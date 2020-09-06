@@ -37,16 +37,16 @@ convo =
     "Just making sure rofl ur turn"]
 
 reverseTaps :: DaPhone -> Char -> [(Digit,Presses)]
-reverseTaps dp wantc =
+reverseTaps d'phone wantc =
   fromJust $ lookup wantc reversed
   where
     reversed :: [(Char,[(Digit,Presses)])]
     reversed = lowers ++ (map upper lowers)
-    lowers = [ (ch, [ (n,i) ] )
-             | (n, abc) <- dp
-             , (ch,i)   <- zip abc [1..]
+    lowers = [ (char, [ (digit, presses) ] )
+             | (digit, abc)     <- d'phone
+             , (char,  presses) <- zip abc [1..]
              ]
-    upper (c,lower) = (toUpper c, reverseTaps dp '^' ++ lower)
+    upper (c,lower) = (toUpper c, reverseTaps d'phone '^' ++ lower)
 
 cellPhonesDead :: DaPhone -> String -> [(Digit, Presses)]
 cellPhonesDead dp s = concat (map (reverseTaps dp) s)

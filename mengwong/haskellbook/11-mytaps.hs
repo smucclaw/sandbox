@@ -41,12 +41,12 @@ reverseTaps dp wantc =
   fromJust $ lookup wantc reversed
   where
     reversed :: [(Char,[(Digit,Presses)])]
-    reversed = lowers ++ (uppers <$> lowers)
-    lowers = [ (c, [ (n,i) ] )
-             | (n,abc) <- dp
-             , (c,i) <- zipWith (,) abc [1..]
+    reversed = lowers ++ (map upper lowers)
+    lowers = [ (ch, [ (n,i) ] )
+             | (n, abc) <- dp
+             , (ch,i)   <- zip abc [1..]
              ]
-    uppers (c,lower) = (toUpper c, reverseTaps dp '^' ++ lower)
+    upper (c,lower) = (toUpper c, reverseTaps dp '^' ++ lower)
 
 cellPhonesDead :: DaPhone -> String -> [(Digit, Presses)]
 cellPhonesDead dp = concatMap $ reverseTaps dp

@@ -46,7 +46,8 @@ reverseTaps d'phone wantc =
              | (digit, abc)     <- d'phone
              , (char,  presses) <- zip abc [1..]
              ]
-    upper (c,lower) = (toUpper c, reverseTaps d'phone '^' ++ lower)
+    upper (char,digitPresses) = (toUpper char
+                                ,reverseTaps d'phone '^' ++ digitPresses)
 
 cellPhonesDead :: DaPhone -> String -> [(Digit, Presses)]
 cellPhonesDead dp s = concat (map (reverseTaps dp) s)

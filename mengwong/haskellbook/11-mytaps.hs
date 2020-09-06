@@ -55,16 +55,17 @@ cellPhonesDead dp s = concat (map (reverseTaps dp) s)
 fingerTaps :: [(Digit,Presses)] -> Presses
 fingerTaps = sum . (fmap snd)
 
+answer input = 
+  let beepboop = cellPhonesDead daPhone input
+  in unlines [ show beepboop 
+             , show (fingerTaps beepboop) ++ " presses" ]
+
 main = do
   forM_ convo (\myline -> do
-                  print $ myline
-                  let beepboop = cellPhonesDead daPhone myline
-                  print $ beepboop
-                  print $ show (fingerTaps beepboop) ++ " presses"
-                  putStrLn ""
+                  putStrLn $ myline
+                  putStrLn $ answer myline
               )
-  interact (unlines
-            . map (\x -> let thang = cellPhonesDead daPhone x
-                         in show thang ++ "\n" ++ (show $ fingerTaps thang))
-            . lines)
+  interact (unlines .
+            map answer .
+            lines)
 

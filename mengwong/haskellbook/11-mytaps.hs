@@ -52,12 +52,19 @@ reverseTaps d'phone wantc =
 cellPhonesDead :: DaPhone -> String -> [(Digit, Presses)]
 cellPhonesDead dp s = concat (map (reverseTaps dp) s)
 
+fingerTaps :: [(Digit,Presses)] -> Presses
+fingerTaps = sum . (fmap snd)
+
 main = do
   forM_ convo (\myline -> do
-                  print myline
-                  print $ cellPhonesDead daPhone myline
+                  print $ myline
+                  let beepboop = cellPhonesDead daPhone myline
+                  print $ beepboop
+                  print $ show (fingerTaps beepboop) ++ " presses"
                   putStrLn ""
               )
-  
-
+  interact (unlines
+            . map (\x -> let thang = cellPhonesDead daPhone x
+                         in show thang ++ "\n" ++ (show $ fingerTaps thang))
+            . lines)
 

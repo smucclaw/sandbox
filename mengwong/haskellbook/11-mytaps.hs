@@ -49,7 +49,7 @@ reverseTaps dp wantc =
     upper (c,lower) = (toUpper c, reverseTaps dp '^' ++ lower)
 
 cellPhonesDead :: DaPhone -> String -> [(Digit, Presses)]
-cellPhonesDead dp = concatMap $ reverseTaps dp
+cellPhonesDead dp s = concat (map (reverseTaps dp) s)
 
 main = do
   forM_ convo (\myline -> do

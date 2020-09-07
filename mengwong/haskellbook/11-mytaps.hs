@@ -41,7 +41,7 @@ reverseTaps d'phone wantc =
   fromJust $ lookup wantc reversed
   where
     reversed :: [(Char,[(Digit,Presses)])]
-    reversed = lowers ++ (map upper lowers)
+    reversed = lowers ++ [ upper l | l <- lowers, fst l /= toUpper (fst l) ]
     lowers = [ (char, [ (digit, presses) ] )
              | (digit, abc)     <- d'phone
              , (char,  presses) <- zip abc [1..]

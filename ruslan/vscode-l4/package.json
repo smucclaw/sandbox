@@ -1,0 +1,25 @@
+{
+    "name": "l4",
+    "displayName": "L4",
+    "description": "Syntax highlighting for L4",
+    "version": "0.0.1",
+    "engines": {
+        "vscode": "^1.49.0"
+    },
+    "categories": [
+        "Programming Languages"
+    ],
+    "contributes": {
+        "languages": [{
+            "id": "l4",
+            "aliases": ["l4", "l4"],
+            "extensions": [".l4"],
+            "configuration": "./language-configuration.json"
+        }],
+        "grammars": [{
+            "language": "l4",
+            "scopeName": "source.l4",
+            "path": "./syntaxes/l4.tmLanguage.json"
+        }]
+    }
+}

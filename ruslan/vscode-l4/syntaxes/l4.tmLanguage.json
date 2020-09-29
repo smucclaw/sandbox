@@ -1,0 +1,70 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "l4",
+	"patterns": [
+		{
+			"include": "#keywords"
+		},
+		{
+			"include": "#strings"
+		}
+		,
+		{
+			"include": "#rule"
+		},
+		{
+			"include": "#party"
+		}
+	],
+	"repository": {
+		"keywords": {
+			"patterns": [{
+				"name": "keyword.other.party.l4",
+				"match": "\\b(EVERYBODY|ANYBODY|EVERYONE|ANYONE|NOBODY|NO-ONE|NOONE|NONE)\\b"
+			},
+			{
+				"name": "keyword.control.l4",
+				"match": "\\b(WHEN|UNLESS|WHERE|OR|HENCE|IS)\\b"
+			},
+			{
+				"name": "keyword.other.deontic.l4",
+				"match": "\\b(MAY|MUST|SHANT)\\b"
+			}]
+		},
+		"strings": {
+			"name": "string.quoted.double.l4",
+			"begin": "\"",
+			"end": "\"",
+			"patterns": [
+				{
+					"name": "constant.character.escape.l4",
+					"match": "\\\\."
+				}
+			]
+		},
+		"rule": {
+			"patterns": [{
+				"name": "meta.entity.rule.l4",
+				"match": "(RULE)\\s+(\\w+)\\s+(\\w+)",
+				"captures" : {
+					"1" : { "name" : "storage.type.rule.l4" },
+					"2" : { "name" :  "entity.name.type"},
+					"3" : { "name" :  "entity.name.class.l4"}
+				 }
+			}]
+		},
+		"party": {
+			"patterns": [{
+				"name": "meta.entity.party.l4",
+				"match": "(PARTY)\\s+(\\w+)\\s+(AS)\\s+(\\w+)",
+				"captures" : {
+					"1" : { "name" : "storage.type.party.l4" },
+					"2" : { "name" :  "entity.name.type"},
+					"3" : { "name" :  "keyword.other"},
+					"4" : { "name" :  "variable.name"}
+				 }
+			}]
+		}
+	},
+	"scopeName": "source.l4"
+}

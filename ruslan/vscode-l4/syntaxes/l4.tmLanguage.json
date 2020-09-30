@@ -13,6 +13,9 @@
 			"include": "#rule"
 		},
 		{
+			"include": "#deontic-limb"
+		},
+		{
 			"include": "#party"
 		}
 	],
@@ -25,10 +28,6 @@
 			{
 				"name": "keyword.control.l4",
 				"match": "\\b(WHEN|UNLESS|WHERE|OR|HENCE|IS)\\b"
-			},
-			{
-				"name": "keyword.other.deontic.l4",
-				"match": "\\b(MAY|MUST|SHANT)\\b"
 			}]
 		},
 		"strings": {
@@ -58,6 +57,25 @@
 			"beginCaptures": {
 				"0": {
 					"name": "storage.type.party.l4"
+				}
+			},
+			"captures": {
+				"0" : {
+					"patterns": [
+						{
+							"include": "#as-alias"
+						}
+					]
+				}
+			}
+		},
+		"deontic-limb": {
+			"name": "meta.deontic.l4",
+			"begin": "(MAY|MUST|SHANT)",
+			"end": "AS\\s+\\w+",
+			"beginCaptures": {
+				"0": {
+					"name": "keyword.other.deontic.l4"
 				}
 			},
 			"captures": {

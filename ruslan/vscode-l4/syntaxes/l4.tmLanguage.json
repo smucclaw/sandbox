@@ -43,27 +43,40 @@
 			]
 		},
 		"rule": {
-			"patterns": [{
-				"name": "meta.entity.rule.l4",
-				"match": "(RULE)\\s+(\\w+)\\s+(\\w+)",
-				"captures" : {
-					"1" : { "name" : "storage.type.rule.l4" },
-					"2" : { "name" :  "entity.name.type"},
-					"3" : { "name" :  "entity.name.class.l4"}
-				 }
-			}]
+			"name": "meta.entity.rule.l4",
+			"match": "(RULE)\\s+(\\w+)\\s+(\\w+)",
+			"captures" : {
+				"1" : { "name" : "storage.type.rule.l4" },
+				"2" : { "name" :  "entity.name.type"},
+				"3" : { "name" :  "entity.name.class.l4"}
+				}
 		},
 		"party": {
-			"patterns": [{
-				"name": "meta.entity.party.l4",
-				"match": "(PARTY)\\s+(\\w+)\\s+(AS)\\s+(\\w+)",
-				"captures" : {
-					"1" : { "name" : "storage.type.party.l4" },
-					"2" : { "name" :  "entity.name.type"},
-					"3" : { "name" :  "keyword.other"},
-					"4" : { "name" :  "variable.name"}
-				 }
-			}]
+			"name": "meta.entity.party.l4",
+			"begin": "PARTY",
+			"end": "AS\\s+\\w+",
+			"beginCaptures": {
+				"0": {
+					"name": "storage.type.party.l4"
+				}
+			},
+			"captures": {
+				"0" : {
+					"patterns": [
+						{
+							"include": "#as-alias"
+						}
+					]
+				}
+			}
+		},
+		"as-alias": {
+			"name": "meta.alias.l4",
+			"match": "(AS)\\s+(\\w+)",
+			"captures" : {
+				"1" : { "name" :  "keyword.other"},
+				"2" : { "name" :  "variable.name"}
+			}
 		}
 	},
 	"scopeName": "source.l4"

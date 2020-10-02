@@ -53,40 +53,42 @@
 		"party": {
 			"name": "meta.entity.party.l4",
 			"begin": "PARTY",
-			"end": "AS\\s+\\w+",
+			"end": "$\\n?",
 			"beginCaptures": {
 				"0": {
 					"name": "storage.type.party.l4"
 				}
 			},
-			"captures": {
-				"0" : {
-					"patterns": [
-						{
-							"include": "#as-alias"
-						}
-					]
+			"patterns": [
+				{
+					"name": "entity.name.class.party.l4",
+					"match": "\\s+(\\w+)\\s+"
+				},
+				{
+					"include": "#as-alias"
 				}
-			}
+			]
 		},
 		"deontic-limb": {
 			"name": "meta.deontic.l4",
-			"begin": "(MAY|MUST|SHANT)",
-			"end": "AS\\s+\\w+",
+			"begin": "(MAY|MUST|SHANT)\\s+(\\w+)\\s+(\\w+)",
+			"end": "$\\n?",
 			"beginCaptures": {
-				"0": {
+				"1": {
 					"name": "keyword.other.deontic.l4"
+				},
+				"2": {
+					"name": "support.function"
+				},
+				"3": {
+					"name": "variable.name"
 				}
 			},
-			"captures": {
-				"0" : {
-					"patterns": [
-						{
-							"include": "#as-alias"
-						}
-					]
+			"patterns": [
+				{
+					"include": "#as-alias"
 				}
-			}
+			]
 		},
 		"as-alias": {
 			"name": "meta.alias.l4",

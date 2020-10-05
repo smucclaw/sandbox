@@ -10,10 +10,29 @@
 		}
 		,
 		{
+			"include": "#comments"
+		}
+		,
+		{
 			"include": "#rule"
 		},
 		{
 			"include": "#deontic-limb"
+		},
+		{
+			"include": "#define-limb"
+		},
+		{
+			"include": "#deadline-limb"
+		},
+		{
+			"include": "#given-limb"
+		},
+		{
+			"include": "#with-limb"
+		},
+		{
+			"include": "#entity"
 		},
 		{
 			"include": "#party"
@@ -27,7 +46,7 @@
 			},
 			{
 				"name": "keyword.control.l4",
-				"match": "\\b(WHEN|UNLESS|WHERE|OR|HENCE|IS)\\b"
+				"match": "\\b(WHEN|UNLESS|WHERE|OR|AND|HENCE|IS|UNLIKELY|LIKELY|HAS|ISA|ARE)\\b"
 			}]
 		},
 		"strings": {
@@ -41,9 +60,13 @@
 				}
 			]
 		},
+		"comments": {
+			"name": "comment.line.double-slash",
+			"match": "//.*$"
+		},
 		"rule": {
 			"name": "meta.entity.rule.l4",
-			"match": "(RULE)\\s+(\\w+)\\s+(\\w+)",
+			"match": "(RULE)\\s+(\\w+)?\\s+(\\w+)",
 			"captures" : {
 				"1" : { "name" : "storage.type.rule.l4" },
 				"2" : { "name" :  "entity.name.type"},
@@ -97,6 +120,76 @@
 				"1" : { "name" :  "keyword.other"},
 				"2" : { "name" :  "variable.name"}
 			}
+		},
+		"when-limb": {
+			"name": "meta.when.l4",
+			"match": "(WHEN)\\s+(\\w+)",
+			"captures" : {
+				"1" : { "name" :  "keyword.other"},
+				"2" : { "name" :  "variable.name"}
+			}
+		}
+		,
+		"define-limb": {
+			"name": "meta.define.l4",
+			"match": "(DEFINE)\\s+(\\w+)",
+			"captures" : {
+				"1" : { "name" :  "keyword.other"},
+				"2" : { "name" :  "variable.name"}
+			}
+		}
+		,
+		"given-limb": {
+			"name": "meta.given.l4",
+			"match": "(GIVEN)\\s+(\\w+)",
+			"captures" : {
+				"1" : { "name" :  "keyword.other"},
+				"2" : { "name" :  "variable.name"}
+			}
+		}
+		,
+		"deadline-limb": {
+			"name": "meta.deadline.l4",
+			"match": "(BEFORE)\\s+(\\w+)",
+			"captures" : {
+				"1" : { "name" :  "keyword.other"},
+				"2" : { "name" :  "variable.name"}
+			}
+		},
+		"with-limb": {
+			"name": "meta.deadline.l4",
+			"match": "(WITH|HAS|TYPE)\\s+(\\w+)",
+			"captures" : {
+				"1" : { "name" :  "keyword.other"},
+				"2" : { "name" :  "variable.name"}
+			}
+		},
+		"entity": {
+			"name": "meta.entity.entity.l4",
+			"begin": "(ENTITY)\\s+(\\w+)",
+			"end": "$\\n?",
+			"beginCaptures": {
+				"1": {
+					"name": "storage.type.party.l4"
+				},
+				"2" : { "name" :  "entity.name.class.l4"}
+			},
+			"patterns": [
+				{
+					"include": "#given-limb"
+				},
+				{
+					"include": "#with-limb"
+				},
+				{
+					"name": "entity.name.class.l4",
+					"match": "(ISA)\\s+(\\w+)",
+					"captures" : {
+						"1" : { "name" :  "keyword.other"},
+						"2" : { "name" :  "variable.name"}
+					}
+				}
+			]
 		}
 	},
 	"scopeName": "source.l4"

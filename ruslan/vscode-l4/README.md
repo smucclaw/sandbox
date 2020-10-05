@@ -1,6 +1,10 @@
-# l4 README
+# L4 README
 
-This is the README for your extension "l4". After writing up a brief description, we recommend including the following sections.
+To use this extention simply run VS code from a checkout folder
+```
+code .
+```
+Then press F5 - another VS Code window will open and in the second VS Code Window open any L4 files
 
 ## Features
 

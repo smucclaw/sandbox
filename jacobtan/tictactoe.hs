@@ -40,3 +40,5 @@ update mark position board =
 startBoard = replicate 9 E
 
 solution = countValidGames O [startBoard]
+
+main = print solution

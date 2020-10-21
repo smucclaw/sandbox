@@ -5,7 +5,7 @@
 - Compile and Run
 
     ```
-     mvn clean package quarkus:dev
+     mvn clean compile quarkus:dev
     ```
 
 - Native Image (requires JAVA_HOME to point to a valid GraalVM)

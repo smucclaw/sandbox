@@ -1,0 +1,10 @@
+POST http://localhost:8080/SAFE HTTP/1.1
+content-type: application/json
+
+{
+    "SAFE":{"ownership":0.2, "cap" : 4000000},
+    "EquityFunding":{
+        "valuation": 5000000,
+        "currentStock":10000000
+    }
+}

@@ -1,0 +1,138 @@
+<dmn:definitions xmlns:dmn="http://www.omg.org/spec/DMN/20180521/MODEL/" xmlns="https://kiegroup.org/dmn/_93516043-DCD5-4D57-B14D-E3941A0DAC8B" xmlns:feel="http://www.omg.org/spec/DMN/20180521/FEEL/" xmlns:kie="http://www.drools.org/kie/dmn/1.2" xmlns:dmndi="http://www.omg.org/spec/DMN/20180521/DMNDI/" xmlns:di="http://www.omg.org/spec/DMN/20180521/DI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" id="_93B58426-4D91-48B0-A19E-893DB2FC9541" name="SAFE" typeLanguage="http://www.omg.org/spec/DMN/20180521/FEEL/" namespace="https://kiegroup.org/dmn/_93516043-DCD5-4D57-B14D-E3941A0DAC8B">
+  <dmn:extensionElements/>
+  <dmn:itemDefinition id="_0D71632D-7B23-42B3-814F-5C4EC5DA1E76" name="tEquityFunding" isCollection="false">
+    <dmn:itemComponent id="_14F0F182-69B9-4748-BD50-F17928B00543" name="currentStock" isCollection="false">
+      <dmn:typeRef>number</dmn:typeRef>
+    </dmn:itemComponent>
+    <dmn:itemComponent id="_286295E9-A800-401F-891A-8C4716C16BF7" name="valuation" isCollection="false">
+      <dmn:typeRef>number</dmn:typeRef>
+    </dmn:itemComponent>
+  </dmn:itemDefinition>
+  <dmn:itemDefinition id="_9C66C722-1471-4E2B-A42B-D875A6213236" name="tSAFE" isCollection="false">
+    <dmn:itemComponent id="_02ACA6E4-D1F5-46CB-A372-ED1ABBF5B306" name="ownership" isCollection="false">
+      <dmn:typeRef>number</dmn:typeRef>
+    </dmn:itemComponent>
+    <dmn:itemComponent id="_6A1F7CDA-9220-4A1B-95E8-515DD298EDD6" name="cap" isCollection="false">
+      <dmn:typeRef>number</dmn:typeRef>
+    </dmn:itemComponent>
+  </dmn:itemDefinition>
+  <dmn:itemDefinition id="_C27D7B2E-C794-4A67-92BC-7235D4F77173" name="tSAFEAllocation" isCollection="false">
+    <dmn:itemComponent id="_8115546A-7271-497B-A768-2BDEF7BA8FA2" name="sharesAllocated" isCollection="false">
+      <dmn:typeRef>number</dmn:typeRef>
+    </dmn:itemComponent>
+    <dmn:itemComponent id="_68DACF78-2011-4251-9C30-BD209E873FAC" name="pricePerShare" isCollection="false">
+      <dmn:typeRef>number</dmn:typeRef>
+    </dmn:itemComponent>
+  </dmn:itemDefinition>
+  <dmn:itemDefinition id="_5DAA2223-4CFE-49EE-A7AB-0BB4C327885C" name="tSAFEFunding" isCollection="false">
+    <dmn:itemComponent id="_ABCDAFA6-7612-46E4-8DC6-DD7A049CCD17" name="safes" isCollection="true">
+      <dmn:typeRef>tSAFE</dmn:typeRef>
+    </dmn:itemComponent>
+  </dmn:itemDefinition>
+  <dmn:inputData id="_DCF76367-DDD6-49C3-A455-912509F5055E" name="EquityFunding">
+    <dmn:extensionElements/>
+    <dmn:variable id="_B54037E0-41E8-420B-9970-3349763455D8" name="EquityFunding" typeRef="tEquityFunding"/>
+  </dmn:inputData>
+  <dmn:inputData id="_5A823AA6-14DE-4DB5-9F95-750A17373955" name="SAFE">
+    <dmn:extensionElements/>
+    <dmn:variable id="_0E0D7D86-68FC-4310-AD5D-607D406C1A25" name="SAFE" typeRef="tSAFE"/>
+  </dmn:inputData>
+  <dmn:decision id="_BB41077A-714E-4792-A935-C296E3B8272A" name="StockAllocation">
+    <dmn:extensionElements/>
+    <dmn:variable id="_4DF3D165-7DA3-4B81-BEA9-635CBFA0FE9B" name="StockAllocation" typeRef="tSAFEAllocation"/>
+    <dmn:informationRequirement id="_65E8CB9E-8347-4664-9FDE-B8CD1F1D5040">
+      <dmn:requiredInput href="#_DCF76367-DDD6-49C3-A455-912509F5055E"/>
+    </dmn:informationRequirement>
+    <dmn:informationRequirement id="_1CDBB1B1-6993-4C05-97B2-BB705188A329">
+      <dmn:requiredInput href="#_5A823AA6-14DE-4DB5-9F95-750A17373955"/>
+    </dmn:informationRequirement>
+    <dmn:decisionTable id="_F921386A-389C-404C-8A3A-078039F84F8F" hitPolicy="UNIQUE" preferredOrientation="Rule-as-Row">
+      <dmn:input id="_1A9F2535-0E40-45FC-BCD2-25F0283FA0E0">
+        <dmn:inputExpression id="_B6124A3A-57F8-47A4-9C49-39AC12EC4719" typeRef="boolean">
+          <dmn:text>EquityFunding.valuation &gt; SAFE.cap</dmn:text>
+        </dmn:inputExpression>
+      </dmn:input>
+      <dmn:output id="_ECDFDE60-BB9F-4ACE-9435-4C423DDCB8F0" name="sharesAllocated" typeRef="number"/>
+      <dmn:output id="_6B05C824-A8BA-46EE-B885-CDB802A42D9F" name="pricePerShare" typeRef="number"/>
+      <dmn:annotation name="annotation-1"/>
+      <dmn:rule id="_CEE649D6-BC4C-462A-A83D-811211EB52C4">
+        <dmn:inputEntry id="_B517B4BE-180F-4760-AB53-0BB42C7E6A3F">
+          <dmn:text>true</dmn:text>
+        </dmn:inputEntry>
+        <dmn:outputEntry id="_7CF829C3-73C1-48E5-B004-976B612CF1C8">
+          <dmn:text>EquityFunding.currentStock*SAFE.ownership</dmn:text>
+        </dmn:outputEntry>
+        <dmn:outputEntry id="_8CFD5BC3-CE29-4FD9-94BD-2920F6A3D45F">
+          <dmn:text>SAFE.cap*SAFE.ownership</dmn:text>
+        </dmn:outputEntry>
+        <dmn:annotationEntry>
+          <dmn:text/>
+        </dmn:annotationEntry>
+      </dmn:rule>
+      <dmn:rule id="_321CCDB1-C53D-495A-B61E-A6C9BF5A8A23">
+        <dmn:inputEntry id="_E2089C0E-D7DA-4B04-83B4-CE8611FA9978">
+          <dmn:text>false</dmn:text>
+        </dmn:inputEntry>
+        <dmn:outputEntry id="_07DE7BAE-5255-4781-94D3-2D26D8313F8A">
+          <dmn:text>EquityFunding.currentStock*SAFE.ownership</dmn:text>
+        </dmn:outputEntry>
+        <dmn:outputEntry id="_1E9999F2-3EB5-4A62-AA4A-ACD58A348914">
+          <dmn:text>EquityFunding.valuation*SAFE.ownership</dmn:text>
+        </dmn:outputEntry>
+        <dmn:annotationEntry>
+          <dmn:text/>
+        </dmn:annotationEntry>
+      </dmn:rule>
+    </dmn:decisionTable>
+  </dmn:decision>
+  <dmndi:DMNDI>
+    <dmndi:DMNDiagram id="_9C3B9E5D-2868-4577-B39F-8F01AE37CCC9" name="DRG">
+      <di:extension>
+        <kie:ComponentsWidthsExtension>
+          <kie:ComponentWidths dmnElementRef="_F921386A-389C-404C-8A3A-078039F84F8F">
+            <kie:width>50</kie:width>
+            <kie:width>307</kie:width>
+            <kie:width>402</kie:width>
+            <kie:width>491</kie:width>
+            <kie:width>100</kie:width>
+          </kie:ComponentWidths>
+        </kie:ComponentsWidthsExtension>
+      </di:extension>
+      <dmndi:DMNShape id="dmnshape-drg-_DCF76367-DDD6-49C3-A455-912509F5055E" dmnElementRef="_DCF76367-DDD6-49C3-A455-912509F5055E" isCollapsed="false">
+        <dmndi:DMNStyle>
+          <dmndi:FillColor red="255" green="255" blue="255"/>
+          <dmndi:StrokeColor red="0" green="0" blue="0"/>
+          <dmndi:FontColor red="0" green="0" blue="0"/>
+        </dmndi:DMNStyle>
+        <dc:Bounds x="422" y="436" width="100" height="50"/>
+        <dmndi:DMNLabel/>
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="dmnshape-drg-_5A823AA6-14DE-4DB5-9F95-750A17373955" dmnElementRef="_5A823AA6-14DE-4DB5-9F95-750A17373955" isCollapsed="false">
+        <dmndi:DMNStyle>
+          <dmndi:FillColor red="255" green="255" blue="255"/>
+          <dmndi:StrokeColor red="0" green="0" blue="0"/>
+          <dmndi:FontColor red="0" green="0" blue="0"/>
+        </dmndi:DMNStyle>
+        <dc:Bounds x="680" y="429" width="100" height="50"/>
+        <dmndi:DMNLabel/>
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="dmnshape-drg-_BB41077A-714E-4792-A935-C296E3B8272A" dmnElementRef="_BB41077A-714E-4792-A935-C296E3B8272A" isCollapsed="false">
+        <dmndi:DMNStyle>
+          <dmndi:FillColor red="255" green="255" blue="255"/>
+          <dmndi:StrokeColor red="0" green="0" blue="0"/>
+          <dmndi:FontColor red="0" green="0" blue="0"/>
+        </dmndi:DMNStyle>
+        <dc:Bounds x="571" y="210" width="100" height="50"/>
+        <dmndi:DMNLabel/>
+      </dmndi:DMNShape>
+      <dmndi:DMNEdge id="dmnedge-drg-_65E8CB9E-8347-4664-9FDE-B8CD1F1D5040" dmnElementRef="_65E8CB9E-8347-4664-9FDE-B8CD1F1D5040">
+        <di:waypoint x="472" y="461"/>
+        <di:waypoint x="621" y="235"/>
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="dmnedge-drg-_1CDBB1B1-6993-4C05-97B2-BB705188A329" dmnElementRef="_1CDBB1B1-6993-4C05-97B2-BB705188A329">
+        <di:waypoint x="730" y="454"/>
+        <di:waypoint x="621" y="235"/>
+      </dmndi:DMNEdge>
+    </dmndi:DMNDiagram>
+  </dmndi:DMNDI>
+</dmn:definitions>

@@ -1,13 +1,10 @@
-package sg.edu.smu.cclaw.calc;
+package calc;
 
+import calc.*;
 import java.io.*;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.*;
-import sg.edu.smu.cclaw.calc.Absyn.Exp;
-import sg.edu.smu.cclaw.calcLexer;
-import sg.edu.smu.cclaw.calcParser;
-
 import java.util.*;
 
 class TestError extends RuntimeException
@@ -67,13 +64,13 @@ public class Test
             p.addErrorListener(new BNFCErrorListener());
   }
 
-  public Exp parse() throws Exception
+  public calc.Absyn.Exp parse() throws Exception
   {
     /* The default parser is the first-defined entry point. */
     /* Other options are: */
     /*  */
     calcParser.Start_ExpContext pc = p.start_Exp();
-    Exp ast = pc.result;
+    calc.Absyn.Exp ast = pc.result;
     System.out.println();
     System.out.println("Parse Succesful!");
     System.out.println();

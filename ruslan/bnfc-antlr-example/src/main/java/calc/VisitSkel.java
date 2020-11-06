@@ -1,6 +1,4 @@
-package sg.edu.smu.cclaw.calc;
-
-import sg.edu.smu.cclaw.calc.Absyn.*;
+package calc;
 
 /*** BNFC-Generated Visitor Design Pattern Skeleton. ***/
 
@@ -12,33 +10,33 @@ import sg.edu.smu.cclaw.calc.Absyn.*;
 
 public class VisitSkel
 {
-  public class ExpVisitor<R,A> implements Exp.Visitor<R,A>
+  public class ExpVisitor<R,A> implements calc.Absyn.Exp.Visitor<R,A>
   {
-    public R visit(EAdd p, A arg)
+    public R visit(calc.Absyn.EAdd p, A arg)
     { /* Code for EAdd goes here */
       p.exp_1.accept(new ExpVisitor<R,A>(), arg);
       p.exp_2.accept(new ExpVisitor<R,A>(), arg);
       return null;
     }
-    public R visit(ESub p, A arg)
+    public R visit(calc.Absyn.ESub p, A arg)
     { /* Code for ESub goes here */
       p.exp_1.accept(new ExpVisitor<R,A>(), arg);
       p.exp_2.accept(new ExpVisitor<R,A>(), arg);
       return null;
     }
-    public R visit(EMul p, A arg)
+    public R visit(calc.Absyn.EMul p, A arg)
     { /* Code for EMul goes here */
       p.exp_1.accept(new ExpVisitor<R,A>(), arg);
       p.exp_2.accept(new ExpVisitor<R,A>(), arg);
       return null;
     }
-    public R visit(EDiv p, A arg)
+    public R visit(calc.Absyn.EDiv p, A arg)
     { /* Code for EDiv goes here */
       p.exp_1.accept(new ExpVisitor<R,A>(), arg);
       p.exp_2.accept(new ExpVisitor<R,A>(), arg);
       return null;
     }
-    public R visit(EInt p, A arg)
+    public R visit(calc.Absyn.EInt p, A arg)
     { /* Code for EInt goes here */
       //p.integer_;
       return null;

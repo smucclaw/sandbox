@@ -1,6 +1,4 @@
-package sg.edu.smu.cclaw.calc;
-
-import sg.edu.smu.cclaw.calc.Absyn.*;
+package calc;
 
 public class PrettyPrinter
 {
@@ -69,7 +67,7 @@ public class PrettyPrinter
 
 
   //  print and show methods are defined for each category.
-  public static String print(Exp foo)
+  public static String print(calc.Absyn.Exp foo)
   {
     pp(foo, 0);
     trim();
@@ -77,7 +75,7 @@ public class PrettyPrinter
     buf_.delete(0,buf_.length());
     return temp;
   }
-  public static String show(Exp foo)
+  public static String show(calc.Absyn.Exp foo)
   {
     sh(foo);
     String temp = buf_.toString();
@@ -86,47 +84,47 @@ public class PrettyPrinter
   }
   /***   You shouldn't need to change anything beyond this point.   ***/
 
-  private static void pp(Exp foo, int _i_)
+  private static void pp(calc.Absyn.Exp foo, int _i_)
   {
-    if (foo instanceof EAdd)
+    if (foo instanceof calc.Absyn.EAdd)
     {
-       EAdd _eadd = (EAdd) foo;
+       calc.Absyn.EAdd _eadd = (calc.Absyn.EAdd) foo;
        if (_i_ > 0) render(_L_PAREN);
        pp(_eadd.exp_1, 0);
        render("+");
        pp(_eadd.exp_2, 1);
        if (_i_ > 0) render(_R_PAREN);
     }
-    else     if (foo instanceof ESub)
+    else     if (foo instanceof calc.Absyn.ESub)
     {
-       ESub _esub = (ESub) foo;
+       calc.Absyn.ESub _esub = (calc.Absyn.ESub) foo;
        if (_i_ > 0) render(_L_PAREN);
        pp(_esub.exp_1, 0);
        render("-");
        pp(_esub.exp_2, 1);
        if (_i_ > 0) render(_R_PAREN);
     }
-    else     if (foo instanceof EMul)
+    else     if (foo instanceof calc.Absyn.EMul)
     {
-       EMul _emul = (EMul) foo;
+       calc.Absyn.EMul _emul = (calc.Absyn.EMul) foo;
        if (_i_ > 1) render(_L_PAREN);
        pp(_emul.exp_1, 1);
        render("*");
        pp(_emul.exp_2, 2);
        if (_i_ > 1) render(_R_PAREN);
     }
-    else     if (foo instanceof EDiv)
+    else     if (foo instanceof calc.Absyn.EDiv)
     {
-       EDiv _ediv = (EDiv) foo;
+       calc.Absyn.EDiv _ediv = (calc.Absyn.EDiv) foo;
        if (_i_ > 1) render(_L_PAREN);
        pp(_ediv.exp_1, 1);
        render("/");
        pp(_ediv.exp_2, 2);
        if (_i_ > 1) render(_R_PAREN);
     }
-    else     if (foo instanceof EInt)
+    else     if (foo instanceof calc.Absyn.EInt)
     {
-       EInt _eint = (EInt) foo;
+       calc.Absyn.EInt _eint = (calc.Absyn.EInt) foo;
        if (_i_ > 2) render(_L_PAREN);
        pp(_eint.integer_, 0);
        if (_i_ > 2) render(_R_PAREN);
@@ -134,47 +132,47 @@ public class PrettyPrinter
   }
 
 
-  private static void sh(Exp foo)
+  private static void sh(calc.Absyn.Exp foo)
   {
-    if (foo instanceof EAdd)
+    if (foo instanceof calc.Absyn.EAdd)
     {
-       EAdd _eadd = (EAdd) foo;
+       calc.Absyn.EAdd _eadd = (calc.Absyn.EAdd) foo;
        render("(");
        render("EAdd");
        sh(_eadd.exp_1);
        sh(_eadd.exp_2);
        render(")");
     }
-    if (foo instanceof ESub)
+    if (foo instanceof calc.Absyn.ESub)
     {
-       ESub _esub = (ESub) foo;
+       calc.Absyn.ESub _esub = (calc.Absyn.ESub) foo;
        render("(");
        render("ESub");
        sh(_esub.exp_1);
        sh(_esub.exp_2);
        render(")");
     }
-    if (foo instanceof EMul)
+    if (foo instanceof calc.Absyn.EMul)
     {
-       EMul _emul = (EMul) foo;
+       calc.Absyn.EMul _emul = (calc.Absyn.EMul) foo;
        render("(");
        render("EMul");
        sh(_emul.exp_1);
        sh(_emul.exp_2);
        render(")");
     }
-    if (foo instanceof EDiv)
+    if (foo instanceof calc.Absyn.EDiv)
     {
-       EDiv _ediv = (EDiv) foo;
+       calc.Absyn.EDiv _ediv = (calc.Absyn.EDiv) foo;
        render("(");
        render("EDiv");
        sh(_ediv.exp_1);
        sh(_ediv.exp_2);
        render(")");
     }
-    if (foo instanceof EInt)
+    if (foo instanceof calc.Absyn.EInt)
     {
-       EInt _eint = (EInt) foo;
+       calc.Absyn.EInt _eint = (calc.Absyn.EInt) foo;
        render("(");
        render("EInt");
        sh(_eint.integer_);

@@ -38,6 +38,10 @@
             <goals>
               <goal>antlr4</goal>
             </goals>
+            <configuration>
+              <sourceDirectory>src/main/java</sourceDirectory>
+              <visitor>true</visitor>
+            </configuration>
           </execution>
         </executions>
       </plugin>

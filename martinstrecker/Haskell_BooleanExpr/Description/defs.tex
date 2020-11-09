@@ -1,0 +1,67 @@
+%======================================================================
+%%%%%%%%% DECLS / DEFNS %%%%%%%%%%%%%%%%%
+
+% redefine existing green color
+\newcommand{\brightgreen}[1]{{\color{green}#1}}
+\definecolor{darkgreen}{rgb}{0,0.7,0}
+\newcommand{\green}[1]{{\color{darkgreen}#1}}
+
+\newcommand{\blue}[1]{{\color{blue}#1}}
+%\newcommand{\green}[1]{{\color{green}#1}}
+\newcommand{\red}[1]{{\color{red}#1}}
+\newcommand{\yellow}[1]{{\color{yellow}#1}}
+\definecolor{grey}{rgb}{0.5,0.5,0.5}
+\newcommand{\grey}[1]{{\color{grey}#1}}
+\newcommand{\black}[1]{{\color{black}#1}}
+
+% Logique
+\newcommand{\IMPL}[0]{\longrightarrow}
+\newcommand{\IMPLL}[0]{\Longrightarrow} % another implication, to make
+                                % a difference with reduction relations
+\newcommand{\AND}[0]{\land}
+\newcommand{\OR}[0]{\lor}
+\newcommand{\NOT}[0]{\lnot}
+\newcommand{\FALSE}[0]{\perp}
+\newcommand{\TRUE}[0]{\top}
+\newcommand{\IFF}[0]{\leftrightarrow}
+\newcommand{\BIGAND}[1]{\bigwedge_{#1}}
+\newcommand{\BIGOR}[1]{\bigvee_{#1}}
+\newcommand{\BIGANDC}[2]{\bigwedge_{#1|#2}} % bigand with constraint
+\newcommand{\BIGORC}[2]{\bigvee_{#1|#2}}    % bigor with constraint
+\newcommand{\ufb}[0]{\mbox{$\stackrel{?}{=}$}} % unifiable
+
+% semantique
+\newcommand{\semtrans}[3]{\mbox{$\langle #1, #2 \rangle \rightarrow #3$}}
+\newcommand{\statesel}[2]{\mbox{$#1 . #2$}}
+\newcommand{\stateupd}[3]{\mbox{$#1 . #2 \leftarrow #3$}}
+
+
+% Macros for mathematical notation
+
+\def\N{{\mathbf N}}                      % ensemble des entiers naturels
+\def\Z{{\mathbf Z}}                      % ensemble des entiers relatifs
+\newcommand{\zmod}[1]{\mbox{$ \Z/{#1} \Z$}}  % anneau Z mod m
+
+
+% WP-calcul
+\newcommand{\wpform}[1]{\mbox{\{\( #1 \)\} }}
+\newcommand{\subst}[3]{ #1 [ #2 \mbox{$\leftarrow\ $} #3]}
+\newcommand{\pfp}[2]{\mbox{\emph{pfp}(\texttt{#1}, \mbox{$#2$})}}
+\newcommand{\evb}[1]{\emph{évaluable}($#1$)}
+
+% special references
+\newcommand{\secref}[1]{\S~\ref{#1}}
+\newcommand{\transpref}[1]{transparent, p.~\ref{#1}}
+
+
+\newtheorem{theorem}{Théorème}
+\newtheorem{lemma}{Lemme}
+\newtheorem{definition}{Définition}
+\newtheorem{logic}{Principe}
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "main"
+%%% coding: utf-8
+%%% End: 

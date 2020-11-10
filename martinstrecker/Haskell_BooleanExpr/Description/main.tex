@@ -1,0 +1,527 @@
+\documentclass[english]{article}
+
+\input{settings}
+\input{defs}
+
+% Ligne commentée: avec solutions; ligne non commentée: sans solutions
+% État par défaut (commit dans le dépôt): décommenté, pour éviter une fuite
+% des solutions aux étudiants.
+\excludecomment{solution}
+
+\begin{document}
+
+\begin{center}
+  {\LARGE Propositional Formulas in Haskell}
+\end{center}
+
+
+%----------------------------------------------------------------------
+\section{Context}\label{sec:context}
+
+The following mini-project is meant to provide an illustration for the
+data types and pattern matching as used in Haskell. At the same time, it deals with
+transformations of (natural or artificial) languages, which is central to the
+L4 project.
+
+Specifically, we will look at manipulating propositional formulas in
+Haskell. The concept appears under various names, such as Boolean
+Algebra\footnote{\url{https://en.wikipedia.org/wiki/Boolean_algebra}} or
+Propositional Logic\footnote{same Wikipedia page, or also
+  \url{https://en.wikipedia.org/wiki/Propositional_calculus}}. If you have
+never in your life heard of them, you should read the introductory sections of
+the mentioned Wikipedia pages, but no in-depth knowledge of logic is required
+in the following.
+
+Manipulating languages in a computer is not intrinsically difficult, but it
+can be bewilderingly confusing because you deal with at least two
+languages: the one used for programming (Haskell in our case) and the
+language(s) you manipulate (you could for example translate Java to C). To
+make things worse, the same language can appear in both roles (you can write a
+Haskell compiler in Haskell).
+
+To keep the two levels separate, we will use the following terminology:
+\begin{itemize}
+\item We will talk about \emph{Boolean expressions} when referring to the
+  language features present in the Haskell programming language. Examples are
+  \texttt{True \&\& False} or also \texttt{(a \&\& not b) || c}.
+\item We will talk about \emph{Boolean formulas} when referring to the
+  language elements that we want to represent and manipulate in Haskell. In
+  print, we will use conventional mathematical notation: $\TRUE$ for ``true'',
+  $\FALSE$ for ``false'', $\NOT$ for ``not'', $\AND$ for ``and'', $\OR$ for
+  ``or''. Written as formulas, the above two expressions become $\TRUE \AND
+  \FALSE$ and $(a \AND \NOT b) \OR c$. Further below, we will develop an
+  internal representation for Boolean formulas.
+\end{itemize}
+
+
+
+%----------------------------------------------------------------------
+\section{Representing Boolean Formulas}
+
+Boolean formulas can represent simple factual statements, and we want to
+reason about these statements and, in particular, know whether they are
+``true'' (this notion is more complex than it seems, see \secref{sec:evaluating_overview}).
+For example, $\TRUE \AND \FALSE$ is always false. To confirm it, you can type the
+corresponding expression into Haskell:
+
+\begin{lstlisting}
+> True && False
+False
+\end{lstlisting}
+
+Similarly, $r \AND \NOT r$ is always false - if $r$ means ``it rains'', it is
+clear that it cannot rain and not rain at the same time. Now, type the
+expression \texttt{r \&\& not r} into Haskell and see what happens - certainly
+not what you want.
+
+We will now conceive a representation of formulas in Haskell. Under this
+representation, $\TRUE \AND \FALSE$ will be \texttt{(C True) `And` (C False)}
+and $r \AND \NOT r$ will be \texttt{V "r" `And` (Not (V "r"))}.\footnote{The
+  word \texttt{And} is surrounded by back-quotes (slanted rightwards) and not
+  straight quotes. When copy-pasting from a PDF document, you sometimes have
+  to modify them manually.} After definition of the corresponding data type,
+you can type these expressions into Haskell, and nothing evil happens. To say
+the truth, nothing happens at all - we will have to tell Haskell what to do
+with these formulas, see \secref{sec:manipulating} and
+\secref{sec:evaluating}.
+
+We will first develop a type \texttt{Form} of formulas. It will be very similar
+to the \texttt{Expr} type you find in the Haskell book (p. 416). The
+\texttt{Form} type has five \emph{constructors}, roughly corresponding to
+$\TRUE, \FALSE, \NOT, \AND, \OR$. However, we will combine $\TRUE$ and
+$\FALSE$ into the constructor \texttt{C} (for constant), which takes a
+\texttt{Bool} as argument, and we also have to
+have to represent variables, for which we use the constructor \texttt{V},
+which takes a string (the variable name) as argument. 
+
+\begin{exo}\label{exo:formula_representation}
+Define the data type \texttt{Form}. Make sure that you can type in Haskell
+formulas, such as the one
+corresponding to $(a \AND \NOT b) \OR c \OR \FALSE$:
+\begin{lstlisting}
+> ((V "a" `And` (Not (V "b"))) `Or` ((V "c") `Or` (C False)))
+Or (And (V "a") (Not (V "b"))) (Or (V "c") (C False))
+\end{lstlisting}
+
+\emph{Hint:} your definition should look something like the following, with \texttt{...} to
+be filled in:
+\begin{lstlisting}
+data Form
+  = ...
+  | Form `Or` Form
+  deriving (Eq, Ord, Show, Read)
+\end{lstlisting}
+\end{exo}
+Some further remarks:
+\begin{itemize}
+\item In Haskell, you can convert a \emph{prefix} function symbol (like
+  \texttt{And}, that precedes its arguments) into an \emph{infix} function
+  symbol (that is surrounded by its arguments) by including it into
+  back-quotes. 
+\item \emph{And} and \emph{or} are naturally associative -- you can parenthesise
+  them either way: $a \AND b \AND c$ ``is the same as'' $(a \AND b) \AND c$ or
+  $a \AND (b \AND c)$. In the internal Haskell representation, we have to be
+  more precise and put the parentheses explicitly.
+\end{itemize}
+
+Sure enough, it is tedious to have a rather complex Haskell representation for
+a formula that looks rather simple in print. Converting a print / textual
+representation into the internal Haskell representation is the job of a
+\emph{parser}\footnote{We can maybe have a follow-up exercise sheet on
+  parsing.}.
+
+\begin{exo}\label{exo:const_var_constructors}
+Make sure you understand why it is necessary to wrap Boolean constants into
+\texttt{C} and variables into \texttt{V}:
+\begin{itemize}
+\item Why can't we write \texttt{True `And` False} but have to write
+  \texttt{(C True) `And` (C False)}? 
+\item Why can't we write \texttt{r `And` (Not r)} but have to write
+  \texttt{V "r" `And` (Not (V "r"))}? 
+\end{itemize}
+Typing the ``wrong'' formulas into the Haskell interpreter might give you an
+idea ...
+\end{exo}
+
+
+
+%----------------------------------------------------------------------
+\section{Manipulating Boolean Formulas}\label{sec:manipulating}
+
+%......................................................................
+\subsection{Simplifying Constants}\label{sec:simplif_const}
+
+The first formula manipulation will be to simplify expressions by eliminating
+constants in formulas. For example, $a \AND \TRUE$ is equivalent to $a$. It is
+here necessary to make a careful distinction between two notions of equality:
+\begin{itemize}
+\item $a \AND \TRUE$ and $a$ are structurally not the same formula
+  (\emph{syntactically}, they are different). In Haskell:
+  \begin{lstlisting}
+> ((V "a") `And` (C True)) == (V "a")
+False
+  \end{lstlisting}
+\item but $a \AND \TRUE$ and $a$ have the same meaning (\emph{semantic
+    equivalence}). For equivalence, we also use the symbol $\equiv$.
+\end{itemize}
+
+The aim of the following exercises is to eliminate constants $\TRUE$ and
+$\FALSE$ from a formula, using equivalences such as $f \AND \TRUE \equiv f$ or
+$\FALSE \AND f \equiv \FALSE$. In the end of the process, we will obtain a
+formula containing no more constants (unless the formula is constantly $\TRUE$
+or $\FALSE$).
+
+We proceed in two stages. Let us first write a function \texttt{removeConst ::
+  Form -> Form} that eliminates constants occurring in combination with the
+unary operator $\NOT$ or the binary operators $\AND$ and $\OR$.
+The clauses corresponding to the above two equivalences are:
+
+\begin{lstlisting}
+removeConst (f `And` (C True)) = f
+removeConst ((C False) `And` f) = (C False)
+\end{lstlisting}
+You see that pattern matching comes in handy to enumerate the possible cases.
+
+\begin{exo}\label{exo:removeConst}
+Complete the definition of \texttt{removeConst}, by systematically exploring
+all possible combinations (2 for $\NOT$, 4 each for $\AND$ and $\OR$). You
+will need one final catch-all clause that covers the case where a formula is
+neither of the preceding forms:
+\begin{lstlisting}
+removeConst f = f
+\end{lstlisting}
+What happens if you put this as the first clause and not the last clause?
+Make sure you understand why the ordering of the clauses matters.
+\end{exo}
+
+When testing this function, you will see that \texttt{((V "a") `And` ((C
+  False) `Or` (C True)))} is not simplified. What is going wrong? 
+The problem is that \texttt{removeConst} only simplifies away constants that occur
+at the top level but not more deeply inside formulas. For this to happen, we
+have to proceed to the second stage of the simplification process, for which
+we write function \texttt{simplifyConst :: Form -> Form}. The strategy will be
+to recursively simplify sub-formulas (returning a constant-free formula or
+$\TRUE$ or $\FALSE$) and then to remove possible constants at the top level
+with \texttt{removeConst}. Here is the clause for \texttt{And}:
+\begin{lstlisting}
+simplifyConst (f1 `And` f2) = removeConst ((simplifyConst f1) `And` (simplifyConst f2))
+\end{lstlisting}
+
+
+\begin{exo}\label{exo:simplifyConst}
+Complete the definition of \texttt{simplifyConst}. 
+\end{exo}
+
+We now get the expected behaviour:
+\begin{lstlisting}
+> simplifyConst ((V "a") `And` ((C False) `Or` (C True)))
+V "a"
+\end{lstlisting}
+
+
+
+%......................................................................
+\subsection{Normal Forms}\label{sec:normal_forms}
+
+Removing constants as in \secref{sec:simplif_const} is a first step in a
+process to derive normal forms that can be processed by more efficient methods
+to check the truth of formulas. The following exercises
+provide some more (optional) training material on manipulating formulas
+without providing essential new insights. If you like, you can directly move to
+\secref{sec:evaluating} for a more elementary method for checking the truth of formulas.
+
+\paragraph{Negation normal form (nnf)} The \emph{nnf} of a formula is a form
+where all negations $\NOT$ are pushed as far inside a formula as possible. For
+computing it, one
+repeatedly applies the following equivalences:
+\begin{itemize}
+\item $\NOT \NOT f \equiv f$
+\item $\NOT (f_1 \AND f_2) \equiv (\NOT f_1) \OR (\NOT f_2)$
+\item $\NOT (f_1 \OR f_2) \equiv (\NOT f_1) \AND (\NOT f_2)$
+\end{itemize}
+
+\begin{exo}\label{exo:nnf}
+  Write the function \texttt{nnf :: Form -> Form} that computes the \emph{nnf}
+  of a formula. The definition is rather straightforward, but do not forget to
+  propagate negations also in nested subformulas, by recursive calls. You may
+  assume that constants have already been removed as of
+  \secref{sec:simplif_const}, which reduces the number of patterns you have to
+  consider.
+\end{exo}
+
+\noindent
+\emph{Example:}
+\begin{lstlisting}
+> nnf (Not ((V "a") `And` ((V "b") `Or` (Not (V "a")))))
+Not (V "a") `Or` (Not (V "b") `And` V "a")
+\end{lstlisting}
+As you see, the \emph{nnf} is characterized by the fact that negations can
+only occur directly in front of variables.
+
+
+\paragraph{Conjunctive normal form (cnf)} The \emph{cnf} of a formula is a
+``polynomial'' representation of a formula in which all the disjunctions
+($\OR$) have been distributed over the conjunctions ($\AND$) so that a formula
+is a conjunction of disjunctions of literals (where a literal is a variable or
+a negated variable).
+
+For this, one exhaustively applies the following equivalences:
+\begin{itemize}
+\item $p \OR (q \AND r) \equiv (p \OR q) \AND (p \OR r)$
+\item $(q \AND r) \OR p  \equiv (q \OR p) \AND (r \OR p)$
+\end{itemize}
+
+\begin{exo}\label{exo:cnf}
+Write function \texttt{cnf :: Form -> Form} that computes the \emph{cnf} of a
+formula.
+
+\emph{Hint:} it may be useful to define a non-recursive auxiliary function
+\texttt{distribOr :: Form -> Form -> Form} that distributes an \texttt{Or} over an \texttt{And}
+according to the above two equations, so that \texttt{distribOr f1 f2} is
+equivalent to \texttt{f1 `Or` f2} and such that the result is in \emph{cnf} if
+both of \texttt{f1} and \texttt{f2} are. The method is analogous to the
+interplay of \texttt{removeConst} and \texttt{simplifyConst} in \secref{sec:simplif_const}.
+\end{exo}
+
+
+\noindent
+\emph{Example:}
+\begin{lstlisting}
+> cnf ((V "a" `And` V "b") `Or` (V "c" `And` V "d"))
+((V "a" `Or` V "c") `And` (V "b" `Or` V "c")) `And`
+((V "a" `Or` V "d") `And` (V "b" `Or` V "d"))
+\end{lstlisting}
+
+Well, these formulas are not very readable. We have converted $(a \AND b) \OR (c \AND d)$ into
+$(a \OR c) \AND (b \OR c) \AND (a \OR d) \AND (b \OR d)$ (omitting some
+parentheses so that the structure of the \emph{cnf} becomes clearer).
+
+
+%----------------------------------------------------------------------
+\section{Evaluating Boolean Formulas}\label{sec:evaluating}
+
+% ......................................................................
+\subsection{Overview}\label{sec:evaluating_overview}
+
+In this section, we will explore how to find out whether a Boolean formula
+is ``true''. The method chosen is not the most efficient one, but we can use
+previously defined functions such as the ones of \secref{sec:simplif_const}.
+
+We will illustrate the procedure with the formula $a \AND (\NOT a \OR \NOT b)$. It
+cannot be simplified in an obvious way, because it contains variables $a$ and
+$b$. To find out whether it could be true, let's replace $a$ by $\TRUE$, which
+yields $\TRUE \AND (\NOT \TRUE \OR \NOT b)$. We could in principle simplify
+this formula, but it still depends on $b$, so we repeat the process (for
+example replacing $b$ by $\FALSE$), to obtain $\TRUE \AND (\NOT \TRUE \OR \NOT
+\FALSE)$. And indeed, this formula simplifies to $\TRUE$.
+
+Could we say that the formula is ``true''? Certainly if $a=\TRUE, b=\FALSE$, but
+not under all circumstances, because for $a=\TRUE, b=\TRUE$, the formula is
+equivalent to $\FALSE$. In logic, an assignment of values to variables such as
+$a=\TRUE, b=\FALSE$ is called a \emph{valuation}. With this notion, we can
+give a more differentiated definition of what it means for a formula to be
+``true'':
+\begin{itemize}
+\item A formula is called \emph{valid} if it is true for every valuation, for
+  example $a \OR b \OR \NOT a$ (try it out, by simplifying it with the 4
+  possible valuations). 
+\item A formula is called \emph{satisfiable} if it is true for at least one
+  valuation, for example $a \AND (\NOT a \OR \NOT b)$. A valid formula is a
+  special case of a satisfiable formula. Formulas that are satisfiable but not
+  valid are sometimes called
+  \emph{contingent}\footnote{\url{https://en.wikipedia.org/wiki/Contingency_(philosophy)}}. 
+\item A formula is called \emph{unsatisfiable} if it is true for no valuation,
+  such as for example $a \AND \NOT a$.
+\end{itemize}
+A valuation that makes a formula true is also called a \emph{model} of the
+formula (so $a=\TRUE, b=\FALSE$ is a model of $a \AND (\NOT a \OR \NOT b)$),
+and the process of verifying whether a valuation is a model is called
+\emph{model checking}. In the following, we will systematically enumerate all
+possible valuations to determine the truth status of a given formula.
+
+
+% ......................................................................
+\subsection{Auxiliary Functions}\label{sec:evaluating_aux}
+
+We  first need to find out what the variables of a formula are.
+
+\begin{exo}\label{exo:fvList}
+Write the function  \texttt{fvList :: Form -> [String]} that returns a list of the
+variable names of the formula (\texttt{fv} is for ``free variables''). 
+
+\emph{Hint:} The arguably most difficult cases are the binary operators. Take
+the example of the formula $a \AND (\NOT a \OR \NOT b)$. A recursive call of
+\texttt{fvList} on the left subformula yields \texttt{["a"]}; for the right
+subformula, you get \texttt{["a", "b"]}. Concatenating these two lists with
+\texttt{++} is a good idea, but you will now have two occurrences of
+\texttt{"a"} in the result. To remove duplicates, use the built-in function
+\texttt{nub}. For this, you will have to \texttt{import Data.List} at the
+beginning of the module.
+\end{exo}
+
+\noindent
+\emph{Example:}
+\begin{lstlisting}
+> fv (V "a" `And` (Not (V "a") `Or` (Not (V "b"))))
+["a","b"]
+\end{lstlisting}
+
+
+We then need a function to replace a variable by a constant in a formula. This
+function will be called \texttt{subst} (for substitution), and it has type
+\texttt{Form -> (String, Bool) -> Form}, where the second argument is a
+(variable name, value) pair. Alternatively, we could have chosen the type
+\texttt{Form -> String -> Bool -> Form}, but the first type is a better fit
+for our representation of valuations later on.
+
+\begin{exo}\label{exo:subst}
+Code function \texttt{subst}, which is a relatively straightforward traversal
+of the formula structure. The only difficult case is the variable case, where
+you have to make a case distinction. For
+example, \texttt{subst (V "a") ("b", True)} should return the same variable:
+\texttt{(V "a")}, whereas \texttt{subst (V "b") ("b", True)} should return
+\texttt{C True}. 
+\end{exo}
+
+\noindent
+\emph{Example:}
+\begin{lstlisting}
+> subst (V "a" `And` (Not (V "a") `Or` (Not (V "b")))) ("a", True)
+C True `And` (Not (C True) `Or` Not (V "b"))
+\end{lstlisting}
+
+We will represent a valuation by a list of pairs (variable, value). The
+valuation $a=\TRUE, b=\FALSE$ will thus be written as \texttt{[("a", True),
+  ("b", False)]}. Whereas \texttt{subst} substituted a single value for a
+single variable, the following \texttt{substAll} substitutes a valuation in a
+formula.
+
+\begin{exo}\label{sec:substAll}
+Code function \texttt{substAll :: Form -> [(String, Bool)] -> Form}. Use
+function \texttt{subst} in your definition. You can either make an explicit
+recursion over the (variable, value) list; or you can take a very close look
+at the predefined function \texttt{foldl} and see how it can be used to define
+\texttt{substAll}. In its most cut-down version, the definition is just two words!
+\end{exo}
+
+\noindent
+\emph{Example:}
+\begin{lstlisting}
+> substAll (V "a" `And` (Not (V "a") `Or` (Not (V "b")))) [("a", True), ("b", False)]
+C True `And` (Not (C True) `Or` Not (C False))
+\end{lstlisting}
+
+\begin{exo}\label{exo:evalSubst}
+Write function \texttt{evalSubst :: Form -> [(String, Bool)] -> Bool} that
+computes the value of a formula under a valuation, assuming that the valuation
+assigns a value to all the variables occurring in the formula (this is an
+essential condition - without that, the function fails). This is easy to
+do: you first substitute the valuation in the formula (with
+\texttt{substAll}), then simplify with \texttt{simplifyConst} and finally
+retrieve the Boolean value you obtain.
+\end{exo}
+
+\noindent
+\emph{Example:}
+\begin{lstlisting}
+> evalSubst (V "a" `And` (Not (V "a") `Or` (Not (V "b")))) [("a", True), ("b", False)]
+True
+> evalSubst (V "a" `And` (Not (V "a") `Or` (Not (V "b")))) [("a", True), ("b", True)]
+False
+\end{lstlisting}
+
+% ......................................................................
+\subsection{Model Finding}\label{sec:evaluating_models}
+
+We now come to the point of systematically enumerating all valuations to
+determine the truth status of a formula. We aim at a function \texttt{allModels}
+that returns a list of all models:
+
+\noindent
+\emph{Example:}
+\begin{lstlisting}
+> allModels (V "a" `Or` (Not (V "b")))
+[[("b",True),("a",True)],
+ [("b",False),("a",True)],
+ [("b",False),("a",False)]]
+\end{lstlisting}
+
+For this, we will use an auxiliary function \texttt{models} that is
+conceptually the most difficult of the functions defined here (even though its
+implementation just comprises two lines of code). \texttt{models} takes a
+formula, a (partial) valuation and a list of variables still to be processed,
+and it returns a list of models.\\
+\texttt{models :: Form -> [(String, Bool)] -> [String] -> [[(String, Bool)]]}
+
+As an invariant, we will ensure that the variables of the valuation together
+with the variables still to be processed are exactly the variables of the
+formula. 
+
+The function is defined by recursion over the third argument,
+\emph{i.e.} the list of variables.
+\begin{itemize}
+\item If the list of variables is empty (thus for the case \texttt{models f vl
+    []}), we can evaluate the formula \texttt{f} under the valuation
+  \texttt{vl} (using \texttt{evalSubst}). If the formula is true under the
+  valuation, we return it as a model (\texttt{[vl]}); otherwise, we return the
+  empty list \texttt{[]}. 
+\item If there are still variables to be processed (thus for a case of the
+  form \texttt{models f vl (vn : vns)}), we will see what happens if the
+  variable \texttt{vn} is assigned the value \texttt{True}, and what happens
+  it it is assigned the value \texttt{False}. For the \texttt{True} case, we
+  will get the models with the call \texttt{(models f ((vn, True):vl) vns)},
+  and analogously for the \texttt{False} case. We just have to concatenate the
+  two results (with \texttt{++}). 
+\end{itemize}
+
+\begin{exo}\label{exo:models}
+Hopefully, this explanation is clear enough so that you can flesh out the
+definition of \texttt{models}.
+\end{exo}
+
+\begin{exo}\label{exo:allModels}
+The definition of \texttt{allModels :: Form -> [[(String, Bool)]]} is now
+easy: given a formula, we generate the models by calling \texttt{models} with
+the list of valuations initially empty and the variables to be processed
+initialised to the list of variables of the formula.
+\end{exo}
+
+\begin{exo}\label{exo:unsatisfiable}
+  It is now clear how to check if a formula is unsatisfiable: generate the
+  list of all of its models and check whether the list is empty or
+  not. Accordingly, define \texttt{unsatisfiable :: Form -> Bool}.
+\end{exo}
+
+\begin{exo}\label{exo:valid}
+Validity can be reduced to unsatisfiability: $f$ is valid if and only if $\NOT
+f$ is unsatisfiable. With this, the definition of \texttt{valid :: Form ->
+  Bool} is a one-liner.
+\end{exo}
+
+
+\noindent
+\emph{Examples:}
+\begin{lstlisting}
+> valid (V "a" `Or` (Not (V "b")))
+False
+> valid (V "a" `Or` (Not (V "a")))
+True
+> unsatisfiable (V "a" `Or` (Not (V "b")))
+False
+> unsatisfiable (V "a" `Or` (Not (V "a")))
+False
+\end{lstlisting}
+
+
+\end{document}
+
+
+
+
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% coding: utf-8-unix
+%%% End: 

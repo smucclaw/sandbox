@@ -584,9 +584,9 @@ public class PrettyPrinter
     {
        cpp.Absyn.EAnd _eand = (cpp.Absyn.EAnd) foo;
        if (_i_ > 4) render(_L_PAREN);
-       pp(_eand.exp_1, 4);
+       pp(_eand.exp_1(), 4);
        render("&&");
-       pp(_eand.exp_2, 5);
+       pp(_eand.exp_2(), 5);
        if (_i_ > 4) render(_R_PAREN);
     }
     else     if (foo instanceof cpp.Absyn.EOr)
@@ -1015,8 +1015,8 @@ public class PrettyPrinter
        cpp.Absyn.EAnd _eand = (cpp.Absyn.EAnd) foo;
        render("(");
        render("EAnd");
-       sh(_eand.exp_1);
-       sh(_eand.exp_2);
+       sh(_eand.exp_1());
+       sh(_eand.exp_2());
        render(")");
     }
     if (foo instanceof cpp.Absyn.EOr)

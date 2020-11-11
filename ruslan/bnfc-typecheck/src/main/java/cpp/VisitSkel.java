@@ -1,5 +1,7 @@
 package cpp;
 
+import cpp.Absyn.Exp;
+
 /*** BNFC-Generated Visitor Design Pattern Skeleton. ***/
 
 /* This implements the common visitor design pattern.
@@ -140,6 +142,12 @@ public class VisitSkel
       p.type_.accept(new TypeVisitor<R,A>(), arg);
       return null;
     }
+
+    @Override
+    public R visit(Exp exp, A arg) {
+      return null;
+    }
+
     public R visit(cpp.Absyn.EPIncr p, A arg)
     { /* Code for EPIncr goes here */
       p.exp_.accept(new ExpVisitor<R,A>(), arg);
@@ -222,8 +230,8 @@ public class VisitSkel
     }
     public R visit(cpp.Absyn.EAnd p, A arg)
     { /* Code for EAnd goes here */
-      p.exp_1.accept(new ExpVisitor<R,A>(), arg);
-      p.exp_2.accept(new ExpVisitor<R,A>(), arg);
+      p.exp_1().accept(new ExpVisitor<R,A>(), arg);
+      p.exp_2().accept(new ExpVisitor<R,A>(), arg);
       return null;
     }
     public R visit(cpp.Absyn.EOr p, A arg)

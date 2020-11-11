@@ -1,5 +1,7 @@
 package cpp;
 
+import cpp.Absyn.Exp;
+
 /** BNFC-Generated Abstract Visitor */
 
 public class AbstractVisitor<R,A> implements AllVisitor<R,A> {
@@ -39,6 +41,12 @@ public class AbstractVisitor<R,A> implements AllVisitor<R,A> {
     public R visit(cpp.Absyn.EId p, A arg) { return visitDefault(p, arg); }
     public R visit(cpp.Absyn.EApp p, A arg) { return visitDefault(p, arg); }
     public R visit(cpp.Absyn.ETyped p, A arg) { return visitDefault(p, arg); }
+
+    @Override
+    public R visit(Exp exp, A arg) {
+        return null;
+    }
+
     public R visit(cpp.Absyn.EPIncr p, A arg) { return visitDefault(p, arg); }
     public R visit(cpp.Absyn.EPDecr p, A arg) { return visitDefault(p, arg); }
     public R visit(cpp.Absyn.EIncr p, A arg) { return visitDefault(p, arg); }

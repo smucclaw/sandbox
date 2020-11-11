@@ -1,14 +1,19 @@
 package cpp;
 
-import java.io.*;
+import cpp.Absyn.Program;
+import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.CommonTokenStream;
 
-import org.antlr.v4.runtime.*;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 
-public class Test {
+public class TypeChecker {
     cppLexer l;
     cppParser p;
 
-    public Test(String[] args) {
+    public TypeChecker(String[] args) {
         try {
             Reader input;
             if (args.length == 0) input = new InputStreamReader(System.in);
@@ -44,13 +49,22 @@ public class Test {
     }
 
     public static void main(String args[]) throws Exception {
-        Test t = new Test(args);
+        TypeChecker t = new TypeChecker(args);
         try {
-            t.parse();
+            Program p = t.parse();
+            t.typecheck(p);
         } catch (TestError e) {
             System.err.println("At line " + e.line + ", column " + e.column + " :");
             System.err.println("     " + e.getMessage());
             System.exit(1);
         }
+    }
+
+    public void typecheck(Program p) {
+        JumboCheckStm stm = new JumboCheckStm();
+        Env topEnv = new Env();
+        p.accept(stm,topEnv);
+
+        topEnv.dump();
     }
 }

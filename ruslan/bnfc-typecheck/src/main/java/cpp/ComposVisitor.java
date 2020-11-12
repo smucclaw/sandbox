@@ -1,5 +1,6 @@
 package cpp;
 
+import cpp.Absyn.Def;
 import cpp.Absyn.Exp;
 import cpp.Absyn.Type;
 
@@ -25,14 +26,14 @@ public class ComposVisitor<A> implements
 
     /* Def */
     public cpp.Absyn.Def visit(cpp.Absyn.DFun p, A arg) {
-        cpp.Absyn.Type type_ = p.type_.accept(this, arg);
-        String id_ = p.id_;
+        cpp.Absyn.Type type_ = p.type().accept(this, arg);
+        String id_ = p.id();
         cpp.Absyn.ListArg listarg_ = new cpp.Absyn.ListArg();
-        for (cpp.Absyn.Arg x : p.listarg_) {
+        for (cpp.Absyn.Arg x : p.args()) {
             listarg_.add(x.accept(this, arg));
         }
         cpp.Absyn.ListStm liststm_ = new cpp.Absyn.ListStm();
-        for (cpp.Absyn.Stm x : p.liststm_) {
+        for (cpp.Absyn.Stm x : p.statements()) {
             liststm_.add(x.accept(this, arg));
         }
         return new cpp.Absyn.DFun(type_, id_, listarg_, liststm_);
@@ -136,11 +137,6 @@ public class ComposVisitor<A> implements
         cpp.Absyn.Exp exp_ = p.exp_.accept(this, arg);
         cpp.Absyn.Type type_ = p.type_.accept(this, arg);
         return new cpp.Absyn.ETyped(exp_, type_);
-    }
-
-    @Override
-    public Exp visit(Exp exp, A arg) {
-        return null;
     }
 
     public cpp.Absyn.Exp visit(cpp.Absyn.EPIncr p, A arg) {
@@ -260,10 +256,5 @@ public class ComposVisitor<A> implements
 
     public cpp.Absyn.Type visit(cpp.Absyn.Type_string p, A arg) {
         return new cpp.Absyn.Type_string();
-    }
-
-    @Override
-    public Type visit(Type type, A arg) {
-        return null;
     }
 }

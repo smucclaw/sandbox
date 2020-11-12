@@ -127,9 +127,4 @@ public class InferExp implements Exp.Visitor<Type,Env>{
     public Type visit(ETyped p, Env arg) {
         return null;
     }
-
-    @Override
-    public Type visit(Exp exp, Env arg) {
-        return null;
-    }
 }

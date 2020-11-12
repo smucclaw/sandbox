@@ -18,12 +18,12 @@ public abstract class FoldVisitor<R,A> implements AllVisitor<R,A> {
 /* Def */
     public R visit(cpp.Absyn.DFun p, A arg) {
       R r = leaf(arg);
-      r = combine(p.type_.accept(this, arg), r, arg);
-      for (cpp.Absyn.Arg x : p.listarg_)
+      r = combine(p.type().accept(this, arg), r, arg);
+      for (cpp.Absyn.Arg x : p.args())
       {
         r = combine(x.accept(this, arg), r, arg);
       }
-      for (cpp.Absyn.Stm x : p.liststm_)
+      for (cpp.Absyn.Stm x : p.statements())
       {
         r = combine(x.accept(this, arg), r, arg);
       }

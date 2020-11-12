@@ -1,5 +1,6 @@
 package cpp;
 
+import cpp.Absyn.Def;
 import cpp.Absyn.Exp;
 import cpp.Absyn.Type;
 
@@ -27,12 +28,12 @@ public class VisitSkel
   {
     public R visit(cpp.Absyn.DFun p, A arg)
     { /* Code for DFun goes here */
-      p.type_.accept(new TypeVisitor<R,A>(), arg);
+      p.type().accept(new TypeVisitor<R,A>(), arg);
       //p.id_;
-      for (cpp.Absyn.Arg x: p.listarg_) {
+      for (cpp.Absyn.Arg x: p.args()) {
         x.accept(new ArgVisitor<R,A>(), arg);
       }
-      for (cpp.Absyn.Stm x: p.liststm_) {
+      for (cpp.Absyn.Stm x: p.statements()) {
         x.accept(new StmVisitor<R,A>(), arg);
       }
       return null;
@@ -141,11 +142,6 @@ public class VisitSkel
     { /* Code for ETyped goes here */
       p.exp_.accept(new ExpVisitor<R,A>(), arg);
       p.type_.accept(new TypeVisitor<R,A>(), arg);
-      return null;
-    }
-
-    @Override
-    public R visit(Exp exp, A arg) {
       return null;
     }
 
@@ -268,11 +264,6 @@ public class VisitSkel
     }
     public R visit(cpp.Absyn.Type_string p, A arg)
     { /* Code for Type_string goes here */
-      return null;
-    }
-
-    @Override
-    public R visit(Type type, A arg) {
       return null;
     }
   }

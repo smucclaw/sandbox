@@ -251,13 +251,13 @@ public class PrettyPrinter
     {
        cpp.Absyn.DFun _dfun = (cpp.Absyn.DFun) foo;
        if (_i_ > 0) render(_L_PAREN);
-       pp(_dfun.type_, 0);
-       pp(_dfun.id_, 0);
+       pp(_dfun.type(), 0);
+       pp(_dfun.id(), 0);
        render("(");
-       pp(_dfun.listarg_, 0);
+       pp(_dfun.args(), 0);
        render(")");
        render("{");
-       pp(_dfun.liststm_, 0);
+       pp(_dfun.statements(), 0);
        render("}");
        if (_i_ > 0) render(_R_PAREN);
     }
@@ -694,13 +694,13 @@ public class PrettyPrinter
        cpp.Absyn.DFun _dfun = (cpp.Absyn.DFun) foo;
        render("(");
        render("DFun");
-       sh(_dfun.type_);
-       sh(_dfun.id_);
+       sh(_dfun.type());
+       sh(_dfun.id());
        render("[");
-       sh(_dfun.listarg_);
+       sh(_dfun.args());
        render("]");
        render("[");
-       sh(_dfun.liststm_);
+       sh(_dfun.statements());
        render("]");
        render(")");
     }

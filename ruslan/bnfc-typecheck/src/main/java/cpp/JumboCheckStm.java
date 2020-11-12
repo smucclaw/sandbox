@@ -33,13 +33,13 @@ public class JumboCheckStm extends AbstractVisitor<Env, Env> {
         FunctionArgTypeExtract argTypeExtractor = new FunctionArgTypeExtract();
         List<Type> functionArgTypes = new ArrayList<>();
 
-        p.listarg_.forEach(arg ->
+        p.args().forEach(arg ->
             functionArgTypes.add(arg.accept(argTypeExtractor, env))
         );
 
-        FunType funSignature = new FunType(functionArgTypes, p.type_);
+        FunType funSignature = new FunType(functionArgTypes, p.type());
 
-        env.updateFun(p.id_, funSignature);
+        env.updateFun(p.id(), funSignature);
 
         return env;
     }

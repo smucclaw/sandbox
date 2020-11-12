@@ -1,6 +1,7 @@
 package cpp;
 
 import cpp.Absyn.Exp;
+import cpp.Absyn.Type;
 
 /**
  * BNFC-Generated Composition Visitor
@@ -259,5 +260,10 @@ public class ComposVisitor<A> implements
 
     public cpp.Absyn.Type visit(cpp.Absyn.Type_string p, A arg) {
         return new cpp.Absyn.Type_string();
+    }
+
+    @Override
+    public Type visit(Type type, A arg) {
+        return null;
     }
 }

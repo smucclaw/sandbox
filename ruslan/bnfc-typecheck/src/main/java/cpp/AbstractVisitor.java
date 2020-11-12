@@ -1,6 +1,7 @@
 package cpp;
 
 import cpp.Absyn.Exp;
+import cpp.Absyn.Type;
 
 /** BNFC-Generated Abstract Visitor */
 
@@ -73,6 +74,12 @@ public class AbstractVisitor<R,A> implements AllVisitor<R,A> {
     public R visit(cpp.Absyn.Type_double p, A arg) { return visitDefault(p, arg); }
     public R visit(cpp.Absyn.Type_void p, A arg) { return visitDefault(p, arg); }
     public R visit(cpp.Absyn.Type_string p, A arg) { return visitDefault(p, arg); }
+
+    @Override
+    public R visit(Type type, A arg) {
+        return null;
+    }
+
     public R visitDefault(cpp.Absyn.Type p, A arg) {
       throw new IllegalArgumentException(this.getClass().getName() + ": " + p);
     }

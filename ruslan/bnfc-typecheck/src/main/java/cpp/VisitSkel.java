@@ -1,6 +1,7 @@
 package cpp;
 
 import cpp.Absyn.Exp;
+import cpp.Absyn.Type;
 
 /*** BNFC-Generated Visitor Design Pattern Skeleton. ***/
 
@@ -267,6 +268,11 @@ public class VisitSkel
     }
     public R visit(cpp.Absyn.Type_string p, A arg)
     { /* Code for Type_string goes here */
+      return null;
+    }
+
+    @Override
+    public R visit(Type type, A arg) {
       return null;
     }
   }

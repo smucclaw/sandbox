@@ -305,7 +305,7 @@ public class PrettyPrinter
     {
        cpp.Absyn.SExp _sexp = (cpp.Absyn.SExp) foo;
        if (_i_ > 0) render(_L_PAREN);
-       pp(_sexp.exp_, 0);
+       pp(_sexp.exp(), 0);
        render(";");
        if (_i_ > 0) render(_R_PAREN);
     }
@@ -313,8 +313,8 @@ public class PrettyPrinter
     {
        cpp.Absyn.SDecls _sdecls = (cpp.Absyn.SDecls) foo;
        if (_i_ > 0) render(_L_PAREN);
-       pp(_sdecls.type_, 0);
-       pp(_sdecls.listid_, 0);
+       pp(_sdecls.type(), 0);
+       pp(_sdecls.listid(), 0);
        render(";");
        if (_i_ > 0) render(_R_PAREN);
     }
@@ -322,10 +322,10 @@ public class PrettyPrinter
     {
        cpp.Absyn.SInit _sinit = (cpp.Absyn.SInit) foo;
        if (_i_ > 0) render(_L_PAREN);
-       pp(_sinit.type_, 0);
-       pp(_sinit.id_, 0);
+       pp(_sinit.type(), 0);
+       pp(_sinit.id(), 0);
        render("=");
-       pp(_sinit.exp_, 0);
+       pp(_sinit.exp(), 0);
        render(";");
        if (_i_ > 0) render(_R_PAREN);
     }
@@ -334,7 +334,7 @@ public class PrettyPrinter
        cpp.Absyn.SReturn _sreturn = (cpp.Absyn.SReturn) foo;
        if (_i_ > 0) render(_L_PAREN);
        render("return");
-       pp(_sreturn.exp_, 0);
+       pp(_sreturn.exp(), 0);
        render(";");
        if (_i_ > 0) render(_R_PAREN);
     }
@@ -352,9 +352,9 @@ public class PrettyPrinter
        if (_i_ > 0) render(_L_PAREN);
        render("while");
        render("(");
-       pp(_swhile.exp_, 0);
+       pp(_swhile.exp(), 0);
        render(")");
-       pp(_swhile.stm_, 0);
+       pp(_swhile.stm(), 0);
        if (_i_ > 0) render(_R_PAREN);
     }
     else     if (foo instanceof cpp.Absyn.SBlock)
@@ -362,7 +362,7 @@ public class PrettyPrinter
        cpp.Absyn.SBlock _sblock = (cpp.Absyn.SBlock) foo;
        if (_i_ > 0) render(_L_PAREN);
        render("{");
-       pp(_sblock.liststm_, 0);
+       pp(_sblock.liststm(), 0);
        render("}");
        if (_i_ > 0) render(_R_PAREN);
     }
@@ -372,11 +372,11 @@ public class PrettyPrinter
        if (_i_ > 0) render(_L_PAREN);
        render("if");
        render("(");
-       pp(_sifelse.exp_, 0);
+       pp(_sifelse.exp(), 0);
        render(")");
-       pp(_sifelse.stm_1, 0);
+       pp(_sifelse.stm_1(), 0);
        render("else");
-       pp(_sifelse.stm_2, 0);
+       pp(_sifelse.stm_2(), 0);
        if (_i_ > 0) render(_R_PAREN);
     }
   }
@@ -746,7 +746,7 @@ public class PrettyPrinter
        cpp.Absyn.SExp _sexp = (cpp.Absyn.SExp) foo;
        render("(");
        render("SExp");
-       sh(_sexp.exp_);
+       sh(_sexp.exp());
        render(")");
     }
     if (foo instanceof cpp.Absyn.SDecls)
@@ -754,9 +754,9 @@ public class PrettyPrinter
        cpp.Absyn.SDecls _sdecls = (cpp.Absyn.SDecls) foo;
        render("(");
        render("SDecls");
-       sh(_sdecls.type_);
+       sh(_sdecls.type());
        render("[");
-       sh(_sdecls.listid_);
+       sh(_sdecls.listid());
        render("]");
        render(")");
     }
@@ -765,9 +765,9 @@ public class PrettyPrinter
        cpp.Absyn.SInit _sinit = (cpp.Absyn.SInit) foo;
        render("(");
        render("SInit");
-       sh(_sinit.type_);
-       sh(_sinit.id_);
-       sh(_sinit.exp_);
+       sh(_sinit.type());
+       sh(_sinit.id());
+       sh(_sinit.exp());
        render(")");
     }
     if (foo instanceof cpp.Absyn.SReturn)
@@ -775,7 +775,7 @@ public class PrettyPrinter
        cpp.Absyn.SReturn _sreturn = (cpp.Absyn.SReturn) foo;
        render("(");
        render("SReturn");
-       sh(_sreturn.exp_);
+       sh(_sreturn.exp());
        render(")");
     }
     if (foo instanceof cpp.Absyn.SReturnVoid)
@@ -788,8 +788,8 @@ public class PrettyPrinter
        cpp.Absyn.SWhile _swhile = (cpp.Absyn.SWhile) foo;
        render("(");
        render("SWhile");
-       sh(_swhile.exp_);
-       sh(_swhile.stm_);
+       sh(_swhile.exp());
+       sh(_swhile.stm());
        render(")");
     }
     if (foo instanceof cpp.Absyn.SBlock)
@@ -798,7 +798,7 @@ public class PrettyPrinter
        render("(");
        render("SBlock");
        render("[");
-       sh(_sblock.liststm_);
+       sh(_sblock.liststm());
        render("]");
        render(")");
     }
@@ -807,9 +807,9 @@ public class PrettyPrinter
        cpp.Absyn.SIfElse _sifelse = (cpp.Absyn.SIfElse) foo;
        render("(");
        render("SIfElse");
-       sh(_sifelse.exp_);
-       sh(_sifelse.stm_1);
-       sh(_sifelse.stm_2);
+       sh(_sifelse.exp());
+       sh(_sifelse.stm_1());
+       sh(_sifelse.stm_2());
        render(")");
     }
   }

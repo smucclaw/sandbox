@@ -14,8 +14,8 @@ public class JumboCheckStm extends AbstractVisitor<Env, Env> {
 
     @Override
     public Env visit(SDecls p, Env env) {
-        p.listid_.forEach(
-                id -> env.updateVar(id, p.type_)
+        p.listid().forEach(
+                id -> env.updateVar(id, p.type())
         );
         return env;
     }
@@ -37,10 +37,24 @@ public class JumboCheckStm extends AbstractVisitor<Env, Env> {
             functionArgTypes.add(arg.accept(argTypeExtractor, env))
         );
 
+        p.statements().forEach(
+                stm -> stm.accept(this, env)
+        );
+
         FunType funSignature = new FunType(functionArgTypes, p.type());
 
         env.updateFun(p.id(), funSignature);
 
+        return env;
+    }
+
+    @Override
+    public Env visit(SIfElse p, Env env) {
+        InferExp inferExp = new InferExp();
+        Type tt = p.exp().accept(inferExp, env);
+        if (tt.getTypeCode() != TypeCode.CBool){
+            throw new TypeException();
+        }
         return env;
     }
 }

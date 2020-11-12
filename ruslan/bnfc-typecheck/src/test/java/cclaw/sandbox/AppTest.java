@@ -1,10 +1,9 @@
 package cclaw.sandbox;
 
-import cpp.PrettyPrinter;
-import cpp.cppLexer;
-import cpp.cppParser;
+import cpp.*;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -31,6 +30,21 @@ public class AppTest {
         cpp.Absyn.Program ast = pc.result;
 
         System.out.println(PrettyPrinter.show(ast));
+    }
+
+    @Test()
+    void testBadIf() throws IOException {
+        cppParser p = getCppParser("badif.cc");
+
+        cppParser.Start_ProgramContext pc = p.start_Program();
+        cpp.Absyn.Program ast = pc.result;
+
+        JumboCheckStm stm = new JumboCheckStm();
+        Env topEnv = new Env();
+
+        Assertions.assertThrows(TypeException.class, () ->
+            ast.accept(stm,topEnv)
+        );
     }
 
     private cppParser getCppParser(String s) throws IOException {

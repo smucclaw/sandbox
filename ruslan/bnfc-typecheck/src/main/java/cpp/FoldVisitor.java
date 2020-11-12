@@ -40,23 +40,23 @@ public abstract class FoldVisitor<R,A> implements AllVisitor<R,A> {
 /* Stm */
     public R visit(cpp.Absyn.SExp p, A arg) {
       R r = leaf(arg);
-      r = combine(p.exp_.accept(this, arg), r, arg);
+      r = combine(p.exp().accept(this, arg), r, arg);
       return r;
     }
     public R visit(cpp.Absyn.SDecls p, A arg) {
       R r = leaf(arg);
-      r = combine(p.type_.accept(this, arg), r, arg);
+      r = combine(p.type().accept(this, arg), r, arg);
       return r;
     }
     public R visit(cpp.Absyn.SInit p, A arg) {
       R r = leaf(arg);
-      r = combine(p.type_.accept(this, arg), r, arg);
-      r = combine(p.exp_.accept(this, arg), r, arg);
+      r = combine(p.type().accept(this, arg), r, arg);
+      r = combine(p.exp().accept(this, arg), r, arg);
       return r;
     }
     public R visit(cpp.Absyn.SReturn p, A arg) {
       R r = leaf(arg);
-      r = combine(p.exp_.accept(this, arg), r, arg);
+      r = combine(p.exp().accept(this, arg), r, arg);
       return r;
     }
     public R visit(cpp.Absyn.SReturnVoid p, A arg) {
@@ -65,13 +65,13 @@ public abstract class FoldVisitor<R,A> implements AllVisitor<R,A> {
     }
     public R visit(cpp.Absyn.SWhile p, A arg) {
       R r = leaf(arg);
-      r = combine(p.exp_.accept(this, arg), r, arg);
-      r = combine(p.stm_.accept(this, arg), r, arg);
+      r = combine(p.exp().accept(this, arg), r, arg);
+      r = combine(p.stm().accept(this, arg), r, arg);
       return r;
     }
     public R visit(cpp.Absyn.SBlock p, A arg) {
       R r = leaf(arg);
-      for (cpp.Absyn.Stm x : p.liststm_)
+      for (cpp.Absyn.Stm x : p.liststm())
       {
         r = combine(x.accept(this, arg), r, arg);
       }
@@ -79,9 +79,9 @@ public abstract class FoldVisitor<R,A> implements AllVisitor<R,A> {
     }
     public R visit(cpp.Absyn.SIfElse p, A arg) {
       R r = leaf(arg);
-      r = combine(p.exp_.accept(this, arg), r, arg);
-      r = combine(p.stm_1.accept(this, arg), r, arg);
-      r = combine(p.stm_2.accept(this, arg), r, arg);
+      r = combine(p.exp().accept(this, arg), r, arg);
+      r = combine(p.stm_1().accept(this, arg), r, arg);
+      r = combine(p.stm_2().accept(this, arg), r, arg);
       return r;
     }
 

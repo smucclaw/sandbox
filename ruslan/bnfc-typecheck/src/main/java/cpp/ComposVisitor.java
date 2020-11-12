@@ -48,25 +48,25 @@ public class ComposVisitor<A> implements
 
     /* Stm */
     public cpp.Absyn.Stm visit(cpp.Absyn.SExp p, A arg) {
-        cpp.Absyn.Exp exp_ = p.exp_.accept(this, arg);
+        cpp.Absyn.Exp exp_ = p.exp().accept(this, arg);
         return new cpp.Absyn.SExp(exp_);
     }
 
     public cpp.Absyn.Stm visit(cpp.Absyn.SDecls p, A arg) {
-        cpp.Absyn.Type type_ = p.type_.accept(this, arg);
-        cpp.Absyn.ListId listid_ = p.listid_;
+        cpp.Absyn.Type type_ = p.type().accept(this, arg);
+        cpp.Absyn.ListId listid_ = p.listid();
         return new cpp.Absyn.SDecls(type_, listid_);
     }
 
     public cpp.Absyn.Stm visit(cpp.Absyn.SInit p, A arg) {
-        cpp.Absyn.Type type_ = p.type_.accept(this, arg);
-        String id_ = p.id_;
-        cpp.Absyn.Exp exp_ = p.exp_.accept(this, arg);
+        cpp.Absyn.Type type_ = p.type().accept(this, arg);
+        String id_ = p.id();
+        cpp.Absyn.Exp exp_ = p.exp().accept(this, arg);
         return new cpp.Absyn.SInit(type_, id_, exp_);
     }
 
     public cpp.Absyn.Stm visit(cpp.Absyn.SReturn p, A arg) {
-        cpp.Absyn.Exp exp_ = p.exp_.accept(this, arg);
+        cpp.Absyn.Exp exp_ = p.exp().accept(this, arg);
         return new cpp.Absyn.SReturn(exp_);
     }
 
@@ -75,23 +75,23 @@ public class ComposVisitor<A> implements
     }
 
     public cpp.Absyn.Stm visit(cpp.Absyn.SWhile p, A arg) {
-        cpp.Absyn.Exp exp_ = p.exp_.accept(this, arg);
-        cpp.Absyn.Stm stm_ = p.stm_.accept(this, arg);
+        cpp.Absyn.Exp exp_ = p.exp().accept(this, arg);
+        cpp.Absyn.Stm stm_ = p.stm().accept(this, arg);
         return new cpp.Absyn.SWhile(exp_, stm_);
     }
 
     public cpp.Absyn.Stm visit(cpp.Absyn.SBlock p, A arg) {
         cpp.Absyn.ListStm liststm_ = new cpp.Absyn.ListStm();
-        for (cpp.Absyn.Stm x : p.liststm_) {
+        for (cpp.Absyn.Stm x : p.liststm()) {
             liststm_.add(x.accept(this, arg));
         }
         return new cpp.Absyn.SBlock(liststm_);
     }
 
     public cpp.Absyn.Stm visit(cpp.Absyn.SIfElse p, A arg) {
-        cpp.Absyn.Exp exp_ = p.exp_.accept(this, arg);
-        cpp.Absyn.Stm stm_1 = p.stm_1.accept(this, arg);
-        cpp.Absyn.Stm stm_2 = p.stm_2.accept(this, arg);
+        cpp.Absyn.Exp exp_ = p.exp().accept(this, arg);
+        cpp.Absyn.Stm stm_1 = p.stm_1().accept(this, arg);
+        cpp.Absyn.Stm stm_2 = p.stm_2().accept(this, arg);
         return new cpp.Absyn.SIfElse(exp_, stm_1, stm_2);
     }
 

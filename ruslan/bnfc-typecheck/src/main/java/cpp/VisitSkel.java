@@ -52,27 +52,27 @@ public class VisitSkel
   {
     public R visit(cpp.Absyn.SExp p, A arg)
     { /* Code for SExp goes here */
-      p.exp_.accept(new ExpVisitor<R,A>(), arg);
+      p.exp().accept(new ExpVisitor<R,A>(), arg);
       return null;
     }
     public R visit(cpp.Absyn.SDecls p, A arg)
     { /* Code for SDecls goes here */
-      p.type_.accept(new TypeVisitor<R,A>(), arg);
-      for (String x: p.listid_) {
+      p.type().accept(new TypeVisitor<R,A>(), arg);
+      for (String x: p.listid()) {
         //x;
       }
       return null;
     }
     public R visit(cpp.Absyn.SInit p, A arg)
     { /* Code for SInit goes here */
-      p.type_.accept(new TypeVisitor<R,A>(), arg);
+      p.type().accept(new TypeVisitor<R,A>(), arg);
       //p.id_;
-      p.exp_.accept(new ExpVisitor<R,A>(), arg);
+      p.exp().accept(new ExpVisitor<R,A>(), arg);
       return null;
     }
     public R visit(cpp.Absyn.SReturn p, A arg)
     { /* Code for SReturn goes here */
-      p.exp_.accept(new ExpVisitor<R,A>(), arg);
+      p.exp().accept(new ExpVisitor<R,A>(), arg);
       return null;
     }
     public R visit(cpp.Absyn.SReturnVoid p, A arg)
@@ -81,22 +81,22 @@ public class VisitSkel
     }
     public R visit(cpp.Absyn.SWhile p, A arg)
     { /* Code for SWhile goes here */
-      p.exp_.accept(new ExpVisitor<R,A>(), arg);
-      p.stm_.accept(new StmVisitor<R,A>(), arg);
+      p.exp().accept(new ExpVisitor<R,A>(), arg);
+      p.stm().accept(new StmVisitor<R,A>(), arg);
       return null;
     }
     public R visit(cpp.Absyn.SBlock p, A arg)
     { /* Code for SBlock goes here */
-      for (cpp.Absyn.Stm x: p.liststm_) {
+      for (cpp.Absyn.Stm x: p.liststm()) {
         x.accept(new StmVisitor<R,A>(), arg);
       }
       return null;
     }
     public R visit(cpp.Absyn.SIfElse p, A arg)
     { /* Code for SIfElse goes here */
-      p.exp_.accept(new ExpVisitor<R,A>(), arg);
-      p.stm_1.accept(new StmVisitor<R,A>(), arg);
-      p.stm_2.accept(new StmVisitor<R,A>(), arg);
+      p.exp().accept(new ExpVisitor<R,A>(), arg);
+      p.stm_1().accept(new StmVisitor<R,A>(), arg);
+      p.stm_2().accept(new StmVisitor<R,A>(), arg);
       return null;
     }
   }

@@ -11,8 +11,8 @@ public class CheckStm implements Stm.Visitor<Env, Env> {
 
     @Override
     public Env visit(SDecls p, Env env) {
-        p.listid_.forEach(
-                id -> env.updateVar(id, p.type_)
+        p.listid().forEach(
+                id -> env.updateVar(id, p.type())
         );
         return env;
     }

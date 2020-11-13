@@ -18,7 +18,7 @@ import java.util.stream.Stream;
 public class ExpressionTypeTest {
 
     @ParameterizedTest
-    @MethodSource("expressionProvider")
+    @MethodSource("arithExpressionProvider")
     void testArithMixedTypes(String expression) throws IOException {
         cppParser p = embedExpressionInProgram(expression);
 
@@ -31,6 +31,36 @@ public class ExpressionTypeTest {
         Assertions.assertThrows(TypeException.class, () ->
                 ast.accept(stm, topEnv)
         );
+    }
+
+    @ParameterizedTest
+    @MethodSource("compareMixedTypeExpressionProvider")
+    void testCompareMixedTypes(String expression) throws IOException {
+        cppParser p = embedExpressionInProgram(expression);
+
+        cppParser.Start_ProgramContext pc = p.start_Program();
+        cpp.Absyn.Program ast = pc.result;
+
+        JumboCheckStm stm = new JumboCheckStm();
+        Env topEnv = new Env();
+
+        Assertions.assertThrows(TypeException.class, () ->
+                ast.accept(stm, topEnv)
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("compareExpressionProvider")
+    void testCompareSameTypes(String expression) throws IOException {
+        cppParser p = embedExpressionInProgram(expression);
+
+        cppParser.Start_ProgramContext pc = p.start_Program();
+        cpp.Absyn.Program ast = pc.result;
+
+        JumboCheckStm stm = new JumboCheckStm();
+        Env topEnv = new Env();
+
+        ast.accept(stm, topEnv);
     }
 
     @Test()
@@ -89,7 +119,7 @@ public class ExpressionTypeTest {
         return new cppParser(new CommonTokenStream(l));
     }
 
-    static Stream<String> expressionProvider() {
+    static Stream<String> arithExpressionProvider() {
         List<String> numbers = List.of("2", "2.0");
         List<String> arg2 = List.of("true", "\"a\"");
         List<String> operators = List.of("+", "-", "*", "/");
@@ -101,6 +131,40 @@ public class ExpressionTypeTest {
                                         op -> arg1 + op + arg
                                 )
                         )
+        );
+    }
+
+    static Stream<String> compareMixedTypeExpressionProvider() {
+        List<String> firstArgs = List.of("2", "2.0", "true", "\"a\"");
+        List<String> secondArgs = List.of("2", "2.0", "true", "\"a\"");
+        List<String> operators = List.of("<", ">", "<=", ">=", "==", "!=");
+
+        return firstArgs.stream().flatMap(
+                arg1 ->
+                        secondArgs.stream().
+                                filter(arg2 -> !arg2.equals(arg1))
+                                .flatMap(
+                                        arg -> operators.stream().map(
+                                                op -> arg1 + op + arg
+                                        )
+                                )
+        );
+    }
+
+    static Stream<String> compareExpressionProvider() {
+        List<String> firstArgs = List.of("2", "2.0", "true", "\"a\"");
+        List<String> secondArgs = List.of("2", "2.0", "true", "\"a\"");
+        List<String> operators = List.of("<", ">", "<=", ">=", "==", "!=");
+
+        return firstArgs.stream().flatMap(
+                arg1 ->
+                        secondArgs.stream().
+                                filter(arg2 -> arg2.equals(arg1))
+                                .flatMap(
+                                        arg -> operators.stream().map(
+                                                op -> arg1 + op + arg
+                                        )
+                                )
         );
     }
 }

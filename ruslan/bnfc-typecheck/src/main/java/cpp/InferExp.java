@@ -122,6 +122,14 @@ public class InferExp implements Exp.Visitor<Type, Env> {
             throw new TypeException("Operands to * must be int or double.");
     }
 
+    private Type validateLogic(Type t1, Type t2) {
+        if (t1.getTypeCode() == TypeCode.CBool &&
+                t2.getTypeCode() == TypeCode.CBool)
+            return new Type_bool();
+        else
+            throw new TypeException("Operands to * must be int or double.");
+    }
+
     @Override
     public Type visit(ELt p, Env env) {
         Type t1 = p.exp_1.accept(this, env);
@@ -175,14 +183,14 @@ public class InferExp implements Exp.Visitor<Type, Env> {
     public Type visit(EAnd p, Env env) {
         Type t1 = p.exp_1().accept(this, env);
         Type t2 = p.exp_2().accept(this, env);
-        return validateArith(t1, t2);
+        return validateLogic(t1, t2);
     }
 
     @Override
     public Type visit(EOr p, Env env) {
         Type t1 = p.exp_1.accept(this, env);
         Type t2 = p.exp_2.accept(this, env);
-        return validateArith(t1, t2);
+        return validateLogic(t1, t2);
     }
 
     @Override

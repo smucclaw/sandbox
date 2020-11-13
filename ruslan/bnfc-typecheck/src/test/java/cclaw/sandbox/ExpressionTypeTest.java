@@ -63,9 +63,51 @@ public class ExpressionTypeTest {
         ast.accept(stm, topEnv);
     }
 
+    @ParameterizedTest
+    @MethodSource("logicExpressionProvider")
+    void testLogicMixedTypes(String expression) throws IOException {
+        cppParser p = embedExpressionInProgram(expression);
+
+        cppParser.Start_ProgramContext pc = p.start_Program();
+        cpp.Absyn.Program ast = pc.result;
+
+        JumboCheckStm stm = new JumboCheckStm();
+        Env topEnv = new Env();
+
+        Assertions.assertThrows(TypeException.class, () ->
+                ast.accept(stm, topEnv)
+        );
+    }
+
     @Test()
     void testAddDouble() throws IOException {
         cppParser p = embedExpressionInProgram("1.3 + 5.7");
+
+        cppParser.Start_ProgramContext pc = p.start_Program();
+        cpp.Absyn.Program ast = pc.result;
+
+        JumboCheckStm stm = new JumboCheckStm();
+        Env topEnv = new Env();
+
+        ast.accept(stm, topEnv);
+    }
+
+    @Test()
+    void testOr() throws IOException {
+        cppParser p = embedExpressionInProgram("true || false");
+
+        cppParser.Start_ProgramContext pc = p.start_Program();
+        cpp.Absyn.Program ast = pc.result;
+
+        JumboCheckStm stm = new JumboCheckStm();
+        Env topEnv = new Env();
+
+        ast.accept(stm, topEnv);
+    }
+
+    @Test()
+    void testAdd() throws IOException {
+        cppParser p = embedExpressionInProgram("true && false");
 
         cppParser.Start_ProgramContext pc = p.start_Program();
         cpp.Absyn.Program ast = pc.result;
@@ -155,6 +197,23 @@ public class ExpressionTypeTest {
         List<String> firstArgs = List.of("2", "2.0", "true", "\"a\"");
         List<String> secondArgs = List.of("2", "2.0", "true", "\"a\"");
         List<String> operators = List.of("<", ">", "<=", ">=", "==", "!=");
+
+        return firstArgs.stream().flatMap(
+                arg1 ->
+                        secondArgs.stream().
+                                filter(arg2 -> arg2.equals(arg1))
+                                .flatMap(
+                                        arg -> operators.stream().map(
+                                                op -> arg1 + op + arg
+                                        )
+                                )
+        );
+    }
+
+    static Stream<String> logicExpressionProvider() {
+        List<String> firstArgs = List.of("2", "2.0", "\"a\"");
+        List<String> secondArgs = List.of("2", "2.0", "\"a\"");
+        List<String> operators = List.of("&&", "||");
 
         return firstArgs.stream().flatMap(
                 arg1 ->

@@ -43,7 +43,7 @@ public class AppTest {
         Env topEnv = new Env();
 
         Assertions.assertThrows(TypeException.class, () ->
-            ast.accept(stm,topEnv)
+                ast.accept(stm, topEnv)
         );
     }
 
@@ -63,9 +63,7 @@ public class AppTest {
         JumboCheckStm stm = new JumboCheckStm();
         Env topEnv = new Env();
 
-        Assertions.assertThrows(TypeException.class, () ->
-                ast.accept(stm,topEnv)
-        );
+        ast.accept(stm, topEnv);
     }
 
     private cppParser getCppParserFromFileName(String s) throws IOException {

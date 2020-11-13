@@ -8,8 +8,10 @@ import java.util.List;
 public class JumboCheckStm extends AbstractVisitor<Env, Env> {
 
     @Override
-    public Env visit(SExp p, Env arg) {
-        return null;
+    public Env visit(SExp p, Env env) {
+        InferExp inferExp = new InferExp();
+        p.exp().accept(inferExp, env);
+        return env;
     }
 
     @Override
@@ -34,7 +36,7 @@ public class JumboCheckStm extends AbstractVisitor<Env, Env> {
         List<Type> functionArgTypes = new ArrayList<>();
 
         p.args().forEach(arg ->
-            functionArgTypes.add(arg.accept(argTypeExtractor, env))
+                functionArgTypes.add(arg.accept(argTypeExtractor, env))
         );
 
         p.statements().forEach(
@@ -52,7 +54,7 @@ public class JumboCheckStm extends AbstractVisitor<Env, Env> {
     public Env visit(SIfElse p, Env env) {
         InferExp inferExp = new InferExp();
         Type tt = p.exp().accept(inferExp, env);
-        if (tt.getTypeCode() != TypeCode.CBool){
+        if (tt.getTypeCode() != TypeCode.CBool) {
             throw new TypeException();
         }
         return env;

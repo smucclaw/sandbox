@@ -148,43 +148,123 @@ public class InferExp implements Exp.Visitor<Type,Env>{
     }
 
     @Override
-    public Type visit(ELt p, Env arg) {
-        return null;
+    public Type visit(ELt p, Env env) {
+        Type t1 = p.exp_1.accept(this, env);
+        Type t2 = p.exp_2.accept(this, env);
+        if (t1.getTypeCode() == TypeCode.CInt &&
+                t2.getTypeCode() == TypeCode.CInt)
+            return new Type_int();
+        else
+        if (t1.getTypeCode() == TypeCode.CDouble &&
+                t2.getTypeCode() == TypeCode.CDouble)
+            return new Type_double();
+        else
+            throw new TypeException("Operands to * must be int or double.");
     }
 
     @Override
-    public Type visit(EGt p, Env arg) {
-        return null;
+    public Type visit(EGt p, Env env) {
+        Type t1 = p.exp_1.accept(this, env);
+        Type t2 = p.exp_2.accept(this, env);
+        if (t1.getTypeCode() == TypeCode.CInt &&
+                t2.getTypeCode() == TypeCode.CInt)
+            return new Type_int();
+        else
+        if (t1.getTypeCode() == TypeCode.CDouble &&
+                t2.getTypeCode() == TypeCode.CDouble)
+            return new Type_double();
+        else
+            throw new TypeException("Operands to * must be int or double.");
     }
 
     @Override
-    public Type visit(ELtEq p, Env arg) {
-        return null;
+    public Type visit(ELtEq p, Env env) {
+        Type t1 = p.exp_1.accept(this, env);
+        Type t2 = p.exp_2.accept(this, env);
+        if (t1.getTypeCode() == TypeCode.CInt &&
+                t2.getTypeCode() == TypeCode.CInt)
+            return new Type_int();
+        else
+        if (t1.getTypeCode() == TypeCode.CDouble &&
+                t2.getTypeCode() == TypeCode.CDouble)
+            return new Type_double();
+        else
+            throw new TypeException("Operands to * must be int or double.");
     }
 
     @Override
-    public Type visit(EGtEq p, Env arg) {
-        return null;
+    public Type visit(EGtEq p, Env env) {
+        Type t1 = p.exp_1.accept(this, env);
+        Type t2 = p.exp_2.accept(this, env);
+        if (t1.getTypeCode() == TypeCode.CInt &&
+                t2.getTypeCode() == TypeCode.CInt)
+            return new Type_int();
+        else
+        if (t1.getTypeCode() == TypeCode.CDouble &&
+                t2.getTypeCode() == TypeCode.CDouble)
+            return new Type_double();
+        else
+            throw new TypeException("Operands to * must be int or double.");
     }
 
     @Override
-    public Type visit(EEq p, Env arg) {
-        return null;
+    public Type visit(EEq p, Env env) {
+        Type t1 = p.exp_1.accept(this, env);
+        Type t2 = p.exp_2.accept(this, env);
+        if (t1.getTypeCode() == TypeCode.CInt &&
+                t2.getTypeCode() == TypeCode.CInt)
+            return new Type_int();
+        else
+        if (t1.getTypeCode() == TypeCode.CDouble &&
+                t2.getTypeCode() == TypeCode.CDouble)
+            return new Type_double();
+        else
+            throw new TypeException("Operands to * must be int or double.");
     }
 
     @Override
-    public Type visit(ENEq p, Env arg) {
-        return null;
+    public Type visit(ENEq p, Env env) {
+        Type t1 = p.exp_1.accept(this, env);
+        Type t2 = p.exp_2.accept(this, env);
+        if (t1.getTypeCode() == TypeCode.CInt &&
+                t2.getTypeCode() == TypeCode.CInt)
+            return new Type_int();
+        else
+        if (t1.getTypeCode() == TypeCode.CDouble &&
+                t2.getTypeCode() == TypeCode.CDouble)
+            return new Type_double();
+        else
+            throw new TypeException("Operands to * must be int or double.");
     }
 
     @Override
-    public Type visit(EAnd p, Env arg) {
-        return null;
+    public Type visit(EAnd p, Env env) {
+        Type t1 = p.exp_1().accept(this, env);
+        Type t2 = p.exp_2().accept(this, env);
+        if (t1.getTypeCode() == TypeCode.CInt &&
+                t2.getTypeCode() == TypeCode.CInt)
+            return new Type_int();
+        else
+        if (t1.getTypeCode() == TypeCode.CDouble &&
+                t2.getTypeCode() == TypeCode.CDouble)
+            return new Type_double();
+        else
+            throw new TypeException("Operands to * must be int or double.");
     }
 
     @Override
-    public Type visit(EOr p, Env arg) {
-        return null;
+    public Type visit(EOr p, Env env) {
+        Type t1 = p.exp_1.accept(this, env);
+        Type t2 = p.exp_2.accept(this, env);
+        if (t1.getTypeCode() == TypeCode.CInt &&
+                t2.getTypeCode() == TypeCode.CInt)
+            return new Type_int();
+        else
+        if (t1.getTypeCode() == TypeCode.CDouble &&
+                t2.getTypeCode() == TypeCode.CDouble)
+            return new Type_double();
+        else
+            throw new TypeException("Operands to * must be int or double.");
     }
 
     @Override

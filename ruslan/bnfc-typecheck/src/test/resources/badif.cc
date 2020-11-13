@@ -2,7 +2,7 @@
 
     int factr (int n)
     {
-      if (2+2)
+      if (true && false)
         return 1 ;
       else
         return (n * factr(n-1)) ;

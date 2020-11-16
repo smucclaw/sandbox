@@ -31,7 +31,7 @@ public class InferExp implements Exp.Visitor<Type, Env> {
 
     @Override
     public Type visit(EId p, Env arg) {
-        return null;
+        return arg.lookupVar(p.id_);
     }
 
     @Override

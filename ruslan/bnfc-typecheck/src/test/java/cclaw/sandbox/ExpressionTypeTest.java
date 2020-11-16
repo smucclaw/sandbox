@@ -128,9 +128,6 @@ public class ExpressionTypeTest {
         return expressions.get(0);
     }
 
-
-
-
     private Program getProgramAst(String s) throws IOException {
         cppParser p = embedExpressionInProgram(s);
 

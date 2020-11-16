@@ -18,7 +18,8 @@ public class Env {
     }
 
     public Type lookupVar(String id) {
-        return null;
+        Map<String, Type> currentContext = contexts.peek();
+        return currentContext.get(id);
     }
 
     public FunType lookupFun(String id) {
@@ -30,6 +31,8 @@ public class Env {
     }
 
     public void updateVar(String id, Type ty) {
+        Map<String, Type> currentContext = contexts.peek();
+        currentContext.put(id, ty);
     }
 
     public void dump() {

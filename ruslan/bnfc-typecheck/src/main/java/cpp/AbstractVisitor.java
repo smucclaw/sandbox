@@ -1,9 +1,5 @@
 package cpp;
 
-import cpp.Absyn.Def;
-import cpp.Absyn.Exp;
-import cpp.Absyn.Type;
-
 /** BNFC-Generated Abstract Visitor */
 
 public class AbstractVisitor<R,A> implements AllVisitor<R,A> {

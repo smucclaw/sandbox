@@ -1,0 +1,13 @@
+cradle:
+  stack:
+    - path: "./src"
+      component: "models20201113:lib"
+
+    - path: "./app/Main.hs"
+      component: "models20201113:exe:models20201113-exe"
+
+    - path: "./app/Paths_models20201113.hs"
+      component: "models20201113:exe:models20201113-exe"
+
+    - path: "./test"
+      component: "models20201113:test:models20201113-test"

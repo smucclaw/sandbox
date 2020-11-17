@@ -1,3 +1,11 @@
+# Gilded Rose Kata Solution (Using DMNMD)
+
+### How to run the tests
+```bash
+$ python -m tests.tests`
+```
+
+
 
 ### Quality Change logic
 | F  | Legendary | Conjured | Aged Brie | Backstage Pass | Sell In | Quality | Delta Sell In (out) | Delta Quality (out) | # Category Name                        |
@@ -21,9 +29,9 @@
 
 - Which quality comes first for camembert?
   	- Case 1: Camembert continues to increase in quality (until it 50) even after sellIn date reaches 0 (argument: cheese doesn't spoil)
-  	- Case 2: Camembert decreases in quality after sellIn date reaches 0 (argument: consistency)
-  	- Decision : go with case 1, requirements do not describe what to do
-
+  	  	- Case 2: Camembert decreases in quality after sellIn date reaches 0 (argument: consistency)
+  	   - Decision : go with case 1, requirements do not describe what to do
+  	
 - Legendary Conjured Items?
   - Case 1: Legendary so no change in quality
   - Case 2: Spectral so decrease in quality (but by how much?)

@@ -1,20 +1,72 @@
 from pprint import pprint
 import src.GildedRose as GR
+import src.Datatype as DT
 
-def cr8_output_dic(quality: str):
-    
-    if quality == "legendary" or quality == "maxQual" :
-        return {'Delta Sell In' : 'sellIn -1', 
-                'Delta Quality' : 'quality +0'}
-    elif quality == "expiredPass":
-        return {'Delta Sell In' : 'sellIn -1', 
-                'Delta Quality' : '0'}
-    else:
-        return {'Delta Sell In' : 'sellIn -1', 
-                'Delta Quality' : 'max(0 ,quality ' + quality}
+def cr8_test_case(itemList: dict, key: str,  date: int):
+    bar = itemList[key]
 
-def cre8_test_cases():
-    return None
+    foo = DT.Item(
+            key, 
+            bar["isLegendary"], 
+            bar["isConjured"],
+            bar["isAged"], 
+            bar["isBackstagePass"], 
+            bar["values"]["%s" % (date)]["sellIn"], 
+            bar["values"]["%s" % (date)]["quality"] 
+        )
+    # if quality == "legendary" or quality == "maxQual" :
+        # return {'Delta Sell In' : 'sellIn -1', 
+                # 'Delta Quality' : 'quality +0'}
+    # elif quality == "expiredPass":
+        # return {'Delta Sell In' : 'sellIn -1', 
+                # 'Delta Quality' : '0'}
+    # else:
+        # return {'Delta Sell In' : 'sellIn -1', 
+                # 'Delta Quality' : 'max(0 ,quality ' + quality}
+    return foo 
+
+
+def process_test_inputs(inList : list):
+    out_dic = {} ; out_dic["items"] = {}
+    db = out_dic["items"] 
+
+    for i in range(len(inList)):
+        if n := re.search(r'-* day ([0-9]+)',inList[i]):
+            day = n.groups()[0]
+        elif itm := re.search(r'(.+), (-*[0-9]+), ([0-9]+)',inList[i]):
+            itm_name = itm.groups()[0]
+            itm_sellIn = itm.groups()[1]
+            itm_quality = itm.groups()[2]
+            
+            if itm_name not in db.keys():
+                db[itm_name] = {}
+
+                tmp = itm_name.lower()
+                ## assign attributes
+                db[itm_name]["isLegendary"] = False
+                db[itm_name]["isConjured"] = False
+                db[itm_name]["isAged"] = False
+                db[itm_name]["isBackstagePass"] = False
+
+                if re.search(r'sulfuras',tmp):
+                    db[itm_name]["isLegendary"] = True
+                if re.search(r'backstage pass', tmp):
+                    db[itm_name]["isBackstagePass"] = True
+                if re.search(r'aged ', tmp):
+                    db[itm_name]["isAged"] = True
+                if re.search(r'Conjured', tmp):
+                    db[itm_name]["isConjured"] = True 
+                
+                # to store sellIn & quality values
+                db[itm_name]["values"] = {}
+
+         
+            ## assign sellIn & quality values on first day appearing
+            db[itm_name]["values"][day] = {}
+            db[itm_name]["values"][day]["sellIn"] = itm_sellIn
+            db[itm_name]["values"][day]["quality"] = itm_quality
+
+    return out_dic
 
 
 def Quality_Change_tests():
@@ -48,8 +100,20 @@ def Quality_Change_tests():
     return tests
 
 if __name__ == "__main__":
-    test_out = Quality_Change_tests()
-    pprint(test_out)
+    import re 
+    
+    with open('tests/test_inputs.gr','r') as f:
+        raw = f.readlines()
+
+    test_dict = process_test_inputs(raw)
+    a = cr8_test_case(test_dict["items"], "Aged Brie", "0")
+    b = cr8_test_case(test_dict["items"], "Aged Brie", "0")
+    print("Datatype instance equality:", a==b)
+    print(vars(cr8_test_case(test_dict["items"], "Aged Brie", "0")))
+    print(vars(cr8_test_case(test_dict["items"], "Aged Brie", "1")))
+
+    # test_out = Quality_Change_tests()
+    # pprint(test_out)
 
 
 

@@ -90,7 +90,7 @@ to the \texttt{Expr} type you find in the Haskell book (p. 416). The
 \texttt{Form} type has five \emph{constructors}, roughly corresponding to
 $\TRUE, \FALSE, \NOT, \AND, \OR$. However, we will combine $\TRUE$ and
 $\FALSE$ into the constructor \texttt{C} (for constant), which takes a
-\texttt{Bool} as argument, and we also have to
+\texttt{Bool} as argument, and we also 
 have to represent variables, for which we use the constructor \texttt{V},
 which takes a string (the variable name) as argument. 
 
@@ -275,7 +275,7 @@ For this, one exhaustively applies the following equivalences:
 Write function \texttt{cnf :: Form -> Form} that computes the \emph{cnf} of a
 formula.
 
-\emph{Hint:} it may be useful to define a non-recursive auxiliary function
+\emph{Hint:} it may be useful to define an auxiliary function
 \texttt{distribOr :: Form -> Form -> Form} that distributes an \texttt{Or} over an \texttt{And}
 according to the above two equations, so that \texttt{distribOr f1 f2} is
 equivalent to \texttt{f1 `Or` f2} and such that the result is in \emph{cnf} if
@@ -512,6 +512,319 @@ False
 False
 \end{lstlisting}
 
+
+%----------------------------------------------------------------------
+\section{Propositional Prolog}\label{sec:prolog}
+
+% ......................................................................
+\subsection{Informal overview}\label{sec:prolog_overview}
+
+This section is about a very impoverished version of the
+Prolog\footnote{\url{https://en.wikipedia.org/wiki/Prolog}} language which we
+call Propositional Prolog (PP) because its ``predicates'' have no arguments and are
+therefore just propositional variables.
+
+Here is the famous ``Socrates is mortal'' argument as PP program:
+\begin{alltt}
+  h.
+  m :- h.
+  ?- m
+\end{alltt}
+It states that Socrates is a human (\texttt{h.}), that for being mortal, it is
+sufficient to be human (\texttt{m :- h.}), and we ask whether Socrates is
+mortal (\texttt{?- m}). When running this program, it answers with
+\texttt{Yes}.
+
+Some terminology:
+\begin{itemize}
+\item The first element (\texttt{h.}) is called a \emph{fact}. It makes a
+  statement about something assumed to be true.
+\item The second element (\texttt{m :- h.}) is called a \emph{rule},
+  consisting of a \emph{head} (\texttt{m}) and a \emph{body} (\texttt{h}). It
+  says that the head is true provided the body is true.
+\item The last element (\texttt{?- m}) is called a \emph{query} by which we
+  want to ascertain whether the proposition of the query can be derived from
+  the facts and rules.
+\end{itemize}
+A PP program can be made up of many facts and rules (in any order), but only
+one query.
+
+A PP program can be given an interpretation as logical formula:
+\begin{itemize}
+\item A fact is just interpreted as a propositional variable $h$.
+\item A rule is interpreted as ``body implies head'', in the example: $h \IMPL
+  m$. In fact, the symbol \texttt{:-} can be understood as a stylised left
+  arrow $\longleftarrow$.
+\item The whole program is interpreted as: the facts and rules imply the
+  query, thus $(h \AND (h \IMPL m)) \IMPL m$.
+\end{itemize}
+
+There are two ways to reason about such a formula:
+\begin{itemize}
+\item by \emph{forward chaining}: starting from the facts, try to infer more
+  facts by applying rules in the direction of the implication. In our case, we
+  know $h$. Applying this knowledge to rule $h \IMPL m$\footnote{In logic,
+    this rule is called \emph{modus ponens}:
+    \url{https://en.wikipedia.org/wiki/Modus_ponens}}, we obtain $m$, and this
+  is what we wanted to know in the query.
+\item by \emph{backward chaining}: starting from the \emph{goal} we want to
+  solve (initially: the query), we try to find out what would be required to
+  satisfy the goal, by applying rules in the opposite direction, thus possibly
+  generating new goals to be solved, until we arrive at a fact. In our case,
+  the goal is $m$. Applying $h \IMPL m$ backwards, we obtain the new goal $h$
+  which we know to be true because it is a fact.
+\end{itemize}
+
+
+% ......................................................................
+\subsection{Propositional Prolog in Haskell}\label{sec:prolog_in_haskell}
+
+We now give a more formal account of the structure of a PP program. In
+extension to what has been said above, the body of a rule can be composed of
+several propositions \texttt{p1 \dots pn} but can only have one head
+\texttt{h}, so the general format of a rule is \texttt{h :- p1, ..., pn}. The
+body is interpreted conjunctively, so the formula corresponding to this rule
+is $p_1 \AND \dots \AND p_n \IMPL h$\footnote{Conjunction binds more strongly
+  than implication; in parenthesised form, this is $(p_1 \AND \dots \AND p_n) \IMPL h$.}.
+A ``conjunction with no elements'' (so for $n=0$) can be taken to be the
+constant true $\TRUE$, and in this case, $\TRUE \IMPL h$ is the same as the
+fact $h$. For these reasons, we can take facts to be special rules with an
+empty body.  Also a goal can consist of several propositions.
+
+\begin{exo}\label{exo:pp_prog_structure}
+  We will henceforth represent propositional variables as strings.
+  Define the following data types:
+  \begin{itemize}
+  \item \texttt{Rule} with constructor \texttt{Rl} consisting of a variable
+    (head) and a list of variables (body).    
+  \item \texttt{Goal} with constructor \texttt{Gl} consisting of a list of
+    variables .
+  \item \texttt{Prog} with constructor \texttt{Pr} consisting of a list of
+    rules and a goal.
+  \end{itemize}
+\end{exo}
+
+For example, the Socrates program is represented as
+\begin{lstlisting}
+mortalSocrates :: Prog
+mortalSocrates
+  = Pr
+  [Rl "h" [],
+   Rl "m" ["h"]
+  ]
+  (Gl ["m"])
+\end{lstlisting}
+
+A more complex program is the following:
+
+\begin{lstlisting}
+abcdProg :: Prog
+abcdProg
+  = Pr
+  [Rl "a" [],
+   Rl "d" ["b", "c"],
+   Rl "d" ["a", "c"],
+   Rl "c" ["a"]
+  ]
+  (Gl ["d", "c"])
+\end{lstlisting}
+corresponding to:
+
+\begin{alltt}
+  a.
+  d :- b, c.
+  d :- a, c.
+  c :- a.
+  ?- d, c.
+\end{alltt}
+
+  
+% ......................................................................
+\subsection{Propositional Prolog as Formula}\label{sec:prolog_as_formula}
+
+\begin{exo}\label{exo:pp_prog_to_form}
+Write functions \texttt{ruleToForm}, \texttt{goalToForm}, \texttt{progToForm}
+that translate rules, goals and programs to formulas as outlined above. The
+translation of a goal \texttt{?- g1, \dots gn} is the conjunction $g_1 \AND
+\dots g_n$.
+
+\emph{Hint:} it is useful to have auxiliary functions
+\begin{itemize}
+\item \texttt{implies :: Form -> Form -> Form} representing implication, where
+  $A \IMPL B$ is equivalent to $(\NOT A) \OR B$. You do not have to modify the
+  type \texttt{Form}!
+\item \texttt{conj :: [Form] -> Form} constructs a conjunction of the formulas
+  in the list, where \texttt{conj []} is \texttt{(C True)}. The function is
+  easy to write with \texttt{foldl}. 
+\end{itemize}
+\end{exo}
+
+With the functions of \secref{sec:evaluating_models}, you now have a first
+handle to check whether a query succeeds or not: convert the Prolog program to
+a formula and then check whether it is valid:
+
+\begin{lstlisting}
+> valid (progToForm mortalSocrates)
+True
+\end{lstlisting}
+
+Let's call the following ``false'' program \texttt{immortalSocrates}:
+\begin{alltt}
+  h.
+  h :- m.
+  ?- m
+\end{alltt}
+
+\begin{lstlisting}
+> valid (progToForm immortalSocrates)
+False
+> allModels (Not (progToForm immortalSocrates))
+[[("m",False),("h",True)]]
+\end{lstlisting}
+The counter-model evidencing that the program's formula is \emph{not} correct
+shows that both preconditions are true ($h$ is true, and $m \IMPL h$ is true
+because $m$ is false), and $m$ is false and thus cannot be a conclusion of the
+preconditions.
+
+
+% ......................................................................
+\subsection{Interlude: some list functions}\label{sec:list_functions}
+
+Before proceeding to the PP interpreter, let's recall some list processing functions.
+
+\begin{exo}\label{exo:any_all}
+  Make sure you are familiar with the functions \texttt{any} (checking whether
+  there is \emph{some} element with a property in a list) and \texttt{all}
+  (checking whether \emph{all} elements have the property). Thus,
+  \begin{itemize}
+  \item how do you check whether there is a number divisible by 3 in the list
+    \texttt{[1, 4, 5, 6]}?
+  \item how do you check whether all numbers in this list are divisible by 3?
+  \end{itemize}
+\end{exo}
+
+List comprehension (see chapter 9.7 in the Haskell book) is a concise way of
+filtering (parts of) elements out of a list that have a specific property.
+\begin{exo}\label{exo:list_comprehension}\
+  \begin{itemize}
+  \item Use list comprehension to compute the squares of the negative numbers
+    of \texttt{[1, -3, 4, -5]} (the result should be \texttt{[9,25]}).
+  \item Use list comprehension to find the rules that have a given head, for
+    example the rules \texttt{d :- b, c.} and \texttt{d :- a, c} for head
+    \texttt{d} in \texttt{abcdProg}.
+  \end{itemize}
+\end{exo}
+
+% ......................................................................
+\subsection{Running Propositional Prolog Programs}\label{sec:running_prolog}
+
+A second approach to check a PP program is to run it the way the Prolog engine
+would do. This can be much more efficient than by conversion to a formula, but
+there are also some downsides as we will see shortly.
+
+Let's see how Prolog would execute \texttt{abcdProg} by backward chaining. The
+goal is initially \texttt{d, c}, and both \texttt{d} and \texttt{c} have to be
+derivable.
+\begin{itemize}
+\item Let's first try to solve \texttt{d}, for which we have two rule
+  candidates:
+  \begin{itemize}
+  \item let's first try with \texttt{d :- b, c.} In order for \texttt{d} to be
+    derivable, both \texttt{b} and \texttt{c} have to, but we see that there
+    is no way to show \texttt{b} (no rule has \texttt{b} as head), so this
+    rule fails.
+  \item let's now try with \texttt{d :- a, c}, which generates 
+    \texttt{a, c}, both of which have to be satisfied. The subgoal \texttt{a}
+    can immediately seen to hold (as a fact), and also \texttt{c} is seen to
+    hold via rule \texttt{c :- a} and fact \texttt{a}. 
+  \end{itemize}
+  Altogether, we conclude that \texttt{d} is derivable.
+\item We now try to show \texttt{c}. Indeed, we have already shown it in a
+  previous subgoal, but Prolog is not intelligent enough to remember it and so
+  does the whole job again.
+\end{itemize}
+
+Let us summarise the procedure:
+\begin{itemize}
+\item In order to \emph{solve a goal} (consisting of one or more propositions, such
+  as \texttt{d, c}), we have to solve \emph{all} the propositions of the goal.
+\item In order to \emph{solve a proposition} \texttt{p}, we have to find \emph{some} rule
+  \texttt{h :- p1, \dots pn} in the rule set whose head matches the
+  proposition (\emph{i.e.} \texttt{h == p}), and then solve the goal \texttt{p1, \dots pn}.
+\end{itemize}
+
+This characterization gives rise to two mutually recursive procedures:
+
+\begin{exo}\label{sec:solve_prolog} \
+  \begin{itemize}
+  \item Write function \texttt{solveGoal :: [Rule] -> [String] -> Bool} such
+    that \texttt{solveGoal rls ps} solves all the propositions in
+    \texttt{ps}. This function will call \texttt{solveProp}. Use the Haskell
+    function \texttt{all} to express that all propositions have to be solved.
+  \item Write function \texttt{solveProp :: [Rule] -> String -> Bool} such
+    that \texttt{solveProp rls p} solves proposition \texttt{p} using rules
+    \texttt{rls}. This function will call \texttt{solveGoal}. Use the Haskell
+    function \texttt{any} to express that some matching rule among
+    \texttt{rls} does the job. Also see exercise~\ref{exo:list_comprehension}.
+  \end{itemize}
+  In spite of the lengthy description, each of these functions is just one
+  line long.
+\end{exo}
+
+
+\begin{exo}\label{sec:runProg}
+It is now easy to define function \texttt{runProg :: Prog -> Bool} that
+fetches the rule set and goal (list of propositions) out of a program and
+starts \texttt{solveGoal} on them.
+
+\noindent
+\emph{Example:}
+\begin{lstlisting}
+> runProg mortalSocrates
+True
+> runProg immortalSocrates
+False
+\end{lstlisting}
+\end{exo}
+
+
+What is the difference between the method of checking a program as in
+\secref{sec:prolog_as_formula} and running it as described here? The latter
+method can be dramatically faster, but can lead to looping behaviour, whereas
+the model finding approach always finds an answer (terminates), at least in
+principle. We illustrate the problem with the following program:
+
+\begin{lstlisting}
+nonterminating :: Prog
+nonterminating
+  = Pr
+  [Rl "h" [],
+   Rl "m" ["m", "h"],
+   Rl "m" ["h"]
+  ]
+  (Gl ["m"])
+\end{lstlisting}
+When trying to solve \texttt{m}, we look through the rules from top to
+bottom and first find \texttt{m :- m, h.}, so we choose it and now have to
+solve the goal \texttt{m, h} corresponding to its body, which amounts to
+solving the proposition \texttt{m} first, and so we are back to the original
+goal. From a logical perspective, the formula $m \AND h \IMPL m$ corresponding
+to \texttt{m :- m, h.} is vacuously true and thus could be deleted without
+altering the meaning of the program, but operationally, the rule leads to
+non-termination.
+
+We can avoid the problem by changing the rule order:
+\begin{lstlisting}
+terminating :: Prog
+terminating
+  = Pr
+  [Rl "h" [],
+   Rl "m" ["h"],
+   Rl "m" ["m", "h"]
+  ]
+  (Gl ["m"])
+\end{lstlisting}
+This program yields the desired result without looping - just try it out!
 
 \end{document}
 

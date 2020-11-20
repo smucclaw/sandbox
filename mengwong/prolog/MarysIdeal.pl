@@ -59,5 +59,5 @@ solution(IdealManName) :-
     %% Which one of the four men satisfies all of Mary's requirements?
 
 % ┌─[mengwong@venice4] - [~/src/smucclaw/sandbox/mengwong/prolog] - [2020-10-15 03:10:47]
-% └─[2] <git:(default 2baaee5✈) > swipl -g 'solution(X), writeln(X), halt' marymen.pl
+% └─[2] <git:(default 2baaee5✈) > swipl -g 'solution(X), writeln(X), halt' MarysIdeal.pl
 % carl

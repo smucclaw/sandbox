@@ -37,3 +37,26 @@ They were then modified.
   - Case 1: Legendary so no change in quality
   - Case 2: Spectral so decrease in quality (but by how much?)
   - Decision: go with case 1, more restrictive (Lex specialis). Legendary items are a more restrictive case than conjured items
+
+# A Contribution
+
+[Hillel Wayne analyzes the underspecification present in the Gilded Rose](https://www.hillelwayne.com/post/requirements/), and presents a decision table that forces certain decisions. However, that decision table remains at the level of a specification.
+
+The DMNMD library _refines_ the specification to an implementation, by producing working Python code that implements the logic of the decision table.
+
+In the first draft of the code, every row gets its own "if" statement. But maybe the terms of the "if" are heavyweight functions; we wouldn't want to evaluate any of them more than necessary.
+
+A lazy functional language like Haskell easily solves that problem by inherently "caching" results of intermediate evaluations under a `let` binding, but the traditional approach is to convert a decision table to a decision tree.
+
+There is a rich literature in how to do that:
+- https://dl.acm.org/doi/10.1145/356628.356630
+- https://www.researchgate.net/publication/220431539_Conversion_of_Limited-Entry_Decision_Tables_to_Optimal_Computer_Programs_I_Minimum_Average_Processing_Time
+- https://dl.acm.org/doi/abs/10.1145/360238.360245
+
+The literature is so old it has passed out of common knowledge.
+
+The next round of work on this library will facilitate the automatic extraction of a decison tree (a.k.a a bunch of nested "ifs"). Initially we will do this the naive way; later we will try to optimize.
+
+
+
+

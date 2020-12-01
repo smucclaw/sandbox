@@ -1,0 +1,104 @@
+#+TITLE: exploring the Allen Interval Algebra
+
+In this exercise we interpret Allen's interval algebra into an isomorphic timepoint algebra.
+
+We decompose Allen's intervals X and Y into timepoints A<B, C<D.
+
+We seek to derive Allen's interval algebra from first principles,
+coming from the timepoint algebra. We know in advance the answer we
+seek; his algebra comprises 13 relations:
+- one symmetric relation "=",
+- six asymmetric relations between X and Y (<, m, o, s, d, f), and
+- six inverses Y to X.
+
+Our universes are as follows:
+
+| algebra   | nodes      | edges               | remark                                 |
+|-----------+------------+---------------------+----------------------------------------|
+| Timepoint | A, B, C, D | <, =                | We normalize x > y to y < x.           |
+| Allen     | X, Y       | <, m, o, s, d, f, = | and the inverses >, mi, oi, si, di, fi |
+
+See https://en.wikipedia.org/wiki/Allen%27s_interval_algebra for details.
+
+* Method
+
+We construct a graph whose nodes are in {A,B,C,D} and edges are in {LT, EQ}.
+
+The LT ordering provides a direction to the edges, while the EQ relation collects nodes into "equivalence classes".
+
+Since we are representing timelines, which are linear, our graph collapses to a simple singly linked list!
+
+We construct all possible combinations of node,edge,node,edge,node,edge,node and extract those legal formulas which match our preconceptions.
+
+Legal formulas have A < B and C < D.
+
+We find that out of the 192 possible lines, there are 22 legal formulas; after eliminating repeats, we find 13, which agrees with Allen.
+
+* The Expected Answer
+
+We expect to see a set of answers and their inverses, obtained by swapping AB with CD.
+
+| Allen Relation | Interpretation | Timepoint Relation  | Inverse             |
+|----------------+----------------+---------------------+---------------------|
+| X < Y          | X precedes Y   | B < C               | D < A               |
+| X m Y          | X meets Y      | B = C               | D = A               |
+| X o Y          | X overlaps Y   | A < C, C < B, B < D | C < A, A < D, D < B |
+| X s Y          | X starts Y     | A = C, B < D        | A = C, D < B        |
+| X d Y          | X during Y     | C < A, B < D        | A < C, D < B        |
+| X f Y          | X finishes Y   | B = D, C < A        | B = D, A < C        |
+| X = Y          | X equal Y      | A = C, B = D        |                     |
+
+* The Answers We Get
+
+$ ./allen
+m : A<B=C<D: AB meets CD
+m :    A---B
+m :        C---D
+
+< : A<B<C<D: AB precedes CD
+< :    A---B
+< :            C---D
+
+= : A=C<B=D: AB equals CD
+= :    A---B
+= :    C---D
+
+s : A=C<B<D: AB starts CD
+s :    A---B
+s :    C-------D
+
+si: A=C<D<B: CD starts AB
+si:    A-------B
+si:    C---D
+
+fi: A<C<B=D: CD finishes AB
+fi:    A-------B
+fi:        C---D
+
+o : A<C<B<D: AB overlaps with CD
+o :    A-------B
+o :        C-------D
+
+di: A<C<D<B: CD during AB
+di:    A-----------B
+di:        C---D
+
+f : C<A<B=D: AB finishes CD
+f :        A---B
+f :    C-------D
+
+d : C<A<B<D: AB during CD
+d :        A---B
+d :    C-----------D
+
+mi: C<A=D<B: CD meets AB
+mi:        A---B
+mi:    C---D
+
+oi: C<A<D<B: CD overlaps with AB
+oi:        A-------B
+oi:    C-------D
+
+> : C<D<A<B: CD precedes AB
+> :            A---B
+> :    C---D

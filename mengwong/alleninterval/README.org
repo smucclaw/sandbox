@@ -32,7 +32,7 @@ We construct all possible combinations of node,edge,node,edge,node,edge,node and
 
 Legal formulas have A < B and C < D.
 
-We find that out of the 192 possible lines, there are 22 legal formulas; after eliminating repeats, we find 13, which agrees with Allen.
+We find that out of the 192 possible lines, there are 22 legal formulas; after eliminating repeats, 13 remain, which agrees with Allen.
 
 * The Expected Answer
 
@@ -50,6 +50,7 @@ We expect to see a set of answers and their inverses, obtained by swapping AB wi
 
 * The Answers We Get
 
+#+begin_example
 $ ./allen
 m : A<B=C<D: AB meets CD
 m :    A---B
@@ -102,3 +103,4 @@ oi:    C-------D
 > : C<D<A<B: CD precedes AB
 > :            A---B
 > :    C---D
+#+end_example

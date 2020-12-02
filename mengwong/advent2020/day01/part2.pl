@@ -28,11 +28,17 @@ solve2(Filename, Sum, Answer, Product) :-
 %% false.
 
 %% Let's generalize to any cardinality of answer!
+solveC(Filename, Sum, Cardinality, Answer) :-
+    readFile(Filename, Input),
+    length(Answer, Cardinality),        % we can say if we want 2 or 3
+    maplist(flip_member(Input),Answer), % Answer is a subset of Input
+    sum(Answer, #=, Sum).               % they sum to the goal
+
+%% Let's assume you're asking for Answer as [X,Y]:
 solveN(Filename, Sum, Answer) :-
     readFile(Filename, Input),
     maplist(flip_member(Input),Answer), % Answer is a subset of Input
     sum(Answer, #=, Sum).               % they sum to the goal
-
 %   sort(Answer,Answer).                % optional, to dedup output
 
 flip_member(X,Y) :- member(Y,X).        % needed for maplist
@@ -56,8 +62,8 @@ flip_member(X,Y) :- member(Y,X).        % needed for maplist
 %% let's write our own!
 
 mysum(X,Y,Z) :- X + Y #= Z. %% the CLP(FD) version of "Z is X + Y"
-mymul(X,Y,Z) :- X * Y #= Z.
 mysumlist(List, Sum) :- foldl(mysum, List, 0, Sum).
+mymul(X,Y,Z) :- X * Y #= Z.
 mymullist(List, Mul) :- foldl(mymul, List, 1, Mul).
 %% yes, this is good old Sum and Product monoid
 %% https://hackage.haskell.org/package/base-4.14.0.0/docs/Data-Monoid.html

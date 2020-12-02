@@ -11,21 +11,25 @@ import Data.Maybe (catMaybes)
 import Control.Applicative (liftA2)
 import Debug.Trace
 
-data TimePoint = A | B | C | D deriving (Show, Eq, Ord)
+data TimePoint = A | B | C | D | E | F deriving (Show, Eq, Ord)
 
 -- a plain old timeline with four timepoints and three ordering relations between them
-data Linear = Lin TimePoint Ordering TimePoint Ordering TimePoint Ordering TimePoint
+data Linear = Lin TimePoint Ordering TimePoint Ordering TimePoint Ordering TimePoint Ordering TimePoint Ordering TimePoint
   deriving (Show, Eq, Ord)
 
 -- every possible timeline; there are 192 of them.
-allLins =  [ Lin tp1 o2 tp3 o4 tp5 o6 tp7
-           | tp1 <- [ A, B, C, D ]
-           , tp3 <- [ A, B, C, D ], tp3 /= tp1
-           , tp5 <- [ A, B, C, D ], tp5 /= tp1, tp5 /= tp3
-           , tp7 <- [ A, B, C, D ], tp7 /= tp1, tp7 /= tp3, tp7 /= tp5
+allLins =  [ Lin tp1 o2 tp3 o4 tp5 o6 tp7 o8 tp9 o10 tp11
+           | tp1  <- [ A, B, C, D, E, F ]
+           , tp3  <- [ A, B, C, D, E, F ], tp3 /= tp1
+           , tp5  <- [ A, B, C, D, E, F ], tp5 /= tp1, tp5 /= tp3
+           , tp7  <- [ A, B, C, D, E, F ], tp7 /= tp1, tp7 /= tp3, tp7 /= tp5
+           , tp9  <- [ A, B, C, D, E, F ], tp9 /= tp1, tp9 /= tp3, tp9 /= tp5, tp9 /= tp7
+           , tp11 <- [ A, B, C, D, E, F ], tp11/= tp1, tp11/= tp3, tp11/= tp5, tp11/= tp7, tp11/= tp9
            ,  o2 <- [ LT, EQ ]
            ,  o4 <- [ LT, EQ ]
            ,  o6 <- [ LT, EQ ]
+           ,  o8 <- [ LT, EQ ]
+           , o10 <- [ LT, EQ ]
            ]
 
 -- perhaps a little overengineered, but we represent a timeline as a leftmost point followed by a nonempty list of (Ordering, TimePoint) pairs.
@@ -44,9 +48,9 @@ instance Show Chain where
       showotl ((o, tp) : rest) = sho o ++ show tp ++ showotl rest
 
 mkChain :: Linear -> Chain
-mkChain (Lin tp1 o2 tp3 o4 tp5 o6 tp7) = Chain tp1 ((o2, tp3) :| [(o4, tp5), (o6, tp7)])
+mkChain (Lin tp1 o2 tp3 o4 tp5 o6 tp7 o8 tp9 o10 tp11) = Chain tp1 ((o2, tp3) :| [(o4, tp5), (o6, tp7), (o8, tp9), (o10, tp11)])
 
-mylin = Lin A LT B EQ C LT D -- some dummy data
+mylin = Lin A LT B EQ C LT D EQ E LT F -- some dummy data
 mychain = mkChain mylin
 -- try: putStrLn $ drawLocations $ locate $ mychain
 
@@ -76,11 +80,12 @@ allChains = mkChain <$> allLins -- length 192
 -- we know that Allen's X = A<B and Y = C<D, so we filter for those
 legalAB line = orderBetween (A,B) line == LT
 legalCD line = orderBetween (C,D) line == LT
+legalEF line = orderBetween (E,F) line == LT
 legalChains = filter legalAB $ filter legalCD $ allChains -- length 22
 legalLocations = sortOn snd $ (\x -> (x, locate x)) <$> legalChains
 uniqLegals = nubBy ((==) `on` ((\ls -> drop 3 <$> tail ls))) -- uniq by the ascii artwork itself; length 13
   [ ((symbol ++ ": ") ++) <$>
-    (show chain ++ ": " ++ english)
+    (show chain) -- ++ ": " ++ english)
     : (lines (drawLocations loc))
   | (chain,loc) <- legalLocations
   , let (symbol, english) = allenName (show chain) ]
@@ -106,7 +111,7 @@ locate' pos orig@(Chain tp3 t@((o4, tp5) :| opts)) =
                  else locate' (pos + tab o4) (Chain tp5 $ NE.fromList opts)
 
 drawLocations :: Locations -> String
-drawLocations locs = dP [A,B] ++ dP [C,D]
+drawLocations locs = dP [A,B] ++ dP [C,D] ++ dP [E,F]
   where dP wanted =
           drawPoints (sortOn snd $ filter (\(tp,pos) -> tp `elem` wanted) locs) 0 ' '
 

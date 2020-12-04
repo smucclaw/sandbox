@@ -1,0 +1,42 @@
+\begin{center}
+\begin{tikzpicture}[scale=1.5,
+on grid,
+simple/.style ={shape=circle, fill=grey!50},
+blue/.style ={shape=circle, fill=blue!50},
+red/.style ={shape=circle, fill=red!50},
+auto]
+
+\node[simple] (a) at (0, 1) {A};
+\node[simple] (b) at (1, 1) {B};
+\node[red] (c) at (2, 1) {C};
+\node[blue] (d) at (0, -1) {D};
+\node[blue] (e) at (1, 0) {E};
+\node[simple] (f) at (3, 2) {F};
+\node[blue] (g) at (1, 2) {G};
+\node[simple] (h) at (2, -1) {H};
+\node[simple] (i) at (3, 0) {I};
+\node[simple] (j) at (3, 1) {J};
+
+\begin{scope}[every path/.style=solid,thick]
+\draw[->] (a) -- (b);
+\draw[->] (a) -- (d);
+\draw[->] (b) -- (c);
+\draw[->] (b) -- (g);
+\draw[->] (a) -- (e);
+\draw[->] (c) -- (i);
+\draw[->] (c) -- (f);
+\draw[->] (c) -- (g);
+\draw[->] (d) -- (h);
+\draw[->] (e) -- (i);
+\draw[->] (e) -- (h);
+\draw[->] (i) -- (j);
+\draw[->] (f) -- (j);
+\end{scope}
+\end{tikzpicture}
+\end{center}
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "../main_recherche"
+%%% End: 

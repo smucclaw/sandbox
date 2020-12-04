@@ -1,0 +1,24 @@
+\begin{tikzpicture}[scale=1.5,
+on grid,
+simple/.style ={shape=circle, fill=grey!50},
+blue/.style ={shape=circle, fill=blue!50},
+red/.style ={shape=circle, fill=red!50},
+auto]
+
+\node[simple] (a) at (0, 1) {A};
+\node[simple] (b) at (1, 1) {B};
+\node[simple] (c) at (2, 1) {C};
+\node[simple] (g) at (1, 2) {G};
+
+\begin{scope}[every path/.style=solid,thick]
+\draw[->] (a) to node {3} (b);
+\draw[->] (b) to node {4} (c);
+\draw[->] (b) to node {2} (g);
+\draw[<->] (g) to node {5} (c);
+\end{scope}
+\end{tikzpicture}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../main"
+%%% End:

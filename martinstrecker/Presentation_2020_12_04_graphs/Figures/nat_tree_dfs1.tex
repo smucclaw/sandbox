@@ -1,0 +1,33 @@
+\begin{center}
+\begin{tikzpicture}[scale=0.5,
+on grid,
+simple/.style ={shape=circle, fill=grey!50},
+orange/.style ={shape=circle, fill=orange!50},
+red/.style ={shape=circle, fill=red!50},
+blue/.style ={shape=circle, fill=blue!50},
+auto]
+
+\node[simple] (n1) at (3, 4) {1};
+\node[red] (n2) at (1, 2) {2};
+\node[blue] (n3) at (5, 2) {3};
+\node[simple] (n4) at (0, 0) {4};
+\node[simple] (n5) at (2, 0) {5};
+\node[simple] (n6) at (4, 0) {6};
+\node[simple] (n7) at (6, 0) {7};
+
+\begin{scope}[every path/.style=solid,thick]
+\draw[->] (n1) -- (n2);
+\draw[->] (n1) -- (n3);
+\draw[->] (n2) -- (n4);
+\draw[->] (n2) -- (n5);
+\draw[->] (n3) -- (n6);
+\draw[->] (n3) -- (n7);
+\end{scope}
+\end{tikzpicture}
+\end{center}
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "../main_recherche"
+%%% End: 

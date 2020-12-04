@@ -1,0 +1,2040 @@
+m : A<B=C<D: X meets Y
+m :    A---B
+m :        C---D
+m : 
+
+< : A<B<C<D: X precedes Y
+< :    A---B
+< :            C---D
+< : 
+
+= : A=C<B=D: X equals Y
+= :    A---B
+= :    C---D
+= : 
+
+s : A=C<B<D: X starts Y
+s :    A---B
+s :    C-------D
+s : 
+
+si: A=C<D<B: Y starts X
+si:    A-------B
+si:    C---D
+si: 
+
+fi: A<C<B=D: Y finishes X
+fi:    A-------B
+fi:        C---D
+fi: 
+
+o : A<C<B<D: X overlaps with Y
+o :    A-------B
+o :        C-------D
+o : 
+
+di: A<C<D<B: Y during X
+di:    A-----------B
+di:        C---D
+di: 
+
+f : C<A<B=D: X finishes Y
+f :        A---B
+f :    C-------D
+f : 
+
+d : C<A<B<D: X during Y
+d :        A---B
+d :    C-----------D
+d : 
+
+mi: C<A=D<B: Y meets X
+mi:        A---B
+mi:    C---D
+mi: 
+
+oi: C<A<D<B: Y overlaps with X
+oi:        A-------B
+oi:    C-------D
+oi: 
+
+> : C<D<A<B: Y precedes X
+> :            A---B
+> :    C---D
+> : 
+
+--------------- composition -- see Figure 4
+
+composition of <  with <  produces < 
+< : A<B<C<D<E<F
+< :    A---B
+< :            C---D
+< :                    E---F
+
+composition of <  with m  produces < 
+< : A<B<C<D=E<F
+< :    A---B
+< :            C---D
+< :                E---F
+
+composition of m  with <  produces < 
+< : A<B=C<D<E<F
+< :    A---B
+< :        C---D
+< :                E---F
+
+composition of m  with m  produces < 
+< : A<B=C<D=E<F
+< :    A---B
+< :        C---D
+< :            E---F
+
+composition of <  with o  produces < 
+< : A<B<C<E<D<F
+< :    A---B
+< :            C-------D
+< :                E-------F
+
+composition of <  with fi produces < 
+< : A<B<C<E<D=F
+< :    A---B
+< :            C-------D
+< :                E---F
+
+composition of <  with s  produces < 
+< : A<B<C=E<D<F
+< :    A---B
+< :            C---D
+< :            E-------F
+
+composition of <  with =  produces < 
+< : A<B<C=E<D=F
+< :    A---B
+< :            C---D
+< :            E---F
+
+composition of m  with o  produces < 
+< : A<B=C<E<D<F
+< :    A---B
+< :        C-------D
+< :            E-------F
+
+composition of m  with fi produces < 
+< : A<B=C<E<D=F
+< :    A---B
+< :        C-------D
+< :            E---F
+
+composition of m  with s  produces m 
+m : A<B=C=E<D<F
+m :    A---B
+m :        C---D
+m :        E-------F
+
+composition of m  with =  produces m 
+m : A<B=C=E<D=F
+m :    A---B
+m :        C---D
+m :        E---F
+
+composition of <  with di produces < 
+< : A<B<C<E<F<D
+< :    A---B
+< :            C-----------D
+< :                E---F
+
+composition of <  with si produces < 
+< : A<B<C=E<F<D
+< :    A---B
+< :            C-------D
+< :            E---F
+
+composition of m  with di produces < 
+< : A<B=C<E<F<D
+< :    A---B
+< :        C-----------D
+< :            E---F
+
+composition of m  with si produces m 
+m : A<B=C=E<F<D
+m :    A---B
+m :        C-------D
+m :        E---F
+
+composition of <  with d  produces < , m , o , s , d 
+< : A<B<E<C<D<F
+< :    A---B
+< :                C---D
+< :            E-----------F
+m : A<B=E<C<D<F
+m :    A---B
+m :            C---D
+m :        E-----------F
+o : A<E<B<C<D<F
+o :    A-------B
+o :                C---D
+o :        E---------------F
+s : A=E<B<C<D<F
+s :    A---B
+s :            C---D
+s :    E---------------F
+d : E<A<B<C<D<F
+d :        A---B
+d :                C---D
+d :    E-------------------F
+
+composition of <  with f  produces < , m , o , s , d 
+< : A<B<E<C<D=F
+< :    A---B
+< :                C---D
+< :            E-------F
+m : A<B=E<C<D=F
+m :    A---B
+m :            C---D
+m :        E-------F
+o : A<E<B<C<D=F
+o :    A-------B
+o :                C---D
+o :        E-----------F
+s : A=E<B<C<D=F
+s :    A---B
+s :            C---D
+s :    E-----------F
+d : E<A<B<C<D=F
+d :        A---B
+d :                C---D
+d :    E---------------F
+
+composition of <  with oi produces < , m , o , s , d 
+< : A<B<E<C<F<D
+< :    A---B
+< :                C-------D
+< :            E-------F
+m : A<B=E<C<F<D
+m :    A---B
+m :            C-------D
+m :        E-------F
+o : A<E<B<C<F<D
+o :    A-------B
+o :                C-------D
+o :        E-----------F
+s : A=E<B<C<F<D
+s :    A---B
+s :            C-------D
+s :    E-----------F
+d : E<A<B<C<F<D
+d :        A---B
+d :                C-------D
+d :    E---------------F
+
+composition of <  with mi produces < , m , o , s , d 
+< : A<B<E<C=F<D
+< :    A---B
+< :                C---D
+< :            E---F
+m : A<B=E<C=F<D
+m :    A---B
+m :            C---D
+m :        E---F
+o : A<E<B<C=F<D
+o :    A-------B
+o :                C---D
+o :        E-------F
+s : A=E<B<C=F<D
+s :    A---B
+s :            C---D
+s :    E-------F
+d : E<A<B<C=F<D
+d :        A---B
+d :                C---D
+d :    E-----------F
+
+composition of <  with >  produces < , m , o , fi, s , = , di, si, d , f , oi, mi, > 
+< : A<B<E<F<C<D
+< :    A---B
+< :                    C---D
+< :            E---F
+m : A<B=E<F<C<D
+m :    A---B
+m :                C---D
+m :        E---F
+o : A<E<B<F<C<D
+o :    A-------B
+o :                    C---D
+o :        E-------F
+fi: A<E<B=F<C<D
+fi:    A-------B
+fi:                C---D
+fi:        E---F
+s : A=E<B<F<C<D
+s :    A---B
+s :                C---D
+s :    E-------F
+= : A=E<B=F<C<D
+= :    A---B
+= :            C---D
+= :    E---F
+di: A<E<F<B<C<D
+di:    A-----------B
+di:                    C---D
+di:        E---F
+si: A=E<F<B<C<D
+si:    A-------B
+si:                C---D
+si:    E---F
+d : E<A<B<F<C<D
+d :        A---B
+d :                    C---D
+d :    E-----------F
+f : E<A<B=F<C<D
+f :        A---B
+f :                C---D
+f :    E-------F
+oi: E<A<F<B<C<D
+oi:        A-------B
+oi:                    C---D
+oi:    E-------F
+mi: E<A=F<B<C<D
+mi:        A---B
+mi:                C---D
+mi:    E---F
+> : E<F<A<B<C<D
+> :            A---B
+> :                    C---D
+> :    E---F
+
+composition of o  with <  produces < 
+< : A<C<B<D<E<F
+< :    A-------B
+< :        C-------D
+< :                    E---F
+
+composition of o  with m  produces < 
+< : A<C<B<D=E<F
+< :    A-------B
+< :        C-------D
+< :                E---F
+
+composition of fi with <  produces < 
+< : A<C<B=D<E<F
+< :    A-------B
+< :        C---D
+< :                E---F
+
+composition of fi with m  produces m 
+m : A<C<B=D=E<F
+m :    A-------B
+m :        C---D
+m :            E---F
+
+composition of s  with <  produces < 
+< : A=C<B<D<E<F
+< :    A---B
+< :    C-------D
+< :                E---F
+
+composition of s  with m  produces < 
+< : A=C<B<D=E<F
+< :    A---B
+< :    C-------D
+< :            E---F
+
+composition of =  with <  produces < 
+< : A=C<B=D<E<F
+< :    A---B
+< :    C---D
+< :            E---F
+
+composition of =  with m  produces m 
+m : A=C<B=D=E<F
+m :    A---B
+m :    C---D
+m :        E---F
+
+composition of o  with o  produces < , m , o 
+< : A<C<B<E<D<F
+< :    A-------B
+< :        C-----------D
+< :                E-------F
+m : A<C<B=E<D<F
+m :    A-------B
+m :        C-------D
+m :            E-------F
+o : A<C<E<B<D<F
+o :    A-----------B
+o :        C-----------D
+o :            E-----------F
+
+composition of o  with fi produces < , m , o 
+< : A<C<B<E<D=F
+< :    A-------B
+< :        C-----------D
+< :                E---F
+m : A<C<B=E<D=F
+m :    A-------B
+m :        C-------D
+m :            E---F
+o : A<C<E<B<D=F
+o :    A-----------B
+o :        C-----------D
+o :            E-------F
+
+composition of s  with o  produces < , m , o 
+< : A=C<B<E<D<F
+< :    A---B
+< :    C-----------D
+< :            E-------F
+m : A=C<B=E<D<F
+m :    A---B
+m :    C-------D
+m :        E-------F
+o : A=C<E<B<D<F
+o :    A-------B
+o :    C-----------D
+o :        E-----------F
+
+composition of s  with fi produces < , m , o 
+< : A=C<B<E<D=F
+< :    A---B
+< :    C-----------D
+< :            E---F
+m : A=C<B=E<D=F
+m :    A---B
+m :    C-------D
+m :        E---F
+o : A=C<E<B<D=F
+o :    A-------B
+o :    C-----------D
+o :        E-------F
+
+composition of o  with di produces < , m , o , fi, di
+< : A<C<B<E<F<D
+< :    A-------B
+< :        C---------------D
+< :                E---F
+m : A<C<B=E<F<D
+m :    A-------B
+m :        C-----------D
+m :            E---F
+o : A<C<E<B<F<D
+o :    A-----------B
+o :        C---------------D
+o :            E-------F
+fi: A<C<E<B=F<D
+fi:    A-----------B
+fi:        C-----------D
+fi:            E---F
+di: A<C<E<F<B<D
+di:    A---------------B
+di:        C---------------D
+di:            E---F
+
+composition of s  with di produces < , m , o , fi, di
+< : A=C<B<E<F<D
+< :    A---B
+< :    C---------------D
+< :            E---F
+m : A=C<B=E<F<D
+m :    A---B
+m :    C-----------D
+m :        E---F
+o : A=C<E<B<F<D
+o :    A-------B
+o :    C---------------D
+o :        E-------F
+fi: A=C<E<B=F<D
+fi:    A-------B
+fi:    C-----------D
+fi:        E---F
+di: A=C<E<F<B<D
+di:    A-----------B
+di:    C---------------D
+di:        E---F
+
+composition of di with <  produces < , m , o , fi, di
+< : A<C<D<B<E<F
+< :    A-----------B
+< :        C---D
+< :                    E---F
+m : A<C<D<B=E<F
+m :    A-----------B
+m :        C---D
+m :                E---F
+o : A<C<D<E<B<F
+o :    A---------------B
+o :        C---D
+o :                E-------F
+fi: A<C<D<E<B=F
+fi:    A---------------B
+fi:        C---D
+fi:                E---F
+di: A<C<D<E<F<B
+di:    A-------------------B
+di:        C---D
+di:                E---F
+
+composition of si with <  produces < , m , o , fi, di
+< : A=C<D<B<E<F
+< :    A-------B
+< :    C---D
+< :                E---F
+m : A=C<D<B=E<F
+m :    A-------B
+m :    C---D
+m :            E---F
+o : A=C<D<E<B<F
+o :    A-----------B
+o :    C---D
+o :            E-------F
+fi: A=C<D<E<B=F
+fi:    A-----------B
+fi:    C---D
+fi:            E---F
+di: A=C<D<E<F<B
+di:    A---------------B
+di:    C---D
+di:            E---F
+
+composition of di with m  produces o , fi, di
+o : A<C<D=E<B<F
+o :    A-----------B
+o :        C---D
+o :            E-------F
+fi: A<C<D=E<B=F
+fi:    A-----------B
+fi:        C---D
+fi:            E---F
+di: A<C<D=E<F<B
+di:    A---------------B
+di:        C---D
+di:            E---F
+
+composition of si with m  produces o , fi, di
+o : A=C<D=E<B<F
+o :    A-------B
+o :    C---D
+o :        E-------F
+fi: A=C<D=E<B=F
+fi:    A-------B
+fi:    C---D
+fi:        E---F
+di: A=C<D=E<F<B
+di:    A-----------B
+di:    C---D
+di:        E---F
+
+composition of fi with o  produces o 
+o : A<C<E<B=D<F
+o :    A-----------B
+o :        C-------D
+o :            E-------F
+
+composition of fi with fi produces fi
+fi: A<C<E<B=D=F
+fi:    A-----------B
+fi:        C-------D
+fi:            E---F
+
+composition of o  with s  produces o 
+o : A<C=E<B<D<F
+o :    A-------B
+o :        C-------D
+o :        E-----------F
+
+composition of o  with =  produces o 
+o : A<C=E<B<D=F
+o :    A-------B
+o :        C-------D
+o :        E-------F
+
+composition of fi with s  produces o 
+o : A<C=E<B=D<F
+o :    A-------B
+o :        C---D
+o :        E-------F
+
+composition of fi with =  produces fi
+fi: A<C=E<B=D=F
+fi:    A-------B
+fi:        C---D
+fi:        E---F
+
+composition of =  with o  produces o 
+o : A=C<E<B=D<F
+o :    A-------B
+o :    C-------D
+o :        E-------F
+
+composition of =  with fi produces fi
+fi: A=C<E<B=D=F
+fi:    A-------B
+fi:    C-------D
+fi:        E---F
+
+composition of s  with s  produces s 
+s : A=C=E<B<D<F
+s :    A---B
+s :    C-------D
+s :    E-----------F
+
+composition of s  with =  produces s 
+s : A=C=E<B<D=F
+s :    A---B
+s :    C-------D
+s :    E-------F
+
+composition of =  with s  produces s 
+s : A=C=E<B=D<F
+s :    A---B
+s :    C---D
+s :    E-------F
+
+composition of =  with =  produces = 
+= : A=C=E<B=D=F
+= :    A---B
+= :    C---D
+= :    E---F
+
+composition of o  with si produces o , fi, di
+o : A<C=E<B<F<D
+o :    A-------B
+o :        C-----------D
+o :        E-------F
+fi: A<C=E<B=F<D
+fi:    A-------B
+fi:        C-------D
+fi:        E---F
+di: A<C=E<F<B<D
+di:    A-----------B
+di:        C-----------D
+di:        E---F
+
+composition of s  with si produces s , = , si
+s : A=C=E<B<F<D
+s :    A---B
+s :    C-----------D
+s :    E-------F
+= : A=C=E<B=F<D
+= :    A---B
+= :    C-------D
+= :    E---F
+si: A=C=E<F<B<D
+si:    A-------B
+si:    C-----------D
+si:    E---F
+
+composition of di with o  produces o , fi, di
+o : A<C<E<D<B<F
+o :    A---------------B
+o :        C-------D
+o :            E-----------F
+fi: A<C<E<D<B=F
+fi:    A---------------B
+fi:        C-------D
+fi:            E-------F
+di: A<C<E<D<F<B
+di:    A-------------------B
+di:        C-------D
+di:            E-------F
+
+composition of di with s  produces o , fi, di
+o : A<C=E<D<B<F
+o :    A-----------B
+o :        C---D
+o :        E-----------F
+fi: A<C=E<D<B=F
+fi:    A-----------B
+fi:        C---D
+fi:        E-------F
+di: A<C=E<D<F<B
+di:    A---------------B
+di:        C---D
+di:        E-------F
+
+composition of si with o  produces o , fi, di
+o : A=C<E<D<B<F
+o :    A-----------B
+o :    C-------D
+o :        E-----------F
+fi: A=C<E<D<B=F
+fi:    A-----------B
+fi:    C-------D
+fi:        E-------F
+di: A=C<E<D<F<B
+di:    A---------------B
+di:    C-------D
+di:        E-------F
+
+composition of si with s  produces s , = , si
+s : A=C=E<D<B<F
+s :    A-------B
+s :    C---D
+s :    E-----------F
+= : A=C=E<D<B=F
+= :    A-------B
+= :    C---D
+= :    E-------F
+si: A=C=E<D<F<B
+si:    A-----------B
+si:    C---D
+si:    E-------F
+
+composition of di with fi produces di
+di: A<C<E<D=F<B
+di:    A---------------B
+di:        C-------D
+di:            E---F
+
+composition of di with =  produces di
+di: A<C=E<D=F<B
+di:    A-----------B
+di:        C---D
+di:        E---F
+
+composition of si with fi produces di
+di: A=C<E<D=F<B
+di:    A-----------B
+di:    C-------D
+di:        E---F
+
+composition of si with =  produces si
+si: A=C=E<D=F<B
+si:    A-------B
+si:    C---D
+si:    E---F
+
+composition of fi with di produces di
+di: A<C<E<F<B=D
+di:    A---------------B
+di:        C-----------D
+di:            E---F
+
+composition of fi with si produces di
+di: A<C=E<F<B=D
+di:    A-----------B
+di:        C-------D
+di:        E---F
+
+composition of =  with di produces di
+di: A=C<E<F<B=D
+di:    A-----------B
+di:    C-----------D
+di:        E---F
+
+composition of =  with si produces si
+si: A=C=E<F<B=D
+si:    A-------B
+si:    C-------D
+si:    E---F
+
+composition of di with di produces di
+di: A<C<E<F<D<B
+di:    A-------------------B
+di:        C-----------D
+di:            E---F
+
+composition of di with si produces di
+di: A<C=E<F<D<B
+di:    A---------------B
+di:        C-------D
+di:        E---F
+
+composition of si with di produces di
+di: A=C<E<F<D<B
+di:    A---------------B
+di:    C-----------D
+di:        E---F
+
+composition of si with si produces si
+si: A=C=E<F<D<B
+si:    A-----------B
+si:    C-------D
+si:    E---F
+
+composition of m  with d  produces o , s , d 
+o : A<E<B=C<D<F
+o :    A-------B
+o :            C---D
+o :        E-----------F
+s : A=E<B=C<D<F
+s :    A---B
+s :        C---D
+s :    E-----------F
+d : E<A<B=C<D<F
+d :        A---B
+d :            C---D
+d :    E---------------F
+
+composition of m  with f  produces o , s , d 
+o : A<E<B=C<D=F
+o :    A-------B
+o :            C---D
+o :        E-------F
+s : A=E<B=C<D=F
+s :    A---B
+s :        C---D
+s :    E-------F
+d : E<A<B=C<D=F
+d :        A---B
+d :            C---D
+d :    E-----------F
+
+composition of m  with oi produces o , s , d 
+o : A<E<B=C<F<D
+o :    A-------B
+o :            C-------D
+o :        E-------F
+s : A=E<B=C<F<D
+s :    A---B
+s :        C-------D
+s :    E-------F
+d : E<A<B=C<F<D
+d :        A---B
+d :            C-------D
+d :    E-----------F
+
+composition of m  with mi produces fi, = , f 
+fi: A<E<B=C=F<D
+fi:    A-------B
+fi:            C---D
+fi:        E---F
+= : A=E<B=C=F<D
+= :    A---B
+= :        C---D
+= :    E---F
+f : E<A<B=C=F<D
+f :        A---B
+f :            C---D
+f :    E-------F
+
+composition of o  with d  produces o , s , d 
+o : A<E<C<B<D<F
+o :    A-----------B
+o :            C-------D
+o :        E---------------F
+s : A=E<C<B<D<F
+s :    A-------B
+s :        C-------D
+s :    E---------------F
+d : E<A<C<B<D<F
+d :        A-------B
+d :            C-------D
+d :    E-------------------F
+
+composition of o  with f  produces o , s , d 
+o : A<E<C<B<D=F
+o :    A-----------B
+o :            C-------D
+o :        E-----------F
+s : A=E<C<B<D=F
+s :    A-------B
+s :        C-------D
+s :    E-----------F
+d : E<A<C<B<D=F
+d :        A-------B
+d :            C-------D
+d :    E---------------F
+
+composition of fi with d  produces o , s , d 
+o : A<E<C<B=D<F
+o :    A-----------B
+o :            C---D
+o :        E-----------F
+s : A=E<C<B=D<F
+s :    A-------B
+s :        C---D
+s :    E-----------F
+d : E<A<C<B=D<F
+d :        A-------B
+d :            C---D
+d :    E---------------F
+
+composition of fi with f  produces fi, = , f 
+fi: A<E<C<B=D=F
+fi:    A-----------B
+fi:            C---D
+fi:        E-------F
+= : A=E<C<B=D=F
+= :    A-------B
+= :        C---D
+= :    E-------F
+f : E<A<C<B=D=F
+f :        A-------B
+f :            C---D
+f :    E-----------F
+
+composition of o  with oi produces o , fi, s , = , di, si, d , f , oi
+o : A<E<C<B<F<D
+o :    A-----------B
+o :            C-----------D
+o :        E-----------F
+fi: A<E<C<B=F<D
+fi:    A-----------B
+fi:            C-------D
+fi:        E-------F
+s : A=E<C<B<F<D
+s :    A-------B
+s :        C-----------D
+s :    E-----------F
+= : A=E<C<B=F<D
+= :    A-------B
+= :        C-------D
+= :    E-------F
+di: A<E<C<F<B<D
+di:    A---------------B
+di:            C-----------D
+di:        E-------F
+si: A=E<C<F<B<D
+si:    A-----------B
+si:        C-----------D
+si:    E-------F
+d : E<A<C<B<F<D
+d :        A-------B
+d :            C-----------D
+d :    E---------------F
+f : E<A<C<B=F<D
+f :        A-------B
+f :            C-------D
+f :    E-----------F
+oi: E<A<C<F<B<D
+oi:        A-----------B
+oi:            C-----------D
+oi:    E-----------F
+
+composition of di with d  produces o , fi, s , = , di, si, d , f , oi
+o : A<E<C<D<B<F
+o :    A---------------B
+o :            C---D
+o :        E---------------F
+fi: A<E<C<D<B=F
+fi:    A---------------B
+fi:            C---D
+fi:        E-----------F
+s : A=E<C<D<B<F
+s :    A-----------B
+s :        C---D
+s :    E---------------F
+= : A=E<C<D<B=F
+= :    A-----------B
+= :        C---D
+= :    E-----------F
+di: A<E<C<D<F<B
+di:    A-------------------B
+di:            C---D
+di:        E-----------F
+si: A=E<C<D<F<B
+si:    A---------------B
+si:        C---D
+si:    E-----------F
+d : E<A<C<D<B<F
+d :        A-----------B
+d :            C---D
+d :    E-------------------F
+f : E<A<C<D<B=F
+f :        A-----------B
+f :            C---D
+f :    E---------------F
+oi: E<A<C<D<F<B
+oi:        A---------------B
+oi:            C---D
+oi:    E---------------F
+
+composition of di with f  produces di, si, oi
+di: A<E<C<D=F<B
+di:    A---------------B
+di:            C---D
+di:        E-------F
+si: A=E<C<D=F<B
+si:    A-----------B
+si:        C---D
+si:    E-------F
+oi: E<A<C<D=F<B
+oi:        A-----------B
+oi:            C---D
+oi:    E-----------F
+
+composition of fi with oi produces di, si, oi
+di: A<E<C<F<B=D
+di:    A---------------B
+di:            C-------D
+di:        E-------F
+si: A=E<C<F<B=D
+si:    A-----------B
+si:        C-------D
+si:    E-------F
+oi: E<A<C<F<B=D
+oi:        A-----------B
+oi:            C-------D
+oi:    E-----------F
+
+composition of o  with mi produces di, si, oi
+di: A<E<C=F<B<D
+di:    A-----------B
+di:            C-------D
+di:        E---F
+si: A=E<C=F<B<D
+si:    A-------B
+si:        C-------D
+si:    E---F
+oi: E<A<C=F<B<D
+oi:        A-------B
+oi:            C-------D
+oi:    E-------F
+
+composition of fi with mi produces di, si, oi
+di: A<E<C=F<B=D
+di:    A-----------B
+di:            C---D
+di:        E---F
+si: A=E<C=F<B=D
+si:    A-------B
+si:        C---D
+si:    E---F
+oi: E<A<C=F<B=D
+oi:        A-------B
+oi:            C---D
+oi:    E-------F
+
+composition of di with oi produces di, si, oi
+di: A<E<C<F<D<B
+di:    A-------------------B
+di:            C-------D
+di:        E-------F
+si: A=E<C<F<D<B
+si:    A---------------B
+si:        C-------D
+si:    E-------F
+oi: E<A<C<F<D<B
+oi:        A---------------B
+oi:            C-------D
+oi:    E-----------F
+
+composition of di with mi produces di, si, oi
+di: A<E<C=F<D<B
+di:    A---------------B
+di:            C---D
+di:        E---F
+si: A=E<C=F<D<B
+si:    A-----------B
+si:        C---D
+si:    E---F
+oi: E<A<C=F<D<B
+oi:        A-----------B
+oi:            C---D
+oi:    E-------F
+
+composition of m  with >  produces di, si, oi, mi, > 
+di: A<E<F<B=C<D
+di:    A-----------B
+di:                C---D
+di:        E---F
+si: A=E<F<B=C<D
+si:    A-------B
+si:            C---D
+si:    E---F
+oi: E<A<F<B=C<D
+oi:        A-------B
+oi:                C---D
+oi:    E-------F
+mi: E<A=F<B=C<D
+mi:        A---B
+mi:            C---D
+mi:    E---F
+> : E<F<A<B=C<D
+> :            A---B
+> :                C---D
+> :    E---F
+
+composition of o  with >  produces di, si, oi, mi, > 
+di: A<E<F<C<B<D
+di:    A---------------B
+di:                C-------D
+di:        E---F
+si: A=E<F<C<B<D
+si:    A-----------B
+si:            C-------D
+si:    E---F
+oi: E<A<F<C<B<D
+oi:        A-----------B
+oi:                C-------D
+oi:    E-------F
+mi: E<A=F<C<B<D
+mi:        A-------B
+mi:            C-------D
+mi:    E---F
+> : E<F<A<C<B<D
+> :            A-------B
+> :                C-------D
+> :    E---F
+
+composition of fi with >  produces di, si, oi, mi, > 
+di: A<E<F<C<B=D
+di:    A---------------B
+di:                C---D
+di:        E---F
+si: A=E<F<C<B=D
+si:    A-----------B
+si:            C---D
+si:    E---F
+oi: E<A<F<C<B=D
+oi:        A-----------B
+oi:                C---D
+oi:    E-------F
+mi: E<A=F<C<B=D
+mi:        A-------B
+mi:            C---D
+mi:    E---F
+> : E<F<A<C<B=D
+> :            A-------B
+> :                C---D
+> :    E---F
+
+composition of di with >  produces di, si, oi, mi, > 
+di: A<E<F<C<D<B
+di:    A-------------------B
+di:                C---D
+di:        E---F
+si: A=E<F<C<D<B
+si:    A---------------B
+si:            C---D
+si:    E---F
+oi: E<A<F<C<D<B
+oi:        A---------------B
+oi:                C---D
+oi:    E-------F
+mi: E<A=F<C<D<B
+mi:        A-----------B
+mi:            C---D
+mi:    E---F
+> : E<F<A<C<D<B
+> :            A-----------B
+> :                C---D
+> :    E---F
+
+composition of d  with <  produces < 
+< : C<A<B<D<E<F
+< :        A---B
+< :    C-----------D
+< :                    E---F
+
+composition of d  with m  produces < 
+< : C<A<B<D=E<F
+< :        A---B
+< :    C-----------D
+< :                E---F
+
+composition of f  with <  produces < 
+< : C<A<B=D<E<F
+< :        A---B
+< :    C-------D
+< :                E---F
+
+composition of f  with m  produces m 
+m : C<A<B=D=E<F
+m :        A---B
+m :    C-------D
+m :            E---F
+
+composition of d  with o  produces < , m , o , s , d 
+< : C<A<B<E<D<F
+< :        A---B
+< :    C---------------D
+< :                E-------F
+m : C<A<B=E<D<F
+m :        A---B
+m :    C-----------D
+m :            E-------F
+o : C<A<E<B<D<F
+o :        A-------B
+o :    C---------------D
+o :            E-----------F
+s : C<A=E<B<D<F
+s :        A---B
+s :    C-----------D
+s :        E-----------F
+d : C<E<A<B<D<F
+d :            A---B
+d :    C---------------D
+d :        E---------------F
+
+composition of d  with fi produces < , m , o , s , d 
+< : C<A<B<E<D=F
+< :        A---B
+< :    C---------------D
+< :                E---F
+m : C<A<B=E<D=F
+m :        A---B
+m :    C-----------D
+m :            E---F
+o : C<A<E<B<D=F
+o :        A-------B
+o :    C---------------D
+o :            E-------F
+s : C<A=E<B<D=F
+s :        A---B
+s :    C-----------D
+s :        E-------F
+d : C<E<A<B<D=F
+d :            A---B
+d :    C---------------D
+d :        E-----------F
+
+composition of d  with di produces < , m , o , fi, s , = , di, si, d , f , oi, mi, > 
+< : C<A<B<E<F<D
+< :        A---B
+< :    C-------------------D
+< :                E---F
+m : C<A<B=E<F<D
+m :        A---B
+m :    C---------------D
+m :            E---F
+o : C<A<E<B<F<D
+o :        A-------B
+o :    C-------------------D
+o :            E-------F
+fi: C<A<E<B=F<D
+fi:        A-------B
+fi:    C---------------D
+fi:            E---F
+s : C<A=E<B<F<D
+s :        A---B
+s :    C---------------D
+s :        E-------F
+= : C<A=E<B=F<D
+= :        A---B
+= :    C-----------D
+= :        E---F
+di: C<A<E<F<B<D
+di:        A-----------B
+di:    C-------------------D
+di:            E---F
+si: C<A=E<F<B<D
+si:        A-------B
+si:    C---------------D
+si:        E---F
+d : C<E<A<B<F<D
+d :            A---B
+d :    C-------------------D
+d :        E-----------F
+f : C<E<A<B=F<D
+f :            A---B
+f :    C---------------D
+f :        E-------F
+oi: C<E<A<F<B<D
+oi:            A-------B
+oi:    C-------------------D
+oi:        E-------F
+mi: C<E<A=F<B<D
+mi:            A---B
+mi:    C---------------D
+mi:        E---F
+> : C<E<F<A<B<D
+> :                A---B
+> :    C-------------------D
+> :        E---F
+
+composition of oi with <  produces < , m , o , fi, di
+< : C<A<D<B<E<F
+< :        A-------B
+< :    C-------D
+< :                    E---F
+m : C<A<D<B=E<F
+m :        A-------B
+m :    C-------D
+m :                E---F
+o : C<A<D<E<B<F
+o :        A-----------B
+o :    C-------D
+o :                E-------F
+fi: C<A<D<E<B=F
+fi:        A-----------B
+fi:    C-------D
+fi:                E---F
+di: C<A<D<E<F<B
+di:        A---------------B
+di:    C-------D
+di:                E---F
+
+composition of mi with <  produces < , m , o , fi, di
+< : C<A=D<B<E<F
+< :        A---B
+< :    C---D
+< :                E---F
+m : C<A=D<B=E<F
+m :        A---B
+m :    C---D
+m :            E---F
+o : C<A=D<E<B<F
+o :        A-------B
+o :    C---D
+o :            E-------F
+fi: C<A=D<E<B=F
+fi:        A-------B
+fi:    C---D
+fi:            E---F
+di: C<A=D<E<F<B
+di:        A-----------B
+di:    C---D
+di:            E---F
+
+composition of oi with m  produces o , fi, di
+o : C<A<D=E<B<F
+o :        A-------B
+o :    C-------D
+o :            E-------F
+fi: C<A<D=E<B=F
+fi:        A-------B
+fi:    C-------D
+fi:            E---F
+di: C<A<D=E<F<B
+di:        A-----------B
+di:    C-------D
+di:            E---F
+
+composition of mi with m  produces s , = , si
+s : C<A=D=E<B<F
+s :        A---B
+s :    C---D
+s :        E-------F
+= : C<A=D=E<B=F
+= :        A---B
+= :    C---D
+= :        E---F
+si: C<A=D=E<F<B
+si:        A-------B
+si:    C---D
+si:        E---F
+
+composition of f  with o  produces o , s , d 
+o : C<A<E<B=D<F
+o :        A-------B
+o :    C-----------D
+o :            E-------F
+s : C<A=E<B=D<F
+s :        A---B
+s :    C-------D
+s :        E-------F
+d : C<E<A<B=D<F
+d :            A---B
+d :    C-----------D
+d :        E-----------F
+
+composition of f  with fi produces fi, = , f 
+fi: C<A<E<B=D=F
+fi:        A-------B
+fi:    C-----------D
+fi:            E---F
+= : C<A=E<B=D=F
+= :        A---B
+= :    C-------D
+= :        E---F
+f : C<E<A<B=D=F
+f :            A---B
+f :    C-----------D
+f :        E-------F
+
+composition of oi with o  produces o , fi, s , = , di, si, d , f , oi
+o : C<A<E<D<B<F
+o :        A-----------B
+o :    C-----------D
+o :            E-----------F
+fi: C<A<E<D<B=F
+fi:        A-----------B
+fi:    C-----------D
+fi:            E-------F
+s : C<A=E<D<B<F
+s :        A-------B
+s :    C-------D
+s :        E-----------F
+= : C<A=E<D<B=F
+= :        A-------B
+= :    C-------D
+= :        E-------F
+di: C<A<E<D<F<B
+di:        A---------------B
+di:    C-----------D
+di:            E-------F
+si: C<A=E<D<F<B
+si:        A-----------B
+si:    C-------D
+si:        E-------F
+d : C<E<A<D<B<F
+d :            A-------B
+d :    C-----------D
+d :        E---------------F
+f : C<E<A<D<B=F
+f :            A-------B
+f :    C-----------D
+f :        E-----------F
+oi: C<E<A<D<F<B
+oi:            A-----------B
+oi:    C-----------D
+oi:        E-----------F
+
+composition of oi with fi produces di, si, oi
+di: C<A<E<D=F<B
+di:        A-----------B
+di:    C-----------D
+di:            E---F
+si: C<A=E<D=F<B
+si:        A-------B
+si:    C-------D
+si:        E---F
+oi: C<E<A<D=F<B
+oi:            A-------B
+oi:    C-----------D
+oi:        E-------F
+
+composition of f  with di produces di, si, oi, mi, > 
+di: C<A<E<F<B=D
+di:        A-----------B
+di:    C---------------D
+di:            E---F
+si: C<A=E<F<B=D
+si:        A-------B
+si:    C-----------D
+si:        E---F
+oi: C<E<A<F<B=D
+oi:            A-------B
+oi:    C---------------D
+oi:        E-------F
+mi: C<E<A=F<B=D
+mi:            A---B
+mi:    C-----------D
+mi:        E---F
+> : C<E<F<A<B=D
+> :                A---B
+> :    C---------------D
+> :        E---F
+
+composition of oi with di produces di, si, oi, mi, > 
+di: C<A<E<F<D<B
+di:        A---------------B
+di:    C---------------D
+di:            E---F
+si: C<A=E<F<D<B
+si:        A-----------B
+si:    C-----------D
+si:        E---F
+oi: C<E<A<F<D<B
+oi:            A-----------B
+oi:    C---------------D
+oi:        E-------F
+mi: C<E<A=F<D<B
+mi:            A-------B
+mi:    C-----------D
+mi:        E---F
+> : C<E<F<A<D<B
+> :                A-------B
+> :    C---------------D
+> :        E---F
+
+composition of >  with <  produces < , m , o , fi, s , = , di, si, d , f , oi, mi, > 
+< : C<D<A<B<E<F
+< :            A---B
+< :    C---D
+< :                    E---F
+m : C<D<A<B=E<F
+m :            A---B
+m :    C---D
+m :                E---F
+o : C<D<A<E<B<F
+o :            A-------B
+o :    C---D
+o :                E-------F
+fi: C<D<A<E<B=F
+fi:            A-------B
+fi:    C---D
+fi:                E---F
+s : C<D<A=E<B<F
+s :            A---B
+s :    C---D
+s :            E-------F
+= : C<D<A=E<B=F
+= :            A---B
+= :    C---D
+= :            E---F
+di: C<D<A<E<F<B
+di:            A-----------B
+di:    C---D
+di:                E---F
+si: C<D<A=E<F<B
+si:            A-------B
+si:    C---D
+si:            E---F
+d : C<D<E<A<B<F
+d :                A---B
+d :    C---D
+d :            E-----------F
+f : C<D<E<A<B=F
+f :                A---B
+f :    C---D
+f :            E-------F
+oi: C<D<E<A<F<B
+oi:                A-------B
+oi:    C---D
+oi:            E-------F
+mi: C<D<E<A=F<B
+mi:                A---B
+mi:    C---D
+mi:            E---F
+> : C<D<E<F<A<B
+> :                    A---B
+> :    C---D
+> :            E---F
+
+composition of >  with m  produces d , f , oi, mi, > 
+d : C<D=E<A<B<F
+d :            A---B
+d :    C---D
+d :        E-----------F
+f : C<D=E<A<B=F
+f :            A---B
+f :    C---D
+f :        E-------F
+oi: C<D=E<A<F<B
+oi:            A-------B
+oi:    C---D
+oi:        E-------F
+mi: C<D=E<A=F<B
+mi:            A---B
+mi:    C---D
+mi:        E---F
+> : C<D=E<F<A<B
+> :                A---B
+> :    C---D
+> :        E---F
+
+composition of d  with s  produces d 
+d : C=E<A<B<D<F
+d :        A---B
+d :    C-----------D
+d :    E---------------F
+
+composition of d  with =  produces d 
+d : C=E<A<B<D=F
+d :        A---B
+d :    C-----------D
+d :    E-----------F
+
+composition of f  with s  produces d 
+d : C=E<A<B=D<F
+d :        A---B
+d :    C-------D
+d :    E-----------F
+
+composition of f  with =  produces f 
+f : C=E<A<B=D=F
+f :        A---B
+f :    C-------D
+f :    E-------F
+
+composition of d  with si produces d , f , oi, mi, > 
+d : C=E<A<B<F<D
+d :        A---B
+d :    C---------------D
+d :    E-----------F
+f : C=E<A<B=F<D
+f :        A---B
+f :    C-----------D
+f :    E-------F
+oi: C=E<A<F<B<D
+oi:        A-------B
+oi:    C---------------D
+oi:    E-------F
+mi: C=E<A=F<B<D
+mi:        A---B
+mi:    C-----------D
+mi:    E---F
+> : C=E<F<A<B<D
+> :            A---B
+> :    C---------------D
+> :    E---F
+
+composition of mi with o  produces d , f , oi
+d : C<E<A=D<B<F
+d :            A---B
+d :    C-------D
+d :        E-----------F
+f : C<E<A=D<B=F
+f :            A---B
+f :    C-------D
+f :        E-------F
+oi: C<E<A=D<F<B
+oi:            A-------B
+oi:    C-------D
+oi:        E-------F
+
+composition of oi with s  produces d , f , oi
+d : C=E<A<D<B<F
+d :        A-------B
+d :    C-------D
+d :    E---------------F
+f : C=E<A<D<B=F
+f :        A-------B
+f :    C-------D
+f :    E-----------F
+oi: C=E<A<D<F<B
+oi:        A-----------B
+oi:    C-------D
+oi:    E-----------F
+
+composition of mi with s  produces d , f , oi
+d : C=E<A=D<B<F
+d :        A---B
+d :    C---D
+d :    E-----------F
+f : C=E<A=D<B=F
+f :        A---B
+f :    C---D
+f :    E-------F
+oi: C=E<A=D<F<B
+oi:        A-------B
+oi:    C---D
+oi:    E-------F
+
+composition of mi with fi produces mi
+mi: C<E<A=D=F<B
+mi:            A---B
+mi:    C-------D
+mi:        E---F
+
+composition of oi with =  produces oi
+oi: C=E<A<D=F<B
+oi:        A-------B
+oi:    C-------D
+oi:    E-------F
+
+composition of mi with =  produces mi
+mi: C=E<A=D=F<B
+mi:        A---B
+mi:    C---D
+mi:    E---F
+
+composition of f  with si produces oi, mi, > 
+oi: C=E<A<F<B=D
+oi:        A-------B
+oi:    C-----------D
+oi:    E-------F
+mi: C=E<A=F<B=D
+mi:        A---B
+mi:    C-------D
+mi:    E---F
+> : C=E<F<A<B=D
+> :            A---B
+> :    C-----------D
+> :    E---F
+
+composition of oi with si produces oi, mi, > 
+oi: C=E<A<F<D<B
+oi:        A-----------B
+oi:    C-----------D
+oi:    E-------F
+mi: C=E<A=F<D<B
+mi:        A-------B
+mi:    C-------D
+mi:    E---F
+> : C=E<F<A<D<B
+> :            A-------B
+> :    C-----------D
+> :    E---F
+
+composition of >  with o  produces d , f , oi, mi, > 
+d : C<E<D<A<B<F
+d :                A---B
+d :    C-------D
+d :        E---------------F
+f : C<E<D<A<B=F
+f :                A---B
+f :    C-------D
+f :        E-----------F
+oi: C<E<D<A<F<B
+oi:                A-------B
+oi:    C-------D
+oi:        E-----------F
+mi: C<E<D<A=F<B
+mi:                A---B
+mi:    C-------D
+mi:        E-------F
+> : C<E<D<F<A<B
+> :                    A---B
+> :    C-------D
+> :        E-------F
+
+composition of >  with s  produces d , f , oi, mi, > 
+d : C=E<D<A<B<F
+d :            A---B
+d :    C---D
+d :    E---------------F
+f : C=E<D<A<B=F
+f :            A---B
+f :    C---D
+f :    E-----------F
+oi: C=E<D<A<F<B
+oi:            A-------B
+oi:    C---D
+oi:    E-----------F
+mi: C=E<D<A=F<B
+mi:            A---B
+mi:    C---D
+mi:    E-------F
+> : C=E<D<F<A<B
+> :                A---B
+> :    C---D
+> :    E-------F
+
+composition of >  with fi produces > 
+> : C<E<D=F<A<B
+> :                A---B
+> :    C-------D
+> :        E---F
+
+composition of >  with =  produces > 
+> : C=E<D=F<A<B
+> :            A---B
+> :    C---D
+> :    E---F
+
+composition of mi with di produces > 
+> : C<E<F<A=D<B
+> :                A---B
+> :    C-----------D
+> :        E---F
+
+composition of mi with si produces > 
+> : C=E<F<A=D<B
+> :            A---B
+> :    C-------D
+> :    E---F
+
+composition of >  with di produces > 
+> : C<E<F<D<A<B
+> :                    A---B
+> :    C-----------D
+> :        E---F
+
+composition of >  with si produces > 
+> : C=E<F<D<A<B
+> :                A---B
+> :    C-------D
+> :    E---F
+
+composition of s  with d  produces d 
+d : E<A=C<B<D<F
+d :        A---B
+d :        C-------D
+d :    E---------------F
+
+composition of s  with f  produces d 
+d : E<A=C<B<D=F
+d :        A---B
+d :        C-------D
+d :    E-----------F
+
+composition of =  with d  produces d 
+d : E<A=C<B=D<F
+d :        A---B
+d :        C---D
+d :    E-----------F
+
+composition of =  with f  produces f 
+f : E<A=C<B=D=F
+f :        A---B
+f :        C---D
+f :    E-------F
+
+composition of s  with oi produces d , f , oi
+d : E<A=C<B<F<D
+d :        A---B
+d :        C-----------D
+d :    E-----------F
+f : E<A=C<B=F<D
+f :        A---B
+f :        C-------D
+f :    E-------F
+oi: E<A=C<F<B<D
+oi:        A-------B
+oi:        C-----------D
+oi:    E-------F
+
+composition of si with d  produces d , f , oi
+d : E<A=C<D<B<F
+d :        A-------B
+d :        C---D
+d :    E---------------F
+f : E<A=C<D<B=F
+f :        A-------B
+f :        C---D
+f :    E-----------F
+oi: E<A=C<D<F<B
+oi:        A-----------B
+oi:        C---D
+oi:    E-----------F
+
+composition of si with f  produces oi
+oi: E<A=C<D=F<B
+oi:        A-------B
+oi:        C---D
+oi:    E-------F
+
+composition of =  with oi produces oi
+oi: E<A=C<F<B=D
+oi:        A-------B
+oi:        C-------D
+oi:    E-------F
+
+composition of s  with mi produces mi
+mi: E<A=C=F<B<D
+mi:        A---B
+mi:        C-------D
+mi:    E---F
+
+composition of =  with mi produces mi
+mi: E<A=C=F<B=D
+mi:        A---B
+mi:        C---D
+mi:    E---F
+
+composition of si with oi produces oi
+oi: E<A=C<F<D<B
+oi:        A-----------B
+oi:        C-------D
+oi:    E-------F
+
+composition of si with mi produces mi
+mi: E<A=C=F<D<B
+mi:        A-------B
+mi:        C---D
+mi:    E---F
+
+composition of d  with d  produces d 
+d : E<C<A<B<D<F
+d :            A---B
+d :        C-----------D
+d :    E-------------------F
+
+composition of d  with f  produces d 
+d : E<C<A<B<D=F
+d :            A---B
+d :        C-----------D
+d :    E---------------F
+
+composition of f  with d  produces d 
+d : E<C<A<B=D<F
+d :            A---B
+d :        C-------D
+d :    E---------------F
+
+composition of f  with f  produces f 
+f : E<C<A<B=D=F
+f :            A---B
+f :        C-------D
+f :    E-----------F
+
+composition of d  with oi produces d , f , oi, mi, > 
+d : E<C<A<B<F<D
+d :            A---B
+d :        C---------------D
+d :    E---------------F
+f : E<C<A<B=F<D
+f :            A---B
+f :        C-----------D
+f :    E-----------F
+oi: E<C<A<F<B<D
+oi:            A-------B
+oi:        C---------------D
+oi:    E-----------F
+mi: E<C<A=F<B<D
+mi:            A---B
+mi:        C-----------D
+mi:    E-------F
+> : E<C<F<A<B<D
+> :                A---B
+> :        C---------------D
+> :    E-------F
+
+composition of oi with d  produces d , f , oi
+d : E<C<A<D<B<F
+d :            A-------B
+d :        C-------D
+d :    E-------------------F
+f : E<C<A<D<B=F
+f :            A-------B
+f :        C-------D
+f :    E---------------F
+oi: E<C<A<D<F<B
+oi:            A-----------B
+oi:        C-------D
+oi:    E---------------F
+
+composition of mi with d  produces d , f , oi
+d : E<C<A=D<B<F
+d :            A---B
+d :        C---D
+d :    E---------------F
+f : E<C<A=D<B=F
+f :            A---B
+f :        C---D
+f :    E-----------F
+oi: E<C<A=D<F<B
+oi:            A-------B
+oi:        C---D
+oi:    E-----------F
+
+composition of oi with f  produces oi
+oi: E<C<A<D=F<B
+oi:            A-------B
+oi:        C-------D
+oi:    E-----------F
+
+composition of mi with f  produces mi
+mi: E<C<A=D=F<B
+mi:            A---B
+mi:        C---D
+mi:    E-------F
+
+composition of f  with oi produces oi, mi, > 
+oi: E<C<A<F<B=D
+oi:            A-------B
+oi:        C-----------D
+oi:    E-----------F
+mi: E<C<A=F<B=D
+mi:            A---B
+mi:        C-------D
+mi:    E-------F
+> : E<C<F<A<B=D
+> :                A---B
+> :        C-----------D
+> :    E-------F
+
+composition of oi with oi produces oi, mi, > 
+oi: E<C<A<F<D<B
+oi:            A-----------B
+oi:        C-----------D
+oi:    E-----------F
+mi: E<C<A=F<D<B
+mi:            A-------B
+mi:        C-------D
+mi:    E-------F
+> : E<C<F<A<D<B
+> :                A-------B
+> :        C-----------D
+> :    E-------F
+
+composition of >  with d  produces d , f , oi, mi, > 
+d : E<C<D<A<B<F
+d :                A---B
+d :        C---D
+d :    E-------------------F
+f : E<C<D<A<B=F
+f :                A---B
+f :        C---D
+f :    E---------------F
+oi: E<C<D<A<F<B
+oi:                A-------B
+oi:        C---D
+oi:    E---------------F
+mi: E<C<D<A=F<B
+mi:                A---B
+mi:        C---D
+mi:    E-----------F
+> : E<C<D<F<A<B
+> :                    A---B
+> :        C---D
+> :    E-----------F
+
+composition of >  with f  produces > 
+> : E<C<D=F<A<B
+> :                A---B
+> :        C---D
+> :    E-------F
+
+composition of d  with mi produces > 
+> : E<C=F<A<B<D
+> :            A---B
+> :        C-----------D
+> :    E---F
+
+composition of f  with mi produces > 
+> : E<C=F<A<B=D
+> :            A---B
+> :        C-------D
+> :    E---F
+
+composition of mi with oi produces > 
+> : E<C<F<A=D<B
+> :                A---B
+> :        C-------D
+> :    E-------F
+
+composition of oi with mi produces > 
+> : E<C=F<A<D<B
+> :            A-------B
+> :        C-------D
+> :    E---F
+
+composition of mi with mi produces > 
+> : E<C=F<A=D<B
+> :            A---B
+> :        C---D
+> :    E---F
+
+composition of >  with oi produces > 
+> : E<C<F<D<A<B
+> :                    A---B
+> :        C-------D
+> :    E-------F
+
+composition of >  with mi produces > 
+> : E<C=F<D<A<B
+> :                A---B
+> :        C---D
+> :    E---F
+
+composition of s  with >  produces > 
+> : E<F<A=C<B<D
+> :            A---B
+> :            C-------D
+> :    E---F
+
+composition of =  with >  produces > 
+> : E<F<A=C<B=D
+> :            A---B
+> :            C---D
+> :    E---F
+
+composition of si with >  produces > 
+> : E<F<A=C<D<B
+> :            A-------B
+> :            C---D
+> :    E---F
+
+composition of d  with >  produces > 
+> : E<F<C<A<B<D
+> :                A---B
+> :            C-----------D
+> :    E---F
+
+composition of f  with >  produces > 
+> : E<F<C<A<B=D
+> :                A---B
+> :            C-------D
+> :    E---F
+
+composition of oi with >  produces > 
+> : E<F<C<A<D<B
+> :                A-------B
+> :            C-------D
+> :    E---F
+
+composition of mi with >  produces > 
+> : E<F<C<A=D<B
+> :                A---B
+> :            C---D
+> :    E---F
+
+composition of >  with >  produces > 
+> : E<F<C<D<A<B
+> :                    A---B
+> :            C---D
+> :    E---F

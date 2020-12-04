@@ -104,3 +104,184 @@ oi:    C-------D
 > :            A---B
 > :    C---D
 #+end_example
+
+* Composition
+
+In part 2 of the program, we derive the composition table Allen recorded as Figure 4 in his paper.
+
+http://cse.unl.edu/~choueiry/Documents/Allen-CACM1983.pdf
+
+#+begin_example
+grep composition alleninterval.txt
+
+--------------- composition -- see Figure 4
+composition of <  with <  produces < 
+composition of <  with m  produces < 
+composition of m  with <  produces < 
+composition of m  with m  produces < 
+composition of <  with o  produces < 
+composition of <  with fi produces < 
+composition of <  with s  produces < 
+composition of <  with =  produces < 
+composition of m  with o  produces < 
+composition of m  with fi produces < 
+composition of m  with s  produces m 
+composition of m  with =  produces m 
+composition of <  with di produces < 
+composition of <  with si produces < 
+composition of m  with di produces < 
+composition of m  with si produces m 
+composition of <  with d  produces < , m , o , s , d 
+composition of <  with f  produces < , m , o , s , d 
+composition of <  with oi produces < , m , o , s , d 
+composition of <  with mi produces < , m , o , s , d 
+composition of <  with >  produces < , m , o , fi, s , = , di, si, d , f , oi, mi, > 
+composition of o  with <  produces < 
+composition of o  with m  produces < 
+composition of fi with <  produces < 
+composition of fi with m  produces m 
+composition of s  with <  produces < 
+composition of s  with m  produces < 
+composition of =  with <  produces < 
+composition of =  with m  produces m 
+composition of o  with o  produces < , m , o 
+composition of o  with fi produces < , m , o 
+composition of s  with o  produces < , m , o 
+composition of s  with fi produces < , m , o 
+composition of o  with di produces < , m , o , fi, di
+composition of s  with di produces < , m , o , fi, di
+composition of di with <  produces < , m , o , fi, di
+composition of si with <  produces < , m , o , fi, di
+composition of di with m  produces o , fi, di
+composition of si with m  produces o , fi, di
+composition of fi with o  produces o 
+composition of fi with fi produces fi
+composition of o  with s  produces o 
+composition of o  with =  produces o 
+composition of fi with s  produces o 
+composition of fi with =  produces fi
+composition of =  with o  produces o 
+composition of =  with fi produces fi
+composition of s  with s  produces s 
+composition of s  with =  produces s 
+composition of =  with s  produces s 
+composition of =  with =  produces = 
+composition of o  with si produces o , fi, di
+composition of s  with si produces s , = , si
+composition of di with o  produces o , fi, di
+composition of di with s  produces o , fi, di
+composition of si with o  produces o , fi, di
+composition of si with s  produces s , = , si
+composition of di with fi produces di
+composition of di with =  produces di
+composition of si with fi produces di
+composition of si with =  produces si
+composition of fi with di produces di
+composition of fi with si produces di
+composition of =  with di produces di
+composition of =  with si produces si
+composition of di with di produces di
+composition of di with si produces di
+composition of si with di produces di
+composition of si with si produces si
+composition of m  with d  produces o , s , d 
+composition of m  with f  produces o , s , d 
+composition of m  with oi produces o , s , d 
+composition of m  with mi produces fi, = , f 
+composition of o  with d  produces o , s , d 
+composition of o  with f  produces o , s , d 
+composition of fi with d  produces o , s , d 
+composition of fi with f  produces fi, = , f 
+composition of o  with oi produces o , fi, s , = , di, si, d , f , oi
+composition of di with d  produces o , fi, s , = , di, si, d , f , oi
+composition of di with f  produces di, si, oi
+composition of fi with oi produces di, si, oi
+composition of o  with mi produces di, si, oi
+composition of fi with mi produces di, si, oi
+composition of di with oi produces di, si, oi
+composition of di with mi produces di, si, oi
+composition of m  with >  produces di, si, oi, mi, > 
+composition of o  with >  produces di, si, oi, mi, > 
+composition of fi with >  produces di, si, oi, mi, > 
+composition of di with >  produces di, si, oi, mi, > 
+composition of d  with <  produces < 
+composition of d  with m  produces < 
+composition of f  with <  produces < 
+composition of f  with m  produces m 
+composition of d  with o  produces < , m , o , s , d 
+composition of d  with fi produces < , m , o , s , d 
+composition of d  with di produces < , m , o , fi, s , = , di, si, d , f , oi, mi, > 
+composition of oi with <  produces < , m , o , fi, di
+composition of mi with <  produces < , m , o , fi, di
+composition of oi with m  produces o , fi, di
+composition of mi with m  produces s , = , si
+composition of f  with o  produces o , s , d 
+composition of f  with fi produces fi, = , f 
+composition of oi with o  produces o , fi, s , = , di, si, d , f , oi
+composition of oi with fi produces di, si, oi
+composition of f  with di produces di, si, oi, mi, > 
+composition of oi with di produces di, si, oi, mi, > 
+composition of >  with <  produces < , m , o , fi, s , = , di, si, d , f , oi, mi, > 
+composition of >  with m  produces d , f , oi, mi, > 
+composition of d  with s  produces d 
+composition of d  with =  produces d 
+composition of f  with s  produces d 
+composition of f  with =  produces f 
+composition of d  with si produces d , f , oi, mi, > 
+composition of mi with o  produces d , f , oi
+composition of oi with s  produces d , f , oi
+composition of mi with s  produces d , f , oi
+composition of mi with fi produces mi
+composition of oi with =  produces oi
+composition of mi with =  produces mi
+composition of f  with si produces oi, mi, > 
+composition of oi with si produces oi, mi, > 
+composition of >  with o  produces d , f , oi, mi, > 
+composition of >  with s  produces d , f , oi, mi, > 
+composition of >  with fi produces > 
+composition of >  with =  produces > 
+composition of mi with di produces > 
+composition of mi with si produces > 
+composition of >  with di produces > 
+composition of >  with si produces > 
+composition of s  with d  produces d 
+composition of s  with f  produces d 
+composition of =  with d  produces d 
+composition of =  with f  produces f 
+composition of s  with oi produces d , f , oi
+composition of si with d  produces d , f , oi
+composition of si with f  produces oi
+composition of =  with oi produces oi
+composition of s  with mi produces mi
+composition of =  with mi produces mi
+composition of si with oi produces oi
+composition of si with mi produces mi
+composition of d  with d  produces d 
+composition of d  with f  produces d 
+composition of f  with d  produces d 
+composition of f  with f  produces f 
+composition of d  with oi produces d , f , oi, mi, > 
+composition of oi with d  produces d , f , oi
+composition of mi with d  produces d , f , oi
+composition of oi with f  produces oi
+composition of mi with f  produces mi
+composition of f  with oi produces oi, mi, > 
+composition of oi with oi produces oi, mi, > 
+composition of >  with d  produces d , f , oi, mi, > 
+composition of >  with f  produces > 
+composition of d  with mi produces > 
+composition of f  with mi produces > 
+composition of mi with oi produces > 
+composition of oi with mi produces > 
+composition of mi with mi produces > 
+composition of >  with oi produces > 
+composition of >  with mi produces > 
+composition of s  with >  produces > 
+composition of =  with >  produces > 
+composition of si with >  produces > 
+composition of d  with >  produces > 
+composition of f  with >  produces > 
+composition of oi with >  produces > 
+composition of mi with >  produces > 
+composition of >  with >  produces > 
+#+end_example

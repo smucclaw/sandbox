@@ -143,9 +143,9 @@ legalLocation6s = cs2cl $ nub $ legalChain6s -- length 409
 showLoc4 (chain,loc) =
   let showchain = allenSquash (show chain)
       (symbol, english) = allenName showchain
-  in ((symbol ++ ": ") ++) <$>
+  in ((symbol ++ ": ") ++) <$> (filter (not . null) $
      (show chain ++ ": " ++ english)
-     : (lines (drawLocations loc))
+     : (lines (drawLocations loc)))
 showLocs locs = showLoc4  <$> locs
 showChain   c  = unlines [ show c , drawLocations (locate c) ]
 showChains  cs =  showLocs $ cs2cl cs -- this one adds a sortOn snd

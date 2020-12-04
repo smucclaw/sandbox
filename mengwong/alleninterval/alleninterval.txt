@@ -1,67 +1,54 @@
 m : A<B=C<D: X meets Y
 m :    A---B
 m :        C---D
-m : 
 
 < : A<B<C<D: X precedes Y
 < :    A---B
 < :            C---D
-< : 
 
 = : A=C<B=D: X equals Y
 = :    A---B
 = :    C---D
-= : 
 
 s : A=C<B<D: X starts Y
 s :    A---B
 s :    C-------D
-s : 
 
 si: A=C<D<B: Y starts X
 si:    A-------B
 si:    C---D
-si: 
 
 fi: A<C<B=D: Y finishes X
 fi:    A-------B
 fi:        C---D
-fi: 
 
 o : A<C<B<D: X overlaps with Y
 o :    A-------B
 o :        C-------D
-o : 
 
 di: A<C<D<B: Y during X
 di:    A-----------B
 di:        C---D
-di: 
 
 f : C<A<B=D: X finishes Y
 f :        A---B
 f :    C-------D
-f : 
 
 d : C<A<B<D: X during Y
 d :        A---B
 d :    C-----------D
-d : 
 
 mi: C<A=D<B: Y meets X
 mi:        A---B
 mi:    C---D
-mi: 
 
 oi: C<A<D<B: Y overlaps with X
 oi:        A-------B
 oi:    C-------D
-oi: 
 
 > : C<D<A<B: Y precedes X
 > :            A---B
 > :    C---D
-> : 
 
 --------------- composition -- see Figure 4
 

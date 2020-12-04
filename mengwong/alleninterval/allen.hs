@@ -13,17 +13,10 @@ import Control.Applicative (liftA2)
 import Debug.Trace
 import Data.Char (isLetter)
 
-<<<<<<< HEAD
-data TimePoint = A | B | C | D | E | F deriving (Show, Eq, Ord)
-
--- a plain old timeline with four timepoints and three ordering relations between them
-data Linear = Lin TimePoint Ordering TimePoint Ordering TimePoint Ordering TimePoint Ordering TimePoint Ordering TimePoint
-=======
 data TimePoint = A | B | C | D | E | F deriving (Show, Read, Eq, Ord)
 
 -- a plain old timeline with N timepoints and N-1 ordering relations between them
 data Linear4 = Lin4 TimePoint Ordering TimePoint Ordering TimePoint Ordering TimePoint
->>>>>>> support both XY and XYZ intervals; next, compose and assess
   deriving (Show, Eq, Ord)
 data Linear6 = Lin6 TimePoint Ordering TimePoint Ordering TimePoint Ordering TimePoint Ordering TimePoint Ordering TimePoint
   deriving (Show, Eq, Ord)
@@ -39,13 +32,8 @@ allLin4s = [ Lin4 tp1 o2 tp3 o4 tp5 o6 tp7
            ,  o6 <- [ LT, EQ ]
            ]
 
-<<<<<<< HEAD
--- every possible timeline; there are 192 of them.
-allLins =  [ Lin tp1 o2 tp3 o4 tp5 o6 tp7 o8 tp9 o10 tp11
-=======
 -- every possible combination of 3 intervals; this allows us to derive Allen's table of compositions between 2 intervals.
 allLin6s = [ Lin6 tp1 o2 tp3 o4 tp5 o6 tp7 o8 tp9 o10 tp11
->>>>>>> support both XY and XYZ intervals; next, compose and assess
            | tp1  <- [ A, B, C, D, E, F ]
            , tp3  <- [ A, B, C, D, E, F ], tp3 /= tp1
            , tp5  <- [ A, B, C, D, E, F ], tp5 /= tp1, tp5 /= tp3
@@ -74,14 +62,6 @@ instance Show Chain where
       showotl [] = ""
       showotl ((o, tp) : rest) = sho o ++ show tp ++ showotl rest
 
-<<<<<<< HEAD
-mkChain :: Linear -> Chain
-mkChain (Lin tp1 o2 tp3 o4 tp5 o6 tp7 o8 tp9 o10 tp11) = Chain tp1 ((o2, tp3) :| [(o4, tp5), (o6, tp7), (o8, tp9), (o10, tp11)])
-
-mylin = Lin A LT B EQ C LT D EQ E LT F -- some dummy data
-mychain = mkChain mylin
--- try: putStrLn $ drawLocations $ locate $ mychain
-=======
 char2cmp '<' = LT
 char2cmp '>' = GT
 char2cmp '=' = EQ
@@ -102,7 +82,6 @@ mylin4 = Lin4 A LT B EQ C LT D
 mylin6 = Lin6 A LT B EQ C LT D EQ F LT E -- some dummy data
 mychain6 = mkChain6 mylin6
 -- try: putStrLn $ drawLocations $ locate $ mychain6
->>>>>>> support both XY and XYZ intervals; next, compose and assess
 
 -- given any two timepoints, what is their relative ordering?
 -- we need this to exclude the non A<B, C<D cases.
@@ -132,11 +111,6 @@ allChain6s = mkChain6 <$> allLin6s
 legalAB line = orderBetween (A,B) line == LT
 legalCD line = orderBetween (C,D) line == LT
 legalEF line = orderBetween (E,F) line == LT
-<<<<<<< HEAD
-legalChains = filter legalAB $ filter legalCD $ allChains -- length 22
-legalLocations = sortOn snd $ (\x -> (x, locate x)) <$> legalChains
-uniqLegals = nubBy ((==) `on` ((\ls -> drop 3 <$> tail ls))) -- uniq by the ascii artwork itself; length 13
-=======
 legal4       = filter legalAB . filter legalCD
 legal6       = legal4         . filter legalEF
 
@@ -145,7 +119,6 @@ legalChain6s = chainSort <$> legal6 allChain6s -- length 1254
 legalLocation4s = sortOn snd $ (\x -> (x, locate x)) <$> nub legalChain4s -- length 13
 legalLocation6s = sortOn snd $ (\x -> (x, locate x)) <$> nub legalChain6s -- length 409
 uniqLegals locs = 
->>>>>>> support both XY and XYZ intervals; next, compose and assess
   [ ((symbol ++ ": ") ++) <$>
     (show chain) -- ++ ": " ++ english)
     : (lines (drawLocations loc))

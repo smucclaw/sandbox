@@ -1,0 +1,272 @@
+// Encoding Events
+//
+// Transaction to be used:
+//   1. Alice orders a bicycle by transferring 100 euros to Bob
+//   2. Bob delivers one bicycle to Alice
+
+type BikeOrder : Event {
+  amount : Int // The amount of euros that Alice will pay for a bicycle
+  recipient : Agent // The recipient of the order.
+}
+
+type BikeDelivery : Event {
+  recipient : Agent // The recipient of the bicycle
+}
+
+// BikeOrder and BikeDelivery are Events (in techninal speak, subtypes
+// of Event). All Events have the following fields: agent, and timestamp.
+// Tutorial does not mention how they are populated though.
+
+
+
+// Specifying Behavior
+//
+
+template entrypoint BikeSale0 () = 
+  <*> BikeOrder // someone sends a bike order
+  then 
+  <*> BikeDelivery // someone sends a bike delivery
+  // Contract is concluded
+
+// The above contract is a 'prefix contract'.
+//  A prefix contract requires some given event to occur.
+//  '<>' is used to enclose agents involved in the event(s).
+//  The <*> syntax means that the event may come from anyone.
+//  'then' syntax requires the specified event to occur, followed by 
+//    whatever the other contract requires.
+//
+//
+//  Less generic version:
+
+template entrypoint BikeSale1(buyer, seller): 
+  <buyer> BikeOrder // buyer places a bike order
+  then
+  <seller> BikeDelivery // seller delivers a bicycle
+  // contract is concluded
+
+//  The version above allows us to capture information regarding the 
+//  parties involved, but lacks information regarding price and time 
+//  of delivery.
+// 
+// 
+// Super specific version:
+
+template entrypoint BikeSale2(buyer, seller):
+  // buyer sends an order worth 100 euros to seller
+  <buyer> order : BikeOrder where
+    order.amount = 100 &&
+    order.recipient = seller
+  then
+  // seller delivers a bicycle to buyer
+  <seller> delivery : BikeDelivery where
+    delivery.recipient = buyer
+
+//  we give names to the events (order : BikeOrder, delivery : 
+//  BikeDelivery) so that we may formulate predicates on it with the 
+//  'where' keyword. The '&&' operator acts as logical conjunction, and 
+//  the event is only accepted when both the field order.price is set to
+//  100 and the field order.recipient is set to seller.
+
+
+
+// Extending the metaphor
+//
+// We now extend our events to account for orders and deliveries of 
+// other items (Not everyone runs a bicycle shop).
+
+type Order : Event {
+  amount : Int, // the amount of euros offered for item
+  recipient : Agent, // recipient of the order
+  item : String // item that is ordered
+}
+
+type Delivery : Event {
+  recipient : Agent, // the recipient of the item
+  item : String // item that is delivered
+}
+
+template entrypoint Sale0(buyer, seller, amount, item):
+  // some buyer orders an item for some price from a seller
+  <buyer> order : Order where
+    order.amount = amount && 
+    order.recipient = seller &&
+    order.item = item
+  then
+  // seller delivers that item
+  <seller> delivery : Delivery where
+    delivery.item = item &&
+    delivery.recipient = buyer
+  // contract concluded
+
+
+
+// Exercise : Pay on delivery
+//  write a variant of the Sale contract where the payment comes
+//  after the delivery
+
+// we have to introduce a payment event, where previously it was implied
+// with the order
+
+type Payment : Event {
+  amount : Int, // amount to be paid
+  recipient : Agent // entity/individual who receives payment
+}
+
+template entrypoint PayOnArrival(buyer, seller, amount, item):
+  <buyer> order : Order where
+    order.amount    = amount &&
+    order.item      = item &&
+    order.recipient = seller
+  then
+  <seller> delivery : Delivery where
+    delivery.item      = item &&
+    delivery.recipient = buyer
+  then
+  <buyer> payment : Payment where
+    payment.amount    = amount &&
+    payment.recipient = seller
+  // contract concluded
+
+
+
+// Wait, but what about an inventory?
+//
+//  As it is currently, as long as the buyer offers some amount, the 
+//  contract will proceed. Nowhere does it specify that certain items 
+//  are required to have certain prices. 
+//
+//  Let us model some basic notion of an inventory that associates
+//  prices to items.
+
+
+val acceptOffer = // accept offer if item and offered price fit
+  \ "Bike" -> (\p -> p >= 100)
+  | "Hammer" -> (\p -> p >= 30)
+  | "Saw" -> (\p -> p >= 40)
+  | _ -> \p -> False // seller does not have item, reject 
+
+template entrypoint Sale1(buyer, seller, amount, item) =
+  // some buyer orders an item from a seller
+  <buyer> order : Order where
+    order.amount = amount &&
+    order.recipient = seller &&
+    order.item = item
+  then
+  // seller delivers that item
+  <seller> delivery : Delivery where
+    acceptOffer order.item order.amount &&
+    delivery.item = order.item &&
+    delivery.recipient = buyer
+  // contract concluded
+
+
+//  The acceptOffer "inventory" is an example of a function in CSL. It 
+//  returns True/False based on whether the offered price for the item 
+//  is acceptable. For functions requiring two or more arguments, CSL 
+//  necessitates currying (\arg1 -> \arg2 -> body). 
+
+//  We further abstractify this new "inventory" as follows.
+
+val bikeShopInventory =
+  [ ("Bike", 100)
+  , ("Brakes", 20)
+  , ("Helmet", 30) 
+  ]
+
+val checkOffer = \inventory -> \(item : String) -> \(price : Int) ->
+  // if item is listed in inventory & price is right,
+  // accept offer
+  // 'List::any' returns True if there is an element of the list 
+  // that satisfies the predicate
+  List::any
+    (\(name, acceptPrice) -> name = item && price >= acceptPrice)
+    inventory
+
+//  The 'List::any' method is a standard library function and returns 
+//  True/False. 
+
+template entrypoint Sale2(buyer, seller, amount, item, inventory):
+  <buyer> order : Order where
+    order.amount = amount &&
+    order.recipient = seller && 
+    order.item = item
+  then
+  <seller> delivery : Delivery where
+    checkOffer inventory order.item order.amount &&
+    delivery.item = order.item &&
+    delivery.recipient = buyer
+  // contract concluded
+
+
+// With this new contract template, we can instantiate it for use in a 
+// bikeshop, bookshop, etc. by defining different inventories for each
+// shop.
+
+val bookShopInventory = 
+  [ ("Joyce", 10)
+  , ("Proust", 2)
+  , ("Hugo", 13)
+  ]
+
+val brunchShopInventory = 
+  [ ("Pancake", 1)
+  , ("Bacon", 2)
+  , ("Egg", 1)
+  ]
+
+
+
+// Fail-safes
+//
+//  Sending an unexpected eventy to a contract does not actually cause 
+//  it to fail in CSL. The contract simply waits for another event to 
+//  arrive. Thus if the seller sends a Delivery event containing a 
+//  different item than the one ordered, such an event is simply ignored
+//  by the contract, and the seller can try again.
+//
+//  However, sometimes we want to react to a situation where something 
+//  wrong has occured, and have the contract fail as it has been breached.
+//  To account for the possibility of a contract failure, we use the
+//  contract combinator 'or' and the primitive contract 'failure'
+
+template entrypoint SaleWithFailure(buyer, seller, amount, item,
+                                    inventory):
+  <buyer> order : Order where
+    order.amount = amount &&
+    order.recipient = seller && 
+    order.item = item
+  then (
+    // the seller delivers the item
+    <seller> delivery : Delivery where
+      checkOffer inventory order.item order.amount &&
+      delivery.item = order.item &&
+      delivery.recipient = buyer
+  or 
+    // seller tries to cheat
+    <seller> delivery : Delivery where
+      // the order was accepted
+      checkOffer inventory order.item order.amount &&
+      // but something isn't right with the delivery
+      (not (delivery.item = order.item) || 
+       not (delivery.recipient = buyer))
+    then failure
+  )
+  // contract concluded
+
+//  The contract above fails only if the seller tries to deliver the
+//  wrong item, or delivers it to the wrong person. To express both 
+//  possibilities within the 'where' clause, we use the connective '||'
+//  a.k.a logical disjunction, as well as negation operator 'not'.
+//
+//  'or' is used to combine contract events, and provides 2 possibilities
+//  of how the contract can evolve.
+// 
+//  Note: there are 2 regimes at play, one of events, and one of fields.
+//        each has its own set of keywords and operators.
+
+
+// Exercise : Pay or Return
+//  extend the pay on delivery exercise by allowing a return of unwanted
+//  items
+//  
+//  refer to payOrReturn.csl

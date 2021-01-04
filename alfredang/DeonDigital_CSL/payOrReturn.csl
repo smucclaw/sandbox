@@ -1,0 +1,60 @@
+// Exercise : Pay or Return
+//  extend the pay on delivery exercise by allowing a return of unwanted
+//  items
+//
+//  Create an inventoryPrice function which, for each item, returns its
+//  price. For items that are not explicitly listed, the price is some 
+//  arbitrarily large number.
+//
+//  The seller should now include the price of the item in the Delivery
+//  event, based on what inventoryPrice function returns. The buyer then
+//  has two options: pay what is asked or return the item to the seller.
+
+
+// Events
+
+type Delivery : Event = {
+  recipient : Agent, // recipient of item
+  item : String // item delivered
+  price : Int // as required by problem statement
+}
+
+type Payment : Event = {
+  payee : Agent, // recipient of payment
+  amount : Int, // payment amount
+  item : String // item paid for
+}
+
+type Return : Event = {
+  recipient : Agent, // recipient of item
+  item : String // item returned
+}
+
+
+// Functions
+val inventoryPrice =
+  \ "Bike" -> 100
+  | "Hammer" -> 30
+  | "Saw" -> 40
+  | _ -> 999999
+
+
+// Contract
+type entrypoint PayOrReturn(buyer, seller, item, inventory):
+  // seller delivers
+  <seller> delivery : Delivery where
+    delivery.recipient = buyer &&
+    delivery.item = item &&
+    delivery.price = inventoryPrice delivery.item
+  then (
+    <buyer> payment : Payment where
+      payment.payee = seller &&
+      payment.amount = delivery.price &&
+      payment.item = delivery.item
+  or
+    <buyer> return : Return where
+      return.recipient = seller && 
+      return.item = delivery.item
+  )
+    
+

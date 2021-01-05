@@ -1,0 +1,42 @@
+// Exercise : Pay on delivery
+
+// Extend the pay on delivery exercise such that there is a time limit
+// of 3 days. If the payment is not delivered on time, the price 
+// increases by a fine which is a parameter to the contract template
+
+type Order : Event {
+  amount : Int,
+  recipient : Agent
+  item : String
+}
+
+type Delivery : Event {
+  recipient : Agent,
+  item : String
+}
+
+type Payment : Event {
+  amount : Int, // amount to be paid
+  recipient : Agent // entity/individual who receives payment
+}
+
+template entrypoint PayOnDelivery(buyer, seller, amount, item, fine):
+  <seller> delivery : Delivery where
+    delivery.item      = item &&
+    delivery.recipient = buyer
+  then (
+    // payment is made in time
+    <buyer> payment : Payment where
+      payment.timestamp <= DateTime::addDays delivery.timestamp 3 &&
+      payment.amount    = amount &&
+      payment.recipient = seller
+    or
+    // buyer fails to make payment in time
+    <buyer> payment : Payment where
+      payment.timestamp > DateTime::addDays delivery.timestamp 3 &&
+      payment,amount    = amount + fine &&
+      payment.recipient = seller 
+  )
+  // contract concluded
+
+

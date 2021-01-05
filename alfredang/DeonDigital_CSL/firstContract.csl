@@ -98,36 +98,8 @@ template entrypoint Sale0(buyer, seller, amount, item):
     delivery.recipient = buyer
   // contract concluded
 
-
-
-// Exercise : Pay on delivery
-//  write a variant of the Sale contract where the payment comes
-//  after the delivery
-
-// we have to introduce a payment event, where previously it was implied
-// with the order
-
-type Payment : Event {
-  amount : Int, // amount to be paid
-  recipient : Agent // entity/individual who receives payment
-}
-
-template entrypoint PayOnArrival(buyer, seller, amount, item):
-  <buyer> order : Order where
-    order.amount    = amount &&
-    order.item      = item &&
-    order.recipient = seller
-  then
-  <seller> delivery : Delivery where
-    delivery.item      = item &&
-    delivery.recipient = buyer
-  then
-  <buyer> payment : Payment where
-    payment.amount    = amount &&
-    payment.recipient = seller
-  // contract concluded
-
-
+// Exercise : Pay on Delivery 
+//  refer to payOnDelivery.csl
 
 // Wait, but what about an inventory?
 //
@@ -270,3 +242,40 @@ template entrypoint SaleWithFailure(buyer, seller, amount, item,
 //  items
 //  
 //  refer to payOrReturn.csl
+
+
+
+// Adding Time constraints
+// 
+//  We now introduce the concept of time to our contracts, which can 
+//  influence which events are allowed or not. This is done through the
+//  'timestamp' field which is available in all Event types. 
+
+template entrypoint TimedSale(buyer, selle, amount, item, inventory,
+                              maxDays):
+  <buyer> order : Order where
+    order.amount = amount &&
+    order.recipient = seller &&
+    order.item = item
+  then (
+    // seller delivers item
+    <seller> delivery : Delivery where
+      checkOfffer inventory order.item order.amount &&
+      delivery.item = order.item &&
+      delivery.recipient = buyer &&
+      // 'DateTime::addDays t d' creates a new timestamp that is 
+      // 'd' days after timestamp 't'
+      delivery.timestamp <= DateTime::addDays order.timestamp maxDays
+  or
+    // seller tries to cheat
+    <seller> delivery : Delivery where
+      checkOffer inventory order.item order.amount &&
+      (not (delivery.item = order.item) ||
+       not (delivery.recipient = buyer))
+    then failure
+  )
+  // contract concluded
+
+
+// Exercise : Pay on Delivery extended
+//  refer to payOnDeliveryExtended.csl

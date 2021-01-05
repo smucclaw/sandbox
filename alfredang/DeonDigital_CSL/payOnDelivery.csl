@@ -1,0 +1,41 @@
+// Exercise : Pay on delivery
+
+//  write a variant of the Sale contract where the payment comes
+//  after the delivery
+
+// we have to introduce a payment event, where previously it was implied
+// with the order
+
+
+type Order : Event {
+  amount : Int,
+  recipient : Agent
+  item : String
+}
+
+type Delivery : Event {
+  recipient : Agent,
+  item : String
+}
+
+type Payment : Event {
+  amount : Int, // amount to be paid
+  recipient : Agent // entity/individual who receives payment
+}
+
+template entrypoint PayOnArrival(buyer, seller, amount, item):
+  <buyer> order : Order where
+    order.amount    = amount &&
+    order.item      = item &&
+    order.recipient = seller
+  then
+  <seller> delivery : Delivery where
+    delivery.item      = item &&
+    delivery.recipient = buyer
+  then
+  <buyer> payment : Payment where
+    payment.amount    = amount &&
+    payment.recipient = seller
+  // contract concluded
+
+

@@ -16,5 +16,6 @@ Some project participants prefer to work within their existing GitHub repos:
 - [inariksit](https://github.com/inariksit)
 - [johsi-k](https://github.com/johsi-k)
 - [maxlooo](https://github.com/maxlooo)
+- [maxloosmu](https://github.com/maxloosmu)
 - [Meowyam](https://github.com/Meowyam)
 

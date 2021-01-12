@@ -1,0 +1,69 @@
+%%%%%%%%% PACKAGES %%%%%%%%%%%%%%%%%
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{alltt}
+\renewcommand{\ttdefault}{txtt} % to resolve a problem with bold fonts in alltt
+
+\usepackage{listings}
+\lstset{language=haskell,basicstyle=\ttfamily}
+
+\usepackage{proof}
+\inferLineSkip=4pt  % increase spacing between lines; default is 2pt
+
+\usepackage[table]{xcolor}
+\usepackage[colorlinks,hyperindex,bookmarks,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\usepackage{todonotes}
+
+\usepackage{fancyhdr}
+
+%\usepackage{floatflt}
+\usepackage{wrapfig}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{framed}
+\usepackage{multicol}
+
+\makeatletter
+
+\usepackage{babel}
+\usepackage{graphicx}
+\usepackage{theorem}
+
+\usepackage{tikz}
+\usetikzlibrary{trees}
+\usetikzlibrary{positioning} 
+\usepackage{tikzsymbols}
+
+
+\makeatother
+
+%%%%%%%%% GEOMETRY %%%%%%%%%%%%%%%%%
+\addtolength{\topmargin}{-15mm}
+\addtolength{\textheight}{25mm}
+\addtolength{\oddsidemargin}{-20mm}
+\setlength{\textwidth}{16cm}
+
+%%%%%%%%% DECLS / DEFNS %%%%%%%%%%%%%%%%%
+
+\usepackage{comment}
+\specialcomment{solution}
+{\todo[inline]{BEGIN SOLUTION}}
+{\todo[inline]{END SOLUTION}}
+
+{\theorembodyfont{\rmfamily} 
+  \newtheorem{exo}{Exercise}
+  \newtheorem{rem}{Remark}
+}
+
+% Macros for references
+\newcommand{\polyref}[1]{polycopié, {#1}}
+
+%%%%%%%%% END DECLS / DEFNS %%%%%%%%%%%%%%%%%
+
+%%% Local Variables: 
+%%% mode: latex
+%%% coding: utf-8-unix
+%%% End: 

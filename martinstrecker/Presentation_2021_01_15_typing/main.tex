@@ -1,0 +1,253 @@
+\documentclass{beamer}
+
+
+\input{settings}
+\input{defs}
+
+\title{Typing}
+
+\author{Martin Strecker}
+\date{2021-01-15}
+
+
+%======================================================================
+
+\begin{document}
+
+
+%======================================================================
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+
+
+%======================================================================
+\section{Typing -- setting the stage}
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Motivation: What are types good for?}
+
+  \blue{Observation:} Natural language is ``typed'':
+  \begin{itemize}
+  \item \emph{e.g.:} Boolean / numeric:
+    \begin{itemize}
+    \item \emph{Should we meet this evening?} (Boolean)
+    \item \emph{At which time should we meet?} (Numeric)
+    \end{itemize}
+  \item \emph{e.g.:} Animate / inanimate:
+    \begin{itemize}
+    \item \emph{What should we eat?}
+    \item \emph{Whom should we eat?}
+    \end{itemize}
+  \end{itemize}
+  
+\end{frame}
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Motivation: Purposes of typing}
+
+  \begin{itemize}
+  \item High-level: as a \blue{first sanity check} to prevent manifest errors:
+    \begin{itemize}
+    \item In C:  \texttt{if (x = 1) ... } (assignment, numeric)\\
+      instead of: \texttt{if (x == 1) ...} (Boolean condition)
+    \item In Caml: What do you want?
+      \begin{itemize}
+      \item \texttt{1.2 +. 3.4} (result is \texttt{4.6}) or
+      \item \texttt{int\_of\_float(1.2) + int\_of\_float(3.4)} (result is \texttt{4})
+      \end{itemize}
+    \end{itemize}
+
+  \item Low-level: during \blue{compilation} to determine memory layout etc.
+    \begin{itemize}
+    \item \texttt{int} and \texttt{float} usually mapped to different kinds of registers
+    \end{itemize}
+  \end{itemize}
+  
+\end{frame}
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Different dimensions of typing}
+
+  \begin{itemize}
+  \item \blue{Dynamic vs. static:}
+    \begin{itemize}
+    \item Dynamic: the type of an expression is only known during its
+      execution
+    \item Static: the type is already known at compile time
+    \end{itemize}
+  \item \blue{Strong vs. weak}
+    \begin{itemize}
+    \item Strong: typing discipline is strictly imposed
+    \item Weak: deviations from typing discipline are tolerated
+    \end{itemize}
+  \item \blue{Unique vs. multiple}
+    \begin{itemize}
+    \item Unique: an expression has only one type
+    \item Multiple: an expression can have several types
+    \end{itemize}
+  \end{itemize}
+
+\end{frame}
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Dynamic vs. static typing}
+
+  \blue{Static} for example in Haskell. Impossible to define:
+  \begin{lstlisting}
+foo n = if (1 / n) > 0 then 1 else True
+
+<interactive>:3:29: error:
+Could not deduce (Num Bool) arising from literal 1
+  \end{lstlisting}
+  
+  \vspace{2mm}
+  \blue{Dynamic} for example in Python.
+  \vspace{-5mm}
+  \begin{columns}[t]
+    \column{.5\textwidth}
+  \begin{lstlisting}[language=python]
+def foo(n):
+    if ((1 / n) > 0):
+        return 1
+    else:
+        return True
+      \end{lstlisting}
+      \column{.5\textwidth}
+      \begin{alltt}
+>>> foo(2)
+1
+>>> foo(-2)
+True
+>>> foo(0)
+ZeroDivisionError
+>>> foo([])
+TypeError
+      \end{alltt}
+    \end{columns}
+
+\end{frame}
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Unique vs. multiple typing}
+
+  Most object-oriented languages have \blue{multiple} typing\\
+  \emph{Example:} an instance can be of class \texttt{Employee} and of class
+  \texttt{Person}
+
+  \vspace{5mm}
+  At first glance, it seems that Haskell admits multiple typing:
+  \begin{itemize}
+  \item \texttt{length [1, 2, 3]}
+  \item \texttt{length [True, False]}
+  \end{itemize}
+
+  But there is only one \emph{principle type}, so Haskell has \blue{unique}
+  typing:
+  \begin{lstlisting}
+> :t length
+length :: Foldable t => t a -> Int
+\end{lstlisting}
+
+\end{frame}
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Ingredients of typing}
+
+  Typing an \blue{expression} $e$ yields a \blue{type} $T$:
+
+  \texttt{3 + 4 : Int}\\
+  \texttt{(3 + 4) < 9 : Bool}
+
+  Preliminary format of typing judgement:
+  \begin{center}
+    $e : T$
+  \end{center}
+
+  \pause
+  The expression  may contain variables\\
+  and its type depend on a \blue{context}:
+  \begin{itemize}
+  \item if \texttt{x} is of type \texttt{Int}, then \texttt{3 + x : Int}:\\
+    \texttt{x: Int} $\vdash$ \texttt{3 + x : Int}
+  \item if \texttt{x} is not of numeric type, then \texttt{3 + x} is ill-typed
+  \end{itemize}
+
+  \vspace{2mm}
+  Full format of typing judgement ($\Gamma$: context; $e$: expression; $T$: type):
+  \begin{center}
+    $\Gamma \vdash e : T$
+  \end{center}
+  
+
+\end{frame}
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Interesting problems related to typing}
+
+  \begin{itemize}
+  \item \blue{Type checking:} Given $\Gamma$, $e$ and $T$, check that $\Gamma \vdash e : T$
+
+  \item \blue{Type computation:} Given $\Gamma$ and $e$, compute $T$:\\
+    $\Gamma \vdash e : \red{?}$ \hspace{4mm} $\leadsto$ \hspace{4mm} $\Gamma \vdash e : T$
+
+    
+  \item \blue{Type inference:} Given $e$ (and possibly $T$), compute $\Gamma$:\\
+    $\red{?} \vdash e : T$ \hspace{4mm} $\leadsto$ \hspace{4mm} $\Gamma \vdash e : T$\\
+    or:\\
+    $\red{?} \vdash e : \red{?}$ \hspace{4mm} $\leadsto$ \hspace{4mm} $\Gamma \vdash e : T$
+
+  \item \blue{Realization:} Given $\Gamma$ and $T$, compute an appopriate $e$:\\
+    $\Gamma \vdash \red{?} : T$ \hspace{4mm} $\leadsto$ \hspace{4mm} $\Gamma \vdash e : T$
+  \end{itemize}
+
+\end{frame}
+
+
+%======================================================================
+\section{Type computation and checking}
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{The relation between type computation and checking}
+
+  In most cases:\\
+  if we can do type \emph{computation}, we can do type \emph{checking}\\
+  (check $\Gamma \vdash e : T$ for given $\Gamma, e, T$):
+
+  \begin{enumerate}
+  \item  Given $\Gamma$ and $e$, compute a type $T'$ such that $\Gamma
+    \vdash e : T'$
+  \item Check that $T$ and $T'$ are \emph{compatible} 
+  \end{enumerate}
+
+  We here assume \emph{unique} typing, and ``compatible'' to mean ``the same''.
+
+\end{frame}
+
+
+
+%======================================================================
+\section{Type inference}
+
+
+
+%======================================================================
+\section{An ignorant's introduction to type theory}
+
+
+
+
+
+
+%-------------------------------------------------------------
+
+\end{document}
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% coding: utf-8
+%%% End: 

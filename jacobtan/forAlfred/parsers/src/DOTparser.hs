@@ -23,5 +23,15 @@ genNode =
 
 main :: IO ()
 main = do
+  putStrLn "__Example 1"
+  parseTest (some genNode) nodeEx
+  putStrLn ""
+
+  putStrLn "__Example 2"
   parseTest (some genNode >> eof) nodeEx
+  putStrLn ""
+  
+  putStrLn "__Example 3 (works)"
+  parseTest ((ord <$> letterChar) `sepBy` " -> " <* eof :: Parser [Int]) nodeEx
+
   -- parseTest ("a" :: Parser String) nodeEx

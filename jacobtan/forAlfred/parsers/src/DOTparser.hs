@@ -32,7 +32,7 @@ main = do
   putStrLn ""
 
   putStrLn "__Example 2"
-  parseTest (some genNode >> eof) nodeEx
+  parseTest (some genNode <* eof) nodeEx
   putStrLn ""
   
   putStrLn "__Example 3 (works)"

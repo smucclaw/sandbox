@@ -43,4 +43,19 @@ main = do
   parseTest (lex' (ord <$> letterChar) `sepBy` lex' "->" <* eof :: Parser [Int]) nodeEx
   putStrLn ""
 
+  putStrLn "__Alfred's new solution (modified by jacob)"
+  parseTest (some genNode' <* eof) nodeEx
+  putStrLn ""
+
   -- parseTest ("a" :: Parser String) nodeEx
+
+
+-- Alfred's new solution (modified by jacob)
+
+goToNode' :: Parser ()
+goToNode' = space >> void (string "->")
+
+genNode' :: Parser Int
+genNode' = 
+  -- ord <$> (space *> letterChar <* (goToNode' <|> eof))
+  ord <$> (space *> letterChar <* (goToNode' <|> void (string "")))

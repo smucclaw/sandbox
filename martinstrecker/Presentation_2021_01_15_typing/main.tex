@@ -42,7 +42,7 @@
     \item \emph{Whom should we eat?}
     \end{itemize}
   \end{itemize}
-  
+
 \end{frame}
 
 %-------------------------------------------------------------
@@ -210,6 +210,10 @@ length :: Foldable t => t a -> Int
 \section{Type computation and checking}
 
 %-------------------------------------------------------------
+\subsection{Type computation without contextual information}
+% -------------------------------------------------------------
+
+%-------------------------------------------------------------
 \begin{frame}[fragile]\frametitle{The relation between type computation and checking}
 
   In most cases:\\
@@ -224,7 +228,617 @@ length :: Foldable t => t a -> Int
 
   We here assume \emph{unique} typing, and ``compatible'' to mean ``the same''.
 
+  \vspace{4mm}
+  \emph{Example:} check whether $\vdash (3 + 4) < 5 : Int$.
+  \begin{enumerate}
+  \item Compute the type of $(3 + 4) < 5$ as $Bool$
+  \item $Int \neq Bool$, so the typing relation is not satisfied.
+  \end{enumerate}
+  
 \end{frame}
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Type computation}
+
+Essential idea: Synthesize type information ``from the leaves upwards'' in the
+syntax tree.
+
+
+\emph{Example:}
+
+\begin{onlyenv}<1-3>
+Expression $(3 + 4) < (5 - 6)$
+\end{onlyenv}
+\begin{onlyenv}<4>
+Expression $(3 + 4) < (5 - 6)$ \red{: Bool}
+\end{onlyenv}
+
+\begin{center}
+\begin{onlyenv}<1>
+\tikz[level 1/.style={sibling distance=3cm}, level 2/.style={sibling distance=1.5cm} ]
+\node {$<$} % root
+child { node {$+$}
+  child { node {3} }
+  child { node {4} }
+}
+child { node {$-$}
+  child { node {5} }
+  child { node {6} }
+};
+\end{onlyenv}
+\begin{onlyenv}<2>
+\tikz[level 1/.style={sibling distance=3cm}, level 2/.style={sibling distance=1.5cm} ]
+\node {$<$} % root
+child { node {$+$}
+  child { node {3 \red{: Int}} }
+  child { node {4 \red{: Int}} }
+}
+child { node {$-$}
+  child { node {5 \red{: Int}} }
+  child { node {6 \red{: Int}} }
+};
+\end{onlyenv}
+\begin{onlyenv}<3>
+\tikz[level 1/.style={sibling distance=3cm}, level 2/.style={sibling distance=1.5cm} ]
+\node {$<$} % root
+child { node {$+$ \red{: Int}}
+  child { node {3 \red{: Int}} }
+  child { node {4 \red{: Int}} }
+}
+child { node {$-$ \red{: Int}}
+  child { node {5 \red{: Int}} }
+  child { node {6 \red{: Int}} }
+};
+\end{onlyenv}
+\begin{onlyenv}<4>
+\tikz[level 1/.style={sibling distance=3cm}, level 2/.style={sibling distance=1.5cm} ]
+\node {$<$ \red{: Bool}} % root
+child { node {$+$ \red{: Int}}
+  child { node {3 \red{: Int}} }
+  child { node {4 \red{: Int}} }
+}
+child { node {$-$ \red{: Int}}
+  child { node {5 \red{: Int}} }
+  child { node {6 \red{: Int}} }
+};
+\end{onlyenv}
+
+\end{center}
+
+\end{frame}
+
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Type computation}
+
+
+\emph{Example:}
+
+\begin{onlyenv}<1-3>
+Expression $(3 < 4) < (5 - 6)$
+\end{onlyenv}
+\begin{onlyenv}<4>
+Expression $(3 < 4) < (5 - 6)$ \red{ill-typed}
+\end{onlyenv}
+
+\begin{center}
+\begin{onlyenv}<1>
+\tikz[level 1/.style={sibling distance=3cm}, level 2/.style={sibling distance=1.5cm} ]
+\node {$<$} % root
+child { node {$<$}
+  child { node {3} }
+  child { node {4} }
+}
+child { node {$-$}
+  child { node {5} }
+  child { node {6} }
+};
+\end{onlyenv}
+\begin{onlyenv}<2>
+\tikz[level 1/.style={sibling distance=3cm}, level 2/.style={sibling distance=1.5cm} ]
+\node {$<$} % root
+child { node {$<$}
+  child { node {3 \red{: Int}} }
+  child { node {4 \red{: Int}} }
+}
+child { node {$-$}
+  child { node {5 \red{: Int}} }
+  child { node {6 \red{: Int}} }
+};
+\end{onlyenv}
+\begin{onlyenv}<3>
+\tikz[level 1/.style={sibling distance=3cm}, level 2/.style={sibling distance=1.5cm} ]
+\node {$<$} % root
+child { node {$<$ \red{: Bool}}
+  child { node {3 \red{: Int}} }
+  child { node {4 \red{: Int}} }
+}
+child { node {$-$ \red{: Int}}
+  child { node {5 \red{: Int}} }
+  child { node {6 \red{: Int}} }
+};
+\end{onlyenv}
+\begin{onlyenv}<4>
+\tikz[level 1/.style={sibling distance=3cm}, level 2/.style={sibling distance=1.5cm} ]
+\node {$<$ \red{\faFlash}} % root
+child { node {$<$ \red{: Bool}}
+  child { node {3 \red{: Int}} }
+  child { node {4 \red{: Int}} }
+}
+child { node {$-$ \red{: Int}}
+  child { node {5 \red{: Int}} }
+  child { node {6 \red{: Int}} }
+};
+\end{onlyenv}
+
+\end{center}
+
+\end{frame}
+
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Typing rules}
+
+  How to express which operators require which type? 
+
+  \begin{itemize}
+  \item Informally:
+    \begin{itemize}
+    \item The addition ($+$) of two $Int$ gives an $Int$
+    \item The comparison (with $<$) of two $Int$ gives a $Bool$
+    \end{itemize}
+
+  \item A bit more formally:
+    \begin{itemize}
+    \item If $e_1$ and $e_2$ are of type $Int$, then $e_1 + e_2$ is of type $Int$
+    \item If $e_1$ and $e_2$ are of type $Int$, then $e_1 < e_2$ is of type $Bool$
+    \end{itemize}
+    
+  \item Mathematically:
+    $$
+\infer[(R+)]{\Gamma \vdash e_1 + e_2 : Int}{
+  \Gamma \vdash e_1 : Int & \Gamma \vdash e_2 : Int}
+\qquad
+\infer[(R<)]{\Gamma \vdash e_1 < e_2 : Bool}{
+  \Gamma \vdash e_1 : Int & \Gamma \vdash e_2 : Int}
+$$
+Note: $\Gamma$ not modified
+\end{itemize}
+
+\red{Exercise:} Develop a rule $(R-)$ for subtraction!
+
+\end{frame}
+
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Typing derivations}
+
+  Successive applications of typing rules give typing derivations.
+
+  In a \blue{type checking mode}, verify that each rule has been applied
+  correctly:
+
+$$
+  \infer[\blue{(3)}]{\vdash (3 + 4) < (5 - 6) : Bool}{
+    \infer[\blue{(1)}]{\vdash 3 + 4 : Int}{
+      \vdash 3 : Int & \vdash 4 : Int}
+    &&
+    \infer[\blue{(2)}]{\vdash 5 - 6 : Int}{
+      \vdash 5 : Int & \vdash 6 : Int}
+  }
+$$
+
+Instances used:
+\begin{itemize}
+\item for \blue{(1)}: $e_1 = 3$ and $e_2 = 4$   of $(R+)$
+\item for \blue{(2)}: $e_1 = 5$ and $e_2 = 6$   of $(R-)$
+\item for \blue{(3)}: $e_1 = 3 + 4$ and $e_2 = 5 - 6$  of $(R<)$
+\end{itemize}
+
+\end{frame}
+
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Typing derivations}
+
+  Compare the derivation tree and syntax tree:
+
+\begin{columns}[t]
+\column{.45\textwidth}
+\small
+\vspace{10mm}
+$$
+  \infer{\vdash (3 + 4) < (5 - 6) : Bool}{
+    \infer{\vdash 3 + 4 : Int}{
+      \vdash 3 : Int & \vdash 4 : Int}
+    &&
+    \infer{\vdash 5 - 6 : Int}{
+      \vdash 5 : Int & \vdash 6 : Int}
+  }
+$$
+\normalsize
+\column{.45\textwidth}
+\small
+\begin{center}
+\tikz[level 1/.style={sibling distance=2.5cm}, level 2/.style={sibling distance=1.2cm} ]
+\node {$<$ \red{: Bool}} % root
+child { node {$+$ \red{: Int}}
+  child { node {3 \red{: Int}} }
+  child { node {4 \red{: Int}} }
+}
+child { node {$-$ \red{: Int}}
+  child { node {5 \red{: Int}} }
+  child { node {6 \red{: Int}} }
+};
+\end{center}
+\normalsize
+\end{columns}
+
+\end{frame}
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Typing derivations}
+
+  In a \blue{type computation mode}, unfold expression, then synthesize type:
+
+\begin{onlyenv}<1>
+  $$
+  \infer{\vdash (3 + 4) < (5 - 6) : ???}{}
+  $$
+\end{onlyenv}
+\begin{onlyenv}<2>
+  $$
+  \infer{\vdash (3 + 4) < (5 - 6) : ???}{
+    \infer{\vdash 3 + 4 : ???}{}
+    &&
+    \infer{\vdash 5 - 6 : ???}{}
+  }
+  $$
+\end{onlyenv}
+\begin{onlyenv}<3>
+  $$
+  \infer{\vdash (3 + 4) < (5 - 6) : ???}{
+    \infer{\vdash 3 + 4 : ???}{
+      \vdash 3 : ??? & \vdash 4 : ???}
+    &&
+    \infer{\vdash 5 - 6 : ???}{
+      \vdash 5 : ??? & \vdash 6 : ???}
+  }
+  $$
+\end{onlyenv}
+\begin{onlyenv}<4>
+  $$
+  \infer{\vdash (3 + 4) < (5 - 6) : ???}{
+    \infer{\vdash 3 + 4 : ???}{
+      \vdash 3 : Int & \vdash 4 : Int}
+    &&
+    \infer{\vdash 5 - 6 : ???}{
+      \vdash 5 : Int & \vdash 6 : Int}
+  }
+  $$
+\end{onlyenv}
+\begin{onlyenv}<5>
+  $$
+  \infer{\vdash (3 + 4) < (5 - 6) : ???}{
+    \infer{\vdash 3 + 4 : Int}{
+      \vdash 3 : Int & \vdash 4 : Int}
+    &&
+    \infer{\vdash 5 - 6 : Int}{
+      \vdash 5 : Int & \vdash 6 : Int}
+  }
+  $$
+\end{onlyenv}
+\begin{onlyenv}<6>
+  $$
+  \infer{\vdash (3 + 4) < (5 - 6) : Bool}{
+    \infer{\vdash 3 + 4 : Int}{
+      \vdash 3 : Int & \vdash 4 : Int}
+    &&
+    \infer{\vdash 5 - 6 : Int}{
+      \vdash 5 : Int & \vdash 6 : Int}
+  }
+  $$
+\end{onlyenv}
+
+\end{frame}
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Type errors derivations}
+
+  What goes wrong with ill-typed expressions?
+
+  \vspace{3mm}
+  \emph{Example:} $(3 < 4) < (5 - 6)$
+
+    $$
+  \infer{\vdash (3 < 4) < (5 - 6) : ???}{
+    \infer{\vdash 3 < 4 : Bool}{
+      \vdash 3 : Int & \vdash 4 : Int}
+    &&
+    \infer{\vdash 5 - 6 : Int}{
+      \vdash 5 : Int & \vdash 6 : Int}
+  }
+  $$
+
+  \vspace{3mm}
+  \begin{itemize}
+  \item No rule is available to complete the deriviation $\leadsto$ type error
+  \item Note: \emph{inductively} defined rule set: for making a derivation,
+    you
+    \begin{itemize}
+    \item may use all the rules of the set
+    \item and only these rules
+    \end{itemize}
+  \end{itemize}
+
+\end{frame}
+
+
+%-------------------------------------------------------------
+\subsection{Type computation with a context}
+% -------------------------------------------------------------
+
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Observation}
+
+  So far, our expressions consist of:
+  \begin{itemize}
+  \item constants (leaves of syntax tree)
+  \item operators ($+, -, <$ \dots) applied to expressions
+  \end{itemize}
+  In the typing rules, $\Gamma$ remains unused.
+
+  Currently:
+  \begin{itemize}
+  \item no variables
+  \item no functions
+  \item consequently, no function application
+  \end{itemize}
+  
+
+\end{frame}
+
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{What is the context good for?} 
+
+  When binding an expression to a name, you progressively build up a context:
+\vspace{-3mm}
+\begin{columns}[t]
+\column{.45\textwidth}
+\begin{verbatim}
+Prelude> x = 4
+Prelude> y = 5
+Prelude> :t x
+x :: Num p => p
+Prelude> b = True
+Prelude> :t b
+b :: Bool
+\end{verbatim}
+\column{.45\textwidth}
+\begin{verbatim}
+Prelude> :t (x + y)
+(x + y) :: Num a => a
+Prelude> :t (x + z)
+interactive:1:6: error: 
+Variable not in scope: z
+\end{verbatim}
+\end{columns}
+
+\vspace{3mm}
+Leaving aside type classes, after declaring \texttt{x, y, z} we get the
+context: $x : Int, y: Int, b : Bool$, and thus:
+
+\begin{itemize}
+\item $x : Int, y: Int, b : Bool \vdash x + y: Int$
+\item $x : Int, y: Int, b : Bool \vdash x + z:$ \faFlash
+\end{itemize}
+
+\end{frame}
+
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Typing expressions with variables}
+
+  We now allow \blue{variables} in expressions and\\
+  extend the rule set by the following \blue{variable rule}:
+
+  $$
+  \infer[(Var)]{\Gamma \vdash x : T}{
+    lookup(\Gamma, x) = T}
+  $$
+  Here:
+  \begin{itemize}
+  \item $lookup$ traverses $\Gamma$ from right to left;
+  \item retrieves the type associated with the first occurrence of $x$
+  \item (error if $x$ not in $\Gamma$)
+  \end{itemize}
+\end{frame}
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Typing expressions with variables}
+
+  The order of the variables in $\Gamma$ is important:\\
+  $lookup(x: Int, y: Int, x: Bool, x) = Bool$
+
+\begin{alltt}
+Prelude> x = 4
+Prelude> y = 5
+Prelude> x = True
+Prelude> :t x
+x :: Bool
+\end{alltt}
+The later declaration \emph{shadows} the earlier.
+
+\end{frame}
+
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Variable declarations in functions}
+
+Variable declarations build up a \emph{local context}, in analogy to the
+\emph{global context} seen before:
+
+\begin{verbatim}
+Prelude> :t (\x y -> x + y)
+(\x y -> x + y) :: Num a => a -> a -> a
+Prelude> :t (\x y -> x + z)
+interactive:1:14: error: Variable not in scope: z
+\end{verbatim}
+
+\end{frame}
+
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Typing functions}
+
+  We now extend expressions by:
+  \begin{itemize}
+  \item \blue{Abstractions} \verb|\x -> e| of variable \texttt{x} over
+    expression \texttt{e}
+  \item \blue{Applications} \texttt{f a} of function \texttt{f} to argument \texttt{a}
+  \end{itemize}
+
+  Syntactic conventions:
+  \begin{itemize}
+  \item Abstractions with several variables correspond to \emph{iterated}
+    abstractions (right associativity):\\
+    \verb|\x y z -> e| \hspace{3mm} = \hspace{3mm} \verb|\x -> (\y -> (\z -> e))|
+  \item Applications with several arguments correspond to \emph{iterated}
+    applications (left associativity):\\
+    \texttt{f a b c}\hspace{3mm} = \hspace{3mm} \texttt{(((f a) b) c)}
+  \end{itemize}
+  
+\end{frame}
+
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Typing functions}
+
+  Let us assume (counterfactual!) that we can annotate variables with types:
+    \verb|\(x ::Int) -> x + 1|
+
+    \vspace{3mm}
+    \blue{Typing rule for abstractions:}
+      $$
+  \infer[(Abs)]{\Gamma \vdash \backslash (x :: A) \to e \;\; : \;\; A \to B}{
+    \Gamma, x: A \vdash e : B}
+  $$
+
+    \vspace{3mm}
+    \blue{Typing rule for applications:}
+      $$
+  \infer[(App)]{\Gamma \vdash (f \; a) \; : \;  B}{
+    \Gamma \vdash f : A \to B & \Gamma \vdash a : A}
+  $$
+\end{frame}
+
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Typing functions}
+
+  \emph{Example:} Let us verify:
+
+\begin{verbatim}
+Prelude> :t (\x -> \y -> x + y) (3 :: Int)
+(\x -> \y -> x + y) (3 :: Int) :: Int -> Int
+\end{verbatim}
+
+\small
+  $$
+  \infer[(App)]{\vdash  \blue{(\backslash (x :: Int) \to \backslash (y :: Int) \to x + y)\; 3} \; : \; \red{Int \to Int}}{
+    \infer[(Abs)]{\vdash  \blue{\backslash (x :: Int) \to \backslash (y :: Int) \to x + y}\; : \; \red{Int \to Int \to Int}}{
+      \infer[(Abs)]{x : Int \vdash \blue{\backslash (y :: Int) \to x + y} \; : \; \red{Int \to Int}}{
+        \infer[(R+)]{x : Int, y : Int  \vdash \blue{x + y} \; : \; \red{Int}}{
+          x : Int, y : Int  \vdash \blue{x} : \red{Int}
+          &
+          x : Int, y : Int  \vdash \blue{y} : \red{Int}
+        }}}
+    &
+    \vdash \blue{3} : \red{Int}
+    }
+  $$
+\normalsize
+
+\end{frame}
+
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Properties of typing}
+
+  Typing is to predict correctly what kind of result you will get when
+  evaluating an expression.
+
+  \emph{Ex.:} Assume expression \verb|(\x y -> (x * y) / (x + y)) | has type
+  \texttt{Flot -> Float -> Float}\\
+  (predicted \emph{statically} by the type checker)
+
+\vspace{3mm}
+  When applied to two \texttt{Float} and \emph{evaluating} the expression
+  \begin{itemize}
+  \item the result is guaranteed to be a \texttt{Float}
+  \item and not a \texttt{Bool} or a list \dots
+  \item and not to produce a dynamic type error
+  \item (but may produce other runtime errors, \emph{e.g.} division by zero)
+  \end{itemize}
+  Slogan: \emph{well-typed programs don't go wrong}
+
+\end{frame}
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Type soundness}
+
+  More formally: Define an \blue{evaluation} relation $e \twoheadrightarrow v$
+  between an expression $e$ and value $v$.
+
+  \vspace{2mm}
+  \emph{NB:} The evaluation relation defines a \blue{semantics} of expressions.
+
+  \vspace{2mm}
+  \emph{Ex.:} $(\backslash x\; y \to (x * y) / (x + y))\; 2.8\; 4.2
+  \twoheadrightarrow 1.68$
+
+  \vspace{4mm}
+  \blue{Subject reduction:}
+  \begin{itemize}
+  \item If $\Gamma \vdash e : T$
+  \item and $e \twoheadrightarrow v$
+  \item then $\Gamma \vdash v : T$
+  \end{itemize}
+  
+
+\end{frame}
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Type soundness}
+
+  What can defeat type soundness?\\
+  An inappropriate definition of evaluation, e.g.: \blue{dynamic scoping}
+  
+  \emph{Example:} a convoluted Haskell expression:
+  \begin{verbatim}
+Prelude> (\x -> (\y x -> y < 2 && x) (x + 1) True) 3
+False
+  \end{verbatim}
+\vspace{-4mm}  
+  \red{Wrong evaluation:}
+\verb|(\x -> (\y x -> y < 2 && x) (x + 1) True) 3| $\twoheadrightarrow$
+\verb|(\x -> (\x -> (x + 1) < 2 && x) True) 3| $\twoheadrightarrow$
+\verb|(\x -> (True + 1) < 2 && True) 3| $\twoheadrightarrow$ 
+\verb|(True + 1) < 2 && True| $\twoheadrightarrow$ \faFlash
+
+\vspace{2mm}
+  \green{Right evaluation:} rename bound variables
+\verb|(\x -> (\y x -> y < 2 && x) (x + 1) True) 3| $\twoheadrightarrow$
+\verb|(\x -> (\b -> (x + 1) < 2 && b) True) 3| $\twoheadrightarrow$ \dots
+
+
+\end{frame}
+
+%-------------------------------------------------------------
+\subsection{Implementation}
+% -------------------------------------------------------------
 
 
 

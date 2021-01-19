@@ -1,6 +1,7 @@
 **/*.DS_Store
 **/*.direnv
 **/*.envrc
-
+**/*.vim_backup
+**/*.stack-work
 
 

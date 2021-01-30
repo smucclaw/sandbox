@@ -1,0 +1,7 @@
+Type Business (12345) :
+    is_operating (23456) : boolean
+
+megaCorp : Business
+megaCorp.is_operating = true
+
+? megaCorp.is_operating = true

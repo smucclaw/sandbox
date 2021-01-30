@@ -11,6 +11,7 @@ import Data.Void (Void)
 import Data.Text
 import Data.Functor ((<&>))
 import Control.Monad (void)
+import Text.Pretty.Simple (pPrint)
 
 someFunc :: IO ()
 someFunc = putStrLn "someFunc"
@@ -47,12 +48,15 @@ newtype AttrTypeS = AttrTypeS String deriving Show
 newtype ObjS = ObjS String deriving Show
 
 -- | E.g. Type Business (12345) :
-data TypeDef = TypeDef TypeS (Maybe Integer) [TypeAttr] deriving Show
+data TypeDef = TypeDef TypeS (Maybe Integer) [TypeAttr]
+  deriving Show
 -- | E.g.     is_operating (23456) : boolean
-data TypeAttr = TypeAttr AttrS (Maybe Integer) AttrTypeS deriving Show
+data TypeAttr = TypeAttr AttrS (Maybe Integer) AttrTypeS
+  deriving Show
 
 -- | E.g. megaCorp : Business
-data ObjDef = ObjDef ObjS TypeS deriving Show
+data ObjDef = ObjDef ObjS TypeS
+  deriving Show
 
 -- Inari's example: data Ind ; data Prop
 data Ind = IStr String | IInt Integer
@@ -114,11 +118,13 @@ l4parser = many (
   L4Type <$> typeDefP
   <|> try (L4Obj <$> objDefP)
   <|> try (L4Prop <$> propP)
+  <|> try (L4Query <$> queryP)
   )
 
 main :: IO ()
 main = do
   input <- readFile "babyl4.txt" <&> pack
-  parseTest (l4parser *> eof) input
+  -- parseTest (l4parser <* eof) input
+  pPrint $ parseMaybe l4parser input
 
 

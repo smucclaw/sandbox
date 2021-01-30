@@ -1,5 +1,10 @@
-Type Business (12345) :
+Type Business (12345) : -- comment
+  {- block comment
+  -}
     is_operating (23456) : boolean
+    is_legal (34567) : boolean
+
+
 
 megaCorp : Business
 megaCorp.is_operating = true

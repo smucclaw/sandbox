@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 0b9024240db1ec27bd3c1c46b56740308e4f76190b263ded4af9b88e55787889
+-- hash: 6d9fe4cfa3d54fa07c3be03d1e5b431cd8d67015106df47a28529a24f1bd7d1d
 
 name:           baby-l4
 version:        0.1.0.0
@@ -35,7 +35,8 @@ library
       src
   build-depends:
       base >=4.7 && <5
-    , megaparsec
+    , megaparsec >9.0.0
+    , pretty-simple
     , text
   default-language: Haskell2010
 
@@ -49,7 +50,8 @@ executable baby-l4-exe
   build-depends:
       baby-l4
     , base >=4.7 && <5
-    , megaparsec
+    , megaparsec >9.0.0
+    , pretty-simple
     , text
   default-language: Haskell2010
 
@@ -64,6 +66,7 @@ test-suite baby-l4-test
   build-depends:
       baby-l4
     , base >=4.7 && <5
-    , megaparsec
+    , megaparsec >9.0.0
+    , pretty-simple
     , text
   default-language: Haskell2010

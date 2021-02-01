@@ -1,0 +1,13 @@
+cradle:
+  stack:
+    - path: "./src"
+      component: "SubcommandsPlease:lib"
+
+    - path: "./app/Main.hs"
+      component: "SubcommandsPlease:exe:SubcommandsPlease"
+
+    - path: "./app/Paths_SubcommandsPlease.hs"
+      component: "SubcommandsPlease:exe:SubcommandsPlease"
+
+    - path: "./test"
+      component: "SubcommandsPlease:test:SubcommandsPlease-test"

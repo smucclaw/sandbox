@@ -1,0 +1,68 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.33.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: 7932887c1646d1eb59e33b706babd845a7d9f5e68b58bc1f6fbc73a94fc3b2f5
+
+name:           SubcommandsPlease
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/githubuser/SubcommandsPlease#readme>
+homepage:       https://github.com/githubuser/SubcommandsPlease#readme
+bug-reports:    https://github.com/githubuser/SubcommandsPlease/issues
+author:         Author name here
+maintainer:     example@example.com
+copyright:      2021 Author name here
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    ChangeLog.md
+
+source-repository head
+  type: git
+  location: https://github.com/githubuser/SubcommandsPlease
+
+library
+  exposed-modules:
+      Lib
+  other-modules:
+      Paths_SubcommandsPlease
+  hs-source-dirs:
+      src
+  build-depends:
+      base >=4.7 && <5
+    , containers
+    , optparse-applicative
+  default-language: Haskell2010
+
+executable SubcommandsPlease
+  main-is: Main.hs
+  other-modules:
+      Paths_SubcommandsPlease
+  hs-source-dirs:
+      app
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      SubcommandsPlease
+    , base >=4.7 && <5
+    , containers
+    , optparse-applicative
+  default-language: Haskell2010
+
+test-suite SubcommandsPlease-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Paths_SubcommandsPlease
+  hs-source-dirs:
+      test
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      SubcommandsPlease
+    , base >=4.7 && <5
+    , containers
+    , optparse-applicative
+  default-language: Haskell2010

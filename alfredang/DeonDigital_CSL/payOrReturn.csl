@@ -13,6 +13,12 @@
 
 // Events
 
+type Order : Event {
+  amount : Int, // the amount of euros offered for item
+  recipient : Agent, // recipient of the order
+  item : String // item that is ordered
+}
+
 type Delivery : Event = {
   recipient : Agent, // recipient of item
   item : String // item delivered
@@ -58,3 +64,20 @@ type entrypoint PayOrReturn(buyer, seller, item, inventory):
   )
     
 
+
+// Write a contract in which the buyer orders both "Bike" and "Helmet",
+// in any order. Use the 'and' combinator.
+
+template entrypoint BikeAndHelmet(buyer, seller, inventory):
+// Buyer orders bike and helmet
+  // bike
+  <buyer> order1 : Order where
+    order1.item      = "Bike" &&
+    order1.amount    = inventoryPrice order1.item &&
+    order1.recipient = seller
+  and
+  <buyer> order2 : Order where
+    order2.item      = "Helmet" &&
+    order2.amount    = inventoryPrice order2.item &&
+    order2.recipient = seller
+  // contract concluded

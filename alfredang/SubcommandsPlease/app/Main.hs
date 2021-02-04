@@ -83,12 +83,21 @@ opts = info (sample <**> helper)
   --options <- execParser opts
   --greet options
 
+
+
+data InputOpts = InputOpts {
+    cny    :: CommandsPlz -> Format,
+    hawker :: CommandsPlz -> HawkerFoods,
+    name   :: Greetee 
+    } deriving Show
+
+newtype Greetee = Person String deriving Show
 data CommandsPlz = Greet CNYhuats | Food HawkerFoods deriving Show
 data CNYhuats = GXFC | WSRY | NNYY deriving (Eq, Show)
 data HawkerFoods = CKT | BCM | CDK deriving (Eq, Show)
 
 isGreeting :: ReadM CNYhuats
-isGreeting = eitherReader $ \s -> case (toUpper <$> s) of 
+isGreeting = eitherReader $ \s -> case toUpper <$> s of 
     "GXFC" -> Right GXFC
     "WSRY" -> Right WSRY
     "NNYY" -> Right NNYY
@@ -101,7 +110,7 @@ cnyParser = option (Greet <$> isGreeting)
              <> help "enter abbreviation here")
 
 isHawkerFood :: ReadM HawkerFoods
-isHawkerFood = eitherReader $ \y -> case (toUpper <$> y) of
+isHawkerFood = eitherReader $ \y -> case toUpper <$> y of
     "CKT" -> Right CKT
     "BCM" -> Right BCM
     "CDK" -> Right CDK
@@ -123,25 +132,8 @@ canHasCommands = subparser
               <> progDesc "can't remember what they're called?"
               <> header "HawkerFoods - i dunno what to eat" ) ) )
 
-data Sample2
-  = Hello [String]
-  | Goodbye
-  deriving (Eq, Show)
-
-hello2 :: Parser Sample2
-hello2 = Hello <$> many (argument str (metavar "TARGET..."))
-
-sample2 :: Parser Sample2
-sample2 = subparser
-       ( command "hello" (info hello2 (progDesc "Print greeting"))
-      <> command "goodbye" (info (pure Goodbye) (progDesc "Say goodbye"))
-       )
-    <|> subparser
-       ( command "bonjour" (info hello2 (progDesc "Print greeting"))
-      <> command "au-revoir" (info (pure Goodbye) (progDesc "Say goodbye"))
-      <> commandGroup "French commands:"
-      <> hidden
-       )
+dunUds :: ReadM InputOpts
+dunUds = eitherReader $ \s -> 
 
 main :: IO ()
 main = print =<< execParser canHasCommands'

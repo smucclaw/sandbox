@@ -3,5 +3,5 @@
 **/*.envrc
 **/*.vim_backup
 **/*.stack-work
-**/*__pycache
+__pycache__/
 

@@ -1,0 +1,7 @@
+README.md
+setup.py
+not_a_pypack_carrotsnotfound.egg-info/PKG-INFO
+not_a_pypack_carrotsnotfound.egg-info/SOURCES.txt
+not_a_pypack_carrotsnotfound.egg-info/dependency_links.txt
+not_a_pypack_carrotsnotfound.egg-info/top_level.txt
+src/__init__.py

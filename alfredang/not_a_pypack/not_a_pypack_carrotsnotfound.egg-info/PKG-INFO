@@ -1,0 +1,19 @@
+Metadata-Version: 2.1
+Name: not-a-pypack-carrotsnotfound
+Version: 0.0.1
+Summary: UNKNOWN
+Home-page: https://github.com/smucclaw/sandbox
+Author: alfred ang
+Author-email: not_an_actual@email.com
+License: UNKNOWN
+Description: # Not a pypack
+        
+        This is an example package. See [here](https://packaging.python.org/tutorials/packaging-projects/) for the tutorial on creating and uploading a package.
+        
+        
+        
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Description-Content-Type: text/markdown

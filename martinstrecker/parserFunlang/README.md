@@ -6,6 +6,11 @@ An example of a small functional language featuring
 - type checking
 - comming soon: evaluation
 
+Before building / running, do in directory src:
+
+alex Lexer.x
+happy Parser.y
+
 
 How to run:
 

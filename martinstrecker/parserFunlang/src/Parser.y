@@ -57,7 +57,6 @@ Tp   : Bool                       { BoolT }
      | '(' Tp ')'                 { $2 }
 
 Expr : '\\' VAR ':' Tp '->' Expr   { FunE () $2 $4 $6 }
--- '\\' '(' VAR ':' Tp ')' '->' Expr   { FunE () $2 $4 $6 }
      | Form                        { $1 }
 
 Form : Form '<' Form               { BinOpE () (BCompar BClt) $1 $3 }
@@ -71,7 +70,7 @@ Fact : Fact Atom                   { AppE () $1 $2 }
 
 Atom : '(' Expr ')'                { $2 }
      | NUM                         { ValE () (IntV $1) }
-     | VAR                         { VarE () $1 }
+     | VAR                         { VarE () $1 0 }
      | true                        { ValE () (BoolV True) }
      | false                       { ValE () (BoolV False) }
 

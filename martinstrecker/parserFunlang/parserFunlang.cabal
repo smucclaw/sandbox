@@ -26,8 +26,9 @@ executable parserFunlang
   Build-depends:       base, array
   build-tools:         alex, happy
   other-modules:       
-    Parser,
+    Eval,
     Lexer,
+    Parser,
     Syntax,
     Typing
                        

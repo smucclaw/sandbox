@@ -3,15 +3,16 @@ module Typing where
 import Data.List
 import Syntax
 
-type Environment = [(VarName, Tp)]
+-- Static environment for typing
+type SEnvironment = [(VarName, Tp)]
 
-tp_constval :: Environment -> Val -> Tp
+tp_constval :: SEnvironment -> Val -> Tp
 tp_constval env x = case x of
   BoolV _ -> BoolT
   IntV _ -> IntT
 
   
-tp_var :: Environment -> VarName -> Tp
+tp_var :: SEnvironment -> VarName -> Tp
 tp_var env v =
   case lookup v env of
     Nothing -> ErrT
@@ -21,7 +22,7 @@ tp_var env v =
 tp_of_expr :: Exp t -> t
 tp_of_expr x = case x of
   ValE t _      -> t
-  VarE t _        -> t
+  VarE t _ _        -> t
   UnaOpE t _ _    -> t
   BinOpE t _ _ _  -> t
   IfThenElseE t _ _ _ -> t
@@ -55,14 +56,20 @@ tp_binop t1 t2 bop = case bop of
   BCompar bc -> tp_bcompar t1 t2 bc
   BBool bb   -> tp_bbool t1 t2 bb
 
-push_vardecl_env :: VarName -> Tp -> Environment -> Environment
+push_vardecl_env :: VarName -> Tp -> SEnvironment -> SEnvironment
 push_vardecl_env vn t env = (vn, t):env
 
 
-tp_expr :: Environment -> Exp () -> Exp Tp
+-- position of variable in environment
+
+pos :: VarName -> SEnvironment -> Int
+pos v [] = 0
+pos v ((hv, _):r) = if v == hv then 0 else (pos v r) + 1
+
+tp_expr :: SEnvironment -> Exp () -> Exp Tp
 tp_expr env x = case x of
   ValE () c -> ValE (tp_constval env c) c
-  VarE () v -> VarE (tp_var env v) v
+  VarE () v _ -> VarE (tp_var env v) v (pos v env)
   UnaOpE () uop e -> 
     let te = (tp_expr env e)
         t   = tp_unaop (tp_of_expr te) uop

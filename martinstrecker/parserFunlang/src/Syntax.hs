@@ -59,7 +59,7 @@ data BinOp
 
 data Exp t
     = ValE t Val                                -- value
-    | VarE t VarName                            -- variable
+    | VarE t VarName Int                        -- variable with dB-Index
     | UnaOpE t UnaOp (Exp t)                    -- unary operator
     | BinOpE t BinOp (Exp t) (Exp t)            -- binary operator
     | IfThenElseE t (Exp t) (Exp t) (Exp t)     -- conditional

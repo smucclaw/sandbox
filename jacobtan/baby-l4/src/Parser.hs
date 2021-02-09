@@ -42,34 +42,38 @@ nonIndented = L.nonIndented hspace
 endLine :: Parser ()
 endLine = void $ some (try $ hspace <* eol)
 
-newtype TypeS = TypeS String deriving Show
-newtype AttrS = AttrS String deriving Show
-newtype AttrTypeS = AttrTypeS String deriving Show
-newtype ObjS = ObjS String deriving Show
+newtype TypeS = TypeS String deriving (Show, Eq)
+newtype AttrS = AttrS String deriving (Show, Eq)
+newtype AttrTypeS = AttrTypeS String deriving (Show, Eq)
+newtype ObjS = ObjS String deriving (Show, Eq)
 
 -- | E.g. Type Business (12345) :
 data TypeDef = TypeDef TypeS (Maybe Integer) [TypeAttr]
-  deriving Show
+  deriving (Show, Eq)
 -- | E.g.     is_operating (23456) : boolean
 data TypeAttr = TypeAttr AttrS (Maybe Integer) AttrTypeS
-  deriving Show
+  deriving (Show, Eq)
 
 -- | E.g. megaCorp : Business
 data ObjDef = ObjDef ObjS TypeS
-  deriving Show
+  deriving (Show, Eq)
 
 -- Inari's example: data Ind ; data Prop
 data Ind = IStr String | IInt Integer
-  deriving Show
+  deriving (Show, Eq)
 
 -- | E.g. megaCorp.is_operating = true
-data Prop =
-  BinOp String Ind Ind 
+data Prop
+  = BinOp String Ind Ind 
   | Equal Ind Ind 
-  deriving Show
+  deriving (Show, Eq)
 
-data L4_statement = L4Type TypeDef | L4Obj ObjDef | L4Prop Prop | L4Query Prop
-  deriving Show
+data L4_statement
+  = L4Type  TypeDef
+  | L4Obj   ObjDef
+  | L4Prop  Prop
+  | L4Query Prop
+  deriving (Show, Eq)
 
 wordNetP :: Parser (Maybe Integer)
 wordNetP = lexeme $ optional $ "(" *> L.decimal <* ")"
@@ -114,12 +118,11 @@ propP = do
 queryP :: Parser Prop
 queryP = symbol "?" *> propP
 
-l4parser = many (
-  L4Type <$> typeDefP
-  <|> try (L4Obj <$> objDefP)
-  <|> try (L4Prop <$> propP)
-  <|> try (L4Query <$> queryP)
-  )
+l4parser = many $ choice $ try <$> [ L4Type  <$> typeDefP
+                                   , L4Obj   <$> objDefP
+                                   , L4Prop  <$> propP
+                                   , L4Query <$> queryP
+                                   ]
 
 main :: IO ()
 main = do

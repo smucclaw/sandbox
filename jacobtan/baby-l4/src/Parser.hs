@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module Parser
-    ( someFunc
+    ( main
     ) where
 
 import Text.Megaparsec
@@ -123,7 +123,7 @@ l4parser = many (
 
 main :: IO ()
 main = do
-  input <- readFile "babyl4.txt" <&> pack
+  input <- getContents <&> pack
   -- parseTest (l4parser <* eof) input
   pPrint $ parseMaybe l4parser input
 

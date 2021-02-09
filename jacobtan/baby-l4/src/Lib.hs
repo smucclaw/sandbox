@@ -1,8 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module Lib
-    ( someFunc
+    ( main
     ) where
 
-someFunc :: IO ()
-someFunc = putStrLn "someFunc"
+import Parser (main)

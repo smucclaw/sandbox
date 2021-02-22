@@ -1,0 +1,11 @@
+#+TITLE: docAssemble-server
+
+* Deployment
+ Run
+#+begin_src bash
+docker run -d -p 80:80 -p 443:443 --stop-timeout 600 jhpyle/docassemble
+#+end_src
+
+* Writing interviews
+Some things to note:
+- the order in which question & code blocks appear in the YAML does not determine the order in which questions are asked.

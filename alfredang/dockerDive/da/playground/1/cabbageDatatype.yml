@@ -1,0 +1,17 @@
+---
+modules:
+  - .DADataType
+---
+include:
+  - DADataType.yml
+---
+objects:
+  - terms: DADTContinue
+  - name: DADTString
+  - age: DADTNumber
+  - dateOfSale: DADTDate
+  - exemption: DADTBoolean
+  - validTill: DADTDateTime
+  - saleDecision: DADTBoolean
+---
+

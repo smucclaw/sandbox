@@ -9,6 +9,7 @@ mandatory: True
 code: |
   saleDecision.value = False
   if dateOfSale.value.day == 1:
+      exemption.value = True
       saleDecision.value = True
   if exemption.value == True:
       saleDecision.value = True

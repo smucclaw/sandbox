@@ -1,0 +1,35 @@
+---
+modules:
+  - .DADataType
+---
+include:
+  - cabbageDatatype.yml
+---
+mandatory: True
+code: |
+  saleDecision.value = False
+  if dateOfSale.value.day == 1:
+      saleDecision.value = True
+  if exemption.value == True:
+      saleDecision.value = True
+---
+mandatory: True
+question: Outcome
+subquestion: |
+  Your application for sales of cabbages in Ba Sing Se on ${ dateOfSale }, the ${ dateOfSale.value.day }rd day of ${ dateOfSale.value.month } has been
+  % if saleDecision.value == True:
+  allowed.
+  % else:
+  disallowed.
+  % endif
+buttons:
+  - Exit: exit
+---
+question: What is the date on which you wish to sell cabbages in Ba Sing Se?
+fields:
+  - ${ dateOfSale }: dateOfSale.value
+    datatype: date
+---
+question: Do you have an exemption from the Director of Agriculture for ${ dateOfSale }?
+yesno: exemption.value
+---

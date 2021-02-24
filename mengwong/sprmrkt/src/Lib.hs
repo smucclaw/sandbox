@@ -1,4 +1,7 @@
 {-# LANGUAGE InstanceSigs #-}
+
+{-# LANGUAGE GeneralisedNewtypeDeriving #-}
+
 module Lib where
 
 import Control.Monad (join)
@@ -25,16 +28,12 @@ infixr 7 </>
 
 
 
-data MyVowels a = MkV [a] deriving (Show, Eq)
+newtype MyVowels a = MkV [a]
+  deriving (Show, Eq, Functor, Applicative)
 
-instance Functor MyVowels where
-  fmap :: (a -> b) -> MyVowels a -> MyVowels b
-  fmap f (MkV xs) = MkV (fmap f xs)
+-- ***Jacob: just use {-# LANGUAGE GeneralisedNewtypeDeriving #-} instead,
+--           to derive Functor and Applicative
 
-instance Applicative MyVowels where
-  (<*>) :: MyVowels (a -> b) -> MyVowels a -> MyVowels b
-  (<*>) (MkV fs) (MkV xs) = MkV (fs <*> xs)
-  pure x = MkV [x]
 
 -- the "programmable semicolon" here inserts every possible vowel, in between lines of the "do"
 instance Monad MyVowels where

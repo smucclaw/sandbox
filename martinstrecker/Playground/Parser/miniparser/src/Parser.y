@@ -52,7 +52,7 @@ Factor : '-' Atom               { NegE (coordFromTo (tokenRng $1) (expCoord $2))
 
 Atom : int                      { IntE (tokenRng $1) (token_Int_val $1)   }
        | var                    { VarE (tokenRng $1) (token_Var_val $1)   }
-       | '(' Exp ')'            { $2            }
+       | '(' Exp ')'            { updateCoord (coordFromTo (tokenRng $1) (tokenRng $3)) $2   }
 
 {
 

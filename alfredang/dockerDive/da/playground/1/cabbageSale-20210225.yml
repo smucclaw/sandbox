@@ -1,0 +1,49 @@
+---
+modules:
+  - .DADataType
+---
+include:
+  - cabbageDatatype.yml
+---
+mandatory: True
+code: |
+  import json
+
+
+  with open("cabbageSeller.json","r") as f:
+    cabbageSeller = json.load(f)
+
+  assert len(cabbageSeller) == 1
+  applicant = cabbageSeller[0]
+
+  name.value = applicant["name"]
+  age.value = applicant["age"]
+
+  saleDecision.value = False
+  if dateOfSale.value.day == 1:
+      exemption.value = True
+      saleDecision.value = True
+  if exemption.value == True:
+      saleDecision.value = True
+---
+mandatory: True
+question: Outcome
+subquestion: |
+  Hello ${ name }, you are currently ${ age } years old.
+  Your application for sales of cabbages in Ba Sing Se on ${ dateOfSale }, the ${ dateOfSale.value.day }rd day of ${ dateOfSale.value.month } has been
+  % if saleDecision.value == True:
+  allowed.
+  % else:
+  disallowed.
+  % endif
+buttons:
+  - Exit: exit
+---
+question: What is the date on which you wish to sell cabbages in Ba Sing Se?
+fields:
+  - ${ dateOfSale }: dateOfSale.value
+    datatype: date
+---
+question: Do you have an exemption from the Director of Agriculture for ${ dateOfSale }?
+yesno: exemption.value
+---

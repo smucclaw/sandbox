@@ -1,6 +1,11 @@
 -- An example demonstrating how to connect a Happy parser to an Alex lexer.
 {
-module Parser (calc,runCalc,happyError) where
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+  
+module Parser (
+  parseProgram
+--  , parseTokens,
+) where
 
 
 import Coordinates
@@ -13,20 +18,25 @@ import Control.Monad.Except
 
 }
 
-%name calc
+%name program Exp
 %tokentype { Token }
 
-%token  let             { Let _ _    }
-        in              { In  _ _    }
-        int             { Int _ _ _  }
-        var             { Var _ _ _ }
-        '='             { Sym _ _ '=' }
-        '+'             { Sym _ _ '+' }
-        '-'             { Sym _ _ '-' }
-        '*'             { Sym _ _ '*' }
-        '/'             { Sym _ _ '/' }
-        '('             { Sym _ _ '(' }
-        ')'             { Sym _ _ ')' }
+-- Parser monad
+%monad { Alex }
+%lexer { lexwrap } { Token _ _ EOF }
+%error { parseError }
+
+%token  let             { Token _ _ Let }
+        in              { Token _ _ In }
+        int             { Token _ _ Int }
+        var             { Token _ _ Var }
+        '='             { Token _ "=" Sym }
+        '+'             { Token _ "+" Sym }
+        '-'             { Token _ "-" Sym }
+        '*'             { Token _ "*" Sym }
+        '/'             { Token _ "/" Sym }
+        '('             { Token _ "(" Sym }
+        ')'             { Token _ ")" Sym }
 
 %%
 
@@ -57,19 +67,18 @@ Atom : int                      { IntE (tokenRng $1) (token_Int_val $1)   }
 {
 
 
-data Coord = Coord AlexPosn 
+lexwrap :: (Token -> Alex a) -> Alex a
+lexwrap = (alexMonadScan' >>=)
 
+parseError :: Token -> Alex a
+parseError (Token p s tk) =
+  alexError' p ("parse error at token '" ++ s ++ "'")
 
-runCalc :: String -> Exp CoordRng
-runCalc = calc . alexScanTokens
+-- parseError :: [Token] -> Except String a
+-- parseError (l:ls) = throwError (show l)
+-- parseError [] = throwError "Unexpected end of Input"
 
-
-happyError :: [Token] -> a
-happyError tks = error ("Parse error at " ++ lcn ++ "\n")
-        where
-        lcn =   case tks of
-                  [] -> "end of file"
-                  tk:_ -> "line " ++ show l ++ ", column " ++ show c
-                        where
-                        AlexPn _ l c = token_posn tk
+parseProgram :: FilePath -> String -> Either String (Exp CoordRng)
+parseProgram = runAlex' program
+  
 }

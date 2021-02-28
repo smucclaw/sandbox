@@ -4,7 +4,6 @@
   
 module Parser (
   parseProgram
---  , parseTokens,
 ) where
 
 
@@ -23,20 +22,20 @@ import Control.Monad.Except
 
 -- Parser monad
 %monad { Alex }
-%lexer { lexwrap } { Token _ _ EOF }
+%lexer { lexwrap } { Token _ EOF _ }
 %error { parseError }
 
-%token  let             { Token _ _ Let }
-        in              { Token _ _ In }
-        int             { Token _ _ Int }
-        var             { Token _ _ Var }
-        '='             { Token _ "=" Sym }
-        '+'             { Token _ "+" Sym }
-        '-'             { Token _ "-" Sym }
-        '*'             { Token _ "*" Sym }
-        '/'             { Token _ "/" Sym }
-        '('             { Token _ "(" Sym }
-        ')'             { Token _ ")" Sym }
+%token  let             { Token _ Let _ }
+        in              { Token _ In _ }
+        int             { Token _ Int _ }
+        var             { Token _ Var _ }
+        '='             { Token _ Sym "=" }
+        '+'             { Token _ Sym "+" }
+        '-'             { Token _ Sym "-" }
+        '*'             { Token _ Sym "*" }
+        '/'             { Token _ Sym "/" }
+        '('             { Token _ Sym "(" }
+        ')'             { Token _ Sym ")" }
 
 %%
 
@@ -71,12 +70,8 @@ lexwrap :: (Token -> Alex a) -> Alex a
 lexwrap = (alexMonadScan' >>=)
 
 parseError :: Token -> Alex a
-parseError (Token p s tk) =
+parseError (Token p tk s) =
   alexError' p ("parse error at token '" ++ s ++ "'")
-
--- parseError :: [Token] -> Except String a
--- parseError (l:ls) = throwError (show l)
--- parseError [] = throwError "Unexpected end of Input"
 
 parseProgram :: FilePath -> String -> Either String (Exp CoordRng)
 parseProgram = runAlex' program

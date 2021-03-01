@@ -62,3 +62,11 @@ def yaml_call_all_objects(all_objs):
         eval(objName)
 
     return
+
+def mainBlock(yaml_path):
+    this_file = get_contents(yaml_path)
+    objs = yaml_get_objects(this_file)
+
+    yaml_call_all_objects(objs)
+
+    return

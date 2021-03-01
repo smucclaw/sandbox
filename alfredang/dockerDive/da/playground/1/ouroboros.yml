@@ -23,9 +23,9 @@ code: |
   this_file = get_contents(yaml_path)
   obj_bounds = get_objects_bounding(this_file)
   objs = yaml_get_objects(this_file)
-
+  
   pretty_this_file = '\n'.join(this_file)
-  # objects_info = yaml_get_objects(this_file)
+  yaml_call_all_objects(objs)
 ---
 mandatory: True
 question: |

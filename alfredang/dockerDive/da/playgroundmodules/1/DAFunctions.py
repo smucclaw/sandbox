@@ -33,7 +33,7 @@ def get_objects_bounding(yaml_contents):
 
     for n, line in enumerate(yaml_contents):
         if re.match(objectsHeader,line):
-            lBound = n
+            lBound = n + 1 # objects start from after the header is listed
             findRight = True
         if findRight and (re.match(blockSep,line)):
             rBound = n
@@ -47,4 +47,18 @@ def yaml_get_objects(yaml_contents: list) -> list:
         Returns objects information
     '''
     lb, rb = get_objects_bounding(yaml_contents)
-    return yaml_contents[lb + 1:rb]
+
+    obj_list = []
+    for line in yaml_contents[lb:rb]:
+        line=re.sub('-|\s','',line)
+        objName, objType = line.split(':')
+        obj_list.append((objName, objType))
+
+    return obj_list
+
+def yaml_call_all_objects(all_objs):
+    for objName, objType in all_objs:
+        objName = objName + '.value'
+        eval(objName)
+
+    return

@@ -21,6 +21,7 @@ library
                   Parser
                   Coordinates
                   Syntax
+                  Typing
   hs-source-dirs:
      src
   build-depends:       base >= 4.7 && < 5
@@ -47,5 +48,6 @@ executable miniparser
                 Lexer,
                 Parser,
                 Coordinates,
-                Syntax
+                Syntax,
+                Typing
                 

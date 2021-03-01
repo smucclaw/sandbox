@@ -29,6 +29,8 @@ import Control.Monad.Except
         in              { Token _ In _ }
         int             { Token _ Int _ }
         var             { Token _ Var _ }
+        True            { Token _ Bool "True" }
+        False           { Token _ Bool "False" }
         '='             { Token _ Sym "=" }
         '+'             { Token _ Sym "+" }
         '-'             { Token _ Sym "-" }
@@ -40,7 +42,7 @@ import Control.Monad.Except
 %%
 
 Exp :: { Exp CoordRng }
-Exp : let Bindings in Exp       { LetE (coordFromTo (tokenRng $1) (expCoord $4)) $2 $4 }
+Exp : let Bindings in Exp       { LetE (coordFromTo (tokenRng $1) (expCoord $4)) (reverse $2) $4 }
     | Exp1                      { $1            }
 
 Bindings :                      { [] }
@@ -60,6 +62,8 @@ Factor : '-' Atom               { NegE (coordFromTo (tokenRng $1) (expCoord $2))
        | Atom                   { $1            }
 
 Atom : int                      { IntE (tokenRng $1) (token_Int_val $1)   }
+       | True                   { BoolE (tokenRng $1) True }
+       | False                  { BoolE (tokenRng $1) False }
        | var                    { VarE (tokenRng $1) (token_Var_val $1)   }
        | '(' Exp ')'            { updateCoord (coordFromTo (tokenRng $1) (tokenRng $3)) $2   }
 

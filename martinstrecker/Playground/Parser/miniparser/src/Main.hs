@@ -1,6 +1,7 @@
 module Main where
 
 import Parser (parseProgram)
+import Typing (tpExp)
 import System.Environment
 
 -- main:: IO ()
@@ -12,7 +13,7 @@ process filepath input = do
   let ast = parseProgram filepath input
   case ast of
     Right ast -> do
-      print ast
+      print (tpExp [] ast)
     Left err -> do
       putStrLn "Parser Error:"
       print err

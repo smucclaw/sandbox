@@ -32,6 +32,8 @@ tokens :-
   "--".*                                ;
   let                                   { lex Let }
   in                                    { lex In }
+  True                                  { lex Bool }
+  False                                 { lex Bool }
   $digit+                               { lex Int }
   [\=\+\-\*\/\(\)]                      { lex Sym }
   $alpha [$alpha $digit \_ \']*         { lex Var }
@@ -62,6 +64,7 @@ data TokenKind =
         In            |
         Sym           |
         Var           |
+        Bool          | 
         Int           |
         EOF
         deriving (Eq,Show)
@@ -75,18 +78,9 @@ alexEOF = do
 -- CHANGE
 -- Unfortunately, we have to extract the matching bit of string
 -- ourselves...
--- lex :: (String -> TokenKind) -> AlexAction Token
--- lex f = \(p,_,_,s) i -> return $ Token p (f (take i s))
 lex :: TokenKind -> AlexAction Token
 lex tk = \(p,_,_,s) i -> return $ Token p tk (take i s)
 
-
-{- CHANGE: not used
--- For constructing tokens that do not depend on
--- the input
-lex' :: TokenKind -> AlexAction Token
-lex' = lex . const
--}
 
 -- We rewrite alexMonadScan' to delegate to alexError' when lexing fails
 -- (the default implementation just returns an error message).

@@ -21,13 +21,24 @@ code: |
   static_yaml_path, mimetype = path_and_mimetype(user_info().filename)
   yaml_path = path_convert(static_yaml_path)
   this_file = get_contents(yaml_path)
+  obj_bounds = get_objects_bounding(this_file)
+  objs = yaml_get_objects(this_file)
+
+  pretty_this_file = '\n'.join(this_file)
+  # objects_info = yaml_get_objects(this_file)
 ---
 mandatory: True
 question: |
   Yaml file information
 subquestion: |
   Current file path: ${ yaml_path }
-
+  
+  Objects info:
+  - bounding: ${ obj_bounds }
+  - objects: ${ objs }
+  
   File contents:
-  ${ this_file }
+  ${ pretty_this_file }
+buttons:
+  Exit: exit
 ---

@@ -18,4 +18,33 @@ def path_convert(fname):
 
 def get_contents(fname):
     with open(fname, 'r') as f:
-        return "\n".join(f.readlines())
+        return f.readlines()
+
+def get_objects_bounding(yaml_contents):
+    '''
+        Returns the boundaries containing the objects information.
+
+        Assumptions:
+            - only 1 'objects' block per yaml
+    '''
+    blockSep = '---'
+    objectsHeader = 'objects:'
+    findRight = False
+
+    for n, line in enumerate(yaml_contents):
+        if re.match(objectsHeader,line):
+            lBound = n
+            findRight = True
+        if findRight and (re.match(blockSep,line)):
+            rBound = n
+            return (lBound, rBound)
+
+    raise Exception("get_objects_bounding failed")
+
+
+def yaml_get_objects(yaml_contents: list) -> list:
+    '''
+        Returns objects information
+    '''
+    lb, rb = get_objects_bounding(yaml_contents)
+    return yaml_contents[lb + 1:rb]

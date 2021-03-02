@@ -30,3 +30,7 @@ subquestion: |
 buttons:
   Exit: exit
 ---
+metadata:
+  agenda:
+    - fact
+---

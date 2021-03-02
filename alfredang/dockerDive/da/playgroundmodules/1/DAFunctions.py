@@ -32,12 +32,15 @@ def get_bounding(block_type : str, yaml_contents : list) -> (int, int):
     '''
     blockSep = '---'
     objectsHeader = 'objects:'
+    agendaHeader = '[\s]*agenda:'
     findRight = False
 
     if re.match('obj[ect]?s?',block_type):
         block_header = objectsHeader
+    elif re.match('ag.?n[da]?',block):
+        block_header = agendaHeader
+
     for n, line in enumerate(yaml_contents):
-        if re.match(objectsHeader,line):
         if re.match(block_header,line):
             lBound = n + 1 # objects start from after the header is listed
             findRight = True
@@ -62,34 +65,34 @@ def yaml_get_agenda(yaml_contents: list) -> list:
     return agenda_list
 
 
-def yaml_get_objects(yaml_contents: list) -> list:
+def yaml_get_objects(yaml_contents: list) -> dict:
     '''
         Returns objects information
     '''
-    lb, rb = get_objects_bounding(yaml_contents)
+    lb, rb = get_bounding('objects',yaml_contents)
 
-    obj_list = []
+    obj_nameType = {}
     for line in yaml_contents[lb:rb]:
         line=re.sub('-|\s','',line)
         objName, objType = line.split(':')
-        obj_list.append((objName, objType))
+        obj_nameType[objName] = objType
 
-    return obj_list
+    return obj_nameType
 
-def yaml_call_all_objects(all_objs):
-    for objName, objType in all_objs:
-        objName = objName + '.value'
-        eval(objName)
 def yaml_call_object(objName : str):
     value(objName + '.value')
     return
 
+def yaml_form_agenda(all_agenda):
+    for objName in all_agenda:
+        yaml_call_object(objName)
     return
+
 
 def mainBlock(yaml_path):
     this_file = get_contents(yaml_path)
-    objs = yaml_get_objects(this_file)
+    agda = yaml_get_agenda(this_file)
 
-    yaml_call_all_objects(objs)
+    yaml_form_agenda(agda)
 
     return

@@ -1,4 +1,5 @@
 import re
+from docassemble.base.functions import value
 
 def plus_one(num):
     return num + 1
@@ -16,11 +17,13 @@ def path_convert(fname):
     '''
     return re.sub('playgroundstatic','playground',fname)
 
+
 def get_contents(fname):
     with open(fname, 'r') as f:
         return f.readlines()
 
-def get_objects_bounding(yaml_contents):
+
+def get_bounding(block_type : str, yaml_contents : list) -> (int, int):
     '''
         Returns the boundaries containing the objects information.
 
@@ -31,15 +34,32 @@ def get_objects_bounding(yaml_contents):
     objectsHeader = 'objects:'
     findRight = False
 
+    if re.match('obj[ect]?s?',block_type):
+        block_header = objectsHeader
     for n, line in enumerate(yaml_contents):
         if re.match(objectsHeader,line):
+        if re.match(block_header,line):
             lBound = n + 1 # objects start from after the header is listed
             findRight = True
         if findRight and (re.match(blockSep,line)):
             rBound = n
             return (lBound, rBound)
 
-    raise Exception("get_objects_bounding failed")
+    raise Exception("get_bounding for {} failed".format(block_type))
+
+
+def yaml_get_agenda(yaml_contents: list) -> list:
+    '''
+        Returns objects information
+    '''
+    lb, rb = get_bounding('agenda', yaml_contents)
+
+    agenda_list = []
+    for line in yaml_contents[lb:rb]:
+        line=re.sub('-|\s','',line)
+        agenda_list.append(line)
+
+    return agenda_list
 
 
 def yaml_get_objects(yaml_contents: list) -> list:
@@ -60,6 +80,9 @@ def yaml_call_all_objects(all_objs):
     for objName, objType in all_objs:
         objName = objName + '.value'
         eval(objName)
+def yaml_call_object(objName : str):
+    value(objName + '.value')
+    return
 
     return
 

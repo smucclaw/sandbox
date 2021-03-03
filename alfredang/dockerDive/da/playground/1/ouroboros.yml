@@ -20,7 +20,7 @@ mandatory: True
 code: |
   static_yaml_path, mimetype = path_and_mimetype(user_info().filename)
   yaml_path = path_convert(static_yaml_path)
-  mainBlock(yaml_path)
+  yaml_form_agenda(yaml_path)
 ---
 mandatory: True
 question: |
@@ -29,8 +29,9 @@ subquestion: |
   This page is intentionally left blank.
 buttons:
   Exit: exit
----
-metadata:
+question metadata:
   agenda:
-    - fact
+    - name
+    - age
+    - email_address
 ---

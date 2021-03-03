@@ -25,10 +25,11 @@ def get_contents(fname):
 
 def get_bounding(block_type : str, yaml_contents : list) -> (int, int):
     '''
-        Returns the boundaries containing the objects information.
+        Returns the boundaries containing the appropriate information.
 
         Assumptions:
             - only 1 'objects' block per yaml
+            - only 1 'agenda' metadata block per yaml
     '''
     blockSep = '---'
     objectsHeader = 'objects:'
@@ -37,14 +38,14 @@ def get_bounding(block_type : str, yaml_contents : list) -> (int, int):
 
     if re.match('obj[ect]?s?',block_type):
         block_header = objectsHeader
-    elif re.match('ag.?n[da]?',block):
+    elif re.match('ag.?n[da]?',block_type):
         block_header = agendaHeader
 
     for n, line in enumerate(yaml_contents):
         if re.match(block_header,line):
-            lBound = n + 1 # objects start from after the header is listed
+            lBound = n + 1 # items start from after the header is listed
             findRight = True
-        if findRight and (re.match(blockSep,line)):
+        if findRight and (re.match(blockSep,line)): # block seperator denotes end of list
             rBound = n
             return (lBound, rBound)
 
@@ -83,16 +84,19 @@ def yaml_call_object(objName : str):
     value(objName + '.value')
     return
 
-def yaml_form_agenda(all_agenda):
+def yaml_form_agenda(yaml_path : str):
+    this_file = get_contents(yaml_path)
+    all_agenda = yaml_get_agenda(this_file)
+
     for objName in all_agenda:
         yaml_call_object(objName)
     return
 
-
-def mainBlock(yaml_path):
+def yaml_form_objects(yaml_path : str):
     this_file = get_contents(yaml_path)
-    agda = yaml_get_agenda(this_file)
+    objs = yaml_get_objects(this_file)
 
-    yaml_form_agenda(agda)
-
+    for objName in objs.keys():
+        yaml_call_object(objName)
     return
+

@@ -80,23 +80,22 @@ def yaml_get_objects(yaml_contents: list) -> dict:
 
     return obj_nameType
 
-def yaml_call_object(objName : str):
-    value(objName + '.value')
+def yaml_call_object(obj_name : str):
+    value(obj_name + '.value')
     return
 
 def yaml_form_agenda(yaml_path : str):
     this_file = get_contents(yaml_path)
     all_agenda = yaml_get_agenda(this_file)
 
-    for objName in all_agenda:
-        yaml_call_object(objName)
+    for obj_name in all_agenda:
+        yaml_call_object(obj_name)
     return
 
 def yaml_form_objects(yaml_path : str):
     this_file = get_contents(yaml_path)
     objs = yaml_get_objects(this_file)
 
-    for objName in objs.keys():
-        yaml_call_object(objName)
+    for obj_name in objs.keys():
+        yaml_call_object(obj_name)
     return
-

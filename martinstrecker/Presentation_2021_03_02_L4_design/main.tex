@@ -1,0 +1,258 @@
+\documentclass{beamer}
+
+
+\input{settings}
+\input{defs}
+
+\title{L4 design}
+
+\author{Martin Strecker}
+\date{2021-03-02}
+
+
+%======================================================================
+
+\begin{document}
+
+
+%======================================================================
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+
+
+%======================================================================
+\section{Snapshot: Baby-L4 now}
+
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{General structure of an L4 file}
+
+  \begin{itemize}
+  \item Lexicon
+\begin{alltt}
+\textbf{lexicon}
+Business -> business_2 #from WordNet
+Value -> value_1 
+\end{alltt}
+    
+  \item List of class definitions (class $\approx$ type):
+\begin{alltt}
+\textbf{class} Business \{
+      foo: Int
+      bar: Bool -> (Int,Int)
+\}
+
+\textbf{class} LawRelatedService \textbf{extends} Business \{
+\}
+\end{alltt}
+
+    
+  \end{itemize}
+
+\end{frame}
+
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{General structure of an L4 file}
+
+  \begin{itemize}
+  \item Declarations:
+\begin{alltt}
+\textbf{decl} AssociatedWith: LegalPractitioner -> 
+                      Appointment -> Bool
+\textbf{decl} MayAcceptApp : LegalPractitioner -> 
+                      Appointment -> Bool
+\textbf{decl} ProhibitedBusiness : Business -> Bool
+\end{alltt}
+    
+  \end{itemize}
+
+\end{frame}
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{General structure of an L4 file}
+
+
+  \begin{itemize}
+  \item Rules:
+\begin{alltt}
+\textbf{rule} <r1a>
+\textbf{for} lpr: LegalPractitioner, app: Appointment
+\textbf{if} (exists bsn : Business. 
+         AssociatedWithAppB app bsn 
+      \&\& IncompatibleDignity bsn)
+\textbf{then} MustNotAcceptApp lpr app
+\end{alltt}
+  
+\item Assertions / Goals to be proved:
+\begin{alltt}
+\textbf{assert} 
+  exists lpr: LegalPractitioner. 
+  exists app: Appointment. 
+      MayAcceptApp lpr app
+\end{alltt}
+  \end{itemize}
+
+
+\end{frame}
+
+  
+%======================================================================
+\section{What to do with Baby-L4}
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Class definitions}
+
+  \blue{Purpose:}
+  \begin{itemize}
+  \item Separation of data and ``rules''
+  \item Used in type checking
+  \end{itemize}
+  
+  \blue{What to do with it?}
+  \begin{itemize}
+  \item Parse data from data description languages:\\
+    YAML, Jason, \dots\\
+    \dots and check conformity with class defs
+  \item Generate language stubs for OO languages
+  \item Use in verification tools like Alloy
+  \end{itemize}
+
+\end{frame}
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Semantics of classes and fields}
+
+  \blue{Mathematically:} Class = set of objects
+
+  \blue{Pragmatically:}
+  \begin{itemize}
+  \item Fields corrsponding to relation declarations?
+  \item Fields/ methods in the sense of OO languages?
+  \end{itemize}
+  Complementary, not incompatible views.
+
+\end{frame}
+
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Semantics of classes and fields}
+
+  \blue{Fields as function / relation declarations?}
+
+\begin{alltt}
+\textbf{class} LegalPractitioner \textbf{extends} Person \{
+\}
+\textbf{decl} AssociatedWith:
+     LegalPractitioner -> Appointment -> Bool
+\end{alltt}
+  
+the same as?:
+
+\begin{alltt}
+\textbf{class} LegalPractitioner \textbf{extends} Person \{
+    AssociatedWith: Appointment -> Bool
+\}
+\end{alltt}
+
+Functional / relational view: we write
+
+\begin{alltt}
+  forall lpr  : LegalPractitioner.
+  exists app: Appointment.
+     AssociatedWith lpr app
+\end{alltt}
+
+\end{frame}
+
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Semantics of classes and fields}
+
+  \blue{Fields as components of a record}
+
+
+  ``Relational'' view of components (as in Alloy)
+\begin{alltt}
+\textbf{class} LegalPractitioner \textbf{extends} Person \{
+    salary: Int
+\}
+\end{alltt}
+
+Understanding: \texttt{salary} is a relation\\
+\texttt{LegalPractitioner} $\times$ \texttt{Int}
+
+and \texttt{lpr.salary} is relation composition.
+
+\end{frame}
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Semantics of classes and fields}
+
+  \blue{Fields as components of a record}
+
+
+  ``Functional'' view of components:
+\begin{alltt}
+\textbf{class} LegalPractitioner \textbf{extends} Person \{
+      salary: Int
+\}
+\end{alltt}
+
+For \texttt{lpr: LegalPractitioner}, one can write:\\
+\texttt{lpr.salary}
+
+which is syntactic sugar of \texttt{salary(lpr)}
+
+\red{Downside:} under the relational interpretation, \texttt{lpr.salary} is
+not uniquely determined $\leadsto$ cardinality annotations.
+
+\end{frame}
+  
+%======================================================================
+\section{Moving to L4}
+
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Rule modifiers}
+
+  ... such as \texttt{subject to} clauses:
+
+  \begin{itemize}
+  \item annotations in rules 
+  \item compilation of preconditions
+  \end{itemize}
+
+
+\end{frame}
+
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Deontic statements}
+
+  Further investigations:
+
+  \begin{itemize}
+  \item Obligations as requirements on a module
+  \item Permissions as requirements on its environment
+  \item Composition of contracts
+  \item Rely-Guarantee reaasoning
+  \end{itemize}
+
+\end{frame}
+
+
+
+%-------------------------------------------------------------
+
+\end{document}
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% coding: utf-8
+%%% End: 

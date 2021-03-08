@@ -5,6 +5,7 @@
 {-# LANGUAGE DeriveFunctor #-}
 module FreeStuff where
 
+import Data.Maybe (fromMaybe)
 data Free f a
  = Pure a
  | Free (f (Free f a))
@@ -54,11 +55,25 @@ program = do
   end'
   setX "baz" "hey"
 
+program2 :: Free DSL ()
+program2 = do
+  x <- get "foo"
+  setX "bar" x
+
+program3 :: Free DSL ()
+program3 = do
+  x <- get "foo"
+  setX "bar" x
+  setX "foo" "Fooish"
+
 iterM :: (Monad m, Functor f) => (f (m a) -> m a) -> Free f a -> m a
 iterM _   (Pure x) = return x
 iterM phi (Free f) = phi (iterM phi <$> f)
 
-
+-- | Tear down a 'Free' 'Monad' using iteration.
+iter :: Functor f => (f a -> a) -> Free f a -> a
+iter _ (Pure a) = a
+iter phi (Free m) = phi (iter phi <$> m)
 
 runIO :: FDSL () -> IO ()
 runIO = iterM $ \case
@@ -70,7 +85,21 @@ runIO = iterM $ \case
     cont
   EndX -> pure ()
 
+-- | This is a reverse state monad that runs backwards
+-- *time travel*
+runPure :: FDSL [(String,String)] -> [(String,String)]
+runPure = iter $ \case
+  Get x cont -> let
+    y = fromMaybe ("Unknown value: " ++ x) $ lookup x ys
+    ys = cont y
+    in ys
+  Set x val cont -> (x,val):cont
+  EndX -> []
 
+-- >>> runPure $ [("a","b")] <$ program2
+-- >>> runPure $ [("a","b")] <$ program3
+-- [("bar","Unknown value: foo"),("a","b")]
+-- [("bar","Fooish"),("foo","Fooish"),("a","b")]
 
 -- get2 :: String -> (String -> Free DSL a) -> Free DSL a
 -- get2 s f = Free (Get s f)

@@ -60,7 +60,7 @@ iterM phi (Free f) = phi (iterM phi <$> f)
 
 
 
-runIO :: FDSL a -> IO a
+runIO :: FDSL () -> IO ()
 runIO = iterM $ \case
   Get x cont -> do
     print x
@@ -68,7 +68,8 @@ runIO = iterM $ \case
   Set x val cont -> do
     putStrLn $ "Set " ++ show x ++ " to " ++ show val
     cont
-  EndX -> pure $ error "End"
+  EndX -> pure ()
+
 
 
 -- get2 :: String -> (String -> Free DSL a) -> Free DSL a

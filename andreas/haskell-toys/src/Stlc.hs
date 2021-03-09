@@ -58,7 +58,7 @@ generalize2 (Lam x) = Lam $ generalize2 x
 class Concat1 (xs :: [Typ]) (ys :: [Typ]) (zs :: [Typ])
     | xs ys -> zs, zs xs -> ys where
   generalizeIdx :: Idx xs t -> Idx zs t
-instance Concat1 '[] ys ys where
+instance ys ~ zs => Concat1 '[] ys zs where
   generalizeIdx x = case x of {}
 instance Concat1 xs ys zs => Concat1 (x : xs) ys (x : zs) where
   generalizeIdx Z = Z
@@ -76,10 +76,9 @@ type family IsEqual (i1 :: [Typ]) (o1 :: [Typ]) :: Bool where
     IsEqual _ _ = 'False
 class ( IsEqual i o ~ eq)
       => Contains eq i o where
-    wrap ::  Idx i t -> Idx o t
+    wrap :: Idx i t -> Idx o t
 
 type Contains' i o = Contains (IsEqual i o) i o
-
 instance Contains 'True '[] '[] where
     wrap x = case x of {}
 
@@ -93,23 +92,56 @@ instance
   Contains 'False inner (x ': outer) where
     wrap = S . wrap
 
+    -- (:@) :: Exp g (t1 :-> t2) -> Exp g t1 -> Exp g t2
+    -- Lam :: Exp (t1 ': g) t2 -> Exp g (t1 :-> t2)
+-- subst :: Exp (t1 ': g) t2 -> Exp g t1 -> Exp g t2
+-- subst (Var Z) x = x
+-- subst (Var (S n)) x = Var n
+-- subst (a :@ b) x = subst a x :@ subst b x
+-- subst (Lam f) x = Lam $ _ f x
+
+-- liftExp1 :: Exp i t -> Exp (x ': i) t
+-- liftExp1 = liftExp
+
+liftExp :: Contains' i o => Exp i t -> Exp o t
+liftExp (Var i) = Var (wrap i)
+liftExp (f :@ x) = liftExp f :@ liftExp x
+-- liftExp (Lam f) = Lam $ liftExpUp f
+liftExp (Lam f) = Lam $ liftExpUp' (CS CZ) Proxy Proxy f
+
+liftExpUp :: Contains' i o => Exp (x ': i) t -> Exp (x ': o) t
+liftExpUp (Var Z) = Var Z
+liftExpUp (Var (S n)) = Var $ S $ wrap n
+liftExpUp (f :@ x) = liftExpUp f :@ liftExpUp x
+liftExpUp (Lam f) = Lam $ liftExpUp' (CS $ CS CZ) Proxy Proxy f
+
+data CtxSing (g :: [Typ]) where
+    CZ :: CtxSing '[]
+    CS :: CtxSing xs -> CtxSing (x ': xs)
+
+liftExpUp' :: (Contains' i o) => CtxSing xs -> Proxy i -> Proxy o -> Exp (Concat xs i) t -> Exp (Concat xs o) t
+liftExpUp' CZ i o n = liftExp n
+liftExpUp' p i o (Var n) = Var $ liftIdxUp p i o n
+liftExpUp' p i o (f :@ x) = liftExpUp' p i o f :@ liftExpUp' p i o x
+liftExpUp' p@(CS _) i o (Lam f) = Lam $ liftExpUp' (CS p) i o f
+
+liftIdxUp :: (Contains' i o) => CtxSing xs -> Proxy i -> Proxy o -> Idx (Concat xs i) t -> Idx (Concat xs o) t
+liftIdxUp CZ i o n = wrap n
+liftIdxUp (CS _) _ _ Z = Z
+liftIdxUp (CS p) i o (S n) = S $ liftIdxUp p i o n
+
 idxToVar :: Contains' inner outer => Idx inner t -> Exp outer t
 idxToVar = Var . wrap
 
-lam' :: ((forall outer. Contains' (t : g) outer =>  Exp outer t)
-         -> Exp (t : g) t2)
+-- | Automatically figure out which context we are in and wrap as necessary
+type ExpInCtx g t = forall outer. Contains' g outer =>  Exp outer t
+
+lam' :: (ExpInCtx (t : g) t -> Exp (t : g) t2)
     -> Exp g (t ':-> t2)
 lam' f = lam $ \x -> f $ idxToVar x
 
--- lam2 f = lam \x -> lam \y -> f (s x) y
--- lam2 :: (Exp t (Incr (Incr a)) -> Exp t (Incr (Incr a)) -> Exp t (Incr (Incr a))) -> Exp t a
--- lam2 :: (Exp (s : t : g2) t -> Idx (t1 : t : g2) t1 -> Exp (t1 : t : g2) t2) -> Exp g2 (t ':-> (t1 ':-> t2))
--- lam2 f = lam $ lam . f . s
-lam2 ::
-    ( Contains' (t1 : g) outer1
-    , Contains' (t2 : t1 : g) outer2
-    ) => (Exp outer1 t1 -> Exp outer2 t2 -> Exp (t2 : t1 : g) t3)
-      -> Exp g (t1 ':-> (t2 ':-> t3))
+lam2 :: (ExpInCtx (t1 : g) t1 -> ExpInCtx (t2 : t1 : g) t2 -> Exp (t2 : t1 : g) t3)
+      -> Exp g (t1 ':-> t2 ':-> t3)
 lam2 f = lam' $ \x -> lam' $ f x
 
 -- s :: Exp t a -> Exp t (Incr a)

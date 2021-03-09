@@ -24,6 +24,7 @@ module Stlc where
 
 
 import Data.Data (Proxy(Proxy))
+import Data.Type.Equality ((:~:) (Refl))
 data Typ = T | Typ :-> Typ
 
 infixr 8 :->
@@ -79,10 +80,8 @@ class ( IsEqual i o ~ eq)
     wrap :: Idx i t -> Idx o t
 
 type Contains' i o = Contains (IsEqual i o) i o
-instance Contains 'True '[] '[] where
-    wrap x = case x of {}
 
-instance Contains 'True (x ': xs) (x ': xs) where
+instance Contains 'True xs xs where
     wrap = id
 
 instance
@@ -92,16 +91,70 @@ instance
   Contains 'False inner (x ': outer) where
     wrap = S . wrap
 
+-- class KnownType (xs :: Typ) where
+--     knownType :: Proxy xs -> Typ
+
+-- class KnownCtx (xs :: [Typ]) where
+--     knownCtx :: CtxSing xs
+-- instance KnownCtx '[] where
+--   knownCtx = CZ
+-- instance KnownCtx xs => KnownCtx (x : xs) where
+--   knownCtx = CS knownCtx
+
+-- knownCtx' :: KnownCtx i => proxy i -> CtxSing i
+-- knownCtx' _ = knownCtx
+
+-- consNeq :: Proxy i -> Proxy x -> (IsEqual i (x ': i) ~ 'False => z) -> z
+-- consNeq i _ f = undefined
+
+-- consNeq' :: KnownCtx i => Proxy i -> Proxy x -> (IsEqual i (x ': i) ~ 'False => z) -> z
+-- consNeq' i x f = go (knownCtx' i) x f
+--   where
+--     go :: CtxSing i -> Proxy x -> (IsEqual i (x ': i) ~ 'False => z) -> z
+--     go CZ _ f = f
+--     go (CS n) x f = go n x $ undefined
+
+-- consNeq'' :: CtxSing i -> Proxy x -> (IsEqual i (x ': i) :~: 'False)
+-- consNeq'' CZ x = Refl
+-- consNeq'' cs@(CS n) x = consNeqLem cs x $ consNeq'' n x
+
+-- consNeqLem :: CtxSing (x1 : xs) -> Proxy x -> (IsEqual xs (x : xs) :~: 'False) -> IsEqual (x1 : xs) (x : x1 : xs) :~: 'False
+-- consNeqLem (CS CZ) x pf = Refl
+-- consNeqLem (CS cs1@(CS cs)) x Refl = _ $ consNeqLem cs1 x Refl
+
     -- (:@) :: Exp g (t1 :-> t2) -> Exp g t1 -> Exp g t2
     -- Lam :: Exp (t1 ': g) t2 -> Exp g (t1 :-> t2)
--- subst :: Exp (t1 ': g) t2 -> Exp g t1 -> Exp g t2
--- subst (Var Z) x = x
--- subst (Var (S n)) x = Var n
--- subst (a :@ b) x = subst a x :@ subst b x
--- subst (Lam f) x = Lam $ _ f x
+subst :: Exp (t1 ': g) t2 -> Exp g t1 -> Exp g t2
+subst (Var Z) x = x
+subst (Var (S n)) x = Var n
+subst (a :@ b) x = subst a x :@ subst b x
+subst (Lam f) x = Lam $ substUnder' (CS CZ) Proxy f x
 
--- liftExp1 :: Exp i t -> Exp (x ': i) t
--- liftExp1 = liftExp
+substUnder :: Exp (t4 : t1 : g) t2 -> Exp g t1 -> Exp (t4 : g) t2
+substUnder (Var Z) x = Var Z
+substUnder (Var (S Z)) x = liftExp0 x
+substUnder (Var (S (S n))) x = liftExp0 $ Var n
+substUnder (a :@ b) x = substUnder a x :@ substUnder b x
+substUnder (Lam f) x = Lam $ substUnder' (CS (CS CZ)) Proxy f x -- _ f x
+
+substUnder' :: CtxSing xs -> Proxy (t1 ': i)
+    -> Exp (Concat xs (t1 ': i)) t2 -> Exp i t1 -> Exp (Concat xs i) t2
+substUnder' CZ ti f x = subst f x
+substUnder' (CS cxs) ti (Var Z) x = Var Z
+substUnder' (CS cxs) ti (Var (S n)) x = liftExp0 $ substUnder' cxs ti (Var n) x
+substUnder' cs ti (a :@ b) x = substUnder' cs ti a x :@ substUnder' cs ti b x
+substUnder' cs ti (Lam f) x = Lam $ substUnder' (CS cs) ti f x
+-- liftExpUp' :: (Contains' i o) => CtxSing xs -> Proxy i -> Proxy o -> Exp (Concat xs i) t -> Exp (Concat xs o) t
+
+liftExp0 :: Exp i t -> Exp (x ': i) t
+-- liftExp0 i x = consNeq i x liftExp1
+liftExp0 = liftExp0 Proxy Proxy
+  where
+  liftExp0 :: Proxy i -> Proxy x -> Exp i t -> Exp (x ': i) t
+  liftExp0 = undefined
+
+liftExp1 :: (IsEqual i (x ': i) ~ 'False) => Exp i t -> Exp (x ': i) t
+liftExp1 = liftExp
 
 liftExp :: Contains' i o => Exp i t -> Exp o t
 liftExp (Var i) = Var (wrap i)

@@ -1,5 +1,5 @@
 let x = 3 + 4
     y = 5
 in (x + 4) *
-   (let z = 42 in ( y + 7  ))
-
+   (let z = True
+        v = 7 in x + v)

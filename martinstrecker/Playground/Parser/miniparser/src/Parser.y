@@ -1,6 +1,10 @@
 -- An example demonstrating how to connect a Happy parser to an Alex lexer.
 {
-module Parser (calc,runCalc,happyError) where
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+  
+module Parser (
+  parseProgram
+) where
 
 
 import Coordinates
@@ -13,25 +17,32 @@ import Control.Monad.Except
 
 }
 
-%name calc
+%name program Exp
 %tokentype { Token }
 
-%token  let             { Let _ _    }
-        in              { In  _ _    }
-        int             { Int _ _ _  }
-        var             { Var _ _ _ }
-        '='             { Sym _ _ '=' }
-        '+'             { Sym _ _ '+' }
-        '-'             { Sym _ _ '-' }
-        '*'             { Sym _ _ '*' }
-        '/'             { Sym _ _ '/' }
-        '('             { Sym _ _ '(' }
-        ')'             { Sym _ _ ')' }
+-- Parser monad
+%monad { Alex }
+%lexer { lexwrap } { Token _ EOF _ }
+%error { parseError }
+
+%token  let             { Token _ Let _ }
+        in              { Token _ In _ }
+        int             { Token _ Int _ }
+        var             { Token _ Var _ }
+        True            { Token _ Bool "True" }
+        False           { Token _ Bool "False" }
+        '='             { Token _ Sym "=" }
+        '+'             { Token _ Sym "+" }
+        '-'             { Token _ Sym "-" }
+        '*'             { Token _ Sym "*" }
+        '/'             { Token _ Sym "/" }
+        '('             { Token _ Sym "(" }
+        ')'             { Token _ Sym ")" }
 
 %%
 
 Exp :: { Exp CoordRng }
-Exp : let Bindings in Exp       { LetE (coordFromTo (tokenRng $1) (expCoord $4)) $2 $4 }
+Exp : let Bindings in Exp       { LetE (coordFromTo (tokenRng $1) (expCoord $4)) (reverse $2) $4 }
     | Exp1                      { $1            }
 
 Bindings :                      { [] }
@@ -51,25 +62,22 @@ Factor : '-' Atom               { NegE (coordFromTo (tokenRng $1) (expCoord $2))
        | Atom                   { $1            }
 
 Atom : int                      { IntE (tokenRng $1) (token_Int_val $1)   }
+       | True                   { BoolE (tokenRng $1) True }
+       | False                  { BoolE (tokenRng $1) False }
        | var                    { VarE (tokenRng $1) (token_Var_val $1)   }
        | '(' Exp ')'            { updateCoord (coordFromTo (tokenRng $1) (tokenRng $3)) $2   }
 
 {
 
 
-data Coord = Coord AlexPosn 
+lexwrap :: (Token -> Alex a) -> Alex a
+lexwrap = (alexMonadScan' >>=)
 
+parseError :: Token -> Alex a
+parseError (Token p tk s) =
+  alexError' p ("parse error at token '" ++ s ++ "'")
 
-runCalc :: String -> Exp CoordRng
-runCalc = calc . alexScanTokens
-
-
-happyError :: [Token] -> a
-happyError tks = error ("Parse error at " ++ lcn ++ "\n")
-        where
-        lcn =   case tks of
-                  [] -> "end of file"
-                  tk:_ -> "line " ++ show l ++ ", column " ++ show c
-                        where
-                        AlexPn _ l c = token_posn tk
+parseProgram :: FilePath -> String -> Either String (Exp CoordRng)
+parseProgram = runAlex' program
+  
 }

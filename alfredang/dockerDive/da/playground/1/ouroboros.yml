@@ -1,0 +1,37 @@
+---
+modules:
+  - .DADataType
+  - .DAFunctions
+---
+include:
+  - DADataType.yml
+---
+objects:
+  - fact: DADTBoolean
+  - name: DADTString
+  - age: DADTNumber
+  - birthdate: DADTDate
+  - email_address: DADTEmail
+  - terms: DADTContinue
+  - lunch: DADTTime
+  - end_of_the_world: DADTDateTime
+---
+mandatory: True
+code: |
+  static_yaml_path, mimetype = path_and_mimetype(user_info().filename)
+  yaml_path = path_convert(static_yaml_path)
+  yaml_form_agenda(yaml_path)
+---
+mandatory: True
+question: |
+  Yaml file information
+subquestion: |
+  This page is intentionally left blank.
+buttons:
+  Exit: exit
+question metadata:
+  agenda:
+    - name
+    - age
+    - email_address
+---

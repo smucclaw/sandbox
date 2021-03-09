@@ -1,3 +1,4 @@
+{-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE BlockArguments #-}
 {-# LANGUAGE DeriveFunctor #-}
@@ -25,6 +26,8 @@ module Stlc where
 import Data.Data (Proxy(Proxy))
 data Typ = T | Typ :-> Typ
 
+infixr 8 :->
+
 data Idx (g :: [Typ]) (t :: Typ) where
     Z :: Idx (t ': ts) t
     S :: Idx gs t -> Idx (g ': gs) t
@@ -36,7 +39,7 @@ data Exp (g :: [Typ]) (t :: Typ) where
     (:@) :: Exp g (t1 :-> t2) -> Exp g t1 -> Exp g t2
     Lam :: Exp (t1 ': g) t2 -> Exp g (t1 :-> t2)
 
-infix 5 :@
+infixl 5 :@
 deriving instance Show (Exp g t)
 
 generalize :: Exp '[] t -> Exp g t
@@ -93,10 +96,10 @@ instance
 idxToVar :: Contains' inner outer => Idx inner t -> Exp outer t
 idxToVar = Var . wrap
 
-lam' :: Contains' (t : g) outer
-    => (Exp outer t -> Exp (t : g) t2)
+lam' :: ((forall outer. Contains' (t : g) outer =>  Exp outer t)
+         -> Exp (t : g) t2)
     -> Exp g (t ':-> t2)
-lam' f = lam $ f . idxToVar
+lam' f = lam $ \x -> f $ idxToVar x
 
 -- lam2 f = lam \x -> lam \y -> f (s x) y
 -- lam2 :: (Exp t (Incr (Incr a)) -> Exp t (Incr (Incr a)) -> Exp t (Incr (Incr a))) -> Exp t a
@@ -107,7 +110,7 @@ lam2 ::
     , Contains' (t2 : t1 : g) outer2
     ) => (Exp outer1 t1 -> Exp outer2 t2 -> Exp (t2 : t1 : g) t3)
       -> Exp g (t1 ':-> (t2 ':-> t3))
-lam2 f = lam' $ lam' . f
+lam2 f = lam' $ \x -> lam' $ f x
 
 -- s :: Exp t a -> Exp t (Incr a)
 -- s = fmap S
@@ -138,9 +141,21 @@ ex2 = lam \z -> generalize ex' :@ Var z
 
 ex3 = lam \x -> lam \y -> s x :@ z y
 
+ex4 = generalize $ lam2 \x y -> x :@ (lam' \ z -> z :@ y)
+
+ex5 :: Exp '[] ((a ':-> a ':-> b) ':-> a ':-> b)
+ex5 = lam' \f -> lam' \x -> f :@ x :@ x
+
+ex6 :: Exp g ((((t1 ':-> t4) ':-> t4) ':-> t1 ':-> t5) ':-> t1 ':-> t5)
+ex6 = generalize $ lam' \f -> lam' \x -> f :@ (lam' \y -> y :@ x) :@ x
+
 -- >>> ex'
 -- >>> ex2
 -- >>> ex3
+-- >>> ex4
+-- >>> ex5
 -- Lam (Lam (Var (S Z) :@ Var Z))
 -- Lam (Lam (Lam (Var (S Z) :@ Var Z)) :@ Var Z)
 -- Lam (Lam (Var (S Z) :@ Var Z))
+-- Lam (Lam (Var (S Z) :@ Lam (Var Z :@ Var (S Z))))
+-- Lam (Lam ((Var (S Z) :@ Var Z) :@ Var Z))

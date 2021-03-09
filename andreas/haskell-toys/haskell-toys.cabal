@@ -25,7 +25,10 @@ source-repository head
 
 library
   exposed-modules:
+      BoundEx
+      Euler217
       FreeStuff
+      LazyPi
       Lib
   other-modules:
       Paths_haskell_toys

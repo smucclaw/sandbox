@@ -30,6 +30,7 @@ library
       FreeStuff
       LazyPi
       Lib
+      Stlc
   other-modules:
       Paths_haskell_toys
   hs-source-dirs:

@@ -8,7 +8,7 @@
 module BoundEx where
 
 import Data.Void (Void)
-data Incr a = Z String | S String a
+data Incr a = Z String | S a
   deriving (Eq, Show)
   deriving (Functor, Foldable, Traversable)
 
@@ -36,20 +36,20 @@ lam name f = Lam $ Scope $ f $ Var (Z name)
 -- lam2 :: (Exp (Incr (Incr a)) -> Exp (Incr (Incr a)) -> Exp (Incr (Incr a))) -> Exp a
 -- lam2 f = lam $ lam . f . s
 
-s :: String -> Exp a -> Exp (Incr a)
-s x = fmap (S x)
+s :: Exp a -> Exp (Incr a)
+s = fmap S
 -- s (Var x) = Var (S x)
 -- s (x :@ y) = s x :@ s y
 -- s (Lam (Scope f)) = Lam $ s f
 
 ex :: Exp Void
-ex = lam "x" $ \x -> lam "y" $ \y -> s "y" x :@ y
+ex = lam "x" $ \x -> lam "y" $ \y -> s x :@ y
 
 ex2 :: Exp Void
-ex2 = lam "z" \z -> s "z" ex :@ z
+ex2 = lam "z" \z -> s ex :@ z
 
 ex3 :: Exp Void
-ex3 = lam "x" $ \x -> s "lul" $ lam "y" $ \y -> x :@ y
+ex3 = lam "x" $ \x -> s $ lam "y" $ \y -> x :@ y
 
 -- >>> ex
 -- >>> ex2

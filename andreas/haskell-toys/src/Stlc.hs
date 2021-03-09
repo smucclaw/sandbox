@@ -1,3 +1,4 @@
+{-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE BlockArguments #-}
 {-# LANGUAGE DeriveFunctor #-}
 {-# LANGUAGE StandaloneDeriving #-}
@@ -16,6 +17,7 @@
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE TypeFamilyDependencies #-}
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE ConstraintKinds #-}
 module Stlc where
 
 
@@ -26,59 +28,48 @@ data Idx (g :: [Typ]) (t :: Typ) where
     Z :: Idx (t ': ts) t
     S :: Idx gs t -> Idx (g ': gs) t
 
-
+deriving instance Show (Idx g t)
+deriving instance Eq (Idx g t)
 data Exp (g :: [Typ]) (t :: Typ) where
     Var :: Idx g t -> Exp g t
     (:@) :: Exp g (t1 :-> t2) -> Exp g t1 -> Exp g t2
     Lam :: Exp (t1 ': g) t2 -> Exp g (t1 :-> t2)
 
+infix 5 :@
+deriving instance Show (Exp g t)
+
 lam :: (Idx (t1 ': g) t1 -> Exp (t1 ': g) t2) -> Exp g (t1 :-> t2)
 lam f = Lam $ f Z
 
--- class Contains (i1 :: [Typ]) (o1 :: [Typ]) where
-    -- wrap :: ( i1 ~ Reverse' i2, o1 ~ Reverse' o2
-    --         , i2 ~ Reverse' i1, o2 ~ Reverse' o1
-    --         )
-    --   => Idx i2 t -> Idx o2 t
-class ( i1 ~ Reverse' i2, o1 ~ Reverse' o2
-            , i2 ~ Reverse' i1, o2 ~ Reverse' o1
-            )
-      => Contains i1 o1 i2 o2 where
-    wrap ::  Idx i2 t -> Idx o2 t
+type family IsEqual (i1 :: [Typ]) (o1 :: [Typ]) :: Bool where
+    IsEqual x x = 'True
+    IsEqual _ _ = 'False
+class ( IsEqual i o ~ eq)
+      => Contains eq i o where
+    wrap ::  Idx i t -> Idx o t
 
-instance Contains '[] '[] '[] '[] where
+type Contains' i o = Contains (IsEqual i o) i o
+
+instance Contains 'True '[] '[] where
     wrap x = case x of {}
 
-instance ( o1 ~ Reverse' (y ': o2)
-         , (y ': o2) ~ Reverse' o1
-         , Contains '[x] (Reverse' o2) '[x] o2
-         ) => Contains '[x] o1 '[x] (y ': o2) where
+instance Contains 'True (x ': xs) (x ': xs) where
+    wrap = id
+
+instance
+  ( IsEqual inner (x ': outer) ~ 'False
+  , Contains' inner outer
+  ) =>
+  Contains 'False inner (x ': outer) where
     wrap = S . wrap
 
-instance ( i2 ~ Reverse' (x ': i1)
-         , (x ': i1) ~ Reverse' i2
-         , o2 ~ Reverse' (x ': o1)
-         , (x ': o1) ~ Reverse' o2
-        --  , Contains '[x] (Reverse' o2) '[x] o2
-         ) => Contains (x ': i1) (x ': o1) i2 o2 where
-    wrap = _
+idxToVar :: Contains' inner outer => Idx inner t -> Exp outer t
+idxToVar = Var . wrap
 
-
--- instance Contains (x ': '[]) (x ': ys) where
---     wrap x = _
-
--- instance Contains xs ys => Contains (x ': xs) (x ': ys) where
---     wrap x = _
-
--- instance Contains xs ys => Contains xs (y ': ys) where
---     wrap = S . wrap
-
-type Reverse' a = Reverse a '[]
-
--- type family Reverse (a :: [Typ]) (b :: [Typ]) = (c :: [Typ]) | c b -> a where
-type family Reverse (a :: [Typ]) (b :: [Typ]) :: [Typ] where
-    Reverse '[] a = a
-    Reverse (x ': xs) ys = Reverse xs (x ': ys)
+lam' :: Contains' (t : g) outer
+    => (Exp outer t -> Exp (t : g) t2)
+    -> Exp g (t ':-> t2)
+lam' f = lam $ f . idxToVar
 
 -- lam2 f = lam \x -> lam \y -> f (s x) y
 -- lam2 :: (Exp t (Incr (Incr a)) -> Exp t (Incr (Incr a)) -> Exp t (Incr (Incr a))) -> Exp t a
@@ -95,17 +86,25 @@ s = Var . S
 
 z = Var
 
--- ex :: Exp '[] a
-ex :: Exp g ((t1 ':-> t2) ':-> (t1 ':-> t2))
-ex = lam \x -> lam \y -> s x :@ z y
+-- ex :: Exp '[] ((t1 ':-> t2) ':-> (t1 ':-> t2))
+-- ex = lam \x -> lam \y -> s x :@ z y
+ex :: (
+    g ~ g,
+    IsEqual ((t1 ':-> t2) : g) (t1 : (t1 ':-> t2) : g) ~ 'False
+    ) =>
+     Exp g ((t1 ':-> t2) ':-> (t1 ':-> t2))
+ex = lam' \x -> lam' \y -> x :@ y
 
+ex' = ex @'[]
+
+ex2 :: (Exp '[] ((t10 ':-> t20) ':-> (t10 ':-> t20)))
 ex2 = lam \z -> ex :@ Var z
 
 ex3 = lam \x -> lam \y -> s x :@ z y
 
--- >>> ex
+-- >>> ex'
 -- >>> ex2
 -- >>> ex3
--- Lam (Lam (Var (S "y" (Z "x")) :@ Var (Z "y")))
--- Lam (Lam (Lam (Var (S "y" (Z "x")) :@ Var (Z "y"))) :@ Var (Z "z"))
--- Lam (Lam (Var (Z "x") :@ Var (Z "y")))
+-- Lam (Lam (Var (S Z) :@ Var Z))
+-- Lam (Lam (Lam (Var (S Z) :@ Var Z)) :@ Var Z)
+-- Lam (Lam (Var (S Z) :@ Var Z))

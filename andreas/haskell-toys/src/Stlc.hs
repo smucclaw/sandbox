@@ -29,14 +29,9 @@ data Typ = T | Typ :-> Typ
 
 infixr 8 :->
 
-data Idx (g :: [Typ]) (t :: Typ) where
-    Z :: Idx (t ': ts) t
-    S :: Idx gs t -> Idx (g ': gs) t
-
-deriving instance Show (Idx g t)
-deriving instance Eq (Idx g t)
 data Exp (g :: [Typ]) (t :: Typ) where
-    Var :: Idx g t -> Exp g t
+    Z :: Exp (t ': ts) t
+    S :: Exp gs t -> Exp (g ': gs) t
     (:@) :: Exp g (t1 :-> t2) -> Exp g t1 -> Exp g t2
     Lam :: Exp (t1 ': g) t2 -> Exp g (t1 :-> t2)
 
@@ -51,25 +46,30 @@ generalize = generalize2
 
 -- generalize2 :: Proxy g2 -> Exp g1 t -> Exp (Concat g1 g2) t
 generalize2 :: Concat1 g1 g2 g3 => Exp g1 t -> Exp g3 t
-generalize2 (Var i) = Var $ generalizeIdx i
+-- generalize2 Z = generalizeIdx Z
+-- generalize2 (S i) = S $ generalize2 i
 generalize2 (f :@ x) = generalize2 f :@ generalize2 x
 generalize2 (Lam x) = Lam $ generalize2 x
+generalize2 (i) = generalizeIdx i
 
 
 class Concat1 (xs :: [Typ]) (ys :: [Typ]) (zs :: [Typ])
     | xs ys -> zs, zs xs -> ys where
-  generalizeIdx :: Idx xs t -> Idx zs t
-instance ys ~ zs => Concat1 '[] ys zs where
-  generalizeIdx x = case x of {}
+  generalizeIdx :: Exp xs t -> Exp zs t
+instance Concat1 '[] ys ys where
+  generalizeIdx (f :@ x) = generalizeIdx f :@ generalizeIdx x
+  generalizeIdx (Lam x) = Lam $ generalizeIdx x
 instance Concat1 xs ys zs => Concat1 (x : xs) ys (x : zs) where
   generalizeIdx Z = Z
   generalizeIdx (S n) = S $ generalizeIdx n
+  generalizeIdx (f :@ x) = generalizeIdx f :@ generalizeIdx x
+  generalizeIdx (Lam x) = Lam $ generalizeIdx x
 
 type family Concat (xs :: [Typ]) (ys :: [Typ]) :: [Typ] where
     Concat '[] ys = ys
     Concat (x ': xs) ys = x ': Concat xs ys
 
-lam :: (Idx (t1 ': g) t1 -> Exp (t1 ': g) t2) -> Exp g (t1 :-> t2)
+lam :: (Exp (t1 ': g) t1 -> Exp (t1 ': g) t2) -> Exp g (t1 :-> t2)
 lam f = Lam $ f Z
 
 type family IsEqual (i1 :: [Typ]) (o1 :: [Typ]) :: Bool where
@@ -77,7 +77,7 @@ type family IsEqual (i1 :: [Typ]) (o1 :: [Typ]) :: Bool where
     IsEqual _ _ = 'False
 class ( IsEqual i o ~ eq)
       => Contains eq i o where
-    wrap :: Idx i t -> Idx o t
+    wrap :: Exp i t -> Exp o t
 
 type Contains' i o = Contains (IsEqual i o) i o
 
@@ -129,15 +129,16 @@ eval _ = Nothing
 
 -- | Substitute the variable with de Bruijn index zero
 subst :: Exp (t1 ': g) t2 -> Exp g t1 -> Exp g t2
-subst (Var Z) x = x
-subst (Var (S n)) x = Var n
+subst Z x = x
+subst (S n) x = n
 subst (a :@ b) x = subst a x :@ subst b x
 subst (Lam f) x = Lam $ substUnder' (CS CZ) Proxy f x
 
 substUnder :: Exp (t4 : t1 : g) t2 -> Exp g t1 -> Exp (t4 : g) t2
-substUnder (Var Z) x = Var Z
-substUnder (Var (S Z)) x = liftExp0 x
-substUnder (Var (S (S n))) x = liftExp0 $ Var n
+substUnder Z x = Z
+substUnder (S n) x = S $ subst n x
+-- substUnder (S Z) x = liftExp0 x
+-- substUnder (S (S n)) x = liftExp0  n
 substUnder (a :@ b) x = substUnder a x :@ substUnder b x
 substUnder (Lam f) x = Lam $ substUnder' (CS (CS CZ)) Proxy f x -- _ f x
 
@@ -145,31 +146,28 @@ substUnder (Lam f) x = Lam $ substUnder' (CS (CS CZ)) Proxy f x -- _ f x
 substUnder' :: CtxSing xs -> Proxy (t1 ': i)
     -> Exp (Concat xs (t1 ': i)) t2 -> Exp i t1 -> Exp (Concat xs i) t2
 substUnder' CZ ti f x = subst f x
-substUnder' (CS cxs) ti (Var Z) x = Var Z
-substUnder' (CS cxs) ti (Var (S n)) x = liftExp0 $ substUnder' cxs ti (Var n) x
+substUnder' (CS cxs) ti Z x = Z
+substUnder' (CS cxs) ti (S n) x = liftExp0 $ substUnder' cxs ti n x
 substUnder' cs ti (a :@ b) x = substUnder' cs ti a x :@ substUnder' cs ti b x
 substUnder' cs ti (Lam f) x = Lam $ substUnder' (CS cs) ti f x
 -- liftExpUp' :: (Contains' i o) => CtxSing xs -> Proxy i -> Proxy o -> Exp (Concat xs i) t -> Exp (Concat xs o) t
 
 liftExp0 :: Exp i t -> Exp (x ': i) t
 -- liftExp0 i x = consNeq i x liftExp1
-liftExp0 = liftExp0 Proxy Proxy
-  where
-  liftExp0 :: Proxy i -> Proxy x -> Exp i t -> Exp (x ': i) t
-  liftExp0 = undefined
+liftExp0 = S
 
 liftExp1 :: (IsEqual i (x ': i) ~ 'False) => Exp i t -> Exp (x ': i) t
 liftExp1 = liftExp
 
 liftExp :: Contains' i o => Exp i t -> Exp o t
-liftExp (Var i) = Var (wrap i)
 liftExp (f :@ x) = liftExp f :@ liftExp x
 -- liftExp (Lam f) = Lam $ liftExpUp f
 liftExp (Lam f) = Lam $ liftExpUp' (CS CZ) Proxy Proxy f
+liftExp i = wrap i
 
 liftExpUp :: Contains' i o => Exp (x ': i) t -> Exp (x ': o) t
-liftExpUp (Var Z) = Var Z
-liftExpUp (Var (S n)) = Var $ S $ wrap n
+liftExpUp Z = Z
+liftExpUp (S n) = S $ wrap n
 liftExpUp (f :@ x) = liftExpUp f :@ liftExpUp x
 liftExpUp (Lam f) = Lam $ liftExpUp' (CS $ CS CZ) Proxy Proxy f
 
@@ -179,17 +177,20 @@ data CtxSing (g :: [Typ]) where
 
 liftExpUp' :: (Contains' i o) => CtxSing xs -> Proxy i -> Proxy o -> Exp (Concat xs i) t -> Exp (Concat xs o) t
 liftExpUp' CZ i o n = liftExp n
-liftExpUp' p i o (Var n) = Var $ liftIdxUp p i o n
+-- liftExpUp' CZ i o n = wrap n
 liftExpUp' p i o (f :@ x) = liftExpUp' p i o f :@ liftExpUp' p i o x
 liftExpUp' p@(CS _) i o (Lam f) = Lam $ liftExpUp' (CS p) i o f
+-- liftExpUp' p i o n = liftIdxUp p i o n
+liftExpUp' (CS _) _ _ Z = Z
+liftExpUp' (CS p) i o (S n) = S $ liftExpUp' p i o n
 
-liftIdxUp :: (Contains' i o) => CtxSing xs -> Proxy i -> Proxy o -> Idx (Concat xs i) t -> Idx (Concat xs o) t
-liftIdxUp CZ i o n = wrap n
-liftIdxUp (CS _) _ _ Z = Z
-liftIdxUp (CS p) i o (S n) = S $ liftIdxUp p i o n
+-- liftIdxUp :: (Contains' i o) => CtxSing xs -> Proxy i -> Proxy o -> Exp (Concat xs i) t -> Exp (Concat xs o) t
+-- liftIdxUp CZ i o n = wrap n
+-- liftIdxUp (CS _) _ _ Z = Z
+-- liftIdxUp (CS p) i o (S n) = S $ liftIdxUp p i o n
 
-idxToVar :: Contains' inner outer => Idx inner t -> Exp outer t
-idxToVar = Var . wrap
+idxToVar :: Contains' inner outer => Exp inner t -> Exp outer t
+idxToVar = wrap
 
 -- | Automatically figure out which context we are in and wrap as necessary
 type ExpInCtx g t = forall outer. Contains' g outer =>  Exp outer t
@@ -208,10 +209,8 @@ lam2 f = lam' $ \x -> lam' $ f x
 -- s (x :@ y) = s x :@ s y
 -- s (Lam (Scope f)) = Lam $ s f
 
-s :: Idx gs t -> Exp (g : gs) t
-s = Var . S
-
-z = Var
+s :: Exp gs t -> Exp (g : gs) t
+s = S
 
 -- ex :: Exp '[] ((t1 ':-> t2) ':-> (t1 ':-> t2))
 -- ex = lam \x -> lam \y -> s x :@ z y
@@ -220,11 +219,11 @@ ex = generalize $ lam' \x -> lam' \y -> x :@ y
 
 ex2 :: (Exp '[] ((t10 ':-> t20) ':-> (t10 ':-> t20)))
 -- ex2 = lam \z -> ex :@ Var z
-ex2 = lam \z -> ex :@ Var z
+ex2 = lam \z -> ex :@ z
 
-ex3 = lam \x -> lam \y -> s x :@ z y
+ex3 = lam \x -> lam \y -> s x :@ y
 
-ex4 = generalize $ lam2 \x y -> x :@ (lam' \ z -> z :@ y)
+ex4 = generalize $ lam2 \x y -> x :@ lam' \ z -> z :@ y
 
 ex5 :: Exp '[] ((a ':-> a ':-> b) ':-> a ':-> b)
 ex5 = lam' \f -> lam' \x -> f :@ x :@ x
@@ -237,8 +236,8 @@ ex6 = generalize $ lam' \f -> lam' \x -> f :@ (lam' \y -> y :@ x) :@ x
 -- >>> ex3
 -- >>> ex4
 -- >>> ex5
--- Lam (Lam (Var (S Z) :@ Var Z))
--- Lam (Lam (Lam (Var (S Z) :@ Var Z)) :@ Var Z)
--- Lam (Lam (Var (S Z) :@ Var Z))
--- Lam (Lam (Var (S Z) :@ Lam (Var Z :@ Var (S Z))))
--- Lam (Lam ((Var (S Z) :@ Var Z) :@ Var Z))
+-- Lam (Lam (S Z :@ Z))
+-- Lam (Lam (Lam (S Z :@ Z)) :@ Z)
+-- Lam (Lam (S Z :@ Z))
+-- Lam (Lam (S Z :@ Lam (Z :@ S Z)))
+-- Lam (Lam ((S Z :@ Z) :@ Z))

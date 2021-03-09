@@ -122,8 +122,12 @@ instance
 -- consNeqLem (CS CZ) x pf = Refl
 -- consNeqLem (CS cs1@(CS cs)) x Refl = _ $ consNeqLem cs1 x Refl
 
-    -- (:@) :: Exp g (t1 :-> t2) -> Exp g t1 -> Exp g t2
-    -- Lam :: Exp (t1 ': g) t2 -> Exp g (t1 :-> t2)
+-- | Evaluate a single step
+eval :: Exp g t -> Maybe (Exp g t)
+eval (Lam f :@ x) = Just $ subst f x
+eval _ = Nothing
+
+-- | Substitute the variable with de Bruijn index zero
 subst :: Exp (t1 ': g) t2 -> Exp g t1 -> Exp g t2
 subst (Var Z) x = x
 subst (Var (S n)) x = Var n
@@ -137,6 +141,7 @@ substUnder (Var (S (S n))) x = liftExp0 $ Var n
 substUnder (a :@ b) x = substUnder a x :@ substUnder b x
 substUnder (Lam f) x = Lam $ substUnder' (CS (CS CZ)) Proxy f x -- _ f x
 
+-- | Substitute the variable with non-zero de Bruijn index
 substUnder' :: CtxSing xs -> Proxy (t1 ': i)
     -> Exp (Concat xs (t1 ': i)) t2 -> Exp i t1 -> Exp (Concat xs i) t2
 substUnder' CZ ti f x = subst f x
@@ -210,19 +215,12 @@ z = Var
 
 -- ex :: Exp '[] ((t1 ':-> t2) ':-> (t1 ':-> t2))
 -- ex = lam \x -> lam \y -> s x :@ z y
-ex :: (
-    g ~ g,
-    IsEqual ((t1 ':-> t2) : g) (t1 : (t1 ':-> t2) : g) ~ 'False
-    ) =>
-     Exp g ((t1 ':-> t2) ':-> (t1 ':-> t2))
-ex = lam' \x -> lam' \y -> x :@ y
-
-ex' :: Exp '[] ((t1 ':-> t2) ':-> (t1 ':-> t2))
-ex' = ex @'[]
+ex :: Exp g ((t1 ':-> t2) ':-> (t1 ':-> t2))
+ex = generalize $ lam' \x -> lam' \y -> x :@ y
 
 ex2 :: (Exp '[] ((t10 ':-> t20) ':-> (t10 ':-> t20)))
 -- ex2 = lam \z -> ex :@ Var z
-ex2 = lam \z -> generalize ex' :@ Var z
+ex2 = lam \z -> ex :@ Var z
 
 ex3 = lam \x -> lam \y -> s x :@ z y
 
@@ -234,7 +232,7 @@ ex5 = lam' \f -> lam' \x -> f :@ x :@ x
 ex6 :: Exp g ((((t1 ':-> t4) ':-> t4) ':-> t1 ':-> t5) ':-> t1 ':-> t5)
 ex6 = generalize $ lam' \f -> lam' \x -> f :@ (lam' \y -> y :@ x) :@ x
 
--- >>> ex'
+-- >>> ex
 -- >>> ex2
 -- >>> ex3
 -- >>> ex4

@@ -39,19 +39,7 @@ infixl 5 :@
 deriving instance Show (Exp g t)
 
 generalize :: Exp '[] t -> Exp g t
-generalize = generalize2
--- generalize (Var i) = Var $ case i of {}
--- generalize (f :@ x) = generalize f :@ generalize x
--- generalize (Lam x) = Lam $ generalize2 x
-
--- generalize2 :: Proxy g2 -> Exp g1 t -> Exp (Concat g1 g2) t
-generalize2 :: Concat1 g1 g2 g3 => Exp g1 t -> Exp g3 t
--- generalize2 Z = generalizeIdx Z
--- generalize2 (S i) = S $ generalize2 i
-generalize2 (f :@ x) = generalize2 f :@ generalize2 x
-generalize2 (Lam x) = Lam $ generalize2 x
-generalize2 (i) = generalizeIdx i
-
+generalize = generalizeIdx
 
 class Concat1 (xs :: [Typ]) (ys :: [Typ]) (zs :: [Typ])
     | xs ys -> zs, zs xs -> ys where
@@ -137,39 +125,23 @@ subst (Lam f) x = Lam $ substUnder' (CS CZ) Proxy f x
 substUnder :: Exp (t4 : t1 : g) t2 -> Exp g t1 -> Exp (t4 : g) t2
 substUnder Z x = Z
 substUnder (S n) x = S $ subst n x
--- substUnder (S Z) x = liftExp0 x
--- substUnder (S (S n)) x = liftExp0  n
 substUnder (a :@ b) x = substUnder a x :@ substUnder b x
 substUnder (Lam f) x = Lam $ substUnder' (CS (CS CZ)) Proxy f x -- _ f x
 
--- | Substitute the variable with non-zero de Bruijn index
+-- | Substitute a variable with non-zero de Bruijn index
 substUnder' :: CtxSing xs -> Proxy (t1 ': i)
     -> Exp (Concat xs (t1 ': i)) t2 -> Exp i t1 -> Exp (Concat xs i) t2
 substUnder' CZ ti f x = subst f x
 substUnder' (CS cxs) ti Z x = Z
-substUnder' (CS cxs) ti (S n) x = liftExp0 $ substUnder' cxs ti n x
+substUnder' (CS cxs) ti (S n) x = S $ substUnder' cxs ti n x
 substUnder' cs ti (a :@ b) x = substUnder' cs ti a x :@ substUnder' cs ti b x
 substUnder' cs ti (Lam f) x = Lam $ substUnder' (CS cs) ti f x
--- liftExpUp' :: (Contains' i o) => CtxSing xs -> Proxy i -> Proxy o -> Exp (Concat xs i) t -> Exp (Concat xs o) t
-
-liftExp0 :: Exp i t -> Exp (x ': i) t
--- liftExp0 i x = consNeq i x liftExp1
-liftExp0 = S
-
-liftExp1 :: (IsEqual i (x ': i) ~ 'False) => Exp i t -> Exp (x ': i) t
-liftExp1 = liftExp
 
 liftExp :: Contains' i o => Exp i t -> Exp o t
-liftExp (f :@ x) = liftExp f :@ liftExp x
--- liftExp (Lam f) = Lam $ liftExpUp f
-liftExp (Lam f) = Lam $ liftExpUp' (CS CZ) Proxy Proxy f
-liftExp i = wrap i
-
-liftExpUp :: Contains' i o => Exp (x ': i) t -> Exp (x ': o) t
-liftExpUp Z = Z
-liftExpUp (S n) = S $ wrap n
-liftExpUp (f :@ x) = liftExpUp f :@ liftExpUp x
-liftExpUp (Lam f) = Lam $ liftExpUp' (CS $ CS CZ) Proxy Proxy f
+-- liftExp (f :@ x) = liftExp f :@ liftExp x
+-- -- liftExp (Lam f) = Lam $ liftExpUp f
+-- liftExp (Lam f) = Lam $ liftExpUp' (CS CZ) Proxy Proxy f
+liftExp = wrap
 
 data CtxSing (g :: [Typ]) where
     CZ :: CtxSing '[]
@@ -184,10 +156,6 @@ liftExpUp' p@(CS _) i o (Lam f) = Lam $ liftExpUp' (CS p) i o f
 liftExpUp' (CS _) _ _ Z = Z
 liftExpUp' (CS p) i o (S n) = S $ liftExpUp' p i o n
 
--- liftIdxUp :: (Contains' i o) => CtxSing xs -> Proxy i -> Proxy o -> Exp (Concat xs i) t -> Exp (Concat xs o) t
--- liftIdxUp CZ i o n = wrap n
--- liftIdxUp (CS _) _ _ Z = Z
--- liftIdxUp (CS p) i o (S n) = S $ liftIdxUp p i o n
 
 idxToVar :: Contains' inner outer => Exp inner t -> Exp outer t
 idxToVar = wrap
@@ -203,17 +171,8 @@ lam2 :: (ExpInCtx (t1 : g) t1 -> ExpInCtx (t2 : t1 : g) t2 -> Exp (t2 : t1 : g) 
       -> Exp g (t1 ':-> t2 ':-> t3)
 lam2 f = lam' $ \x -> lam' $ f x
 
--- s :: Exp t a -> Exp t (Incr a)
--- s = fmap S
--- s (Var x) = Var (S x)
--- s (x :@ y) = s x :@ s y
--- s (Lam (Scope f)) = Lam $ s f
+-- * Examples
 
-s :: Exp gs t -> Exp (g : gs) t
-s = S
-
--- ex :: Exp '[] ((t1 ':-> t2) ':-> (t1 ':-> t2))
--- ex = lam \x -> lam \y -> s x :@ z y
 ex :: Exp g ((t1 ':-> t2) ':-> (t1 ':-> t2))
 ex = generalize $ lam' \x -> lam' \y -> x :@ y
 
@@ -221,7 +180,7 @@ ex2 :: (Exp '[] ((t10 ':-> t20) ':-> (t10 ':-> t20)))
 -- ex2 = lam \z -> ex :@ Var z
 ex2 = lam \z -> ex :@ z
 
-ex3 = lam \x -> lam \y -> s x :@ y
+ex3 = lam \x -> lam \y -> S x :@ y
 
 ex4 = generalize $ lam2 \x y -> x :@ lam' \ z -> z :@ y
 

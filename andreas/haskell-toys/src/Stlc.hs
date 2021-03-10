@@ -29,6 +29,63 @@ data Typ = T | Typ :-> Typ
 
 infixr 8 :->
 
+-- data Var t a
+
+data Exp1 (g :: [Typ]) (t :: Typ) a where
+    Z1 :: Exp1 (t ': ts) t a
+    -- S1 :: (b ~ Exp1 gs t a) => Exp1 gs t a -> Exp1 (g ': gs) t b
+    S1 :: Exp1 gs t a -> Exp1 (g ': gs) t (Exp1 gs t a)
+    -- Var :: Exp1 g t a
+    (:@!) :: Exp1 g (t1 :-> t2) a -> Exp1 g t1 a -> Exp1 g t2 a
+    Lam1 :: Exp1 (t1 ': g) t2 (Exp1 g t a) -> Exp1 g (t1 :-> t2) a
+
+-- data IsBound
+
+data Exp2 (bnd :: Maybe Typ) f (t :: Typ) where
+    Z2 :: Exp2 (Just t) f t
+    -- S2 :: Exp2 b f t -> Exp2 (Just t) (Exp2 b f) t
+    S2 :: f t -> Exp2 (Just t1) f t
+    (:@?) :: Exp2 g f (t1 :-> t2) -> Exp2 g f t1 -> Exp2 g f t2
+    Lam2 :: Exp2 (Just t1) (Exp2 g f) t2 -> Exp2 g f (t1 :-> t2)
+
+infixl 5 :@?
+
+exp2Ex = Lam2 $ Lam2 Z2 :@? Lam2 (S2 Z2)
+
+withF :: (forall s. f s -> g s) -> Exp2 b f t -> Exp2 b g t
+withF _ Z2 = Z2
+withF mu (S2 ft) = S2 $ mu ft
+withF mu (a :@? b) = withF mu a :@? withF mu b
+withF mu (Lam2 f) = Lam2 $ withF (withF mu) f
+
+class TFunctor (t :: (Typ -> *) -> Typ -> *) where
+    hoistT :: (forall a. f a -> g a) -> t f b -> t g b
+
+instance TFunctor (Exp2 b) where
+  hoistT = withF
+
+data Var (t1 :: Typ) f (t :: Typ) where
+    Z3 :: Var t f t
+    -- S3 :: Exp3 b f t -> Exp3 (Just t) (Exp3 b f) t
+    S3 :: f t -> Var t1 f t
+instance TFunctor (Var t) where
+  hoistT _ Z3 = Z3
+  hoistT mu (S3 x) = S3 $ mu x
+
+data Exp3 f (t :: Typ) where
+    -- Z3 :: Exp3 (Just t) f t
+    -- S3 :: Exp3 b f t -> Exp3 (Just t) (Exp3 b f) t
+    -- S3 :: f t -> Exp3 (Just t1) f t
+    Var3 :: f t -> Exp3 f t
+    (:@#) :: Exp3 f (t1 :-> t2) -> Exp3 f t1 -> Exp3 f t2
+    Lam3 :: Exp3 (Var t1 (Exp3 f)) t2 -> Exp3 f (t1 :-> t2)
+
+infixl 5 :@#
+instance TFunctor Exp3 where
+  hoistT mu (Var3 x) = Var3 (mu x)
+  hoistT mu (a :@# b) = hoistT mu a :@# hoistT mu b
+  hoistT mu (Lam3 f) = Lam3 $ hoistT (hoistT (hoistT mu)) f
+
 data Exp (g :: [Typ]) (t :: Typ) where
     Z :: Exp (t ': ts) t
     S :: Exp gs t -> Exp (g ': gs) t

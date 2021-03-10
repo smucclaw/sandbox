@@ -112,8 +112,35 @@ instance
 
 -- | Evaluate a single step
 eval :: Exp g t -> Maybe (Exp g t)
+eval (S (f :@ x)) = eval $ S f :@ S x
+eval (S (Lam f) :@ x) = eval $ Lam (liftExpUp1 f) :@ x
+-- eval (S (Lam f) :@ x) = Just $ _ f x
 eval (Lam f :@ x) = Just $ subst f x
+eval (f :@ x) = (:@ x) <$> eval f
 eval _ = Nothing
+
+withTail :: (forall t0. Exp g1 t0 -> Exp g2 t0) -> Exp (t1 : g1) t -> Exp (t1 : g2) t
+withTail _ Z = Z
+withTail f (S x) = S $ f x
+withTail f (a :@ b) = withTail f a :@ withTail f b
+withTail f (Lam g) = Lam $ withTail (withTail f) g
+
+liftExpUp1Alt :: Exp (t1 : gs) t -> Exp (t1 : g1 : gs) t
+liftExpUp1Alt = withTail S
+
+liftExpUp1 :: Exp (t1 : gs) t -> Exp (t1 : g1 : gs) t
+liftExpUp1 Z = Z
+liftExpUp1 (S x) = S $ S x
+liftExpUp1 (a :@ b) = liftExpUp1 a :@ liftExpUp1 b
+liftExpUp1 (Lam f) = Lam $ liftExpUp1' (CS (CS CZ)) Proxy f
+
+liftExpUp1' :: CtxSing xs -> Proxy (x ': i) -> Exp (Concat xs i) t -> Exp (Concat xs (x ': i)) t
+liftExpUp1' CZ i n = S n
+liftExpUp1' p i (f :@ x) = liftExpUp1' p i f :@ liftExpUp1' p i x
+liftExpUp1' p@(CS _) i (Lam f) = Lam $ liftExpUp1' (CS p) i f
+-- liftExpUp1' p i n = liftIdxUp p i n
+liftExpUp1' (CS _) _ Z = Z
+liftExpUp1' (CS p) i (S n) = S $ liftExpUp1' p i n
 
 -- | Substitute the variable with de Bruijn index zero
 subst :: Exp (t1 ': g) t2 -> Exp g t1 -> Exp g t2
@@ -142,6 +169,12 @@ liftExp :: Contains' i o => Exp i t -> Exp o t
 -- -- liftExp (Lam f) = Lam $ liftExpUp f
 -- liftExp (Lam f) = Lam $ liftExpUp' (CS CZ) Proxy Proxy f
 liftExp = wrap
+
+liftExpUp :: Contains' i o => Exp (x ': i) t -> Exp (x ': o) t
+liftExpUp Z = Z
+liftExpUp (S n) = S $ wrap n
+liftExpUp (f :@ x) = liftExpUp f :@ liftExpUp x
+liftExpUp (Lam f) = Lam $ liftExpUp' (CS $ CS CZ) Proxy Proxy f
 
 data CtxSing (g :: [Typ]) where
     CZ :: CtxSing '[]

@@ -2,33 +2,45 @@ concrete RockPaperScissorsEng of RockPaperScissors = open SyntaxEng, (P=Paradigm
   lincat
     Statement = S ;
     [Statement] = BulletsOrComma => ListS ;
+    Var = NP ;
+    [Var] = ListNP ;
+    ThrowItem = NP ;
     Conjunction = Conj ;
 
   param
     BulletsOrComma = Bullets | Comma ;
 
   lin
-    -- : String -> Statement ;                 -- B is a game
-    IsGame s = mkS (mkCl (symb s) (mkNP a_Det game_N)) ;
+    -- : Var -> Statement ;                 -- B is a game
+    game var = mkS (mkCl var (mkNP a_Det game_N)) ;
 
-    -- : (winner, game : String) -> Statement ;  -- A wins B
-    Wins w g = mkS (mkCl (symb w) win_V2 (symb g)) ;
+    -- : (winner, game : Var) -> Statement ;  -- A wins B
+    winner w g = mkS (mkCl w win_V2 g) ;
 
-    -- : (a,b,c : String) -> Statement ; -- A and B are participants in C
-    Participants a b c =
-      let AandB : NP = mkNP and_Conj (symb a) (symb b) ;
-          inC : Adv = mkAdv in_Prep (symb c) ;
-          participant_in_C : CN = mkCN participant_N inC ;
-      in mkS (mkCl AandB (mkNP aPl_Det participant_in_C)) ;
+    -- : (player, game : Var) -> Statement     -- A is a participant in B
+    participant_in = participant a_Det ;
 
-    Players a b =
-      let AandB : NP = mkNP and_Conj (symb a) (symb b) ;
-      in mkS (mkCl AandB (mkNP aPl_Det player_N)) ;
+    -- : Var -> ThrowItem -> Statement         -- A throws {rock,paper,scissors}
+    throw var item = mkS (mkCl var throw_V2 item) ;
 
-    -- : String -> Statement ; -- A throws {rock,paper,scissors}
-    ThrowRock = throw (mkNP rock_N) ;
-    ThrowPaper = throw (mkNP paper_N) ;
-    ThrowScissors = throw (mkNP aPl_Det scissor_N) ;
+    -- : ThrowItem
+    rock = mkNP rock_N ;
+    paper = mkNP paper_N ;
+    scissors = mkNP aPl_Det scissor_N ;
+
+    -- : String -> Var
+    SVar = symb ;
+
+    -- Aggregation functions
+
+    -- : [Var] -> Var -> Statement ; -- A and B are participants in C
+    ParticipantsIn ps game = participant aPl_Det (mkNP and_Conj ps) game ;
+
+    -- : [Var] -> Statement
+    Players ps =
+      mkS (mkCl
+             (mkNP and_Conj ps)
+             (mkNP aPl_Det player_N)) ;
 
     -- : Statement -> Statement -> Statement ; -- A wins B if …
     IfThen = mkS if_Conj ;
@@ -49,6 +61,8 @@ concrete RockPaperScissorsEng of RockPaperScissors = open SyntaxEng, (P=Paradigm
     ConjStatementInline c ss = mkS c (ss ! Comma) ;
     ConjStatementBullets c ss = mkS c (ss ! Bullets) ;
 
+    BaseVar = mkListNP ;
+    ConsVar = mkListNP ;
 
     -- : Conjunction ;
     And = and_Conj ;
@@ -66,10 +80,16 @@ concrete RockPaperScissorsEng of RockPaperScissors = open SyntaxEng, (P=Paradigm
     scissor_N     = P.mkN "scissor" ;
     if_Conj       = and_Conj ** {s2 = "if"} ;
 
-    throw : NP -> SS -> S = \np,string ->
-      mkS (mkCl (symb string) throw_V2 np) ;
 
     addBullet : S -> S = \s -> s ** {
       s = "\\*" ++ s.s
       } ;
- }
+
+
+    participant : Det -> (player, game : NP) -> S = \det,p,g ->
+      let inGame : Adv = mkAdv in_Prep g ;          -- first, build adverbial
+          pIG_CN : CN = mkCN participant_N inGame ; -- adv modifies CN
+          pIG_NP : NP = mkNP det pIG_CN ;       -- CN is quantified into singular or plular NP
+      in mkS (mkCl p pIG_NP) ;
+
+}

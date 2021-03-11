@@ -1,3 +1,4 @@
+{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE BlockArguments #-}
@@ -61,6 +62,12 @@ withF mu (Lam2 f) = Lam2 $ withF (withF mu) f
 class TFunctor (t :: (Typ -> *) -> Typ -> *) where
     hoistT :: (forall a. f a -> g a) -> t f b -> t g b
 
+class TFunctor tr => TMonad (tr :: (Typ -> *) -> Typ -> *) where
+    returnT :: f typ -> tr f typ
+    (>>>=) :: tr f typ -> (forall typ2. f typ2 -> tr g typ2) -> tr g typ
+    -- (>>>=) :: tr f typ -> (f typ -> tr g typ) -> tr g typ
+
+infixl 4 >>>=
 instance TFunctor (Exp2 b) where
   hoistT = withF
 
@@ -71,20 +78,39 @@ data Var (t1 :: Typ) f (t :: Typ) where
 instance TFunctor (Var t) where
   hoistT _ Z3 = Z3
   hoistT mu (S3 x) = S3 $ mu x
+instance TMonad (Var t) where
+  returnT = S3
+  Z3 >>>= _ = Z3
+  S3 x >>>= f = f x
 
+newtype Scope (t1 :: Typ) w (f:: Typ -> *) (t2 :: Typ) = Scope { unscope :: w (Var t1 (w f)) t2 }
+instance TFunctor w => TFunctor (Scope t1 w) where
+  hoistT mu (Scope x) = Scope $ hoistT (hoistT (hoistT mu)) x
+instance TMonad w => TMonad (Scope t1 w) where
+  returnT = Scope . returnT . S3 . returnT
+  Scope e1 >>>= f = Scope $ e1 >>>= \case
+     Z3 -> returnT Z3
+     (S3 e2) -> e2 >>>= unscope . f
+
+-- Tweaked version of this:
+-- https://hackage.haskell.org/package/bound-2.0.3/docs/Bound-Class.html#v:-62--62--62--61-
+bound :: TMonad f => Scope t1 f a t2 -> (forall t3. a t3 -> f c t3) -> Scope t1 f c t2
+bound (Scope m) f = Scope $ hoistT (hoistT (>>>= f)) m
 data Exp3 f (t :: Typ) where
-    -- Z3 :: Exp3 (Just t) f t
-    -- S3 :: Exp3 b f t -> Exp3 (Just t) (Exp3 b f) t
-    -- S3 :: f t -> Exp3 (Just t1) f t
     Var3 :: f t -> Exp3 f t
     (:@#) :: Exp3 f (t1 :-> t2) -> Exp3 f t1 -> Exp3 f t2
-    Lam3 :: Exp3 (Var t1 (Exp3 f)) t2 -> Exp3 f (t1 :-> t2)
+    Lam3 :: Scope t1 Exp3 f t2 -> Exp3 f (t1 :-> t2)
 
 infixl 5 :@#
 instance TFunctor Exp3 where
   hoistT mu (Var3 x) = Var3 (mu x)
   hoistT mu (a :@# b) = hoistT mu a :@# hoistT mu b
-  hoistT mu (Lam3 f) = Lam3 $ hoistT (hoistT (hoistT mu)) f
+  hoistT mu (Lam3 f) = Lam3 $ hoistT mu f
+instance TMonad Exp3 where
+  returnT = Var3
+  Var3 x    >>>= f = f x
+  (a :@# b) >>>= f = (a >>>= f) :@# (b >>>= f)
+  Lam3 e    >>>= f = Lam3 $ bound e f
 
 data Exp (g :: [Typ]) (t :: Typ) where
     Z :: Exp (t ': ts) t
@@ -263,6 +289,11 @@ lam2 f = lam' $ \x -> lam' $ f x
 
 -- * Examples
 
+{-# ANN ex "HLint: ignore Avoid lambda" #-}
+{-# ANN ex2 "HLint: ignore Avoid lambda" #-}
+{-# ANN ex4 "HLint: ignore Avoid lambda using `infix`" #-}
+{-# ANN ex6 "HLint: ignore Avoid lambda using `infix`" #-}
+
 ex :: Exp g ((t1 ':-> t2) ':-> (t1 ':-> t2))
 ex = generalize $ lam' \x -> lam' \y -> x :@ y
 
@@ -278,7 +309,7 @@ ex5 :: Exp '[] ((a ':-> a ':-> b) ':-> a ':-> b)
 ex5 = lam' \f -> lam' \x -> f :@ x :@ x
 
 ex6 :: Exp g ((((t1 ':-> t4) ':-> t4) ':-> t1 ':-> t5) ':-> t1 ':-> t5)
-ex6 = generalize $ lam' \f -> lam' \x -> f :@ (lam' \y -> y :@ x) :@ x
+ex6 = generalize $ lam' \f -> lam' \x -> f :@ lam' (\y -> y :@ x) :@ x
 
 -- >>> ex
 -- >>> ex2

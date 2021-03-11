@@ -1,6 +1,21 @@
 #/usr/bin/bash
 
 
+# Build GF grammar, if needed
+if [ -n "$(ls -la | grep pgf)" ]
+then
+    echo GF grammar found, proceeding with demo
+else
+    echo Building the GF grammar...
+
+    gf -make -f haskell --haskell=gadt RockPaperScissorsEng.gf
+
+    echo GF grammar built, proceeding with demo
+    echo ''
+fi
+
+
+
 read -p 'Player 1: ' a
 read -p 'Player 2: ' c
 read -p 'Name of the game: ' b

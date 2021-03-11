@@ -1,8 +1,10 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.34.2.
+-- This file has been generated from package.yaml by hpack version 0.33.0.
 --
 -- see: https://github.com/sol/hpack
+--
+-- hash: 59a1f0762ae771f5015bdb6439bd869fcb4005c8a18173d158aea2d7ffa29183
 
 name:           haskell-toys
 version:        0.1.0.0

@@ -2,6 +2,8 @@
 
 -- Inspired by: https://web.archive.org/web/20051017081559/http://users.info.unicaen.fr/~karczma/arpap/lazypi.ps.gz
 
+module LazyPi where
+
 import Data.Ratio
 import GHC.Real (Ratio((:%)))
 

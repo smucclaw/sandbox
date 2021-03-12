@@ -36,6 +36,8 @@ gfPP bi lbi clbi = PreProcessor {
                 [ "-make"
                 , "-f", "haskell"
                 , "--haskell=gadt"
+                , "--haskell=lexical"
+                , "--lexical=Atom"
                 , "--output-dir=" ++ outDir
                 , "--gfo-dir=/tmp"
                 , inDir </> inFile

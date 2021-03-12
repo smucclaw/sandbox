@@ -1,40 +1,72 @@
-concrete RockPaperScissorsEng of RockPaperScissors = open SyntaxEng, (P=ParadigmsEng), SymbolicEng, Prelude in {
+concrete RockPaperScissorsEng of RockPaperScissors = open SyntaxEng, (P=ParadigmsEng), SymbolicEng, Predef in {
   lincat
     Statement = S ;
     [Statement] = BulletsOrComma => ListS ;
-    Var = NP ;
-    [Var] = ListNP ;
-    ThrowItem = NP ;
+    Var, Arg = NP ;
+    Atom = LinAtom ; -- Multiple options
+    [Var], [Arg] = ListNP ;
     Conjunction = Conj ;
 
   param
     BulletsOrComma = Bullets | Comma ;
+    AType = AN2 | ANP | AV | AV2 ;
+  oper
+    LinAtom : Type = {n2 : N2 ; np : NP ; v : V ; v2 : V2 ; atype : AType} ;
+    dummyV : V = P.mkV "dummy" ;
+    dummyV2 : V2 = P.mkV2 "dummy" ;
+    dummyN2 : N2 = P.mkN2 (P.mkN "dummy") ;
+    dummyAtom : LinAtom = {np = nothing_NP ; v = dummyV ; v2 = dummyV2 ; n2 = dummyN2 ; atype = ANP};
+    mkAtom = overload {
+      mkAtom : NP -> LinAtom = \np -> dummyAtom ** {np = np ; atype = ANP} ;
+      mkAtom : N -> LinAtom = \n -> dummyAtom ** {np = mkNP n ; atype = ANP} ;
+      mkAtom : V -> LinAtom = \v -> dummyAtom ** {v = v ; atype = AV} ;
+      mkAtom : V2 -> LinAtom = \v2 -> dummyAtom ** {v2 = v2 ; atype = AV2} ;
+      mkAtom : N2 -> LinAtom = \n2 -> dummyAtom ** {n2 = n2 ; atype = AN2} ;
+    } ;
 
   lin
-    -- : Var -> Statement ;                 -- B is a game
-    game var = mkS (mkCl var (mkNP a_Det game_N)) ;
+    game = mkAtom (mkNP a_Det game_N);
+    player = mkAtom (mkNP a_Det player_N) ;
+    winner = mkAtom win_V2 ;
+    participant_in = mkAtom (P.mkN2 participant_N in_Prep) ;
+    player_throw = mkAtom throw_V2 ;
+    rock = mkAtom rock_N ;
+    paper = mkAtom paper_N ;
+    scissors = mkAtom (mkNP aPl_Det scissor_N) ;
+    beats = mkAtom beat_V2 ;
 
-    -- : (winner, game : Var) -> Statement ;  -- A wins B
-    winner w g = mkS (mkCl w win_V2 g) ;
+    -- Coercions to Arg
+    AVar v = v ;
+    AAtom atom = case atom.atype of {
+      ANP => atom.np ;
+      _ => nothing_NP --Predef.error "AAtom: trying to make predicate into argument"
+    } ;
 
-    -- : (player, game : Var) -> Statement     -- A is a participant in B
-    participant_in = participant a_Det ;
+    -- Atom -> Arg -> Statement ;
+    Pred1 atom arg =
+      let pred : VP = case atom.atype of {
+                        AV  => mkVP atom.v ;
+                        ANP => mkVP atom.np ;
+                        AN2 => mkVP (mkNP a_Det (mkCN atom.n2)) ;
+                        AV2 => mkVP atom.v2 something_NP } 
+       in mkS (mkCl arg pred) ;
 
-    -- : Var -> ThrowItem -> Statement         -- A throws {rock,paper,scissors}
-    throw var item = mkS (mkCl var throw_V2 item) ;
-
-    -- : ThrowItem
-    rock = mkNP rock_N ;
-    paper = mkNP paper_N ;
-    scissors = mkNP aPl_Det scissor_N ;
+    -- : Atom -> (x, y : Arg) -> Statement ;
+    Pred2 atom subj obj =
+      let pred : VP = case atom.atype of {
+                        AV  => mkVP (mkVP atom.v) (mkAdv with_Prep obj) ;
+                        ANP => mkVP (mkVP atom.np) (mkAdv with_Prep obj) ;
+                        AN2 => mkVP (mkNP a_Det (mkCN atom.n2 obj)) ;
+                        AV2 => mkVP atom.v2 obj } 
+       in mkS (mkCl subj pred) ;
 
     -- : String -> Var
     SVar = symb ;
 
     -- Aggregation functions
 
-    -- : [Var] -> Var -> Statement ; -- A and B are participants in C
-    ParticipantsIn ps game = participant aPl_Det (mkNP and_Conj ps) game ;
+    -- : [Var] -> Atom -> Statement ; -- A and B are participants in C
+    ParticipantsIn ps game = participantIn aPl_Det (mkNP and_Conj ps) game.np ;
 
     -- : [Var] -> Statement
     Players ps =
@@ -72,6 +104,8 @@ concrete RockPaperScissorsEng of RockPaperScissors = open SyntaxEng, (P=Paradigm
     -- Can also open WordNet or other multilingual lexicon and get the lexicon from there
     game_N        = P.mkN "game" ;
     win_V2        = P.mkV2 "win" ;
+    beat_V2       = P.mkV2 "beat" ;
+    winner_N      = P.mkN "winner" ;
     participant_N = P.mkN "participant" ;
     player_N      = P.mkN "player" ;
     throw_V2      = P.mkV2 "throw" ;
@@ -86,7 +120,7 @@ concrete RockPaperScissorsEng of RockPaperScissors = open SyntaxEng, (P=Paradigm
       } ;
 
 
-    participant : Det -> (player, game : NP) -> S = \det,p,g ->
+    participantIn : Det -> (player, game : NP) -> S = \det,p,g ->
       let inGame : Adv = mkAdv in_Prep g ;          -- first, build adverbial
           pIG_CN : CN = mkCN participant_N inGame ; -- adv modifies CN
           pIG_NP : NP = mkNP det pIG_CN ;       -- CN is quantified into singular or plular NP

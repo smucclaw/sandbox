@@ -13,7 +13,10 @@ import Text.Megaparsec.Char
 import qualified Data.Text as T
 import qualified Text.Megaparsec.Char.Lexer as L
 
-data Kind = KModel | KExp | KArg | KVar | KAtom
+----------------------------------------------------------------
+-- Abstract syntax
+
+data SKind = KModel | KExp | KArg | KVar | KAtom
 
 type Exp = Tree KExp
 type Var = Tree KVar
@@ -21,7 +24,7 @@ type Model = Tree KModel
 type Atom = Tree KAtom
 type Arg = Tree KArg
 
-data Tree :: Kind -> * where
+data Tree :: SKind -> * where
   MExps :: [Exp] -> Tree KModel
 
   EApp :: Atom -> [Arg] -> Tree KExp
@@ -34,19 +37,12 @@ data Tree :: Kind -> * where
 
 deriving instance Show (Tree k)
 
-{- Without GADTs:
-data MyExp =
-  MEApp MyExp MyExp |
-  MEVar MyVar
-newtype MyVar = MyVar String
-data Model = MExps [MyExp]
--}
-
 ----------------------------------------------------------------
 -- Parser
+-- It could be any parser, this happens to be with Megaparsec.
+-- The point is the use of GADTs and type families in the abstract syntax.
 
 type Parser = Parsec Void String
-
 
 parseModel :: String -> Either String Model
 parseModel = parseWError pModel ""

@@ -26,6 +26,7 @@ module Stlc where
 
 import Data.Data (Proxy(Proxy))
 import Data.Type.Equality ((:~:) (Refl))
+
 data Typ = T | Typ :-> Typ
 
 infixr 8 :->
@@ -111,6 +112,51 @@ instance TMonad Exp3 where
   Var3 x    >>>= f = f x
   (a :@# b) >>>= f = (a >>>= f) :@# (b >>>= f)
   Lam3 e    >>>= f = Lam3 $ bound e f
+
+instantiate :: TMonad tr => tr f t1 -> Scope t1 tr f typ -> tr f typ
+instantiate k e = unscope e >>>= \case
+   Z3 -> k
+   (S3 b) -> b
+
+whnf :: Exp3 f t -> Exp3 f t
+whnf (f :@# a) = case whnf f of
+  Lam3 b -> whnf (instantiate a b)
+  f'    -> f' :@# a
+whnf e = e
+
+
+newtype Var4 s = Var4 s
+
+-- Untyped quasi-HOAS using the runST trick
+data Exp4 (g :: [*]) where
+    Z4 :: Var4 s -> Exp4 (s ': g)
+    S4 :: Exp4 gs -> Exp4 (g ': gs)
+    (:@&) :: Exp4 g -> Exp4 g -> Exp4 g
+    Lam4 :: (forall s. Var4 s -> Exp4 (s ': g)) -> Exp4 g
+
+map4 :: (Exp4 g -> Exp4 h) -> Exp4 (s : g) -> Exp4 (s : h)
+map4 f (Z4 vs) = Z4 vs
+map4 f (S4 x) = S4 $ f x
+map4 f (a :@& b) = map4 f a :@& map4 f b
+map4 f (Lam4 x) = Lam4 $ map4 (map4 f) . x
+
+collapse4 :: Exp4 (Exp4 g ': g) -> Exp4 g
+collapse4 (Z4 (Var4 s)) = s
+collapse4 (S4 e) = e
+collapse4 (a :@& b) = collapse4 a :@& collapse4 b
+collapse4 (Lam4 f) = Lam4 $ map4 collapse4 . f
+
+instantiate4 :: Exp4 g -> (forall s. Var4 s -> Exp4 (s ': g)) -> Exp4 g
+instantiate4 k e = collapse4 $ e $ Var4 k
+
+whnf4 :: Exp4 g -> Exp4 g
+whnf4 (f :@& a) = case whnf4 f of
+  Lam4 b -> whnf4 (instantiate4 a b)
+  f'    -> f' :@& a
+whnf4 e = e
+
+lam4 :: (forall s. Exp4 (s : g) -> Exp4 (s : g)) -> Exp4 g
+lam4 f = Lam4 $ f . Z4
 
 data Exp (g :: [Typ]) (t :: Typ) where
     Z :: Exp (t ': ts) t

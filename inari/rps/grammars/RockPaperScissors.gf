@@ -4,16 +4,16 @@ abstract RockPaperScissors = {
     Statement ;
     [Statement]{2} ;
     Var ;
-    [Var]{2} ;
     Arg ;
     [Arg]{2} ;
     Conjunction ;
     Atom ;
+    Typography ;
 
   fun
-    -- Direct translation from s(CASP)
-    Pred1 : Atom -> Arg -> Statement ;
-    Pred2 : Atom -> (x, y : Arg) -> Statement ;
+    -- Direct translation from s(CASP) asdafsf
+    App1 : Atom -> Arg -> Statement ;
+    App2 : Atom -> (x, y : Arg) -> Statement ;
 
     game, player, 
     winner, participant_in, beats,
@@ -25,13 +25,13 @@ abstract RockPaperScissors = {
 
     -- Aggregation functions, manually written
     -- Transformations from the direct s(CASP) functions to these need to be manually written in Haskell
-    Players : [Arg] -> Statement ;             -- A and C are players
-    ParticipantsIn : [Arg] -> Atom -> Statement ; -- A and C are participants in B
+    Aggregate1 : Atom -> [Arg] -> Statement ;        -- A and C are players
+    Aggregate2 : Atom -> Arg -> [Arg] -> Statement ; -- A and C are participants in B
 
     IfThen : Statement -> Statement -> Statement ; -- A wins B if …
 
-    ConjStatementInline : Conjunction -> [Statement] -> Statement ;
-    ConjStatementBullets : Conjunction -> [Statement] -> Statement ;
+    ConjStatement : Typography -> Conjunction -> [Statement] -> Statement ;
 
     And, Or : Conjunction ;
+    Inline, Bullets : Typography ;
 }

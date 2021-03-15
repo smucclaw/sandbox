@@ -3,39 +3,40 @@
 {-# LANGUAGE KindSignatures #-}
 {-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE OverloadedStrings #-}
-module SCaspAbsSyn where
+module SCasp where
 
 import Control.Applicative hiding (many, some)
-import Control.Monad
-import Data.Void
+import Data.Void ( Void )
 import Text.Megaparsec hiding (State)
 import Text.Megaparsec.Char
-import qualified Data.Text as T
 import qualified Text.Megaparsec.Char.Lexer as L
 
 ----------------------------------------------------------------
 -- Abstract syntax
 
+-- Type that is used as an index in the GADT
 data SKind = KModel | KExp | KArg | KVar | KAtom
 
-type Exp = Tree KExp
-type Var = Tree KVar
-type Model = Tree KModel
-type Atom = Tree KAtom
-type Arg = Tree KArg
-
+-- The actual GADT
 data Tree :: SKind -> * where
-  MExps :: [Exp] -> Tree KModel
+  MExps :: [Tree KExp] -> Tree KModel
 
-  EApp :: Atom -> [Arg] -> Tree KExp
+  EApp :: Tree KAtom -> [Tree KArg] -> Tree KExp
 
-  AAtom :: Atom -> Tree KArg
-  AVar  :: Var -> Tree KArg
+  AAtom :: Tree KAtom -> Tree KArg
+  AVar  :: Tree KVar -> Tree KArg
 
   A :: String -> Tree KAtom
   V :: String -> Tree KVar
 
 deriving instance Show (Tree k)
+
+-- Shorthands for the GADT
+type Exp = Tree KExp
+type Var = Tree KVar
+type Model = Tree KModel
+type Atom = Tree KAtom
+type Arg = Tree KArg
 
 ----------------------------------------------------------------
 -- Parser
@@ -47,6 +48,7 @@ type Parser = Parsec Void String
 parseModel :: String -> Either String Model
 parseModel = parseWError pModel ""
 
+parseModel' :: String -> IO ()
 parseModel' = parseTest pModel
 
 parseWError :: (Stream s, ShowErrorComponent e) => Parsec e s b -> String -> s -> Either String b
@@ -92,11 +94,3 @@ pArg = AAtom <$> pAtom
    <|> AVar <$> pVar
 
 testModel = "{ winner(A,B),  game(B ),  participant_in(A,B),  player(A),  player_throw(A,rock),  player(C),  participant_in(C,B),  player_throw(C,scissors),  beats(rock,scissors) }"
-
--- >>> parseTest pExp "here" "hello_world "
--- Couldn't match expected type ‘[Char] -> f0’
---             with actual type ‘IO ()’
-
-
--- >>> parseModel testModel
--- Right (MExps [EApp (A "winner") [AVar (V "A"),AVar (V "B")],EApp (A "game") [AVar (V "B")],EApp (A "participant_in") [AVar (V "A"),AVar (V "B")],EApp (A "player") [AVar (V "A")],EApp (A "player_throw") [AVar (V "A"),AAtom (A "rock")],EApp (A "player") [AVar (V "C")],EApp (A "participant_in") [AVar (V "C"),AVar (V "B")],EApp (A "player_throw") [AVar (V "C"),AAtom (A "scissors")],EApp (A "beats") [AAtom (A "rock"),AAtom (A "scissors")]])

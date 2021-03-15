@@ -4,7 +4,7 @@ cabal-version: 1.24
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: dd5b6434931dac0ad83f80d7db723e4528e8274543a5e3d0d5f8f89bd848f8a2
+-- hash: 14dfa8535489e84114566029ebb46718b262905328920529fdbebe4dd23abc4c
 
 name:           rps
 version:        0.1.0.0
@@ -32,14 +32,14 @@ custom-setup
 
 library
   exposed-modules:
-      SCaspAbsSyn
+      SCasp
       ToGF
-      TreeTransform
   other-modules:
       RockPaperScissors
   hs-source-dirs:
       src
       grammars
+  ghc-options: -Wall -Wno-unticked-promoted-constructors
   build-depends:
       base >=4.7 && <5
     , gf
@@ -54,7 +54,7 @@ executable rps-exe
       Paths_rps
   hs-source-dirs:
       app
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -Wall -Wno-unticked-promoted-constructors -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
     , gf

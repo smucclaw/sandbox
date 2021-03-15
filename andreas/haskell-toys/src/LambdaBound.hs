@@ -11,6 +11,7 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE ConstraintKinds #-}
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE IncoherentInstances #-}
 module LambdaBound where
 
 import Bound
@@ -104,7 +105,8 @@ instance Show a => Show (Exp2 a) where
     go :: Show a => [String] -> Exp2 a -> String
     go _ (Var2 a) = "Var2 (" ++ show a ++ ")"
     go names ((:@#) a b) = "(" ++ go names a ++ ") :@# (" ++ go names b ++ ")"
-    go (name: names) (Lam2 f) = "Lam2 (" ++ show (f name) ++ ")"
+    -- go (name: names) (Lam2 f) = "Lam2 (" ++ show (f name) ++ ")"
+    go (name: names) (Lam2 f) = "Lam2 (" ++ go names (unscope (f name)) ++ ")"
 
 
 type family Matches s a :: Bool where
@@ -113,29 +115,37 @@ type family Matches s a :: Bool where
     Matches s (Var s a) = True
     Matches s (Var s1 a) = False
 
-class Matches s a ~ b => Contains (b :: Bool) s a where
+class Contains s a where
   wrap :: s -> a
 
-instance Contains b s a => Contains b s (Exp2 a) where
+instance Contains s a => Contains s (Exp2 a) where
   wrap = Var2 . wrap
 
-instance Contains 'True s (Scope s Exp2 a) where
---   wrap = Scope . Var2 . B
-  wrap = Scope . wrap
+instance {-# OVERLAPPABLE #-} Contains s (Scope s Exp2 a) where
+  wrap = Scope . Var2 . B
+--   wrap = Scope . wrap
 
-instance Contains 'True s (Var s a) where
+instance Contains s (Var s a) where
   wrap = B
 
-type Contains_ s a = Contains (Matches s a) s a
+instance {-# OVERLAPPING #-} Contains s a => Contains s (Var s1 a) where
+  wrap = F . wrap
 
 -- instance Contains True
 
 
 -- lam2 :: (forall s. (forall x. Contains_ s x => x) -> Scope s Exp2 a) -> Exp2 a
 -- lam2 f = Lam2 $ \s -> f (wrap s)
-lam2 :: (forall s. (forall x. Contains_ s x => x) -> Exp2 (Var s (Exp2 a))) -> Exp2 a
+lam2 :: (forall s. (forall x. Contains s x => x) -> Exp2 (Var s (Exp2 a))) -> Exp2 a
 lam2 f = Lam2 $ \s -> Scope $ f (wrap s)
 
+ex1 :: Exp2 ()
 ex1 = lam2 \x -> x
 
--- ex2 = lam2 \x -> lam2 \y -> x
+ex2 :: Exp2 ()
+ex2 = lam2 \x -> x :@# lam2 \y -> y :@# x
+
+-- >>> ex1
+-- >>> ex2
+-- Lam2 (Var2 (B "a"))
+-- Lam2 ((Var2 (B "a")) :@# (Lam2 ((Var2 (B "b")) :@# (Var2 (F Var2 (B "a"))))))

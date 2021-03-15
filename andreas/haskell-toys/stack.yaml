@@ -20,6 +20,9 @@
 resolver:
   url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/17/5.yaml
 
+ghc-options:
+  "$everything":  -fwrite-ide-info -hiedir=/Users/anka/.cache/hiedb/
+
 # User packages to be built.
 # Various formats can be used as shown in the example below.
 #

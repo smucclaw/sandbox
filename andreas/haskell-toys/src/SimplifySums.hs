@@ -82,21 +82,19 @@ instance Num (PolySum a) where
   I a * I b = I $ a * b
   I 0 * _   = I 0
   _   * I 0 = I 0
+  I 1 * b   = b
+  a   * I 1 = a
   a * b = a :*: b
   abs _ = error "PolySum: abs not defined"
   signum = error "PolySum: signum not defined"
   fromInteger = I
-  negate = ((-1) *)
+  negate = (I (-1) *)
 
-data NormalPoly a
-  = NEnd
-  | a :+*: NormalPoly a -- ^ a + x*b
---   | NPolySum a :+: NPolySum a
---   | NPolySum a :*: NPolySum a
---   | NI Integer
+sumRange :: Eq a => Range -> a -> PolySum a -> PolySum a
+sumRange r n e = SumRange r $ abstract1 n e
 
 normalizePoly :: Num a => PolySum (Var () a) -> [a]
-normalizePoly (SumRange r inner) = error "not done yet"
+normalizePoly (SumRange r inner) = normalizePoly $ polyRange r (normalizePoly $ unscope inner)
 normalizePoly (V (B _)) = [0, 1]
 normalizePoly (V (F a)) = [a]
 normalizePoly (a :+: b) = normalizePoly a +& normalizePoly b
@@ -104,11 +102,32 @@ normalizePoly (a :*: b) = multPoly (normalizePoly a) (normalizePoly b)
 -- normalizePoly (a :^: i) = _
 normalizePoly (I i) = [fromInteger i]
 
--- normalizeNums :: PolySum a -> PolySum a
--- normalizeNums (a :+: b) = _ :+: _
--- normalizeNums (a :*: b) = _ :*: _
--- normalizeNums (I i) = I _
--- normalizeNums e = e
+
+normalizeClosed :: PolySum a -> PolySum a
+normalizeClosed (SumRange r inner) = normalizeClosed $ polyRange r (normalizePoly $ unscope inner)
+normalizeClosed (V a) = V a
+normalizeClosed (a :+: b) = normalizeClosed a + normalizeClosed b
+normalizeClosed (a :*: b) = normalizeClosed a * normalizeClosed b
+-- normalizeClosed (a :^: i) = _
+normalizeClosed (I i) = I i
+
+polySumToNum :: Num a => PolySum a -> a
+polySumToNum (SumRange r inner) = polySumToNum $ polyRange r (normalizePoly $ unscope inner)
+polySumToNum (V a) = a
+polySumToNum (a :+: b) = polySumToNum a + polySumToNum b
+polySumToNum (a :*: b) = polySumToNum a * polySumToNum b
+polySumToNum (I i) = fromInteger i
+
+evaluate :: PolySum a -> Maybe Integer
+evaluate = fmap polySumToNum . closed
+
+-- polyRangeFormulas :: Num a => [Range -> a]
+-- polyRangeFormulas :: Integral a => [Range -> a]
+polyRangeFormulas :: [Range -> Integer]
+polyRangeFormulas = [ rLen , rSum , rSquare , rCube ] ++ [error $ "Don't know how to sum x^" ++ show n | n <- [4..]]
+
+polyRange :: Num a => Range -> [a] -> a
+polyRange r = sum . zipWith (*) (map (fromInteger . ($ r)) polyRangeFormulas)
 
 reifyPoly :: [a] -> PolySum (Var () a)
 reifyPoly [] = I 0
@@ -138,6 +157,12 @@ ex = abstract1 "x" $ x + 4 * x + x * 3 * x + x * x
 -- [I 0,I 5,I 4]
 -- V (F (I 0)) :+: (V (B ()) :*: (V (F (I 5)) :+: (V (B ()) :*: V (F (I 4)))))
 
+oneToNine = sumRange (Range 1 9) "n" $ (V"n" + V"a") * V"n" * V"n"
+
+-- >>> oneToNine
+-- >>> normalizeClosed oneToNine
+-- SumRange (Range 1 9) (Scope (((V (B ()) :+: V (F (V "a"))) :*: V (B ())) :*: V (B ())))
+-- (I 285 :*: V "a") :+: I 2025
 
 -- data PolySum1 a where
 --    SumRange1 :: Range -> Scope () PolySum1 a -> PolySum1 a
@@ -146,3 +171,71 @@ ex = abstract1 "x" $ x + 4 * x + x * 3 * x + x * x
 --    (:*&:)    :: PolySum1 a -> PolySum1 a     -> PolySum1 a
 --    (:^&:)    :: PolySum1 a -> Int            -> PolySum1 a
 --    I1        :: Integer                      -> PolySum1 a
+
+t5'0 = sum [10000*a+1000*b+100*bc+10*c+d | a <- [1..9], b <- [0..9], c <- [0..9], d <- [0..9] , a + b == c + d, bc <- [0..9]]
+
+t5'11 =
+    sum [
+        10000* sum [10*a+n - a | a <- rToList $ pairRng1 n] * lPairs0 n
+      + 10   * lPairs1 n                * sum [10*c+n - c | c <- rToList $ pairRng0 n]
+      + 100  * sum [bc | bc <- [0..9]]  * lPairs1 n * lPairs0 n
+    | n <- rToList $ r19 + r09 ]
+    where
+      r09 = Range 0 9
+      r19 = Range 1 9
+      pairRng1 n = overlapRange r19 $ fromIntegral n - r09
+      lPairs1 = rLen . pairRng1
+      pairRng0 n = overlapRange r09 $ fromIntegral n - r09
+      lPairs0 = rLen . pairRng0
+
+t5'12 =
+    sum [
+        10000* sumRange (pairRng1 n) "a" (10*a+ I n - a) * sumRange (pairRng0 n) "c" 1
+      + 10   * sumRange (pairRng1 n) "a" 1               * sumRange (pairRng0 n) "c" (10*c+I n - c )
+      + 100  * sumRange r09 "bc" (V "bc")  * lPairs1 n * lPairs0 n
+    | n <- rToList $ r19 + r09 ]
+    where
+      a = V"a"
+      c = V"c"
+      r09 = Range 0 9
+      r19 = Range 1 9
+      pairRng1 n = overlapRange r19 $ fromIntegral n - r09
+      lPairs1 n = sumRange (pairRng1 n) "a" 1
+      pairRng0 n = overlapRange r09 $ fromIntegral n - r09
+      lPairs0 n = sumRange (pairRng0 n) "c" 1
+
+t5'13 =
+    sum [
+        sumRange (pairRng1 n) "a" (sumRange (pairRng0 n) "c" $ 10000* (10*a+ I n - a))
+      + sumRange (pairRng1 n) "a" (sumRange (pairRng0 n) "c" $ 10   * (10*c+ I n - c))
+      + sumRange r09 "bc" (100  * V "bc")  * lPairs1 n * lPairs0 n
+    | n <- rToList $ r19 + r09 ]
+    where
+      a = V"a"
+      c = V"c"
+      r09 = Range 0 9
+      r19 = Range 1 9
+      pairRng1 n = overlapRange r19 $ fromIntegral n - r09
+      lPairs1 n = sumRange (pairRng1 n) "a" 1
+      pairRng0 n = overlapRange r09 $ fromIntegral n - r09
+      lPairs0 n = sumRange (pairRng0 n) "c" 1
+
+t5'14 =
+    sum [
+        sumRange (pairRng1 n) "a" (sumRange (pairRng0 n) "c" $ 10000* (10*a+ I n - a) + 10 * (10*c+ I n - c))
+      + sumRange r09 "bc" (100  * V "bc")  * lPairs1 n * lPairs0 n
+    | n <- rToList $ r19 + r09 ]
+    where
+      a = V"a"
+      c = V"c"
+      r09 = Range 0 9
+      r19 = Range 1 9
+      pairRng1 n = overlapRange r19 $ fromIntegral n - r09
+      lPairs1 n = sumRange (pairRng1 n) "a" 1
+      pairRng0 n = overlapRange r09 $ fromIntegral n - r09
+      lPairs0 n = sumRange (pairRng0 n) "c" 1
+
+-- >>> t5'11
+-- >>> normalizeClosed t5'14
+-- 331431000
+-- I 331431000

@@ -24,6 +24,7 @@ dependencies:
 - containers
 - prettyprinter
 - bound
+- deriving-compat
 
 library:
   source-dirs: src

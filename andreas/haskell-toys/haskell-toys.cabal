@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 1b54c18085913e9fe515f6ab366220155117b2959d4cf4f6ca2bd7d649bc8988
+-- hash: 642a43b4f2bb4ee124291639f91af077e22a51fb3577f20635b679a3575a8152
 
 name:           haskell-toys
 version:        0.1.0.0
@@ -33,6 +33,7 @@ library
       LambdaBound
       LazyPi
       Lib
+      SimplifySums
       Stlc
   other-modules:
       Paths_haskell_toys
@@ -42,6 +43,7 @@ library
       base >=4.7 && <5
     , bound
     , containers
+    , deriving-compat
     , prettyprinter
   default-language: Haskell2010
 
@@ -56,6 +58,7 @@ executable haskell-toys-exe
       base >=4.7 && <5
     , bound
     , containers
+    , deriving-compat
     , haskell-toys
     , prettyprinter
   default-language: Haskell2010
@@ -72,6 +75,7 @@ test-suite haskell-toys-test
       base >=4.7 && <5
     , bound
     , containers
+    , deriving-compat
     , haskell-toys
     , prettyprinter
   default-language: Haskell2010

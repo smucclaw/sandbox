@@ -93,23 +93,34 @@ instance Num (PolySum a) where
 sumRange :: Eq a => Range -> a -> PolySum a -> PolySum a
 sumRange r n e = SumRange r $ abstract1 n e
 
-normalizePoly :: Num a => PolySum (Var () a) -> [a]
+newtype Polynomial a = P {unP :: [a]}
+  deriving Show
+
+instance Num a => Num (Polynomial a) where
+    P[] + bs = bs
+    P(a:as) + P(b:bs) = P $ (a + b) : unP (P as + P bs)
+    as + P[] = as
+    P [] * bs = P[]
+    P(a:as) * P bs = P (map (a *) bs) + P as * P(0:bs)
+    abs _ = error "Polynomial: abs not defined"
+    signum = error "Polynomial: signum not defined"
+    fromInteger = P . pure . fromInteger
+    negate (P xs) = P $ map negate xs
+
+
+-- TODO: Make a "Polynomial" type and merge the three functions below
+
+normalizePoly :: Num a => PolySum (Var () a) -> Polynomial a
 normalizePoly (SumRange r inner) = normalizePoly $ polyRange r (normalizePoly $ unscope inner)
-normalizePoly (V (B _)) = [0, 1]
-normalizePoly (V (F a)) = [a]
-normalizePoly (a :+: b) = normalizePoly a +& normalizePoly b
-normalizePoly (a :*: b) = multPoly (normalizePoly a) (normalizePoly b)
--- normalizePoly (a :^: i) = _
-normalizePoly (I i) = [fromInteger i]
+normalizePoly (V (B _)) = P [0, 1]
+normalizePoly (V (F a)) = P [a]
+normalizePoly (a :+: b) = normalizePoly a + normalizePoly b
+normalizePoly (a :*: b) = normalizePoly a * normalizePoly b
+normalizePoly (I i) = fromInteger i
 
 
 normalizeClosed :: PolySum a -> PolySum a
-normalizeClosed (SumRange r inner) = normalizeClosed $ polyRange r (normalizePoly $ unscope inner)
-normalizeClosed (V a) = V a
-normalizeClosed (a :+: b) = normalizeClosed a + normalizeClosed b
-normalizeClosed (a :*: b) = normalizeClosed a * normalizeClosed b
--- normalizeClosed (a :^: i) = _
-normalizeClosed (I i) = I i
+normalizeClosed = polySumToNum . fmap V
 
 polySumToNum :: Num a => PolySum a -> a
 polySumToNum (SumRange r inner) = polySumToNum $ polyRange r (normalizePoly $ unscope inner)
@@ -126,22 +137,12 @@ evaluate = fmap polySumToNum . closed
 polyRangeFormulas :: [Range -> Integer]
 polyRangeFormulas = [ rLen , rSum , rSquare , rCube ] ++ [error $ "Don't know how to sum x^" ++ show n | n <- [4..]]
 
-polyRange :: Num a => Range -> [a] -> a
-polyRange r = sum . zipWith (*) (map (fromInteger . ($ r)) polyRangeFormulas)
+polyRange :: Num a => Range -> Polynomial a -> a
+polyRange r = sum . zipWith (*) (map (fromInteger . ($ r)) polyRangeFormulas) . unP
 
 reifyPoly :: [a] -> PolySum (Var () a)
 reifyPoly [] = I 0
 reifyPoly (x : xs) = V (F x) + V (B ()) * reifyPoly xs
-
-(+&) :: Num a => [a] -> [a] -> [a]
--- (+&) = zipWith (+)
-[] +& bs = bs
-(a:as) +& (b:bs) = (a + b) : (as +& bs)
-as +& [] = as
-
-multPoly :: Num a => [a] -> [a] -> [a]
-multPoly [] bs = []
-multPoly (a:as) bs = map (a *) bs +& multPoly as (0:bs)
 
 ex :: Scope () PolySum String
 ex = abstract1 "x" $ x + 4 * x + x * 3 * x + x * x
@@ -235,7 +236,51 @@ t5'14 =
       pairRng0 n = overlapRange r09 $ fromIntegral n - r09
       lPairs0 n = sumRange (pairRng0 n) "c" 1
 
+t5'15 =
+    sum [
+        sumRange (pairRng1 n) "a" $ sumRange (pairRng0 n) "c" $ sumRange r09 "bc" $
+          let b = I n - a
+              d = I n - c
+          in
+          10000*a + 1000*b + 100*bc + 10*c + d
+    | n <- rToList $ r19 + r09 ]
+    where
+      a = V"a"
+      c = V"c"
+      bc = V"bc"
+      r09 = Range 0 9
+      r19 = Range 1 9
+      pairRng1 n = overlapRange r19 $ fromIntegral n - r09
+      lPairs1 n = sumRange (pairRng1 n) "a" 1
+      pairRng0 n = overlapRange r09 $ fromIntegral n - r09
+      lPairs0 n = sumRange (pairRng0 n) "c" 1
+
+-- TODO: Make a function for a combined range with a fixed sum
+
+-- TODO: Consider if it is neccessary for Range to take two Integer or if any Num would do.
+
 -- >>> t5'11
--- >>> normalizeClosed t5'14
+-- >>> normalizeClosed t5'15
 -- 331431000
 -- I 331431000
+
+t6'1 =
+    sum [
+        sumRange (pairRng1 n) "a" $ sumRange (pairRng0 n) "d" $ sumRange r09 "bc" $
+          let b = I n - a
+              c = I n - a
+              e = I n - d
+              f = I n - d
+          in
+          100000*a + 10000*b + 1000*c + 100*d + 10*e + f
+    | n <- rToList $ r19 + r09 + r09 ]
+    where
+      a = V"a"
+      d = V"d"
+      bc = V"bc"
+      r09 = Range 0 9
+      r19 = Range 1 9
+      pairRng1 n = overlapRange r19 $ fromIntegral n - r09
+      lPairs1 n = sumRange (pairRng1 n) "a" 1
+      pairRng0 n = overlapRange r09 $ fromIntegral n - r09
+      lPairs0 n = sumRange (pairRng0 n) "c" 1

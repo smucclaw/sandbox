@@ -107,17 +107,12 @@ instance Num a => Num (Polynomial a) where
     fromInteger = P . pure . fromInteger
     negate (P xs) = P $ map negate xs
 
-
--- TODO: Make a "Polynomial" type and merge the three functions below
+varToPoly :: Num a => Var () a -> Polynomial a
+varToPoly (B _) = P [0, 1]
+varToPoly (F a) = P [a]
 
 normalizePoly :: Num a => PolySum (Var () a) -> Polynomial a
-normalizePoly (SumRange r inner) = normalizePoly $ polyRange r (normalizePoly $ unscope inner)
-normalizePoly (V (B _)) = P [0, 1]
-normalizePoly (V (F a)) = P [a]
-normalizePoly (a :+: b) = normalizePoly a + normalizePoly b
-normalizePoly (a :*: b) = normalizePoly a * normalizePoly b
-normalizePoly (I i) = fromInteger i
-
+normalizePoly = polySumToNum . fmap varToPoly
 
 normalizeClosed :: PolySum a -> PolySum a
 normalizeClosed = polySumToNum . fmap V

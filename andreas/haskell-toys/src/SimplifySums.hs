@@ -39,8 +39,8 @@ instance Num a => Num (RangeX a) where
   negate (Range l r) = Range (-r) (-l)
 
 deriveEq1   ''RangeX
--- deriveOrd1  ''PolySum
--- deriveRead1 ''PolySum
+deriveOrd1  ''RangeX
+deriveRead1 ''RangeX
 deriveShow1 ''RangeX
 
 generalRange :: Num b => Range -> RangeX b
@@ -182,14 +182,14 @@ infixl 6 :+:
 infixl 7 :*:
 
 deriveEq1   ''PolySum
--- deriveOrd1  ''PolySum
--- deriveRead1 ''PolySum
+deriveOrd1  ''PolySum
+deriveRead1 ''PolySum
 deriveShow1 ''PolySum
 
 instance Eq a   => Eq   (PolySum a) where (==) = eq1
--- instance Ord a  => Ord  (PolySum a) where compare = compare1
+instance Ord a  => Ord  (PolySum a) where compare = compare1
 instance Show a => Show (PolySum a) where showsPrec = showsPrec1
--- instance Read a => Read (PolySum a) where readsPrec = readsPrec1
+instance Read a => Read (PolySum a) where readsPrec = readsPrec1
 
 instance Applicative PolySum where pure = V; (<*>) = ap
 instance Monad PolySum where
@@ -335,8 +335,6 @@ reifyNormalExpr = sum . M.mapWithKey convSingle . unNE
 fullyNormalize :: Ord a => PolySum a -> PolySum a
 fullyNormalize = reifyNormalExpr . toNormalExpr
 
--- >>>
-
 ex :: Scope () PolySum String
 ex = abstract1 "x" $ x + 4 * x + x * 3 * x + x * x
   where x = V"x"
@@ -344,16 +342,20 @@ ex = abstract1 "x" $ x + 4 * x + x * 3 * x + x * x
 -- >>> ex
 -- >>> normalizePoly $ unscope ex
 -- >>> reifyPoly . normalizePoly $ unscope ex
--- Scope (((V (B ()) :+: (I (4 % 1) :*: V (B ()))) :+: ((V (B ()) :*: I (3 % 1)) :*: V (B ()))) :+: (V (B ()) :*: V (B ())))
+-- >>> fullyNormalize $ unscope ex
+-- Scope (((V (B ()) :+: I (4 % 1) :*: V (B ())) :+: (V (B ()) :*: I (3 % 1)) :*: V (B ())) :+: V (B ()) :*: V (B ()))
 -- P {unP = [I (0 % 1),I (5 % 1),I (4 % 1)]}
--- V (F (I (0 % 1))) :+: (V (B ()) :*: (V (F (I (5 % 1))) :+: (V (B ()) :*: V (F (I (4 % 1))))))
+-- V (F (I (0 % 1))) :+: V (B ()) :*: (V (F (I (5 % 1))) :+: V (B ()) :*: V (F (I (4 % 1))))
+-- I (5 % 1) :*: V (B ()) :+: I (4 % 1) :*: (V (B ()) :*: V (B ()))
 
 oneToNine = sumRange (Range 1 9) "n" $ (V"n" + V"a") * V"n" * V"n"
 
 -- >>> oneToNine
 -- >>> normalizeClosed oneToNine
+-- >>> fullyNormalize oneToNine
 -- SumRange (Range (I (1 % 1)) (I (9 % 1))) (Scope (((V (B ()) :+: V (F (V "a"))) :*: V (B ())) :*: V (B ())))
--- (I (10260 % 1) :*: V "a") :+: I (32400 % 1)
+-- I (285 % 1) :*: V "a" :+: I (2025 % 1)
+-- I (2025 % 1) :+: I (285 % 1) :*: V "a"
 
 t5'0 = sum [10000*a+1000*b+100*bc+10*c+d | a <- [1..9], b <- [0..9], c <- [0..9], d <- [0..9] , a + b == c + d, bc <- [0..9]]
 

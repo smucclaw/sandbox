@@ -139,6 +139,9 @@ instance {-# OVERLAPPING #-} Contains s a => Contains s (Var s1 a) where
 lam2 :: (forall s. (forall x. Contains s x => x) -> Exp2 (Var s (Exp2 a))) -> Exp2 a
 lam2 f = Lam2 $ \s -> Scope $ f (wrap s)
 
+{-# ANN ex1 "HLint: ignore Use id" #-}
+{-# ANN ex2 "HLint: ignore Avoid lambda using `infix`" #-}
+
 ex1 :: Exp2 ()
 ex1 = lam2 \x -> x
 
@@ -149,3 +152,8 @@ ex2 = lam2 \x -> x :@# lam2 \y -> y :@# x
 -- >>> ex2
 -- Lam2 (Var2 (B "a"))
 -- Lam2 ((Var2 (B "a")) :@# (Lam2 ((Var2 (B "b")) :@# (Var2 (F Var2 (B "a"))))))
+
+
+
+bindSingleVariable :: Monad f => (forall s. f s -> f s) -> Scope () f a
+bindSingleVariable f = Scope . f $ pure (B ())

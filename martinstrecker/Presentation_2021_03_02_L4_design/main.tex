@@ -26,7 +26,6 @@
 %======================================================================
 \section{Snapshot: Baby-L4 now}
 
-
 %-------------------------------------------------------------
 \begin{frame}[fragile]\frametitle{General structure of an L4 file}
 
@@ -96,12 +95,16 @@ Value -> value_1
 \end{alltt}
   \end{itemize}
 
-
 \end{frame}
 
   
 %======================================================================
 \section{What to do with Baby-L4}
+
+%-------------------------------------------------------------
+\subsection{The space of options}
+%-------------------------------------------------------------
+
 
 %-------------------------------------------------------------
 \begin{frame}[fragile]\frametitle{Class definitions}
@@ -212,6 +215,157 @@ not uniquely determined $\leadsto$ cardinality annotations.
 
 \end{frame}
   
+%-------------------------------------------------------------
+\subsection{Proposal}
+%-------------------------------------------------------------
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Core / operational / logical model}
+
+  \blue{Core model} describes the essential semantics of constructs
+
+  \vspace{5mm}
+  \blue{Operational model} for use in programming languages
+
+  \vspace{5mm}
+  \blue{Logical model} for use in verification tools.
+
+\end{frame}
+
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Core model: Types}
+
+  The elements of discourse are characterized by
+  \blue{types}
+  \begin{itemize}
+  \item \emph{Predefined} types (\texttt{int}, \texttt{bool}) represent sets of
+    numbers / truth values
+  \item \emph{Classes} are specific types representing \emph{objects}
+  \item So far no inductively defined \texttt{data} types
+  \end{itemize}
+
+  \vspace{5mm}
+  Syntactic restrictions imposed on \blue{classes}:
+  \begin{itemize}
+  \item Classes arranged in hierarchy (\texttt{extends})
+    \begin{itemize}
+    \item that must be acyclic
+    \item with top class \texttt{Object}
+    \end{itemize}
+  \item Unique field names (no overriding)
+  \end{itemize}
+
+\end{frame}
+
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Core model: Instances}
+
+  Instances and the question of identity:   Given a class
+\begin{alltt}
+\textbf{class} Person \{
+      name: String
+      spouse: Person
+\}
+\end{alltt}
+how to marry \texttt{jane} and \texttt{jim}?
+\begin{alltt}
+  \textbf{def} jane =
+       \{ name = "Jane",
+         spouse = \{ name = "Jim",
+                    spouse = \{ name = "Jane", ...
+\end{alltt}
+Not practicable.
+
+\end{frame}
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Core model: Instances}
+
+  Reference-based model:
+\begin{alltt}
+\textbf{decl} jane: Person
+\textbf{decl} jim: Person
+\textbf{def} jane = \textbf{instance} Person
+       \{ name = "Jane",
+         spouse = jim \}
+\textbf{def} jim = \textbf{instance} Person
+       \{ name = "Jim",
+         spouse = jane \}
+\end{alltt}
+
+Here: \textbf{\texttt{instance}} creates an object identity:
+
+\begin{alltt}
+\textbf{class} Object \{
+   id: Integer
+\}
+\end{alltt}
+
+\end{frame}
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Core model: Instances}
+
+  Unpleasant: object identities not directly visible:
+
+  \begin{alltt}
+\textbf{def} oedipusJr = \textbf{instance} Person
+                \{name = "Oedipus",
+                 spouse = jocasta
+\}
+\textbf{def} oedipusSen = \textbf{instance} Person
+                 \{name = "Oedipus",
+                  spouse = jocasta
+\}
+  \end{alltt}    
+
+  with \texttt{oedipusJr} $\neq$ \texttt{oedipusSen}
+  
+\end{frame}
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Core model: Instances}
+
+  Semantics? Classical heap-based semantics with state:
+
+  \begin{itemize}
+  \item $state = heap \times locals$
+  \item $locals = VarName \to val$
+  \item $heap = objid \to obj$
+  \item $obj = ClassName \times [FieldName \to val]$
+  \end{itemize}
+
+  The heap remains constant after reading all \textbf{def}s.
+
+  Or doesn't it?
+
+\end{frame}
+
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Core model: Dynamics}
+
+  \blue{Functions in classes?}
+\begin{alltt}
+\textbf{class} Tax \{
+      taxCalc: Int -> Int
+\}
+\end{alltt}
+
+Not a good idea: \texttt{t1, t2: Tax} could not be compared.
+
+\end{frame}
+
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Operational model}
+
+\end{frame}
+
+
+
 %======================================================================
 \section{Moving to L4}
 
@@ -244,6 +398,331 @@ not uniquely determined $\leadsto$ cardinality annotations.
 
 \end{frame}
 
+
+%======================================================================
+\section{Contracts}
+
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Review of related approaches}
+
+  \begin{itemize}
+  \item FCL, by Quian Hu / William Farmer
+  \item CSL, by Deon Digital
+  \end{itemize}
+
+\end{frame}
+
+% -------------------------------------------------------------
+\subsection{FCL}
+% -------------------------------------------------------------
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{FCL}
+
+  FCL
+  \begin{itemize}
+  \item PhD thesis of Quian Hu
+  \item supervised by William Farmer (``Little Theories'')
+  \end{itemize}
+
+  \vspace{5mm}
+  General appreciation:
+  \begin{itemize}
+  \item In PhD thesis: Lengthy explication of some fundamentals (``simple type
+    theory'')
+  \item Few references to established notions (automata / temporal logics)
+  \item Not clear whether there exists a real implementation 
+  \item One minimalistic example in the appendix
+  \end{itemize}
+
+
+\end{frame}
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{FCL: Notion of contract}
+
+
+
+  \begin{itemize}
+  \item Contract $C = (t, Q)$ where:
+    \begin{itemize}
+    \item $t$ is the ``current'' time
+    \item $Q$ is a set of constant definitions $D$, agreements $A$, rules $R$
+    \end{itemize}
+    
+  \item Rule $R$ is of the form $\phi \mapsto Q$, where $\phi$ is a formula\\
+    ``if $\phi$ is satisfied at time $t$, the elements of $Q$ are added to the
+    state at $t+1$''
+
+  \item Agreement $A$ is of the form $O(a, T)$ or $F(a, T)$ where
+    \begin{itemize}
+    \item $a$ is an action
+    \item $T$ a set of times
+    \item $O$ expresses an obligation and $F$ a prohibition (forbidden)
+    \end{itemize}
+  \end{itemize}
+
+\end{frame}
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{FCL: Semantics}
+
+
+  Obligations / prohibitions:
+  \begin{itemize}
+  \item   Obligation $O(a, T)$ corresponds to\\
+    $\exists u : Time. u \in T \AND u \leq t \AND \mathit{obs-event}(u,a)$
+  \item  $F(a, T) = \NOT O(a, T)$
+  \end{itemize}
+  
+  Contracts:
+  \begin{itemize}
+  \item Evolving in discrete time steps
+  \item New rules $\phi \mapsto Q$ are ``activated'' when their precondition
+    $\phi$ becomes active
+  \end{itemize}
+
+
+\end{frame}
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Remarks about FCL}
+
+  \begin{itemize}
+  \item Permissions as obligations imposed on others
+  \item However: Obligations / prohibitions not bound to a principal 
+  \item Contracts no first-order entities (no operators on contracts)
+  \item In particular, no composition of contracts
+  \end{itemize}
+
+\end{frame}
+
+% -------------------------------------------------------------
+\subsection{CSL}
+% -------------------------------------------------------------
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Background: Process Algebras}
+
+  Purpose:
+  \begin{itemize}
+  \item provide an algebraic account of \emph{concurrent} systems
+  \item  (whereas lambda calculus / combinatory algebra are for
+    single-process, deterministic systems)
+  \item defines a set of \emph{traces} that are valid executions of the system
+  \end{itemize}
+
+  Best known representatives (starting in the 1970):
+  \begin{itemize}
+  \item CCS (Calculus of Communicating Systems) by Robin Milner
+  \item CSP (Communicating Sequential Processes) by CAR Hoare
+  \end{itemize}
+
+  Verification tools directly based on process algebras:
+  \begin{itemize}
+  \item LOTOS
+  \item CADP \url{http://cadp.inria.fr/}
+  \end{itemize}
+
+\end{frame}
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{CCS}
+
+  Processes $p,q$ are built up of constructors:
+
+  \begin{itemize}
+  \item nil: empty process, stops immediately
+  \item $a.p$: carry out action $a$, then behave like $p$
+  \item $p + q$: nondeterministically behave like $p$ or $q$
+  \item $p | q$: parallel composition of $p$ and $q$ (maybe synchronizing on
+    an internal action)
+  \item $rec\; x. p$: recursive process running $p$ and then restarting $rec\;
+    x. p$
+    
+  \item Operators for hiding ($p \backslash a$) and renaming
+  \end{itemize}
+
+  Example derivations:
+  \begin{itemize}
+  \item $r := rec\; x. (a.b.x + a.c.x) \longrightarrow a.b.r + a.c.r
+    \longrightarrow a.b.r \stackrel{a}{\longrightarrow}$\\
+    $b.r \stackrel{b}{\longrightarrow} r \longrightarrow a.b.r + a.c.r
+    \longrightarrow a.c.r \longrightarrow \dots$ 
+  \item $(a.b.d | a.c.d)\backslash a \stackrel{\tau}{\longrightarrow} (b.d | c.d)\backslash a \stackrel{c}{\longrightarrow} 
+    (b.d | d)\backslash a \longrightarrow \dots$ 
+  \end{itemize}
+
+\end{frame}
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{CCS and automata}
+
+  \begin{center}
+$a . b . r + a . c . r \neq a. (b. r + c.r)$  
+\end{center}
+
+\begin{tikzpicture}[scale=.5]
+
+  \node[state] (q0) {};
+  \node[state] (qa1) [above right=of q0] {};
+  \node[state] (qa2) [below right=of q0] {};
+  \node[state] (qb) [right=of qa1] {};
+  \node[state] (qc) [right=of qa2] {};
+
+  \path[->] (q0) edge [above] node {a} (qa1)
+                 edge [below] node {a} (qa2)
+            (qa1) edge [above] node {b} (qb)
+            (qa2) edge [below] node {c} (qc);
+
+  \node[state] (q0') [below right=of qb] {};
+  \node[state] (qa') [right=of q0'] {};
+  \node[state] (qb') [above right=of qa'] {};
+  \node[state] (qc') [below right=of qa'] {};
+
+  \path[->] (q0') edge [above] node {a} (qa')
+            (qa') edge [above] node {b} (qb')
+            (qa') edge [below] node {c} (qc');
+
+\end{tikzpicture}
+\end{frame}
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{CSL}
+
+  CSL
+  \begin{itemize}
+  \item  Developed by Deon Digital
+  \item based on PhD of Tom Hvitved, supervised by Henglein, Filinski
+  \end{itemize}
+
+
+  \vspace{5mm}
+  General appreciation:
+  \begin{itemize}
+  \item PhD thesis discusses in fact two models:
+    \begin{itemize}
+    \item one based on Process Algebras
+    \item one based on automata
+    \end{itemize}
+  \item \dots{} and lots of implementation details
+  \item Concentrates on
+    \begin{itemize}
+    \item execution and run-time monitoring
+    \item blame assignment (which party is responsible for breach)
+    \item But: what about static verification?
+    \end{itemize}
+  \end{itemize}
+
+  \red{Some notable differences between CSL-Deon and CSL by T.H.}
+  
+\end{frame}
+
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{CSL - Deon}
+
+  Essentially:
+  \begin{itemize}
+  \item a process algebra 
+  \item without a specification mechanism for desired behavior (obligations / permissions)
+  \end{itemize}
+
+  Ingredients:
+  \begin{itemize}
+  \item ``final'' contracts: \texttt{success}, \texttt{failure}
+  \item elementary contracts:\\
+    \texttt{<AGENT> x:EVENTTYPE where PREDICATE}
+
+    \emph{Example}
+\begin{verbatim}
+<buyer> order: BikeOrder where
+      order.amount = 100 &&
+      order.recipient = seller
+\end{verbatim}
+    
+  \end{itemize}
+
+\end{frame}
+
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{CSL - Deon}
+
+  Contract composition:
+  \begin{itemize}
+  \item Sequential: \texttt{c1 then c2}\\
+    (more or less $c1 . c2$ in CCS)
+  \item Nondeterministic choice: \texttt{c1 or c2}\\
+    ($c1 + c2$ in CCS)
+  \item Concurrent composition with interleaving: \texttt{c1 and c2}\\
+    ($c1 | c2$ in CCS)
+  \item Recursive congtracts \\
+    \texttt{contract rec contractName = CONTRACTBODY}
+  \end{itemize}
+
+\end{frame}
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{CSL - Deon}
+
+\small
+\begin{verbatim}
+contract entrypoint sale3 = 
+   \(buyer, seller, amount, item, inventory) ->
+  // Some buyer orders an item for some price from a seller
+  <buyer> order: Order where
+      order.amount = amount &&
+      order.recipient = seller &&
+      order.item = item
+  then (
+    // The seller delivers that item
+    <seller> delivery: Delivery where
+        checkOffer inventory order.item order.amount &&  ...
+  or
+    // The seller tries to cheat
+    <seller> delivery: Delivery where
+        checkOffer inventory order.item order.amount && ...
+    then failure
+  )
+\end{verbatim}
+\normalsize
+
+
+\end{frame}
+
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{CSL - T.H.}
+
+  Two major changes / additions:
+  \begin{itemize}
+  \item Atomic agent-initiated contracts replaced by obligations:\\
+    \texttt{<agent> event(x1 ... xn) \textbf{where} cond \textbf{due} d \textbf{remaining} z \textbf{then} c}
+  \item External choice:\\
+    \texttt{\textbf{if} event(x1 ... xn)  \textbf{where} cond \textbf{due} d
+      \textbf{remaining} z \textbf{then} c1 else \textbf{else} c2}
+  \end{itemize}
+  where \texttt{d} is a deadline: \texttt{\textbf{after} e2 \textbf{within} e2}
+
+
+\end{frame}
+
+
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Interesting for L4}
+
+
+\end{frame}
+
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{}
+
+
+\end{frame}
 
 
 %-------------------------------------------------------------

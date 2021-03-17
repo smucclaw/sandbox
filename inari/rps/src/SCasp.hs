@@ -10,6 +10,8 @@ import Data.Void ( Void )
 import Text.Megaparsec hiding (State)
 import Text.Megaparsec.Char
 import qualified Text.Megaparsec.Char.Lexer as L
+import Data.Set (Set)
+import qualified Data.Set as S
 
 ----------------------------------------------------------------
 -- Abstract syntax
@@ -45,14 +47,14 @@ fancyFoldMap f t@(AAtom tk) = f t <> fancyFoldMap f tk
 fancyFoldMap f t@(AVar tk) = f t <> fancyFoldMap f tk
 fancyFoldMap f t = f t
 
-data AtomWithArity = AA String Int
+data AtomWithArity = AA String Int deriving (Show, Eq, Ord)
 
-getAtom :: Tree a -> [AtomWithArity]
-getAtom (EApp (A str) ts) = [AA str (length ts)]
-getAtom _                 = []
+getAtom :: Tree a -> Set AtomWithArity
+getAtom (EApp (A str) ts) = S.singleton $ AA str (length ts)
+getAtom (AAtom (A str))   = S.singleton $ AA str 0
+getAtom _                 = mempty
 
-
-getAtoms :: Tree s -> [AtomWithArity]
+getAtoms :: Tree s -> Set AtomWithArity
 getAtoms = fancyFoldMap getAtom
 
 ----------------------------------------------------------------

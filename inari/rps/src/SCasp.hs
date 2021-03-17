@@ -5,7 +5,6 @@
 {-# LANGUAGE StandaloneDeriving #-}
 module SCasp where
 
-import Control.Applicative hiding (many, some)
 import Data.Void ( Void )
 import Text.Megaparsec hiding (State)
 import Text.Megaparsec.Char
@@ -113,4 +112,4 @@ pArg = AAtom <$> pAtom
    <|> AVar <$> pVar
 
 testModel :: String
-testModel = "{ win(A,B),  game(B),  participant_in(A,B),  player(A),  throw(A,rock),  player(C),  participant_in(C,B),  throw(C,scissors),  beat(rock,scissors) }"
+testModel = "{ is_winner(A,RPS),  is_game(RPS),  is_participant_in(A,RPS),  is_player(A),  throw(A,rock), is_player(C),  is_participant_in(C,RPS),  throw(C,scissors),  beat(rock,scissors) }"

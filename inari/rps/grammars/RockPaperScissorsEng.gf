@@ -5,20 +5,9 @@ concrete RockPaperScissorsEng of RockPaperScissors = open
     [Statement] = BulletsOrInline => ListS ;
     Var, Arg = NP ;
     Atom = LinAtom ; -- Multiple options
-    [Arg] = ListNP ; -- C.ListCN ;
-    Conjunction = Conj ;
+    [Arg] = ListNP ;
 
   lin
-    -- : Atom
-    game = mkAtom game_N ;
-    player = mkAtom player_N ;
-    winner = mkAtom win_V2 ;
-    participant_in = mkAtom (P.mkN2 participant_N in_Prep) ;
-    player_throw = mkAtom throw_V2 ;
-    rock = mkAtom rock_N ;
-    paper = mkAtom paper_N ;
-    scissors = mkAtom scissor_N ;
-    beats = mkAtom beat_V2 ;
 
     -- Coercions to Arg
     AVar v = v ;
@@ -47,7 +36,7 @@ concrete RockPaperScissorsEng of RockPaperScissors = open
        in mkS (mkCl subj pred) ;
 
     -- : String -> Var
-    SVar = symb ;
+    V = symb ;
 
     -- Aggregation functions
 
@@ -75,14 +64,10 @@ concrete RockPaperScissorsEng of RockPaperScissors = open
       } ;
 
     -- : Conjunction -> [Statement] -> Statement ;
-    ConjStatement t c ss = mkS c (ss ! t.t) ;
+    ConjStatement t ss = mkS and_Conj (ss ! t.t) ;
 
     BaseArg = mkListNP ;
     ConsArg = mkListNP ;
-
-    -- : Conjunction ;
-    And = and_Conj ;
-    Or = or_Conj ;
 
     -- : Typography
   lincat
@@ -110,18 +95,6 @@ concrete RockPaperScissorsEng of RockPaperScissors = open
       mkAtom : N2 -> LinAtom = \n2 -> dummyAtom ** {n2 = n2 ; atype = AN2} ;
     } ;
 
-    -- Lexicon
-    -- Can also open WordNet or other multilingual lexicon and get the lexicon from there
-    game_N        = P.mkN "game" ;
-    win_V2        = P.mkV2 "win" ;
-    beat_V2       = P.mkV2 "beat" ;
-    winner_N      = P.mkN "winner" ;
-    participant_N = P.mkN "participant" ;
-    player_N      = P.mkN "player" ;
-    throw_V2      = P.mkV2 "throw" ;
-    rock_N        = P.mkN "rock" ;
-    paper_N       = P.mkN "paper" ;
-    scissor_N     = P.mkN "scissors" "scissors" ; --hack for plurale tantum
     if_Conj       = and_Conj ** {s2 = "if"} ;
 
     addBullet : S -> S = \s -> s ** {

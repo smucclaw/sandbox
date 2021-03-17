@@ -34,12 +34,12 @@ toGF (EApp f [x, y]) = GApp2 (toGF f) (toGF x) (toGF y)
 toGF (AAtom tk) = GAAtom (toGF tk)
 toGF (AVar tk) = GAVar (toGF tk)
 toGF (A str) = LexAtom str
-toGF (V str) = GSVar (GString str)
+toGF (V str) = GV (GString str)
 toGF _ = undefined
 
 -- temporary hack, to get something nice to print and get back the list
 peel :: GStatement -> [GStatement]
-peel (GConjStatement _ _ (GListStatement ss)) = ss
+peel (GConjStatement _ (GListStatement ss)) = ss
 peel s = [s]
 
 unpeel :: [GStatement] -> GStatement
@@ -49,7 +49,7 @@ wrap :: GTypography -> [GStatement] -> GStatement
 wrap t ss = case ss of
   [] -> error "wrap: empty list"
   [x] -> x
-  _ -> GConjStatement t GAnd $ GListStatement ss
+  _ -> GConjStatement t $ GListStatement ss
 
 ----------------------------------------------------------------------
 -- GF tree transformations
@@ -75,7 +75,7 @@ getSubj :: GStatement -> GArg
 getSubj s = case s of
   GApp1 _ subj -> subj
   GApp2 _ subj _ -> subj
-  _ -> error $ "getSubj applied to a complex tree " ++ show s
+  _ -> error $ "getSubj applied to a complex tree " ++ show (gf s)
 
 ignoreSubj :: RPS.Tree a -> RPS.Tree a
 ignoreSubj s = case s of
@@ -84,7 +84,7 @@ ignoreSubj s = case s of
   _ -> composOp ignoreSubj s
   where
     dummyArg :: GArg
-    dummyArg = GAVar (GSVar (GString "dummy"))
+    dummyArg = GAVar (GV (GString "dummy"))
 
 ----------------------------------------------------------------------
 -- Make it print etc.

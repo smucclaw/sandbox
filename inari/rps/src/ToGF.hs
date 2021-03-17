@@ -1,21 +1,29 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# OPTIONS_GHC -Wall -Wno-unticked-promoted-constructors #-}
 
 module ToGF where
 
-import Data.List (partition)
+import Data.List.Extra (partition, splitOn)
+import qualified Data.Set as S
 import qualified GF
 import PGF (PGF, linearizeAll, readPGF, showExpr)
+import Prettyprinter
+import Prettyprinter.Render.Text (hPutDoc)
 import RockPaperScissors
 import qualified RockPaperScissors as RPS
 import SCasp
-  ( SKind (..),
+  ( AtomWithArity (AA),
+    Model,
+    SKind (..),
     Tree (A, AAtom, AVar, EApp, MExps, V),
+    getAtoms,
   )
 import qualified SCasp as SC
 import System.Environment (withArgs)
+import System.IO (IOMode (WriteMode), withFile)
 import Text.Printf (printf)
 
 -- 1) This is a data family that translates SKind to GF types
@@ -56,7 +64,7 @@ wrap t ss = case ss of
 
 aggregate :: [GStatement] -> [GStatement]
 aggregate statements =
-  [ case grp of 
+  [ case grp of
       [] -> error "aggregate: empty list"
       [x] -> x
       x : _ -> aggregateSubj (map getSubj grp) x
@@ -89,37 +97,37 @@ ignoreSubj s = case s of
 ----------------------------------------------------------------------
 -- Make it print etc.
 
+topGrName :: String
+topGrName = "RPSTop"
+
 nlg :: SC.Model -> IO ()
 nlg model = do
+  createGF model
   gr <- createPGF
   let printGF expr = do
---        putStrLn $ showExpr [] $ gf expr
+        --putStrLn $ showExpr [] $ gf expr
         mapM_ (putStrLn . postprocess) (linearizeAll gr (gf expr))
-
   let gfModel = toGF model
   putStrLn "\nRaw translation of the model"
   printGF gfModel
-
-  let aggr@(f:rest) = aggregate $ peel gfModel
+  let aggr@(f : rest) = aggregate $ peel gfModel
   putStrLn "\nFirst step: aggregation"
   printGF $ unpeel aggr
-
   let caus = GIfThen f (unpeel rest)
   putStrLn "\nAdded causality (relying on the original order)\n"
   printGF caus
 
 createPGF :: IO PGF.PGF
 createPGF = do
-  let grName = "RockPaperScissors"
   withArgs
     [ "-make",
       "--output-dir=/tmp",
       "--gfo-dir=/tmp",
       "-v=0",
-      printf "grammars/%sEng.gf" grName
+      printf "grammars/%sEng.gf" topGrName
     ]
     GF.main
-  PGF.readPGF $ printf "/tmp/%s.pgf" grName
+  PGF.readPGF $ printf "/tmp/%s.pgf" topGrName
 
 postprocess :: String -> String
 postprocess = map (\c -> if c == '\\' then '\n' else c)
@@ -127,5 +135,78 @@ postprocess = map (\c -> if c == '\\' then '\n' else c)
 -- from https://mail.haskell.org/pipermail/haskell-cafe/2014-March/113271.html
 groupBy' :: (a -> a -> Bool) -> [a] -> [[a]]
 groupBy' _ [] = []
-groupBy' f (a:rest) = (a:as) : groupBy' f bs
-    where (as,bs) = partition (f a) rest
+groupBy' f (a : rest) = (a : as) : groupBy' f bs
+  where
+    (as, bs) = partition (f a) rest
+
+----------------------------------------------------------------------
+-- Generate GF code
+
+createGF :: Model -> IO ()
+createGF model = do
+  let (absS, cncS) = mkLexicon model
+  let absLex = "grammars/RPSLexicon.gf"
+  let absTop = printf "grammars/%s.gf" topGrName
+  let cncLex = "grammars/RPSLexiconEng.gf"
+  let cncTop = printf "grammars/%sEng.gf" topGrName
+  writeDoc absLex absS
+  writeDoc cncLex cncS
+  writeDoc absTop $ "abstract " <> pretty topGrName <> " = RockPaperScissors, RPSLexicon ;"
+  writeDoc cncTop $ "concrete " <> pretty topGrName <> "Eng of " <> pretty topGrName <> " = RockPaperScissorsEng, RPSLexiconEng ;"
+
+writeDoc :: FilePath -> Doc () -> IO ()
+writeDoc name doc = withFile name WriteMode $ \h -> hPutDoc h doc
+
+mkLexicon :: SC.Tree s -> (Doc (), Doc ())
+mkLexicon model = (abstractLexicon lexicon, concreteLexicon lexicon)
+  where
+    lexicon = guessPOS <$> S.toList (getAtoms model)
+
+concreteLexicon :: [POS] -> Doc ()
+concreteLexicon poses =
+  vsep
+    [ "concrete RPSLexiconEng of RPSLexicon = RockPaperScissorsEng ** open SyntaxEng, (P=ParadigmsEng) in {",
+      "lin",
+      (indent 4 . vsep) (concrEntry <$> poses),
+      "}"
+    ]
+
+abstractLexicon :: [POS] -> Doc ()
+abstractLexicon poses =
+  vsep
+    [ "abstract RPSLexicon = RockPaperScissors ** {",
+      "fun",
+      indent 4 . sep . punctuate "," . map (pretty . origName) $ poses,
+      indent 4 ": Atom ;",
+      "}"
+    ]
+
+concrEntry :: POS -> Doc ()
+concrEntry (POS name p) = hsep [pretty name, "=", "mkAtom", parens $ innerLex p, ";"]
+  where
+    innerLex :: InnerPOS -> Doc ()
+    innerLex (PN2 n pr) =
+      "P.mkN2" <+> parens (innerLex (PN n))
+        <+> maybe "possess" pretty pr <> "_Prep"
+    innerLex (PN n) = "P.mkN" <+> viaShow n
+    innerLex (PV2 v pr) = "P.mkV2" <+> parens (innerLex (PV v))
+      <+> case pr of
+        Nothing -> ""
+        Just prep -> pretty prep <> "_Prep"
+    innerLex (PV v) = "P.mkV" <+> viaShow v
+
+type Prep = Maybe String
+
+data POS = POS {origName :: String, pos :: InnerPOS}
+
+data InnerPOS = PN2 String Prep | PN String | PV2 String Prep | PV String
+
+guessPOS :: AtomWithArity -> POS
+guessPOS aa@(AA str int) = POS str $ case (int, splitOn "_" str) of
+  (0, [noun]) -> PN noun
+  (_, ["is", noun, prep]) -> PN2 noun (Just prep)
+  (_, ["is", noun]) -> PN noun
+  (1, [verb]) -> PV verb
+  (2, [verb]) -> PV2 verb Nothing
+  (2, [verb, prep]) -> PV2 verb (Just prep)
+  _ -> error $ "guessPOS: unexpected output " ++ show aa

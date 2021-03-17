@@ -2,3 +2,6 @@
 *~
 *.gfo
 *.pgf
+grammars/RPS*
+grammars/*.hs
+src/RockPaperScissors.hs

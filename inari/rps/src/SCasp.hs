@@ -1,8 +1,8 @@
+{-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE KindSignatures #-}
 {-# LANGUAGE StandaloneDeriving #-}
-{-# LANGUAGE OverloadedStrings #-}
 module SCasp where
 
 import Control.Applicative hiding (many, some)
@@ -37,6 +37,23 @@ type Var = Tree KVar
 type Model = Tree KModel
 type Atom = Tree KAtom
 type Arg = Tree KArg
+
+fancyFoldMap :: Monoid m => (forall a. Tree a -> m) -> Tree s -> m
+fancyFoldMap f t@(MExps l_tk) = f t <> foldMap (fancyFoldMap f) l_tk
+fancyFoldMap f t@(EApp tk l_tk) = f t <> fancyFoldMap f tk <> foldMap (fancyFoldMap f) l_tk
+fancyFoldMap f t@(AAtom tk) = f t <> fancyFoldMap f tk
+fancyFoldMap f t@(AVar tk) = f t <> fancyFoldMap f tk
+fancyFoldMap f t = f t
+
+data AtomWithArity = AA String Int
+
+getAtom :: Tree a -> [AtomWithArity]
+getAtom (EApp (A str) ts) = [AA str (length ts)]
+getAtom _                 = []
+
+
+getAtoms :: Tree s -> [AtomWithArity]
+getAtoms = fancyFoldMap getAtom
 
 ----------------------------------------------------------------
 -- Parser
@@ -93,4 +110,5 @@ pArg :: Parser Arg
 pArg = AAtom <$> pAtom
    <|> AVar <$> pVar
 
-testModel = "{ winner(A,B),  game(B ),  participant_in(A,B),  player(A),  player_throw(A,rock),  player(C),  participant_in(C,B),  player_throw(C,scissors),  beats(rock,scissors) }"
+testModel :: String
+testModel = "{ win(A,B),  game(B),  participant_in(A,B),  player(A),  throw(A,rock),  player(C),  participant_in(C,B),  throw(C,scissors),  beat(rock,scissors) }"

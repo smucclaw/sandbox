@@ -33,6 +33,9 @@ dependencies:
 - mtl
 - megaparsec
 - text
+- prettyprinter >= 1.7.0
+- extra
+- containers
 
 ghc-options:
 - -Wall

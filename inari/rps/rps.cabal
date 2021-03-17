@@ -4,7 +4,7 @@ cabal-version: 1.24
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 14dfa8535489e84114566029ebb46718b262905328920529fdbebe4dd23abc4c
+-- hash: 4011f6844992b290fd14d88e72f854fcf479450b7aaf7a124ccc4da0c8199315
 
 name:           rps
 version:        0.1.0.0
@@ -42,9 +42,12 @@ library
   ghc-options: -Wall -Wno-unticked-promoted-constructors
   build-depends:
       base >=4.7 && <5
+    , containers
+    , extra
     , gf
     , megaparsec
     , mtl
+    , prettyprinter >=1.7.0
     , text
   default-language: Haskell2010
 
@@ -57,9 +60,12 @@ executable rps-exe
   ghc-options: -Wall -Wno-unticked-promoted-constructors -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
+    , containers
+    , extra
     , gf
     , megaparsec
     , mtl
+    , prettyprinter >=1.7.0
     , rps
     , text
   default-language: Haskell2010

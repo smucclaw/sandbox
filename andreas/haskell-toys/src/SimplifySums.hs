@@ -1,3 +1,4 @@
+{-# LANGUAGE RankNTypes #-}
 -- Simplifies expressions that involves sums of polynomials
 
 {-# LANGUAGE DeriveTraversable #-}
@@ -10,7 +11,7 @@ import Data.Functor.Classes
 import Data.Deriving (deriveEq1, deriveOrd1, deriveRead1, deriveShow1)
 import Control.Monad (ap)
 import Data.Void (Void)
-import Data.Ratio (Ratio)
+import Data.Ratio (Ratio, denominator, numerator)
 import Data.Map.Strict (Map)
 import Data.Set (Set)
 import qualified Data.Map as M
@@ -230,6 +231,7 @@ newtype Polynomial a = P {unP :: [a]}
   deriving Show
 
 instance Num a => Num (Polynomial a) where
+    -- This is almost zipWith (+), but instead of truncating, we leave the longest as is
     P[] + bs = bs
     P(a:as) + P(b:bs) = P $ (a + b) : unP (P as + P bs)
     as + P[] = as
@@ -243,16 +245,56 @@ instance Num a => Num (Polynomial a) where
 instance FromRational a => FromRational (Polynomial a) where
   fromRat = P . pure . fromRat
 
+divModPoly :: (Eq a, Num a, Fractional a) => Polynomial a -> Polynomial a -> (Polynomial a, Polynomial a)
+divModPoly (P ra) (P rb) = (P rd, P $ reverse rm)
+    where
+    d = reverse rb
+    (dh:dt) = d
+    lenD = length rb
+    (rd, rm) = divModP (reverse ra) []
+
+    -- divModP :: (Eq a, Num a) => [a] -> [a] -> ([a], [a])
+    divModP as ans | length as < lenD = (ans, dropWhile (==0) as)
+    divModP (0:as) ans = divModP as (0:ans)
+    divModP (a:as) ans = divModP rmn (fact:ans)
+      where fact = a / dh
+            rmn = unP $ P as - P (pure fact) * P dt
+
+sumPoly :: Polynomial Rational
+sumPoly = mkPoly' sum4
+
+sumPolyN :: Integer -> Polynomial Rational
+sumPolyN n = mkPoly' $ sumPow n
+
+nPlus1 :: Polynomial Rational
+nPlus1 = mkPoly' (+1)
+-- nPlus1 = mkPoly' $ \n -> n * (n + 1) * (2*n + 1) // 30
+
+simplifyPol :: (Polynomial Rational, Polynomial Rational) -> Polynomial Integer
+simplifyPol (P x, P []) = P $ map (\y -> if denominator y == 1 then numerator y else error $ "Not an integer: " ++ show x) x
+
+--  >>> sumPoly
+--  >>> nPlus1
+--  >>> divModPoly sumPoly nPlus1
+-- P {unP = [0 % 1,(-1) % 30,0 % 1,1 % 3,1 % 2,1 % 5]}
+-- P {unP = [0 % 1,1 % 30,1 % 10,1 % 15]}
+-- (P {unP = [(-1) % 1,3 % 1,3 % 1]},P {unP = []})
+--  >>> simplifyPol $ divModPoly (sumPolyN 1) (sumPolyN 0 // 2)
+--  >>> simplifyPol $ divModPoly (sumPolyN 2) (sumPolyN 1 // 3)
+--  >>> simplifyPol $ divModPoly (sumPolyN 3) (sumPolyN 1 * sumPolyN 1)
+--  >>> simplifyPol $ divModPoly (sumPolyN 4) (sumPolyN 2 // 5)
+--  >>> simplifyPol $ divModPoly (sumPolyN 5) (sumPolyN 3 // 3)
+--  >>> simplifyPol $ divModPoly (sumPolyN 6) (sumPolyN 2 // 7)
+-- P {unP = [1,1]}
+-- P {unP = [1,2]}
+-- P {unP = [1]}
+-- P {unP = [-1,3,3]}
+-- P {unP = [-1,2,2]}
+-- P {unP = [1,-3,0,6,3]}
+
 varToPoly :: Num a => Var () a -> Polynomial a
 varToPoly (B _) = P [0, 1]
 varToPoly (F a) = P [a]
-
-polyBound :: a -> Polynomial (PolySum a)
-polyBound a = P [0, V a]
--- polyBound = P . (0:) . (:[]) . V
-
-polyOfFree :: PolySum a -> Polynomial (PolySum a)
-polyOfFree = polySumToNum . fmap polyBound
 
 normalizePoly :: FromRational a => PolySum (Var () a) -> Polynomial a
 normalizePoly = polySumToNum . fmap varToPoly
@@ -289,6 +331,9 @@ bindVariable name f = unscope . abstract1 name $ f (pure name)
 
 mkPoly :: Eq a => a -> (PolySum a -> PolySum a) -> Polynomial (PolySum a)
 mkPoly name = normalizePoly . bindVariable name
+
+mkPoly' :: FromRational a => (forall s. PolySum s -> PolySum s) -> Polynomial a
+mkPoly' = normalizePoly . ($ V (B ()))
 
 evalPoly :: Num p => p -> Polynomial p -> p
 evalPoly x (P[]) = 0

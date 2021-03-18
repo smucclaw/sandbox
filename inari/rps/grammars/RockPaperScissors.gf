@@ -20,9 +20,13 @@ abstract RockPaperScissors = {
     V : String -> Var ;
 
     -- Aggregation functions, manually written
-    -- Transformations from the direct s(CASP) functions to these need to be manually written in Haskell
+    -- Transformations from the direct s(CASP ) functions to these need to be manually written in Haskell
     Aggregate1 : Atom -> [Arg] -> Statement ;        -- A and C are players
     Aggregate2 : Atom -> Arg -> [Arg] -> Statement ; -- A and C are participants in B
+
+    AggregatePred11 : (a1, a2 : Atom) -> (subjs : [Arg]) -> Statement ;
+    AggregatePred12 : (a1, a2 : Atom) -> (obj : Arg) -> (subjs : [Arg]) -> Statement ;
+    -- AggregatePred22 : (a1, a2 : Atom) -> (obj1, obj2, subj : Arg) -> Statement ;
 
     IfThen : Statement -> Statement -> Statement ; -- A wins B if …
 

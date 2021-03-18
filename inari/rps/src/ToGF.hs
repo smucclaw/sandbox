@@ -6,7 +6,7 @@
 
 module ToGF where
 
-import Data.List.Extra (partition, splitOn)
+import Data.List.Extra (partition, splitOn, groupBy)
 import qualified Data.Set as S
 import qualified GF
 import PGF (PGF, linearizeAll, readPGF, showExpr)
@@ -63,37 +63,75 @@ wrap t ss = case ss of
 -- GF tree transformations
 
 aggregate :: [GStatement] -> [GStatement]
-aggregate statements =
-  [ case grp of
-      [] -> error "aggregate: empty list"
-      [x] -> x
-      x : _ -> aggregateSubj (map getSubj grp) x
-    | grp <- groupBy' samePred statements
-  ]
-
+aggregate statements = secondAggr
+  where
+    firstAggr =
+        [ case grp of
+            [] -> error "aggregate: empty list"
+            [x] -> x
+            x : _ -> aggregateSubj (map getSubj grp) x
+          | grp <- groupBy' samePred statements
+        ]
+    secondAggr = concat
+      [ case grp of
+          [] -> error "aggregate: empty list"
+          [x] -> [x]
+          x : _ -> 
+            case aggregatePred (map getPred grp) x of 
+              y | x==y      -> grp 
+                | otherwise -> [y]
+        | grp <- groupBy sameSubj firstAggr --NB. this is the standard groupBy! We know that "A and C" statements are already next to each other
+      ]
 aggregateSubj :: [GArg] -> GStatement -> GStatement
 aggregateSubj subjs (GApp1 pr _subj) = GAggregate1 pr (GListArg subjs)
 aggregateSubj subjs (GApp2 pr _subj obj) = GAggregate2 pr obj (GListArg subjs)
 aggregateSubj _ x = x
 
+aggregatePred :: [GAtom] -> GStatement -> GStatement
+aggregatePred [pr1,pr2] (GAggregate1 _pr subjs) = GAggregatePred11 pr1 pr2 subjs
+aggregatePred [pr1,pr2] (GAggregate2 _pr obj subjs) = GAggregatePred12 pr1 pr2 obj subjs
+aggregatePred _ x = x
+
+
 samePred :: RPS.Tree a -> RPS.Tree a -> Bool
 samePred s1 s2 = ignoreSubj s1 == ignoreSubj s2
+
+sameSubj :: RPS.Tree a -> RPS.Tree a -> Bool
+sameSubj s1 s2 = ignorePred s1 == ignorePred s2
 
 getSubj :: GStatement -> GArg
 getSubj s = case s of
   GApp1 _ subj -> subj
   GApp2 _ subj _ -> subj
-  _ -> error $ "getSubj applied to a complex tree " ++ show (gf s)
+  _ -> error $ "getSubj applied to a complex tree " ++ showExpr [] (gf s)
 
 ignoreSubj :: RPS.Tree a -> RPS.Tree a
 ignoreSubj s = case s of
   GApp1 pr _ -> GApp1 pr dummyArg
   GApp2 pr _ obj -> GApp2 pr dummyArg obj
   _ -> composOp ignoreSubj s
-  where
-    dummyArg :: GArg
-    dummyArg = GAVar (GV (GString "dummy"))
 
+getPred :: GStatement -> GAtom
+getPred s = case s of
+  GApp1 pr _ -> pr
+  GApp2 pr _ _ -> pr
+  GAggregate1 pr _ -> pr
+  GAggregate2 pr _ _ -> pr
+  _ -> error $ "getPred applied to a complex tree " ++ showExpr [] (gf s)
+
+ignorePred :: RPS.Tree a -> RPS.Tree a
+ignorePred s = case s of
+  GApp1 _ subj -> GApp2 dummyAtom subj dummyArg
+  GApp2 _ subj _ -> GApp2 dummyAtom subj dummyArg
+  GAggregate1 _ subjs -> GAggregate2 dummyAtom dummyArg subjs
+  GAggregate2 _ _ subjs -> GAggregate2 dummyAtom dummyArg subjs
+  _ -> composOp ignorePred s
+
+dummyAtom :: GAtom
+dummyAtom = LexAtom "dummy"
+
+dummyArg :: GArg
+dummyArg = GAVar (GV (GString "dummy"))
 ----------------------------------------------------------------------
 -- Make it print etc.
 
@@ -110,9 +148,11 @@ nlg model = do
   let gfModel = toGF model
   putStrLn "\nRaw translation of the model"
   printGF gfModel
+
   let aggr@(f : rest) = aggregate $ peel gfModel
   putStrLn "\nFirst step: aggregation"
   printGF $ unpeel aggr
+
   let caus = GIfThen f (unpeel rest)
   putStrLn "\nAdded causality (relying on the original order)\n"
   printGF caus

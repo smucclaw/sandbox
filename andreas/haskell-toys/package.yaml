@@ -25,6 +25,7 @@ dependencies:
 - prettyprinter
 - bound
 - deriving-compat
+- random
 
 library:
   source-dirs: src

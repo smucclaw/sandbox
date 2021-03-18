@@ -1,10 +1,10 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.34.2.
+-- This file has been generated from package.yaml by hpack version 0.33.0.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 642a43b4f2bb4ee124291639f91af077e22a51fb3577f20635b679a3575a8152
+-- hash: 0afd69c37012127da329836ac108d9051f369ee3588dc1e506fcb42b0894744f
 
 name:           haskell-toys
 version:        0.1.0.0
@@ -30,6 +30,7 @@ library
       BoundEx
       Euler217
       FreeStuff
+      GenericAlternative
       LambdaBound
       LazyPi
       Lib
@@ -45,6 +46,7 @@ library
     , containers
     , deriving-compat
     , prettyprinter
+    , random
   default-language: Haskell2010
 
 executable haskell-toys-exe
@@ -61,6 +63,7 @@ executable haskell-toys-exe
     , deriving-compat
     , haskell-toys
     , prettyprinter
+    , random
   default-language: Haskell2010
 
 test-suite haskell-toys-test
@@ -78,4 +81,5 @@ test-suite haskell-toys-test
     , deriving-compat
     , haskell-toys
     , prettyprinter
+    , random
   default-language: Haskell2010

@@ -81,8 +81,9 @@ concrete RockPaperScissorsEng of RockPaperScissors = open
       TBullets => mkListS (addBullet s) (ss ! TBullets)
       } ;
 
-    -- : Conjunction -> [Statement] -> Statement ;
+    -- : Typography -> [Statement] -> Statement ;
     ConjStatement t ss = mkS and_Conj (ss ! t.t) ;
+    DisjStatement t ss = mkS or_Conj (ss ! t.t) ;
 
     BaseArg = mkListNP ;
     ConsArg = mkListNP ;

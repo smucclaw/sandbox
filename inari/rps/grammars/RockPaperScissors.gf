@@ -32,6 +32,8 @@ abstract RockPaperScissors = {
 
     ConjStatement : Typography -> [Statement] -> Statement ;
 
+    DisjStatement : Typography -> [Statement] -> Statement ;
+
     Inline, Bullets : Typography ;
 
     dummyAtom : Atom ;

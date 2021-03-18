@@ -6,9 +6,10 @@
 
 module ToGF where
 
-import Data.List.Extra (partition, splitOn, groupBy)
+import Data.List.Extra (groupBy, partition, splitOn)
 import qualified Data.Set as S
 import qualified GF
+import GHC.Exts (the)
 import PGF (PGF, linearizeAll, readPGF, showExpr)
 import Prettyprinter
 import Prettyprinter.Render.Text (hPutDoc)
@@ -19,6 +20,7 @@ import SCasp
     Model,
     SKind (..),
     Tree (A, AAtom, AVar, EApp, MExps, V),
+    dumpModels,
     getAtoms,
   )
 import qualified SCasp as SC
@@ -66,32 +68,34 @@ aggregate :: [GStatement] -> [GStatement]
 aggregate statements = secondAggr
   where
     firstAggr =
-        [ case grp of
-            [] -> error "aggregate: empty list"
-            [x] -> x
-            x : _ -> aggregateSubj (map getSubj grp) x
-          | grp <- groupBy' samePred statements
-        ]
-    secondAggr = concat
       [ case grp of
           [] -> error "aggregate: empty list"
-          [x] -> [x]
-          x : _ -> 
-            case aggregatePred (map getPred grp) x of 
-              y | x==y      -> grp 
-                | otherwise -> [y]
-        | grp <- groupBy sameSubj firstAggr --NB. this is the standard groupBy! We know that "A and C" statements are already next to each other
+          [x] -> x
+          x : _ -> aggregateSubj (map getSubj grp) x
+        | grp <- groupBy' samePred statements
       ]
+    secondAggr =
+      concat
+        [ case grp of
+            [] -> error "aggregate: empty list"
+            [x] -> [x]
+            x : _ ->
+              case aggregatePred (map getPred grp) x of
+                y
+                  | x == y -> grp
+                  | otherwise -> [y]
+          | grp <- groupBy sameSubj firstAggr --NB. this is the standard groupBy! We know that "A and C" statements are already next to each other
+        ]
+
 aggregateSubj :: [GArg] -> GStatement -> GStatement
 aggregateSubj subjs (GApp1 pr _subj) = GAggregate1 pr (GListArg subjs)
 aggregateSubj subjs (GApp2 pr _subj obj) = GAggregate2 pr obj (GListArg subjs)
 aggregateSubj _ x = x
 
 aggregatePred :: [GAtom] -> GStatement -> GStatement
-aggregatePred [pr1,pr2] (GAggregate1 _pr subjs) = GAggregatePred11 pr1 pr2 subjs
-aggregatePred [pr1,pr2] (GAggregate2 _pr obj subjs) = GAggregatePred12 pr1 pr2 obj subjs
+aggregatePred [pr1, pr2] (GAggregate1 _pr subjs) = GAggregatePred11 pr1 pr2 subjs
+aggregatePred [pr1, pr2] (GAggregate2 _pr obj subjs) = GAggregatePred12 pr1 pr2 obj subjs
 aggregatePred _ x = x
-
 
 samePred :: RPS.Tree a -> RPS.Tree a -> Bool
 samePred s1 s2 = ignoreSubj s1 == ignoreSubj s2
@@ -132,45 +136,6 @@ dummyAtom = LexAtom "dummy"
 
 dummyArg :: GArg
 dummyArg = GAVar (GV (GString "dummy"))
-----------------------------------------------------------------------
--- Make it print etc.
-
-topGrName :: String
-topGrName = "RPSTop"
-
-nlg :: SC.Model -> IO ()
-nlg model = do
-  createGF model
-  gr <- createPGF
-  let printGF expr = do
-        --putStrLn $ showExpr [] $ gf expr
-        mapM_ (putStrLn . postprocess) (linearizeAll gr (gf expr))
-  let gfModel = toGF model
-  putStrLn "\nRaw translation of the model"
-  printGF gfModel
-
-  let aggr@(f : rest) = aggregate $ peel gfModel
-  putStrLn "\nFirst step: aggregation"
-  printGF $ unpeel aggr
-
-  let caus = GIfThen f (unpeel rest)
-  putStrLn "\nAdded causality (relying on the original order)\n"
-  printGF caus
-
-createPGF :: IO PGF.PGF
-createPGF = do
-  withArgs
-    [ "-make",
-      "--output-dir=/tmp",
-      "--gfo-dir=/tmp",
-      "-v=0",
-      printf "grammars/%sEng.gf" topGrName
-    ]
-    GF.main
-  PGF.readPGF $ printf "/tmp/%s.pgf" topGrName
-
-postprocess :: String -> String
-postprocess = map (\c -> if c == '\\' then '\n' else c)
 
 -- from https://mail.haskell.org/pipermail/haskell-cafe/2014-March/113271.html
 groupBy' :: (a -> a -> Bool) -> [a] -> [[a]]
@@ -182,17 +147,34 @@ groupBy' f (a : rest) = (a : as) : groupBy' f bs
 ----------------------------------------------------------------------
 -- Generate GF code
 
+grName, lexName :: Doc () --String
+grName = "RPSTop"
+lexName = "RPSLexicon"
+
+mkAbsName, mkCncName, mkPGFName :: Doc () -> String
+mkAbsName d = printf "grammars/%s.gf" (show d)
+mkCncName d = printf "grammars/%sEng.gf" (show d)
+mkPGFName d = printf "/tmp/%s.pgf" (show d)
+
+createPGF :: IO PGF.PGF
+createPGF = do
+  withArgs
+    [ "-make",
+      "--output-dir=/tmp",
+      "--gfo-dir=/tmp",
+      "-v=0",
+      mkCncName grName
+    ]
+    GF.main
+  PGF.readPGF $ mkPGFName grName
+
 createGF :: Model -> IO ()
 createGF model = do
   let (absS, cncS) = mkLexicon model
-  let absLex = "grammars/RPSLexicon.gf"
-  let absTop = printf "grammars/%s.gf" topGrName
-  let cncLex = "grammars/RPSLexiconEng.gf"
-  let cncTop = printf "grammars/%sEng.gf" topGrName
-  writeDoc absLex absS
-  writeDoc cncLex cncS
-  writeDoc absTop $ "abstract " <> pretty topGrName <> " = RockPaperScissors, RPSLexicon ;"
-  writeDoc cncTop $ "concrete " <> pretty topGrName <> "Eng of " <> pretty topGrName <> " = RockPaperScissorsEng, RPSLexiconEng ;"
+  writeDoc (mkAbsName lexName) absS
+  writeDoc (mkCncName lexName) cncS
+  writeDoc (mkAbsName grName) $ "abstract " <>  grName <> " = RockPaperScissors," <+> lexName <+> ";"
+  writeDoc (mkCncName grName) $ "concrete " <>  grName <> "Eng of " <> grName <> " = RockPaperScissorsEng, RPSLexiconEng ;"
 
 writeDoc :: FilePath -> Doc () -> IO ()
 writeDoc name doc = withFile name WriteMode $ \h -> hPutDoc h doc
@@ -205,7 +187,7 @@ mkLexicon model = (abstractLexicon lexicon, concreteLexicon lexicon)
 concreteLexicon :: [POS] -> Doc ()
 concreteLexicon poses =
   vsep
-    [ "concrete RPSLexiconEng of RPSLexicon = RockPaperScissorsEng ** open SyntaxEng, ParadigmsEng in {",
+    [ "concrete" <+> lexName <> "Eng of" <+> lexName <+> "= RockPaperScissorsEng ** open SyntaxEng, ParadigmsEng in {",
       "lin",
       (indent 4 . vsep) (concrEntry <$> poses),
       "}"
@@ -214,7 +196,7 @@ concreteLexicon poses =
 abstractLexicon :: [POS] -> Doc ()
 abstractLexicon poses =
   vsep
-    [ "abstract RPSLexicon = RockPaperScissors ** {",
+    [ "abstract" <+> lexName <+> "= RockPaperScissors ** {",
       "fun",
       indent 4 . sep . punctuate "," . map (pretty . origName) $ poses,
       indent 4 ": Atom ;",
@@ -250,3 +232,65 @@ guessPOS aa@(AA str int) = POS str $ case (int, splitOn "_" str) of
   (2, [verb]) -> PV2 verb Nothing
   (2, [verb, prep]) -> PV2 verb (Just prep)
   _ -> error $ "guessPOS: unexpected output " ++ show aa
+
+----------------------------------------------------------------------
+-- print etc.
+
+postprocess :: String -> String
+postprocess = map (\c -> if c == '\\' then '\n' else c)
+
+printGF :: Gf a => PGF -> a -> IO ()
+printGF gr expr = do
+  --putStrLn $ showExpr [] $ gf expr
+  mapM_ (putStrLn . postprocess) (linearizeAll gr (gf expr))
+
+nlgModels :: [Model] -> IO ()
+nlgModels [] = error "nlgModels: no models given"
+nlgModels [model] = nlg model -- default to nlg for just a single model
+nlgModels models = do
+  createGF (dumpModels models) -- We need all models together just to create lexicon
+  gr <- createPGF
+  let gfModels = toGF <$> models
+  -- putStrLn "\nRaw translation of the model"
+  -- mapM_ (printGF gr) gfModels
+
+  let concls_evidences =
+        [ (concl, aggregate evidence)
+          | gfModel <- gfModels,
+            let concl : evidence = peel gfModel
+        ]
+  let conclusion = the $ map fst concls_evidences
+  let allEvidence = concatMap snd concls_evidences
+  let shared = [s | s : _ : _ <- groupBy' (==) allEvidence]
+  let uniques =
+        [ wrap
+            GInline
+            [ st
+              | st <- evidence,
+                st `notElem` shared
+            ]
+          | (_, evidence) <- concls_evidences
+        ]
+  ---------
+  -- Final printout
+  printGF gr conclusion
+  putStrLn "\nif all of the following hold:"
+  printGF gr $ unpeel shared
+  putStrLn "\nand one of the following holds:"
+  printGF gr $ GDisjStatement GBullets (GListStatement uniques)
+
+
+nlg :: Model -> IO ()
+nlg model = do
+  createGF model
+  gr <- createPGF
+  let gfModel = toGF model
+  putStrLn "\nRaw translation of the model"
+  printGF gr gfModel
+  let aggr@(f : rest) = aggregate $ peel gfModel
+  -- putStrLn "\nFirst step: aggregation"
+  -- printGF $ unpeel aggr
+
+  let caus = GIfThen f (unpeel rest)
+  putStrLn "\nAggregation and causality (relying on the original order)\n"
+  printGF gr caus

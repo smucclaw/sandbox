@@ -56,6 +56,12 @@ getAtom _                 = mempty
 getAtoms :: Tree s -> Set AtomWithArity
 getAtoms = fancyFoldMap getAtom
 
+dumpModels :: [Model] -> Model
+dumpModels = MExps . foldMap getModel
+  where
+    getModel :: Model -> [Exp]
+    getModel (MExps es) = es
+
 ----------------------------------------------------------------
 -- Parser
 -- It could be any parser, this happens to be with Megaparsec.
@@ -110,6 +116,3 @@ pAtom = fmap A $ lexeme $ some (lowerChar <|> char '_')
 pArg :: Parser Arg
 pArg = AAtom <$> pAtom
    <|> AVar <$> pVar
-
-testModel :: String
-testModel = "{ is_winner(A,RPS),  is_game(RPS),  is_participant_in(A,RPS),  is_player(A),  throw(A,rock), is_player(C),  is_participant_in(C,RPS),  throw(C,scissors),  beat(rock,scissors) }"

@@ -165,7 +165,7 @@ mkLexicon model = (abstractLexicon lexicon, concreteLexicon lexicon)
 concreteLexicon :: [POS] -> Doc ()
 concreteLexicon poses =
   vsep
-    [ "concrete RPSLexiconEng of RPSLexicon = RockPaperScissorsEng ** open SyntaxEng, (P=ParadigmsEng) in {",
+    [ "concrete RPSLexiconEng of RPSLexicon = RockPaperScissorsEng ** open SyntaxEng, ParadigmsEng in {",
       "lin",
       (indent 4 . vsep) (concrEntry <$> poses),
       "}"
@@ -186,14 +186,14 @@ concrEntry (POS name p) = hsep [pretty name, "=", "mkAtom", parens $ innerLex p,
   where
     innerLex :: InnerPOS -> Doc ()
     innerLex (PN2 n pr) =
-      "P.mkN2" <+> parens (innerLex (PN n))
+      "mkN2" <+> parens (innerLex (PN n))
         <+> maybe "possess" pretty pr <> "_Prep"
-    innerLex (PN n) = "P.mkN" <+> viaShow n
-    innerLex (PV2 v pr) = "P.mkV2" <+> parens (innerLex (PV v))
+    innerLex (PN n) = "mkN" <+> viaShow n
+    innerLex (PV2 v pr) = "mkV2" <+> parens (innerLex (PV v))
       <+> case pr of
         Nothing -> ""
         Just prep -> pretty prep <> "_Prep"
-    innerLex (PV v) = "P.mkV" <+> viaShow v
+    innerLex (PV v) = "mkV" <+> viaShow v
 
 type Prep = Maybe String
 

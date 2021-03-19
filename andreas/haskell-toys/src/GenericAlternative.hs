@@ -11,6 +11,7 @@
 {-# LANGUAGE DeriveTraversable #-}
 {-# LANGUAGE TupleSections #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE DerivingStrategies #-}
 module GenericAlternative where
 
 import GHC.Generics
@@ -149,11 +150,30 @@ genRandom = rngIo alternatives
 -- >>> seq (from [1..]) ()
 -- ()
 
-newtype SizeOf a = Size Int
+data InfiniteOr a = Finite a | Infinite
   deriving (Show, Functor)
 
+instance Applicative InfiniteOr where
+  pure = Finite
+  Finite f <*> Finite x = Finite (f x)
+  _ <*> _ = Infinite
+
+instance (Num a, Eq a) => Num (InfiniteOr a) where
+  (+) = liftA2 (+)
+  Finite 0 * _ = Finite 0
+  _ * Finite 0 = Finite 0
+  a * b = liftA2 (*) a b
+  abs = fmap abs
+  signum = fmap signum
+  fromInteger = pure . fromInteger
+  negate = fmap negate
+
+newtype SizeOf a = Size (InfiniteOr Int)
+  deriving (Show, Functor)
+  deriving newtype (Num)
+
 instance Applicative SizeOf where
-  pure _ = Size 1
+  pure _ = 1
   Size a <*> Size b = Size $ a * b
 
 instance Alternative SizeOf where
@@ -166,6 +186,8 @@ sizeOf = alternatives
 -- >>> sizeOf @(Maybe (Bool, Bool))
 -- Size 5
 
+newtype AtDepth f a = AtDepth (Int -> f a)
+
 class Enumerate a where
     enumerate :: [a]
     default enumerate :: (Generic a, GAlternating Enumerate (Rep a)) => [a]
@@ -174,11 +196,13 @@ class Enumerate a where
     default alternatives :: (Alternative f, Generic a, GAlternating Enumerate (Rep a)) => f a
     alternatives = alternate (Proxy @Enumerate) alternatives
 
-    -- size :: SizeOf a
-    -- size = alternatives
+    size :: SizeOf a
+    size = alternatives
 
 instance Enumerate a => Enumerate [a]
+    where size = (:) <$> size <*> Size Infinite
 instance Enumerate a => Enumerate (ZipList a)
+    where size = Size Infinite
 instance Enumerate a => Enumerate (Maybe a)
 instance (Enumerate a, Enumerate b) => Enumerate (a , b)
 instance Enumerate ()
@@ -186,6 +210,7 @@ instance Enumerate Bool
 
 instance Enumerate Int where
   enumerate = [0..1]
+  size = Size Infinite
 --   alternatives = pure 0 <|> alternativesInt 1
   alternatives = pure 0 <|> alternativesInt 1
 

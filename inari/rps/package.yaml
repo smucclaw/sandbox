@@ -15,7 +15,7 @@ custom-setup:
 
 extra-source-files:
 - README.md
-- grammars/RockPaperScissors.gf
+- grammars/RPS.gf
 
 
 # Metadata used when publishing your package
@@ -46,7 +46,7 @@ library:
   - src
   - grammars
   other-modules:
-  - RockPaperScissors
+  - RPS
 
 
 executables:

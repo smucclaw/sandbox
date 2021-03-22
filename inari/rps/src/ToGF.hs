@@ -13,8 +13,8 @@ import GHC.Exts (the)
 import PGF (PGF, linearizeAll, readPGF, showExpr)
 import Prettyprinter
 import Prettyprinter.Render.Text (hPutDoc)
-import RockPaperScissors
-import qualified RockPaperScissors as RPS
+import RPS
+import qualified RPS
 import SCasp
   ( AtomWithArity (AA),
     Model,
@@ -173,8 +173,8 @@ createGF model = do
   let (absS, cncS) = mkLexicon model
   writeDoc (mkAbsName lexName) absS
   writeDoc (mkCncName lexName) cncS
-  writeDoc (mkAbsName grName) $ "abstract " <>  grName <> " = RockPaperScissors," <+> lexName <+> ";"
-  writeDoc (mkCncName grName) $ "concrete " <>  grName <> "Eng of " <> grName <> " = RockPaperScissorsEng, RPSLexiconEng ;"
+  writeDoc (mkAbsName grName) $ "abstract " <>  grName <> " = RPS," <+> lexName <+> ";"
+  writeDoc (mkCncName grName) $ "concrete " <>  grName <> "Eng of " <> grName <> " = RPSEng, RPSLexiconEng ;"
 
 writeDoc :: FilePath -> Doc () -> IO ()
 writeDoc name doc = withFile name WriteMode $ \h -> hPutDoc h doc
@@ -187,7 +187,7 @@ mkLexicon model = (abstractLexicon lexicon, concreteLexicon lexicon)
 concreteLexicon :: [POS] -> Doc ()
 concreteLexicon poses =
   vsep
-    [ "concrete" <+> lexName <> "Eng of" <+> lexName <+> "= RockPaperScissorsEng ** open SyntaxEng, ParadigmsEng in {",
+    [ "concrete" <+> lexName <> "Eng of" <+> lexName <+> "= RPSEng ** open SyntaxEng, ParadigmsEng in {",
       "lin",
       (indent 4 . vsep) (concrEntry <$> poses),
       "}"
@@ -196,7 +196,7 @@ concreteLexicon poses =
 abstractLexicon :: [POS] -> Doc ()
 abstractLexicon poses =
   vsep
-    [ "abstract" <+> lexName <+> "= RockPaperScissors ** {",
+    [ "abstract" <+> lexName <+> "= RPS ** {",
       "fun",
       indent 4 . sep . punctuate "," . map (pretty . origName) $ poses,
       indent 4 ": Atom ;",

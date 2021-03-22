@@ -4,7 +4,7 @@ cabal-version: 1.24
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 4011f6844992b290fd14d88e72f854fcf479450b7aaf7a124ccc4da0c8199315
+-- hash: 076bd9e4f426e0234dbd2daaadcd4d2862a4acd32a5a221d3290a3724b2048c5
 
 name:           rps
 version:        0.1.0.0
@@ -18,7 +18,7 @@ license:        BSD3
 build-type:     Custom
 extra-source-files:
     README.md
-    grammars/RockPaperScissors.gf
+    grammars/RPS.gf
 
 source-repository head
   type: git
@@ -32,10 +32,11 @@ custom-setup
 
 library
   exposed-modules:
+      RockPaperScissors
       SCasp
       ToGF
   other-modules:
-      RockPaperScissors
+      RPS
   hs-source-dirs:
       src
       grammars

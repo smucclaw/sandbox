@@ -2,6 +2,7 @@
 *~
 *.gfo
 *.pgf
-grammars/RPS*
+grammars/RPSTop*
+grammars/RPSLex*
 grammars/*.hs
-src/RockPaperScissors.hs
+src/RPS.hs

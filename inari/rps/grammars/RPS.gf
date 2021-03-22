@@ -1,4 +1,4 @@
-abstract RockPaperScissors = {
+abstract RPS = {
   flags startcat = Statement ;
   cat
     Statement ;

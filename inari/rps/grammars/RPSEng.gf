@@ -1,4 +1,4 @@
-concrete RockPaperScissorsEng of RockPaperScissors = open 
+concrete RPSEng of RPS = open 
   SyntaxEng, (P=ParadigmsEng), (C=ConjunctionEng), SymbolicEng, ExtendEng in {
   lincat
     Statement = S ;

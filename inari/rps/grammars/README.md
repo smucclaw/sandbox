@@ -4,9 +4,9 @@ This is the old demo, which just relied on handcrafted trees in demo.sh.
 
 ### Files
 ```
-RockPaperScissors.gf    -- abstract syntax
-RockPaperScissorsEng.gf -- English concrete syntax
-demo.sh                 -- Hand-crafted trees
+RPS.gf    -- abstract syntax
+RPSEng.gf -- English concrete syntax
+demo.sh   -- Hand-crafted trees
 ```
 
 ### Usage

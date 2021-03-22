@@ -32,7 +32,6 @@ custom-setup
 
 library
   exposed-modules:
-      RockPaperScissors
       SCasp
       ToGF
   other-modules:

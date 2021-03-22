@@ -33,7 +33,7 @@ and one of the following holds:
 
 ## NLG pipeline
 
-![Diagram of the NLG pipeline](./NLG-pipeline.svg)
+![Diagram of the NLG pipeline](https://raw.githubusercontent.com/smucclaw/sandbox/default/inari/rps/NLG-diagram.svg)
 
 ## Which parts took human effort
 

@@ -31,6 +31,10 @@ and one of the following holds:
 * A throws paper , C throws rock and paper beats rock
 ```
 
+## NLG pipeline
+
+![Diagram of the NLG pipeline](./NLG-pipeline.svg)
+
 ## Which parts took human effort
 
 * Linearisation of App1 and App2

@@ -261,7 +261,8 @@ nlgModels models = do
         ]
   let conclusion = the $ map fst concls_evidences
   let allEvidence = concatMap snd concls_evidences
-  let shared = [s | s : _ : _ <- groupBy' (==) allEvidence]
+  let shared = [s | ss@(s :_) <- groupBy' (==) allEvidence,
+                   length ss == length concls_evidences ]
   let uniques =
         [ wrap
             GInline

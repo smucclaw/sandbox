@@ -8,7 +8,9 @@ http://web.engr.oregonstate.edu/~walkiner/projects/semantics-first.html
 > 
 > The approach is partly inspired by the success of combinator-based DSLs in Haskell, such as Parsec.
 > 
-> Below are some of my observations.
+
+
+Below are some of my observations.
 
 ________________________________________________
 

@@ -18,9 +18,9 @@ data instance HList (x ': xs) = Vars x `HCons` HList xs
 infixr 5 :*
 pattern a :* b = HCons a b
 
-type family xs ++ ys :: [a] where
-  '[] ++ ys = ys
-  (x : xs) ++ ys = x : (xs++ys)
+-- type family xs ++ ys :: [a] where
+--   '[] ++ ys = ys
+--   (x : xs) ++ ys = x : (xs++ys)
 
 data Vars' = A' | B'
 data Vars (a :: Vars') where

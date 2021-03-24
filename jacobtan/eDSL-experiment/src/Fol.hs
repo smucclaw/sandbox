@@ -34,5 +34,7 @@ data Statements =
 data FOL (a :: [Vars']) where
   Forall :: Vars vars -> FOL bs
 
+x :: HList '[ A', B']
 x = HCons A $ HCons B HNil
+y :: HList '[ A', B']
 y = A :* B :* HNil

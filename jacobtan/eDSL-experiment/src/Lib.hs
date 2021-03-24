@@ -47,13 +47,13 @@ example = P1 `And` P2
 In accordance with the restrictions in sCasp, the naf "not derivable" may only appear before literals, i.e. positive or negative elementary predicates. Accordingly, he following expression does not parse:
     assert not derivable (P(1, 2) && P(2, 3))
 -}
-typeError = NAF (P1 `And` P2)
+-- typeClass'Error = NAF (P1 `And` P2)
 
 {-
 Of course, the classical "not" (corresponding to - in sCasp) can be used without restrictions, as in
     assert not (P(1, 2) && P(2, 3))
 -}
-legal = (NAF P1) `And` P2
+legal = NAF P1 `And` P2
 
 legal2 = Neg (P1 `And` P2)
 
@@ -61,10 +61,10 @@ legal3 = Neg (Neg P1)
 
 legal4 = NAF (Neg P1)
 
-notLegal = Neg (NAF P1)
+-- notLegal = Neg (NAF P1)
 
-notLegal2 = NAF (NAF P1)
+-- notLegal2 = NAF (NAF P1)
 
-legal5 = NAF (P1 `And` P2)
+-- not_so_legal5 = NAF (P1 `And` P2)
 
-notLegal3 = NAF (P1 `And` (NAF P2))
+-- notLegal3 = NAF (P1 `And` (NAF P2))

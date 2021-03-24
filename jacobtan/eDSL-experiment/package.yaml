@@ -23,6 +23,8 @@ dependencies:
 - base >= 4.7 && < 5
 - pretty-simple
 - HList
+- unordered-containers
+- time
 
 library:
   source-dirs: src

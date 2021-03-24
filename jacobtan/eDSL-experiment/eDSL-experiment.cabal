@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 9e06cc064cefa5aa284bba05fe9b641f104755b589198a354843167dd5b71ddb
+-- hash: 8bc0be7e1ab27e2023fa1aab8b1125750c569f10794e1b29f932288818303747
 
 name:           eDSL-experiment
 version:        0.1.0.0
@@ -39,6 +39,8 @@ library
       HList
     , base >=4.7 && <5
     , pretty-simple
+    , time
+    , unordered-containers
   default-language: Haskell2010
 
 executable eDSL-experiment-exe
@@ -53,6 +55,8 @@ executable eDSL-experiment-exe
     , base >=4.7 && <5
     , eDSL-experiment
     , pretty-simple
+    , time
+    , unordered-containers
   default-language: Haskell2010
 
 test-suite eDSL-experiment-test
@@ -68,4 +72,6 @@ test-suite eDSL-experiment-test
     , base >=4.7 && <5
     , eDSL-experiment
     , pretty-simple
+    , time
+    , unordered-containers
   default-language: Haskell2010

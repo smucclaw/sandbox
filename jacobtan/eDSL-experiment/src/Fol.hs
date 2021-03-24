@@ -7,13 +7,13 @@
 
 module Fol where
 
-data family HList (l::[Vars'])
+data family HList (l::[Var'])
 data instance HList '[] = HNil
-data instance HList (x ': xs) = Vars x `HCons` HList xs
+data instance HList (x ': xs) = Var x `HCons` HList xs
 
--- data HList (l::[Vars']) where
+-- data HList (l::[Var']) where
 --     HNil  :: HList '[]
---     HCons :: Vars e -> HList l -> HList (e ': l)
+--     HCons :: Var e -> HList l -> HList (e ': l)
 
 infixr 5 :*
 pattern a :* b = HCons a b
@@ -22,19 +22,22 @@ pattern a :* b = HCons a b
 --   '[] ++ ys = ys
 --   (x : xs) ++ ys = x : (xs++ys)
 
-data Vars' = A' | B'
-data Vars (a :: Vars') where
-  A :: Vars A'
-  B :: Vars B'
+data Var' = X0' | X1'
+data Var (a :: Var') where
+  X0 :: Var X0'
+  X1 :: Var X1'
 
-data Statements = 
-  Statement1
+data Const
+data Func
+data Pred
 
--- type Context' = [Vars']
-data FOL (a :: [Vars']) where
-  Forall :: Vars vars -> FOL bs
+data Formula
 
-x :: HList '[ A', B']
-x = HCons A $ HCons B HNil
-y :: HList '[ A', B']
-y = A :* B :* HNil
+-- type Context' = [Var']
+data FOL (a :: [Var']) where
+  Forall :: Var vars -> Formula -> FOL bs
+
+x :: HList '[ 'X0', 'X1']
+x = HCons X0 $ HCons X1 HNil
+y :: HList '[ 'X0', 'X1']
+y = X0 :* X1 :* HNil

@@ -1,0 +1,8 @@
+.stack-work/
+*~
+*.gfo
+*.pgf
+grammars/RPSTop*
+grammars/RPSLex*
+grammars/*.hs
+src/RPS.hs

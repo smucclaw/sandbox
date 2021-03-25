@@ -1,0 +1,77 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.33.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: 8bc0be7e1ab27e2023fa1aab8b1125750c569f10794e1b29f932288818303747
+
+name:           eDSL-experiment
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/githubuser/eDSL-experiment#readme>
+homepage:       https://github.com/githubuser/eDSL-experiment#readme
+bug-reports:    https://github.com/githubuser/eDSL-experiment/issues
+author:         2jacobtan
+maintainer:     example@example.com
+copyright:      2021 2jacobtan
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    ChangeLog.md
+
+source-repository head
+  type: git
+  location: https://github.com/githubuser/eDSL-experiment
+
+library
+  exposed-modules:
+      Fol
+      Lib
+      SDDD
+      SDDD2
+  other-modules:
+      Paths_eDSL_experiment
+  hs-source-dirs:
+      src
+  build-depends:
+      HList
+    , base >=4.7 && <5
+    , pretty-simple
+    , time
+    , unordered-containers
+  default-language: Haskell2010
+
+executable eDSL-experiment-exe
+  main-is: Main.hs
+  other-modules:
+      Paths_eDSL_experiment
+  hs-source-dirs:
+      app
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      HList
+    , base >=4.7 && <5
+    , eDSL-experiment
+    , pretty-simple
+    , time
+    , unordered-containers
+  default-language: Haskell2010
+
+test-suite eDSL-experiment-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Paths_eDSL_experiment
+  hs-source-dirs:
+      test
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      HList
+    , base >=4.7 && <5
+    , eDSL-experiment
+    , pretty-simple
+    , time
+    , unordered-containers
+  default-language: Haskell2010

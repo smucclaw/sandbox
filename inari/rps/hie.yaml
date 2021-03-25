@@ -1,0 +1,22 @@
+cradle:
+  multi:
+    - path: ./Setup.hs
+      config:
+        cradle:
+          none: {}
+    - path: "./grammars"
+      config:
+        cradle:
+          none:
+    - path: "./"
+      config:
+        cradle:
+          stack:
+            - path: "./.stack-work/"
+              component: "rps:lib"
+
+            - path: "./src"
+              component: "rps:lib"
+
+            - path: "./app/Main.hs"
+              component: "rps:exe:rps-exe"

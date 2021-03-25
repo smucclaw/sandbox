@@ -1,10 +1,10 @@
-name:                haskell-toys
+name:                eDSL-experiment
 version:             0.1.0.0
-github:              "anka-213/haskell-toys"
+github:              "githubuser/eDSL-experiment"
 license:             BSD3
-author:              "Andreas Källberg"
-maintainer:          "anka.213@gmail.com"
-copyright:           "(c) 2019 Andreas Källberg"
+author:              "2jacobtan"
+maintainer:          "example@example.com"
+copyright:           "2021 2jacobtan"
 
 extra-source-files:
 - README.md
@@ -17,20 +17,20 @@ extra-source-files:
 # To avoid duplicated efforts in documentation and dealing with the
 # complications of embedding Haddock markup inside cabal files, it is
 # common to point users to the README.md file.
-description:         Please see the README on GitHub at <https://github.com/anka-213/haskell-toys#readme>
+description:         Please see the README on GitHub at <https://github.com/githubuser/eDSL-experiment#readme>
 
 dependencies:
 - base >= 4.7 && < 5
-- containers
-- prettyprinter
-- bound
-- deriving-compat
+- pretty-simple
+- HList
+- unordered-containers
+- time
 
 library:
   source-dirs: src
 
 executables:
-  haskell-toys-exe:
+  eDSL-experiment-exe:
     main:                Main.hs
     source-dirs:         app
     ghc-options:
@@ -38,10 +38,10 @@ executables:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - haskell-toys
+    - eDSL-experiment
 
 tests:
-  haskell-toys-test:
+  eDSL-experiment-test:
     main:                Spec.hs
     source-dirs:         test
     ghc-options:
@@ -49,4 +49,4 @@ tests:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - haskell-toys
+    - eDSL-experiment

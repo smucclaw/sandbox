@@ -18,10 +18,7 @@
 # resolver: ./custom-snapshot.yaml
 # resolver: https://example.com/snapshots/2018-01-01.yaml
 resolver:
-  url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/17/5.yaml
-
-# ghc-options:
-#   "$everything":  -fwrite-ide-info -hiedir=/Users/anka/.cache/hiedb/
+  url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/17/7.yaml
 
 # User packages to be built.
 # Various formats can be used as shown in the example below.
@@ -44,6 +41,8 @@ packages:
 #   commit: e7b331f14bcffb8367cd58fbfc8b40ec7642100a
 #
 # extra-deps: []
+extra-deps:
+  - HList-0.5.0.0@sha256:7d7a0bee8d01a7e0e10bf96c5214a21bebae3ecfc02d14fc13bf75458b38ac43,7137
 
 # Override default flag values for local packages and extra-deps
 # flags: {}
@@ -68,3 +67,5 @@ packages:
 #
 # Allow a newer minor version of GHC than the snapshot specifies
 # compiler-check: newer-minor
+
+allow-newer: true

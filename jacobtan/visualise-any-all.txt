@@ -1,0 +1,2 @@
+all [All1,All2,(any [Any1,Any2,(all [All3,All4])])]
+

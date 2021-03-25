@@ -26,6 +26,41 @@ main = do
 -- rule 2: persons whose names start with "b" and are below the age of the magic number times 3
 --         are allowed to buy vanilla ice cream on any day.
 
+-- to say this, we need the following semantics:
+-- variable assignments: binding "magic number" to 7
+-- mathematical arithmetic: multiply 7 by 3
+-- entities/records: persons have names … and ages
+-- enums/sum types: ice creams can be chocolate or vanilla
+-- deontics: an entity may or may not do something when a predicate is met
+-- predicates: given a world, return a boolean
+-- temporals: dates - weekdays -- etc
+-- temporals: calculate the age based on record date-of-birth
+
+-- next up: semantics for
+-- - relations
+-- - semantic for LTL/CTL expressions
+
+-- from this we can now do inferences and other kinds of declarative-style reasoning, like, on what worldDate will someone be 21?
+
+
+class Modality a where
+  box     :: a
+  diamond :: a
+
+data TemporalModals = TAlways | TOnce | TEventually
+  deriving (Show, Read, Eq)
+
+data DeonticModals = DMust | DMay | DShant
+  deriving (Show, Read, Eq)
+
+instance Modality TemporalModals where
+  box     = TAlways
+  diamond = TOnce
+
+instance Modality DeonticModals where
+  box     = DMust
+  diamond = DMay
+
 data Rule = MkRule EntQualifier DeonticExpr ActionExpr WhenWorld
 
 rule1 :: Rule
@@ -163,21 +198,13 @@ evalRule (MkRule eq de (MkAE aelabel aeq) ww) world entity actionDetails =
 
 type EntityScenario = Entity
 
--- to say this, we need the following semantics:
--- variable assignments: binding "magic number" to 7
--- mathematical arithmetic: multiply 7 by 3
--- entities/records: persons have names … and ages
--- enums/sum types: ice creams can be chocolate or vanilla
--- deontics: an entity may or may not do something when a predicate is met
--- predicates: given a world, return a boolean
--- temporals: dates - weekdays -- etc
--- temporals: calculate the age based on record date-of-birth
 
 -- -XOverloadedLists !
 intVars' :: IntVars = [("magic number", 7)]
 
 data Person = Person { personName :: String, personDob :: Date }
 
+-- suggest using the time library for this rather than rolling our own
 age :: Date -> Date -> Int
 age dob@(Date y0 m0 d0) today@(Date y1 m1 d1) =
   (-) <$> today <*> dob

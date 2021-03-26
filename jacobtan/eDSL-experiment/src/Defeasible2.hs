@@ -7,8 +7,6 @@
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE AllowAmbiguousTypes #-}
-{-# LANGUAGE FunctionalDependencies #-}
-{-# LANGUAGE UndecidableInstances #-}
 
 module Defeasible2 where
 
@@ -17,7 +15,7 @@ data IsQri = Qri | NotQri
 data IsDeductible = Deductible | NotDeductible
 data IsDeductible' (r :: IsDeductible)
 
-class Interest (a :: IsPersonal) (b :: IsQri) (r :: IsDeductible) | a b -> r where
+class Interest (a :: IsPersonal) (b :: IsQri) (r :: IsDeductible) where
   deductible :: Bool
   deductibleT :: IsDeductible' r
   deductibleT = undefined

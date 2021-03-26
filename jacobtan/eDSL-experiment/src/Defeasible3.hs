@@ -7,8 +7,6 @@
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE AllowAmbiguousTypes #-}
-{-# LANGUAGE FunctionalDependencies #-}
-{-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
 module Defeasible3 where
@@ -27,7 +25,7 @@ instance BDeductible Deductible where
 instance BDeductible NotDeductible where
   bDeductible = False
 
-class BDeductible r => CDeductible a (r :: IsDeductible) | a -> r where
+class BDeductible r => CDeductible a (r :: IsDeductible) where
   deductible :: Bool
   deductible = bDeductible @r
   deductibleT :: IsDeductible' r

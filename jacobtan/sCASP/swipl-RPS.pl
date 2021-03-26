@@ -1,7 +1,10 @@
-#abducible player(X).
-#abducible game(X).
-#abducible participates_in(X,Y).
-#abducible throws(X,Y).
+player(tom).
+player(dick).
+game(myGame).
+participates_in(myGame,tom).
+participates_in(myGame,dick).
+throws(rock,tom).
+throws(scissors,dick).
 
 sign(rock).
 sign(paper).
@@ -21,4 +24,4 @@ winner(Player,Game) :-
     beats(Sign,Other_Sign),
     Player \= Other_Player.
 
-?- winner(tom,myGame).
+% ?- winner(tom,myGame).

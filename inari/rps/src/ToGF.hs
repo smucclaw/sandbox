@@ -117,7 +117,8 @@ aggregateSubj transforms that list of lists into
 
 groupBy sameSubj returns this:
 
-[[ RPS is a game ], 
+[
+[ RPS is a game ], 
 [ A and C participate in RPS , A and C play ], 
 [ A throws rock ], 
 [ C throws scissors], 

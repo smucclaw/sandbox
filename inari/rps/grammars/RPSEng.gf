@@ -1,5 +1,5 @@
 concrete RPSEng of RPS = open 
-  SyntaxEng, (S=SyntaxEng), (P=ParadigmsEng), (C=ConjunctionEng), SymbolicEng, ExtendEng in {
+  SyntaxEng, (S=SyntaxEng), (P=ParadigmsEng), (C=ConjunctionEng), SymbolicEng, ExtendEng, Prelude in {
   lincat
     Statement = S ;
     [Statement] = BulletsOrInline => ListS ;
@@ -46,24 +46,30 @@ concrete RPSEng of RPS = open
           } ;
 
     -- : (a1, a2 : Atom) -> (obj : Arg) -> (subjs : [Arg]) -> Statement ;
-    AggregatePred12 p q obj subjs =
+    AggregatePred12 p1 p2 obj subjs =
       let subj : NP = mkNP and_Conj subjs 
-       in case <p.atype, q.atype> of {
+       in case <p1.atype, p2.atype> of {
             <ACN, AN2> => 
-              let comp : CN = mkCN q.n2 obj ;
-               in mkS (mkCl subj (mkVP (C.ConjCN and_Conj (C.BaseCN p.cn comp)))) ;
+              let comp : CN = mkCN p2.n2 obj ;
+               in mkS (mkCl subj (mkVP (C.ConjCN and_Conj (C.BaseCN p1.cn comp)))) ;
             <AN2, ACN> => 
-              let comp : CN = mkCN p.n2 obj ;
-               in mkS (mkCl subj (mkVP (C.ConjCN and_Conj (C.BaseCN q.cn comp)))) ;
-            _ => let vps1 = myVPS (pred1 p) ;
-                     vps2 = myVPS (pred2 q obj) ;
-                  in PredVPS subj (ConjVPS and_Conj (BaseVPS vps1 vps2)) 
-          } ;
+              let comp : CN = mkCN p1.n2 obj ;
+               in mkS (mkCl subj (mkVP (C.ConjCN and_Conj (C.BaseCN p2.cn comp)))) ;
+            _ => case <isTransitive p1, isTransitive p2> of {
+                <True,True> => AggregatePred22 p1 p2 obj obj subjs ;
+                <True,False> => let vps1 = myVPS (pred1 p2) ; -- flip order: p1 is actually the transitive one, p2 is intransitive
+                                    vps2 = myVPS (pred2 p1 obj) ;
+                                 in PredVPS subj (ConjVPS and_Conj (BaseVPS vps1 vps2)) ;
+                _ => let vps1 = myVPS (pred1 p1) ;
+                         vps2 = myVPS (pred2 p2 obj) ;
+                      in PredVPS subj (ConjVPS and_Conj (BaseVPS vps1 vps2)) 
+       }} ;
 
     -- : (a1, a2 : Atom) -> (obj1, obj2, subj : Arg) -> Statement ;
-    AggregatePred22 p q obj1 obj2 subj =
+    AggregatePred22 p q obj1 obj2 subjs =
       let vps1 = myVPS (pred2 p obj1) ;
           vps2 = myVPS (pred2 q obj2) ;
+          subj : NP = mkNP and_Conj subjs 
        in PredVPS subj (ConjVPS and_Conj (BaseVPS vps1 vps2)) ;
 
     -- : Statement -> Statement -> Statement ; -- A wins B if …
@@ -100,6 +106,12 @@ concrete RPSEng of RPS = open
     AType = AN2 | ACN | AV | AV2 ;
 
   oper
+
+    isTransitive : LinAtom -> Bool = \atom -> case atom.atype of {
+      AN2|AV2 => True ;
+      _ => False
+    } ;
+
     if_Conj = and_Conj ** {s2 = "if"} ;
 
     addBullet : S -> S = \s -> s ** {s = "\\*" ++ s.s} ;

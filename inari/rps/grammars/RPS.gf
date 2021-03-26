@@ -30,7 +30,7 @@ abstract RPS = {
 
     --               sleep (intrans. v) -> eat (transitive v) -> pizza       -> [A,C]         -> "A and C sleep and eat pizza"
     AggregatePred12 : Atom              -> Atom               -> (obj:Arg)   -> (subjs:[Arg]) -> Statement ;
-    -- AggregatePred22 : (a1, a2 : Atom) -> (obj1, obj2, subj : Arg) -> Statement ;
+    AggregatePred22 : Atom              -> Atom      -> (obj1, obj2 : Arg)   -> (subjs: [Arg]) -> Statement ;
 
     IfThen : Statement -> Statement -> Statement ; -- A wins B if …
 

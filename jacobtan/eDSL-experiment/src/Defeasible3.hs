@@ -53,8 +53,13 @@ xT = deductibleT @(Interest NotPersonal _)
 yT = deductibleT @(Interest Personal NotQri)
 zT = deductibleT @(Interest Personal Qri)
 
+o = deductible @Other
+oT = deductibleT @Other
+
 main :: IO ()
 main = do
   print x
   print y
   print z
+  putStrLn ""
+  print o

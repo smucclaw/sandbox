@@ -1,4 +1,5 @@
 {-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE NamedFieldPuns #-}
 
 module ToSCASP where
 
@@ -24,7 +25,13 @@ class SCasp x where
   showSClist :: [x] -> Doc ann
   showSClist = vsep . map showSC
 instance SCasp (Program ct Tp) where
-  showSC = showSClist . assertionsOfProgram
+  showSC Program { lexiconOfProgram,classDeclsOfProgram,globalsOfProgram,rulesOfProgram,assertionsOfProgram} =
+    vsep 
+      [
+        showSClist  rulesOfProgram,
+        showSClist assertionsOfProgram
+      ]
+
 
 instance SCasp (Rule Tp) where
   showSC (Rule rulename vardecls ifExp thenExp) =

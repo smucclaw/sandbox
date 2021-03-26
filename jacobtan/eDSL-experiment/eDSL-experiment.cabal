@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 8bc0be7e1ab27e2023fa1aab8b1125750c569f10794e1b29f932288818303747
+-- hash: f0d34bf77940170fe5c5e89b9ba91d8080cd958696b436e5aa9d621f2dc7b213
 
 name:           eDSL-experiment
 version:        0.1.0.0
@@ -27,6 +27,8 @@ source-repository head
 
 library
   exposed-modules:
+      Defeasible
+      Defeasible2
       Fol
       Lib
       SDDD

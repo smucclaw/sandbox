@@ -18,20 +18,25 @@ import qualified Data.Set as S
 -- Type that is used as an index in the GADT
 data SKind = KModel | KExp | KArg | KVar | KAtom
 
--- The actual GADT
+-- The actual GADT (Generalized Abstract Datatype)
 data Tree :: SKind -> * where
-  MExps :: [Tree KExp] -> Tree KModel
+  MExps :: [Exp] -> Model
 
-  EApp :: Tree KAtom -> [Tree KArg] -> Tree KExp
+  EApp :: Atom -> [Arg] -> Exp
 
-  AAtom :: Tree KAtom -> Tree KArg
-  AVar  :: Tree KVar -> Tree KArg
+  AAtom :: Atom -> Arg
+  AVar  :: Var -> Arg
 
-  A :: String -> Tree KAtom
-  V :: String -> Tree KVar
+  A :: String -> Atom
+  V :: String -> Var
 
 deriving instance Show (Tree k)
 
+{-throw(C,rock) -- the string 
+                -- the tree, to which the string is parsed
+ EApp (A "throw") [(AVar (V "C")), (AAtom (A "rock"))]
+
+-}
 -- Shorthands for the GADT
 type Exp = Tree KExp
 type Var = Tree KVar

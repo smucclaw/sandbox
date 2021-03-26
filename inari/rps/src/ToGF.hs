@@ -14,7 +14,6 @@ import PGF (PGF, linearizeAll, readPGF, showExpr)
 import Prettyprinter
 import Prettyprinter.Render.Text (hPutDoc)
 import RPS
-import qualified RPS
 import SCasp
   ( AtomWithArity (AA),
     Model,
@@ -87,14 +86,60 @@ aggregate statements = secondAggr
           | grp <- groupBy sameSubj firstAggr --NB. this is the standard groupBy! We know that "A and C" statements are already next to each other
         ]
 
+{-
+firstAggr gets this as argument:
+* RPS is a game , 
+* A participates in RPS , 
+* A plays , 
+* A throws rock , 
+* C plays , 
+* C participates in RPS , 
+* C throws scissors and 
+* rock beats scissors
+
+groupBy' samePred statements returns this:
+
+[[RPS is a game] , 
+[A participates in RPS , C participates in RPS] , 
+[A plays               , C plays ], 
+[A throws rock] , 
+[C throws scissors],
+[rock beats scissors]]
+
+aggregateSubj transforms that list of lists into
+
+* RPS is a game , 
+* A and C participate in RPS , 
+* A and C play , 
+* A throws rock , 
+* C throws scissors and 
+* rock beats scissors
+
+groupBy sameSubj returns this:
+
+[[ RPS is a game ], 
+[ A and C participate in RPS , A and C play ], 
+[ A throws rock ], 
+[ C throws scissors], 
+[ rock beats scissors]]
+
+aggregatePred transforms that list of lists into
+
+* RPS is a game , 
+* A and C play and participate in RPS , 
+* A throws rock , 
+* C throws scissors and
+* rock beats scissors
+-}
+
 aggregateSubj :: [GArg] -> GStatement -> GStatement
-aggregateSubj subjs (GApp1 pr _subj) = GAggregate1 pr (GListArg subjs)
-aggregateSubj subjs (GApp2 pr _subj obj) = GAggregate2 pr obj (GListArg subjs)
+aggregateSubj subjs (GApp1 pr _subj) = GAggregateSubj1 pr (GListArg subjs)
+aggregateSubj subjs (GApp2 pr _subj obj) = GAggregateSubj2 pr obj (GListArg subjs)
 aggregateSubj _ x = x
 
 aggregatePred :: [GAtom] -> GStatement -> GStatement
-aggregatePred [pr1, pr2] (GAggregate1 _pr subjs) = GAggregatePred11 pr1 pr2 subjs
-aggregatePred [pr1, pr2] (GAggregate2 _pr obj subjs) = GAggregatePred12 pr1 pr2 obj subjs
+aggregatePred [pr1, pr2] (GAggregateSubj1 _pr subjs) = GAggregatePred11 pr1 pr2 subjs
+aggregatePred [pr1, pr2] (GAggregateSubj2 _pr obj subjs) = GAggregatePred12 pr1 pr2 obj subjs
 aggregatePred _ x = x
 
 samePred :: RPS.Tree a -> RPS.Tree a -> Bool
@@ -119,16 +164,16 @@ getPred :: GStatement -> GAtom
 getPred s = case s of
   GApp1 pr _ -> pr
   GApp2 pr _ _ -> pr
-  GAggregate1 pr _ -> pr
-  GAggregate2 pr _ _ -> pr
+  GAggregateSubj1 pr _ -> pr
+  GAggregateSubj2 pr _ _ -> pr
   _ -> error $ "getPred applied to a complex tree " ++ showExpr [] (gf s)
 
 ignorePred :: RPS.Tree a -> RPS.Tree a
 ignorePred s = case s of
   GApp1 _ subj -> GApp2 dummyAtom subj dummyArg
   GApp2 _ subj _ -> GApp2 dummyAtom subj dummyArg
-  GAggregate1 _ subjs -> GAggregate2 dummyAtom dummyArg subjs
-  GAggregate2 _ _ subjs -> GAggregate2 dummyAtom dummyArg subjs
+  GAggregateSubj1 _ subjs -> GAggregateSubj2 dummyAtom dummyArg subjs
+  GAggregateSubj2 _ _ subjs -> GAggregateSubj2 dummyAtom dummyArg subjs
   _ -> composOp ignorePred s
 
 dummyAtom :: GAtom
@@ -173,8 +218,8 @@ createGF model = do
   let (absS, cncS) = mkLexicon model
   writeDoc (mkAbsName lexName) absS
   writeDoc (mkCncName lexName) cncS
-  writeDoc (mkAbsName grName) $ "abstract " <>  grName <> " = RPS," <+> lexName <+> ";"
-  writeDoc (mkCncName grName) $ "concrete " <>  grName <> "Eng of " <> grName <> " = RPSEng, RPSLexiconEng ;"
+  writeDoc (mkAbsName grName) $ "abstract " <> grName <> " = RPS," <+> lexName <+> "** {flags startcat = Statement ;}"
+  writeDoc (mkCncName grName) $ "concrete " <> grName <> "Eng of " <> grName <> " = RPSEng, RPSLexiconEng ;"
 
 writeDoc :: FilePath -> Doc () -> IO ()
 writeDoc name doc = withFile name WriteMode $ \h -> hPutDoc h doc
@@ -226,8 +271,8 @@ data InnerPOS = PN2 String Prep | PN String | PV2 String Prep | PV String
 guessPOS :: AtomWithArity -> POS
 guessPOS aa@(AA str int) = POS str $ case (int, splitOn "_" str) of
   (0, [noun]) -> PN noun
-  (_, ["is", noun, prep]) -> PN2 noun (Just prep)
-  (_, ["is", noun]) -> PN noun
+  (_, ["is", noun, prep]) -> PN2 noun (Just prep) -- e.g. is_participant_in
+  (_, ["is", noun]) -> PN noun                    -- e.g. is_game
   (1, [verb]) -> PV verb
   (2, [verb]) -> PV2 verb Nothing
   (2, [verb, prep]) -> PV2 verb (Just prep)

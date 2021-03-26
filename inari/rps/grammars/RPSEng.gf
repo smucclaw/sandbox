@@ -1,5 +1,5 @@
 concrete RPSEng of RPS = open 
-  SyntaxEng, (P=ParadigmsEng), (C=ConjunctionEng), SymbolicEng, ExtendEng in {
+  SyntaxEng, (S=SyntaxEng), (P=ParadigmsEng), (C=ConjunctionEng), SymbolicEng, ExtendEng in {
   lincat
     Statement = S ;
     [Statement] = BulletsOrInline => ListS ;
@@ -28,11 +28,11 @@ concrete RPSEng of RPS = open
     -- Aggregation functions
 
     -- : Atom -> Arg -> [Arg] -> Statement ; -- A and B are participants in C
-    Aggregate1 isplayer players =
+    AggregateSubj1 isplayer players =
       App1 isplayer (mkNP and_Conj players) ;
 
     -- : Atom -> Arg -> [Arg] -> Statement ; -- A and B are participants in C
-    Aggregate2 throws rock players =
+    AggregateSubj2 throws rock players =
       App2 throws (mkNP and_Conj players) rock ;
 
     -- : (a1, a2 : Atom) -> (subj : [Arg]) -> Statement ;
@@ -104,18 +104,26 @@ concrete RPSEng of RPS = open
 
     addBullet : S -> S = \s -> s ** {s = "\\*" ++ s.s} ;
 
-    LinAtom : Type = {n2 : N2 ; cn : CN ; v : SyntaxEng.V ; v2 : V2 ; atype : AType} ;
-    dummyV : SyntaxEng.V = P.mkV "dummy" ;
-    dummyV2 : V2 = P.mkV2 "dummy" ;
-    dummyN2 : N2 = P.mkN2 (P.mkN "dummy") ;
-    dummyCN : CN = mkCN dummyN2 ;
-    dummyAtom : LinAtom = {cn = dummyCN ; v = dummyV ; v2 = dummyV2 ; n2 = dummyN2 ; atype = ACN};
+    LinAtom : Type = {
+      n2 : N2 ; 
+      cn : CN ; 
+      v  : S.V ; 
+      v2 : V2 ; 
+      atype : AType
+      } ; 
+    dummyAtom : LinAtom = let dummyN2 : N2 = P.mkN2 (P.mkN "dummy") in {
+      cn = mkCN dummyN2 ; 
+      v  = P.mkV "dummy" ;
+      v2 = P.mkV2 "dummy" ;
+      n2 = dummyN2 ; 
+      atype = ACN
+      } ;
     mkAtom = overload {
-      mkAtom : CN -> LinAtom = \cn -> dummyAtom ** {cn = cn ; atype = ACN} ;
-      mkAtom : N -> LinAtom = \n -> dummyAtom ** {cn = mkCN n ; atype = ACN} ;
-      mkAtom : SyntaxEng.V -> LinAtom = \v -> dummyAtom ** {v = v ; atype = AV} ;
-      mkAtom : V2 -> LinAtom = \v2 -> dummyAtom ** {v2 = v2 ; atype = AV2} ;
-      mkAtom : N2 -> LinAtom = \n2 -> dummyAtom ** {n2 = n2 ; atype = AN2} ;
+      mkAtom : CN  -> LinAtom = \cn -> dummyAtom ** {cn = cn ; atype = ACN} ;
+      mkAtom : N   -> LinAtom = \n  -> dummyAtom ** {cn = mkCN n ; atype = ACN} ;
+      mkAtom : S.V -> LinAtom = \v  -> dummyAtom ** {v  = v ; atype = AV} ;
+      mkAtom : V2  -> LinAtom = \v2 -> dummyAtom ** {v2 = v2 ; atype = AV2} ;
+      mkAtom : N2  -> LinAtom = \n2 -> dummyAtom ** {n2 = n2 ; atype = AN2} ;
     } ;
 
     pred1 : LinAtom -> VP = \atom -> case atom.atype of {

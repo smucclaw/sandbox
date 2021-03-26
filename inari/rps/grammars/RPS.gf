@@ -11,21 +11,25 @@ abstract RPS = {
 
   fun
     -- Direct translation from s(CASP)
-    App1 : Atom -> Arg -> Statement ;
-    App2 : Atom -> (x, y : Arg) -> Statement ;
+    App1 : Atom               -> (subj:Arg) -> Statement ; -- A is a player
+    App2 : Atom -> (obj:Arg)  -> (subj:Arg) -> Statement ; -- A is a participant in RPS
 
     AAtom : Atom -> Arg ;
     AVar : Var -> Arg ;
     
     V : String -> Var ;
 
-    -- Aggregation functions, manually written
-    -- Transformations from the direct s(CASP ) functions to these need to be manually written in Haskell
-    Aggregate1 : Atom -> [Arg] -> Statement ;        -- A and C are players
-    Aggregate2 : Atom -> Arg -> [Arg] -> Statement ; -- A and C are participants in B
 
-    AggregatePred11 : (a1, a2 : Atom) -> (subjs : [Arg]) -> Statement ;
-    AggregatePred12 : (a1, a2 : Atom) -> (obj : Arg) -> (subjs : [Arg]) -> Statement ;
+    -- Aggregation functions, manually written
+    -- Transformations from the direct s(CASP) functions to these need to be manually written in Haskell
+    AggregateSubj1 : Atom              -> (subjs:[Arg]) -> Statement ; -- A and C are players
+    AggregateSubj2 : Atom -> (obj:Arg) -> (subjs:[Arg]) -> Statement ; -- A and C are participants in RPS
+
+    --                  sleep -> walk  -> [A,C] -> "A and C sleep and walk" 
+    AggregatePred11 :  Atom   -> Atom  -> (subjs:[Arg]) -> Statement ; 
+
+    --               sleep (intrans. v) -> eat (transitive v) -> pizza       -> [A,C]         -> "A and C sleep and eat pizza"
+    AggregatePred12 : Atom              -> Atom               -> (obj:Arg)   -> (subjs:[Arg]) -> Statement ;
     -- AggregatePred22 : (a1, a2 : Atom) -> (obj1, obj2, subj : Arg) -> Statement ;
 
     IfThen : Statement -> Statement -> Statement ; -- A wins B if …
@@ -39,3 +43,4 @@ abstract RPS = {
     dummyAtom : Atom ;
     
 }
+

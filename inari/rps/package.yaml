@@ -1,6 +1,6 @@
 name:                rps
 version:             0.1.0.0
-github:              "https://github.com/smucclaw/sandbox/tree/default/inari/rps"
+#github:              "https://github.com/smucclaw/sandbox/tree/default/inari/rps"
 license:             BSD3
 author:              "Inari Listenmaa"
 maintainer:          "inari.listenmaa@gmail.com"

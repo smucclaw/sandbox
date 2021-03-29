@@ -255,7 +255,9 @@ concrEntry (POS name p) = hsep [pretty name, "=", "mkAtom", parens $ innerLex p,
     innerLex :: InnerPOS -> Doc ()
     innerLex (PN2 n pr) =
       "mkN2" <+> parens (innerLex (PN n))
-        <+> maybe "possess" pretty pr <> "_Prep"
+        <+> case pr of
+          Nothing -> "possess_Prep"
+          Just prep -> "(mkPrep \"" <> pretty prep <> "\")"
     innerLex (PN n) = "mkN" <+> viaShow n
     innerLex (PV2 v pr) = "mkV2" <+> parens (innerLex (PV v))
       <+> case pr of
@@ -272,8 +274,10 @@ data InnerPOS = PN2 String Prep | PN String | PV2 String Prep | PV String
 guessPOS :: AtomWithArity -> POS
 guessPOS aa@(AA str int) = POS str $ case (int, splitOn "_" str) of
   (0, [noun]) -> PN noun
-  (_, ["is", noun, prep]) -> PN2 noun (Just prep) -- e.g. is_participant_in
-  (_, ["is", noun]) -> PN noun                    -- e.g. is_game
+  (2, ["is", noun, prep]) -> PN2 noun (Just prep) -- e.g. is_participant_in
+  (2, ["is", noun]) -> PN2 noun Nothing           -- e.g. is_winner
+  (1, ["is", noun]) -> PN noun                    -- e.g. is_game
+  (1, ["is", noun, _]) -> PN noun                 -- for completeness' sake
   (1, [verb]) -> PV verb
   (2, [verb]) -> PV2 verb Nothing
   (2, [verb, prep]) -> PV2 verb (Just prep)

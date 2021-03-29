@@ -1,16 +1,12 @@
 cabal-version: 1.24
 
--- This file has been generated from package.yaml by hpack version 0.33.0.
+-- This file has been generated from package.yaml by hpack version 0.34.2.
 --
 -- see: https://github.com/sol/hpack
---
--- hash: 076bd9e4f426e0234dbd2daaadcd4d2862a4acd32a5a221d3290a3724b2048c5
 
 name:           rps
 version:        0.1.0.0
 description:    Please see the README on GitHub at <https://github.com/githubuser/rps#readme>
-homepage:       https://github.com/https://github.com/smucclaw/sandbox/tree/default/inari/rps#readme
-bug-reports:    https://github.com/https://github.com/smucclaw/sandbox/tree/default/inari/rps/issues
 author:         Inari Listenmaa
 maintainer:     inari.listenmaa@gmail.com
 copyright:      2021 Inari Listenmaa
@@ -20,10 +16,6 @@ extra-source-files:
     README.md
     grammars/RPS.gf
 
-source-repository head
-  type: git
-  location: https://github.com/https://github.com/smucclaw/sandbox/tree/default/inari/rps
-
 custom-setup
   setup-depends:
       Cabal >=1.10
@@ -32,8 +24,11 @@ custom-setup
 
 library
   exposed-modules:
+      GenerateLexicon
+      L4ToGF
       SCasp
-      ToGF
+      SCaspToGF
+      TreeTransform
   other-modules:
       RPS
   hs-source-dirs:

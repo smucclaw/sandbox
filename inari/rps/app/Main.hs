@@ -1,7 +1,7 @@
 module Main where
 
 import SCasp ( parseModel )
-import ToGF ( nlg, nlgModels )
+import SCaspToGF ( nlg, nlgModels )
 import Data.Either (rights)
 
 main :: IO ()

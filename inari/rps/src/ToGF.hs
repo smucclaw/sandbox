@@ -63,29 +63,6 @@ wrap t ss = case ss of
 ----------------------------------------------------------------------
 -- GF tree transformations
 
-aggregate :: [GStatement] -> [GStatement]
-aggregate statements = secondAggr
-  where
-    firstAggr =
-      [ case grp of
-          [] -> error "aggregate: empty list"
-          [x] -> x
-          x : _ -> aggregateSubj (map getSubj grp) x
-        | grp <- groupBy' samePred statements
-      ]
-    secondAggr =
-      concat
-        [ case grp of
-            [] -> error "aggregate: empty list"
-            [x] -> [x]
-            x : _ ->
-              case aggregatePred (map getPred grp) x of
-                y
-                  | x == y -> grp
-                  | otherwise -> [y]
-          | grp <- groupBy sameSubj firstAggr --NB. this is the standard groupBy! We know that "A and C" statements are already next to each other
-        ]
-
 {-
 firstAggr gets this as argument:
 * RPS is a game , 
@@ -100,7 +77,7 @@ firstAggr gets this as argument:
 groupBy' samePred statements returns this:
 
 [[RPS is a game] , 
-[A participates in RPS , C participates in RPS] , 
+[A participates in RPS , C participates in RPS] ,
 [A plays               , C plays ], 
 [A throws rock] , 
 [C throws scissors],
@@ -133,15 +110,47 @@ aggregatePred transforms that list of lists into
 * rock beats scissors
 -}
 
+aggregate :: [GStatement] -> [GStatement]
+aggregate statements = secondAggr
+  where
+    firstAggr =
+      [ case grp of
+          [] -> error "aggregate: empty list"
+          [x] -> x
+          x : _ -> aggregateSubj (map getSubj grp) x
+        | grp <- groupBy' samePred statements
+      ]
+    secondAggr =
+      concat
+        [ case grp of -- grp = [ A and C participate in RPS , A and C play ],
+            [] -> error "aggregate: empty list"
+            [x] -> [x]
+            x : _ ->
+              case aggregatePred (map getPred grp) x of -- preds = [participate, play]
+                resultStatement
+                  | x == resultStatement -> grp -- aggregatePred didn't do anything :(
+                  | otherwise -> [resultStatement]
+          | grp <- groupBy sameSubj firstAggr --NB. this is the standard groupBy! We know that "A and C" statements are already next to each other
+        ]
+
+
 aggregateSubj :: [GArg] -> GStatement -> GStatement
 aggregateSubj subjs (GApp1 pr _subj) = GAggregateSubj1 pr (GListArg subjs)
 aggregateSubj subjs (GApp2 pr _subj obj) = GAggregateSubj2 pr obj (GListArg subjs)
 aggregateSubj _ x = x
 
-aggregatePred :: [GAtom] -> GStatement -> GStatement
-aggregatePred [pr1, pr2] (GAggregateSubj1 _pr subjs) = GAggregatePred11 pr1 pr2 subjs
-aggregatePred [pr1, pr2] (GAggregateSubj2 _pr obj subjs) = GAggregatePred12 pr1 pr2 obj subjs
+aggregatePred :: [GPred] -> GStatement -> GStatement
+aggregatePred [pr1, pr2] (GAggregateSubj1 _ subjs) = GAggregatePred pr1 pr2 subjs
+aggregatePred [pr1, pr2] (GAggregateSubj2 _ _ subjs) = GAggregatePred pr1 pr2 subjs
 aggregatePred _ x = x
+
+getPred :: GStatement -> GPred
+getPred s = case s of
+  GApp1 pr _ -> GIntransPred pr
+  GApp2 pr arg _ -> GTransPred pr arg
+  GAggregateSubj1 pr _ -> GIntransPred pr
+  GAggregateSubj2 pr arg _ -> GTransPred pr arg
+  _ -> error $ "getPred applied to a complex tree " ++ showExpr [] (gf s)
 
 samePred :: RPS.Tree a -> RPS.Tree a -> Bool
 samePred s1 s2 = ignoreSubj s1 == ignoreSubj s2
@@ -161,13 +170,6 @@ ignoreSubj s = case s of
   GApp2 pr _ obj -> GApp2 pr dummyArg obj
   _ -> composOp ignoreSubj s
 
-getPred :: GStatement -> GAtom
-getPred s = case s of
-  GApp1 pr _ -> pr
-  GApp2 pr _ _ -> pr
-  GAggregateSubj1 pr _ -> pr
-  GAggregateSubj2 pr _ _ -> pr
-  _ -> error $ "getPred applied to a complex tree " ++ showExpr [] (gf s)
 
 ignorePred :: RPS.Tree a -> RPS.Tree a
 ignorePred s = case s of

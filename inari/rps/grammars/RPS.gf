@@ -22,15 +22,20 @@ abstract RPS = {
 
     -- Aggregation functions, manually written
     -- Transformations from the direct s(CASP) functions to these need to be manually written in Haskell
+                     -- sleep          -> [A,C]       
     AggregateSubj1 : Atom              -> (subjs:[Arg]) -> Statement ; -- A and C are players
     AggregateSubj2 : Atom -> (obj:Arg) -> (subjs:[Arg]) -> Statement ; -- A and C are participants in RPS
 
-    --                  sleep -> walk  -> [A,C] -> "A and C sleep and walk" 
-    AggregatePred11 :  Atom   -> Atom  -> (subjs:[Arg]) -> Statement ; 
+  cat
 
-    --               sleep (intrans. v) -> eat (transitive v) -> pizza       -> [A,C]         -> "A and C sleep and eat pizza"
-    AggregatePred12 : Atom              -> Atom               -> (obj:Arg)   -> (subjs:[Arg]) -> Statement ;
-    AggregatePred22 : Atom              -> Atom      -> (obj1, obj2 : Arg)   -> (subjs: [Arg]) -> Statement ;
+    Pred ;
+
+  fun
+    
+    TransPred : Atom -> Arg -> Pred ;
+    IntransPred : Atom -> Pred ;
+
+    AggregatePred : Pred -> Pred -> (subjs : [Arg]) -> Statement ;
 
     IfThen : Statement -> Statement -> Statement ; -- A wins B if …
 

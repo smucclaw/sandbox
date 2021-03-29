@@ -35,42 +35,31 @@ concrete RPSEng of RPS = open
     AggregateSubj2 throws rock players =
       App2 throws (mkNP and_Conj players) rock ;
 
-    -- : (a1, a2 : Atom) -> (subj : [Arg]) -> Statement ;
-    AggregatePred11 p q subjs = 
-      let subj : NP = mkNP and_Conj subjs 
-       in case <p.atype, q.atype> of {
-            <ACN, ACN> => mkS (mkCl subj (mkVP (C.ConjCN and_Conj (C.BaseCN p.cn q.cn)))) ;
-            _ => let vps1 = myVPS (pred1 p) ;
-                     vps2 = myVPS (pred1 q) ;
-                  in PredVPS subj (ConjVPS and_Conj (BaseVPS vps1 vps2)) 
-          } ;
+  lincat
+    Pred = LinPred ;
+  lin
+    TransPred atom arg = {atom = atom ; arg = arg ; hasArg = True} ;
+    IntransPred atom = {atom = atom ; arg = nothing_NP ; hasArg = False} ;
 
-    -- : (a1, a2 : Atom) -> (obj : Arg) -> (subjs : [Arg]) -> Statement ;
-    AggregatePred12 p1 p2 obj subjs =
-      let subj : NP = mkNP and_Conj subjs 
-       in case <p1.atype, p2.atype> of {
+    AggregatePred p1 p2 subjs = 
+      let subj : NP = mkNP and_Conj subjs ;
+          vps1 : VPS = mkPred p1 ;
+          vps2 : VPS = mkPred p2 ;
+          cnConjS : CN -> CN -> S = \cn1,cn2 -> mkS (mkCl subj (C.ConjCN and_Conj (C.BaseCN cn1 cn2))) ;
+       in case <p1.atom.atype, p2.atom.atype> of {
+            <ACN, ACN> => cnConjS p1.atom.cn p2.atom.cn ;
             <ACN, AN2> => 
-              let comp : CN = mkCN p2.n2 obj ;
-               in mkS (mkCl subj (mkVP (C.ConjCN and_Conj (C.BaseCN p1.cn comp)))) ;
+              let comp : CN = mkCN p2.atom.n2 p2.arg ;
+               in cnConjS p1.atom.cn comp ;
             <AN2, ACN> => 
-              let comp : CN = mkCN p1.n2 obj ;
-               in mkS (mkCl subj (mkVP (C.ConjCN and_Conj (C.BaseCN p2.cn comp)))) ;
-            _ => case <isTransitive p1, isTransitive p2> of {
-                <True,True> => AggregatePred22 p1 p2 obj obj subjs ;
-                <True,False> => let vps1 = myVPS (pred1 p2) ; -- flip order: p1 is actually the transitive one, p2 is intransitive
-                                    vps2 = myVPS (pred2 p1 obj) ;
-                                 in PredVPS subj (ConjVPS and_Conj (BaseVPS vps1 vps2)) ;
-                _ => let vps1 = myVPS (pred1 p1) ;
-                         vps2 = myVPS (pred2 p2 obj) ;
-                      in PredVPS subj (ConjVPS and_Conj (BaseVPS vps1 vps2)) 
-       }} ;
-
-    -- : (a1, a2 : Atom) -> (obj1, obj2, subj : Arg) -> Statement ;
-    AggregatePred22 p q obj1 obj2 subjs =
-      let vps1 = myVPS (pred2 p obj1) ;
-          vps2 = myVPS (pred2 q obj2) ;
-          subj : NP = mkNP and_Conj subjs 
-       in PredVPS subj (ConjVPS and_Conj (BaseVPS vps1 vps2)) ;
+              let comp : CN = mkCN p1.atom.n2 p1.arg ;
+               in cnConjS p2.atom.cn comp ;
+            <AN2, AN2> => 
+              let comp1 : CN = mkCN p1.atom.n2 p1.arg ;
+                  comp2 : CN = mkCN p2.atom.n2 p2.arg ;
+               in cnConjS comp1 comp2 ;
+            _ => PredVPS subj (ConjVPS and_Conj (BaseVPS vps1 vps2)) 
+          } ;
 
     -- : Statement -> Statement -> Statement ; -- A wins B if …
     IfThen = mkS if_Conj ;
@@ -119,7 +108,7 @@ concrete RPSEng of RPS = open
     LinAtom : Type = {
       n2 : N2 ; 
       cn : CN ; 
-      v  : S.V ; 
+      v  : S.V ; -- SyntaxEng.V = intransitive verb
       v2 : V2 ; 
       atype : AType
       } ; 
@@ -153,4 +142,11 @@ concrete RPSEng of RPS = open
             AV2 => mkVP atom.v2  obj } ; -- throws rock
 
     myVPS : VP -> VPS = \vp -> MkVPS (mkTemp presentTense simultaneousAnt) positivePol vp ;
+
+    LinPred : Type = {atom : LinAtom ; arg : NP ; hasArg : Bool} ;
+
+    mkPred : LinPred -> VPS = \pred ->
+      myVPS (case pred.hasArg of {
+            True => pred2 pred.atom pred.arg ;
+            False => pred1 pred.atom }) ;
 }

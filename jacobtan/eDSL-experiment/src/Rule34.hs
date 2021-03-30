@@ -33,7 +33,7 @@ class CAcceptability (p1 :: P1) (p2 :: P2) (p3 :: P3) (p4 :: P4) (p5 :: P5) (p6 
     queryAcceptable = undefined 
 
 -- para 1
-instance r ~ MustNot => CAcceptability P1MustNot p2 p3 p4 p5 p6 P7NA r
+instance r ~ MustNot => CAcceptability P1MustNot p2 p3 p4 P5NA p6 P7NA r
 -- para 2
 instance r ~ May => CAcceptability P1NA P2May p3 p4 p5 p6 P7NA r
 -- para 3
@@ -47,7 +47,19 @@ instance r ~ MustNot => CAcceptability p1 P2NA P3NA P4NA P5NA P6MustNot P7NA r
 -- para 7
 instance r ~ May => CAcceptability p1 p2 p3 p4 p5 p6 P7May r
   
-mayIAccept = queryAcceptable @_ @_ @_ @_ @_ @_ @P7May
+-- mayIAccept1 = queryAcceptable @P1MustNot @_ @_ @_ @_ @_ @_
+-- mayIAccept1na = queryAcceptable @P1NA @_ @_ @_ @_ @_ @_
+
+-- mayIAccept2 = queryAcceptable @_ @P2May @_ @_ @_ @_ @_
+-- mayIAccept2' = queryAcceptable @P1NA @P2May @_ @_ @_ @_ @_
+-- mayIAccept2na = queryAcceptable @_ @P2NA @_ @_ @_ @_ @_
+
+-- mayIAccept5 = queryAcceptable @_ @_ @_ @_ @P5May @_ @P7NA
+
+mayIAccept7 = queryAcceptable @_ @_ @_ @_ @_ @_ @P7May
+
+
+-- random stuff
 
 type family Acc (a :: Bool) :: Acceptability where
   Acc False = MustNot

@@ -41,13 +41,13 @@ class CAcceptability (p1 :: P1) (p2 :: P2) (p3 :: P3) (p4 :: P4) (p5 :: P5) (p6 
 -- para 1
 instance (i ~ 1, r ~ MustNot) => CAcceptability P1MustNot p2 p3 p4 P5NA p6 P7NA r i
 -- para 2
-instance (i ~ 2, r ~ May) => CAcceptability P1NA P2May p3 p4 p5 p6 P7NA r i
+instance (i ~ 2, r ~ May) => CAcceptability P1NA P2May p3 p4 p5 p6 p7 r i
 -- para 3
-instance (i ~ 3, r ~ May) => CAcceptability P1NA p2 P3May p4 p5 p6 P7NA r i
+instance (i ~ 3, r ~ May) => CAcceptability P1NA p2 P3May p4 p5 p6 p7 r i
 -- para 4
-instance (i ~ 4, r ~ May) => CAcceptability P1NA p2 p3 P4May p5 p6 P7NA r i
+instance (i ~ 4, r ~ May) => CAcceptability P1NA p2 p3 P4May p5 p6 p7  r i
 -- para 5
-instance (i ~ 5, r ~ May) => CAcceptability p1 p2 p3 p4 P5May p6 P7NA r i
+instance (i ~ 5, r ~ May) => CAcceptability p1 p2 p3 p4 P5May p6 p7 r i
 -- para 6
 instance (i ~ 6, r ~ MustNot) => CAcceptability P1NA P2NA P3NA P4NA P5NA P6MustNot P7NA r i
 -- para 7
@@ -62,7 +62,7 @@ instance (i ~ 7, r ~ May) => CAcceptability p1 p2 p3 p4 p5 p6 P7May r i
 
 -- mayIAccept5 = queryAcceptable @_ @_ @_ @_ @P5May @_ @P7NA
 
-mayIAccept7 = queryAcceptable @_ @_ @_ @_ @_ @_ @P7May
+-- mayIAccept7 = queryAcceptable @_ @_ @_ @_ @_ @_ @P7May
 
 -- | Custom queries
 data Pxs (p1 :: P1) (p2 :: P2) (p3 :: P3) (p4 :: P4) (p5 :: P5) (p6 :: P6) (p7 :: P7)
@@ -71,18 +71,18 @@ data Pxs (p1 :: P1) (p2 :: P2) (p3 :: P3) (p4 :: P4) (p5 :: P5) (p6 :: P6) (p7 :
     AssociatedWithBadBusiness :: Pxs P1MustNot p2 p3 p4 p5 p6 p7
     Not'AssociatedWithBadBusiness :: Pxs P1NA p2 p3 p4 p5 p6 p7
     -- para 2
-    SingaporeLawPractice :: Pxs p1 P2May P3NA P4NA P5NA p6 p7
+    SingaporeLawPractice :: Pxs p1 P2May P3NA P4NA P5NA p6 P7NA
     -- para 3
-    BusinessEntity'LawRelated :: Pxs p1 P2NA P3May P4NA P5NA p6 p7
+    BusinessEntity'LawRelated :: Pxs p1 P2NA P3May P4NA P5NA p6 P7NA
     -- para 4
-    BusinessEntity'NotLawRelated'NotLocum :: Pxs p1 P2NA P3NA P4May P5NA p6 p7
+    BusinessEntity'NotLawRelated'NotLocum :: Pxs p1 P2NA P3NA P4May P5NA p6 P7NA
     -- para 5
-    BusinessEntity'NotLawRelated'Locum :: Pxs p1 P2NA P3NA P4NA P5May p6 p7
-    Not'BusinessEntity'NotLawRelated'Locum :: Pxs p1 p2 p3 p4 P5NA p6 p7
+    BusinessEntity'NotLawRelated'Locum :: Pxs p1 P2NA P3NA P4NA P5May p6 P7NA
+    Not'BusinessEntity'NotLawRelated'Locum :: Pxs p1 p2 p3 p4 P5NA p6 P7NA
     -- para 6
     Not'2to5 :: Pxs p1 P2NA P3NA P4NA P5NA p6 p7
     -- para 7
-    ThirdSchedule :: Pxs p1 p2 p3 p4 p5 p6 P7May
+    ThirdSchedule :: Pxs p1 P2NA P3NA P4NA P5NA p6 P7May
     NotThirdSchedule :: Pxs p1 p2 p3 p4 p5 p6 P7NA
 
 (<+>) :: Pxs (p1 :: P1) (p2 :: P2) (p3 :: P3) (p4 :: P4) (p5 :: P5) (p6 :: P6) (p7 :: P7)
@@ -91,10 +91,10 @@ data Pxs (p1 :: P1) (p2 :: P2) (p3 :: P3) (p4 :: P4) (p5 :: P5) (p6 :: P6) (p7 :
 (<+>) _ _ = undefined
 
 foo1 = query $ AssociatedWithBadBusiness <+> Not'BusinessEntity'NotLawRelated'Locum <+> NotThirdSchedule
-foo2 = query $ Not'AssociatedWithBadBusiness <+> SingaporeLawPractice <+> NotThirdSchedule
-foo3 = query $ Not'AssociatedWithBadBusiness <+> BusinessEntity'LawRelated <+> NotThirdSchedule
-foo4 = query $ Not'AssociatedWithBadBusiness <+> BusinessEntity'NotLawRelated'NotLocum <+> NotThirdSchedule
-foo5 = query $ BusinessEntity'NotLawRelated'Locum <+> NotThirdSchedule
+foo2 = query $ Not'AssociatedWithBadBusiness <+> SingaporeLawPractice
+foo3 = query $ Not'AssociatedWithBadBusiness <+> BusinessEntity'LawRelated
+foo4 = query $ Not'AssociatedWithBadBusiness <+> BusinessEntity'NotLawRelated'NotLocum
+foo5 = query BusinessEntity'NotLawRelated'Locum
 foo7 = query ThirdSchedule
 
 -- | experiment (duplicates functionality of `query` in the typeclass)

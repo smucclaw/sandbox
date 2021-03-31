@@ -8,7 +8,8 @@
 {-# LANGUAGE FlexibleInstances #-}
 module Rule34 where
 
-data QueryAcceptable (a :: Acceptability)
+import GHC.TypeLits (Nat)
+data QueryAcceptable (a :: Acceptability) (i :: Nat)
 
 data Acceptability = MustNot | May deriving Show
 
@@ -27,27 +28,27 @@ data P6 = P6MustNot | P6NA
 
 data P7 = P7May | P7NA
 
-class CAcceptability (p1 :: P1) (p2 :: P2) (p3 :: P3) (p4 :: P4) (p5 :: P5) (p6 :: P6) (p7 :: P7) (r :: Acceptability)
+class CAcceptability (p1 :: P1) (p2 :: P2) (p3 :: P3) (p4 :: P4) (p5 :: P5) (p6 :: P6) (p7 :: P7) (r :: Acceptability) (i :: Nat)
   where
-    queryAcceptable :: QueryAcceptable r
+    queryAcceptable :: QueryAcceptable r i
     queryAcceptable = undefined 
 
 -- para 1
-instance r ~ MustNot => CAcceptability P1MustNot p2 p3 p4 P5NA p6 P7NA r
+instance (i ~ 1, r ~ MustNot) => CAcceptability P1MustNot p2 p3 p4 P5NA p6 P7NA r i
 -- para 2
-instance r ~ May => CAcceptability P1NA P2May p3 p4 p5 p6 P7NA r
+instance (i ~ 2, r ~ May) => CAcceptability P1NA P2May p3 p4 p5 p6 P7NA r i
 -- para 3
-instance r ~ May => CAcceptability P1NA p2 P3May p4 p5 p6 P7NA r
+instance (i ~ 3, r ~ May) => CAcceptability P1NA p2 P3May p4 p5 p6 P7NA r i
 -- para 4
-instance r ~ May => CAcceptability P1NA p2 p3 P4May p5 p6 P7NA r
+instance (i ~ 4, r ~ May) => CAcceptability P1NA p2 p3 P4May p5 p6 P7NA r i
 -- para 5
-instance r ~ May => CAcceptability p1 p2 p3 p4 P5May p6 P7NA r
+instance (i ~ 5, r ~ May) => CAcceptability p1 p2 p3 p4 P5May p6 P7NA r i
 -- para 6
-instance r ~ MustNot => CAcceptability p1 P2NA P3NA P4NA P5NA P6MustNot P7NA r
+instance (i ~ 6, r ~ MustNot) => CAcceptability p1 P2NA P3NA P4NA P5NA P6MustNot P7NA r i
 -- para 7
-instance r ~ May => CAcceptability p1 p2 p3 p4 p5 p6 P7May r
+instance (i ~ 7, r ~ May) => CAcceptability p1 p2 p3 p4 p5 p6 P7May r i
   
--- mayIAccept1 = queryAcceptable @P1MustNot @_ @_ @_ @_ @_ @_
+mayIAccept1 = queryAcceptable @P1MustNot @_ @_ @_ @_ @_ @_
 -- mayIAccept1na = queryAcceptable @P1NA @_ @_ @_ @_ @_ @_
 
 -- mayIAccept2 = queryAcceptable @_ @P2May @_ @_ @_ @_ @_

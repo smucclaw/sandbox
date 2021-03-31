@@ -48,7 +48,7 @@ instance (i ~ 6, r ~ MustNot) => CAcceptability p1 P2NA P3NA P4NA P5NA P6MustNot
 -- para 7
 instance (i ~ 7, r ~ May) => CAcceptability p1 p2 p3 p4 p5 p6 P7May r i
   
-mayIAccept1 = queryAcceptable @P1MustNot @_ @_ @_ @_ @_ @_
+-- mayIAccept1 = queryAcceptable @P1MustNot @_ @_ @_ @_ @_ @_
 -- mayIAccept1na = queryAcceptable @P1NA @_ @_ @_ @_ @_ @_
 
 -- mayIAccept2 = queryAcceptable @_ @P2May @_ @_ @_ @_ @_

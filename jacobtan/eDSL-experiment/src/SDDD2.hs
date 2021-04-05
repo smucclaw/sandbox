@@ -104,10 +104,12 @@ rules = [rule1, rule2] :: [Rule] -- please don't tell me we need another @[]
 type EntQualifier = World -> Entity -> Bool
 
 data Entity = EPerson Person
-            -- | EIceCream IceCream -- comment out for now, to avoid warning
+            --- | EIceCream IceCream -- comment out for now, to avoid warning
 
-data DeonticExpr = DMust | DMay | DShant
-  deriving (Show, Eq)
+-- data DeonticExpr = DMust | DMay | DShant
+--   deriving (Show, Eq)
+
+type DeonticExpr = DeonticModals
 
 data ActionExpr = MkAE ActionLabel ActionQualifier
 

@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: bc17d1b7c17279175012adc5a48bfd1bf338fe47e6f8cdce319af7b418f87a21
+-- hash: 30abc1e3326e9be69d9e1510a59737c6e3bc258196a1d9bc1fe3e10167c50dc3
 
 name:           diagrams-sandbox
 version:        0.1.0.0
@@ -26,6 +26,7 @@ source-repository head
 
 library
   exposed-modules:
+      FilterFlow
       Lib
       Prototype
   other-modules:

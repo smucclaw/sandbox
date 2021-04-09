@@ -45,6 +45,7 @@ instance Gate GateRef where
 data GateRef = Bulb'MustNot | Bulb'May | And'MustNot | Or'May | N1 | N2 | M3 | M4 | M5
   deriving (Generic, Show)
 
+-- | unused
 instance Labellable GateInfo where
   toLabelValue = toLabelValue . show
 

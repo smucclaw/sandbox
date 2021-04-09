@@ -85,8 +85,8 @@
 
 % For drawing syntax diagrams
 \newenvironment{syntaxdiagram}[0]
-{\begin{tikzpicture}[%
-node distance=5mm,
+{\noindent\begin{tikzpicture}[%
+node distance=5mm and 10mm,
 >=stealth',
 black!50,
 text=black,
@@ -117,6 +117,28 @@ start,
 },
 junction/.style={circle,inner sep=0pt,minimum size=0pt},]}
 {\end{tikzpicture}}
+
+
+\newcommand{\syndiagSeq}[2]{%
+\graph [use existing nodes] {
+#1 -- #2;
+};
+}
+
+\newcommand{\syndiagAlternative}[4]{%
+\graph[use existing nodes] {
+#1 ->[vh path] #2;
+#3 ->[hv path] #4;
+};
+}
+
+\newcommand{\syndiagBridge}[3]{%
+\graph[use existing nodes] {
+#1 --[vh path] #2;
+#2 ->[hv path] #3;
+};
+}
+
 
 %%% Local Variables: 
 %%% mode: latex

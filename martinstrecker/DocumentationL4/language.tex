@@ -3,136 +3,140 @@
 \subsection{Syntax}
 
 \begin{syntaxdiagram}
-\node[junction] (start) {};
-\node[junction,right=of start] (p1) {};
-\node[nonterminal,right=of p1] (term) {term};
-\node[terminal,below=of term] (plus)  {+};
-\node[junction,right=of term] (p2) {};
-\node[junction,right=of p2] (end) {};
-\node[terminal,below=of plus] (longer)  {longer};
+  \node[nonterminal] (Program) {Program:};
+  \node[junction,right=of Program] (startl1) {};
+  \node[junction,right=of startl1] (bl) {};
+  \node[junction,right=of bl] (l) {};
+  \node[junction,right=of l] (al) {};
+  \node[junction,right=of al] (bcd) {};
+  \node[junction,right=of bcd,xshift=3mm] (cd) {};
+  \node[junction,right=of cd,xshift=3mm] (acd) {};
+  \node[junction,right=of acd] (bvd) {};
+  \node[junction,right=of bvd,xshift=7mm] (vd) {};
+  \node[junction,right=of vd,xshift=7mm] (avd) {};
+  \node[junction,right=of avd] (endl1) {$\cdots$};
+  \node[junction,below=of startl1,yshift=-10mm] (startl2) {};
+  \node[junction,right=of startl2] (brl) {};
+  \node[junction,right=of brl] (rl) {};
+  \node[junction,right=of brl] (rl) {};
+  \node[junction,right=of rl] (arl) {};
+  \node[junction,right=of arl] (bass) {};
+  \node[junction,right=of bass,xshift=3mm] (ass) {};
+  \node[junction,right=of ass,xshift=3mm] (aass) {};
+  \node[junction,right=of aass] (endl2) {$\diamond$};
 
+  \node[nonterminal,below=of l] (Lexicon) {Lexicon};
+  \node[nonterminal,below=of cd] (ClassDecls) {ClassDecls};
+  \node[nonterminal,below=of vd] (GlobalVarDecls) {GlobalVarDecls};
+  \node[nonterminal,below=of rl] (Rules) {Rules};
+  \node[nonterminal,below=of ass] (Assertions) {Assertions};
+  
 \graph [use existing nodes] {
-start -- p1 -> term -- p2 -> end;
+startl1 -- bl -- l -- al -- bcd  -- cd -- acd -- bvd -- vd -- avd -> endl1
+};
+\graph [use existing nodes] {
+startl2 -- brl -- rl -- arl -- bass  -- ass -- aass -> endl2
 };
 
-\graph [use existing nodes] {
-p2 ->[vh path] plus;
-plus ->[hv path] p1;
-p2 ->[vh path] longer;
-longer ->[hv path] p1;
-};
+\syndiagAlternative{bl}{Lexicon}{Lexicon}{al}
+\syndiagAlternative{bcd}{ClassDecls}{ClassDecls}{acd}
+\syndiagAlternative{bvd}{GlobalVarDecls}{GlobalVarDecls}{avd}
+\syndiagAlternative{brl}{Rules}{Rules}{arl}
+\syndiagAlternative{bass}{Assertions}{Assertions}{aass}
 \end{syntaxdiagram}
 
 
-\begin{tikzpicture}[%
-node distance=5mm,
->=stealth',
-black!50,
-text=black,
-graphs/every graph/.style={edges=rounded corners},
-vloop/.style={to path={-- ++(#1,0) |- (\tikztotarget)}},
-hloop/.style={to path={-- ++($(0,0)-(#1,0)$) |- (\tikztotarget)}},
-hv path/.style={to path={-| (\tikztotarget)}},
-vh path/.style={to path={|- (\tikztotarget)}},
-nonterminal/.style={%
-    rectangle,
-    minimum size=6mm,
-    draw=black,
-    %top color=white, % a shading that is white at the top...
-    %bottom color=red!50!black!20, % and something else at the bottom
-    % Font
-    %font=\itshape
-},
-terminal/.style={%
-    rectangle,minimum size=6mm,rounded corners=3mm,
-    draw=black!50,
-    %top color=white,bottom color=black!20,
-},
-start/.style={%
-    circle,inner sep=1pt,minimum size=1pt,fill=white,draw=black!50,
-},
-end/.style={%
-    start,
-},
-junction/.style={circle,inner sep=0pt,minimum size=0pt},
-]
-
-\node[junction] (start) {};
-\node[junction,right=of start] (p1) {};
-\node[nonterminal,right=of p1] (term) {term};
-\node[terminal,below=of term] (plus)  {+};
-\node[junction,right=of term] (p2) {};
-\node[junction,right=of p2] (end) {};
-\node[terminal,below=of plus] (longer)  {longer};
+\begin{syntaxdiagram}
+  \node[nonterminal] (Lexicon) {Lexicon:};
+  \node[junction,right=of Lexicon] (startl1) {};
+  \node[terminal,right=of startl1] (lexicon) {\texttt{lexicon}};
+  \node[junction,right=of lexicon] (bvar) {};
+  \node[terminal,right=of bvar] (var) {\emph{VAR}};
+  \node[terminal,right=of var] (arrow) {\texttt{->}};
+  \node[terminal,right=of arrow] (string) {\emph{string}};
+  \node[junction,right=of string] (astring) {};
+  \node[junction,right=of astring] (end) {};
+  \node[junction,above=of string] (abs) {};
 
 \graph [use existing nodes] {
-start -> p1 -> term -> p2 -> end;
+startl1 -- lexicon -- bvar -- var -- arrow -- string -- astring -> end
 };
+
+\syndiagBridge{astring}{abs}{bvar}
+\end{syntaxdiagram}
+
+\begin{syntaxdiagram}
+  \node[nonterminal] (GlobalVarDecls) {GlobalVarDecls:};
+  \node[junction,right=of GlobalVarDecls] (start) {};
+  \node[junction,right=of start] (bdecl) {};
+  \node[terminal,right=of bdecl] (decl) {\texttt{decl}};
+  \node[nonterminal,right=of decl] (VarDecl) {VarDecl};
+  \node[junction,right=of VarDecl] (aVarDecl) {};
+  \node[junction,right=of aVarDecl] (end) {};
+  \node[junction,above=of VarDecl] (abv) {};
 
 \graph [use existing nodes] {
-term ->[vloop] plus;
-plus ->[hloop] term;
-term ->[vloop] longer;
-longer ->[hloop] term;
+start -- bdecl -- decl -- VarDecl -- aVarDecl -> end
 };
-\end{tikzpicture}
+
+\syndiagBridge{aVarDecl}{abv}{bdecl}
+\end{syntaxdiagram}
+
+\begin{syntaxdiagram}
+  \node[nonterminal] (VarDecl) {VarDecl:};
+  \node[junction,right=of VarDecl] (start) {};
+  \node[junction,right=of start] (bvar) {};
+  \node[terminal,right=of bvar] (var) {\emph{VAR}};
+  \node[terminal,right=of var] (colon) {\texttt{:}};
+  \node[nonterminal,right=of colon] (Tp) {Tp};
+  \node[junction,right=of Tp] (aTp) {};
+  \node[junction,right=of aTp] (end) {};
+
+\graph [use existing nodes] {
+start -- bvar -- var -- colon -- Tp -- aTp -> end
+};
+\end{syntaxdiagram}
+
+\begin{syntaxdiagram}
+  \node[nonterminal] (Rules) {Rules:};
+  \node[junction,right=of Rules] (start) {};
+  \node[junction,right=of start] (brule) {};
+  \node[nonterminal,right=of brule] (Fact) {Fact};
+  \node[junction,right=of Fact] (arule) {};
+  \node[junction,right=of arule] (end) {};
+  \node[junction,above=of Fact] (abfact) {};
+  \node[nonterminal,below=of Fact] (Rule) {Rule};
+
+\graph [use existing nodes] {
+start -- brule -- Fact -- arule -> end
+};
+
+\syndiagBridge{arule}{abfact}{brule}
+%\syndiagAlternative{brule}{Fact}{Fact}{arule}
+\syndiagAlternative{brule}{Rule}{Rule}{arule}
+
+\end{syntaxdiagram}
 
 
+\begin{syntaxdiagram}
+  \node[nonterminal] (Assertions) {Assertions:};
+  \node[junction,right=of Assertions] (start) {};
+  \node[junction,right=of start] (bassert) {};
+  \node[terminal,right=of bassert] (assert) {\texttt{assert}};
+  \node[nonterminal,right=of assert] (expr) {Expr};
+  \node[junction,right=of expr] (aexpr) {};
+  \node[junction,right=of aexpr] (end) {};
+  \node[junction,below=of expr] (blexpr) {};
+  \node[junction,above=of expr] (abexpr) {};
 
-\begin{tikzpicture}[
-  node distance=2mm,
-  text height=1.5ex,
-  text depth=.25ex,
-  nonterminal/.style={
-    % The shape:
-    rectangle,
-    % The size:
-    minimum size=6mm,
-    % The border:
-    very thick,
-    draw=red!50!black!50,
-    % 50% red and 50% black,
-    % and that mixed with 50% white
-    % The filling:
-    top color=white,
-    % a shading that is white at the top...
-    bottom color=red!50!black!20, % and something else at the bottom
-    % Font
-    font=\itshape
-  },
-  terminal/.style={
-    % The shape:
-    rectangle,
-    minimum size=6mm,
-    rounded corners=3mm,
-    % The rest
-    very thick,draw=black!50,
-    top color=white,bottom color=black!20,
-    font=\ttfamily
-  },
-  junction/.style={circle,inner sep=0pt,minimum size=0pt},
-%  >={Stealth[round]},thick,black!50,text=black,
-%  every new ->/.style={shorten >=1pt},
-%  graphs/every graph/.style={edges=rounded corners},
-  skip loop/.style={to path={-- ++(0,#1) -| (\tikztotarget)}}
-  ]
-\node (ui1) [nonterminal] {unsigned integer};
-\node (pt1) [junction,right=of ui1] {};
-%\path (ui1) edge [--] (pt1);
-\node (dot) [terminal,right=of pt1] {.};
-% \path (pt1) edge [--] (dot);
-\node (pt2) [junction,right=of dot] {};
-\node (digit) [terminal,right=of pt2]{digit};
-\node (E) [terminal,right=of digit] {E};
-\node (plus) [terminal,above right=of E] {+};
-\node (minus) [terminal,below right=of E] {-};
-\node (ui2) [nonterminal,below right=of plus] {unsigned integer};
+\graph [use existing nodes] {
+start -- bassert -- assert -- expr -- aexpr -> end
+};
 
-\graph [use existing nodes] {(ui1) -- (pt1) -> (dot)};
+\syndiagBridge{aexpr}{abexpr}{bassert}
+\syndiagBridge{bassert}{blexpr}{aexpr}
 
-
-\end{tikzpicture}
-
+\end{syntaxdiagram}
 
 
 %......................................................................

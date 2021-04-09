@@ -1,3 +1,3 @@
 # rule34-haskell: Logic gates in Haskell
 
-![first draft]("src/First Draft _ Screenshot 2021-04-09 194608.png")
+![first draft]("First Draft _ Screenshot 2021-04-09 194608.png")

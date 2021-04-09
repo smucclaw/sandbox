@@ -4,7 +4,7 @@
 
 * Or download free trial: https://logic.ly/download/
 
-Use latest version: Rule34-7.logicly
+Use latest version: Rule34-[biggest number].logicly
 
 ---
 

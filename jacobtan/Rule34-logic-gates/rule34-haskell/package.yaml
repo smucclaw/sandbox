@@ -1,0 +1,53 @@
+name:                rule34-haskell
+version:             0.1.0.0
+github:              "githubuser/rule34-haskell"
+license:             BSD3
+author:              "2jacobtan"
+maintainer:          "example@example.com"
+copyright:           "2021 2jacobtan"
+
+extra-source-files:
+- README.md
+- ChangeLog.md
+
+# Metadata used when publishing your package
+# synopsis:            Short description of your package
+# category:            Web
+
+# To avoid duplicated efforts in documentation and dealing with the
+# complications of embedding Haddock markup inside cabal files, it is
+# common to point users to the README.md file.
+description:         Please see the README on GitHub at <https://github.com/githubuser/rule34-haskell#readme>
+
+dependencies:
+- base >= 4.7 && < 5
+- pretty-simple
+- text
+- fgl
+- graphviz
+- generic-data
+
+library:
+  source-dirs: src
+
+executables:
+  rule34-haskell-exe:
+    main:                Main.hs
+    source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - rule34-haskell
+
+tests:
+  rule34-haskell-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - rule34-haskell

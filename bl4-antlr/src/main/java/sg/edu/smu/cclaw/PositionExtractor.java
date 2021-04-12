@@ -1,6 +1,5 @@
 package sg.edu.smu.cclaw;
 
-import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -9,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class PositionExtractor extends BabyL4BaseListener {
-    private Map<Integer, Map<Integer, ParseTree>> positionMap = new HashMap();
+    private final Map<Integer, Map<Integer, ParseTree>> positionMap = new HashMap();
 
     @Override
     public void visitTerminal(TerminalNode node) {

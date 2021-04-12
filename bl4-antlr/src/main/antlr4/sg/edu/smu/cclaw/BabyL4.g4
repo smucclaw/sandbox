@@ -2,7 +2,7 @@
 grammar BabyL4;
 
 program
-    :   lexiconBlock?
+    :   lexiconBlock? classDeclaration*
     ;
 
 lexiconBlock
@@ -12,6 +12,19 @@ lexiconBlock
 lexiconMapping
     : Identifier '->' StringLiteral
     ;
+
+classDeclaration
+    : 'class' Identifier classFieldBlock?
+    ;
+
+classFieldBlock
+    : '{' classField+ '}'
+    ;
+
+classField
+    : Identifier  ':' Identifier
+    ;
+
 // START: lex
 
 StringLiteral

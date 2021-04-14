@@ -5,7 +5,9 @@ module Rule34 where
 import Data.Tree
 import qualified Data.Map as Map
 
-data MyRule = MyRule { label :: String
+type RuleLabel = String
+
+data MyRule = MyRule { label :: RuleLabel
                      , defeasors :: [Defeasor]
                      , party :: Party
                      , deontic :: Deontic
@@ -26,9 +28,9 @@ lp = "Legal Practitioner"
 data Deontic = MustNot | May
   deriving (Eq, Show)
 
-data Defeasor = Notwithstanding [MyRule]
-              | SubjectTo       [MyRule]
-              | Despite         [MyRule]
+data Defeasor = Notwithstanding [RuleLabel]
+              | SubjectTo       [RuleLabel]
+              | Despite         [RuleLabel]
               deriving (Show, Eq)
 
 -- we pretend we have queried the user and received certain answers.
@@ -47,6 +49,17 @@ inEnglish :: String -> String
 inEnglish "detractsFrom" = "detracts from"
 inEnglish "isIncompatibleWith" = "is incompatible with"
 inEnglish "derogatesFrom" = "derogates from"
+
+class Defeasible x where
+  subjectTo       :: x -> x -> x
+  notwithstanding :: x -> x -> x
+  notwithstanding = flip subjectTo
+  despite         :: x -> x -> x
+  despite = notwithstanding
+
+-- defeasibility:
+instance Defeasible Bool where
+  x `subjectTo` y = x && not y
 
 data Condition a = Any
                  | Or

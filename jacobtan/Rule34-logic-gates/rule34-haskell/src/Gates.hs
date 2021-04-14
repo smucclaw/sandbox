@@ -27,20 +27,20 @@ nodeList = genumFrom (gtoEnum @NodeRef 0)
 data GateType = NOT | AND | OR | NOR | Bulb | Switch deriving Show
 
 -- | 
-data GateInfo = GInfo { gType :: GateType, gDescr :: Text } deriving Show
+data NodeInfo = Node { gType :: GateType, gDescr :: Text } deriving Show
 
 -- | To specify info about each specific gate (node).
-gateInfo :: NodeRef -> GateInfo
-gateInfo = \case
-  Bulb'MustNot -> GInfo Bulb "Must Not"
-  Bulb'May -> GInfo Bulb "May"
-  And'MustNot -> GInfo AND "Must Not"
-  Or'May -> GInfo OR "May"
-  N1 -> GInfo Switch "N1"
-  N2 -> GInfo Switch "N2"
-  M3 -> GInfo Switch "N3"
-  M4 -> GInfo Switch "M4"
-  M5 -> GInfo Switch "M5"
+nodeInfo :: NodeRef -> NodeInfo
+nodeInfo = \case
+  Bulb'MustNot -> Node Bulb "Must Not"
+  Bulb'May -> Node Bulb "May"
+  And'MustNot -> Node AND "Must Not"
+  Or'May -> Node OR "May"
+  N1 -> Node Switch "N1"
+  N2 -> Node Switch "N2"
+  M3 -> Node Switch "N3"
+  M4 -> Node Switch "M4"
+  M5 -> Node Switch "M5"
 
 edges0 :: [(NodeRef, NodeRef)]
 edges0 = [

@@ -23,7 +23,7 @@ nodes = nodeList <&> do -- Reader applicative
   return (index, label)
   where
     makeNodeLabel :: NodeRef -> Text
-    makeNodeLabel node = gateInfo node & do -- Reader applicative
+    makeNodeLabel node = nodeInfo node & do -- Reader applicative
       typ <- gType
       descr <- gDescr
       return $ (T.pack . show) typ <> ": " <> descr

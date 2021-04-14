@@ -12,7 +12,7 @@ import Gates
 import Fgl
 
 -- | unused
-instance Labellable GateInfo where
+instance Labellable NodeInfo where
   toLabelValue = toLabelValue . show
 
 

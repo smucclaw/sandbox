@@ -1,6 +1,11 @@
 module Lib
-    ( someFunc
-    ) where
+  ( mainFunc
+  ) where
 
-someFunc :: IO ()
-someFunc = putStrLn "someFunc"
+import Graphviz ( graphvizMain )
+import Fgl ( fglMain )
+
+mainFunc :: IO ()
+mainFunc = do
+  fglMain
+  graphvizMain

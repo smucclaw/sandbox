@@ -1,5 +1,5 @@
-{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE OverloadedStrings #-}
 module Fgl where
 
 import Data.Text (Text)
@@ -22,10 +22,6 @@ nodes = nodeList <&> do -- Reader applicative
   label <- makeNodeLabel
   return (index, label)
   where
-    nodeList :: [NodeRef]
-    nodeList = genumFrom (gtoEnum @NodeRef 0)
-    -- ^ Use generics to generate a list of all the nodes (gates),
-    --   i.e. a list of all the constructors in the NodeRef data type.
     makeNodeLabel :: NodeRef -> Text
     makeNodeLabel node = gateInfo node & do -- Reader applicative
       typ <- gType

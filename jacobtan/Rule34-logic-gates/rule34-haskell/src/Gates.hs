@@ -1,10 +1,11 @@
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE TypeApplications #-}
 module Gates where
 
 import Data.Text ( Text )
-import Generic.Data ( Generic )
+import Generic.Data ( Generic, genumFrom, gtoEnum )
 
 -- *** Readme *** --
 -- Use graphviz library for visualisation.
@@ -16,6 +17,11 @@ import Generic.Data ( Generic )
 -- | Gates used in the model.
 data NodeRef = Bulb'MustNot | Bulb'May | And'MustNot | Or'May | N1 | N2 | M3 | M4 | M5
   deriving (Generic, Show)
+
+nodeList :: [NodeRef]
+nodeList = genumFrom (gtoEnum @NodeRef 0)
+-- ^ Use generics to generate a list of all the nodes (gates),
+--   i.e. a list of all the constructors in the NodeRef data type.
 
 -- | Logic gate types
 data GateType = NOT | AND | OR | NOR | Bulb | Switch deriving Show

@@ -1,8 +1,6 @@
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE ApplicativeDo #-}
 module Gates where
 
 import Data.Text ( Text )

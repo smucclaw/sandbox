@@ -1,8 +1,3 @@
-{-# LANGUAGE LambdaCase #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TypeApplications #-}
-{-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE ApplicativeDo #-}
 module Graphviz where
 
 import Data.Text (Text, pack)

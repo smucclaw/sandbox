@@ -1,8 +1,5 @@
-{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeApplications #-}
-{-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE ApplicativeDo #-}
 module Fgl where
 
 import Data.Text (Text)

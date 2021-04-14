@@ -11,7 +11,7 @@ import Data.Graph.Inductive (mkGraph)
 
 import Utils
 
-import Gates
+import Encoding
 
 -- *** Readme *** --
 -- Fgl library represents nodes using a unique index of type Int.

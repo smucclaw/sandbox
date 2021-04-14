@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: b43f6f13afe19888dd6ad35c5fb8ac9c1a69b9d6bf7515362cea2bebb6431c59
+-- hash: 70ee23d9190815f843a10eb604ee32170b3e3ea9dcc41239ba902d65619c5600
 
 name:           rule34-haskell
 version:        0.1.0.0
@@ -27,8 +27,8 @@ source-repository head
 
 library
   exposed-modules:
+      Encoding
       Fgl
-      Gates
       Graphviz
       Lib
       Utils

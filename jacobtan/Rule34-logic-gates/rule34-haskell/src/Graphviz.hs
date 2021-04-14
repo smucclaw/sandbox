@@ -8,7 +8,7 @@ import Data.Graph.Inductive (mkGraph)
 import Data.GraphViz.Attributes (Labellable (..))
 import Data.GraphViz (preview)
 
-import Gates
+import Encoding
 import Fgl
 
 -- | unused

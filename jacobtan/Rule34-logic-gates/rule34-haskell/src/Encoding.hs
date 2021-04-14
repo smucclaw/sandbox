@@ -2,7 +2,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE TypeApplications #-}
-module Gates where
+module Encoding where
 
 import Data.Text ( Text )
 import Generic.Data ( Generic, genumFrom, gtoEnum )

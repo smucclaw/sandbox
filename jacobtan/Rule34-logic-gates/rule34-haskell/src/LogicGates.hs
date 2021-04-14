@@ -109,6 +109,7 @@ flattenBool :: Maybe Bool -> Bool
 flattenBool (Just True) = True
 flattenBool _           = False
 
+logicGatesMain :: IO ()
 logicGatesMain = do
   -- https://en.wikipedia.org/wiki/Three-valued_logic#Kleene_and_Priest_logics
   let threeValues = [Just False, Nothing, Just True]

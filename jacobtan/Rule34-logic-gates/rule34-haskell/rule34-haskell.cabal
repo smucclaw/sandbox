@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: f11c8b67bee0aeda35f348184e836507bfc2c1bc6ac8602cf2f66a24b9b4ff6a
+-- hash: e30b430fa3d8202ff420668255906b013796fab797bc507a9e991fa2d471556c
 
 name:           rule34-haskell
 version:        0.1.0.0
@@ -40,6 +40,7 @@ library
       src
   build-depends:
       base >=4.7 && <5
+    , containers
     , fgl
     , generic-data
     , graphviz
@@ -57,6 +58,7 @@ executable rule34-haskell-exe
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
+    , containers
     , fgl
     , generic-data
     , graphviz
@@ -76,6 +78,7 @@ test-suite rule34-haskell-test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
+    , containers
     , fgl
     , generic-data
     , graphviz

@@ -5,7 +5,7 @@
 module Encoding where
 
 import Data.Text ( Text )
-import Generic.Data ( Generic, genumFrom, gtoEnum )
+import Generic.Data ( Generic, genumFrom, gtoEnum, gconIndex )
 
 
 -- | Gates used in the model.
@@ -49,6 +49,10 @@ edges0 = [
   ]
 
 
-gatesMain :: IO ()
-gatesMain = do
+encodingMain :: IO ()
+encodingMain = do
   putStrLn "__gatesMain__"
+  print $ gconIndex Bulb'May
+  print $ gconIndex Or'May
+  print $ genumFrom Bulb'MustNot
+  print $ genumFrom (gtoEnum @NodeRef 0) -- nodeList

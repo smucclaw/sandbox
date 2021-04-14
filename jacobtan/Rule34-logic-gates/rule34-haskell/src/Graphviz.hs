@@ -1,7 +1,6 @@
 module Graphviz where
 
 import Data.Text (Text, pack)
-import Generic.Data ( Generic, gconIndex, genumFrom, gtoEnum )
 
 import Data.Graph.Inductive.PatriciaTree (Gr)
 import Data.Graph.Inductive (mkGraph)
@@ -19,4 +18,4 @@ instance Labellable NodeInfo where
 graphvizMain :: IO ()
 graphvizMain = do
   putStrLn "__graphvizMain__"
-  preview graph >> putStrLn "< visualise a graph using the Xlib GraphvizCanvas >"
+  preview myGraph >> putStrLn "< visualise a graph using the Xlib GraphvizCanvas >"

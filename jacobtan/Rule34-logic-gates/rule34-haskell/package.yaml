@@ -28,6 +28,7 @@ dependencies:
 - fgl
 - graphviz
 - generic-data
+- prettyprinter
 
 library:
   source-dirs: src

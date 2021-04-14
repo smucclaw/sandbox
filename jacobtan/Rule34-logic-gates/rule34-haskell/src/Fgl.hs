@@ -13,6 +13,11 @@ import Utils
 
 import Gates
 
+-- *** Readme *** --
+-- Fgl library represents nodes using a unique index of type Int.
+-- I use Generic.Data from generic-data library to
+--    auto-generate unique indices. (using the function: gconIndex)
+
 -- | https://hackage.haskell.org/package/fgl-5.7.0.3/docs/Data-Graph-Inductive-Graph.html#t:LNode
 -- Labeled node with index=Int, label=Text
 nodes :: [(Int, Text)]

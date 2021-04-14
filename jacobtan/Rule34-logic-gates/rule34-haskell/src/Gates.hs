@@ -7,12 +7,6 @@ module Gates where
 import Data.Text ( Text )
 import Generic.Data ( Generic, genumFrom, gtoEnum )
 
--- *** Readme *** --
--- Use graphviz library for visualisation.
--- Graphviz uses fgl library.
--- Fgl library represents nodes using a unique index of type Int.
--- I use Generic.Data from generic-data library to
---    auto-generate unique indices. (using the function: gconIndex)
 
 -- | Gates used in the model.
 data NodeRef = Bulb'MustNot | Bulb'May | And'MustNot | Or'May | N1 | N2 | M3 | M4 | M5

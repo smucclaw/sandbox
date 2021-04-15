@@ -149,44 +149,6 @@ answers = Map.fromList [("always true",       Just True)
                        ,("derogatesFrom",     Just True)
                        ]
 
-class NLG x where
-  toEnglish :: x -> Doc ann
-  toEnglishList :: [x] -> Doc ann
-  toEnglishList [] = mempty
-
-instance NLG MyRule where
-  toEnglish (MyRule defeasors p d c) =
-    indent 4 (
-    toEnglishList defeasors
-    <> toEnglish c)
-  toEnglishList rs = vsep (toEnglish <$> rs)
-
-instance NLG Defeasor where
-  toEnglish (Notwithstanding rls) = "notwithstanding" <+> toEnglishList rls
-  toEnglish (SubjectTo       rls) = "subject to"      <+> toEnglishList rls
-  toEnglish (Despite         rls) = "despite"         <+> toEnglishList rls
-  toEnglishList ds = hsep $ punctuate comma (toEnglish <$> ds)
-
-instance (NLG x) => NLG (Maybe x) where
-  toEnglish Nothing = mempty
-  toEnglish (Just x) = toEnglish x
-
-instance NLG String where
-  toEnglish "detractsFrom" = "detracts from"
-  toEnglish "isIncompatibleWith" = "is incompatible with"
-  toEnglish "derogatesFrom" = "derogates from"
-  toEnglish "primaryOccupation(LP)" = "the legal practitioner's primary occupation of practising as a lawyer"
-  toEnglish "availability(LP)" = "the legal practitioner's availability to those who may seek the legal practitioner's services as a lawyer"
-  toEnglish "representationOfClients(LP)" = "the representation of the legal practitioner's clients"
-  toEnglish "unfairlyAttractive" = "likely to unfairly attract business in the practice of law"
-  toEnglish "feeSharing(LP)" = "the sharing of the legal practitioner's fees with"
-  toEnglish "commission" = "the payment of a commission to"
-  toEnglish "inSchedule1" = "set out in the First Schedule"
-  toEnglish "inSchedule2" = "set out in the Second Schedule"
-  toEnglish "inSchedule3" = "set out in the Third Schedule"
-  toEnglish "inSchedule4" = "set out in the Fourth Schedule"
-  toEnglish x = pretty x
-
 class Defeasible x where
   subjectTo       :: x -> x -> x
   notwithstanding :: x -> x -> x
@@ -211,22 +173,73 @@ instance Defeasible (Labeled RuleLabel MyRule) where
   -- there is an order of evaluation in the defeasors, so maybe we
   -- can't actually merge all SubjectTo etc together.
 
-instance {-# OVERLAPPING #-} (NLG a, NLG b) => NLG (Labeled (Maybe a) b) where
-  toEnglish (Labeled (Just l) i) = toEnglish $ Labeled l i
-  toEnglish (Labeled Nothing  i) = toEnglish i
+class NLG x where
+  toEnglish :: x -> Doc ann
+  toEnglishList :: [x] -> Doc ann
+  toEnglishList [] = mempty
+  dashFor :: x -> Doc ann
+  dashFor = mempty
+
+instance NLG MyRule where
+  toEnglish (MyRule defeasors p d c) =
+    toEnglishList defeasors
+    <>
+    toEnglish c
+  toEnglishList rs = vsep (toEnglish <$> rs)
+
+instance NLG Defeasor where
+  toEnglish (Notwithstanding rls) = "notwithstanding" <+> toEnglishList rls
+  toEnglish (SubjectTo       rls) = "subject to"      <+> toEnglishList rls
+  toEnglish (Despite         rls) = "despite"         <+> toEnglishList rls
+  toEnglishList ds = hsep $ punctuate comma (toEnglish <$> ds)
 
 instance {-# OVERLAPPABLE #-} (NLG a, NLG b) => NLG (Labeled a b) where
   toEnglish (Labeled l i)        = toEnglish l <> ":" <+> toEnglish i
+
+instance {-# OVERLAPPING #-} (NLG a, NLG b) => NLG (Labeled (Maybe a) b) where
+  toEnglish (Labeled (Just l) i) = toEnglish $ Labeled l i
+  toEnglish (Labeled Nothing  i) = toEnglish i
+  dashFor   (Labeled (Just l) i) = pretty $ dots2stars l
+  dashFor   (Labeled Nothing  i) = "- "
+
+instance {-# OVERLAPPING #-} (NLG a) => NLG (Labeled (Maybe a) MyRule) where
+  toEnglish (Labeled l r) = pretty (dots2stars l) <+> toEnglish l <> line <> (toEnglish r)
+
+dots2stars :: (NLG a) => a -> String
+dots2stars x = take (length (filter (=='.') (show $ toEnglish x))) (repeat '*')
 
 instance NLG Predicate where
   toEnglish (Pred p) = toEnglish p
   toEnglish (Goto r) = toEnglish (ruleBase Map.! r)
 
+instance (NLG x) => NLG (Maybe x) where
+  toEnglish Nothing = emptyDoc
+  toEnglish (Just x) = toEnglish x
+
+instance NLG String where
+  toEnglish "detractsFrom" = "detracts from"
+  toEnglish "isIncompatibleWith" = "is incompatible with"
+  toEnglish "derogatesFrom" = "derogates from"
+  toEnglish "primaryOccupation(LP)" = "the legal practitioner's primary occupation of practising as a lawyer"
+  toEnglish "availability(LP)" = "the legal practitioner's availability to those who may seek the legal practitioner's services as a lawyer"
+  toEnglish "representationOfClients(LP)" = "the representation of the legal practitioner's clients"
+  toEnglish "unfairlyAttractive" = "likely to unfairly attract business in the practice of law"
+  toEnglish "feeSharing(LP)" = "the sharing of the legal practitioner's fees with"
+  toEnglish "commission" = "the payment of a commission to"
+  toEnglish "inSchedule1" = "set out in the First Schedule"
+  toEnglish "inSchedule2" = "set out in the Second Schedule"
+  toEnglish "inSchedule3" = "set out in the Third Schedule"
+  toEnglish "inSchedule4" = "set out in the Fourth Schedule"
+  toEnglish x = pretty x
+
 enlist :: (NLG a) => String -> Maybe String -> [a] -> Maybe String -> Maybe String -> Doc ann
 -- todo: omit the last separator in the list
-enlist separator conjunction middle front back = vsep (toEnglish front <> ":-"
-                                                   : (addConjunction conjunction ( ((\x -> "-" <+> x) . toEnglish <$> middle))) ++ [toEnglish back])
+enlist separator conjunction middle front back =
+  vsep (toEnglish front <> ":-"
+        : (addConjunction conjunction ( dashPrefix <$> middle )) ++ [toEnglish back])
   where
+    dashPrefix :: (NLG a) => a -> Doc ann
+    dashPrefix x = dashFor x <> toEnglish x
     addConjunction :: Maybe String -> [Doc ann] -> [Doc ann]
     addConjunction (Just c) [y, z] = [y <> pretty separator <+> pretty c, z]
     addConjunction (Just c) [z]    = [z]
@@ -234,13 +247,17 @@ enlist separator conjunction middle front back = vsep (toEnglish front <> ":-"
     addConjunction (Just c) (x:xs) = x <> pretty separator : addConjunction (Just c) xs
     addConjunction Nothing xs = xs
 
-instance (NLG a, NLG b, Show a, Show b) => NLG (Tree (Labeled a (Condition b))) where
-  toEnglish (Node (Labeled a (MkCondition pre Any               post)) children) = toEnglish a <> enlist ";" Nothing      children (pre <> Just "any of the following") post
-  toEnglish (Node (Labeled a (MkCondition pre Or                post)) children) = toEnglish a <> enlist ";" (Just "or")  children pre post
-  toEnglish (Node (Labeled a (MkCondition pre All               post)) children) = toEnglish a <> enlist ";" Nothing      children (pre <> Just "all of the following") post
-  toEnglish (Node (Labeled a (MkCondition pre Union             post)) children) = toEnglish a <> enlist ";" (Just "and") children pre post
-  toEnglish (Node (Labeled a (MkCondition pre (Leaf  b)         post)) [])       = toEnglish a <> toEnglish pre <> toEnglish b <> toEnglish post
-  toEnglish (Node (Labeled a (MkCondition pre (Inner condtrees) post)) [])       = toEnglish a <> toEnglish pre <+> toEnglishList condtrees <+> toEnglish post
+toEnglishLabel :: (NLG a) => Maybe a -> Doc ann
+toEnglishLabel Nothing = emptyDoc
+toEnglishLabel (Just x) = pretty (dots2stars x) <+> toEnglish x <> line
+
+instance (NLG a, NLG b, Show a, Show b) => NLG (Tree (Labeled (Maybe a) (Condition b))) where
+  toEnglish (Node (Labeled a (MkCondition pre Any               post)) children) = toEnglishLabel a <> enlist ";" Nothing      children (pre <> Just "any of the following") post
+  toEnglish (Node (Labeled a (MkCondition pre Or                post)) children) = toEnglishLabel a <> enlist ";" (Just "or")  children pre post
+  toEnglish (Node (Labeled a (MkCondition pre All               post)) children) = toEnglishLabel a <> enlist ";" Nothing      children (pre <> Just "all of the following") post
+  toEnglish (Node (Labeled a (MkCondition pre Union             post)) children) = toEnglishLabel a <> enlist ";" (Just "and") children pre post
+  toEnglish (Node (Labeled a (MkCondition pre (Leaf  b)         post)) [])       = toEnglishLabel a <> toEnglish pre <> toEnglish b <> toEnglish post
+  toEnglish (Node (Labeled a (MkCondition pre (Inner condtrees) post)) [])       = toEnglishLabel a <> toEnglish pre <+> toEnglishList condtrees <+> toEnglish post
   toEnglish (Node (Labeled a (MkCondition pre (Leaf  b)         post)) children) = error ("leaf node " ++ (show b) ++ " should have no children! " ++ show children)
   toEnglish (Node (Labeled a (MkCondition pre (Inner b)         post)) children) = error ("inner node " ++ (show b) ++ " should have no children! " ++ show children)
 
@@ -250,11 +267,11 @@ rule34_1 = Labeled (Just "rule 34.1")
   MyRule { defeasors = []
          , party = lp
          , deontic = MustNot
-         , condition = Node (Labeled (Just "34.1")
+         , condition = Node (Labeled Nothing
                              (MkCondition
                               (Just "a legal practitioner must not accept any executive appointment associated with ")
                               Any Nothing))
-                       [ Node (Labeled (Just "34.1.a")
+                       [ Node (Labeled (Just "34.2.a")
                                (MkCondition
                                 (Just "any business which") Or (Just "the dignity of the legal profession") ))
                          [mkLeaf "detractsFrom"

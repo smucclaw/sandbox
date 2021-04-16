@@ -4,7 +4,7 @@ cabal-version: 2.0
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: aae093f91f1746f1fce56167d8da665889b0e8f298a1c87857283701779942d4
+-- hash: 820309ec4163c672102e40ad9e00cb955eea73f0b25732f4a393daf193134fd3
 
 name:           parse-predicates
 version:        0.1.0.0
@@ -58,7 +58,7 @@ library gf-generated
     , split
   default-language: Haskell2010
 
-executable rps-exe
+executable pp-exe
   main-is: Main.hs
   other-modules:
       Paths_parse_predicates

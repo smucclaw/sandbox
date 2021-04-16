@@ -54,7 +54,7 @@ library:
 
 
 executables:
-  rps-exe:
+  pp-exe:
     main:                Main.hs
     source-dirs:         app
     ghc-options:

@@ -21,10 +21,11 @@ flags
 
   fun
     -- Very specialised things
-
+ 
     CnNum : CN -> Card -> CN ; -- Section 1
     V2PartAdv : Polarity -> V2 -> Adv -> FullPredicate ;
 
+    Test : CN -> CN ;
 
   cat
     Predicate ;

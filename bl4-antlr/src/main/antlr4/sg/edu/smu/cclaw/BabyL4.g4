@@ -2,7 +2,7 @@
 grammar BabyL4;
 
 program
-    :   lexiconBlock? classDeclaration*
+    :   lexiconBlock? classDeclaration* globalVarDecls* rules* assertions*
     ;
 
 lexiconBlock
@@ -24,6 +24,43 @@ classFieldBlock
 classField
     : Identifier  ':' Identifier
     ;
+
+globalVarDecls 
+    : 'decl' Identifier ':' Identifier
+    ;
+
+varDeclsCommaSep
+    : varDecl (',' varDecl)*
+    ;
+
+varDecl
+    : Identifier ':' Identifier
+    ;
+
+rules
+    : 'rule <' Identifier '>' ruleVarDecls rulePrecond ruleConcl
+    ;
+
+ruleVarDecls
+    : 'for' varDeclsCommaSep
+    ;
+
+rulePrecond
+    : 'if' expr
+    ;
+
+ruleConcl
+    : 'then' expr
+    ;
+
+assertions
+    : 'assert' expr
+    ;
+
+expr
+    : 'dummy'
+    ;
+
 
 // START: lex
 

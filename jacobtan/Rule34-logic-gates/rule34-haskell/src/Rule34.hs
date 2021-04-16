@@ -7,6 +7,7 @@ module Rule34 where
 -- import Encoding
 -- import LogicGates
 import Prettyprinter
+import Data.Maybe (maybeToList)
 import Data.Tree
 import qualified Data.Map as Map
 
@@ -82,17 +83,17 @@ data MyRule = MyRule { defeasors :: [Defeasor]
                      }
               deriving (Eq, Show)
 
-data Labeled a b = Labeled { label :: a, inner :: b }
+data Labeled a b = Labeled { label :: Maybe a, inner :: b }
   deriving (Eq, Show)
 
-rule_alwaysmay = Labeled (Just "test rule always true")
+rule_alwaysmay = Labeled (Just "test rule always true, may")
                  MyRule { defeasors = []
                         , party     = lp
                         , deontic   = May
                         , condition = mkLeaf "always true"
                         }
   
-rule_alwaysmustnot = Labeled (Just "test rule always true")
+rule_alwaysmustnot = Labeled (Just "test rule always true, mustnot")
                      MyRule { defeasors = []
                             , party     = lp
                             , deontic   = MustNot
@@ -112,7 +113,9 @@ data Predicate = Pred String
                | Goto RuleLabel
   deriving (Eq, Show)
 
-type ConditionTree a = Tree (Labeled (Maybe String) (Condition a))
+type ConditionLabel = String
+
+type ConditionTree a = Tree (Labeled ConditionLabel (Condition a))
 
 data Condition a = MkCondition (Maybe String) (Inner a) (Maybe String)
   deriving (Eq, Show)
@@ -122,11 +125,7 @@ data Inner a = Any
              | All
              | Union
              | Leaf a
-             | Inner [Tree (Labeled (Maybe String) (Condition a))]
              deriving (Eq, Show)
-
-class MyShow x where
-  myshow :: x -> String
 
 type Party = String
 lp :: Party
@@ -163,8 +162,8 @@ instance Defeasible Bool where
   x `subjectTo` y = not y && x
 
 -- defeasibility -- normalization and graph transformation
-instance Defeasible (Labeled RuleLabel MyRule) where
-  (Labeled xl xi) `subjectTo` (Labeled yl yi) = Labeled xl (xi { defeasors = (SubjectTo [yl]) : defeasors xi })
+-- instance Defeasible (Labeled RuleLabel MyRule) where
+--   (Labeled xl xi) `subjectTo` (Labeled yl yi) = Labeled xl (xi { defeasors = (SubjectTo [yl]) : defeasors xi })
 
   -- in every rule x which is notwithstanding y,
   -- rewrite to say that y is subject to x
@@ -173,12 +172,12 @@ instance Defeasible (Labeled RuleLabel MyRule) where
   -- there is an order of evaluation in the defeasors, so maybe we
   -- can't actually merge all SubjectTo etc together.
 
-class NLG x where
+class (Show x) => NLG x where
   toEnglish :: x -> Doc ann
   toEnglishList :: [x] -> Doc ann
   toEnglishList [] = mempty
   dashFor :: x -> Doc ann
-  dashFor = mempty
+  dashFor x =  ("default dashfor " <> pretty (show x))
 
 instance NLG MyRule where
   toEnglish (MyRule defeasors p d c) =
@@ -199,22 +198,24 @@ instance {-# OVERLAPPABLE #-} (NLG a, NLG b) => NLG (Labeled a b) where
 instance {-# OVERLAPPING #-} (NLG a, NLG b) => NLG (Labeled (Maybe a) b) where
   toEnglish (Labeled (Just l) i) = toEnglish $ Labeled l i
   toEnglish (Labeled Nothing  i) = toEnglish i
-  dashFor   (Labeled (Just l) i) = pretty $ dots2stars l
+  dashFor   (Labeled (Just l) i) = dots2stars l
   dashFor   (Labeled Nothing  i) = "- "
 
-instance {-# OVERLAPPING #-} (NLG a) => NLG (Labeled (Maybe a) MyRule) where
-  toEnglish (Labeled l r) = pretty (dots2stars l) <+> toEnglish l <> line <> (toEnglish r)
+instance {-# OVERLAPPING #-} NLG (Labeled ConditionLabel MyRule) where
+  toEnglish (Labeled l r) = dots2stars l <+> toEnglish l <> line <> (toEnglish r)
 
-dots2stars :: (NLG a) => a -> String
-dots2stars x = take (length (filter (=='.') (show $ toEnglish x))) (repeat '*')
+dots2stars :: (NLG a) => a -> Doc ann
+dots2stars x = pretty $ take (length (filter (=='.') (show $ toEnglish x))) (repeat '*')
 
 instance NLG Predicate where
   toEnglish (Pred p) = toEnglish p
   toEnglish (Goto r) = toEnglish (ruleBase Map.! r)
 
-instance (NLG x) => NLG (Maybe x) where
+instance (NLG a) => NLG (Maybe a) where
   toEnglish Nothing = emptyDoc
   toEnglish (Just x) = toEnglish x
+  dashFor Nothing = "- " -- todo: add a State monad to allow counting up, so "- " becomes "(i) ", "(ii) ", "(iii) " etc.
+  dashFor (Just x) = line <> dots2stars x <> " "
 
 instance NLG String where
   toEnglish "detractsFrom" = "detracts from"
@@ -232,34 +233,34 @@ instance NLG String where
   toEnglish "inSchedule4" = "set out in the Fourth Schedule"
   toEnglish x = pretty x
 
-enlist :: (NLG a) => String -> Maybe String -> [a] -> Maybe String -> Maybe String -> Doc ann
+enlist :: (NLG a) => Doc ann -> Maybe String -> [ConditionTree a] -> Maybe String -> Maybe String -> Doc ann
 -- todo: omit the last separator in the list
 enlist separator conjunction middle front back =
-  vsep (toEnglish front <> ":-"
-        : (addConjunction conjunction ( dashPrefix <$> middle )) ++ [toEnglish back])
+  vsep (maybe [] (\f -> [toEnglish f <> ":-"]) front
+        ++ (addConjunction separator conjunction ( dashPrefix <$> middle ))
+        ++ (toEnglish <$> maybeToList back))
   where
-    dashPrefix :: (NLG a) => a -> Doc ann
-    dashPrefix x = dashFor x <> toEnglish x
-    addConjunction :: Maybe String -> [Doc ann] -> [Doc ann]
-    addConjunction (Just c) [y, z] = [y <> pretty separator <+> pretty c, z]
-    addConjunction (Just c) [z]    = [z]
-    addConjunction (Just c) []     = []
-    addConjunction (Just c) (x:xs) = x <> pretty separator : addConjunction (Just c) xs
-    addConjunction Nothing xs = xs
+    dashPrefix :: (NLG a) => ConditionTree a -> Doc ann
+    dashPrefix x = (dashFor $ label $ rootLabel x) <> toEnglish x
+
+addConjunction :: Doc ann -> Maybe String -> [Doc ann] -> [Doc ann]
+addConjunction separator (Just c) [y, z] = [y <> separator <+> pretty c, z]
+addConjunction separator _ [z]    = [z]
+addConjunction separator _ []     = []
+addConjunction separator (Just c) (x:xs) = x <> separator : addConjunction separator (Just c) xs
+addConjunction separator Nothing (x:xs)  = x <> separator : addConjunction separator Nothing xs
 
 toEnglishLabel :: (NLG a) => Maybe a -> Doc ann
 toEnglishLabel Nothing = emptyDoc
-toEnglishLabel (Just x) = pretty (dots2stars x) <+> toEnglish x <> line
+toEnglishLabel (Just x) = toEnglish x <> line
 
-instance (NLG a, NLG b, Show a, Show b) => NLG (Tree (Labeled (Maybe a) (Condition b))) where
-  toEnglish (Node (Labeled a (MkCondition pre Any               post)) children) = toEnglishLabel a <> enlist ";" Nothing      children (pre <> Just "any of the following") post
-  toEnglish (Node (Labeled a (MkCondition pre Or                post)) children) = toEnglishLabel a <> enlist ";" (Just "or")  children pre post
-  toEnglish (Node (Labeled a (MkCondition pre All               post)) children) = toEnglishLabel a <> enlist ";" Nothing      children (pre <> Just "all of the following") post
-  toEnglish (Node (Labeled a (MkCondition pre Union             post)) children) = toEnglishLabel a <> enlist ";" (Just "and") children pre post
+instance (NLG b, Show b) => NLG (ConditionTree b) where
+  toEnglish (Node (Labeled a (MkCondition pre Any               post)) children) = toEnglishLabel a <> enlist semi Nothing      children (pre <> Just "any of the following") post <> "."
+  toEnglish (Node (Labeled a (MkCondition pre Or                post)) children) = toEnglishLabel a <> enlist semi (Just "or")  children pre post
+  toEnglish (Node (Labeled a (MkCondition pre All               post)) children) = toEnglishLabel a <> enlist semi Nothing      children (pre <> Just "all of the following") post
+  toEnglish (Node (Labeled a (MkCondition pre Union             post)) children) = toEnglishLabel a <> enlist semi (Just "and") children pre post
   toEnglish (Node (Labeled a (MkCondition pre (Leaf  b)         post)) [])       = toEnglishLabel a <> toEnglish pre <> toEnglish b <> toEnglish post
-  toEnglish (Node (Labeled a (MkCondition pre (Inner condtrees) post)) [])       = toEnglishLabel a <> toEnglish pre <+> toEnglishList condtrees <+> toEnglish post
   toEnglish (Node (Labeled a (MkCondition pre (Leaf  b)         post)) children) = error ("leaf node " ++ (show b) ++ " should have no children! " ++ show children)
-  toEnglish (Node (Labeled a (MkCondition pre (Inner b)         post)) children) = error ("inner node " ++ (show b) ++ " should have no children! " ++ show children)
 
 mkLeaf x = Node (Labeled Nothing $ MkCondition Nothing (Leaf $ Pred x) Nothing) []
 

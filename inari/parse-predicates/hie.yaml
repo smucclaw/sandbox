@@ -1,0 +1,16 @@
+cradle:
+  stack:
+    - path: "./src"
+      component: "parse-predicates:lib"
+
+    - path: "./grammars"
+      component: "parse-predicates:lib:gf-generated"
+    
+    - path: "./.stack-work/dist/x86_64-osx/Cabal-3.0.1.0/build/gf-generated"
+      component: "parse-predicates:lib:gf-generated"
+
+    - path: "./app/Main.hs"
+      component: "parse-predicates:exe:rps-exe"
+
+    - path: "./app/Paths_parse_predicates.hs"
+      component: "parse-predicates:exe:rps-exe"

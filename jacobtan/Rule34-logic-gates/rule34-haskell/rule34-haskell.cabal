@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: d9e1c47c8e88876a68ed6752f9d9f0902d1c4feb30e0f1af559db7e90d6ef4b2
+-- hash: f2d7a0f5be31755154feccea055de5fc113866c9cad3e004eebc2963b5cd7ef6
 
 name:           rule34-haskell
 version:        0.1.0.0
@@ -27,18 +27,26 @@ source-repository head
 
 library
   exposed-modules:
-      Gates
+      Encoding
+      Fgl
+      Graphviz
       Lib
+      LogicGates
+      Rule34
+      Utils
   other-modules:
       Paths_rule34_haskell
   hs-source-dirs:
       src
   build-depends:
       base >=4.7 && <5
+    , containers
     , fgl
     , generic-data
     , graphviz
     , pretty-simple
+    , prettyprinter
+    , split
     , text
   default-language: Haskell2010
 
@@ -51,11 +59,14 @@ executable rule34-haskell-exe
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
+    , containers
     , fgl
     , generic-data
     , graphviz
     , pretty-simple
+    , prettyprinter
     , rule34-haskell
+    , split
     , text
   default-language: Haskell2010
 
@@ -69,10 +80,13 @@ test-suite rule34-haskell-test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
+    , containers
     , fgl
     , generic-data
     , graphviz
     , pretty-simple
+    , prettyprinter
     , rule34-haskell
+    , split
     , text
   default-language: Haskell2010

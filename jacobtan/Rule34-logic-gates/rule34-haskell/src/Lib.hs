@@ -1,6 +1,17 @@
 module Lib
-    ( someFunc
-    ) where
+  ( mainFunc
+  ) where
 
-someFunc :: IO ()
-someFunc = putStrLn "someFunc"
+import Encoding ( encodingMain )
+import Graphviz ( graphvizMain )
+import Fgl ( fglMain )
+
+-- *** Readme *** --
+-- Use graphviz library for visualisation.
+-- Graphviz uses fgl library.
+
+mainFunc :: IO ()
+mainFunc = do
+  encodingMain
+  fglMain
+  -- graphvizMain

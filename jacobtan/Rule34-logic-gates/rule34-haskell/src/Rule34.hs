@@ -124,6 +124,7 @@ data Inner a = Any
              | Or
              | All
              | Union
+             | Compl -- allows chaining of conditions as a sugary version of "union", where we use complements to express in-place quantifiers -- see 8.8 of the GF book.
              | Leaf a
              deriving (Eq, Show)
 
@@ -211,11 +212,13 @@ instance NLG Predicate where
   toEnglish (Pred p) = toEnglish p
   toEnglish (Goto r) = toEnglish (ruleBase Map.! r)
 
-instance (NLG a) => NLG (Maybe a) where
+instance (NLG a, Show a) => NLG (Maybe a) where
   toEnglish Nothing = emptyDoc
   toEnglish (Just x) = toEnglish x
   dashFor Nothing = "- " -- todo: add a State monad to allow counting up, so "- " becomes "(i) ", "(ii) ", "(iii) " etc.
-  dashFor (Just x) = line <> dots2stars x <> " "
+  dashFor (Just x)
+    | (show x) == "\"\"" = emptyDoc
+    | otherwise          = line <> dots2stars x <> " "
 
 instance NLG String where
   toEnglish "detractsFrom" = "detracts from"
@@ -231,13 +234,24 @@ instance NLG String where
   toEnglish "inSchedule2" = "set out in the Second Schedule"
   toEnglish "inSchedule3" = "set out in the Third Schedule"
   toEnglish "inSchedule4" = "set out in the Fourth Schedule"
+  toEnglish "theAct" = "the Act"
+  toEnglish "theseRules" = "these Rules"
+  toEnglish "otherSubsidiary" = "any other subsidiary legislation made under the Act"
+  toEnglish "practiceDirections" = "practice directions"
+  toEnglish "guidanceNotes" = "guidance notes"
+  toEnglish "rulings" = "rulings"
+  toEnglish "theCouncil" = "the Council"
+  toEnglish "theSociety" = "the Society"
   toEnglish x = pretty x
 
 enlist :: (NLG a) => Doc ann -> Maybe String -> [ConditionTree a] -> Maybe String -> Maybe String -> Doc ann
 -- todo: omit the last separator in the list
 enlist separator conjunction middle front back =
-  vsep (maybe [] (\f -> [toEnglish f <> ":-"]) front
-        ++ (addConjunction separator conjunction ( dashPrefix <$> middle ))
+  let frontPart = maybe [] (\f -> [toEnglish f <> ":-"]) front
+      indentMiddle = if length frontPart /= 0 then 2 else 0
+  in
+  vsep (frontPart
+        ++ (indent indentMiddle <$> (addConjunction separator conjunction ( dashPrefix <$> middle )))
         ++ (toEnglish <$> maybeToList back))
   where
     dashPrefix :: (NLG a) => ConditionTree a -> Doc ann
@@ -250,19 +264,23 @@ addConjunction separator _ []     = []
 addConjunction separator (Just c) (x:xs) = x <> separator : addConjunction separator (Just c) xs
 addConjunction separator Nothing (x:xs)  = x <> separator : addConjunction separator Nothing xs
 
-toEnglishLabel :: (NLG a) => Maybe a -> Doc ann
+toEnglishLabel :: (NLG a, Show a) => Maybe a -> Doc ann
 toEnglishLabel Nothing = emptyDoc
-toEnglishLabel (Just x) = toEnglish x <> line
+toEnglishLabel (Just x)
+  | show x == "\"\""   = emptyDoc
+  | otherwise          = toEnglish x <> line
 
 instance (NLG b, Show b) => NLG (ConditionTree b) where
-  toEnglish (Node (Labeled a (MkCondition pre Any               post)) children) = toEnglishLabel a <> enlist semi Nothing      children (pre <> Just "any of the following") post <> "."
-  toEnglish (Node (Labeled a (MkCondition pre Or                post)) children) = toEnglishLabel a <> enlist semi (Just "or")  children pre post
-  toEnglish (Node (Labeled a (MkCondition pre All               post)) children) = toEnglishLabel a <> enlist semi Nothing      children (pre <> Just "all of the following") post
-  toEnglish (Node (Labeled a (MkCondition pre Union             post)) children) = toEnglishLabel a <> enlist semi (Just "and") children pre post
-  toEnglish (Node (Labeled a (MkCondition pre (Leaf  b)         post)) [])       = toEnglishLabel a <> toEnglish pre <> toEnglish b <> toEnglish post
-  toEnglish (Node (Labeled a (MkCondition pre (Leaf  b)         post)) children) = error ("leaf node " ++ (show b) ++ " should have no children! " ++ show children)
+  toEnglish (Node (Labeled a (MkCondition pre Any        post)) children) = toEnglishLabel a <> enlist semi Nothing      children (pre <> Just "any of the following") post <> "."
+  toEnglish (Node (Labeled a (MkCondition pre Or         post)) children) = toEnglishLabel a <> enlist semi (Just "or")  children pre post
+  toEnglish (Node (Labeled a (MkCondition pre All        post)) children) = toEnglishLabel a <> enlist semi Nothing      children (pre <> Just "all of the following") post
+  toEnglish (Node (Labeled a (MkCondition pre Union      post)) children) = toEnglishLabel a <> enlist semi (Just "and") children pre post
+  toEnglish (Node (Labeled a (MkCondition pre Compl      post)) children) = toEnglishLabel a <> enlist emptyDoc Nothing   children pre post
+  toEnglish (Node (Labeled a (MkCondition pre (Leaf  b)  post)) [])       = toEnglishLabel a <> toEnglish pre <> toEnglish b <> toEnglish post
+  toEnglish (Node (Labeled a (MkCondition pre (Leaf  b)  post)) children) = error ("leaf node " ++ (show b) ++ " should have no children! " ++ show children)
 
-mkLeaf x = Node (Labeled Nothing $ MkCondition Nothing (Leaf $ Pred x) Nothing) []
+mkLeaf x = Node (Labeled Nothing $ mkPred x) []
+mkPred x = MkCondition Nothing (Leaf $ Pred x) Nothing
 
 rule34_1 = Labeled (Just "rule 34.1")
   MyRule { defeasors = []
@@ -272,7 +290,7 @@ rule34_1 = Labeled (Just "rule 34.1")
                              (MkCondition
                               (Just "a legal practitioner must not accept any executive appointment associated with ")
                               Any Nothing))
-                       [ Node (Labeled (Just "34.2.a")
+                       [ Node (Labeled (Just "34.1.a")
                                (MkCondition
                                 (Just "any business which") Or (Just "the dignity of the legal profession") ))
                          [mkLeaf "detractsFrom"
@@ -295,10 +313,35 @@ rule34_1 = Labeled (Just "rule 34.1")
                                [mkLeaf "feeSharing(LP)"
                                ,mkLeaf "commission"]
                        , Node (Labeled (Just "34.1.e")
-                               (MkCondition (Just "any business which is ")
+                               (MkCondition (Just "any business ")
                                 (Leaf $ Pred "inSchedule1")
                                Nothing)) []
-                       ]
+                       , Node (Labeled (Just "34.1.f")
+                               (MkCondition (Just "any business which is prohibited by")
+                               Or Nothing)
+                              )
+                         [Node (Labeled (Just "34.1.f.i") (mkPred "theAct")) []
+                         ,Node (Labeled (Just "34.1.f.ii") (MkCondition Nothing Or Nothing))
+                           [mkLeaf "theseRules"
+                          ,mkLeaf "otherSubsidiary"]
+
+                         ,Node (Labeled (Just "34.1.f.iii") (MkCondition (Just "any") Union (Just "issued under section 71(6) of the Act")))
+                           [mkLeaf "practiceDirections"
+                           ,mkLeaf "guidanceNotes"
+                           ,mkLeaf "rulings"]
+
+                         ,Node (Labeled (Just "34.1.f.iv") (MkCondition Nothing Compl Nothing))
+                           [Node (Labeled (Just "") (MkCondition (Just "any") Union (Just "(relating to professional practice, etiquette, conduct and discipline)")))
+                                  [mkLeaf "practiceDirections"
+                                  ,mkLeaf "guidanceNotes"
+                                  ,mkLeaf "rulings"]
+                           ,Node (Labeled (Just "") (MkCondition (Just "issued by") Or Nothing))
+                           [mkLeaf "theCouncil"
+                           ,mkLeaf "theSociety"]
+                         
+                           ]
+                         ]
+                         ]
          }
 
 ruleBase = Map.fromList $ (\(Labeled (Just l) r) -> (l, r)) <$>

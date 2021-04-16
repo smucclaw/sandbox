@@ -14,7 +14,7 @@ lexiconMapping
     ;
 
 classDeclaration
-    : 'class' Identifier classFieldBlock?
+    : 'class' Identifier ('extends' Identifier)? classFieldBlock?
     ;
 
 classFieldBlock
@@ -22,11 +22,11 @@ classFieldBlock
     ;
 
 classField
-    : Identifier  ':' Identifier
+    : Identifier  ':' tp
     ;
 
 globalVarDecls 
-    : 'decl' Identifier ':' Identifier
+    : 'decl' Identifier ':' tp
     ;
 
 varDeclsCommaSep
@@ -34,11 +34,11 @@ varDeclsCommaSep
     ;
 
 varDecl
-    : Identifier ':' Identifier
+    : Identifier ':' tp
     ;
 
 rules
-    : 'rule <' Identifier '>' ruleVarDecls rulePrecond ruleConcl
+    : 'rule' '<' Identifier '>' ruleVarDecls rulePrecond ruleConcl
     ;
 
 ruleVarDecls
@@ -57,10 +57,56 @@ assertions
     : 'assert' expr
     ;
 
+atp  : 'Boolean'
+     | 'Int'
+     | Identifier
+     | '(' tp (',' tp)* ')'
+     ;
+
+tp   : atp
+     | tp '->' tp
+     ;
+
 expr
-    : 'dummy'
+    : 'forall' Identifier ':' tp '.' expr
+    | 'exists' Identifier ':' tp '.' expr
+    | expr '-->' expr
+    | expr '||' expr
+    | expr '&&' expr
+    | 'if' expr 'then' expr 'else' expr
+    | 'not' expr
+    | 'not' 'derivable' Identifier
+    | 'not' 'derivable' 'not' Identifier
+    | 'not' 'derivable' Identifier Identifier
+    | 'not' 'derivable' 'not' Identifier Identifier
+    | expr '<' expr
+    | expr '<=' expr
+    | expr '>' expr
+    | expr '>=' expr
+    | expr '=' expr
+    | expr '+' expr
+    | expr '-' expr
+    | '-' expr
+    | expr '*' expr
+    | expr '/' expr
+    | expr '%' expr
+    | app
     ;
 
+app :  acc+;
+
+acc : acc '.' Identifier
+    | atom
+    ;
+
+atom
+    : '(' expr (',' expr)* ')'
+    | NumberLiteral
+    | StringLiteral
+    | Identifier
+    | 'true'
+    | 'false'
+    ;
 
 // START: lex
 
@@ -68,6 +114,42 @@ StringLiteral
     :  '"' ( EscapeSequence | ~('\\'|'"') )* '"'
     ;
 
+NumberLiteral
+	:	'0'
+	|	NonZeroDigit (Digits? | Underscores Digits)
+	;
+
+fragment
+Digits
+	:	Digit (DigitsAndUnderscores? Digit)?
+	;
+
+fragment
+Digit
+	:	'0'
+	|	NonZeroDigit
+	;
+
+fragment
+NonZeroDigit
+	:	[1-9]
+	;
+
+fragment
+DigitsAndUnderscores
+	:	DigitOrUnderscore+
+	;
+
+fragment
+DigitOrUnderscore
+	:	Digit
+	|	'_'
+	;
+
+fragment
+Underscores
+	:	'_'+
+	;
 
 /** Skip whitespace */
 WS : (' ' | '\t' | '\r' | '\n') {skip();} ;

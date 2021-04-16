@@ -74,8 +74,10 @@ public class BL4TextDocumentService implements TextDocumentService {
 
         if (lexMapNode != null && lexMapNode.getParent() instanceof BabyL4Parser.LexiconMappingContext mappingContext){
             return "This block maps variable %s to WordNet definion %s".formatted( mappingContext.getChild(0),  mappingContext.getChild(2));
+        } else if (lexMapNode != null) {
+             return  lexMapNode.getPayload() + ":" + lexMapNode.getParent().getClass();
         }
-        return "Don't know";
+        return "Dont know";
     }
 
     @Override

@@ -123,7 +123,7 @@ data Condition a = MkCondition (Maybe String) (Inner a) (Maybe String)
 data Inner a = Any
              | Or
              | All
-             | Union
+             | Union | UnionComma
              | Compl -- allows chaining of conditions as a sugary version of "union", where we use complements to express in-place quantifiers -- see 8.8 of the GF book.
              | Leaf a
              deriving (Eq, Show)
@@ -249,20 +249,23 @@ enlist :: (NLG a) => Doc ann -> Maybe String -> [ConditionTree a] -> Maybe Strin
 enlist separator conjunction middle front back =
   let frontPart = maybe [] (\f -> [toEnglish f <> ":-"]) front
       indentMiddle = if length frontPart /= 0 then 2 else 0
+      listLength = length middle
   in
   vsep (frontPart
-        ++ (indent indentMiddle <$> (addConjunction separator conjunction ( dashPrefix <$> middle )))
+        ++ (indent indentMiddle <$> (addConjunction listLength separator conjunction ( dashPrefix <$> middle )))
         ++ (toEnglish <$> maybeToList back))
   where
     dashPrefix :: (NLG a) => ConditionTree a -> Doc ann
     dashPrefix x = (dashFor $ label $ rootLabel x) <> toEnglish x
 
-addConjunction :: Doc ann -> Maybe String -> [Doc ann] -> [Doc ann]
-addConjunction separator (Just c) [y, z] = [y <> separator <+> pretty c, z]
-addConjunction separator _ [z]    = [z]
-addConjunction separator _ []     = []
-addConjunction separator (Just c) (x:xs) = x <> separator : addConjunction separator (Just c) xs
-addConjunction separator Nothing (x:xs)  = x <> separator : addConjunction separator Nothing xs
+addConjunction :: Int -> Doc ann -> Maybe String -> [Doc ann] -> [Doc ann]
+addConjunction len separator (Just c) [y, z]
+  | len >= 3  = [y <> separator <+> pretty c, z]
+  | otherwise = [y              <+> pretty c, z]
+addConjunction _ separator _ [z]    = [z]
+addConjunction _ separator _ []     = []
+addConjunction l separator (Just c) (x:xs) = x <> separator : addConjunction l separator (Just c) xs
+addConjunction l separator Nothing (x:xs)  = x <> separator : addConjunction l separator Nothing xs
 
 toEnglishLabel :: (NLG a, Show a) => Maybe a -> Doc ann
 toEnglishLabel Nothing = emptyDoc
@@ -275,6 +278,7 @@ instance (NLG b, Show b) => NLG (ConditionTree b) where
   toEnglish (Node (Labeled a (MkCondition pre Or         post)) children) = toEnglishLabel a <> enlist semi (Just "or")  children pre post
   toEnglish (Node (Labeled a (MkCondition pre All        post)) children) = toEnglishLabel a <> enlist semi Nothing      children (pre <> Just "all of the following") post
   toEnglish (Node (Labeled a (MkCondition pre Union      post)) children) = toEnglishLabel a <> enlist semi (Just "and") children pre post
+  toEnglish (Node (Labeled a (MkCondition pre UnionComma post)) children) = toEnglishLabel a <> enlist comma (Just "and") children pre post
   toEnglish (Node (Labeled a (MkCondition pre Compl      post)) children) = toEnglishLabel a <> enlist emptyDoc Nothing   children pre post
   toEnglish (Node (Labeled a (MkCondition pre (Leaf  b)  post)) [])       = toEnglishLabel a <> toEnglish pre <> toEnglish b <> toEnglish post
   toEnglish (Node (Labeled a (MkCondition pre (Leaf  b)  post)) children) = error ("leaf node " ++ (show b) ++ " should have no children! " ++ show children)
@@ -331,10 +335,15 @@ rule34_1 = Labeled (Just "rule 34.1")
                            ,mkLeaf "rulings"]
 
                          ,Node (Labeled (Just "34.1.f.iv") (MkCondition Nothing Compl Nothing))
-                           [Node (Labeled (Just "") (MkCondition (Just "any") Union (Just "(relating to professional practice, etiquette, conduct and discipline)")))
+                           [Node (Labeled (Just "") (MkCondition (Just "any") UnionComma Nothing))
                                   [mkLeaf "practiceDirections"
                                   ,mkLeaf "guidanceNotes"
                                   ,mkLeaf "rulings"]
+                           ,Node (Labeled (Just "") (MkCondition (Just "(relating to") UnionComma (Just ")")))
+                            [mkLeaf "professional practice"
+                            ,mkLeaf "etiquette"
+                            ,mkLeaf "conduct"
+                            ,mkLeaf "discipline"]
                            ,Node (Labeled (Just "") (MkCondition (Just "issued by") Or Nothing))
                            [mkLeaf "theCouncil"
                            ,mkLeaf "theSociety"]

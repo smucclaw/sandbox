@@ -2,11 +2,15 @@
 {-# LANGUAGE LambdaCase #-}
 module LogicGates where
 
-import Utils
+import Utils ( (&), (<&>) )
 import Data.List.Split (chunksOf)
 import Text.Pretty.Simple (pPrint)
 
 import Encoding
+    ( NodeInfo(gType, gDescr),
+      GateType(Buffer, NOT, AND, OR, NOR, Bulb, Switch),
+      NodeRef,
+      nodeInfo )
 import Fgl (makeNodeLabel)
 import qualified Data.Text as T
 

@@ -5,7 +5,7 @@
 {-# LANGUAGE TupleSections #-}
 module Rule34_jacob where
 
-import Utils
+import Utils ( foldl', (&), (<&>), (>>>), show' )
 import qualified Data.Map.Strict as Map
 import Data.Text (Text)
 import qualified Data.Text as Text
@@ -14,7 +14,6 @@ import Data.Graph.Inductive.Graph (mkGraph)
 import Data.Graph.Inductive.PatriciaTree (Gr)
 
 import Encoding ( GateType(..) )
--- import Data.GraphViz (preview)
 import Graphviz (preview, preview'custom)
 import qualified Data.Bifunctor
 
@@ -145,5 +144,5 @@ makeGraph = makeGraph1 >>> makeGraph2
 rule34_jacobMain :: IO ()
 rule34_jacobMain = do
   putStrLn "__rule34_jacobMain__"
-  preview (makeGraph rule34_text) >> putStrLn "< visualise a graph using the Xlib GraphvizCanvas >"
+  -- preview (makeGraph rule34_text) >> putStrLn "< visualise a graph using the Xlib GraphvizCanvas >"
   preview'custom (makeGraph rule34_text) >> putStrLn "< visualise a graph using the Xlib GraphvizCanvas >"

@@ -15,8 +15,8 @@ import Data.GraphViz.Commands (runGraphvizCanvas', GraphvizCanvas (Xlib))
 import Data.GraphViz.Types (GlobalAttributes(GraphAttrs, attrs))
 import Data.GraphViz.Attributes.Complete (Attribute(RankDir), RankDir (FromLeft))
 
-import Encoding
-import Fgl
+import Encoding ( NodeInfo )
+import Fgl ( myGraph )
 
 -- | unused
 instance Labellable NodeInfo where

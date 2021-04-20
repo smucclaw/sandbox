@@ -15,9 +15,14 @@ import Data.Graph.Inductive.PatriciaTree (Gr)
 import Data.Graph.Inductive.Graph
     ( Graph(mkGraph), Node, pre, suc )
 
-import Utils
+import Utils ( (&), (<&>) )
 
 import Encoding
+    ( NodeInfo(gType, gDescr),
+      NodeRef(Bulb'May, Or'May),
+      nodeList,
+      nodeInfo,
+      edges0 )
 
 -- *** Readme *** --
 -- Fgl library represents nodes using a unique index of type Int.

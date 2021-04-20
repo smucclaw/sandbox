@@ -1,4 +1,8 @@
-module Graphviz where
+module Graphviz (
+  preview,
+  preview'custom,
+  graphvizMain
+) where
 
 import Data.Text (Text, pack)
 import Control.Concurrent (forkIO)

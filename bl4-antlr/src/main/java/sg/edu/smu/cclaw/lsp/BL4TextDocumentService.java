@@ -5,6 +5,7 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import org.antlr.v4.runtime.tree.TerminalNode;
 import org.eclipse.lsp4j.*;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.TextDocumentService;
@@ -33,7 +34,8 @@ public class BL4TextDocumentService implements TextDocumentService {
         LOGGER.info("received textDocument/hover request:" + params);
         try {
             final Path path = Paths.get(new URI(params.getTextDocument().getUri()));
-            message = getHoverMessage(path, params.getPosition());
+            CharStream input = CharStreams.fromPath(path);
+            message = getHoverMessage(input, params.getPosition());
         } catch (URISyntaxException | IOException e) {
             throw new IllegalArgumentException("Failed to get file from hover param", e);
         }
@@ -42,10 +44,7 @@ public class BL4TextDocumentService implements TextDocumentService {
         return CompletableFuture.completedFuture(h);
     }
 
-     String getHoverMessage(Path path, Position position) throws IOException {
-
-        CharStream input = CharStreams.fromPath(path);
-
+     public static String getHoverMessage(CharStream input, Position position) throws IOException {
         BabyL4Lexer lex = new BabyL4Lexer(input);
 
         CommonTokenStream tokens = new CommonTokenStream(lex);
@@ -59,10 +58,13 @@ public class BL4TextDocumentService implements TextDocumentService {
 
         ParseTree lexMapNode = extractor.locateParseTree(position.getLine() + 1, position.getCharacter() + 1);
 
-        if (lexMapNode != null && lexMapNode.getParent() instanceof BabyL4Parser.LexiconMappingContext mappingContext){
-            return "This block maps variable %s to WordNet definion %s".formatted( mappingContext.getChild(0),  mappingContext.getChild(2));
-        } else if (lexMapNode != null) {
-             return  lexMapNode.getPayload() + ":" + lexMapNode.getParent().getClass();
+         return getHoverFromTree(lexMapNode);
+     }
+
+    public static  String getHoverFromTree(ParseTree lexMapNode) {
+        HoverVisitor hoverVisitor = new HoverVisitor();
+        if (lexMapNode != null ){
+            return hoverVisitor.visit(lexMapNode.getParent());
         }
         return "Dont know";
     }

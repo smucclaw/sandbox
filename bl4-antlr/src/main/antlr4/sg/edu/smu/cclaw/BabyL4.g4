@@ -22,11 +22,11 @@ classFieldBlock
     ;
 
 classField
-    : Identifier  ':' tp
+    : Identifier  ':' type
     ;
 
 globalVarDecls 
-    : 'decl' Identifier ':' tp
+    : 'decl' Identifier ':' type
     ;
 
 varDeclsCommaSep
@@ -34,7 +34,7 @@ varDeclsCommaSep
     ;
 
 varDecl
-    : Identifier ':' tp
+    : Identifier ':' type
     ;
 
 rules
@@ -57,19 +57,18 @@ assertions
     : 'assert' expr
     ;
 
-atp  : 'Boolean'
-     | 'Int'
-     | Identifier
-     | '(' tp (',' tp)* ')'
-     ;
+type
+    : 'Boolean'
+    | 'Int'
+    | Identifier
+    | '(' type (',' type)* ')'
+    | type '->' type
+    ;
 
-tp   : atp
-     | tp '->' tp
-     ;
 
 expr
-    : 'forall' Identifier ':' tp '.' expr
-    | 'exists' Identifier ':' tp '.' expr
+    : 'forall' Identifier ':' type '.' expr
+    | 'exists' Identifier ':' type '.' expr
     | expr '-->' expr
     | expr '||' expr
     | expr '&&' expr

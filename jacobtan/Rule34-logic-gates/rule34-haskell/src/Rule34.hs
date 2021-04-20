@@ -286,6 +286,16 @@ instance (NLG b, Show b) => NLG (ConditionTree b) where
 mkLeaf x = Node (Labeled Nothing $ mkPred x) []
 mkPred x = MkCondition Nothing (Leaf $ Pred x) Nothing
 
+{- the user-facing syntax for this is ultimately relational. In Prolog it would look like:
+
+34_1_d("34.1.d", mustNot, B, LP, P) :-
+  business(B), legalPractitioner(LP), person(P,unauthorised),
+  involves(B, Naughtiness, for, work(legal, performedBy(LP))),
+  ( Naughtiness = feeSharing(P)
+  ; Naughtiness = commissionPaymentTo(P)
+  ).
+
+-}
 rule34_1 = Labeled (Just "rule 34.1")
   MyRule { defeasors = []
          , party = lp

@@ -1,3 +1,4 @@
+{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE NamedFieldPuns #-}
@@ -8,7 +9,6 @@ import Utils
 import qualified Data.Map.Strict as Map
 import Data.Text (Text)
 import qualified Data.Text as Text
-import qualified Data.Bifunctor
 
 import Data.Graph.Inductive.Graph (mkGraph)
 import Data.Graph.Inductive.PatriciaTree (Gr)
@@ -19,7 +19,7 @@ import Graphviz (preview'custom)
 
 data ParaRef = P341 | P341a | P341b | P341c | P341d | P341e | P341f
   | P342 | P343 | P344 | P345 | P346 | P347 | PMustNot | PMay
-  deriving (Eq, Ord)
+  deriving (Eq, Ord, Show)
 
 data Direction = In | Out deriving (Eq, Ord)
 
@@ -45,6 +45,7 @@ rule34_text = init [
   Stmt P341e "34.1e GOTO 1st Schedule" Switch [] [] [],
   Stmt P341f "34.1f otherwise prohibited" Switch [] [] [],
 
+  Stmt PMay "May" Bulb [P342] [] [],
   Stmt P342 "34.2 connected [see sub conditions]" Switch [] [P341] [],
 
   Stmt undefined undefined undefined undefined undefined undefined
@@ -57,27 +58,50 @@ data MakeGraphState = MGState {
   --- ^ A paragraph may be represented by a newer logic gate node
   ---      as @makeGraph@ builds the graph.
   mgsNodes :: [(Int, GateType, Text)], -- Text is node label
-  mgsEdges :: [(ParaRef, Int)],
+  mgsEdges :: [(Input, Int)],
   mgsCounter :: Int }
+
+data Input = IRef ParaRef | I Int
 
 makeGraph1 :: [Statement] -> MakeGraphState
 makeGraph1 statements = statements
-  & foldl f (MGState mempty [] [] 0)
+  & foldl' f (MGState mempty [] [] 0)
   where
     f :: MakeGraphState -> Statement -> MakeGraphState
-    f mgsState@MGState{ mgsPointers, mgsNodes, mgsEdges, mgsCounter = i } Stmt {sParaRef, sLabel, sGateType, sInputs} =
-      mgsState{
-        mgsPointers = Map.insert sParaRef i mgsPointers,
-        mgsNodes = (i, sGateType, sLabel) : mgsNodes,
-        mgsEdges = mgsEdges ++ fmap (,i) sInputs,
-        mgsCounter = succ i
-        }
-
--- makeNodes :: [Statement] -> [(Int, Text)]
--- makeNodes statements = statements
---   <&> (\Stmt{ sLabel, sGateType } ->
---     (Text.pack . show) sGateType <> ": " <> sLabel)
---   & zip [0..]
+    f mgsState
+      Stmt{ sParaRef, sLabel, sGateType, sInputs, sSubjectTo }
+      = mgsState & initState & rewriteSubjectTo
+      where
+        initState :: MakeGraphState -> MakeGraphState
+        initState mgsState@MGState{ mgsPointers, mgsNodes, mgsEdges, mgsCounter }
+          = let i = succ mgsCounter in mgsState{
+            mgsPointers = Map.insert sParaRef i mgsPointers,
+            mgsNodes = (i, sGateType, sLabel) : mgsNodes,
+            mgsEdges = mgsEdges ++ fmap (, i) (sInputs <&> IRef),
+            mgsCounter = i
+            }
+        -- | defeasibility rewrite
+        rewriteSubjectTo stateAfterInit@MGState{ mgsCounter, mgsPointers } =
+          if null sSubjectTo then stateAfterInit
+          else foldl' g (stateAfterInit & addAND) sSubjectTo
+          where
+            oldParaIndex = mgsPointers Map.! sParaRef
+            andNodeIndex = succ mgsCounter
+            addAND :: MakeGraphState -> MakeGraphState
+            addAND mgsState@MGState{ mgsPointers, mgsNodes, mgsEdges, mgsCounter }
+              = mgsState{
+                  mgsNodes = (andNodeIndex, AND, show' sParaRef <> " with defeasibility") : mgsNodes,
+                  mgsCounter = andNodeIndex,
+                  mgsPointers = Map.insert sParaRef andNodeIndex mgsPointers,
+                  mgsEdges = (I oldParaIndex, andNodeIndex) : mgsEdges
+                  }
+            g :: MakeGraphState -> ParaRef -> MakeGraphState
+            g mgsState@MGState{ mgsPointers, mgsNodes, mgsEdges, mgsCounter } subjectTo
+              = let j = succ mgsCounter in mgsState {
+                  mgsNodes = (j, NOT, show' sParaRef <> " subject to " <> show' sSubjectTo) : mgsNodes,
+                  mgsCounter = j,
+                  mgsEdges = (IRef subjectTo, j) : (I j, andNodeIndex) : mgsEdges
+                  }
 
 makeGraph2 :: MakeGraphState -> Gr Text Text
 makeGraph2 MGState{ mgsPointers, mgsNodes, mgsEdges } =
@@ -85,11 +109,11 @@ makeGraph2 MGState{ mgsPointers, mgsNodes, mgsEdges } =
   where
     makeNode :: (Int, GateType, Text) -> (Int, Text)
     makeNode (i, gateType, label) =
-      (i, (Text.pack . show) gateType <> ": " <> label)
-    makeFinalEdge :: (ParaRef, Int) -> (Int, Int)
-    makeFinalEdge =
-      -- \(paraRef, int) -> (pointers Map.! paraRef, int) -- replaced with hlint suggestion
-      Data.Bifunctor.first (mgsPointers Map.!) -- hlint suggested this
+      (i, show' gateType <> ": " <> label)
+    makeFinalEdge :: (Input, Int) -> (Int, Int)
+    makeFinalEdge = \case
+      (I i, j) -> (i,j)
+      (IRef paraRef, int) -> (mgsPointers Map.! paraRef, int)
 
 makeGraph :: [Statement] -> Gr Text Text
 makeGraph = makeGraph1 >>> makeGraph2

@@ -18,7 +18,7 @@ nodeList = genumFrom (gtoEnum @NodeRef 0)
 --   i.e. a list of all the constructors in the NodeRef data type.
 
 -- | Logic gate types
-data GateType = NOT | AND | OR | NOR | Bulb | Switch deriving Show
+data GateType = NOT | AND | OR | NOR | Bulb | Switch | Buffer deriving Show
 
 -- | 
 data NodeInfo = Node { gType :: GateType, gDescr :: Text } deriving Show

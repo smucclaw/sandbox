@@ -51,6 +51,7 @@ myGraph :: Gr Text Text
 myGraph = mkGraph @Gr fglNodes fglEdges
 
 
+-- | typeclass to produce NodeRef from compatible input types
 class HasNodeRef a b where
   toNodeRef :: a -> b
 instance (HasNodeRef a b, Functor f, f ~ g) => HasNodeRef (f a) (g b) where
@@ -58,7 +59,7 @@ instance (HasNodeRef a b, Functor f, f ~ g) => HasNodeRef (f a) (g b) where
 instance NodeRef ~ nr => HasNodeRef Node nr where
   toNodeRef = gtoEnum @NodeRef
 
--- | for convenient type application (see the fgl function)
+-- | for convenient type application (see the @fgl@ function)
 class X a
 instance X a
 

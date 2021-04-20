@@ -39,10 +39,21 @@ public class HoverVisitor extends BabyL4BaseVisitor<String> {
             ParserRuleContext classDecl = typeContainer.getParent().getParent();
             return "Declaration of type for field %s within class %s".formatted(typeContainer.getChild(0), classDecl.getChild(1));
         } else if (typeContainer instanceof BabyL4Parser.GlobalVarDeclsContext ) {
-            return "Declaration of type for global variable AssociatedWith";
+            return "Declaration of type for global variable %s".formatted(typeContainer.getChild(1));
         }
         return "Some type";
     }
+
+    @Override
+    public String visitGlobalVarDecls(BabyL4Parser.GlobalVarDeclsContext ctx) {
+        return "Declaration of global variable %s".formatted(ctx.getChild(1));
+    }
+
+    @Override
+    public String visitRules(BabyL4Parser.RulesContext ctx) {
+        return "Declaration of rule %s".formatted(ctx.getChild(2));
+    }
+
 
     @Override
     public String visitTerminal(TerminalNode node) {

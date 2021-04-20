@@ -30,8 +30,8 @@ class HoverTest {
                 .getResourceAsStream("mini.l4");
         CharStream input = CharStreams.fromStream(in);
 
-        String lexiconHover = BL4TextDocumentService.getHoverMessage(input, new Position(3,2));
-        assertThat(lexiconHover).isEqualTo("This block maps variable Business to WordNet definion \"business_1_N\"");
+        String lexiconMappingHover = BL4TextDocumentService.getHoverMessage(input, new Position(3,2));
+        assertThat(lexiconMappingHover).isEqualTo("This block maps variable Business to WordNet definion \"business_1_N\"");
     }
 
     @Test
@@ -40,8 +40,8 @@ class HoverTest {
                 .getResourceAsStream("cr.l4");
         CharStream input = CharStreams.fromStream(in);
 
-        String lexiconHover = BL4TextDocumentService.getHoverMessage(input, new Position(21,10));
-        assertThat(lexiconHover).isEqualTo("Declaration of new class : Business");
+        String classDefinitionNameHover = BL4TextDocumentService.getHoverMessage(input, new Position(21,10));
+        assertThat(classDefinitionNameHover).isEqualTo("Declaration of new class : Business");
     }
 
     @Test
@@ -50,8 +50,8 @@ class HoverTest {
                 .getResourceAsStream("cr.l4");
         CharStream input = CharStreams.fromStream(in);
 
-        String lexiconHover2 = BL4TextDocumentService.getHoverMessage(input, new Position(21,2));
-        assertThat(lexiconHover2).isEqualTo("Declaration of new class : Business");
+        String classDefinitionClassHeaderHover = BL4TextDocumentService.getHoverMessage(input, new Position(21,2));
+        assertThat(classDefinitionClassHeaderHover).isEqualTo("Declaration of new class : Business");
     }
 
     @Test
@@ -60,8 +60,8 @@ class HoverTest {
                 .getResourceAsStream("cr.l4");
         CharStream input = CharStreams.fromStream(in);
 
-        String lexiconHover = BL4TextDocumentService.getHoverMessage(input, new Position(22,8));
-        assertThat(lexiconHover).isEqualTo("Declaration of field foo within class Business");
+        String classFieldNameHover = BL4TextDocumentService.getHoverMessage(input, new Position(22,8));
+        assertThat(classFieldNameHover).isEqualTo("Declaration of field foo within class Business");
     }
 
     @Test
@@ -70,8 +70,8 @@ class HoverTest {
                 .getResourceAsStream("cr.l4");
         CharStream input = CharStreams.fromStream(in);
 
-        String lexiconHover = BL4TextDocumentService.getHoverMessage(input, new Position(23,13));
-        assertThat(lexiconHover).isEqualTo("Declaration of type for field foo within class Business");
+        String classFieldTypeHover = BL4TextDocumentService.getHoverMessage(input, new Position(23,13));
+        assertThat(classFieldTypeHover).isEqualTo("Declaration of type for field bar within class Business");
     }
 
     @Test
@@ -80,8 +80,28 @@ class HoverTest {
                 .getResourceAsStream("cr.l4");
         CharStream input = CharStreams.fromStream(in);
 
-        String lexiconHover = BL4TextDocumentService.getHoverMessage(input, new Position(38,30));
-        assertThat(lexiconHover).isEqualTo("Declaration of type for global variable AssociatedWith");
+        String globalVarTypeHover = BL4TextDocumentService.getHoverMessage(input, new Position(38,30));
+        assertThat(globalVarTypeHover).isEqualTo("Declaration of type for global variable AssociatedWith");
+    }
+
+    @Test
+    void testGlobalVarDecl() throws Exception {
+        InputStream in = this.getClass().getClassLoader()
+                .getResourceAsStream("cr.l4");
+        CharStream input = CharStreams.fromStream(in);
+
+        String globalVarDeclHover = BL4TextDocumentService.getHoverMessage(input, new Position(38,12));
+        assertThat(globalVarDeclHover).isEqualTo("Declaration of global variable AssociatedWith");
+    }
+
+    @Test
+    void testRuleName() throws Exception {
+        InputStream in = this.getClass().getClassLoader()
+                .getResourceAsStream("cr.l4");
+        CharStream input = CharStreams.fromStream(in);
+
+        String ruleNameHover = BL4TextDocumentService.getHoverMessage(input, new Position(61,7));
+        assertThat(ruleNameHover).isEqualTo("Declaration of rule r1a");
     }
 
 }

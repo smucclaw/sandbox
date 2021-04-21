@@ -4,7 +4,7 @@ cabal-version: 2.0
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 820309ec4163c672102e40ad9e00cb955eea73f0b25732f4a393daf193134fd3
+-- hash: 18c88cc142aa95d243a12eef57dd3390e9d9dfb8bd9a8e6b39e6f680d72184c6
 
 name:           parse-predicates
 version:        0.1.0.0
@@ -15,7 +15,7 @@ copyright:      2021 Inari Listenmaa
 license:        BSD3
 build-type:     Custom
 extra-source-files:
-    grammars/Parse.gf
+    grammars/ParseGF.gf
 
 custom-setup
   setup-depends:
@@ -43,7 +43,7 @@ library
 
 library gf-generated
   exposed-modules:
-      Parse
+      ParseGF
   other-modules:
       Paths_parse_predicates
   hs-source-dirs:
@@ -73,4 +73,44 @@ executable pp-exe
     , mtl
     , parse-predicates
     , split
+  default-language: Haskell2010
+
+test-suite doctest
+  type: exitcode-stdio-1.0
+  main-is: Doctest.hs
+  other-modules:
+      Paths_parse_predicates
+  hs-source-dirs:
+      doctest
+  ghc-options: -Wall -Wno-unticked-promoted-constructors
+  build-depends:
+      base >=4.7 && <5
+    , containers
+    , doctest
+    , extra
+    , gf
+    , gf-generated
+    , mtl
+    , parse-predicates
+    , split
+  default-language: Haskell2010
+
+test-suite my-tests
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Paths_parse_predicates
+  hs-source-dirs:
+      tests
+  ghc-options: -Wall -Wno-unticked-promoted-constructors
+  build-depends:
+      base >=4.7 && <5
+    , containers
+    , extra
+    , gf
+    , mtl
+    , parse-predicates
+    , split
+    , tasty
+    , tasty-hunit
   default-language: Haskell2010

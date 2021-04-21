@@ -10,7 +10,13 @@ cradle:
       component: "parse-predicates:lib:gf-generated"
 
     - path: "./app/Main.hs"
-      component: "parse-predicates:exe:rps-exe"
+      component: "parse-predicates:exe:pp-exe"
 
     - path: "./app/Paths_parse_predicates.hs"
-      component: "parse-predicates:exe:rps-exe"
+      component: "parse-predicates:exe:pp-exe"
+    
+    - path: "./tests"
+      component: "parse-predicates:test:my-tests"
+
+    - path: "./doctest"
+      component: "parse-predicates:test:doctest"

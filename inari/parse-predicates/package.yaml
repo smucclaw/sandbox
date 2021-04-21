@@ -15,7 +15,7 @@ custom-setup:
 
 extra-source-files:
 # - README.md
-- grammars/Parse.gf
+- grammars/ParseGF.gf
 
 
 # Metadata used when publishing your package
@@ -34,6 +34,7 @@ dependencies:
 - extra
 - mtl
 - containers
+- gf-ud
 
 ghc-options:
 - -Wall
@@ -42,7 +43,7 @@ ghc-options:
 internal-libraries:
   gf-generated:
     exposed-modules:
-    - Parse
+    - ParseGF
     source-dirs:
     - grammars
 
@@ -52,6 +53,21 @@ library:
   source-dirs: 
   - src
 
+tests:
+  doctest:
+    dependencies:
+    - parse-predicates
+    - doctest
+    - gf-generated
+    source-dirs: doctest
+    main: Doctest.hs
+  my-tests:
+    dependencies:
+    - parse-predicates
+    - tasty
+    - tasty-hunit
+    source-dirs: tests
+    main: Spec.hs
 
 executables:
   pp-exe:

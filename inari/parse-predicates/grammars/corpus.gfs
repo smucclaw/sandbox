@@ -72,7 +72,6 @@ p "awesome"
 ps "* cool"
 p "cool"
 
-
 ps "* owner"
 p "owner"
 ps "* legal owner"
@@ -89,3 +88,8 @@ ps "* jurisdiction is Singapore"
 p "jurisdiction is Singapore"
 ps "* member"
 p "member"
+
+-- vt -view=open FullPred PresIndSg PosPol (ComplVP (ComplSlash (SlashV2a involve_V2) (MassNP (AdjCN (PastPartAgentAP (SlashV2a perform_V2) (DetCN (DetQuant DefArt NumSg) (AdjCN (PositA legal_A) (UseN practitioner_N)))) (GerundCN (ComplSlash (SlashV2a share_V2) (DetCN (DetQuant IndefArt NumPl) (ComplN2 (MkN2 fee_N with_Prep) (DetCN (DetQuant IndefArt NumPl) (AdjCN (PositA unauthorized_A) (ComplN2 (MkN2 person_N for_Prep) (MassNP (AdjCN (PositA legal_A) (UseN work_N))))))))))))))
+-- vt -view=open FullPred PresIndSg PosPol (ComplVP (ComplSlash (SlashV2a involve_V2) (MassNP (GerundCN (ComplSlash (SlashV2a share_V2) (DetCN (DetQuant IndefArt NumPl) (AdjCN (PastPartAgentAP (SlashV2a perform_V2) (DetCN (DetQuant DefArt NumSg) (AdjCN (PositA legal_A) (UseN practitioner_N)))) (ComplN2 (MkN2 fee_N with_Prep) (DetCN (DetQuant IndefArt NumPl) (AdjCN (PositA unauthorized_A) (ComplN2 (MkN2 person_N for_Prep) (MassNP (AdjCN (PositA legal_A) (UseN work_FullPred))))))))))))))
+-- vt -view=open FullPred PresIndSg PosPol (ComplVP (ComplSlash (SlashV2a involve_V2) (MassNP (GerundCN (ComplSlash (SlashV2a share_V2) (DetCN (DetQuant IndefArt NumPl) (ComplN2 (MkN2 fee_N with_Prep) (DetCN (DetQuant IndefArt NumPl) (AdjCN (PositA unauthorized_A) (AdjCN (PastPartAgentAP (SlashV2a perform_V2) (DetCN (DetQuant DefArt NumSg) (AdjCN (PositA legal_A) (UseN practitioner_N)))) (ComplN2 (MkN2 person_N for_Prep) (MassNP (AdjCN (PositA legal_A) (UseN work_N))))))))))))))
+-- vt -view=open FullPred PresIndSg PosPol (ComplVP (ComplSlash (SlashV2a involve_V2) (MassNP (GerundCN (ComplSlash (SlashV2a share_V2) (DetCN (DetQuant IndefArt NumPl) (ComplN2 (MkN2 fee_N with_Prep) (DetCN (DetQuant IndefArt NumPl) (AdjCN (PositA unauthorized_A) (ComplN2 (MkN2 person_N for_Prep) (MassNP (AdjCN (PositA legal_A) (AdjCN (PastPartAgentAP (SlashV2a perform_V2) (DetCN (DetQuant DefArt NumSg) (AdjCN (PositA legal_A) (UseN practitioner_N)))) (UseN work_N))))))))))))))

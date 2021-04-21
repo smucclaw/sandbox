@@ -38,10 +38,17 @@ data Statement = Stmt {
 }
 
 -- | encoding of the legal text
+--     *** note *** sOutputs field is conveneint but fragile.
+--       It's safer not to use sOutputs, and just add to the respective sInputs field instead.
+--       Due to rewriting, the ParaRef you're outputting to can point to something non-sensible.
 rule34_text :: [Statement]
 rule34_text = init [
   Stmt PMustNotBulb "Must Not (bulb)" Bulb [PMustNot] [] [] [],
-  Stmt PMustNot "Must Not" Buffer [] [] [] [],
+  Stmt PMustNot "Must Not" OR [] [] [] [],
+  --- ^ PMustNot originally uses a "Buffer" logic gate due to having only 1 input.
+  ---     But OR is probably more appropriate because another rule that appears
+  ---     later may also output to PMustNot.
+  ---       (An OR gate with 1 input still makes sense.)
 
   Stmt P341 "34.1 associated with bad business" OR [P341a, P341b, P341c, P341d, P341e, P341f] [PMustNot] [] [],
   Stmt P341a "34.1a undignified" Switch [] [] [] [],
@@ -66,11 +73,13 @@ rule34_text = init [
   Stmt P341a'P341c_to_f "34.1a, 34.1c-f" OR [P341a, P341c, P341d, P341e, P341f] [] [] [],
   Stmt P'IsLocum "is locum" Switch [] [] [] [],
 
+  Stmt P346 "34.6" NOR [P342, P343, P344, P345] [PMustNot] [] [],
+
   Stmt P347 "34.7" Buffer [P'3rdSchedule] [PMay] [] [PMustNot],
   Stmt P'3rdSchedule "3rd schedule" Switch [] [] [] [],
 
   Stmt undefined undefined undefined undefined undefined undefined undefined
-  --- ^ for trailing commas
+  --- ^ for trailing commas. Used with the @init@ function.
   ]
 
 -- | Int represents node index

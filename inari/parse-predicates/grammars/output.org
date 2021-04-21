@@ -1,0 +1,138 @@
+* described in section 1
+V2PartAdv PosPol describe_V2 (PrepNP in_Prep (MassNP (CnNum (UseN section_N) (NumDigits (IDig D_1)))))
+
+* detracts from dignity of legal profession
+FullPred PresIndSg PosPol (ComplVP (ComplSlash (SlashV2a (MkV2 detract_V from_Prep)) (MassNP (ComplN2 (MkN2 dignity_N of_Prep) (MassNP (AdjCN (PositA legal_A) (UseN profession_N)))))))
+
+* incompatible with dignity of legal profession
+PredAP PosPol (ComplA2 (MkA2 incompatible_A with_Prep) (MassNP (ComplN2 (MkN2 dignity_N of_Prep) (MassNP (AdjCN (PositA legal_A) (UseN profession_N))))))
+
+* derogates from dignity of legal profession
+FullPred PresIndSg PosPol (ComplVP (ComplSlash (SlashV2a (MkV2 derogate_V from_Prep)) (MassNP (ComplN2 (MkN2 dignity_N of_Prep) (MassNP (AdjCN (PositA legal_A) (UseN profession_N)))))))
+
+* unfair
+PredAP PosPol (PositA unfair_A)
+
+* described in first schedule
+V2PartAdv PosPol describe_V2 (PrepNP in_Prep (MassNP (AdjCN (AdjOrd (OrdNumeral (num (pot2as3 (pot1as2 (pot0as1 pot01)))))) (UseN schedule_N))))
+
+* prohibited
+PredAP PosPol (PastPartAP (SlashV2a prohibit_V2))
+
+* involves sharing fees  with unauthorized persons for legal work performed by the legal practitioner
+FullPred PresIndSg PosPol (ComplVP (ComplSlash (SlashV2a involve_V2) (MassNP (AdjCN (PastPartAgentAP (SlashV2a perform_V2) (DetCN (DetQuant DefArt NumSg) (AdjCN (PositA legal_A) (UseN practitioner_N)))) (ApposCN (UseN sharing_N) (DetCN (DetQuant IndefArt NumPl) (ComplN2 (MkN2 fee_N with_Prep) (DetCN (DetQuant IndefArt NumPl) (AdjCN (PositA unauthorized_A) (ComplN2 (MkN2 person_N for_Prep) (MassNP (AdjCN (PositA legal_A) (UseN work_N)))))))))))))
+FullPred PresIndSg PosPol (ComplVP (ComplSlash (SlashV2a involve_V2) (MassNP (AdjCN (PastPartAgentAP (SlashV2a perform_V2) (DetCN (DetQuant DefArt NumSg) (AdjCN (PositA legal_A) (UseN practitioner_N)))) (GerundCN (ComplSlash (SlashV2a share_V2) (DetCN (DetQuant IndefArt NumPl) (ComplN2 (MkN2 fee_N with_Prep) (DetCN (DetQuant IndefArt NumPl) (AdjCN (PositA unauthorized_A) (ComplN2 (MkN2 person_N for_Prep) (MassNP (AdjCN (PositA legal_A) (UseN work_N))))))))))))))
+FullPred PresIndSg PosPol (ComplVP (ComplSlash (SlashV2a involve_V2) (MassNP (ApposCN (UseN sharing_N) (DetCN (DetQuant IndefArt NumPl) (AdjCN (PastPartAgentAP (SlashV2a perform_V2) (DetCN (DetQuant DefArt NumSg) (AdjCN (PositA legal_A) (UseN practitioner_N)))) (ComplN2 (MkN2 fee_N with_Prep) (DetCN (DetQuant IndefArt NumPl) (AdjCN (PositA unauthorized_A) (ComplN2 (MkN2 person_N for_Prep) (MassNP (AdjCN (PositA legal_A) (UseN work_N)))))))))))))
+FullPred PresIndSg PosPol (ComplVP (ComplSlash (SlashV2a involve_V2) (MassNP (ApposCN (UseN sharing_N) (DetCN (DetQuant IndefArt NumPl) (ComplN2 (MkN2 fee_N with_Prep) (DetCN (DetQuant IndefArt NumPl) (AdjCN (PastPartAgentAP (SlashV2a perform_V2) (DetCN (DetQuant DefArt NumSg) (AdjCN (PositA legal_A) (UseN practitioner_N)))) (AdjCN (PositA unauthorized_A) (ComplN2 (MkN2 person_N for_Prep) (MassNP (AdjCN (PositA legal_A) (UseN work_N)))))))))))))
+FullPred PresIndSg PosPol (ComplVP (ComplSlash (SlashV2a involve_V2) (MassNP (ApposCN (UseN sharing_N) (DetCN (DetQuant IndefArt NumPl) (ComplN2 (MkN2 fee_N with_Prep) (DetCN (DetQuant IndefArt NumPl) (AdjCN (PositA unauthorized_A) (AdjCN (PastPartAgentAP (SlashV2a perform_V2) (DetCN (DetQuant DefArt NumSg) (AdjCN (PositA legal_A) (UseN practitioner_N)))) (ComplN2 (MkN2 person_N for_Prep) (MassNP (AdjCN (PositA legal_A) (UseN work_N)))))))))))))
+FullPred PresIndSg PosPol (ComplVP (ComplSlash (SlashV2a involve_V2) (MassNP (ApposCN (UseN sharing_N) (DetCN (DetQuant IndefArt NumPl) (ComplN2 (MkN2 fee_N with_Prep) (DetCN (DetQuant IndefArt NumPl) (AdjCN (PositA unauthorized_A) (ComplN2 (MkN2 person_N for_Prep) (MassNP (AdjCN (PastPartAgentAP (SlashV2a perform_V2) (DetCN (DetQuant DefArt NumSg) (AdjCN (PositA legal_A) (UseN practitioner_N)))) (AdjCN (PositA legal_A) (UseN work_N)))))))))))))
+FullPred PresIndSg PosPol (ComplVP (ComplSlash (SlashV2a involve_V2) (MassNP (ApposCN (UseN sharing_N) (DetCN (DetQuant IndefArt NumPl) (ComplN2 (MkN2 fee_N with_Prep) (DetCN (DetQuant IndefArt NumPl) (AdjCN (PositA unauthorized_A) (ComplN2 (MkN2 person_N for_Prep) (MassNP (AdjCN (PositA legal_A) (AdjCN (PastPartAgentAP (SlashV2a perform_V2) (DetCN (DetQuant DefArt NumSg) (AdjCN (PositA legal_A) (UseN practitioner_N)))) (UseN work_N)))))))))))))
+FullPred PresIndSg PosPol (ComplVP (ComplSlash (SlashV2a involve_V2) (MassNP (GerundCN (ComplSlash (SlashV2a share_V2) (DetCN (DetQuant IndefArt NumPl) (AdjCN (PastPartAgentAP (SlashV2a perform_V2) (DetCN (DetQuant DefArt NumSg) (AdjCN (PositA legal_A) (UseN practitioner_N)))) (ComplN2 (MkN2 fee_N with_Prep) (DetCN (DetQuant IndefArt NumPl) (AdjCN (PositA unauthorized_A) (ComplN2 (MkN2 person_N for_Prep) (MassNP (AdjCN (PositA legal_A) (UseN work_N))))))))))))))
+FullPred PresIndSg PosPol (ComplVP (ComplSlash (SlashV2a involve_V2) (MassNP (GerundCN (ComplSlash (SlashV2a share_V2) (DetCN (DetQuant IndefArt NumPl) (ComplN2 (MkN2 fee_N with_Prep) (DetCN (DetQuant IndefArt NumPl) (AdjCN (PastPartAgentAP (SlashV2a perform_V2) (DetCN (DetQuant DefArt NumSg) (AdjCN (PositA legal_A) (UseN practitioner_N)))) (AdjCN (PositA unauthorized_A) (ComplN2 (MkN2 person_N for_Prep) (MassNP (AdjCN (PositA legal_A) (UseN work_N))))))))))))))
+FullPred PresIndSg PosPol (ComplVP (ComplSlash (SlashV2a involve_V2) (MassNP (GerundCN (ComplSlash (SlashV2a share_V2) (DetCN (DetQuant IndefArt NumPl) (ComplN2 (MkN2 fee_N with_Prep) (DetCN (DetQuant IndefArt NumPl) (AdjCN (PositA unauthorized_A) (AdjCN (PastPartAgentAP (SlashV2a perform_V2) (DetCN (DetQuant DefArt NumSg) (AdjCN (PositA legal_A) (UseN practitioner_N)))) (ComplN2 (MkN2 person_N for_Prep) (MassNP (AdjCN (PositA legal_A) (UseN work_N))))))))))))))
+FullPred PresIndSg PosPol (ComplVP (ComplSlash (SlashV2a involve_V2) (MassNP (GerundCN (ComplSlash (SlashV2a share_V2) (DetCN (DetQuant IndefArt NumPl) (ComplN2 (MkN2 fee_N with_Prep) (DetCN (DetQuant IndefArt NumPl) (AdjCN (PositA unauthorized_A) (ComplN2 (MkN2 person_N for_Prep) (MassNP (AdjCN (PastPartAgentAP (SlashV2a perform_V2) (DetCN (DetQuant DefArt NumSg) (AdjCN (PositA legal_A) (UseN practitioner_N)))) (AdjCN (PositA legal_A) (UseN work_N))))))))))))))
+FullPred PresIndSg PosPol (ComplVP (ComplSlash (SlashV2a involve_V2) (MassNP (GerundCN (ComplSlash (SlashV2a share_V2) (DetCN (DetQuant IndefArt NumPl) (ComplN2 (MkN2 fee_N with_Prep) (DetCN (DetQuant IndefArt NumPl) (AdjCN (PositA unauthorized_A) (ComplN2 (MkN2 person_N for_Prep) (MassNP (AdjCN (PositA legal_A) (AdjCN (PastPartAgentAP (SlashV2a perform_V2) (DetCN (DetQuant DefArt NumSg) (AdjCN (PositA legal_A) (UseN practitioner_N)))) (UseN work_N))))))))))))))
+
+* involves payment of commissions for legal work with unauthorized persons performed by the legal practitioner
+FullPred PresIndSg PosPol (ComplVP (ComplSlash (SlashV2a involve_V2) (MassNP (AdjCN (PastPartAgentAP (SlashV2a perform_V2) (DetCN (DetQuant DefArt NumSg) (AdjCN (PositA legal_A) (UseN practitioner_N)))) (ComplN2 (MkN2 payment_N of_Prep) (DetCN (DetQuant IndefArt NumPl) (ComplN2 (MkN2 commission_N for_Prep) (MassNP (AdjCN (PositA legal_A) (ComplN2 (MkN2 work_N with_Prep) (DetCN (DetQuant IndefArt NumPl) (AdjCN (PositA unauthorized_A) (UseN person_N)))))))))))))
+FullPred PresIndSg PosPol (ComplVP (ComplSlash (SlashV2a involve_V2) (MassNP (ComplN2 (MkN2 payment_N of_Prep) (DetCN (DetQuant IndefArt NumPl) (AdjCN (PastPartAgentAP (SlashV2a perform_V2) (DetCN (DetQuant DefArt NumSg) (AdjCN (PositA legal_A) (UseN practitioner_N)))) (ComplN2 (MkN2 commission_N for_Prep) (MassNP (AdjCN (PositA legal_A) (ComplN2 (MkN2 work_N with_Prep) (DetCN (DetQuant IndefArt NumPl) (AdjCN (PositA unauthorized_A) (UseN person_N)))))))))))))
+FullPred PresIndSg PosPol (ComplVP (ComplSlash (SlashV2a involve_V2) (MassNP (ComplN2 (MkN2 payment_N of_Prep) (DetCN (DetQuant IndefArt NumPl) (ComplN2 (MkN2 commission_N for_Prep) (MassNP (AdjCN (PastPartAgentAP (SlashV2a perform_V2) (DetCN (DetQuant DefArt NumSg) (AdjCN (PositA legal_A) (UseN practitioner_N)))) (AdjCN (PositA legal_A) (ComplN2 (MkN2 work_N with_Prep) (DetCN (DetQuant IndefArt NumPl) (AdjCN (PositA unauthorized_A) (UseN person_N)))))))))))))
+FullPred PresIndSg PosPol (ComplVP (ComplSlash (SlashV2a involve_V2) (MassNP (ComplN2 (MkN2 payment_N of_Prep) (DetCN (DetQuant IndefArt NumPl) (ComplN2 (MkN2 commission_N for_Prep) (MassNP (AdjCN (PositA legal_A) (AdjCN (PastPartAgentAP (SlashV2a perform_V2) (DetCN (DetQuant DefArt NumSg) (AdjCN (PositA legal_A) (UseN practitioner_N)))) (ComplN2 (MkN2 work_N with_Prep) (DetCN (DetQuant IndefArt NumPl) (AdjCN (PositA unauthorized_A) (UseN person_N)))))))))))))
+FullPred PresIndSg PosPol (ComplVP (ComplSlash (SlashV2a involve_V2) (MassNP (ComplN2 (MkN2 payment_N of_Prep) (DetCN (DetQuant IndefArt NumPl) (ComplN2 (MkN2 commission_N for_Prep) (MassNP (AdjCN (PositA legal_A) (ComplN2 (MkN2 work_N with_Prep) (DetCN (DetQuant IndefArt NumPl) (AdjCN (PastPartAgentAP (SlashV2a perform_V2) (DetCN (DetQuant DefArt NumSg) (AdjCN (PositA legal_A) (UseN practitioner_N)))) (AdjCN (PositA unauthorized_A) (UseN person_N)))))))))))))
+FullPred PresIndSg PosPol (ComplVP (ComplSlash (SlashV2a involve_V2) (MassNP (ComplN2 (MkN2 payment_N of_Prep) (DetCN (DetQuant IndefArt NumPl) (ComplN2 (MkN2 commission_N for_Prep) (MassNP (AdjCN (PositA legal_A) (ComplN2 (MkN2 work_N with_Prep) (DetCN (DetQuant IndefArt NumPl) (AdjCN (PositA unauthorized_A) (AdjCN (PastPartAgentAP (SlashV2a perform_V2) (DetCN (DetQuant DefArt NumSg) (AdjCN (PositA legal_A) (UseN practitioner_N)))) (UseN person_N)))))))))))))
+
+* associated with
+PredAP2 PosPol (PastPartAP (SlashV2a associate_V2)) with_Prep
+PredAP2 PosPol (PositA associated_A) with_Prep
+
+* materially interferes with availability
+FullPred PresIndSg PosPol (ComplVP (AdvVVP (PositAdvAdj material_A) (ComplSlash (SlashV2a interfere_with_V2) (MassNP (UseN availability_N)))))
+
+* materially interferes with practicing as lawyer
+FullPred PresIndSg PosPol (ComplVP (AdvVVP (PositAdvAdj material_A) (ComplSlash (SlashV2a interfere_with_V2) (MassNP (GerundCN (ComplSlash (SlashV2a (MkV2 practice_V as_Prep)) (MassNP (UseN lawyer_N))))))))
+
+* materially interferes with representation
+FullPred PresIndSg PosPol (ComplVP (AdvVVP (PositAdvAdj material_A) (ComplSlash (SlashV2a interfere_with_V2) (MassNP (UseN representation_N)))))
+
+* position
+FullPred PresIndPl PosPol (ComplVPSlash (SlashV2a position_V2))
+PredNP PosPol (MassNP (UseN position_N))
+
+* provides
+FullPred PresIndSg PosPol (ComplVPSlash (SlashV2a provide_V2))
+
+* listed in third schedule
+V2PartAdv PosPol list_V2 (PrepNP in_Prep (MassNP (AdjCN (AdjOrd (OrdNumeral (num (pot2as3 (pot1as2 (pot0as1 (pot0 n3))))))) (UseN schedule_N))))
+
+* legal
+PredAP PosPol (PositA legal_A)
+
+* held as representative of
+PredAP2 PosPol (ComplA2 (MkA2 held_A as_Prep) (MassNP (UseN representative_N))) of_Prep
+
+* entitles holder
+FullPred PresIndSg PosPol (ComplV2V entitle_V2V (MassNP (UseN holder_N)))
+
+* non executive director
+PredNP NegPol (MassNP (AdjCN (PositA executive_A) (UseN director_N)))
+PredNP NegPol (MassNP (ApposCN (UseN executive_N) (MassNP (UseN director_N))))
+
+* independent director
+PredNP PosPol (MassNP (AdjCN (PositA independent_A) (UseN director_N)))
+PredNP PosPol (MassNP (ApposCN (UseN independent_N) (MassNP (UseN director_N))))
+
+* must not accept
+Must NegPol (SlashV2a accept_V2)
+
+* may accept
+May PosPol (SlashV2a accept_V2)
+
+* primary occupation is practicing as lawyer
+ComplSentence PosPol (MassNP (AdjCN (PositA primary_A) (UseN occupation_N))) (ProgrVP (ComplSlash (SlashV2a (MkV2 practice_V as_Prep)) (MassNP (UseN lawyer_N))))
+ComplSentence PosPol (MassNP (AdjCN (PositA primary_A) (UseN occupation_N))) (UseComp (CompAP (PresPartAP (ComplSlash (SlashV2a (MkV2 practice_V as_Prep)) (MassNP (UseN lawyer_N))))))
+ComplSentence PosPol (MassNP (AdjCN (PositA primary_A) (UseN occupation_N))) (UseComp (CompNP (MassNP (GerundCN (ComplSlash (SlashV2a (MkV2 practice_V as_Prep)) (MassNP (UseN lawyer_N)))))))
+ComplSentence PosPol (MassNP (ApposCN (UseN primary_N) (MassNP (UseN occupation_N)))) (ProgrVP (ComplSlash (SlashV2a (MkV2 practice_V as_Prep)) (MassNP (UseN lawyer_N))))
+ComplSentence PosPol (MassNP (ApposCN (UseN primary_N) (MassNP (UseN occupation_N)))) (UseComp (CompAP (PresPartAP (ComplSlash (SlashV2a (MkV2 practice_V as_Prep)) (MassNP (UseN lawyer_N))))))
+ComplSentence PosPol (MassNP (ApposCN (UseN primary_N) (MassNP (UseN occupation_N)))) (UseComp (CompNP (MassNP (GerundCN (ComplSlash (SlashV2a (MkV2 practice_V as_Prep)) (MassNP (UseN lawyer_N)))))))
+
+* locum solicitor
+PredNP PosPol (MassNP (ApposCN (UseN locum_N) (MassNP (UseN solicitor_N))))
+
+* authorized to practice law
+V2PartAdv PosPol authorize_V2 (PrepNP to_Prep (MassNP (ApposCN (UseN practice_N) (MassNP (UseN law_N)))))
+
+* awesome
+PredAP PosPol (PositA awesome_A)
+
+* cool
+FullPred PresIndPl PosPol (ComplVPSlash (SlashV2a cool_V2))
+PredAP PosPol (PositA cool_A)
+PredNP PosPol (MassNP (UseN cool_N))
+
+* owner
+PredNP PosPol (MassNP (UseN owner_N))
+
+* legal owner
+PredNP PosPol (MassNP (AdjCN (PositA legal_A) (UseN owner_N)))
+
+* beneficial owner
+PredNP PosPol (MassNP (AdjCN (PositA beneficial_A) (UseN owner_N)))
+
+* partner
+FullPred PresIndPl PosPol (ComplVPSlash (SlashV2a partner_V2))
+PredNP PosPol (MassNP (UseN partner_N))
+
+* sole proprietor
+FullPred PresIndPl PosPol (ComplVP (ComplSlash (SlashV2a sole_V2) (MassNP (UseN proprietor_N))))
+PredNP PosPol (MassNP (AdjCN (PositA sole_A) (UseN proprietor_N)))
+PredNP PosPol (MassNP (ApposCN (UseN sole_N) (MassNP (UseN proprietor_N))))
+
+* director
+PredNP PosPol (MassNP (UseN director_N))
+
+* jurisdiction is Singapore
+ComplSentence PosPol (MassNP (UseN jurisdiction_N)) (UseComp (CompNP (UsePN singapore_PN)))
+
+* member
+PredNP PosPol (MassNP (UseN member_N))
+

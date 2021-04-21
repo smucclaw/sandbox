@@ -1,0 +1,81 @@
+name:                parse-predicates
+version:             0.1.0.0
+#github:              "https://github.com/smucclaw/sandbox/tree/default/inari/rps"
+license:             BSD3
+author:              "Inari Listenmaa"
+maintainer:          "inari.listenmaa@gmail.com"
+copyright:           "2021 Inari Listenmaa"
+build-type:          "Custom"
+
+custom-setup:
+  dependencies: 
+  - base >= 4.7 && < 5
+  - Cabal >= 1.10
+  - filepath
+
+extra-source-files:
+# - README.md
+- grammars/ParseGF.gf
+
+
+# Metadata used when publishing your package
+# synopsis:            Short description of your package
+# category:            
+
+# To avoid duplicated efforts in documentation and dealing with the
+# complications of embedding Haddock markup inside cabal files, it is
+# common to point users to the README.md file.
+description:         Please see the README on GitHub at <https://github.com/githubuser/rps#readme>
+
+dependencies:
+- base >= 4.7 && < 5
+- gf
+- split
+- extra
+- mtl
+- containers
+- gf-ud
+
+ghc-options:
+- -Wall
+- -Wno-unticked-promoted-constructors
+
+internal-libraries:
+  gf-generated:
+    exposed-modules:
+    - ParseGF
+    source-dirs:
+    - grammars
+
+library:
+  dependencies:
+  - gf-generated
+  source-dirs: 
+  - src
+
+tests:
+  doctest:
+    dependencies:
+    - parse-predicates
+    - doctest
+    - gf-generated
+    source-dirs: doctest
+    main: Doctest.hs
+  my-tests:
+    dependencies:
+    - parse-predicates
+    - tasty
+    - tasty-hunit
+    source-dirs: tests
+    main: Spec.hs
+
+executables:
+  pp-exe:
+    main:                Main.hs
+    source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - parse-predicates

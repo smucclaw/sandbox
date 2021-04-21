@@ -1,0 +1,116 @@
+cabal-version: 2.0
+
+-- This file has been generated from package.yaml by hpack version 0.33.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: 18c88cc142aa95d243a12eef57dd3390e9d9dfb8bd9a8e6b39e6f680d72184c6
+
+name:           parse-predicates
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/githubuser/rps#readme>
+author:         Inari Listenmaa
+maintainer:     inari.listenmaa@gmail.com
+copyright:      2021 Inari Listenmaa
+license:        BSD3
+build-type:     Custom
+extra-source-files:
+    grammars/ParseGF.gf
+
+custom-setup
+  setup-depends:
+      Cabal >=1.10
+    , base >=4.7 && <5
+    , filepath
+
+library
+  exposed-modules:
+      ParsePred
+  other-modules:
+      Paths_parse_predicates
+  hs-source-dirs:
+      src
+  ghc-options: -Wall -Wno-unticked-promoted-constructors
+  build-depends:
+      base >=4.7 && <5
+    , containers
+    , extra
+    , gf
+    , gf-generated
+    , mtl
+    , split
+  default-language: Haskell2010
+
+library gf-generated
+  exposed-modules:
+      ParseGF
+  other-modules:
+      Paths_parse_predicates
+  hs-source-dirs:
+      grammars
+  ghc-options: -Wall -Wno-unticked-promoted-constructors
+  build-depends:
+      base >=4.7 && <5
+    , containers
+    , extra
+    , gf
+    , mtl
+    , split
+  default-language: Haskell2010
+
+executable pp-exe
+  main-is: Main.hs
+  other-modules:
+      Paths_parse_predicates
+  hs-source-dirs:
+      app
+  ghc-options: -Wall -Wno-unticked-promoted-constructors -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , containers
+    , extra
+    , gf
+    , mtl
+    , parse-predicates
+    , split
+  default-language: Haskell2010
+
+test-suite doctest
+  type: exitcode-stdio-1.0
+  main-is: Doctest.hs
+  other-modules:
+      Paths_parse_predicates
+  hs-source-dirs:
+      doctest
+  ghc-options: -Wall -Wno-unticked-promoted-constructors
+  build-depends:
+      base >=4.7 && <5
+    , containers
+    , doctest
+    , extra
+    , gf
+    , gf-generated
+    , mtl
+    , parse-predicates
+    , split
+  default-language: Haskell2010
+
+test-suite my-tests
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Paths_parse_predicates
+  hs-source-dirs:
+      tests
+  ghc-options: -Wall -Wno-unticked-promoted-constructors
+  build-depends:
+      base >=4.7 && <5
+    , containers
+    , extra
+    , gf
+    , mtl
+    , parse-predicates
+    , split
+    , tasty
+    , tasty-hunit
+  default-language: Haskell2010

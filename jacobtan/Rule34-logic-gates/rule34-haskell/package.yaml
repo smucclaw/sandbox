@@ -21,11 +21,14 @@ description:         Please see the README on GitHub at <https://github.com/gith
 
 dependencies:
 - base >= 4.7 && < 5
+- containers
 - pretty-simple
+- split
 - text
 - fgl
 - graphviz
 - generic-data
+- prettyprinter
 
 library:
   source-dirs: src

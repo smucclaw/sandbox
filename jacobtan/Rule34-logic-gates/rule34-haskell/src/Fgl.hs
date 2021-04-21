@@ -15,9 +15,14 @@ import Data.Graph.Inductive.PatriciaTree (Gr)
 import Data.Graph.Inductive.Graph
     ( Graph(mkGraph), Node, pre, suc )
 
-import Utils
+import Utils ( (&), (<&>) )
 
 import Encoding
+    ( NodeInfo(gType, gDescr),
+      NodeRef(Bulb'May, Or'May),
+      nodeList,
+      nodeInfo,
+      edges0 )
 
 -- *** Readme *** --
 -- Fgl library represents nodes using a unique index of type Int.
@@ -51,6 +56,7 @@ myGraph :: Gr Text Text
 myGraph = mkGraph @Gr fglNodes fglEdges
 
 
+-- | typeclass to produce NodeRef from compatible input types
 class HasNodeRef a b where
   toNodeRef :: a -> b
 instance (HasNodeRef a b, Functor f, f ~ g) => HasNodeRef (f a) (g b) where
@@ -58,7 +64,7 @@ instance (HasNodeRef a b, Functor f, f ~ g) => HasNodeRef (f a) (g b) where
 instance NodeRef ~ nr => HasNodeRef Node nr where
   toNodeRef = gtoEnum @NodeRef
 
--- | for convenient type application (see the fgl function)
+-- | for convenient type application (see the @fgl@ function)
 class X a
 instance X a
 

@@ -2,11 +2,15 @@
 {-# LANGUAGE LambdaCase #-}
 module LogicGates where
 
-import Utils
+import Utils ( (&), (<&>) )
 import Data.List.Split (chunksOf)
 import Text.Pretty.Simple (pPrint)
 
 import Encoding
+    ( NodeInfo(gType, gDescr),
+      GateType(Buffer, NOT, AND, OR, NOR, Bulb, Switch),
+      NodeRef,
+      nodeInfo )
 import Fgl (makeNodeLabel)
 import qualified Data.Text as T
 
@@ -21,6 +25,7 @@ toLogicGate node = nodeInfo node & do -- Reader applicative
     NOR -> fmap not . orGate
     Bulb -> bulbGate node
     Switch -> switchGate node
+    Buffer -> bufferGate node
 
 notGate :: NodeRef -> [Maybe Bool] -> Maybe Bool
 notGate node inputs =
@@ -44,10 +49,21 @@ bulbGate node inputs =
 
 switchGate :: NodeRef -> [Maybe Bool] -> Maybe Bool
 switchGate node inputs =
+  -- if length inputs /= 0 -- replaced with hlint suggestion
+  if not (null inputs) -- hlint suggested this
+  then error (
+    (makeNodeLabel node & T.unpack)
+    ++ ": " ++ "Switch gate can have only zero inputs. Inputs: "
+    ++ show inputs
+  )
+  else head inputs
+
+bufferGate :: NodeRef -> [Maybe Bool] -> Maybe Bool
+bufferGate node inputs =
   if length inputs /= 1
   then error (
     (makeNodeLabel node & T.unpack)
-    ++ ": " ++ "Switch gate can have only one input. Inputs: "
+    ++ ": " ++ "Buffer gate can have only one input. Inputs: "
     ++ show inputs
   )
   else head inputs

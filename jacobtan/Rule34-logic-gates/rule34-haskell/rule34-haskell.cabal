@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: f2d7a0f5be31755154feccea055de5fc113866c9cad3e004eebc2963b5cd7ef6
+-- hash: b84eaa294a75125155300ee315a654727f614312afda32ddc228fe2afd6cac23
 
 name:           rule34-haskell
 version:        0.1.0.0
@@ -33,6 +33,7 @@ library
       Lib
       LogicGates
       Rule34
+      Rule34_jacob
       Utils
   other-modules:
       Paths_rule34_haskell

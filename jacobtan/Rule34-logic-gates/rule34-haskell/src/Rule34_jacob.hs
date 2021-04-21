@@ -21,7 +21,7 @@ data ParaRef = PMustNot | PMay | PMustNotBulb | PMayBulb
   | P341 | P341a | P341b | P341c | P341d | P341e | P341f
   | P342 | P343 | P344 | P345 | P346 | P347
   | P'NotLocum | P'BusinessEntity'NotLawRelated | P'2ndSchedule
-  | P'IsLocum
+  | P'IsLocum | P341a'P341c_to_f
   deriving (Eq, Ord, Show)
 
 data Direction = In | Out deriving (Eq, Ord)
@@ -61,8 +61,9 @@ rule34_text = init [
   Stmt P'BusinessEntity'NotLawRelated "business entity\nnot law-related" Switch [] [] [] [],
   Stmt P'2ndSchedule "2nd schedule" Switch [] [] [] [],
   
-  Stmt P345 "34.5" AND [P'IsLocum, P'BusinessEntity'NotLawRelated, P'2ndSchedule] [PMay] [P341] [],
-  Stmt P'IsLocum "is locum" Switch  [] [] [] [],
+  Stmt P345 "34.5" AND [P'IsLocum, P'BusinessEntity'NotLawRelated, P'2ndSchedule] [PMay] [P341a'P341c_to_f] [P341b],
+  Stmt P341a'P341c_to_f "34.1a, 34.1c-f" OR [P341a, P341c, P341d, P341e, P341f] [] [] [],
+  Stmt P'IsLocum "is locum" Switch [] [] [] [],
 
   Stmt undefined undefined undefined undefined undefined undefined undefined
   --- ^ for trailing commas
@@ -86,8 +87,8 @@ makeGraph1 statements = statements
   where
     f :: MakeGraphState -> Statement -> MakeGraphState
     f mgsState
-      Stmt{ sParaRef, sLabel, sGateType, sInputs, sOutputs, sSubjectTo }
-      = mgsState & initState & rewriteSubjectTo
+      Stmt{ sParaRef, sLabel, sGateType, sInputs, sOutputs, sSubjectTo, sDespite }
+      = mgsState & initState & rewriteSubjectTo & rewriteDespite
       where
         initState :: MakeGraphState -> MakeGraphState
         initState mgsState@MGState{ mgsPointers, mgsNodes, mgsEdges, mgsCounter }
@@ -99,7 +100,7 @@ makeGraph1 statements = statements
               ++ mgsEdges,
             mgsCounter = i
             }
-        -- | defeasibility rewrite
+        -- | defeasibility rewrite for "subject to"
         rewriteSubjectTo stateAfterInit@MGState{ mgsCounter, mgsPointers } =
           if null sSubjectTo then stateAfterInit
           else foldl' g (stateAfterInit & addAND) sSubjectTo
@@ -117,10 +118,32 @@ makeGraph1 statements = statements
             g :: MakeGraphState -> ParaRef -> MakeGraphState
             g mgsState@MGState{ mgsPointers, mgsNodes, mgsEdges, mgsCounter } subjectTo
               = let j = succ mgsCounter in mgsState {
-                  mgsNodes = (j, NOT, show' sParaRef <> " subject to " <> show' sSubjectTo) : mgsNodes,
+                  mgsNodes = (j, NOT, show' sParaRef <> " subject to " <> show' subjectTo) : mgsNodes,
                   mgsCounter = j,
                   mgsEdges = (IRef subjectTo, O j) : (I j, O andNodeIndex) : mgsEdges
                   }
+        -- | defeasibility rewrite for "despite"
+        rewriteDespite stateAfterRewriteSubjectTo@MGState{ mgsCounter, mgsPointers } =
+          if null sDespite then stateAfterRewriteSubjectTo
+          else foldl' h stateAfterRewriteSubjectTo sDespite
+          where
+            h :: MakeGraphState -> ParaRef -> MakeGraphState
+            h mgsState@MGState{ mgsPointers, mgsNodes, mgsEdges, mgsCounter } despite
+              = mgsState {
+                  mgsNodes = andNode : notNode : mgsNodes,
+                  mgsCounter = k2,
+                  mgsEdges = andEdgeToDespite : notEdgeToAnd : notEdgeToPara : mgsEdges,
+                  mgsPointers = reassignPointer
+                  }
+              where
+                k1 = succ mgsCounter
+                andNode = (k1, AND, show' despite <> " with defeasibility")
+                andEdgeToDespite = (I $ mgsPointers Map.! despite, O k1)
+                k2 = succ k1
+                notNode = (k2, NOT, show' sParaRef <> " despite " <> show' despite)
+                notEdgeToAnd = (I k2, O k1)
+                notEdgeToPara = (IRef sParaRef, O k2)
+                reassignPointer = Map.insert despite k1 mgsPointers
 
 makeGraph2 :: MakeGraphState -> Gr Text Text
 makeGraph2 MGState{ mgsPointers, mgsNodes, mgsEdges } =
@@ -144,5 +167,5 @@ makeGraph = makeGraph1 >>> makeGraph2
 rule34_jacobMain :: IO ()
 rule34_jacobMain = do
   putStrLn "__rule34_jacobMain__"
-  -- preview (makeGraph rule34_text) >> putStrLn "< visualise a graph using the Xlib GraphvizCanvas >"
-  preview'custom (makeGraph rule34_text) >> putStrLn "< visualise a graph using the Xlib GraphvizCanvas >"
+  preview (makeGraph rule34_text) >> putStrLn "< visualise a graph using the Xlib GraphvizCanvas >"
+  -- preview'custom (makeGraph rule34_text) >> putStrLn "< visualise a graph using the Xlib GraphvizCanvas >"

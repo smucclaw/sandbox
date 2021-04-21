@@ -1,5 +1,5 @@
 
-concrete ParseEng of Parse =
+concrete ParseGFEng of ParseGF =
   NounEng - [PPartNP, UseN2, RelNP, DetNP, AdvNP, PossNP, PartNP, CountNP, AdvCN],
   VerbEng - [PassV2, ReflVP, ComplVV, SlashV2V, SlashVV, SlashV2VNP, UseCopula, AdvVP, AdvVPSlash, VPSlashPrep],
   AdjectiveEng - [ReflA2, CAdvAP, UseA2, AdvAP],

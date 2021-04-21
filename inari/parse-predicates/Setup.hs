@@ -22,6 +22,17 @@ main = defaultMainWithHooks userHooks
 userHooks :: UserHooks
 userHooks = simpleUserHooks {
     hookedPreProcessors = gfPPSuffix : knownSuffixHandlers
+    , postCopy = \args insF pDesc lbi -> do
+        -- print $ buildDir lbi
+        let cdest = fromFlag $ copyDest insF
+        let dDir = datadir $ absoluteComponentInstallDirs pDesc lbi (localUnitId lbi) cdest
+        let verbosity = fromFlag $ copyVerbosity insF
+        let src = buildDir lbi </> "gf-generated" </> "ParseGF.pgf"
+        let dst = dDir </> "ParseGF.pgf"
+        -- print dDir
+        createDirectoryIfMissingVerbose verbosity True dDir
+        installOrdinaryFile verbosity src dst
+        return ()
 }
 
 gfPPSuffix :: PPSuffixHandler
@@ -37,10 +48,11 @@ gfPP bi lbi clbi = PreProcessor {
                 , "-f", "haskell"
                 , "--haskell=gadt"
                 , "--haskell=lexical"
-                , "--lexical=N,V,A,N2,N3,V2,A2,V2V,VV,V3,VS,V2S,V2Q,Adv,AdV,PN,Prep,Pron,Pol,Quant,Det,Card,Text"
+                , "--lexical=N,V,A,N2,N3,V2,A2,VA,V2V,VV,V3,VS,V2A,V2S,V2Q,Adv,AdV,AdA,AdN,ACard,CAdv,Conj,Interj,PN,Prep,Pron,Pol,Quant,Det,Card,Text,Predet,Subj"
                 , "--output-dir=" ++ outDir
                 , "--gfo-dir=/tmp"
-                , inDir </> inFile
+                --, inDir </> inFile
+                , inDir </> "ParseGFEng.gf"
                 ]
         print args
         (gfProg, _) <- requireProgram verbosity gfProgram (withPrograms lbi)

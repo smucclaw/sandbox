@@ -1,4 +1,4 @@
-abstract Parse =
+abstract ParseGF =
   Noun - [PPartNP, UseN2, RelNP, DetNP, AdvNP, PossNP, PartNP, CountNP],
   Verb - [PassV2, ReflVP, ComplVV, SlashVV, SlashV2V, SlashV2VNP, AdvVP],
   Adjective - [ReflA2, CAdvAP, UseA2], --AdvAP],
@@ -20,7 +20,7 @@ flags
   startcat = FullPredicate ;
 
   fun
-    -- Very specialised things
+    -- Very specialised t hings
  
     CnNum : CN -> Card -> CN ; -- Section 1
     V2PartAdv : Polarity -> V2 -> Adv -> FullPredicate ;

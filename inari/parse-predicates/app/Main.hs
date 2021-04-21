@@ -9,8 +9,7 @@ main = do
 
 corpus :: [String]
 corpus = [
-    "MateriallyInterferesWithAvailability : ExecutiveAppointment -> LegalPractitioner -> Boolean"
-    ,"DescribedInSection1: Business -> Boolean"
+    "DescribedInSection1: Business -> Boolean"
     ,"DetractsFromDignityOfLegalProfession: Business -> Boolean"
     ,"IncompatibleWithDignityOfLegalProfession: Business -> Boolean"
     ,"DerogatesFromDignityOfLegalProfession: Business -> Boolean"
@@ -18,55 +17,37 @@ corpus = [
     ,"DescribedInFirstSchedule: Business -> Boolean"
     ,"Prohibited: Business -> Boolean"
     ,"InvolvesSharingFeesWithUnauthorizedPersonsForLegalWorkPerformedByTheLegalPractitioner: Business -> Boolean"
-    ,"InvolvesPaymentOfCommissions: Business -> Boolean"
+    ,"InvolvesPaymentOfCommissionsForLegalWorkByUnauthorizedPersonsPerformedByTheLegalPractioner: Business -> Boolean"
     ,"AssociatedWith: ExecutiveAppointment -> Business -> Boolean"
     ,"JurisdictionIsSingapore : Business -> Boolean"
     ,"MateriallyInterferesWithAvailability: ExecutiveAppointment -> LegalPractitioner -> Boolean"
     ,"MateriallyInterferesWithPracticingAsLawyer: ExecutiveAppointment -> LegalPractitioner -> Boolean"
     ,"MateriallyInterferesWithRepresentation: ExecutiveAppointment -> LegalPractitioner -> Boolean"
- ]
+    ,"Position: Organization -> Position"
+    ,"Provides: Organization -> Service"
+    ,"ListedInThirdSchedule: Institution -> Boolean"
+    ,"Legal : Service -> Boolean"
+    ,"HeldAsRepresentativeOf: Position -> Organization"
+    ,"EntitlesHolder: Position -> Boolean"
+    ,"NonExecutiveDirector: Position -> Boolean"
+    ,"IndependentDirector: Position -> Boolean"
+    ,"MustNotAccept: LegalPractitioner -> Appointment"
+    ,"MayAccept: LegalPractitioner -> Appointment"
+    ,"PrimaryOccupationIsPracticingAsLawyer: LegalPractitioner -> Boolean"
+    ,"LocumSolicitor: LegalPractitioner -> Boolean"
+    ,"AuthorizedToPracticeLaw: Person -> Boolean"
+    ,"Awesome: Person -> Boolean"
+    ,"Cool: Person -> Boolean"
+    ,"Owner: LawPractice -> Person"
+    ,"LegalOwner: LawPractice -> Person"
+    ,"BeneficialOwner: LawPractice -> Person"
+    ,"Partner: LawPractice -> Person"
+    ,"SoleProprietor: LawPractice -> Person"
+    ,"Director: LawPractice -> Person"
+    ,"JurisdictionIsSingapore: LawPractice -> Boolean"
+    ,"Member: LawPractice -> LegalPractitioner"
+    ,"OwnerDriven : LawPractice -> Bool"]
+
 {-
-class Organization {
-    Position: Position
-    Provides: Service
-}
-
-class Institution extends Organization {
-    ListedInThirdSchedule: Boolean
-}
-
-class Service {
-    Legal: Boolean
-}
-
-class Position {
-    HeldAsRepresentativeOf: Organization
-    EntitlesHolder: Boolean
-    NonExecutiveDirector: Boolean
-    IndependentDirector: Boolean
-}
-
-class LegalPractitioner extends Person {
-    MustNotAccept: Appointment
-    MayAccept: Appointment
-    PrimaryOccupationIsPracticingAsLawyer: Boolean
-    LocumSolicitor: Boolean
-}
-
-class Person {
-    AuthorizedToPracticeLaw: Boolean
-    Awesome: Boolean
-    Cool: Boolean
-}
-
-class LawPractice extends Organization {
-    Owner: Person
-    LegalOwner: Person
-    BeneficialOwner: Person
-    Partner: Person
-    SoleProprietor: Person
-    Director: Person
-    JurisdictionIsSingapore: Boolean
-    Member: LegalPractitioner
-}
+* Introduce WordNet synsets
 -}

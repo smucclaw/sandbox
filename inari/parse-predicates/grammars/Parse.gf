@@ -24,6 +24,7 @@ flags
  
     CnNum : CN -> Card -> CN ; -- Section 1
     V2PartAdv : Polarity -> V2 -> Adv -> FullPredicate ;
+    NPAP : NP -> AP -> AP ; -- OwnerDriven
 
   cat
     Predicate ;
@@ -34,7 +35,6 @@ flags
 
     PredAP : Polarity -> AP -> FullPredicate ; -- Legal, AuthorizedToPracticeLaw
     PredAP2 : Polarity -> AP -> Prep -> FullPredicate ; -- AuthorizedToPracticeLawIn (argument)
---    PredAPAdv
 
     ComplV2V : V2V -> NP -> Predicate ; -- EntitlesHolder
 
@@ -55,6 +55,11 @@ flags
     MkV2 : V -> Prep -> V2 ;
     MkA2 : A -> Prep -> A2 ;
 
+    NegAP : AP -> AP ; -- non-executive
+
+    PartialParseAfterNTokens,
+    ParseFailedAfterNTokens : Int -> FullPredicate ;
+    NoParse : FullPredicate ;
 
   cat
     AgrTAM ;

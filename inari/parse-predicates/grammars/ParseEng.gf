@@ -40,9 +40,10 @@ lin
   lin
     CnNum cn card = mkCN cn (mkNP (mkDet card)) ;
     V2PartAdv pol v2 adv = PredAP pol (AdvAP (PastPartAP (mkVPSlash v2)) adv) ;
+    NPAP np ap = mkAP (lin AdA (mkUtt np)) ap ;
 
     PosPol = {p = positivePol ; s = ""} ;
-    NegPol = {p = negativePol | UncontractedNeg ; s = "not"|"non"} ; -- a hack
+    NegPol = {p = negativePol | UncontractedNeg ; s = "not"} ; -- a hack
 
     PresIndSg = {t = mkTemp presentTense simultaneousAnt ; a = MySg} ;
     PresIndPl = {t = mkTemp presentTense simultaneousAnt ; a = MyPl} ;
@@ -58,10 +59,15 @@ lin
     MkV2 v prep = P.mkV2 v prep ;
     MkA2 a prep = P.mkA2 a prep ;
 
+    NegAP ap = mkAP (lin AdA {s = "non"}) ap ;
+
     Must pol vp = FullPred PresIndSg pol (vvPred must_VV vp) ;
     May pol vp = FullPred PresIndSg pol (vvPred may_VV vp) ;
     Shall pol vp = FullPred PresIndSg pol (vvPred shall_VV vp) ;
 
+    PartialParseAfterNTokens n = lin Utt (cc3 (ss "partial parse after") n (ss "tokens")) ;
+    ParseFailedAfterNTokens n = lin Utt (cc3 (ss "parse failed after") n (ss "tokens")) ;
+    NoParse = lin Utt (ss "no parse") ;
 
   oper
     vvPred : VV -> VPSlash -> LinPred = \vv,vps -> \\agr =>

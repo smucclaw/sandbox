@@ -42,7 +42,6 @@ parseGF :: PGF -> String -> [Expr]
 parseGF gr str = go wds
   where
     wds = map (trim . map toLower) $ split (startsWithOneOf (['A' .. 'Z']++['0'..'9']) ) str
-    -- TODO: try to capitalise words if getting parse errors
     lang = head $ languages gr
     cat = startCat gr
     go ws = finalParse
@@ -58,10 +57,13 @@ parseGF gr str = go wds
                         | ind == n = toUpper w : ord
                         | otherwise = w:ord
               ]
+          ParseFailed 1 -> [gf GNoParse]
+          ParseFailed n -> go (take (n-1) ws) ++ [gf (GParseFailedAfterNTokens (GInt n))]
+          ParseIncomplete -> go (init ws)
           _ -> []
 
 filterHeuristic :: [Expr] -> [Expr]
-filterHeuristic ts = filter filterGerund ts
+filterHeuristic ts = filter (not . ppBeforeAP) (filter filterGerund ts)
   where
     filterGerund
       | any hasGerund ts && not (all hasGerund ts) = hasGerund
@@ -69,10 +71,18 @@ filterHeuristic ts = filter filterGerund ts
 
 hasGerund :: Expr -> Bool
 hasGerund = getAny . hasGerund' . (fg :: Expr -> GFullPredicate)
+  where
+    hasGerund' :: Tree a -> Any
+    hasGerund' (GGerundCN _) = Any True
+    hasGerund' x = composOpMonoid hasGerund' x
 
-hasGerund' :: Tree a -> Any
-hasGerund' (GGerundCN _) = Any True
-hasGerund' x = composOpMonoid hasGerund' x
+ppBeforeAP :: Expr -> Bool 
+ppBeforeAP = getAny . ppBeforeAP' . (fg :: Expr -> GFullPredicate)
+  where
+    ppBeforeAP' :: Tree a -> Any
+    ppBeforeAP' (GAdjCN (GPastPartAP _) (GAdjCN _ _)) = Any True
+    ppBeforeAP' (GAdjCN (GPastPartAgentAP _ _) (GAdjCN _ _)) = Any True
+    ppBeforeAP' x = composOpMonoid ppBeforeAP' x
 
 --------------------------
 -- GF stuff

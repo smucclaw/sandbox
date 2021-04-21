@@ -22,6 +22,7 @@ data ParaRef = PMustNot | PMay | PMustNotBulb | PMayBulb
   | P342 | P343 | P344 | P345 | P346 | P347
   | P'NotLocum | P'BusinessEntity'NotLawRelated | P'2ndSchedule
   | P'IsLocum | P341a'P341c_to_f
+  | P'3rdSchedule
   deriving (Eq, Ord, Show)
 
 data Direction = In | Out deriving (Eq, Ord)
@@ -64,6 +65,9 @@ rule34_text = init [
   Stmt P345 "34.5" AND [P'IsLocum, P'BusinessEntity'NotLawRelated, P'2ndSchedule] [PMay] [P341a'P341c_to_f] [P341b],
   Stmt P341a'P341c_to_f "34.1a, 34.1c-f" OR [P341a, P341c, P341d, P341e, P341f] [] [] [],
   Stmt P'IsLocum "is locum" Switch [] [] [] [],
+
+  Stmt P347 "34.7" Buffer [P'3rdSchedule] [PMay] [] [PMustNot],
+  Stmt P'3rdSchedule "3rd schedule" Switch [] [] [] [],
 
   Stmt undefined undefined undefined undefined undefined undefined undefined
   --- ^ for trailing commas
@@ -168,4 +172,4 @@ rule34_jacobMain :: IO ()
 rule34_jacobMain = do
   putStrLn "__rule34_jacobMain__"
   preview (makeGraph rule34_text) >> putStrLn "< visualise a graph using the Xlib GraphvizCanvas >"
-  -- preview'custom (makeGraph rule34_text) >> putStrLn "< visualise a graph using the Xlib GraphvizCanvas >"
+  preview'custom (makeGraph rule34_text) >> putStrLn "< visualise a graph using the Xlib GraphvizCanvas >"

@@ -1,0 +1,5 @@
+# l4 version 0.3.4
+
+lexicon
+Business -> "business_1_N"
+BusinessEntity -> "CompoundN business_1_N entity_N"

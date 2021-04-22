@@ -1,0 +1,11 @@
+*.gfo
+*~
+*.pgf
+.stack-work
+*.log
+*.pdf
+*.aux
+*.dot
+*.tex
+*.png
+*.trees

@@ -53,13 +53,18 @@ getPGF = do
 
 ----------------------------------------------------
 
-data Predicate = Pred {name :: String, parsetrees :: [BracketedString], trees :: [PGF.Expr], arity :: Int}
+data Predicate = Pred {name :: String, trees :: MyParseOutput, arity :: Int}
 
 instance Show Predicate where
-  show (Pred nm _ [] ar) = printf "%s\narity %d, no parses" nm ar
-  show (Pred nm pts ts ar) = printf "%s\narity %d\nparses\n%s\n%s" nm ar exprs (unwords $ map showBracketedString pts)
+  show (Pred nm [] ar) = printf "%s\narity %d, no parses" nm ar
+  show (Pred nm ts ar) = printf "%s\narity %d\nparses\n%s" nm ar exprs
     where
       exprs = unlines $ map (showExpr []) ts
+      -- exprs = unlines [
+      --   unlines [ showExpr [] t
+      --           , showBracketedString b]
+      --   | (t,b) <- ts
+      --   ]
 
 type Question = [String]
 
@@ -72,27 +77,41 @@ step1 pr | length (trees pr) <= 1 = []
 
 -- |
 -- >>> mkQuestion $ extractContentWords (parsePred gr "InvolvesSharingFeesWithUnauthorizedPersonsForLegalWorkPerformedByTheLegalPractitioner")
--- [["sharing_N","share_V2","sharing_N","sharing_N","sharing_N","sharing_N","share_V2","share_V2","share_V2"]]
--- >>> mkQuestion $ extractContentWords (parsePred gr "SoleIndependent")
--- [["independent_N","independent_A","independent_N","independent_N"],["sole_V2","sole_N","sole_A","sole_N"]]
--- >>> (parsePred gr "SoleIndependent")
--- SoleIndependent
+-- WAS [["sharing_N","share_V2","sharing_N","sharing_N","sharing_N","sharing_N","share_V2","share_V2","share_V2"]]
+-- NOW [["sharing_N"],["share_V2"],["sharing_N"],["sharing_N"],["sharing_N"],["sharing_N"],["share_V2"],["share_V2"],["share_V2"]]
+-- >>> mkQuestion $ extractContentWords (parsePred gr "SoleIndependentContractor")
+-- [["independent_A","sole_V2"],["independent_N","sole_V2"],["independent_A","sole_A"],["independent_N","sole_A"],
+--  ["independent_A","sole_N"],["independent_A","sole_N"],["independent_N","sole_N"],["independent_N","sole_A"],["independent_N","sole_N"]]
+
+-- >>> extractContentWords (parsePred gr "SoleIndependentContractor")
+-- [["sole_V2","independent_A","contractor_N"],["sole_V2","independent_N","contractor_N"],["sole_A","independent_A","contractor_N"],
+--  ["sole_A","independent_N","contractor_N"],["sole_N","independent_A","contractor_N"],["sole_N","independent_A","contractor_N"],
+--  ["sole_N","independent_N","contractor_N"],["sole_A","independent_N","contractor_N"],["sole_N","independent_N","contractor_N"]]
+
+-- >>> (parsePred gr "SoleIndependentContractor")
+-- SoleIndependentContractor
 -- arity 0
 -- parses
--- FullPred PresIndPl PosPol (ComplVP (ComplSlash (SlashV2a sole_V2) (MassNP (UseN independent_N))))
--- PredAP PosPol (NPAP (MassNP (UseN sole_N)) (PositA independent_A))
--- PredNP PosPol (MassNP (AdjCN (PositA sole_A) (UseN independent_N)))
--- PredNP PosPol (MassNP (ApposCN (UseN sole_N) (MassNP (UseN independent_N))))
+-- FullPred PresIndPl PosPol (ComplVP (ComplSlash (SlashV2a sole_V2) (MassNP (AdjCN (PositA independent_A) (UseN contractor_N)))))
+-- FullPred PresIndPl PosPol (ComplVP (ComplSlash (SlashV2a sole_V2) (MassNP (ApposCN (UseN independent_N) (MassNP (UseN contractor_N))))))
+-- PredNP PosPol (MassNP (AdjCN (PositA sole_A) (AdjCN (PositA independent_A) (UseN contractor_N))))
+-- PredNP PosPol (MassNP (AdjCN (PositA sole_A) (ApposCN (UseN independent_N) (MassNP (UseN contractor_N)))))
+-- PredNP PosPol (MassNP (AdjCN (NPAP (MassNP (UseN sole_N)) (PositA independent_A)) (UseN contractor_N)))
+-- PredNP PosPol (MassNP (ApposCN (UseN sole_N) (MassNP (AdjCN (PositA independent_A) (UseN contractor_N)))))
+-- PredNP PosPol (MassNP (ApposCN (UseN sole_N) (MassNP (ApposCN (UseN independent_N) (MassNP (UseN contractor_N))))))
+-- PredNP PosPol (MassNP (ApposCN (AdjCN (PositA sole_A) (UseN independent_N)) (MassNP (UseN contractor_N))))
+-- PredNP PosPol (MassNP (ApposCN (ApposCN (UseN sole_N) (MassNP (UseN independent_N))) (MassNP (UseN contractor_N))))
 
--- (FullPredicate:623 sole independent)
+-- (FullPredicate:819 sole independent (N:731 contractor))
 
 -- TODO: use the information from position and function to ask proper questions:
 -- "is sole a verb or a noun"
 -- and that makes other options impossible
 -- Ask first the most discriminating questions
 mkQuestion :: [[String]] -> [Question]
-mkQuestion = differingItems
-
+mkQuestion = transpose .
+  differingItems
+  
 differingItems :: (Ord a) => [[a]] -> [[a]]
 differingItems = filter (not . allSame) . transpose . map sort
 
@@ -118,25 +137,26 @@ extractContentWords pr = [onlyLex (fg' tree) | tree <- trees pr]
 
 
 parsePred :: PGF -> [Char] -> Predicate
-parsePred gr str = Pred nm pts (filterHeuristic ts) ar
+parsePred gr str = Pred nm (filterHeuristic ts) ar
   where
     nm : _ = splitOn ":" str
     ar = length $ filter (== '>') str
-    (ts, pts) = parseGF gr nm
+    ts = parseGF gr nm
 
-parseGF :: PGF -> String -> ([Expr], [BracketedString])
-parseGF gr str = (go wds, [parsetree])
+type MyParseOutput = [Expr] -- [(Expr, BracketedString)]
+
+parseGF :: PGF -> String -> MyParseOutput
+parseGF gr str = go wds
   where
     wds = map (trim . map toLower) $ split (startsWithOneOf (['A' .. 'Z']++['0'..'9']) ) str
     lang = head $ languages gr
     cat = startCat gr
-    (_, parsetree) = parse_  gr lang cat Nothing (unwords wds)
-    go :: [String] -> [Expr]
+    go :: [String] -> MyParseOutput
     go ws = finalParse
       where
-        (output, parsetree) = parse_ gr lang cat Nothing (unwords ws)
+        (output, bstring) = parse_ gr lang cat Nothing (unwords ws)
         finalParse = case output of
-          ParseOk ts -> ts
+          ParseOk ts -> ts -- [(t, bstring) | t <- ts]
           ParseFailed n | all isLower (ws !! (n-1)) ->
             go
               [ capWd
@@ -145,20 +165,28 @@ parseGF gr str = (go wds, [parsetree])
                         | ind == n = toUpper w : ord
                         | otherwise = w:ord
               ]
-          -- TODO: find out where infinite loop happens
-          -- ParseFailed 1 -> [gf GNoParse]
-          -- ParseFailed n -> go (take (n-1) ws) ++ [gf (GParseFailedAfterNTokens (GInt n))]
-          -- ParseIncomplete -> go (init ws)
+          ParseFailed 1 -> [gf GNoParse] -- , Leaf [])]
+          ParseFailed n -> go (take (n-1) ws) ++ [gf (GParseFailedAfterNTokens (GInt n))] -- , Leaf [])]
+          ParseIncomplete -> go (init ws)
           _ -> []
 
+-- if we want [(Expr,BracketedString)]
+-- filterHeuristic' :: MyParseOutput -> MyParseOutput
+-- filterHeuristic' ps = [(t,b) | (t,b) <- ps, not $ ppBeforeAP t]
+
 filterHeuristic :: [Expr] -> [Expr]
-filterHeuristic ts = filter (not . ppBeforeAP) ts -- (filter filterGerund ts)
+filterHeuristic ts = filter (not . ppBeforeAP) (filter filterGerund ts)
   where
     filterGerund
-      | any hasGerund ts && not (all hasGerund ts) = hasGerund
+      | any hasGerund ts &&  -- "practicing as lawyer": progressive, pres. part. or gerund
+        any hasProgr ts && 
+        not (all hasGerund ts) = not . hasProgr
+--      | any hasGerund ts && not (all hasGerund ts) = hasGerund
       | otherwise = const True
 
 -- TODO only remove apposition, keep compound noun
+
+
 hasGerund :: Expr -> Bool
 hasGerund = getAny . hasGerund' . (fg :: Expr -> GFullPredicate)
   where
@@ -166,6 +194,13 @@ hasGerund = getAny . hasGerund' . (fg :: Expr -> GFullPredicate)
     hasGerund' (GGerundCN _) = Any True
     hasGerund' x = composOpMonoid hasGerund' x
 
+hasProgr :: Expr -> Bool
+hasProgr = getAny . hasProgr' . (fg :: Expr -> GFullPredicate)
+  where
+    hasProgr' :: Tree a -> Any
+    hasProgr' (GProgrVP _) = Any True
+    hasProgr' (GUseComp (GCompAP (GPresPartAP _))) = Any True
+    hasProgr' x = composOpMonoid hasProgr' x
 
 ppBeforeAP :: Expr -> Bool
 ppBeforeAP = getAny . ppBeforeAP' . (fg :: Expr -> GFullPredicate)
@@ -174,5 +209,3 @@ ppBeforeAP = getAny . ppBeforeAP' . (fg :: Expr -> GFullPredicate)
     ppBeforeAP' (GAdjCN (GPastPartAP _) (GAdjCN _ _)) = Any True
     ppBeforeAP' (GAdjCN (GPastPartAgentAP _ _) (GAdjCN _ _)) = Any True
     ppBeforeAP' x = composOpMonoid ppBeforeAP' x
-
-

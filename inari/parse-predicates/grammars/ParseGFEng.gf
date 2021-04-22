@@ -1,6 +1,6 @@
 
 concrete ParseGFEng of ParseGF =
-  NounEng - [PPartNP, UseN2, RelNP, DetNP, AdvNP, PossNP, PartNP, CountNP, AdvCN],
+  NounEng - [PPartNP, UseN2, RelNP, DetNP, AdvNP, PossNP, PartNP, CountNP, AdvCN, ApposCN],
   VerbEng - [PassV2, ReflVP, ComplVV, SlashV2V, SlashVV, SlashV2VNP, UseCopula, AdvVP, AdvVPSlash, VPSlashPrep],
   AdjectiveEng - [ReflA2, CAdvAP, UseA2, AdvAP],
   AdverbEng - [ComparAdvAdj,ComparAdvAdjS,AdnCAdv],
@@ -11,7 +11,7 @@ concrete ParseGFEng of ParseGF =
   PhraseEng - [UttAP, UttVP],
   IdiomEng,
   NumeralEng,
-  ExtendEng [GerundCN,PresPartAP,PastPartAP,PastPartAgentAP],
+  ExtendEng [GerundCN,PresPartAP,PastPartAP,PastPartAgentAP, CompoundN],
   TenseX - [Pol,PPos,PNeg,SC,CAdv],
   ReducedWordNetEng - [in_N, in_A],
   ConstructionEng,
@@ -40,7 +40,7 @@ lin
   lin
     CnNum cn card = mkCN cn (mkNP (mkDet card)) ;
     V2PartAdv pol v2 adv = PredAP pol (AdvAP (PastPartAP (mkVPSlash v2)) adv) ;
-    NPAP np ap = mkAP (lin AdA (mkUtt np)) ap ;
+    CompoundA n ap = mkAP (lin AdA (mkUtt n)) ap ;
 
     PosPol = {p = positivePol ; s = ""} ;
     NegPol = {p = negativePol | UncontractedNeg ; s = "not"} ; -- a hack

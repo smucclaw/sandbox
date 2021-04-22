@@ -5,7 +5,7 @@
 {-# LANGUAGE TupleSections #-}
 module Rule34_jacob where
 
-import Utils ( foldl', (&), (<&>), (>>>), show' )
+import Utils ( foldl', (&), (<&>), (>>>), show', (!) )
 import qualified Data.Map.Strict as Map
 import Data.Text (Text)
 import qualified Data.Text as Text
@@ -17,7 +17,7 @@ import Encoding ( GateType(..) )
 import Graphviz (preview, preview'custom)
 import qualified Data.Bifunctor
 
-data ParaRef = PMustNot | PMay | PMustNotBulb | PMayBulb 
+data ParaRef = PMustNot | PMay | PMustNotBulb | PMayBulb
   | P341 | P341a | P341b | P341c | P341d | P341e | P341f
   | P342 | P343 | P344 | P345 | P346 | P347
   | P'NotLocum | P'BusinessEntity'NotLawRelated | P'2ndSchedule
@@ -65,7 +65,7 @@ rule34_text = init [
   Stmt P'NotLocum "not locum" Switch  [] [] [] [],
   Stmt P'BusinessEntity'NotLawRelated "business entity\nnot law-related" Switch [] [] [] [],
   Stmt P'2ndSchedule "2nd schedule" Switch [] [] [] [],
-  
+
   Stmt P345 "34.5" AND [P'IsLocum, P'BusinessEntity'NotLawRelated, P'2ndSchedule] [PMay] [P341a'P341c_tIf] [P341b],
   Stmt P341a'P341c_tIf "34.1a, 34.1c-f" OR [P341a, P341c, P341d, P341e, P341f] [] [] [],
   Stmt P'IsLocum "is locum" Switch [] [] [] [],
@@ -127,7 +127,7 @@ makeGraph1 statements = statements
           if null sSubjectTo then stateAfterInit
           else foldl' g (stateAfterInit & addAND) sSubjectTo
           where
-            oldParaIndex = mgsOutPointers Map.! sParaRef
+            oldParaIndex = mgsOutPointers ! sParaRef
             andNodeIndex = succ mgsCounter
             addAND :: MakeGraphState -> MakeGraphState
             addAND mgsState@MGState{ mgsOutPointers, mgsNodes, mgsEdges, mgsCounter }
@@ -160,7 +160,7 @@ makeGraph1 statements = statements
               where
                 k1 = succ mgsCounter
                 andNode = (k1, AND, show' despite <> " with defeasibility")
-                andEdgeToDespite = (O $ mgsOutPointers Map.! despite, I k1)
+                andEdgeToDespite = (O $ mgsOutPointers ! despite, I k1)
                 k2 = succ k1
                 notNode = (k2, NOT, show' sParaRef <> " despite " <> show' despite)
                 notEdgeToAnd = (O k2, I k1)
@@ -178,10 +178,10 @@ makeGraph2 MGState{ mgsOutPointers, mgsInPointers, mgsNodes, mgsEdges } =
     makeFinalEdge = Data.Bifunctor.bimap
       (\case
         O i -> i
-        ORef oParaRef -> mgsOutPointers Map.! oParaRef)
+        ORef oParaRef -> mgsOutPointers ! oParaRef)
       (\case
         I o -> o
-        IRef iParaRef -> mgsInPointers Map.! iParaRef)
+        IRef iParaRef -> mgsInPointers ! iParaRef)
 
 makeGraph :: [Statement] -> Gr Text Text
 makeGraph = makeGraph1 >>> makeGraph2

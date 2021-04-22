@@ -21,7 +21,7 @@ data ParaRef = PMustNot | PMay | PMustNotBulb | PMayBulb
   | P341 | P341a | P341b | P341c | P341d | P341e | P341f
   | P342 | P343 | P344 | P345 | P346 | P347
   | P'NotLocum | P'BusinessEntity'NotLawRelated | P'2ndSchedule
-  | P'IsLocum | P341a'P341c_to_f
+  | P'IsLocum | P341a'P341c_tIf
   | P'3rdSchedule
   deriving (Eq, Ord, Show)
 
@@ -66,8 +66,8 @@ rule34_text = init [
   Stmt P'BusinessEntity'NotLawRelated "business entity\nnot law-related" Switch [] [] [] [],
   Stmt P'2ndSchedule "2nd schedule" Switch [] [] [] [],
   
-  Stmt P345 "34.5" AND [P'IsLocum, P'BusinessEntity'NotLawRelated, P'2ndSchedule] [PMay] [P341a'P341c_to_f] [P341b],
-  Stmt P341a'P341c_to_f "34.1a, 34.1c-f" OR [P341a, P341c, P341d, P341e, P341f] [] [] [],
+  Stmt P345 "34.5" AND [P'IsLocum, P'BusinessEntity'NotLawRelated, P'2ndSchedule] [PMay] [P341a'P341c_tIf] [P341b],
+  Stmt P341a'P341c_tIf "34.1a, 34.1c-f" OR [P341a, P341c, P341d, P341e, P341f] [] [] [],
   Stmt P'IsLocum "is locum" Switch [] [] [] [],
 
   Stmt P346 "34.6" NOR [P342, P343, P344, P345] [PMustNot] [] [],
@@ -94,11 +94,11 @@ data MakeGraphState = MGState {
   ---     * In my present understanding, input pointers are not expected to be modified
   ---         by any rewriting.
   mgsNodes :: [(Int, GateType, Text)], -- Text is node label
-  mgsEdges :: [(Input_, Output_)],
+  mgsEdges :: [(Output, Input)],
   mgsCounter :: Int }
 
-data Output_ = ORef_ ParaRef | O_ Int
-data Input_ = IRef_ ParaRef | I_ Int
+data Input = IRef ParaRef | I Int
+data Output = ORef ParaRef | O Int
 
 --- *** warning *** The Haskel langauge extension NamedFieldPuns can be confusing for the uninitiated.
 ---   cf. https://ghc.gitlab.haskell.org/ghc/doc/users_guide/exts/record_puns.html
@@ -117,8 +117,8 @@ makeGraph1 statements = statements
             mgsOutPointers = Map.insert sParaRef i mgsOutPointers,
             mgsInPointers = Map.insert sParaRef i mgsInPointers,
             mgsNodes = (i, sGateType, sLabel) : mgsNodes,
-            mgsEdges = fmap (, ORef_ sParaRef) (IRef_ <$> sInputs) -- connect to inputs
-              ++ fmap (IRef_ sParaRef ,) (ORef_ <$> sOutputs) -- connect to outputs
+            mgsEdges = fmap (, IRef sParaRef) (ORef <$> sInputs) -- connect to inputs
+              ++ fmap (ORef sParaRef ,) (IRef <$> sOutputs) -- connect to outputs
               ++ mgsEdges,
             mgsCounter = i
             }
@@ -135,14 +135,14 @@ makeGraph1 statements = statements
                   mgsNodes = (andNodeIndex, AND, show' sParaRef <> " with defeasibility") : mgsNodes,
                   mgsCounter = andNodeIndex,
                   mgsOutPointers = Map.insert sParaRef andNodeIndex mgsOutPointers,
-                  mgsEdges = (I_ oldParaIndex, O_ andNodeIndex) : mgsEdges
+                  mgsEdges = (O oldParaIndex, I andNodeIndex) : mgsEdges
                   }
             g :: MakeGraphState -> ParaRef -> MakeGraphState
             g mgsState@MGState{ mgsOutPointers, mgsNodes, mgsEdges, mgsCounter } subjectTo
               = let j = succ mgsCounter in mgsState {
                   mgsNodes = (j, NOT, show' sParaRef <> " subject to " <> show' subjectTo) : mgsNodes,
                   mgsCounter = j,
-                  mgsEdges = (IRef_ subjectTo, O_ j) : (I_ j, O_ andNodeIndex) : mgsEdges
+                  mgsEdges = (ORef subjectTo, I j) : (O j, I andNodeIndex) : mgsEdges
                   }
         -- | defeasibility rewrite for "despite"
         rewriteDespite stateAfterRewriteSubjectTo@MGState{ mgsCounter, mgsOutPointers } =
@@ -160,28 +160,28 @@ makeGraph1 statements = statements
               where
                 k1 = succ mgsCounter
                 andNode = (k1, AND, show' despite <> " with defeasibility")
-                andEdgeToDespite = (I_ $ mgsOutPointers Map.! despite, O_ k1)
+                andEdgeToDespite = (O $ mgsOutPointers Map.! despite, I k1)
                 k2 = succ k1
                 notNode = (k2, NOT, show' sParaRef <> " despite " <> show' despite)
-                notEdgeToAnd = (I_ k2, O_ k1)
-                notEdgeToPara = (IRef_ sParaRef, O_ k2)
+                notEdgeToAnd = (O k2, I k1)
+                notEdgeToPara = (ORef sParaRef, I k2)
                 reassignPointer = Map.insert despite k1 mgsOutPointers
 
 makeGraph2 :: MakeGraphState -> Gr Text Text
-makeGraph2 MGState{ mgsOutPointers, mgsNodes, mgsEdges } =
+makeGraph2 MGState{ mgsOutPointers, mgsInPointers, mgsNodes, mgsEdges } =
   mkGraph @Gr (mgsNodes <&> makeNode) (mgsEdges <&> makeFinalEdge <&> \(x,y) -> (x,y,"" :: Text))
   where
     makeNode :: (Int, GateType, Text) -> (Int, Text)
     makeNode (i, gateType, label) =
       (i, show' gateType <> ": " <> label)
-    makeFinalEdge :: (Input_, Output_) -> (Int, Int)
+    makeFinalEdge :: (Output, Input) -> (Int, Int)
     makeFinalEdge = Data.Bifunctor.bimap
       (\case
-        I_ i -> i
-        IRef_ iParaRef -> mgsOutPointers Map.! iParaRef)
+        O i -> i
+        ORef oParaRef -> mgsOutPointers Map.! oParaRef)
       (\case
-        O_ o -> o
-        ORef_ oParaRef -> mgsOutPointers Map.! oParaRef)
+        I o -> o
+        IRef iParaRef -> mgsInPointers Map.! iParaRef)
 
 makeGraph :: [Statement] -> Gr Text Text
 makeGraph = makeGraph1 >>> makeGraph2

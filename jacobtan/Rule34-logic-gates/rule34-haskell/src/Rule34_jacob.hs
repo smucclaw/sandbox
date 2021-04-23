@@ -3,19 +3,21 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE TupleSections #-}
+{-# LANGUAGE ViewPatterns #-}
 module Rule34_jacob where
 
 import Utils ( foldl', (&), (<&>), (>>>), show', (!) )
 import qualified Data.Map.Strict as Map
 import Data.Text (Text)
 import qualified Data.Text as Text
+import qualified Data.Bifunctor
+import qualified Data.Set
 
 import Data.Graph.Inductive.Graph (mkGraph)
 import Data.Graph.Inductive.PatriciaTree (Gr)
 
 import Encoding ( GateType(..) )
 import Graphviz (preview, preview'custom)
-import qualified Data.Bifunctor
 
 data ParaRef = PMustNot | PMay | PMustNotBulb | PMayBulb
   | P341 | P341a | P341b | P341c | P341d | P341e | P341f
@@ -79,6 +81,17 @@ rule34_text = init [
   --- ^ for trailing commas. Used with the @init@ function.
   ]
 
+-- | check that all pointers used are defined
+validateStatements :: Foldable t => t Statement -> t Statement
+validateStatements statements = if null missingDefinitions
+    then statements
+    else error $ "*** Error *** these are used but not defined: " ++ show (Data.Set.toAscList missingDefinitions)
+  where
+    missingDefinitions = Data.Set.difference (Data.Set.fromList usedSet) (Data.Set.fromList definedSet)
+    (definedSet, usedSet) = foldl' f ([],[]) statements
+    f (defined, used) Stmt{ sParaRef, sInputs, sOutputs, sSubjectTo, sDespite }
+      = (sParaRef : defined, sInputs ++ sOutputs ++ sSubjectTo ++ sDespite ++ used)
+
 -- | Int represents node index
 data MakeGraphState = MGState {
   mgsOutPointers :: Map.Map ParaRef Int,
@@ -103,13 +116,15 @@ data Output = ORef ParaRef | O Int
 --- *** warning *** The Haskel langauge extension NamedFieldPuns can be confusing for the uninitiated.
 ---   cf. https://ghc.gitlab.haskell.org/ghc/doc/users_guide/exts/record_puns.html
 makeGraph1 :: [Statement] -> MakeGraphState
-makeGraph1 statements = statements
-  & foldl' f (MGState mempty mempty [] [] 0)
+makeGraph1 (validateStatements -> statements) =
+  foldl' f0 (MGState mempty mempty [] [] 0) statements
+  & \state1 -> foldl' f1 state1 statements
   where
-    f :: MakeGraphState -> Statement -> MakeGraphState
-    f mgsState
+    -- | First pass: create logic gates, without defeasibility
+    f0 :: MakeGraphState -> Statement -> MakeGraphState
+    f0 mgsState
       Stmt{ sParaRef, sLabel, sGateType, sInputs, sOutputs, sSubjectTo, sDespite }
-      = mgsState & writeState & rewriteSubjectTo & rewriteDespite
+      = writeState mgsState
       where
         writeState :: MakeGraphState -> MakeGraphState
         writeState mgsState@MGState{ mgsOutPointers, mgsInPointers, mgsNodes, mgsEdges, mgsCounter }
@@ -122,6 +137,12 @@ makeGraph1 statements = statements
               ++ mgsEdges,
             mgsCounter = i
             }
+    -- | Second pass: defeasibility rewrites
+    f1 :: MakeGraphState -> Statement -> MakeGraphState
+    f1 mgsState
+      Stmt{ sParaRef, sLabel, sGateType, sInputs, sOutputs, sSubjectTo, sDespite }
+      = mgsState & rewriteSubjectTo & rewriteDespite
+      where
         -- | defeasibility rewrite for "subject to"
         rewriteSubjectTo stateAfterInit@MGState{ mgsCounter, mgsOutPointers } =
           if null sSubjectTo then stateAfterInit
@@ -190,4 +211,4 @@ rule34_jacobMain :: IO ()
 rule34_jacobMain = do
   putStrLn "__rule34_jacobMain__"
   preview (makeGraph rule34_text) >> putStrLn "< visualise a graph using the Xlib GraphvizCanvas >"
-  preview'custom (makeGraph rule34_text) >> putStrLn "< visualise a graph using the Xlib GraphvizCanvas >"
+  -- preview'custom (makeGraph rule34_text) >> putStrLn "< visualise a graph using the Xlib GraphvizCanvas >"

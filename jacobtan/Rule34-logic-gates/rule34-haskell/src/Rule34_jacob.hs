@@ -224,11 +224,17 @@ makeGraph2 MGState{ mgsOutPointers, mgsInPointers, mgsNodes, mgsEdges } =
 makeGraph :: [Statement] -> Gr Text Text
 makeGraph = makeGraph1 >>> makeGraph2
 
+preview1 :: IO ()
+preview1 = preview (makeGraph rule34_text) >> putStrLn "< visualise a graph using the Xlib GraphvizCanvas >"
+  
+preview2 :: IO ()
+preview2 = preview'custom (makeGraph rule34_text) >> putStrLn "< visualise a graph using the Xlib GraphvizCanvas >"
+
 rule34_jacobMain :: IO ()
 rule34_jacobMain = do
   putStrLn "__rule34_jacobMain__"
-  preview (makeGraph rule34_text) >> putStrLn "< visualise a graph using the Xlib GraphvizCanvas >"
-  -- preview'custom (makeGraph rule34_text) >> putStrLn "< visualise a graph using the Xlib GraphvizCanvas >"
+  preview1
+  preview2
 
 importGraph :: Gr Text Text
 importGraph = makeGraph (outputBulbs ++ myruleToStm rule34_1)

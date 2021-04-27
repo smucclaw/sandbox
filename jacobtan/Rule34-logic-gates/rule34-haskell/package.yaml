@@ -29,6 +29,7 @@ dependencies:
 - graphviz
 - generic-data
 - prettyprinter
+- sbv
 
 library:
   source-dirs: src

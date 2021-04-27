@@ -80,6 +80,7 @@ gates = do
   constrain $ p3rdSchedule .== sFalse
   --- ^ just to reduce unnecessary models returned by SMT
   
+  --- | Usage: uncomment one of the lines below, and comment out the rest
   return $ sNot pMustNot'Bulb .&& pMay'Bulb -- (not MustNot) && (May)
   -- return $ pMustNot'Bulb .&& pMay'Bulb -- MustNot && May (unsatisfiable)
   -- return $ sNot pMustNot'Bulb .&& sNot pMay'Bulb -- (not MustNot) && (not May) (unsatisfiable)
@@ -88,3 +89,7 @@ rule34_SMT_main :: IO ()
 rule34_SMT_main = sat gates >>= print
 
 main = rule34_SMT_main
+
+-- | If without constraints, long wait and many solutions.
+mainAllSat :: IO ()
+mainAllSat = allSat gates >>= print

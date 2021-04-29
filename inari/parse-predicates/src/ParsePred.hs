@@ -4,7 +4,7 @@
 module ParsePred where
 
 import Data.Char (toLower, toUpper, isLower)
-import Data.List.Extra (trim, sort, transpose, allSame)
+import Data.List.Extra (trim, sort, transpose, allSame, nub, intercalate)
 import Data.List.Split ( split, splitOn, startsWithOneOf )
 import Data.Monoid (Any (..))
 import PGF hiding (Tree)
@@ -74,14 +74,23 @@ step1 pr | length (trees pr) <= 1 = []
 
 -- $setup
 -- >>> gr <- getPGF
-
 -- |
 -- >>> mkQuestion $ extractContentWords (parsePred gr "InvolvesSharingFeesWithUnauthorizedPersonsForLegalWorkPerformedByTheLegalPractitioner")
--- WAS [["sharing_N","share_V2","sharing_N","sharing_N","sharing_N","sharing_N","share_V2","share_V2","share_V2"]]
--- NOW [["sharing_N"],["share_V2"],["sharing_N"],["sharing_N"],["sharing_N"],["sharing_N"],["share_V2"],["share_V2"],["share_V2"]]
+-- [["share_V2"],["share_V2"],["share_V2"],["share_V2"],["sharing_N"],["sharing_N"],["sharing_N"]]
+
+-- >>> askWord $ extractContentWords (parsePred gr "SoleIndependentContractor")
+-- "sole_V2 or sole_A or sole_N"
+
+-- 
+-- >>> askWord $ checkWord "sOle_V2" (extractContentWords (parsePred gr "SoleIndependentContractor"))
+-- "independent_A or independent_N"
+
+-- yes I mean sole_v2
+-- >>> filterWord "sole_v2" (mkQuestion $ extractContentWords (parsePred gr "SoleIndependentContractor"))
+-- [["independent_A","sole_V2"],["independent_N","sole_V2"]]
+
 -- >>> mkQuestion $ extractContentWords (parsePred gr "SoleIndependentContractor")
--- [["independent_A","sole_V2"],["independent_N","sole_V2"],["independent_A","sole_A"],["independent_N","sole_A"],
---  ["independent_A","sole_N"],["independent_A","sole_N"],["independent_N","sole_N"],["independent_N","sole_A"],["independent_N","sole_N"]]
+-- [["independent_A","sole_V2"],["independent_N","sole_V2"],["independent_A","sole_A"],["independent_N","sole_A"],["independent_A","sole_N"],["independent_N","sole_N"],["independent_N","sole_N"]]
 
 -- >>> extractContentWords (parsePred gr "SoleIndependentContractor")
 -- [["sole_V2","independent_A","contractor_N"],["sole_V2","independent_N","contractor_N"],["sole_A","independent_A","contractor_N"],
@@ -104,6 +113,42 @@ step1 pr | length (trees pr) <= 1 = []
 
 -- (FullPredicate:819 sole independent (N:731 contractor))
 
+-- ask more questions to clarify what things are
+groupWord :: Eq a => [[a]] -> [[a]]
+groupWord [] = []
+groupWord ([]:_) = []
+groupWord l = map nub (map head l : groupWord (map tail l))
+
+-- check for most variety of type word, and ask which type
+askWord :: [[String]] -> String
+askWord = intercalate " or " . snd . maximum . map ((,) =<< length) . groupWord . mkQuestion
+
+-- check if chosen word exists
+
+checkWord :: String -> [[String]] -> [[String]]
+checkWord w str
+  | doesExist = filterWord w str
+  | otherwise = error "that is not a valid choice"
+  where
+    doesExist = map toLower w `elem` (map . map) toLower (filter (/="or") $ words $ askWord str)
+
+-- only get lists with that chosen word type
+filterWord :: String -> [[String]] -> [[String]]
+filterWord w (l:ls)
+  | null ls = []
+  | map toLower w `elem` (map . map) toLower l = l : filterWord w ls
+  | otherwise = filterWord w ls
+
+
+-- take lists and check for most variety of type word, and keep going
+keepAsking :: [[String]] -> IO ()
+keepAsking str = do
+  putStrLn $ askWord str
+  chosenWord <- getLine 
+  let action | length (checkWord chosenWord str) == 1 = putStrLn $ (concat . concat) str
+             | otherwise = keepAsking str
+  action
+
 -- TODO: use the information from position and function to ask proper questions:
 -- "is sole a verb or a noun"
 -- and that makes other options impossible
@@ -111,7 +156,7 @@ step1 pr | length (trees pr) <= 1 = []
 mkQuestion :: [[String]] -> [Question]
 mkQuestion = transpose .
   differingItems
-  
+
 differingItems :: (Ord a) => [[a]] -> [[a]]
 differingItems = filter (not . allSame) . transpose . map sort
 
@@ -119,7 +164,6 @@ differingItems = filter (not . allSame) . transpose . map sort
 -- $setup
 -- >>> gr <- getPGF
 
--- | Gives a list of content words for each possible parse
 -- >>> extractContentWords (parsePred gr "InvolvesSharingFeesWithUnauthorizedPersonsForLegalWorkPerformedByTheLegalPractitioner")
 -- [["involve_V2","perform_V2","DefArt","legal_A","practitioner_N","sharing_N","IndefArt","fee_N","with_Prep","IndefArt","unauthorized_A","person_N","for_Prep","legal_A","work_N"],["involve_V2","perform_V2","DefArt","legal_A","practitioner_N","share_V2","IndefArt","fee_N","with_Prep","IndefArt","unauthorized_A","person_N","for_Prep","legal_A","work_N"],["involve_V2","IndefArt","fee_N","with_Prep","IndefArt","unauthorized_A","person_N","for_Prep","legal_A","work_N","perform_V2","DefArt","legal_A","practitioner_N","sharing_N"],["involve_V2","sharing_N","IndefArt","perform_V2","DefArt","legal_A","practitioner_N","fee_N","with_Prep","IndefArt","unauthorized_A","person_N","for_Prep","legal_A","work_N"],["involve_V2","sharing_N","IndefArt","fee_N","with_Prep","IndefArt","unauthorized_A","perform_V2","DefArt","legal_A","practitioner_N","person_N","for_Prep","legal_A","work_N"],["involve_V2","sharing_N","IndefArt","fee_N","with_Prep","IndefArt","unauthorized_A","person_N","for_Prep","legal_A","perform_V2","DefArt","legal_A","practitioner_N","work_N"],["involve_V2","share_V2","IndefArt","perform_V2","DefArt","legal_A","practitioner_N","fee_N","with_Prep","IndefArt","unauthorized_A","person_N","for_Prep","legal_A","work_N"],["involve_V2","share_V2","IndefArt","fee_N","with_Prep","IndefArt","unauthorized_A","perform_V2","DefArt","legal_A","practitioner_N","person_N","for_Prep","legal_A","work_N"],["involve_V2","share_V2","IndefArt","fee_N","with_Prep","IndefArt","unauthorized_A","person_N","for_Prep","legal_A","perform_V2","DefArt","legal_A","practitioner_N","work_N"]]
 
@@ -179,7 +223,7 @@ filterHeuristic ts = filter (not . ppBeforeAP) (filter filterGerund ts)
   where
     filterGerund
       | any hasGerund ts &&  -- "practicing as lawyer": progressive, pres. part. or gerund
-        any hasProgr ts && 
+        any hasProgr ts &&
         not (all hasGerund ts) = not . hasProgr
 --      | any hasGerund ts && not (all hasGerund ts) = hasGerund
       | otherwise = const True

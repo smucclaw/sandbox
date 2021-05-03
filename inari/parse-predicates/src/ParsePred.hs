@@ -1,6 +1,7 @@
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE GADTs #-}
 
+{-# OPTIONS_GHC -Wno-overlapping-patterns #-}
 module ParsePred where
 
 import Data.Char (toLower, toUpper, isLower)
@@ -78,16 +79,21 @@ step1 pr | length (trees pr) <= 1 = []
 -- >>> mkQuestion $ extractContentWords (parsePred gr "InvolvesSharingFeesWithUnauthorizedPersonsForLegalWorkPerformedByTheLegalPractitioner")
 -- [["share_V2"],["share_V2"],["share_V2"],["share_V2"],["sharing_N"],["sharing_N"],["sharing_N"]]
 
--- >>> askWord $ extractContentWords (parsePred gr "SoleIndependentContractor")
--- "sole_V2 or sole_A or sole_N"
+phrase :: String
+phrase = "Position: Organization -> Position"
 
--- 
--- >>> askWord $ checkWord "sOle_V2" (extractContentWords (parsePred gr "SoleIndependentContractor"))
--- "independent_A or independent_N"
+-- >>> filterWord "position_n" $ [["position_n"], ["position_v2"]]
+-- [["position_n"]]
+
+-- >>> map toLower "position_n" `elem` (map . map) toLower ["position_n"]
+-- True
+
+-- >>> length (checkWord "position_v2" (extractContentWords (parsePred gr phrase)))
+-- 1
 
 -- yes I mean sole_v2
--- >>> filterWord "sole_v2" (mkQuestion $ extractContentWords (parsePred gr "SoleIndependentContractor"))
--- [["independent_A","sole_V2"],["independent_N","sole_V2"]]
+-- >>> filterWord "share_v2" (extractContentWords (parsePred gr phrase))
+-- [["involve_V2","perform_V2","DefArt","legal_A","practitioner_N","share_V2","IndefArt","fee_N","with_Prep","IndefArt","unauthorized_A","person_N","for_Prep","legal_A","work_N"],["involve_V2","share_V2","IndefArt","perform_V2","DefArt","legal_A","practitioner_N","fee_N","with_Prep","IndefArt","unauthorized_A","person_N","for_Prep","legal_A","work_N"],["involve_V2","share_V2","IndefArt","fee_N","with_Prep","IndefArt","unauthorized_A","perform_V2","DefArt","legal_A","practitioner_N","person_N","for_Prep","legal_A","work_N"],["involve_V2","share_V2","IndefArt","fee_N","with_Prep","IndefArt","unauthorized_A","person_N","for_Prep","legal_A","perform_V2","DefArt","legal_A","practitioner_N","work_N"]]
 
 -- >>> mkQuestion $ extractContentWords (parsePred gr "SoleIndependentContractor")
 -- [["independent_A","sole_V2"],["independent_N","sole_V2"],["independent_A","sole_A"],["independent_N","sole_A"],["independent_A","sole_N"],["independent_N","sole_N"],["independent_N","sole_N"]]
@@ -121,33 +127,46 @@ groupWord l = map nub (map head l : groupWord (map tail l))
 
 -- check for most variety of type word, and ask which type
 askWord :: [[String]] -> String
-askWord = intercalate " or " . snd . maximum . map ((,) =<< length) . groupWord . mkQuestion
+askWord
+  = intercalate " or " . snd . maximum . map ((,) =<< length) . groupWord . mkQuestion
 
 -- check if chosen word exists
 
 checkWord :: String -> [[String]] -> [[String]]
 checkWord w str
-  | doesExist = filterWord w str
+  | doesExist w str = filterWord w str
   | otherwise = error "that is not a valid choice"
-  where
-    doesExist = map toLower w `elem` (map . map) toLower (filter (/="or") $ words $ askWord str)
+    
+doesExist :: String -> [[String]] -> Bool
+doesExist w str = map toLower w `elem` (map . map) toLower (filter (/="or") $ words $ askWord str)
 
 -- only get lists with that chosen word type
 filterWord :: String -> [[String]] -> [[String]]
+filterWord _ [] = []
 filterWord w (l:ls)
-  | null ls = []
   | map toLower w `elem` (map . map) toLower l = l : filterWord w ls
   | otherwise = filterWord w ls
 
+checkForDiff :: [[String]] -> IO ()
+checkForDiff str
+  | null (mkQuestion str) = putStrLn $  "[" ++ intercalate ", " (head str) ++ "]"
+  | otherwise = keepAsking str
+
+notEmpty :: [[String]] -> IO ()
+notEmpty str = do
+  putStrLn $ askWord str
+  chosenWord <- getLine
+  let action | length (checkWord chosenWord str) == 1 = putStrLn $ "[" ++ intercalate ", " (concat $ filterWord chosenWord str) ++ "]"
+             | otherwise = checkForDiff $ filterWord chosenWord str
+  action
 
 -- take lists and check for most variety of type word, and keep going
 keepAsking :: [[String]] -> IO ()
 keepAsking str = do
-  putStrLn $ askWord str
-  chosenWord <- getLine 
-  let action | length (checkWord chosenWord str) == 1 = putStrLn $ (concat . concat) str
-             | otherwise = keepAsking str
-  action
+  putStrLn "start keepAsking"
+  let checkEmpty | null (mkQuestion str) = putStrLn $ "[" ++ intercalate ", " (concat str) ++ "]"
+                 | otherwise = do notEmpty str
+  checkEmpty
 
 -- TODO: use the information from position and function to ask proper questions:
 -- "is sole a verb or a noun"
@@ -159,7 +178,6 @@ mkQuestion = transpose .
 
 differingItems :: (Ord a) => [[a]] -> [[a]]
 differingItems = filter (not . allSame) . transpose . map sort
-
 
 -- $setup
 -- >>> gr <- getPGF
@@ -177,8 +195,6 @@ extractContentWords pr = [onlyLex (fg' tree) | tree <- trees pr]
     onlyLex tree = case fromLexicalNode tree of
       Just s -> [s]
       Nothing -> composOpMonoid onlyLex tree
-
-
 
 parsePred :: PGF -> [Char] -> Predicate
 parsePred gr str = Pred nm (filterHeuristic ts) ar

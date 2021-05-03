@@ -1,6 +1,6 @@
 module Main where
 
-import ParsePred ( parsePred )
+import ParsePred
 import Paths_parse_predicates
 import PGF (readPGF)
 
@@ -23,6 +23,8 @@ main = do
     pgf <- getDataFileName "ParseGF.pgf"
     gr <- readPGF pgf
     mapM_ (print . parsePred gr) corpus
+    mapM_ (keepAsking . extractContentWords . parsePred gr) corpus
+
 
 corpus :: [String]
 corpus = [

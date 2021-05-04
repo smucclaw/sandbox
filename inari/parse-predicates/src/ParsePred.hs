@@ -9,7 +9,7 @@ import Data.List.Extra (trim, sort, transpose, allSame, nub, intercalate)
 import Data.List.Split ( split, splitOn, startsWithOneOf )
 import Data.Monoid (Any (..))
 import PGF hiding (Tree)
-import ParseGF
+import ParsePredicates
 import Text.Printf (printf)
 import Paths_parse_predicates ( getDataFileName )
 
@@ -48,7 +48,7 @@ fromLexicalNode _ = Nothing
 
 getPGF :: IO PGF
 getPGF = do
-  pgf <- getDataFileName "ParseGF.pgf"
+  pgf <- getDataFileName "ParsePredicates.pgf"
   readPGF pgf
 
 
@@ -103,21 +103,7 @@ phrase = "Position: Organization -> Position"
 --  ["sole_A","independent_N","contractor_N"],["sole_N","independent_A","contractor_N"],["sole_N","independent_A","contractor_N"],
 --  ["sole_N","independent_N","contractor_N"],["sole_A","independent_N","contractor_N"],["sole_N","independent_N","contractor_N"]]
 
--- >>> (parsePred gr "SoleIndependentContractor")
--- SoleIndependentContractor
--- arity 0
--- parses
--- FullPred PresIndPl PosPol (ComplVP (ComplSlash (SlashV2a sole_V2) (MassNP (AdjCN (PositA independent_A) (UseN contractor_N)))))
--- FullPred PresIndPl PosPol (ComplVP (ComplSlash (SlashV2a sole_V2) (MassNP (ApposCN (UseN independent_N) (MassNP (UseN contractor_N))))))
--- PredNP PosPol (MassNP (AdjCN (PositA sole_A) (AdjCN (PositA independent_A) (UseN contractor_N))))
--- PredNP PosPol (MassNP (AdjCN (PositA sole_A) (ApposCN (UseN independent_N) (MassNP (UseN contractor_N)))))
--- PredNP PosPol (MassNP (AdjCN (NPAP (MassNP (UseN sole_N)) (PositA independent_A)) (UseN contractor_N)))
--- PredNP PosPol (MassNP (ApposCN (UseN sole_N) (MassNP (AdjCN (PositA independent_A) (UseN contractor_N)))))
--- PredNP PosPol (MassNP (ApposCN (UseN sole_N) (MassNP (ApposCN (UseN independent_N) (MassNP (UseN contractor_N))))))
--- PredNP PosPol (MassNP (ApposCN (AdjCN (PositA sole_A) (UseN independent_N)) (MassNP (UseN contractor_N))))
--- PredNP PosPol (MassNP (ApposCN (ApposCN (UseN sole_N) (MassNP (UseN independent_N))) (MassNP (UseN contractor_N))))
 
--- (FullPredicate:819 sole independent (N:731 contractor))
 
 -- ask more questions to clarify what things are
 groupWord :: Eq a => [[a]] -> [[a]]
@@ -269,3 +255,21 @@ ppBeforeAP = getAny . ppBeforeAP' . (fg :: Expr -> GFullPredicate)
     ppBeforeAP' (GAdjCN (GPastPartAP _) (GAdjCN _ _)) = Any True
     ppBeforeAP' (GAdjCN (GPastPartAgentAP _ _) (GAdjCN _ _)) = Any True
     ppBeforeAP' x = composOpMonoid ppBeforeAP' x
+
+
+{-
+Templates to ask about ambiguities
+
+Gerund verb vs. noun
+sharing fees
+  * "sharing (N) fees (N)" as in "parking fee"
+  * "sharing (V) fees (N)" as in "I share fees"
+
+Adjective vs. noun
+sole independent contractor
+  * "sole (N) independent (N)" as in "tax evasion"
+  * "sole (N) independent (A)" as in "member-driven"
+  * "sole (A) independent (A)" as in "big, blue"
+
+
+-}

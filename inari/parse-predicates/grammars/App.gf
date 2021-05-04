@@ -1,1 +1,3 @@
-abstract App = Predicates, WordNet ;
+abstract App = Predicates, WordNet ** {
+    flags startcat = FullPredicate ;
+} ;

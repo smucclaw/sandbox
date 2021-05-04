@@ -30,6 +30,7 @@ dependencies:
 - generic-data
 - prettyprinter
 - sbv
+- casing
 
 library:
   source-dirs: src

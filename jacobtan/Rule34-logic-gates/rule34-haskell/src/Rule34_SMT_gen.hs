@@ -17,6 +17,22 @@ import Rule34_jacob
 import Data.IntSet (IntSet, member, Key, insert)
 import Control.Monad.RWS.Strict
 
+{-
+
+__Algorithm:
+
+Depth-first tree traversal, generating the leaves first, then progress up the branches.
+
+This ensures that when a line of the generated code references something, that thing has already been declared in the previous lines.
+
+__Haskell features used:
+
+RWS monad (an amalgamation of Reader, Writer, and State monads).
+http://dev.stephendiehl.com/hask/#rws-monad
+It was perfect for the job.
+
+-}
+
 -- | use this to generate the SMT code
 rule34_SMT_gen :: IO ()
 rule34_SMT_gen = mapM_ (putStrLn . Text.unpack) smtGen

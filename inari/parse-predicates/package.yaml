@@ -15,7 +15,7 @@ custom-setup:
 
 extra-source-files:
 # - README.md
-- grammars/ParseGF.gf
+- grammars/ParsePredicates.gf
 
 
 # Metadata used when publishing your package
@@ -43,7 +43,7 @@ ghc-options:
 internal-libraries:
   gf-generated:
     exposed-modules:
-    - ParseGF
+    - ParsePredicates
     source-dirs:
     - grammars
 

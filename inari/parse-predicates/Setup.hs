@@ -27,8 +27,8 @@ userHooks = simpleUserHooks {
         let cdest = fromFlag $ copyDest insF
         let dDir = datadir $ absoluteComponentInstallDirs pDesc lbi (localUnitId lbi) cdest
         let verbosity = fromFlag $ copyVerbosity insF
-        let src = buildDir lbi </> "gf-generated" </> "ParseGF.pgf"
-        let dst = dDir </> "ParseGF.pgf"
+        let src = buildDir lbi </> "gf-generated" </> "ParsePredicates.pgf"
+        let dst = dDir </> "ParsePredicates.pgf"
         -- print dDir
         createDirectoryIfMissingVerbose verbosity True dDir
         installOrdinaryFile verbosity src dst
@@ -52,7 +52,7 @@ gfPP bi lbi clbi = PreProcessor {
                 , "--output-dir=" ++ outDir
                 , "--gfo-dir=/tmp"
                 --, inDir </> inFile
-                , inDir </> "ParseGFEng.gf"
+                , inDir </> "ParsePredicatesEng.gf"
                 ]
         print args
         (gfProg, _) <- requireProgram verbosity gfProgram (withPrograms lbi)

@@ -7,6 +7,7 @@ module Rule34 where
 -- import Encoding
 -- import LogicGates
 import Prettyprinter
+import Prettyprinter.Util
 import Data.Maybe (maybeToList)
 import Data.Tree
 import qualified Data.Map as Map
@@ -296,6 +297,10 @@ mkPred x = MkCondition Nothing (Leaf $ Pred x) Nothing
   ).
 
 -}
+
+
+
+
 rule34_1 = Labeled (Just "rule 34.1")
   MyRule { defeasors = []
          , party = lp
@@ -366,3 +371,11 @@ rule34_1 = Labeled (Just "rule 34.1")
 ruleBase = Map.fromList $ (\(Labeled (Just l) r) -> (l, r)) <$>
   [ rule34_1
   ]
+
+as_org = putDocW 120 (org_prefix <> line <>
+                      toEnglish rule34_1 <> line)
+
+org_prefix = "#+TITLE: Rule 34 as Org\n#+OPTIONS: num:nil toc:nil" <> line
+
+
+

@@ -1,5 +1,4 @@
-
-concrete ParseGFEng of ParseGF =
+concrete PredicatesEng of Predicates =
   NounEng - [PPartNP, UseN2, RelNP, DetNP, AdvNP, PossNP, PartNP, CountNP, AdvCN, ApposCN],
   VerbEng - [PassV2, ReflVP, ComplVV, SlashV2V, SlashVV, SlashV2VNP, UseCopula, AdvVP, AdvVPSlash, VPSlashPrep],
   AdjectiveEng - [ReflA2, CAdvAP, UseA2, AdvAP],
@@ -12,10 +11,8 @@ concrete ParseGFEng of ParseGF =
   IdiomEng,
   NumeralEng,
   ExtendEng [GerundCN,PresPartAP,PastPartAP,PastPartAgentAP, CompoundN],
-  TenseX - [Pol,PPos,PNeg,SC,CAdv],
-  ReducedWordNetEng - [in_N, in_A],
-  ConstructionEng,
-  DocumentationEng ** open ResEng, ExtraEng, (V=VerbEng), (P=ParadigmsEng), ExtendEng, SyntaxEng, Prelude in {
+  TenseX - [Pol,PPos,PNeg,SC,CAdv] 
+  ** open ResEng, ExtraEng, (V=VerbEng), (P=ParadigmsEng), ExtendEng, SyntaxEng, Prelude in {
 
 flags
   case_sensitive = off;
@@ -61,9 +58,14 @@ lin
 
     NegAP ap = mkAP (lin AdA {s = "non"}) ap ;
 
-    Must pol vp = FullPred PresIndSg pol (vvPred must_VV vp) ;
-    May pol vp = FullPred PresIndSg pol (vvPred may_VV vp) ;
-    Shall pol vp = FullPred PresIndSg pol (vvPred shall_VV vp) ;
+    -- Must pol vp = FullPred PresIndSg pol (vvPred must_VV vp) ;
+    -- May pol vp = FullPred PresIndSg pol (vvPred may_VV vp) ;
+    -- Shall pol vp = FullPred PresIndSg pol (vvPred shall_VV vp) ;
+
+    Must vp = (vvPred must_VV vp) ;
+    May vp = (vvPred may_VV vp) ;
+    Shall vp = (vvPred shall_VV vp) ;
+
 
     PartialParseAfterNTokens n = lin Utt (cc3 (ss "partial parse after") n (ss "tokens")) ;
     ParseFailedAfterNTokens n = lin Utt (cc3 (ss "parse failed after") n (ss "tokens")) ;

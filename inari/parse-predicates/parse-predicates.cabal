@@ -4,7 +4,7 @@ cabal-version: 2.0
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 18c88cc142aa95d243a12eef57dd3390e9d9dfb8bd9a8e6b39e6f680d72184c6
+-- hash: a0297a5350c1c52823469c78564e80cf3a5a0d2e00efa3dc9d25b2e5cc0baa68
 
 name:           parse-predicates
 version:        0.1.0.0
@@ -15,7 +15,7 @@ copyright:      2021 Inari Listenmaa
 license:        BSD3
 build-type:     Custom
 extra-source-files:
-    grammars/ParseGF.gf
+    grammars/ParsePredicates.gf
 
 custom-setup
   setup-depends:
@@ -37,13 +37,14 @@ library
     , extra
     , gf
     , gf-generated
+    , gf-ud
     , mtl
     , split
   default-language: Haskell2010
 
 library gf-generated
   exposed-modules:
-      ParseGF
+      ParsePredicates
   other-modules:
       Paths_parse_predicates
   hs-source-dirs:
@@ -54,6 +55,7 @@ library gf-generated
     , containers
     , extra
     , gf
+    , gf-ud
     , mtl
     , split
   default-language: Haskell2010
@@ -70,6 +72,7 @@ executable pp-exe
     , containers
     , extra
     , gf
+    , gf-ud
     , mtl
     , parse-predicates
     , split
@@ -90,6 +93,7 @@ test-suite doctest
     , extra
     , gf
     , gf-generated
+    , gf-ud
     , mtl
     , parse-predicates
     , split
@@ -108,6 +112,7 @@ test-suite my-tests
     , containers
     , extra
     , gf
+    , gf-ud
     , mtl
     , parse-predicates
     , split

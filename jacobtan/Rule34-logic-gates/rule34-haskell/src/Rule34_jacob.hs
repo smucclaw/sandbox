@@ -3,21 +3,23 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE TupleSections #-}
+{-# LANGUAGE ViewPatterns #-}
 module Rule34_jacob where
 
-import Utils ( foldl', (&), (<&>), (>>>), show' )
+import Utils ( foldl', (&), (<&>), (>>>), show', (!) )
 import qualified Data.Map.Strict as Map
 import Data.Text (Text)
 import qualified Data.Text as Text
+import qualified Data.Bifunctor
+import qualified Data.Set
 
 import Data.Graph.Inductive.Graph (mkGraph)
 import Data.Graph.Inductive.PatriciaTree (Gr)
 
 import Encoding ( GateType(..) )
 import Graphviz (preview, preview'custom)
-import qualified Data.Bifunctor
 
-data ParaRef = PMustNot | PMay | PMustNotBulb | PMayBulb 
+data ParaRef = PMustNot | PMay | PMustNotBulb | PMayBulb
   | P341 | P341a | P341b | P341c | P341d | P341e | P341f
   | P342 | P343 | P344 | P345 | P346 | P347
   | P'NotLocum | P'BusinessEntity'NotLawRelated | P'2ndSchedule
@@ -65,7 +67,7 @@ rule34_text = init [
   Stmt P'NotLocum "not locum" Switch  [] [] [] [],
   Stmt P'BusinessEntity'NotLawRelated "business entity\nnot law-related" Switch [] [] [] [],
   Stmt P'2ndSchedule "2nd schedule" Switch [] [] [] [],
-  
+
   Stmt P345 "34.5" AND [P'IsLocum, P'BusinessEntity'NotLawRelated, P'2ndSchedule] [PMay] [P341a'P341c_tIf] [P341b],
   Stmt P341a'P341c_tIf "34.1a, 34.1c-f" OR [P341a, P341c, P341d, P341e, P341f] [] [] [],
   Stmt P'IsLocum "is locum" Switch [] [] [] [],
@@ -78,6 +80,17 @@ rule34_text = init [
   Stmt undefined undefined undefined undefined undefined undefined undefined
   --- ^ for trailing commas. Used with the @init@ function.
   ]
+
+-- | check that all pointers used are defined
+validateStatements :: Foldable t => t Statement -> t Statement
+validateStatements statements = if null missingDefinitions
+    then statements
+    else error $ "*** Error *** these are used but not defined: " ++ show (Data.Set.toAscList missingDefinitions)
+  where
+    missingDefinitions = Data.Set.difference (Data.Set.fromList usedSet) (Data.Set.fromList definedSet)
+    (definedSet, usedSet) = foldl' f ([],[]) statements
+    f (defined, used) Stmt{ sParaRef, sInputs, sOutputs, sSubjectTo, sDespite }
+      = (sParaRef : defined, sInputs ++ sOutputs ++ sSubjectTo ++ sDespite ++ used)
 
 -- | Int represents node index
 data MakeGraphState = MGState {
@@ -103,13 +116,15 @@ data Output = ORef ParaRef | O Int
 --- *** warning *** The Haskel langauge extension NamedFieldPuns can be confusing for the uninitiated.
 ---   cf. https://ghc.gitlab.haskell.org/ghc/doc/users_guide/exts/record_puns.html
 makeGraph1 :: [Statement] -> MakeGraphState
-makeGraph1 statements = statements
-  & foldl' f (MGState mempty mempty [] [] 0)
+makeGraph1 (validateStatements -> statements) =
+  foldl' f0 (MGState mempty mempty [] [] 0) statements
+  & \state1 -> foldl' f1 state1 statements
   where
-    f :: MakeGraphState -> Statement -> MakeGraphState
-    f mgsState
+    -- | First pass: create logic gates, without defeasibility
+    f0 :: MakeGraphState -> Statement -> MakeGraphState
+    f0 mgsState
       Stmt{ sParaRef, sLabel, sGateType, sInputs, sOutputs, sSubjectTo, sDespite }
-      = mgsState & writeState & rewriteSubjectTo & rewriteDespite
+      = writeState mgsState
       where
         writeState :: MakeGraphState -> MakeGraphState
         writeState mgsState@MGState{ mgsOutPointers, mgsInPointers, mgsNodes, mgsEdges, mgsCounter }
@@ -122,12 +137,18 @@ makeGraph1 statements = statements
               ++ mgsEdges,
             mgsCounter = i
             }
+    -- | Second pass: defeasibility rewrites
+    f1 :: MakeGraphState -> Statement -> MakeGraphState
+    f1 mgsState
+      Stmt{ sParaRef, sLabel, sGateType, sInputs, sOutputs, sSubjectTo, sDespite }
+      = mgsState & rewriteSubjectTo & rewriteDespite
+      where
         -- | defeasibility rewrite for "subject to"
         rewriteSubjectTo stateAfterInit@MGState{ mgsCounter, mgsOutPointers } =
           if null sSubjectTo then stateAfterInit
           else foldl' g (stateAfterInit & addAND) sSubjectTo
           where
-            oldParaIndex = mgsOutPointers Map.! sParaRef
+            oldParaIndex = mgsOutPointers ! sParaRef
             andNodeIndex = succ mgsCounter
             addAND :: MakeGraphState -> MakeGraphState
             addAND mgsState@MGState{ mgsOutPointers, mgsNodes, mgsEdges, mgsCounter }
@@ -160,7 +181,7 @@ makeGraph1 statements = statements
               where
                 k1 = succ mgsCounter
                 andNode = (k1, AND, show' despite <> " with defeasibility")
-                andEdgeToDespite = (O $ mgsOutPointers Map.! despite, I k1)
+                andEdgeToDespite = (O $ mgsOutPointers ! despite, I k1)
                 k2 = succ k1
                 notNode = (k2, NOT, show' sParaRef <> " despite " <> show' despite)
                 notEdgeToAnd = (O k2, I k1)
@@ -178,10 +199,10 @@ makeGraph2 MGState{ mgsOutPointers, mgsInPointers, mgsNodes, mgsEdges } =
     makeFinalEdge = Data.Bifunctor.bimap
       (\case
         O i -> i
-        ORef oParaRef -> mgsOutPointers Map.! oParaRef)
+        ORef oParaRef -> mgsOutPointers ! oParaRef)
       (\case
         I o -> o
-        IRef iParaRef -> mgsInPointers Map.! iParaRef)
+        IRef iParaRef -> mgsInPointers ! iParaRef)
 
 makeGraph :: [Statement] -> Gr Text Text
 makeGraph = makeGraph1 >>> makeGraph2
@@ -190,4 +211,4 @@ rule34_jacobMain :: IO ()
 rule34_jacobMain = do
   putStrLn "__rule34_jacobMain__"
   preview (makeGraph rule34_text) >> putStrLn "< visualise a graph using the Xlib GraphvizCanvas >"
-  preview'custom (makeGraph rule34_text) >> putStrLn "< visualise a graph using the Xlib GraphvizCanvas >"
+  -- preview'custom (makeGraph rule34_text) >> putStrLn "< visualise a graph using the Xlib GraphvizCanvas >"

@@ -1,4 +1,4 @@
-abstract ParseGF =
+abstract Predicates =
   Noun - [PPartNP, UseN2, RelNP, DetNP, AdvNP, PossNP, PartNP, CountNP, ApposCN],
   Verb - [PassV2, ReflVP, ComplVV, SlashVV, SlashV2V, SlashV2VNP, AdvVP],
   Adjective - [ReflA2, CAdvAP, UseA2], --AdvAP],
@@ -11,10 +11,7 @@ abstract ParseGF =
   Idiom,
   Numeral,
   Tense,
-  Extend [GerundCN,PresPartAP,PastPartAP,PastPartAgentAP, CompoundN],
-  Construction,
-  ReducedWordNet - [in_N, in_A],
-  Documentation ** {
+  Extend [GerundCN,PresPartAP,PastPartAP,PastPartAgentAP, CompoundN] ** {
 
 flags
   startcat = FullPredicate ;
@@ -77,7 +74,8 @@ flags
 
     FullPred : AgrTAM -> Polarity -> Predicate -> FullPredicate ;
 
-    May,Must,Shall : Polarity -> VPSlash -> FullPredicate ;
+--    May,Must,Shall : Polarity -> VPSlash -> FullPredicate ;
+    May,Must,Shall : VPSlash -> Predicate ;
 
     ComplSentence : Polarity -> NP -> VP -> FullPredicate ; -- JurisdictionIsSingapore
 

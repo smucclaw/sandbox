@@ -1,14 +1,15 @@
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE GADTs #-}
 
+{-# OPTIONS_GHC -Wno-overlapping-patterns #-}
 module ParsePred where
 
 import Data.Char (toLower, toUpper, isLower)
-import Data.List.Extra (trim, sort, transpose, allSame)
+import Data.List.Extra (trim, sort, transpose, allSame, nub, intercalate)
 import Data.List.Split ( split, splitOn, startsWithOneOf )
 import Data.Monoid (Any (..))
 import PGF hiding (Tree)
-import ParseGF
+import ParsePredicates
 import Text.Printf (printf)
 import Paths_parse_predicates ( getDataFileName )
 
@@ -47,7 +48,7 @@ fromLexicalNode _ = Nothing
 
 getPGF :: IO PGF
 getPGF = do
-  pgf <- getDataFileName "ParseGF.pgf"
+  pgf <- getDataFileName "ParsePredicates.pgf"
   readPGF pgf
 
 
@@ -74,35 +75,84 @@ step1 pr | length (trees pr) <= 1 = []
 
 -- $setup
 -- >>> gr <- getPGF
-
 -- |
 -- >>> mkQuestion $ extractContentWords (parsePred gr "InvolvesSharingFeesWithUnauthorizedPersonsForLegalWorkPerformedByTheLegalPractitioner")
--- WAS [["sharing_N","share_V2","sharing_N","sharing_N","sharing_N","sharing_N","share_V2","share_V2","share_V2"]]
--- NOW [["sharing_N"],["share_V2"],["sharing_N"],["sharing_N"],["sharing_N"],["sharing_N"],["share_V2"],["share_V2"],["share_V2"]]
+-- [["share_V2"],["share_V2"],["share_V2"],["share_V2"],["sharing_N"],["sharing_N"],["sharing_N"]]
+
+phrase :: String
+phrase = "Position: Organization -> Position"
+
+-- >>> filterWord "position_n" $ [["position_n"], ["position_v2"]]
+-- [["position_n"]]
+
+-- >>> map toLower "position_n" `elem` (map . map) toLower ["position_n"]
+-- True
+
+-- >>> length (checkWord "position_v2" (extractContentWords (parsePred gr phrase)))
+-- 1
+
+-- yes I mean sole_v2
+-- >>> filterWord "share_v2" (extractContentWords (parsePred gr phrase))
+-- [["involve_V2","perform_V2","DefArt","legal_A","practitioner_N","share_V2","IndefArt","fee_N","with_Prep","IndefArt","unauthorized_A","person_N","for_Prep","legal_A","work_N"],["involve_V2","share_V2","IndefArt","perform_V2","DefArt","legal_A","practitioner_N","fee_N","with_Prep","IndefArt","unauthorized_A","person_N","for_Prep","legal_A","work_N"],["involve_V2","share_V2","IndefArt","fee_N","with_Prep","IndefArt","unauthorized_A","perform_V2","DefArt","legal_A","practitioner_N","person_N","for_Prep","legal_A","work_N"],["involve_V2","share_V2","IndefArt","fee_N","with_Prep","IndefArt","unauthorized_A","person_N","for_Prep","legal_A","perform_V2","DefArt","legal_A","practitioner_N","work_N"]]
+
 -- >>> mkQuestion $ extractContentWords (parsePred gr "SoleIndependentContractor")
--- [["independent_A","sole_V2"],["independent_N","sole_V2"],["independent_A","sole_A"],["independent_N","sole_A"],
---  ["independent_A","sole_N"],["independent_A","sole_N"],["independent_N","sole_N"],["independent_N","sole_A"],["independent_N","sole_N"]]
+-- [["independent_A","sole_V2"],["independent_N","sole_V2"],["independent_A","sole_A"],["independent_N","sole_A"],["independent_A","sole_N"],["independent_N","sole_N"],["independent_N","sole_N"]]
 
 -- >>> extractContentWords (parsePred gr "SoleIndependentContractor")
 -- [["sole_V2","independent_A","contractor_N"],["sole_V2","independent_N","contractor_N"],["sole_A","independent_A","contractor_N"],
 --  ["sole_A","independent_N","contractor_N"],["sole_N","independent_A","contractor_N"],["sole_N","independent_A","contractor_N"],
 --  ["sole_N","independent_N","contractor_N"],["sole_A","independent_N","contractor_N"],["sole_N","independent_N","contractor_N"]]
 
--- >>> (parsePred gr "SoleIndependentContractor")
--- SoleIndependentContractor
--- arity 0
--- parses
--- FullPred PresIndPl PosPol (ComplVP (ComplSlash (SlashV2a sole_V2) (MassNP (AdjCN (PositA independent_A) (UseN contractor_N)))))
--- FullPred PresIndPl PosPol (ComplVP (ComplSlash (SlashV2a sole_V2) (MassNP (ApposCN (UseN independent_N) (MassNP (UseN contractor_N))))))
--- PredNP PosPol (MassNP (AdjCN (PositA sole_A) (AdjCN (PositA independent_A) (UseN contractor_N))))
--- PredNP PosPol (MassNP (AdjCN (PositA sole_A) (ApposCN (UseN independent_N) (MassNP (UseN contractor_N)))))
--- PredNP PosPol (MassNP (AdjCN (NPAP (MassNP (UseN sole_N)) (PositA independent_A)) (UseN contractor_N)))
--- PredNP PosPol (MassNP (ApposCN (UseN sole_N) (MassNP (AdjCN (PositA independent_A) (UseN contractor_N)))))
--- PredNP PosPol (MassNP (ApposCN (UseN sole_N) (MassNP (ApposCN (UseN independent_N) (MassNP (UseN contractor_N))))))
--- PredNP PosPol (MassNP (ApposCN (AdjCN (PositA sole_A) (UseN independent_N)) (MassNP (UseN contractor_N))))
--- PredNP PosPol (MassNP (ApposCN (ApposCN (UseN sole_N) (MassNP (UseN independent_N))) (MassNP (UseN contractor_N))))
 
--- (FullPredicate:819 sole independent (N:731 contractor))
+
+-- ask more questions to clarify what things are
+groupWord :: Eq a => [[a]] -> [[a]]
+groupWord [] = []
+groupWord ([]:_) = []
+groupWord l = map nub (map head l : groupWord (map tail l))
+
+-- check for most variety of type word, and ask which type
+askWord :: [[String]] -> String
+askWord
+  = intercalate " or " . snd . maximum . map ((,) =<< length) . groupWord . mkQuestion
+
+-- check if chosen word exists
+
+checkWord :: String -> [[String]] -> [[String]]
+checkWord w str
+  | doesExist w str = filterWord w str
+  | otherwise = error "that is not a valid choice"
+    
+doesExist :: String -> [[String]] -> Bool
+doesExist w str = map toLower w `elem` (map . map) toLower (filter (/="or") $ words $ askWord str)
+
+-- only get lists with that chosen word type
+filterWord :: String -> [[String]] -> [[String]]
+filterWord _ [] = []
+filterWord w (l:ls)
+  | map toLower w `elem` (map . map) toLower l = l : filterWord w ls
+  | otherwise = filterWord w ls
+
+checkForDiff :: [[String]] -> IO ()
+checkForDiff str
+  | null (mkQuestion str) = putStrLn $  "[" ++ intercalate ", " (head str) ++ "]"
+  | otherwise = keepAsking str
+
+notEmpty :: [[String]] -> IO ()
+notEmpty str = do
+  putStrLn $ askWord str
+  chosenWord <- getLine
+  let action | length (checkWord chosenWord str) == 1 = putStrLn $ "[" ++ intercalate ", " (concat $ filterWord chosenWord str) ++ "]"
+             | otherwise = checkForDiff $ filterWord chosenWord str
+  action
+
+-- take lists and check for most variety of type word, and keep going
+keepAsking :: [[String]] -> IO ()
+keepAsking str = do
+  putStrLn "start keepAsking"
+  let checkEmpty | null (mkQuestion str) = putStrLn $ "[" ++ intercalate ", " (concat str) ++ "]"
+                 | otherwise = do notEmpty str
+  checkEmpty
 
 -- TODO: use the information from position and function to ask proper questions:
 -- "is sole a verb or a noun"
@@ -111,15 +161,13 @@ step1 pr | length (trees pr) <= 1 = []
 mkQuestion :: [[String]] -> [Question]
 mkQuestion = transpose .
   differingItems
-  
+
 differingItems :: (Ord a) => [[a]] -> [[a]]
 differingItems = filter (not . allSame) . transpose . map sort
-
 
 -- $setup
 -- >>> gr <- getPGF
 
--- | Gives a list of content words for each possible parse
 -- >>> extractContentWords (parsePred gr "InvolvesSharingFeesWithUnauthorizedPersonsForLegalWorkPerformedByTheLegalPractitioner")
 -- [["involve_V2","perform_V2","DefArt","legal_A","practitioner_N","sharing_N","IndefArt","fee_N","with_Prep","IndefArt","unauthorized_A","person_N","for_Prep","legal_A","work_N"],["involve_V2","perform_V2","DefArt","legal_A","practitioner_N","share_V2","IndefArt","fee_N","with_Prep","IndefArt","unauthorized_A","person_N","for_Prep","legal_A","work_N"],["involve_V2","IndefArt","fee_N","with_Prep","IndefArt","unauthorized_A","person_N","for_Prep","legal_A","work_N","perform_V2","DefArt","legal_A","practitioner_N","sharing_N"],["involve_V2","sharing_N","IndefArt","perform_V2","DefArt","legal_A","practitioner_N","fee_N","with_Prep","IndefArt","unauthorized_A","person_N","for_Prep","legal_A","work_N"],["involve_V2","sharing_N","IndefArt","fee_N","with_Prep","IndefArt","unauthorized_A","perform_V2","DefArt","legal_A","practitioner_N","person_N","for_Prep","legal_A","work_N"],["involve_V2","sharing_N","IndefArt","fee_N","with_Prep","IndefArt","unauthorized_A","person_N","for_Prep","legal_A","perform_V2","DefArt","legal_A","practitioner_N","work_N"],["involve_V2","share_V2","IndefArt","perform_V2","DefArt","legal_A","practitioner_N","fee_N","with_Prep","IndefArt","unauthorized_A","person_N","for_Prep","legal_A","work_N"],["involve_V2","share_V2","IndefArt","fee_N","with_Prep","IndefArt","unauthorized_A","perform_V2","DefArt","legal_A","practitioner_N","person_N","for_Prep","legal_A","work_N"],["involve_V2","share_V2","IndefArt","fee_N","with_Prep","IndefArt","unauthorized_A","person_N","for_Prep","legal_A","perform_V2","DefArt","legal_A","practitioner_N","work_N"]]
 
@@ -133,8 +181,6 @@ extractContentWords pr = [onlyLex (fg' tree) | tree <- trees pr]
     onlyLex tree = case fromLexicalNode tree of
       Just s -> [s]
       Nothing -> composOpMonoid onlyLex tree
-
-
 
 parsePred :: PGF -> [Char] -> Predicate
 parsePred gr str = Pred nm (filterHeuristic ts) ar
@@ -179,7 +225,7 @@ filterHeuristic ts = filter (not . ppBeforeAP) (filter filterGerund ts)
   where
     filterGerund
       | any hasGerund ts &&  -- "practicing as lawyer": progressive, pres. part. or gerund
-        any hasProgr ts && 
+        any hasProgr ts &&
         not (all hasGerund ts) = not . hasProgr
 --      | any hasGerund ts && not (all hasGerund ts) = hasGerund
       | otherwise = const True
@@ -209,3 +255,21 @@ ppBeforeAP = getAny . ppBeforeAP' . (fg :: Expr -> GFullPredicate)
     ppBeforeAP' (GAdjCN (GPastPartAP _) (GAdjCN _ _)) = Any True
     ppBeforeAP' (GAdjCN (GPastPartAgentAP _ _) (GAdjCN _ _)) = Any True
     ppBeforeAP' x = composOpMonoid ppBeforeAP' x
+
+
+{-
+Templates to ask about ambiguities
+
+Gerund verb vs. noun
+sharing fees
+  * "sharing (N) fees (N)" as in "parking fee"
+  * "sharing (V) fees (N)" as in "I share fees"
+
+Adjective vs. noun
+sole independent contractor
+  * "sole (N) independent (N)" as in "tax evasion"
+  * "sole (N) independent (A)" as in "member-driven"
+  * "sole (A) independent (A)" as in "big, blue"
+
+
+-}

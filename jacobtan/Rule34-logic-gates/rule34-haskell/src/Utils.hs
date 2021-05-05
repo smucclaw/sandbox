@@ -10,7 +10,9 @@ module Utils (
   fromMaybe,
   (<+>),
   foldl1',
-  void
+  void,
+  execShell,
+  execShell'
 ) where
 
 import Data.Function ((&))
@@ -27,6 +29,8 @@ import Data.List (foldl1')
 
 import Control.Monad (void)
 
+import System.Process (readCreateProcessWithExitCode, shell)
+
 show' :: Show a => a -> Text.Text
 show' = Text.pack . show
 
@@ -37,3 +41,14 @@ show' = Text.pack . show
 -- | Append with a space
 (<+>) :: (Semigroup a, IsString a) => a -> a -> a
 x <+> y = x <> fromString " " <> y
+
+execShell' :: String -> String -> IO ()
+execShell' command input = readCreateProcessWithExitCode
+  (shell command) input
+  >>= \(exitcode, stdout, stderr) -> do
+    putStrLn ("__exitcode: " ++ show exitcode)
+    putStrLn ("__stdout: " ++ show stdout)
+    putStrLn ("__stderr: " ++ show stderr)
+
+execShell :: String -> IO ()
+execShell command =  execShell' command ""

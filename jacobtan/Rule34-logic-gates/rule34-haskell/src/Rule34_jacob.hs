@@ -6,28 +6,26 @@
 {-# LANGUAGE ViewPatterns #-}
 module Rule34_jacob where
 
-import Utils ( foldl', (&), (<&>), (>>>), show', (!), void )
+import Utils ( foldl', (&), (<&>), (>>>), show', (!), void, execShell )
 import qualified Data.Map.Strict as Map
 import Data.Text (Text)
 import qualified Data.Text as Text
 import qualified Data.Text.Lazy.IO as Text.Lazy.IO
 import qualified Data.Bifunctor
 import qualified Data.Set
-import Data.Maybe as Maybe
+import Data.Maybe as Maybe ( fromJust, isJust )
 
-import Data.Tree
+import Data.Tree ( Tree(rootLabel, subForest) )
 
 import Rule34 (rule34_1, Label(..), MyRule(..), ConditionTree, Condition(..), Predicate, Inner(..), Deontic(..))
 
 import Data.Graph.Inductive.Graph (mkGraph, nmap)
 import Data.Graph.Inductive.PatriciaTree (Gr)
 
-import System.Process
-
 import Encoding ( GateType(..) )
 import Graphviz (preview, preview'custom, printDotGraph, defaultVis, checkDirectednessVis'custom)
 
-import Debug.Trace
+import Debug.Trace ( traceShow )
 
 data ParaRef = PMustNot | PMay | PMustNotBulb | PMayBulb
   | P341 | P341a | P341b | P341c | P341d | P341e | P341f
@@ -242,43 +240,36 @@ preview1 = preview (makeGraphViz rule34_text) >> putStrLn "< visualise a graph u
 preview2 :: IO ()
 preview2 = preview'custom (makeGraphViz rule34_text) >> putStrLn "< visualise a graph using the Xlib GraphvizCanvas >"
 
-rule34_jacobMain :: IO ()
-rule34_jacobMain = do
-  putStrLn "__rule34_jacobMain__"
+main :: IO ()
+main = do
+  putStrLn "__Rule34_jacob.hs preview graphs"
   preview1
   preview2
 
--- | print graph to .dot format
---   * You may then do:
---       $ dot file.dot -Tpng > file.png
-rule34_jacob_writeDotGraph1 :: IO ()
-rule34_jacob_writeDotGraph1 = do
+mainWrite :: IO ()
+mainWrite = do
+  putStrLn "__Rule34_jacob.hs output graphs to .dot and .png"
+  writeDotGraph1
+  writeDotGraph2
+
+-- | graph to .dot and .png
+writeDotGraph1 :: IO ()
+writeDotGraph1 = do
   rule34_text
     & makeGraphViz & defaultVis
     & printDotGraph & Text.Lazy.IO.writeFile "../viz/rule34_graph1.dot"
-  rule34_jacob_dotToPng1
+  -- dot to png
+  execShell "dot ../viz/rule34_graph1.dot -Tpng > ../viz/rule34_graph1.png"
 
--- | dot to png
-rule34_jacob_dotToPng1 :: IO ()
-rule34_jacob_dotToPng1 = readCreateProcess
-  (shell "dot ../viz/rule34_graph1.dot -Tpng > ../viz/rule34_graph1.png") ""
-  >>= putStrLn
-
--- | print graph to .dot format (customised)
---   * You may then do:
---       $ dot file.dot -Tpng > file.png
-rule34_jacob_writeDotGraph2 :: IO ()
-rule34_jacob_writeDotGraph2 = do
+-- | graph to .dot and .png (customised)
+writeDotGraph2 :: IO ()
+writeDotGraph2 = do
   rule34_text
     & makeGraphViz & checkDirectednessVis'custom
     & printDotGraph & Text.Lazy.IO.writeFile "../viz/rule34_graph2.dot"
-  rule34_jacob_dotToPng2
+  -- dot to png
+  execShell "dot ../viz/rule34_graph2.dot -Tpng > ../viz/rule34_graph2.png"
 
--- | dot to png
-rule34_jacob_dotToPng2 :: IO ()
-rule34_jacob_dotToPng2 = readCreateProcess
-  (shell "dot ../viz/rule34_graph2.dot -Tpng > ../viz/rule34_graph2.png") ""
-  >>= putStrLn
 
 
 -- Transpile from the format of Rule34.hs (Meng's) to the format of Rule34_jacob.hs

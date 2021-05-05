@@ -251,22 +251,34 @@ rule34_jacobMain = do
 -- | print graph to .dot format
 --   * You may then do:
 --       $ dot file.dot -Tpng > file.png
-rule34_jacob_printDotGraph1 :: IO ()
-rule34_jacob_printDotGraph1 = do
+rule34_jacob_writeDotGraph1 :: IO ()
+rule34_jacob_writeDotGraph1 = do
   rule34_text
     & makeGraphViz & defaultVis
     & printDotGraph & Text.Lazy.IO.writeFile "../viz/rule34_graph1.dot"
-  void $ createProcess (proc "dot ../viz/rule34_graph1.dot -Tpng > ../viz/rule34_graph1.png" [])
+  rule34_jacob_dotToPng1
+
+-- | dot to png
+rule34_jacob_dotToPng1 :: IO ()
+rule34_jacob_dotToPng1 = readCreateProcess
+  (shell "dot ../viz/rule34_graph1.dot -Tpng > ../viz/rule34_graph1.png") ""
+  >>= putStrLn
 
 -- | print graph to .dot format (customised)
 --   * You may then do:
 --       $ dot file.dot -Tpng > file.png
-rule34_jacob_printDotGraph2 :: IO ()
-rule34_jacob_printDotGraph2 = do
+rule34_jacob_writeDotGraph2 :: IO ()
+rule34_jacob_writeDotGraph2 = do
   rule34_text
     & makeGraphViz & checkDirectednessVis'custom
     & printDotGraph & Text.Lazy.IO.writeFile "../viz/rule34_graph2.dot"
-  void $ createProcess (proc "dot ../viz/rule34_graph2.dot -Tpng > ../viz/rule34_graph2.png" [])
+  rule34_jacob_dotToPng2
+
+-- | dot to png
+rule34_jacob_dotToPng2 :: IO ()
+rule34_jacob_dotToPng2 = readCreateProcess
+  (shell "dot ../viz/rule34_graph2.dot -Tpng > ../viz/rule34_graph2.png") ""
+  >>= putStrLn
 
 
 -- Transpile from the format of Rule34.hs (Meng's) to the format of Rule34_jacob.hs

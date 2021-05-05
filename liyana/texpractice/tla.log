@@ -1,0 +1,176 @@
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020) (preloaded format=pdflatex 2021.2.3)  5 MAY 2021 12:55
+entering extended mode
+ restricted \write18 enabled.
+ %&-line parsing enabled.
+**tla.tex
+(./tla.tex
+LaTeX2e <2020-02-02> patch level 5
+L3 programming layer <2020-03-06>
+(/usr/local/texlive/2020/texmf-dist/tex/latex/base/article.cls
+Document Class: article 2019/12/20 v1.4l Standard LaTeX document class
+(/usr/local/texlive/2020/texmf-dist/tex/latex/base/size10.clo
+File: size10.clo 2019/12/20 v1.4l Standard LaTeX file (size option)
+)
+\c@part=\count167
+\c@section=\count168
+\c@subsection=\count169
+\c@subsubsection=\count170
+\c@paragraph=\count171
+\c@subparagraph=\count172
+\c@figure=\count173
+\c@table=\count174
+\abovecaptionskip=\skip47
+\belowcaptionskip=\skip48
+\bibindent=\dimen134
+)
+(/usr/local/texlive/2020/texmf-dist/tex/latex/program/program.sty
+\@gtempa=\dimen135
+\@gtempa=\dimen136
+\@gtempa=\dimen137
+\@gtempa=\dimen138
+\@gtempa=\dimen139
+\@gtempa=\dimen140
+\@gtempa=\dimen141
+\@gtempa=\dimen142
+\@gtempa=\dimen143
+\@gtempa=\dimen144
+\@gtempa=\dimen145
+\@gtempa=\dimen146
+\@gtempa=\dimen147
+\@gtempa=\dimen148
+\@gtempa=\dimen149
+\@gtempa=\dimen150
+\@gtempa=\dimen151
+\@gtempa=\dimen152
+\@gtempa=\dimen153
+\@gtempa=\dimen154
+\@gtempa=\dimen155
+\@gtempa=\dimen156
+\@gtempa=\dimen157
+\@gtempa=\dimen158
+\@gtempa=\dimen159
+\@gtempa=\dimen160
+\@gtempa=\dimen161
+\@gtempa=\dimen162
+\@gtempa=\dimen163
+\@gtempa=\dimen164
+\@gtempa=\dimen165
+\@gtempa=\dimen166
+\@gtempa=\dimen167
+\@gtempa=\dimen168
+\@gtempa=\dimen169
+\@gtempa=\dimen170
+\@gtempa=\dimen171
+\@gtempa=\dimen172
+\@gtempa=\dimen173
+\@gtempa=\dimen174
+\@gtempa=\dimen175
+\@gtempa=\dimen176
+\@gtempa=\dimen177
+\@gtempa=\dimen178
+\@gtempa=\dimen179
+\@gtempa=\dimen180
+\@gtempa=\dimen181
+\@gtempa=\dimen182
+\@gtempa=\dimen183
+\@gtempa=\dimen184
+\c@programline=\count175
+\old@nxttabmar=\count176
+\symeulerletters=\mathgroup4
+\powersetbox=\box45
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <14.4> on input line 841.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <7> on input line 841.
+LaTeX Font Info:    Trying to load font information for U+eur on input line 841
+.
+
+(/usr/local/texlive/2020/texmf-dist/tex/latex/amsfonts/ueur.fd
+File: ueur.fd 2013/01/14 v3.01 Euler Roman
+))
+(/usr/local/texlive/2020/texmf-dist/tex/latex/graphics/color.sty
+Package: color 2019/11/23 v1.2a Standard LaTeX Color (DPC)
+
+(/usr/local/texlive/2020/texmf-dist/tex/latex/graphics-cfg/color.cfg
+File: color.cfg 2016/01/02 v1.6 sample color configuration
+)
+Package color Info: Driver file: pdftex.def on input line 147.
+
+(/usr/local/texlive/2020/texmf-dist/tex/latex/graphics-def/pdftex.def
+File: pdftex.def 2018/01/08 v1.0l Graphics/color driver for pdftex
+))
+(/usr/local/texlive/2020/texmf-dist/tex/latex/l3backend/l3backend-pdfmode.def
+File: l3backend-pdfmode.def 2020-03-12 L3 backend support: PDF mode
+\l__kernel_color_stack_int=\count177
+\l__pdf_internal_box=\box46
+)
+(./tla.aux)
+\openout1 = `tla.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 5.
+LaTeX Font Info:    ... okay on input line 5.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 5.
+LaTeX Font Info:    ... okay on input line 5.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 5.
+LaTeX Font Info:    ... okay on input line 5.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 5.
+LaTeX Font Info:    ... okay on input line 5.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 5.
+LaTeX Font Info:    ... okay on input line 5.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 5.
+LaTeX Font Info:    ... okay on input line 5.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 5.
+LaTeX Font Info:    ... okay on input line 5.
+
+(/usr/local/texlive/2020/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+\scratchcounter=\count178
+\scratchdimen=\dimen185
+\scratchbox=\box47
+\nofMPsegments=\count179
+\nofMParguments=\count180
+\everyMPshowfont=\toks15
+\MPscratchCnt=\count181
+\MPscratchDim=\dimen186
+\MPnumerator=\count182
+\makeMPintoPDFobject=\count183
+\everyMPtoPDFconversion=\toks16
+)
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <12> on input line 8.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <8> on input line 8.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <6> on input line 8.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <9> on input line 11.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <5> on input line 11.
+ (./tla.toc)
+\tf@toc=\write3
+\openout3 = `tla.toc'.
+
+ [1
+
+{/usr/local/texlive/2020/texmf-var/fonts/map/pdftex/updmap/pdftex.map}] (./tla.
+aux) ) 
+Here is how much of TeX's memory you used:
+ 1271 strings out of 480608
+ 16566 string characters out of 5903631
+ 251060 words of memory out of 5000000
+ 17202 multiletter control sequences out of 15000+600000
+ 540077 words of font info for 50 fonts, out of 8000000 for 9000
+ 1141 hyphenation exceptions out of 8191
+ 33i,6n,27p,148b,187s stack positions out of 5000i,500n,10000p,200000b,80000s
+</usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12
+.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx9.p
+fb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb
+></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb><
+/usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb>
+Output written on tla.pdf (1 page, 46683 bytes).
+PDF statistics:
+ 28 PDF objects out of 1000 (max. 8388607)
+ 19 compressed objects within 1 object stream
+ 0 named destinations out of 1000 (max. 500000)
+ 1 words of extra memory for PDF output out of 10000 (max. 10000000)
+

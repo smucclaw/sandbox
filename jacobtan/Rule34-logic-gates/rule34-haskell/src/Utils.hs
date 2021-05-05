@@ -6,7 +6,10 @@ module Utils (
   (>>>),
   foldl',
   show',
-  (!)
+  (!),
+  fromMaybe,
+  (<+>),
+  foldl1'
 ) where
 
 import Data.Function ((&))
@@ -19,6 +22,7 @@ import Data.Maybe (fromMaybe)
 import qualified Data.Map (lookup)
 import qualified Data.Map.Internal
 import Data.String (fromString, IsString)
+import Data.List (foldl1')
 
 show' :: Show a => a -> Text.Text
 show' = Text.pack . show

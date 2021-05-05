@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 8d1b2dea8e1f4e4cfddca81d1ee014dfcb230ed4ecc0ebd572e497d4ede1963b
+-- hash: ebd01add447b898ab0cdc45620b4fd9f08b4f925a3f7f92101837f753f780ecb
 
 name:           rule34-haskell
 version:        0.1.0.0
@@ -36,6 +36,7 @@ library
       Rule34_jacob
       Rule34_SMT
       Rule34_SMT_gen
+      Rule34_SMT_sandbox
       Utils
       Defeasible
   other-modules:
@@ -49,6 +50,7 @@ library
     , fgl
     , generic-data
     , graphviz
+    , mtl
     , pretty-simple
     , prettyprinter
     , sbv
@@ -70,6 +72,7 @@ executable rule34-haskell-exe
     , fgl
     , generic-data
     , graphviz
+    , mtl
     , pretty-simple
     , prettyprinter
     , rule34-haskell
@@ -93,6 +96,7 @@ test-suite rule34-haskell-test
     , fgl
     , generic-data
     , graphviz
+    , mtl
     , pretty-simple
     , prettyprinter
     , rule34-haskell

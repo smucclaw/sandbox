@@ -77,7 +77,7 @@ rule34_text = outputBulbs ++ init [
 
   Stmt P344 "34.4" AND [P'NotLocum, P'BusinessEntity'NotLawRelated, P'2ndSchedule] [PMay] [P341] [],
   Stmt P'NotLocum "not locum" Switch  [] [] [] [],
-  Stmt P'BusinessEntity'NotLawRelated "business entity\nnot law-related" Switch [] [] [] [],
+  Stmt P'BusinessEntity'NotLawRelated "business entity, not law-related" Switch [] [] [] [],
   Stmt P'2ndSchedule "2nd schedule" Switch [] [] [] [],
 
   Stmt P345 "34.5" AND [P'IsLocum, P'BusinessEntity'NotLawRelated, P'2ndSchedule] [PMay] [P341a'P341c_tIf] [P341b],
@@ -221,6 +221,7 @@ makeGraph2 MGState{ mgsOutPointers, mgsInPointers, mgsNodes, mgsEdges } =
         I o -> o
         IRef iParaRef -> mgsInPointers ! iParaRef)
 
+makeGraph3 :: Gr (GateType, Text) b -> Gr Text b
 makeGraph3 = nmap makeGraphVizNodeLabel
   where
     makeGraphVizNodeLabel (gateType, label) =

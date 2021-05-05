@@ -32,6 +32,7 @@ dependencies:
 - sbv
 - casing
 - mtl
+- process
 
 library:
   source-dirs: src

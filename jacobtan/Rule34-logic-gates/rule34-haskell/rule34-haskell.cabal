@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: ebd01add447b898ab0cdc45620b4fd9f08b4f925a3f7f92101837f753f780ecb
+-- hash: ddb99745cd686acd27bc5715ead4d94e9782ecbe1f87144c68c94f5428f3e2ed
 
 name:           rule34-haskell
 version:        0.1.0.0
@@ -27,6 +27,7 @@ source-repository head
 
 library
   exposed-modules:
+      Defeasible
       Encoding
       Fgl
       Graphviz
@@ -38,7 +39,6 @@ library
       Rule34_SMT_gen
       Rule34_SMT_sandbox
       Utils
-      Defeasible
   other-modules:
       Paths_rule34_haskell
   hs-source-dirs:
@@ -53,6 +53,7 @@ library
     , mtl
     , pretty-simple
     , prettyprinter
+    , process
     , sbv
     , split
     , text
@@ -75,6 +76,7 @@ executable rule34-haskell-exe
     , mtl
     , pretty-simple
     , prettyprinter
+    , process
     , rule34-haskell
     , sbv
     , split
@@ -99,6 +101,7 @@ test-suite rule34-haskell-test
     , mtl
     , pretty-simple
     , prettyprinter
+    , process
     , rule34-haskell
     , sbv
     , split

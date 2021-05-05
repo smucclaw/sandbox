@@ -6,10 +6,11 @@
 {-# LANGUAGE ViewPatterns #-}
 module Rule34_jacob where
 
-import Utils ( foldl', (&), (<&>), (>>>), show', (!) )
+import Utils ( foldl', (&), (<&>), (>>>), show', (!), void )
 import qualified Data.Map.Strict as Map
 import Data.Text (Text)
 import qualified Data.Text as Text
+import qualified Data.Text.Lazy.IO as Text.Lazy.IO
 import qualified Data.Bifunctor
 import qualified Data.Set
 import Data.Maybe as Maybe
@@ -21,8 +22,10 @@ import Rule34 (rule34_1, Label(..), MyRule(..), ConditionTree, Condition(..), Pr
 import Data.Graph.Inductive.Graph (mkGraph, nmap)
 import Data.Graph.Inductive.PatriciaTree (Gr)
 
+import System.Process
+
 import Encoding ( GateType(..) )
-import Graphviz (preview, preview'custom)
+import Graphviz (preview, preview'custom, printDotGraph, defaultVis, checkDirectednessVis'custom)
 
 import Debug.Trace
 
@@ -244,6 +247,29 @@ rule34_jacobMain = do
   putStrLn "__rule34_jacobMain__"
   preview1
   preview2
+
+-- | print graph to .dot format
+--   * You may then do:
+--       $ dot file.dot -Tpng > file.png
+rule34_jacob_printDotGraph1 :: IO ()
+rule34_jacob_printDotGraph1 = do
+  rule34_text
+    & makeGraphViz & defaultVis
+    & printDotGraph & Text.Lazy.IO.writeFile "../viz/rule34_graph1.dot"
+  void $ createProcess (proc "dot ../viz/rule34_graph1.dot -Tpng > ../viz/rule34_graph1.png" [])
+
+-- | print graph to .dot format (customised)
+--   * You may then do:
+--       $ dot file.dot -Tpng > file.png
+rule34_jacob_printDotGraph2 :: IO ()
+rule34_jacob_printDotGraph2 = do
+  rule34_text
+    & makeGraphViz & checkDirectednessVis'custom
+    & printDotGraph & Text.Lazy.IO.writeFile "../viz/rule34_graph2.dot"
+  void $ createProcess (proc "dot ../viz/rule34_graph2.dot -Tpng > ../viz/rule34_graph2.png" [])
+
+
+-- Transpile from the format of Rule34.hs (Meng's) to the format of Rule34_jacob.hs
 
 importGraph :: Gr (GateType, Text) Text
 importGraph = makeGraph (outputBulbs ++ myruleToStm rule34_1)

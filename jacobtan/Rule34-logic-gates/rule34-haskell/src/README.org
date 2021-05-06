@@ -1,0 +1,63 @@
+* Random Remarks
+
+How do we model nested conditions?
+Consider the problem:
+
+  You may order any of the following flavours of ice cream:
+     a. Chocolate
+     b. Strawberry
+     c. Vanilla
+     d. Any flavour listed on any of the following pages of the menu:
+        (i)   page 12
+        (ii)  page 13
+        (iii) page 16
+
+And that's fine. What about conditional conditions?
+     e. On weekdays, any flavour listed on page 14.
+     f. On weekends, any flavour listed on page 15.
+
+What if the nested conditions aren't just nested, but chained?
+
+     You may buy any
+                   - automobile
+                   - light truck, or
+                   - motorcycle
+     that is coloured
+                    - red
+                    - green, or
+                    - yellow
+     that was manufactured between 2010 and 2016
+
+We can model these "chained" conditions as
+    AND [ vehicleType ANY [ automobile, light truck, motorcycle ] ]
+        , colour      ANY [ red, green, yellow ]
+        , manufDate    IN [ 2010 .. 2016 ]
+        ]
+
+Translated back to a more legalistic form with the "and"s and "or"s put back
+
+   You may buy any vehicle that satisfies all the following conditions:
+      1. the vehicle type is any of the following:
+         a. automobile,
+         b. light truck, or
+         c. motorcycle;
+      2. the colour is
+         a. red,
+         b. green, or
+         c. yellow; and
+      3. the manufacturing year is in the range 2010 to 2016.
+
+The placement of the connectors between the second-last and last elements
+of the list is just something we've all gotten used to, but when you think
+about it, it's as arbitrary as the fact that the hour after 12am is 1pm.
+
+If you were designing the time system from scratch, surely you would have
+  am: 1 .. 12
+  pm: 1 .. 12
+
+But instead we have
+  12am, 1am .. 11am
+  12pm, 1pm .. 11pm
+
+Weird offsets are everywhere.
+

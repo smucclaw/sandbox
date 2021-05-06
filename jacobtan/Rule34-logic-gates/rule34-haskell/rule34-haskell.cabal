@@ -35,6 +35,7 @@ library
       Rule34
       Rule34_jacob
       Utils
+      Defeasible
   other-modules:
       Paths_rule34_haskell
   hs-source-dirs:

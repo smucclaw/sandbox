@@ -245,7 +245,7 @@ rule34_jacobMain = do
   preview1
   preview2
 
-importGraph :: Gr Text Text
+importGraph :: Gr (GateType, Text) Text
 importGraph = makeGraph (outputBulbs ++ myruleToStm rule34_1)
 
 myruleToStm :: MyRule -> [Statement]

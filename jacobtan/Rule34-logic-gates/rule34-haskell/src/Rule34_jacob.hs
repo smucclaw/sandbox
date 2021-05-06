@@ -18,7 +18,7 @@ import Data.Tree
 
 import Rule34 (rule34_1, Label(..), MyRule(..), ConditionTree, Condition(..), Predicate, Inner(..), Deontic(..))
 
-import Data.Graph.Inductive.Graph (mkGraph)
+import Data.Graph.Inductive.Graph (mkGraph, nmap)
 import Data.Graph.Inductive.PatriciaTree (Gr)
 
 import Encoding ( GateType(..) )
@@ -77,7 +77,7 @@ rule34_text = outputBulbs ++ init [
 
   Stmt P344 "34.4" AND [P'NotLocum, P'BusinessEntity'NotLawRelated, P'2ndSchedule] [PMay] [P341] [],
   Stmt P'NotLocum "not locum" Switch  [] [] [] [],
-  Stmt P'BusinessEntity'NotLawRelated "business entity\nnot law-related" Switch [] [] [] [],
+  Stmt P'BusinessEntity'NotLawRelated "business entity, not law-related" Switch [] [] [] [],
   Stmt P'2ndSchedule "2nd schedule" Switch [] [] [] [],
 
   Stmt P345 "34.5" AND [P'IsLocum, P'BusinessEntity'NotLawRelated, P'2ndSchedule] [PMay] [P341a'P341c_tIf] [P341b],
@@ -205,13 +205,13 @@ makeGraph1 (validateStatements -> statements) =
                 notEdgeToPara = (ORef sParaRef, I k2)
                 reassignPointer = Map.insert despite k1 mgsOutPointers
 
-makeGraph2 :: MakeGraphState -> Gr Text Text
+makeGraph2 :: MakeGraphState -> Gr (GateType, Text) Text
 makeGraph2 MGState{ mgsOutPointers, mgsInPointers, mgsNodes, mgsEdges } =
   mkGraph @Gr (mgsNodes <&> makeNode) (mgsEdges <&> makeFinalEdge <&> \(x,y) -> (x,y,"" :: Text))
   where
-    makeNode :: (Int, GateType, Text) -> (Int, Text)
+    makeNode :: (Int, GateType, Text) -> (Int, (GateType, Text))
     makeNode (i, gateType, label) =
-      (i, show' gateType <> ": " <> label)
+      (i, (gateType, label))
     makeFinalEdge :: (Output, Input) -> (Int, Int)
     makeFinalEdge = Data.Bifunctor.bimap
       (\case
@@ -221,16 +221,31 @@ makeGraph2 MGState{ mgsOutPointers, mgsInPointers, mgsNodes, mgsEdges } =
         I o -> o
         IRef iParaRef -> mgsInPointers ! iParaRef)
 
-makeGraph :: [Statement] -> Gr Text Text
+makeGraph3 :: Gr (GateType, Text) b -> Gr Text b
+makeGraph3 = nmap makeGraphVizNodeLabel
+  where
+    makeGraphVizNodeLabel (gateType, label) =
+      show' gateType <> ": " <> label
+
+makeGraph :: [Statement] -> Gr (GateType, Text) Text
 makeGraph = makeGraph1 >>> makeGraph2
+
+makeGraphViz :: [Statement] -> Gr Text Text
+makeGraphViz = makeGraph1 >>> makeGraph2 >>> makeGraph3
+
+preview1 :: IO ()
+preview1 = preview (makeGraphViz rule34_text) >> putStrLn "< visualise a graph using the Xlib GraphvizCanvas >"
+  
+preview2 :: IO ()
+preview2 = preview'custom (makeGraphViz rule34_text) >> putStrLn "< visualise a graph using the Xlib GraphvizCanvas >"
 
 rule34_jacobMain :: IO ()
 rule34_jacobMain = do
   putStrLn "__rule34_jacobMain__"
-  preview (makeGraph rule34_text) >> putStrLn "< visualise a graph using the Xlib GraphvizCanvas >"
-  -- preview'custom (makeGraph rule34_text) >> putStrLn "< visualise a graph using the Xlib GraphvizCanvas >"
+  preview1
+  preview2
 
-importGraph :: Gr Text Text
+importGraph :: Gr (GateType, Text) Text
 importGraph = makeGraph (outputBulbs ++ myruleToStm rule34_1)
 
 myruleToStm :: MyRule -> [Statement]

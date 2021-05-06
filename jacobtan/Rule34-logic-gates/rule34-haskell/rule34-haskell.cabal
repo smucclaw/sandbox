@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: b84eaa294a75125155300ee315a654727f614312afda32ddc228fe2afd6cac23
+-- hash: ebd01add447b898ab0cdc45620b4fd9f08b4f925a3f7f92101837f753f780ecb
 
 name:           rule34-haskell
 version:        0.1.0.0
@@ -34,6 +34,9 @@ library
       LogicGates
       Rule34
       Rule34_jacob
+      Rule34_SMT
+      Rule34_SMT_gen
+      Rule34_SMT_sandbox
       Utils
       Defeasible
   other-modules:
@@ -42,12 +45,15 @@ library
       src
   build-depends:
       base >=4.7 && <5
+    , casing
     , containers
     , fgl
     , generic-data
     , graphviz
+    , mtl
     , pretty-simple
     , prettyprinter
+    , sbv
     , split
     , text
   default-language: Haskell2010
@@ -61,13 +67,16 @@ executable rule34-haskell-exe
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
+    , casing
     , containers
     , fgl
     , generic-data
     , graphviz
+    , mtl
     , pretty-simple
     , prettyprinter
     , rule34-haskell
+    , sbv
     , split
     , text
   default-language: Haskell2010
@@ -82,13 +91,16 @@ test-suite rule34-haskell-test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
+    , casing
     , containers
     , fgl
     , generic-data
     , graphviz
+    , mtl
     , pretty-simple
     , prettyprinter
     , rule34-haskell
+    , sbv
     , split
     , text
   default-language: Haskell2010

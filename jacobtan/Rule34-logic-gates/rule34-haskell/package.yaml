@@ -29,6 +29,9 @@ dependencies:
 - graphviz
 - generic-data
 - prettyprinter
+- sbv
+- casing
+- mtl
 
 library:
   source-dirs: src

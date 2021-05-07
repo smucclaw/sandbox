@@ -1,6 +1,5 @@
-
-concrete ParseGFEng of ParseGF =
-  NounEng - [PPartNP, UseN2, RelNP, DetNP, AdvNP, PossNP, PartNP, CountNP, AdvCN],
+concrete PredicatesEng of Predicates =
+  NounEng - [PPartNP, UseN2, RelNP, DetNP, AdvNP, PossNP, PartNP, CountNP, AdvCN, ApposCN],
   VerbEng - [PassV2, ReflVP, ComplVV, SlashV2V, SlashVV, SlashV2VNP, UseCopula, AdvVP, AdvVPSlash, VPSlashPrep],
   AdjectiveEng - [ReflA2, CAdvAP, UseA2, AdvAP],
   AdverbEng - [ComparAdvAdj,ComparAdvAdjS,AdnCAdv],
@@ -11,11 +10,9 @@ concrete ParseGFEng of ParseGF =
   PhraseEng - [UttAP, UttVP],
   IdiomEng,
   NumeralEng,
-  ExtendEng [GerundCN,PresPartAP,PastPartAP,PastPartAgentAP],
-  TenseX - [Pol,PPos,PNeg,SC,CAdv],
-  ReducedWordNetEng - [in_N, in_A],
-  ConstructionEng,
-  DocumentationEng ** open ResEng, ExtraEng, (V=VerbEng), (P=ParadigmsEng), ExtendEng, SyntaxEng, Prelude in {
+  ExtendEng [GerundCN,PresPartAP,PastPartAP,PastPartAgentAP, CompoundN],
+  TenseX - [Pol,PPos,PNeg,SC,CAdv] 
+  ** open ResEng, ExtraEng, (V=VerbEng), (P=ParadigmsEng), ExtendEng, SyntaxEng, Prelude in {
 
 flags
   case_sensitive = off;
@@ -40,7 +37,7 @@ lin
   lin
     CnNum cn card = mkCN cn (mkNP (mkDet card)) ;
     V2PartAdv pol v2 adv = PredAP pol (AdvAP (PastPartAP (mkVPSlash v2)) adv) ;
-    NPAP np ap = mkAP (lin AdA (mkUtt np)) ap ;
+    CompoundA n ap = mkAP (lin AdA (mkUtt n)) ap ;
 
     PosPol = {p = positivePol ; s = ""} ;
     NegPol = {p = negativePol | UncontractedNeg ; s = "not"} ; -- a hack
@@ -61,9 +58,14 @@ lin
 
     NegAP ap = mkAP (lin AdA {s = "non"}) ap ;
 
-    Must pol vp = FullPred PresIndSg pol (vvPred must_VV vp) ;
-    May pol vp = FullPred PresIndSg pol (vvPred may_VV vp) ;
-    Shall pol vp = FullPred PresIndSg pol (vvPred shall_VV vp) ;
+    -- Must pol vp = FullPred PresIndSg pol (vvPred must_VV vp) ;
+    -- May pol vp = FullPred PresIndSg pol (vvPred may_VV vp) ;
+    -- Shall pol vp = FullPred PresIndSg pol (vvPred shall_VV vp) ;
+
+    Must vp = (vvPred must_VV vp) ;
+    May vp = (vvPred may_VV vp) ;
+    Shall vp = (vvPred shall_VV vp) ;
+
 
     PartialParseAfterNTokens n = lin Utt (cc3 (ss "partial parse after") n (ss "tokens")) ;
     ParseFailedAfterNTokens n = lin Utt (cc3 (ss "parse failed after") n (ss "tokens")) ;

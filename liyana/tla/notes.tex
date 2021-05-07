@@ -1,0 +1,38 @@
+% TeX ignores anything on a line after a %
+% The next two lines define fonts for the title
+\font\xmplbx = cmbx10 scaled \magstephalf
+\font\xmplbxti = cmbxti10 scaled \magstephalf
+% Now here's the title.
+\leftline{\xmplbx Example 1:\quad\xmplbxti Entering simple text}
+\vglue .5\baselineskip % skip an extra half line
+It's easy to prepare ordinary text for \TeX\ since
+\TeX\ usually doesn't care about how you break up your input into
+lines. It treats the end of a line of text like a space.%
+\footnote \dag{\TeX\ treats a tab like a space too, as we point
+out in this {\it footnote}.} If you don't want a space there,
+put a per%
+cent sign (the comment character) at the end of the line.
+\TeX\ ignores spaces at the start of a line, and treats more
+than one space as equivalent to a single space,
+even after a period. You indicate a new paragraph by
+skipping a line (or more than one line).
+When \TeX\ sees a period followed by a space (or the end of the
+line, which is equivalent), it ordinarily assumes you've ended a
+sentence and inserts a little extra space after the period. It
+treats question marks and exclamation points the same way.
+But \TeX's rules for handling periods sometimes need fine
+tuning. \TeX\ assumes that a capital letter before a period
+doesn't end the sentence, so you have to do something a little
+different if, say, you're writing about DNA\null.
+% The \null prevents TeX from perceiving the capital `A'
+% as being next to the period.
+It's a good idea to tie words together in references such as
+``see Fig.~8'' and in names such as V.~I\null. Lenin and in
+$\ldots$ so that \TeX\ will never split them in an awkward place
+between two lines. (The three dots indicate an ellipsis.)
+You should put quotations in pairs of left and right
+single ``quotes'' so that you get the correct left and right
+double quotation marks. ``For adjacent single and double
+quotation marks, insert a `thinspace'\thinspace''. You can
+get en-dashes--like so, and em-dashes---like so.
+\bye % end the document

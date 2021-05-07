@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: b84eaa294a75125155300ee315a654727f614312afda32ddc228fe2afd6cac23
+-- hash: ddb99745cd686acd27bc5715ead4d94e9782ecbe1f87144c68c94f5428f3e2ed
 
 name:           rule34-haskell
 version:        0.1.0.0
@@ -27,6 +27,7 @@ source-repository head
 
 library
   exposed-modules:
+      Defeasible
       Encoding
       Fgl
       Graphviz
@@ -34,6 +35,9 @@ library
       LogicGates
       Rule34
       Rule34_jacob
+      Rule34_SMT
+      Rule34_SMT_gen
+      Rule34_SMT_sandbox
       Utils
   other-modules:
       Paths_rule34_haskell
@@ -41,12 +45,16 @@ library
       src
   build-depends:
       base >=4.7 && <5
+    , casing
     , containers
     , fgl
     , generic-data
     , graphviz
+    , mtl
     , pretty-simple
     , prettyprinter
+    , process
+    , sbv
     , split
     , text
   default-language: Haskell2010
@@ -60,13 +68,17 @@ executable rule34-haskell-exe
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
+    , casing
     , containers
     , fgl
     , generic-data
     , graphviz
+    , mtl
     , pretty-simple
     , prettyprinter
+    , process
     , rule34-haskell
+    , sbv
     , split
     , text
   default-language: Haskell2010
@@ -81,13 +93,17 @@ test-suite rule34-haskell-test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
+    , casing
     , containers
     , fgl
     , generic-data
     , graphviz
+    , mtl
     , pretty-simple
     , prettyprinter
+    , process
     , rule34-haskell
+    , sbv
     , split
     , text
   default-language: Haskell2010

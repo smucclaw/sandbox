@@ -1,12 +1,12 @@
 module Main where
 
-import ParsePred ( parsePred )
+import ParsePred ( parsePred, extractContentWords, keepAsking )
 import Paths_parse_predicates
 import PGF (readPGF)
 
 
 -- $setup
--- >>> pgf <- getDataFileName "ParseGF.pgf"
+-- >>> pgf <- getDataFileName "ParsePredicates.pgf"
 -- >>> gr <- readPGF pgf
 
 -- | Test
@@ -20,9 +20,11 @@ import PGF (readPGF)
 -- (FullPredicate:623 (NP:619 (CN:596 independent (N:535 director))))
 main :: IO ()
 main = do
-    pgf <- getDataFileName "ParseGF.pgf"
+    pgf <- getDataFileName "ParsePredicates.pgf"
     gr <- readPGF pgf
-    mapM_ (print . parsePred gr) corpus
+    --mapM_ (print . parsePred gr) corpus
+    mapM_ (keepAsking . extractContentWords . parsePred gr) corpus
+
 
 corpus :: [String]
 corpus = [
@@ -63,6 +65,7 @@ corpus = [
     ,"Director: LawPractice -> Person"
     ,"JurisdictionIsSingapore: LawPractice -> Boolean"
     ,"Member: LawPractice -> LegalPractitioner"
+    , "SoleIndependentContractor"
     ,"OwnerDriven : LawPractice -> Bool"]
 
 {-

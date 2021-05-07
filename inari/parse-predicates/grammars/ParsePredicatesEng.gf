@@ -1,0 +1,1 @@
+concrete ParsePredicatesEng of ParsePredicates = PredicatesEng, ReducedWordNetEng - [in_N, in_A] ;

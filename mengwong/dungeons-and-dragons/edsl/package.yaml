@@ -23,6 +23,8 @@ dependencies:
 - base >= 4.7 && < 5
 - fgl
 - containers
+- graphviz
+- prettyprinter
 
 library:
   source-dirs: src

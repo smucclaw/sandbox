@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: e9a8938cbfda4d3f6891d1a05c2c415751a7d14222004ae7998fe203d7ab1d91
+-- hash: 73c8b89b072261e4549cab9e82ef09189edf0c333661e037b29214086dc0e01f
 
 name:           edsl
 version:        0.1.0.0
@@ -15,7 +15,6 @@ author:         Author name here
 maintainer:     example@example.com
 copyright:      2021 Author name here
 license:        BSD3
-license-file:   LICENSE
 build-type:     Simple
 extra-source-files:
     README.md
@@ -34,6 +33,10 @@ library
       src
   build-depends:
       base >=4.7 && <5
+    , containers
+    , fgl
+    , graphviz
+    , prettyprinter
   default-language: Haskell2010
 
 executable edsl-exe
@@ -45,7 +48,11 @@ executable edsl-exe
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
+    , containers
     , edsl
+    , fgl
+    , graphviz
+    , prettyprinter
   default-language: Haskell2010
 
 test-suite edsl-test
@@ -58,5 +65,9 @@ test-suite edsl-test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
+    , containers
     , edsl
+    , fgl
+    , graphviz
+    , prettyprinter
   default-language: Haskell2010

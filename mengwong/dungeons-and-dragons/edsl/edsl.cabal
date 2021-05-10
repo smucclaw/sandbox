@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 73c8b89b072261e4549cab9e82ef09189edf0c333661e037b29214086dc0e01f
+-- hash: b650068adf688b107adac3d7a878dad4b967a0d7a970f203385eb71ff51d24b2
 
 name:           edsl
 version:        0.1.0.0
@@ -37,6 +37,7 @@ library
     , fgl
     , graphviz
     , prettyprinter
+    , rule34-haskell
   default-language: Haskell2010
 
 executable edsl-exe
@@ -53,6 +54,7 @@ executable edsl-exe
     , fgl
     , graphviz
     , prettyprinter
+    , rule34-haskell
   default-language: Haskell2010
 
 test-suite edsl-test
@@ -70,4 +72,5 @@ test-suite edsl-test
     , fgl
     , graphviz
     , prettyprinter
+    , rule34-haskell
   default-language: Haskell2010

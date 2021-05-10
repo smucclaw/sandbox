@@ -7,6 +7,9 @@ import Data.Graph.Inductive
 import Data.List
 import Data.GraphViz (preview, GraphvizParams (fmtNode, fmtEdge, globalAttributes), graphToDot, nonClusteredParams, setDirectedness, DotGraph, printDotGraph)
 
+-- from rule34-haskell package
+import Graphviz
+
 type StateName = String
 type EdgeLabel = String
 
@@ -66,7 +69,8 @@ grow (Node parent siblings) =
 
 -- output to Dot representation of original spec.
 -- every non-leaf node is a cluster
-
+asHSM :: a
+asHSM = undefined 
 
 -- output to Petri net representation.
 -- Petri Nets aren't strictly hierarchical.

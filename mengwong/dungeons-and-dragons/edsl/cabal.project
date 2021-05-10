@@ -1,3 +1,0 @@
-packages: ./*.cabal
-          ../../../jacobtan/Rule34-logic-gates/rule34-haskell/*.cabal
-

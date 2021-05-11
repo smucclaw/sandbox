@@ -1,8 +1,11 @@
+{-# LANGUAGE DerivingVia #-}
+{-# LANGUAGE DeriveGeneric #-}
 module Petri where
 
 import Data.Map as Map
 import Data.Maybe (maybeToList)
 import Data.List (nub, intersect)
+import Generic.Data (Generic, Generically(..))
 
 -- the simple version of a petri net assumes all edge weights are 1.
 --                      a P->T edge label means the number of dots needed to fire
@@ -55,7 +58,9 @@ data PetriNet pl tl = MkPN { places :: [PLabel]
                            , ptEdges :: [(PLabel,TLabel,Int)]
                            , tpEdges :: [(TLabel,PLabel,Int)]
                            }
-                      deriving (Ord, Eq, Show)
+                      deriving (Ord, Eq, Show, Generic)
+                      deriving Semigroup via Generically (PetriNet pl tl)
+                      deriving Monoid via Generically (PetriNet pl tl)
 
 pn_from_simple :: [Place PLabel TLabel] -> PetriNet p t
 pn_from_simple ps = MkPN

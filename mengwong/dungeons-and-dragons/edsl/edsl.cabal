@@ -1,10 +1,10 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.33.0.
+-- This file has been generated from package.yaml by hpack version 0.34.4.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 18867ff68585c17c6e7ceb833afc315d93cc85002b5b2184f0d6f23dd4bcb90b
+-- hash: d8179385796e60c6f938b3aded8ca52f8885bd16ef08b97431850fac71b7e67f
 
 name:           edsl
 version:        0.1.0.0
@@ -28,6 +28,7 @@ library
   exposed-modules:
       Lib
       Petri
+      Sandbox
   other-modules:
       Paths_edsl
   hs-source-dirs:
@@ -36,6 +37,7 @@ library
       base >=4.7 && <5
     , containers
     , fgl
+    , generic-data
     , graphviz
     , prettyprinter
     , rule34-haskell
@@ -53,6 +55,7 @@ executable edsl-exe
     , containers
     , edsl
     , fgl
+    , generic-data
     , graphviz
     , prettyprinter
     , rule34-haskell
@@ -71,6 +74,7 @@ test-suite edsl-test
     , containers
     , edsl
     , fgl
+    , generic-data
     , graphviz
     , prettyprinter
     , rule34-haskell

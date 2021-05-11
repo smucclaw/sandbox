@@ -59,8 +59,7 @@ data PetriNet pl tl = MkPN { places :: [PLabel]
                            , tpEdges :: [(TLabel,PLabel,Int)]
                            }
                       deriving (Ord, Eq, Show, Generic)
-                      deriving Semigroup via Generically (PetriNet pl tl)
-                      deriving Monoid via Generically (PetriNet pl tl)
+                      deriving (Semigroup, Monoid) via Generically (PetriNet pl tl)
 
 pn_from_simple :: [Place PLabel TLabel] -> PetriNet p t
 pn_from_simple ps = MkPN

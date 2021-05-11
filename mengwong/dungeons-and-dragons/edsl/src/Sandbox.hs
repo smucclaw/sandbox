@@ -21,8 +21,7 @@ data Foo a = Bar [a] [a]
 
 data T a b = T {x :: [a], y :: [b]}
   deriving (Generic, Show)
-  deriving Semigroup via (Generically (T a b))
-  deriving Monoid via (Generically (T a b))
+  deriving (Semigroup, Monoid) via (Generically (T a b))
 
 -- >>> T [1,2] "ab" <> T [3,4] "cd"
 -- T {x = [1,2,3,4], y = "abcd"}

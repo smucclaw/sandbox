@@ -1,6 +1,8 @@
+{-# LANGUAGE PackageImports #-}
+
 module Main where
 
-import Lib
+import "edsl" Lib
 
 main :: IO ()
 main = someFunc

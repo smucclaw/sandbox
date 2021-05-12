@@ -23,6 +23,10 @@ dependencies:
 - base >= 4.7 && < 5
 - fgl
 - containers
+- graphviz
+- prettyprinter
+- rule34-haskell
+- generic-data
 
 library:
   source-dirs: src

@@ -2,6 +2,7 @@ module Petri where
 
 import Data.Map as Map
 import Data.Maybe (maybeToList)
+import Data.List (nub)
 
 -- the simple version of a petri net assumes all edge weights are 1.
 --                      a P->T edge label means the number of dots needed to fire
@@ -41,26 +42,31 @@ example_2 = start
     t'join = [T Join 1 end]
 
 -- a "marking" keeps track of how many dots are in which plaes
-type Marking = Map.Map PLabel Int
+type Marking pl = Map.Map pl Int
 start_marking = Map.fromList [(Start, 1)]
 
 -- which transitions are ready to fire?
 -- return a list of transition labels whose places meet the edgecount requirement
-readyToFire :: Marking -> Place PLabel TLabel -> [TLabel]
+readyToFire :: Marking PLabel -> Place PLabel TLabel -> [TLabel]
 readyToFire marking (P pl needed ts) =
   if length (maybeToList $ Map.lookup pl marking) >= needed
-  then getLabel ts ++ (concatMap (readyToFire marking) (concat $ pChildren ts))
+  then getLabel ts ++ (concatMap (readyToFire marking) (pChildren ts))
   else []
-  where getLabel ts  = [ tl | (T tl _ _) <- ts ]
-        pChildren ts = [ c  | (T tl _ c) <- ts ]
+
+getLabel ts  = [ tl | (T tl _ _) <- ts ]
+pChildren ts = concat [ ps | (T tl _ ps) <- ts ]
+tChildren ps = concat [ ts | (P pl _ ts) <- ps ]
+
+getPlabel (P pl _ _) = pl
+getTlabel (T tl _ _) = tl
 
 -- todo -- convert this to some sort of fix or fold
-play :: Marking -> Place PLabel TLabel -> [[TLabel]]
+play :: Marking pl -> Place pl TLabel -> [[TLabel]]
 play m pn =
   [[]] -- note that we should automatically play through any Fork | Join | Noop events
        -- but halt on (TL _) as that indicates we need an external user action to occur
   where
-    step :: Marking -> [Place PLabel TLabel] -> [TLabel]
+    step :: Marking PLabel -> [Place PLabel TLabel] -> [TLabel]
     step m ps = concatMap (readyToFire m) ps
 
 -- the above syntax implies a petri net where one of the places (typically the start node)
@@ -72,9 +78,27 @@ data PetriNet pl tl = MkPN { places :: [PLabel]
                            , transitions :: [TLabel]
                            , ptEdges :: [(PLabel,TLabel,Int)]
                            , tpEdges :: [(TLabel,PLabel,Int)]
-                           , marking :: Marking
                            }
+                      deriving (Ord, Eq, Show)
 
+pn_from_simple :: [Place PLabel TLabel] -> PetriNet p t
+pn_from_simple ps = MkPN
+                    (getPlaces ps)
+                    (getTransitions ps)
+                    (getPTedges ps)
+                    (getTPedges (tChildren ps))
+  where
+    getPlaces ps = nub $ concat [ pl : getPlaces (pChildren ts)
+                       | (P pl _ ts) <- ps ]
+    getTransitions ps = nub $ concat [ tl : getTransitions ps'
+                                     | (P pl _ ts ) <- ps
+                                     , (T tl _ ps') <- ts ]
+    getPTedges ps = nub $ concat [ (pl,tl,pt) : getPTedges ps'
+                                 | (P pl pt ts) <- ps
+                                 , (T tl _ ps') <- ts ]
+    getTPedges ts = nub $ concat [ (tl,pl,tp) : getTPedges ts'
+                                 | (T tl _ ps) <- ts
+                                 , (P pl tp ts') <- ps ]
 
 main = do
   putStrLn "example 1:";  print (readyToFire start_marking example_1)

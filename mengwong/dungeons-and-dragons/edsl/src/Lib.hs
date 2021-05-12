@@ -1,3 +1,5 @@
+{-# LANGUAGE PackageImports #-}
+
 module Lib
     ( someFunc
     ) where
@@ -6,6 +8,8 @@ import Data.Tree
 import Data.Graph.Inductive
 import Data.List
 import Data.GraphViz (preview, GraphvizParams (fmtNode, fmtEdge, globalAttributes), graphToDot, nonClusteredParams, setDirectedness, DotGraph, printDotGraph)
+
+import Petri
 
 -- from rule34-haskell package
 import Graphviz
@@ -79,6 +83,18 @@ asHSM = undefined
 -- we rewrite all sourceless children of the root state to be targets of a fork event.
 -- that's how we do synchronization!
 
+asPetri :: StateTree -> PetriNet PLabel TLabel
+asPetri (Node (state :-> outs) [])
+  | take 6 state == "Choose" = let itemname = drop 7 state
+                                   awaiting = PL $ "Awaiting " <> itemname
+                                   received = PL $ "Received " <> itemname
+                               in MkPN
+                                  [awaiting, received]
+                                  [TL state]
+                                  [(awaiting,TL state,1)]
+                                  [(TL state,received,1)]
+
+        
 synchronize :: StateTree -> StateTree
 synchronize = fork . join
 

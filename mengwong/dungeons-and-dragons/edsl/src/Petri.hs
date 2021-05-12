@@ -3,6 +3,7 @@ module Petri where
 import Data.Map as Map
 import Data.Maybe (maybeToList)
 
+-- the simple version of a petri net assumes all edge weights are 1.
 --                      a P->T edge label means the number of dots needed to fire
 --                      a T->P edge label means the number of dots produced by firing in each place
 data Place      pl tl = P pl Int [Transition tl pl] deriving (Eq, Show)
@@ -14,7 +15,6 @@ data PLabel = Start | End
 data TLabel = Fork | Join | Noop
             | TL String deriving (Ord, Eq, Show)
 
--- the simple version of a petri net assumes all edge weights are 1;
 -- a couple of helper functions help to set up a petri net that hasn't started running yet
 p pl ts = P (PL pl) 1 ts
 t tl ps = T (TL tl) 1 ps
@@ -55,8 +55,8 @@ readyToFire marking (P pl needed ts) =
         pChildren ts = [ c  | (T tl _ c) <- ts ]
 
 -- todo -- convert this to some sort of fix or fold
-play :: PetriNet PLabel TLabel -> [[TLabel]]
-play pn =
+play :: Marking -> Place PLabel TLabel -> [[TLabel]]
+play m pn =
   [[]] -- note that we should automatically play through any Fork | Join | Noop events
        -- but halt on (TL _) as that indicates we need an external user action to occur
   where
@@ -65,10 +65,16 @@ play pn =
 
 -- the above syntax implies a petri net where one of the places (typically the start node)
 -- can be used as a root; but a properly general petri net could have any number of starting places!
--- let's accommodate that:
-data PetriNet pl tl = MkPN { graph :: [Place pl tl]
+-- A more correct representation would also allow us to weight each P->T and T->P edge independently.
+-- we don't have that yet. Let's write a converter from the above simple format to a more correct
+-- format.
+data PetriNet pl tl = MkPN { places :: [PLabel]
+                           , transitions :: [TLabel]
+                           , ptEdges :: [(PLabel,TLabel,Int)]
+                           , tpEdges :: [(TLabel,PLabel,Int)]
                            , marking :: Marking
                            }
+
 
 main = do
   putStrLn "example 1:";  print (readyToFire start_marking example_1)

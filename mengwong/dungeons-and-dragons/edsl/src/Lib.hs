@@ -48,11 +48,12 @@ charCreator =
     ]
   , state "Choose Description" `contains`
     [ leaf $ state "Choose Age"
-    , leaf $ state "Choose Height"
+    , leaf $ "Choose Height" :-> [(Nothing, "Choose Width")]
+    --- ^ add "Choose Width" (not in original spec) to demonstrate need for recursion in the @grow@ function
     , leaf $ state "Choose Appearance"
     , leaf $ state "Choose Alignment"
     ]
-  , leaf . state $ "Get Ability Scores"
+  , leaf $ state "Get Ability Scores"
   , leaf $ "Choose Race" :-> [(Just "Dwarf", "Choose Dwarf Sub-Race")
                              ,(Just "Elf",   "Choose Elf Sub-Race")]
   ]
@@ -64,10 +65,12 @@ normalize = grow
 -- In the "grow" phase of normalization, we promote any targets of "siblings", to leaf nodes at the same level, if they don't already exist there.
 grow :: StateTree -> StateTree
 grow (Node parent siblings) =
-  Node parent (siblings ++ nub [ leaf $ state target
-                               | (Node (_ :-> outs) children) <- siblings
+  let grownSiblings = grow <$> siblings
+  in
+  Node parent (grownSiblings ++ nub [ leaf $ state target
+                               | (Node (_ :-> outs) children) <- grownSiblings
                                , (_, target) <- outs
-                               , not $ target `elem` (stateName . rootLabel <$> siblings)
+                               , target `notElem` (stateName . rootLabel <$> grownSiblings)
                                  -- yes I know this is accidentallyquadratic.tumblr.com
                                ])
 

@@ -23,7 +23,7 @@ start = P Start 1
 
 example_1 = start
             [t "middle"
-             [P End 1 []]]
+             end]
 
 example_2 = start
             [t'fork

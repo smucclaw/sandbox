@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: b650068adf688b107adac3d7a878dad4b967a0d7a970f203385eb71ff51d24b2
+-- hash: 18867ff68585c17c6e7ceb833afc315d93cc85002b5b2184f0d6f23dd4bcb90b
 
 name:           edsl
 version:        0.1.0.0
@@ -27,6 +27,7 @@ source-repository head
 library
   exposed-modules:
       Lib
+      Petri
   other-modules:
       Paths_edsl
   hs-source-dirs:

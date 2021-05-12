@@ -1,11 +1,21 @@
 module Petri where
 
-data Place      a i = P a i [Transition a i]
-data Transition a i = T a i [Place a i]
+import Data.Map as Map
+import Data.Maybe (maybeToList)
 
--- the simple version of a petri net assumes all edge weights are 1
-p a ts = P a 1 ts
-t a ps = T a 1 ps
+--                      a P->T edge label means the number of dots needed to fire
+--                      a T->P edge label means the number of dots produced by firing in each place
+data Place      pl tl = P pl Int [Transition tl pl] deriving (Eq, Show)
+data Transition tl pl = T tl Int [Place pl tl]      deriving (Eq, Show)
+
+-- we distinguish label types
+newtype PLabel = PL String deriving (Ord, Eq, Show)
+newtype TLabel = TL String deriving (Ord, Eq, Show)
+
+-- the simple version of a petri net assumes all edge weights are 1;
+-- a couple of helper functions help to set up a petri net that hasn't started running yet
+p pl ts = P (PL pl) 1 ts
+t tl ps = T (TL tl) 1 ps
 
 example_1 = p "start"
             [t "middle"
@@ -26,3 +36,40 @@ example_2 = p "start"
   where t'join = [t "join"
                   [p "end"
                    []]]
+
+-- a "marking" keeps track of how many dots are in which plaes
+type Marking = Map.Map PLabel Int
+start_marking = Map.fromList [(PL "start", 1)]
+
+-- which transitions are ready to fire?
+-- return a list of transition labels whose places meet the edgecount requirement
+readyToFire :: Marking -> Place PLabel TLabel -> [TLabel]
+readyToFire marking (P pl needed ts) =
+  if length (maybeToList $ Map.lookup pl marking) >= needed
+  then getLabel ts ++ (concatMap (readyToFire marking) (concat $ pChildren ts))
+  else []
+  where getLabel ts  = [ tl | (T tl _ _) <- ts ]
+        pChildren ts = [ c  | (T tl _ c) <- ts ]
+
+-- todo -- convert this to some sort of fix or fold
+play :: PetriNet PLabel TLabel -> [[TLabel]]
+play pn =
+  [[]]
+  where
+    step :: Marking -> [Place PLabel TLabel] -> [TLabel]
+    step m ps = concatMap (readyToFire m) ps
+
+-- the above syntax implies a petri net where one of the places (typically the start node)
+-- can be used as a root; but a properly general petri net could have any number of starting places!
+-- let's accommodate that:
+data PetriNet pl tl = MkPN { graph :: [Place pl tl]
+                           , marking :: Marking
+                           }
+
+main = do
+  putStrLn "example 1:";  print (readyToFire start_marking example_1)
+  putStrLn "example 2:";  print (readyToFire start_marking example_2)
+  
+-- references:
+-- http://www.pnml.org/version-2009/version-2009.php
+-- https://en.wikipedia.org/wiki/Petri_net

@@ -2,7 +2,7 @@ module Petri where
 
 import Data.Map as Map
 import Data.Maybe (maybeToList)
-import Data.List (nub)
+import Data.List (nub, intersect)
 
 -- the simple version of a petri net assumes all edge weights are 1.
 --                      a P->T edge label means the number of dots needed to fire
@@ -45,30 +45,6 @@ example_2 = start
 type Marking pl = Map.Map pl Int
 start_marking = Map.fromList [(Start, 1)]
 
--- which transitions are ready to fire?
--- return a list of transition labels whose places meet the edgecount requirement
-readyToFire :: Marking PLabel -> Place PLabel TLabel -> [TLabel]
-readyToFire marking (P pl needed ts) =
-  if length (maybeToList $ Map.lookup pl marking) >= needed
-  then getLabel ts ++ (concatMap (readyToFire marking) (pChildren ts))
-  else []
-
-getLabel ts  = [ tl | (T tl _ _) <- ts ]
-pChildren ts = concat [ ps | (T tl _ ps) <- ts ]
-tChildren ps = concat [ ts | (P pl _ ts) <- ps ]
-
-getPlabel (P pl _ _) = pl
-getTlabel (T tl _ _) = tl
-
--- todo -- convert this to some sort of fix or fold
-play :: Marking pl -> Place pl TLabel -> [[TLabel]]
-play m pn =
-  [[]] -- note that we should automatically play through any Fork | Join | Noop events
-       -- but halt on (TL _) as that indicates we need an external user action to occur
-  where
-    step :: Marking PLabel -> [Place PLabel TLabel] -> [TLabel]
-    step m ps = concatMap (readyToFire m) ps
-
 -- the above syntax implies a petri net where one of the places (typically the start node)
 -- can be used as a root; but a properly general petri net could have any number of starting places!
 -- A more correct representation would also allow us to weight each P->T and T->P edge independently.
@@ -100,9 +76,58 @@ pn_from_simple ps = MkPN
                                  | (T tl _ ps) <- ts
                                  , (P pl tp ts') <- ps ]
 
+-- now let's actually run the petri net.
+
+-- which transitions are ready to fire?
+-- return a list of transition labels whose places meet the edgecount requirement
+readyToFire :: PetriNet PLabel TLabel -> Marking PLabel -> [TLabel]
+readyToFire pn marking =
+  [ tl
+  | (pl, tl, n) <- ptEdges pn
+  , Map.lookup pl marking >= Just n
+  ]
+
+getLabel ts  = [ tl | (T tl _ _) <- ts ]
+pChildren ts = concat [ ps | (T tl _ ps) <- ts ]
+tChildren ps = concat [ ts | (P pl _ ts) <- ps ]
+
+getPlabel (P pl _ _) = pl
+getTlabel (T tl _ _) = tl
+
+-- todo -- convert this to some sort of fix or fold
+play :: PetriNet PLabel TLabel -> Marking PLabel -> [[TLabel]]
+play pn m =
+  [[]] -- note that we should automatically play through any Fork | Join | Noop events
+       -- but halt on (TL _) as that indicates we need an external user action to occur
+  where
+    step :: PetriNet PLabel TLabel -> Marking PLabel -> [TLabel] -> Marking PLabel
+    step pn m events =
+      -- of those events which are actaully readyToFire
+      -- perform the transition by deleting dots from the input places
+      -- and create dots in the output places
+      let tofire = intersect events (readyToFire pn m)
+      in Prelude.foldl (substep pn) m tofire
+      where
+        substep :: PetriNet PLabel TLabel -> Marking PLabel -> TLabel -> Marking PLabel
+        substep pn mOrig tl' =
+          -- adjust the marking by removing the appropriate number of dots from source places
+          let adjustments = [ (subtract n, pl)
+                            | (pl, tl, n) <- ptEdges pn
+                            , tl == tl' ]
+          -- and add the appropriate number of dots to the destination places
+                            ++
+                            [ ((+n), pl)
+                            | (tl, pl, n) <- tpEdges pn
+                            , tl == tl' ]
+          in Prelude.foldl (flip (uncurry Map.adjust)) mOrig adjustments
+
+data Auto = Full | Semi | Manual
+  deriving (Eq)
+
+
 main = do
-  putStrLn "example 1:";  print (readyToFire start_marking example_1)
-  putStrLn "example 2:";  print (readyToFire start_marking example_2)
+  putStrLn "example 1:";  print (readyToFire (pn_from_simple [example_1]) start_marking)
+  putStrLn "example 2:";  print (readyToFire (pn_from_simple [example_2]) start_marking)
   
 -- references:
 -- http://www.pnml.org/version-2009/version-2009.php

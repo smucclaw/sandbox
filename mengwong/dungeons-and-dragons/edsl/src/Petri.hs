@@ -59,19 +59,18 @@ data PetriNet pl tl = MkPN { places :: [PLabel]
 
 pn_from_simple :: [Place PLabel TLabel] -> PetriNet p t
 pn_from_simple ps = MkPN
-                    (getPlaces ps)
-                    (getTransitions ps)
-                    (getPTedges ps)
-                    (getTPedges (tChildren ps))
+                    (nub $ getPlaces ps)
+                    (nub $ getTransitions ps)
+                    (nub $ getPTedges ps)
+                    (nub $ getTPedges (tChildren ps))
   where
-    getPlaces      ps = nc [ pl : getPlaces (pChildren ts) | (P pl _ ts) <- ps ]
-    getTransitions ps = nc [ tl : getTransitions ps'       | (P pl _ ts ) <- ps
-                                                           , (T tl _ ps') <- ts ]
-    getPTedges     ps = nc [ (pl,tl,pt) : getPTedges ps'   | (P pl pt ts) <- ps
-                                                           , (T tl _ ps') <- ts ]
-    getTPedges     ts = nc [ (tl,pl,tp) : getTPedges ts'   | (T tl _ ps) <- ts
-                                                           , (P pl tp ts') <- ps ]
-    nc = nub . concat
+    getPlaces      ps = concat [ pl : getPlaces (pChildren ts) | (P pl _ ts  ) <- ps ]
+    getTransitions ps = concat [ tl : getTransitions ps'       | (P pl _ ts  ) <- ps
+                                                               , (T tl _ ps' ) <- ts ]
+    getPTedges     ps = concat [ (pl,tl,pt) : getPTedges ps'   | (P pl pt ts ) <- ps
+                                                               , (T tl _ ps' ) <- ts ]
+    getTPedges     ts = concat [ (tl,pl,tp) : getTPedges ts'   | (T tl _ ps  ) <- ts
+                                                               , (P pl tp ts') <- ps ]
 -- now let's actually run the petri net.
 
 -- which transitions are ready to fire?

@@ -9,21 +9,24 @@ data Place      pl tl = P pl Int [Transition tl pl] deriving (Eq, Show)
 data Transition tl pl = T tl Int [Place pl tl]      deriving (Eq, Show)
 
 -- we distinguish label types
-newtype PLabel = PL String deriving (Ord, Eq, Show)
-newtype TLabel = TL String deriving (Ord, Eq, Show)
+data PLabel = Start | End
+            | PL String deriving (Ord, Eq, Show)
+data TLabel = Fork | Join | Noop
+            | TL String deriving (Ord, Eq, Show)
 
 -- the simple version of a petri net assumes all edge weights are 1;
 -- a couple of helper functions help to set up a petri net that hasn't started running yet
 p pl ts = P (PL pl) 1 ts
 t tl ps = T (TL tl) 1 ps
+end = [P End 1 []]
+start = P Start 1
 
-example_1 = p "start"
+example_1 = start
             [t "middle"
-             [p "end"
-              []]]
+             [P End 1 []]]
 
-example_2 = p "start"
-            [t "fork"
+example_2 = start
+            [t'fork
              [p "left branch"
               [t "left event"
                [p "left middle"
@@ -33,13 +36,13 @@ example_2 = p "start"
                [p "right middle"
                 t'join]]
              ]]
-  where t'join = [t "join"
-                  [p "end"
-                   []]]
+  where
+    t'fork = T Fork 1
+    t'join = [T Join 1 end]
 
 -- a "marking" keeps track of how many dots are in which plaes
 type Marking = Map.Map PLabel Int
-start_marking = Map.fromList [(PL "start", 1)]
+start_marking = Map.fromList [(Start, 1)]
 
 -- which transitions are ready to fire?
 -- return a list of transition labels whose places meet the edgecount requirement
@@ -54,7 +57,8 @@ readyToFire marking (P pl needed ts) =
 -- todo -- convert this to some sort of fix or fold
 play :: PetriNet PLabel TLabel -> [[TLabel]]
 play pn =
-  [[]]
+  [[]] -- note that we should automatically play through any Fork | Join | Noop events
+       -- but halt on (TL _) as that indicates we need an external user action to occur
   where
     step :: Marking -> [Place PLabel TLabel] -> [TLabel]
     step m ps = concatMap (readyToFire m) ps

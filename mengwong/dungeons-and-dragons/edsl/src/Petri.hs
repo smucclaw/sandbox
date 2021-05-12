@@ -64,18 +64,14 @@ pn_from_simple ps = MkPN
                     (getPTedges ps)
                     (getTPedges (tChildren ps))
   where
-    getPlaces ps = nub $ concat [ pl : getPlaces (pChildren ts)
-                       | (P pl _ ts) <- ps ]
-    getTransitions ps = nub $ concat [ tl : getTransitions ps'
-                                     | (P pl _ ts ) <- ps
-                                     , (T tl _ ps') <- ts ]
-    getPTedges ps = nub $ concat [ (pl,tl,pt) : getPTedges ps'
-                                 | (P pl pt ts) <- ps
-                                 , (T tl _ ps') <- ts ]
-    getTPedges ts = nub $ concat [ (tl,pl,tp) : getTPedges ts'
-                                 | (T tl _ ps) <- ts
-                                 , (P pl tp ts') <- ps ]
-
+    getPlaces      ps = nc [ pl : getPlaces (pChildren ts) | (P pl _ ts) <- ps ]
+    getTransitions ps = nc [ tl : getTransitions ps'       | (P pl _ ts ) <- ps
+                                                           , (T tl _ ps') <- ts ]
+    getPTedges     ps = nc [ (pl,tl,pt) : getPTedges ps'   | (P pl pt ts) <- ps
+                                                           , (T tl _ ps') <- ts ]
+    getTPedges     ts = nc [ (tl,pl,tp) : getTPedges ts'   | (T tl _ ps) <- ts
+                                                           , (P pl tp ts') <- ps ]
+    nc = nub . concat
 -- now let's actually run the petri net.
 
 -- which transitions are ready to fire?

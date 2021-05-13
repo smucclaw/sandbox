@@ -4,6 +4,7 @@ module Lib
     ( someFunc
     ) where
 
+import qualified Data.Map as Map
 import Data.Tree
 import Data.Graph.Inductive
 import Data.List
@@ -53,7 +54,7 @@ charCreator =
     , leaf $ state "Choose Appearance"
     , leaf $ state "Choose Alignment"
     ]
-  , leaf $ state "Get Ability Scores"
+  , leaf $ state "Choose Ability Scores"
   , leaf $ "Choose Race" :-> [(Just "Dwarf", "Choose Dwarf Sub-Race")
                              ,(Just "Elf",   "Choose Elf Sub-Race")]
   ]
@@ -86,17 +87,75 @@ asHSM = undefined
 -- we rewrite all sourceless children of the root state to be targets of a fork event.
 -- that's how we do synchronization!
 
+
+-- a labeled out edge becomes a downstream place
+
 asPetri :: StateTree -> PetriNet PLabel TLabel
-asPetri (Node (state :-> outs) [])
+asPetri (Node (state :-> nexts) []) -- no children; the transition is "choose"
   | take 6 state == "Choose" = let itemname = drop 7 state
                                    awaiting = PL $ "Awaiting " <> itemname
-                                   received = PL $ "Received " <> itemname
+                                   decided  = PL $ "Decided " <> itemname
                                in MkPN
-                                  [awaiting, received]
+                                  [awaiting, decided]
                                   [TL state]
                                   [(awaiting,TL state,1)]
-                                  [(TL state,received,1)]
+                                  [(TL state,decided,1)]
+  | otherwise = let begin  = PL $ "Begin " ++ state
+                    middle = TL state
+                    end    = PL $ "End " ++ state
+                in MkPN
+                   [begin, end]
+                   [middle]
+                   [(begin,middle,1)]
+                   [(middle,begin,1)]
 
+asPetri (Node (state :-> nexts) [child]) -- got children; a single child; the transition is the child
+  | take 6 state == "Choose" = let itemname = drop 7 state
+                                   awaiting = PL $ "Awaiting " <> itemname
+                                   decided  = PL $ "Decided " <> itemname
+                                   childPetri = asPetri child
+                               in childPetri <>
+                                  MkPN
+                                  [awaiting, decided]
+                                  []
+                                  [(awaiting,head (transitions childPetri),1)]
+                                  [(last (transitions childPetri),decided,1)]
+  | otherwise = error $ "unsupported state command " ++ state
+
+asPetri (Node (state :-> nexts) children) -- got children; multiple children; we fork/join the children
+  | take 6 state == "Choose" = let itemname = drop 7 state
+                                   awaiting = PL $ "Awaiting " <> itemname
+                                   decided  = PL $ "Decided " <> itemname
+                                   myfork   = Fork $ itemname ++ " FORK"
+                                   myjoin   = Join $ itemname ++ " JOIN"
+                                   childPetris = asPetri <$> children
+                               in MkPN
+                                  [awaiting, decided]
+                                  [myfork, myjoin]
+                                  ((awaiting,myfork,1) : [ (endState,myjoin,1)
+                                                         | childPetri <- childPetris
+                                                         , let endState = last $ places childPetri ])
+                                  ((myjoin,decided,1) : [ (myfork,startState,1)
+                                                        | childPetri <- childPetris
+                                                        , let startState = head $ places childPetri
+                                                        ])
+  | otherwise = let begin  = PL $ "Begin " ++ state
+                    end    = PL $ "End " ++ state
+                    myfork = Fork $ state ++ " FORK"
+                    myjoin = Join $ state ++ " JOIN"
+                    childPetris = asPetri <$> children
+                in MkPN
+                   [begin, end]
+                   [myfork, myjoin]
+                   ((begin,myfork,1) : [ (endState,myjoin,1)
+                                       | childPetri <- childPetris
+                                       , let endState = last $ places childPetri ])
+                   ((myjoin,end,1) : [ (myfork,startState,1)
+                                     | childPetri <- childPetris
+                                     , let startState = head $ places childPetri
+                                     ])
+
+-- TODO: hook up my "decided" to the next stages' inputs via a NOOP
         
 synchronize :: StateTree -> StateTree
 synchronize = fork . join
@@ -109,4 +168,7 @@ todo = id
 
 
 someFunc :: IO ()
-someFunc = putStrLn "someFunc"
+someFunc = do
+  let pcc = asPetri charCreator
+  Petri.run pcc (Map.fromList [(head $ places pcc, 1)])
+

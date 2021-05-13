@@ -2,7 +2,7 @@
 {-# LANGUAGE DeriveGeneric #-}
 module Petri where
 
-import Data.Map as Map
+import qualified Data.Map as Map
 import Data.Maybe (maybeToList)
 import Data.List (nub, intersect)
 import Generic.Data (Generic, Generically(..))
@@ -13,11 +13,15 @@ import Generic.Data (Generic, Generically(..))
 data Place      pl tl = P pl Int [Transition tl pl] deriving (Eq, Show)
 data Transition tl pl = T tl Int [Place pl tl]      deriving (Eq, Show)
 
+type StringText = String
+
 -- we distinguish label types
 data PLabel = Start | End
-            | PL String deriving (Ord, Eq, Show)
-data TLabel = Fork | Join | Noop
-            | TL String deriving (Ord, Eq, Show)
+            | PL StringText deriving (Ord, Eq, Show)
+data TLabel = Fork StringText
+            | Join StringText
+            | Noop StringText
+            | TL   StringText deriving (Ord, Eq, Show)
 
 -- a couple of helper functions help to set up a petri net that hasn't started running yet
 p pl ts = P (PL pl) 1 ts
@@ -41,8 +45,8 @@ example_2 = start
                 t'join]]
              ]]
   where
-    t'fork = T Fork 1
-    t'join = [T Join 1 end]
+    t'fork =  T (Fork "fork 1") 1
+    t'join = [T (Join "fork 1") 1 end]
 
 -- a "marking" keeps track of how many dots are in which plaes
 type Marking pl = Map.Map pl Int
@@ -128,14 +132,13 @@ data Auto = Full | Semi | Manual
 
 
 main = do
-  putStrLn "* example 1"; run example_1
-  putStrLn "* example 2"; run example_2
+  putStrLn "* example 1"; run (pn_from_simple [example_1]) start_marking
+  putStrLn "* example 2"; run (pn_from_simple [example_2]) start_marking
 
-run simple = do
-  let pn = pn_from_simple [simple]
-      ready1 = readyToFire pn start_marking
+run pn sm = do
+  let ready1 = readyToFire pn sm
   putStrLn $ "petri net: " ++ show pn
-  putStrLn $ "start marking: " ++ show start_marking
+  putStrLn $ "start marking: " ++ show sm
   putStrLn $ "ready to fire: " ++ show ready1
   mapM_  print (fire pn start_marking <$> ready1)
   

@@ -128,8 +128,16 @@ data Auto = Full | Semi | Manual
 
 
 main = do
-  putStrLn "example 1:";  print (readyToFire (pn_from_simple [example_1]) start_marking)
-  putStrLn "example 2:";  print (readyToFire (pn_from_simple [example_2]) start_marking)
+  putStrLn "* example 1"; run example_1
+  putStrLn "* example 2"; run example_2
+
+run simple = do
+  let pn = pn_from_simple [simple]
+      ready1 = readyToFire pn start_marking
+  putStrLn $ "petri net: " ++ show pn
+  putStrLn $ "start marking: " ++ show start_marking
+  putStrLn $ "ready to fire: " ++ show ready1
+  mapM_  print (fire pn start_marking <$> ready1)
   
 -- references:
 -- http://www.pnml.org/version-2009/version-2009.php

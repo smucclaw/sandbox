@@ -129,7 +129,7 @@ asPetri (Node (state :-> nexts) children) -- got children; multiple children; we
                                    myfork   = Fork $ itemname ++ " FORK"
                                    myjoin   = Join $ itemname ++ " JOIN"
                                    childPetris = asPetri <$> children
-                               in MkPN
+                               in mconcat childPetris <> MkPN
                                   [awaiting, decided]
                                   [myfork, myjoin]
                                   ((awaiting,myfork,1) : [ (endState,myjoin,1)
@@ -144,16 +144,19 @@ asPetri (Node (state :-> nexts) children) -- got children; multiple children; we
                     myfork = Fork $ state ++ " FORK"
                     myjoin = Join $ state ++ " JOIN"
                     childPetris = asPetri <$> children
-                in MkPN
-                   [begin, end]
-                   [myfork, myjoin]
-                   ((begin,myfork,1) : [ (endState,myjoin,1)
-                                       | childPetri <- childPetris
-                                       , let endState = last $ places childPetri ])
-                   ((myjoin,end,1) : [ (myfork,startState,1)
-                                     | childPetri <- childPetris
-                                     , let startState = head $ places childPetri
-                                     ])
+                in MkPN [begin] [myfork] [(begin,myfork,1)]
+                    [ (myfork,startState,1)
+                    | childPetri <- childPetris
+                    , let startState = head $ places childPetri
+                    ]
+                   <> mconcat childPetris
+                   <> MkPN
+                   [end]
+                   [myjoin]
+                   [ (endState,myjoin,1)
+                   | childPetri <- childPetris
+                   , let endState = last $ places childPetri ]
+                   [(myjoin,end,1)]
 
 -- TODO: hook up my "decided" to the next stages' inputs via a NOOP
         

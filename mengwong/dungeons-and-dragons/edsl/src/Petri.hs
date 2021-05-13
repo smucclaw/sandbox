@@ -116,7 +116,7 @@ fire pn mOrig tl' =
                     , tl == tl' ]
   -- and add the appropriate number of dots to the destination places
                     ++
-                    [ (maybe (Just 0) (Just . (+n)), pl)
+                    [ (maybe (Just n) (Just . (+n)), pl)
                     | (tl, pl, n) <- tpEdges pn
                     , tl == tl' ]
   in Prelude.foldl (flip (uncurry Map.alter)) mOrig adjustments

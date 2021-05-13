@@ -105,20 +105,23 @@ play pn m =
       -- perform the transition by deleting dots from the input places
       -- and create dots in the output places
       let tofire = intersect events (readyToFire pn m)
-      in Prelude.foldl (substep pn) m tofire
-      where
-        substep :: PetriNet PLabel TLabel -> Marking PLabel -> TLabel -> Marking PLabel
-        substep pn mOrig tl' =
-          -- adjust the marking by removing the appropriate number of dots from source places
-          let adjustments = [ (subtract n, pl)
-                            | (pl, tl, n) <- ptEdges pn
-                            , tl == tl' ]
-          -- and add the appropriate number of dots to the destination places
-                            ++
-                            [ ((+n), pl)
-                            | (tl, pl, n) <- tpEdges pn
-                            , tl == tl' ]
-          in Prelude.foldl (flip (uncurry Map.adjust)) mOrig adjustments
+      in Prelude.foldl (fire pn) m tofire
+
+-- fire a particular transition against a particular marking of a particular petri net
+fire :: PetriNet PLabel TLabel -> Marking PLabel -> TLabel -> Marking PLabel
+fire pn mOrig tl' =
+  -- adjust the marking by removing the appropriate number of dots from source places
+  let adjustments = [ (maybe (Just 0) (Just . (subtract n)), pl)
+                    | (pl, tl, n) <- ptEdges pn
+                    , tl == tl' ]
+  -- and add the appropriate number of dots to the destination places
+                    ++
+                    [ (maybe (Just 0) (Just . (+n)), pl)
+                    | (tl, pl, n) <- tpEdges pn
+                    , tl == tl' ]
+  in Prelude.foldl (flip (uncurry Map.alter)) mOrig adjustments
+  
+
 
 data Auto = Full | Semi | Manual
   deriving (Eq)

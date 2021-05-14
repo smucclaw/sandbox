@@ -83,8 +83,8 @@ pn_from_simple ps = MkPN
 
 -- which transitions are ready to fire?
 -- return a list of transition labels where all input places meet the edgecount requirement
-readyToFire :: PetriNet PLabel TLabel -> Marking PLabel -> [TLabel]
-readyToFire pn marking =
+enabled :: PetriNet PLabel TLabel -> Marking PLabel -> [TLabel]
+enabled pn marking =
   [ transition
   | transition <- transitions pn
   , all (\(pl, n) -> Map.lookup pl marking >= Just n) [ (pl, n) | (pl, tl, n) <- ptEdges pn , tl == transition ]
@@ -105,10 +105,10 @@ play pn m =
   where
     step :: PetriNet PLabel TLabel -> Marking PLabel -> [TLabel] -> Marking PLabel
     step pn m events =
-      -- of those events which are actaully readyToFire
+      -- of those events which are actaluly enabled (ready to fire)
       -- perform the transition by deleting dots from the input places
       -- and create dots in the output places
-      let tofire = intersect events (readyToFire pn m)
+      let tofire = intersect events (enabled pn m)
       in Prelude.foldl (fire pn) m tofire
 
 -- fire a particular transition against a particular marking of a particular petri net
@@ -136,7 +136,7 @@ main = do
   putStrLn "* example 2"; run (pn_from_simple [example_2]) start_marking
 
 run pn sm = do
-  let ready1 = readyToFire pn sm
+  let ready1 = enabled pn sm
   putStrLn $ "petri net: " ++ show pn
   putStrLn $ "start marking: " ++ show sm
   putStrLn $ "ready to fire: " ++ show ready1

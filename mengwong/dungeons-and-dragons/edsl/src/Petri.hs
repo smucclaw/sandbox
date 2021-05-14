@@ -82,12 +82,12 @@ pn_from_simple ps = MkPN
 -- now let's actually run the petri net.
 
 -- which transitions are ready to fire?
--- return a list of transition labels whose places meet the edgecount requirement
+-- return a list of transition labels where all input places meet the edgecount requirement
 readyToFire :: PetriNet PLabel TLabel -> Marking PLabel -> [TLabel]
 readyToFire pn marking =
-  [ tl
-  | (pl, tl, n) <- ptEdges pn
-  , Map.lookup pl marking >= Just n
+  [ transition
+  | transition <- transitions pn
+  , all (\(pl, n) -> Map.lookup pl marking >= Just n) [ (pl, n) | (pl, tl, n) <- ptEdges pn , tl == transition ]
   ]
 
 getLabel ts  = [ tl | (T tl _ _) <- ts ]

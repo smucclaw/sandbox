@@ -81,82 +81,54 @@ asHSM :: a
 asHSM = undefined 
 
 -- output to Petri net representation.
--- Petri Nets aren't strictly hierarchical.
--- We flatten the hierarchy by doing a couple of things:
+-- Petri Nets are a graph; they aren't strictly hierarchical -- we're not doing Nets In Nets.
+-- so how do we take a Workflow approach to this?
+-- https://en.wikipedia.org/wiki/Petri_net#Workflow_nets
+-- 
+-- We flatten the hierarchy into a workflow model by doing a couple of things:
 -- we rewrite all targetless children of a state to be indegrees of a join event that points to a parent state.
 -- we rewrite all sourceless children of the root state to be targets of a fork event.
--- that's how we do synchronization!
+
+-- a labeled out edge becomes a downstream transition from a place.
+-- "case" conditions are represented as "nondeterminism" where a place can have multiple output transitions;
+-- it's up to the environment to tell us which of the transitions actually fired.
+-- in other words, case race of
+--                        dwarf -> foo
+--                        elf   -> bar
+-- translates to (chose race) place, with two output transitions
+--                -> [ race is dwarf ] -> (ready to choose dwarf sub-race) -> [ choose dwarf sub-race ] ->
+--                -> [ race is elf   ] -> (ready to choose elf   sub-race) -> [ choose elf sub-race ] ->
 
 
--- a labeled out edge becomes a downstream place
-
+-- (front)    -> [pre]  -> (recurse) -> [post] -> (back)
+-- (awaiting) -> [fork] -> (recurse) -> [join] -> (decided)
+-- (start)    -> [push] -> (recurse) -> [pop]  -> (end)
 asPetri :: StateTree -> PetriNet PLabel TLabel
-asPetri (Node (state :-> nexts) []) -- no children; the transition is "choose"
-  | take 6 state == "Choose" = let itemname = drop 7 state
-                                   awaiting = PL $ "Awaiting " <> itemname
-                                   decided  = PL $ "Decided " <> itemname
-                               in MkPN
-                                  [awaiting, decided]
-                                  [TL state]
-                                  [(awaiting,TL state,1)]
-                                  [(TL state,decided,1)]
-  | otherwise = let begin  = PL $ "Begin " ++ state
-                    middle = TL state
-                    end    = PL $ "End " ++ state
-                in MkPN
-                   [begin, end]
-                   [middle]
-                   [(begin,middle,1)]
-                   [(middle,begin,1)]
+asPetri (Node (state :-> nexts) children) =
+  let itemname      = drop 7 state
+      (front, back) = case take 6 state of
+                        "Choose" -> (PL $ "Awaiting " <> itemname, PL $ "Decided " <> itemname)
+                        _        -> (PL $ "Begin "    <> state,    PL $ "End "     <> state)
+      middle        = TL state
+      (pre, post)   = if length children == 1
+                      then (Noop $ itemname ++ " PUSH", Noop $ itemname ++ " POP")
+                      else (Fork $ itemname ++ " FORK", Join $ itemname ++ " JOIN")
+      childPetris   = asPetri <$> children
+      mchildPetri   = mconcat childPetris
+      scatter       = [ (pre,startState,1)
+                      | childPetri <- childPetris
+                      , let startState = head $ places childPetri ]
+      gather        = [ (endState,post,1)
+                      | childPetri <- childPetris
+                      , let endState = last $ places childPetri ]
 
-asPetri (Node (state :-> nexts) [child]) -- got children; a single child; the transition is the child
-  | take 6 state == "Choose" = let itemname = drop 7 state
-                                   awaiting = PL $ "Awaiting " <> itemname
-                                   decided  = PL $ "Decided " <> itemname
-                                   childPetri = asPetri child
-                               in childPetri <>
-                                  MkPN
-                                  [awaiting, decided]
-                                  []
-                                  [(awaiting,head (transitions childPetri),1)]
-                                  [(last (transitions childPetri),decided,1)]
-  | otherwise = error $ "unsupported state command " ++ state
+  in case (length children) of
+  --   n          places          transitions  p->t edges             t->p edges
+       0 -> MkPN [front, back]    [middle]     [(front, middle, 1)]   [(middle,back,1)]
+       _ -> MkPN [front]          [pre]        [(front, pre, 1)]      scatter
+            <> mchildPetri <>
+            MkPN [back]           [post]       gather                 [(post, back, 1)]
 
-asPetri (Node (state :-> nexts) children) -- got children; multiple children; we fork/join the children
-  | take 6 state == "Choose" = let itemname = drop 7 state
-                                   awaiting = PL $ "Awaiting " <> itemname
-                                   decided  = PL $ "Decided " <> itemname
-                                   myfork   = Fork $ itemname ++ " FORK"
-                                   myjoin   = Join $ itemname ++ " JOIN"
-                                   childPetris = asPetri <$> children
-                               in mconcat childPetris <> MkPN
-                                  [awaiting, decided]
-                                  [myfork, myjoin]
-                                  ((awaiting,myfork,1) : [ (endState,myjoin,1)
-                                                         | childPetri <- childPetris
-                                                         , let endState = last $ places childPetri ])
-                                  ((myjoin,decided,1) : [ (myfork,startState,1)
-                                                        | childPetri <- childPetris
-                                                        , let startState = head $ places childPetri
-                                                        ])
-  | otherwise = let begin  = PL $ "Begin " ++ state
-                    end    = PL $ "End " ++ state
-                    myfork = Fork $ state ++ " FORK"
-                    myjoin = Join $ state ++ " JOIN"
-                    childPetris = asPetri <$> children
-                in MkPN [begin] [myfork] [(begin,myfork,1)]
-                    [ (myfork,startState,1)
-                    | childPetri <- childPetris
-                    , let startState = head $ places childPetri
-                    ]
-                   <> mconcat childPetris
-                   <> MkPN
-                   [end]
-                   [myjoin]
-                   [ (endState,myjoin,1)
-                   | childPetri <- childPetris
-                   , let endState = last $ places childPetri ]
-                   [(myjoin,end,1)]
 
 -- TODO: hook up my "decided" to the next stages' inputs via a NOOP
         

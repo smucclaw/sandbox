@@ -105,11 +105,13 @@ asHSM = undefined
 -- (start)    -> [push] -> (recurse) -> [pop]  -> (end)
 asPetri :: StateTree -> PetriNet PLabel TLabel
 asPetri (Node (state :-> nexts) children) =
-  let itemname      = drop 7 state
+  let itemname      = case take 6 state of
+                        "Choose" -> drop 7 state
+                        _        -> state
       (front, back) = case take 6 state of
                         "Choose" -> (PL $ "Awaiting " <> itemname, PL $ "Decided " <> itemname)
-                        _        -> (PL $ "Begin "    <> state,    PL $ "End "     <> state)
-      middle        = TL state
+                        _        -> (PL $ "Begin "    <> itemname, PL $ "End "     <> itemname)
+      middle        = TL itemname
       (pre, post)   = if length children == 1
                       then (Noop $ itemname ++ " PUSH", Noop $ itemname ++ " POP")
                       else (Fork $ itemname ++ " FORK", Join $ itemname ++ " JOIN")

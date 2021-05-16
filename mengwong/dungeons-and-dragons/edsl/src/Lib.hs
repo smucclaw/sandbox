@@ -148,4 +148,4 @@ previewPCC :: IO ()
 previewPCC = previewPetri $ asPetri charCreator
 
 writePCC :: IO ()
-writePCC = writePetri "../viz/pcc" $ asPetri charCreator
+writePCC = writePetri "viz/pcc" $ asPetri charCreator

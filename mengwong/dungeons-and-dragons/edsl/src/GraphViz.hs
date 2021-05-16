@@ -64,4 +64,6 @@ writePetri :: String -> PetriNet PLabel TLabel -> IO ()
 writePetri filePath (petriFgl @Gr -> petriGraphViz -> dotGraph) = do
   printDotGraph dotGraph & Text.Lazy.IO.writeFile (filePath ++ ".dot")
   -- dot to png
-  execShell ("dot " ++ filePath ++ ".dot -Tpng > " ++ filePath ++ ".png")
+  let shellCommand = "dot " ++ filePath ++ ".dot -Tpng > " ++ filePath ++ ".png" 
+  putStrLn $ "Attempting to execute shell command: " ++ shellCommand
+  execShell shellCommand

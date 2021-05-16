@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 8dba15d7c8089a64c2d15368b25c07bd3538e3d955cf4cacec40f2495e2ff603
+-- hash: 66937d84fb2e83bf8b86ff67e9b149e0bffa078d4ccf465a91bee26406eaebaa
 
 name:           edsl
 version:        0.1.0.0
@@ -26,6 +26,7 @@ source-repository head
 
 library
   exposed-modules:
+      GraphViz
       Lib
       Petri
       Sandbox
@@ -42,6 +43,7 @@ library
     , pretty-simple
     , prettyprinter
     , rule34-haskell
+    , unordered-containers
   default-language: Haskell2010
 
 executable edsl-exe
@@ -61,6 +63,7 @@ executable edsl-exe
     , pretty-simple
     , prettyprinter
     , rule34-haskell
+    , unordered-containers
   default-language: Haskell2010
 
 test-suite edsl-test
@@ -81,4 +84,5 @@ test-suite edsl-test
     , pretty-simple
     , prettyprinter
     , rule34-haskell
+    , unordered-containers
   default-language: Haskell2010

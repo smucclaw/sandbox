@@ -118,7 +118,7 @@ play pn m =
 fire :: PetriNet PLabel TLabel -> Marking PLabel -> TLabel -> Marking PLabel
 fire pn mOrig tl' =
   -- adjust the marking by removing the appropriate number of dots from source places
-  let adjustments = [ (maybe (Just 0) (Just . (subtract n)), pl)
+  let adjustments = [ (maybe (Just 0) (Just . subtract n), pl)
                     | (pl, tl, n) <- ptEdges pn
                     , tl == tl' ]
   -- and add the appropriate number of dots to the destination places
@@ -138,6 +138,7 @@ main = do
   putStrLn "* example 1"; run (pn_from_simple [example_1]) start_marking
   putStrLn "* example 2"; run (pn_from_simple [example_2]) start_marking
 
+run :: PetriNet PLabel TLabel -> Marking PLabel -> IO ()
 run pn sm = do
   let ready1 = enabled pn sm
   putStrLn $ "petri net: " ++ show pn

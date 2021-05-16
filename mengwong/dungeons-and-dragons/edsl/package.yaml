@@ -29,6 +29,7 @@ dependencies:
 - rule34-haskell
 - generic-data
 
+
 library:
   source-dirs: src
 

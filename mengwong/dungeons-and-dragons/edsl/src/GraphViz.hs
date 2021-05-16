@@ -60,8 +60,8 @@ previewPetri (petriFgl @Gr -> petriGraphViz -> dotGraph) =
   void $ forkIO (void $ runGraphvizCanvas' dotGraph Xlib)
 
 -- | graph to .dot and .png
-writePetri :: PetriNet PLabel TLabel -> String -> IO ()
-writePetri (petriFgl @Gr -> petriGraphViz -> dotGraph) filePath = do
-  printDotGraph dotGraph & Text.Lazy.IO.writeFile filePath
+writePetri :: String -> PetriNet PLabel TLabel -> IO ()
+writePetri filePath (petriFgl @Gr -> petriGraphViz -> dotGraph) = do
+  printDotGraph dotGraph & Text.Lazy.IO.writeFile (filePath ++ ".dot")
   -- dot to png
-  execShell "dot ../viz/rule34_graph1.dot -Tpng > ../viz/rule34_graph1.png"
+  execShell ("dot " ++ filePath ++ ".dot -Tpng > " ++ filePath ++ ".png")

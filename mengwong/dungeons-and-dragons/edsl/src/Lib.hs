@@ -13,7 +13,6 @@ import Data.GraphViz (preview, GraphvizParams (fmtNode, fmtEdge, globalAttribute
 import Petri
 
 -- from rule34-haskell package
-import Graphviz
 import GraphViz
 
 type StateName = String
@@ -147,3 +146,6 @@ someFunc = do
 
 previewPCC :: IO ()
 previewPCC = previewPetri $ asPetri charCreator
+
+writePCC :: IO ()
+writePCC = writePetri "../viz/pcc" $ asPetri charCreator

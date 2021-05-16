@@ -14,6 +14,7 @@ import Petri
 
 -- from rule34-haskell package
 import Graphviz
+import GraphViz
 
 type StateName = String
 type EdgeLabel = String
@@ -144,3 +145,5 @@ someFunc = do
   let pcc = asPetri charCreator
   Petri.run pcc (Map.fromList [(head $ places pcc, 1)])
 
+previewPCC :: IO ()
+previewPCC = previewPetri $ asPetri charCreator

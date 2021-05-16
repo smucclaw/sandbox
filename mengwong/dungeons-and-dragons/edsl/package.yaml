@@ -28,6 +28,7 @@ dependencies:
 - prettyprinter
 - rule34-haskell
 - generic-data
+- text
 
 
 library:

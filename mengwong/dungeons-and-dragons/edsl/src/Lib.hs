@@ -123,18 +123,18 @@ asPetri (Node (state :-> nexts) children) =
       gather        = [ (endState,post,1)
                       | childPetri <- childPetris
                       , let endState = last $ places childPetri ]
-      withChildren = case length children of
+      withChildren  = case length children of
         --   places                transitions  p->t edges             t->p edges
         0 -> MkPN [front, back]    [middle]     [(front, middle, 1)]   [(middle,back,1)]
         _ -> MkPN [front]          [pre]        [(front, pre, 1)]      scatter
              <> mchildPetri <>
              MkPN [back]           [post]       gather                 [(post, back, 1)]
-      nextStates = mconcat
+      nextStates   = mconcat
         [ MkPN    [next]           [proceed]    [(back, proceed, 1)]   [(proceed,next,1)]
-        | (mel, sn) <- nexts
-        , let next = PL sn
-              proceed = maybe (Noop $ "proceeding directly from " ++ itemname ++ " to " ++ sn)
-                              (\el -> TL $ "from " ++ itemname ++ ", choice \"" ++ el ++ "\" leads to " ++ sn) mel
+        | (edgeLabel, statename) <- nexts
+        , let next = PL statename
+              proceed = maybe (Noop $ "proceeding directly from " ++ itemname ++ " to " ++ statename)
+                              (\el -> TL $ "from " ++ itemname ++ ", choice \"" ++ el ++ "\" leads to " ++ statename) edgeLabel
         ]
    in
    nubPN $ withChildren <> nextStates

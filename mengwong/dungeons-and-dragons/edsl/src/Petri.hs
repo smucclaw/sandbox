@@ -65,6 +65,9 @@ data PetriNet pl tl = MkPN { places :: [PLabel]
                       deriving (Ord, Eq, Show, Generic)
                       deriving (Semigroup, Monoid) via Generically (PetriNet pl tl)
 
+nubPN :: (Eq pl, Eq tl) => PetriNet pl tl -> PetriNet pl tl
+nubPN (MkPN ps ts pte tpe) = MkPN (nub ps) (nub ts) (nub pte) (nub tpe)
+
 pn_from_simple :: [Place PLabel TLabel] -> PetriNet p t
 pn_from_simple ps = MkPN
                     (nub $ getPlaces ps)

@@ -57,10 +57,10 @@ start_marking = Map.fromList [(Start, 1)]
 -- A more correct representation would also allow us to weight each P->T and T->P edge independently.
 -- we don't have that yet. Let's write a converter from the above simple format to a more correct
 -- format.
-data PetriNet pl tl = MkPN { places :: [PLabel]
-                           , transitions :: [TLabel]
-                           , ptEdges :: [(PLabel,TLabel,Int)]
-                           , tpEdges :: [(TLabel,PLabel,Int)]
+data PetriNet pl tl = MkPN { places :: [pl]
+                           , transitions :: [tl]
+                           , ptEdges :: [(pl,tl,Int)]
+                           , tpEdges :: [(tl,pl,Int)]
                            }
                       deriving (Ord, Eq, Show, Generic)
                       deriving (Semigroup, Monoid) via Generically (PetriNet pl tl)
@@ -68,7 +68,7 @@ data PetriNet pl tl = MkPN { places :: [PLabel]
 nubPN :: (Eq pl, Eq tl) => PetriNet pl tl -> PetriNet pl tl
 nubPN (MkPN ps ts pte tpe) = MkPN (nub ps) (nub ts) (nub pte) (nub tpe)
 
-pn_from_simple :: [Place PLabel TLabel] -> PetriNet p t
+pn_from_simple :: (Eq pl, Eq tl) => [Place pl tl] -> PetriNet pl tl
 pn_from_simple ps = MkPN
                     (nub $ getPlaces ps)
                     (nub $ getTransitions ps)

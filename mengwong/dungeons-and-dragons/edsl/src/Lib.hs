@@ -105,9 +105,7 @@ asHSM = undefined
 -- (start)    -> [push] -> (recurse) -> [pop]  -> (end)
 asPetri :: StateTree -> PetriNet PLabel TLabel
 asPetri (Node (state :-> nexts) children) =
-  let itemname      = case take 6 state of
-                        "Choose" -> drop 7 state
-                        _        -> state
+  let itemname      = state
       (front, back) = case take 6 state of
                         "Choose" -> (PL $ "Awaiting " <> itemname, PL $ "Decided " <> itemname)
                         _        -> (PL $ "Begin "    <> itemname, PL $ "End "     <> itemname)
@@ -116,7 +114,6 @@ asPetri (Node (state :-> nexts) children) =
                       then (Noop $ itemname ++ " PUSH", Noop $ itemname ++ " POP")
                       else (Fork $ itemname ++ " FORK", Join $ itemname ++ " JOIN")
       childPetris   = asPetri <$> children
-      mchildPetri   = mconcat childPetris
       scatter       = [ (pre,startState,1)
                       | childPetri <- childPetris
                       , let startState = head $ places childPetri ]
@@ -127,9 +124,9 @@ asPetri (Node (state :-> nexts) children) =
         --   places                transitions  p->t edges             t->p edges
         0 -> MkPN [front, back]    [middle]     [(front, middle, 1)]   [(middle,back,1)]
         _ -> MkPN [front]          [pre]        [(front, pre, 1)]      scatter
-             <> mchildPetri <>
+             <> mconcat childPetris <>
              MkPN [back]           [post]       gather                 [(post, back, 1)]
-      nextStates   = mconcat
+      nextStates    = mconcat
         [ MkPN    [next]           [proceed]    [(back, proceed, 1)]   [(proceed,next,1)]
         | (edgeLabel, statename) <- nexts
         , let next = PL statename
@@ -141,11 +138,11 @@ asPetri (Node (state :-> nexts) children) =
 
 someFunc :: IO ()
 someFunc = do
-  let pcc = asPetri charCreator
+  let pcc = asPetri (normalize charCreator)
   Petri.run pcc (Map.fromList [(head $ places pcc, 1)])
 
 previewPCC :: IO ()
-previewPCC = previewPetri $ asPetri charCreator
+previewPCC = previewPetri $ asPetri (normalize charCreator)
 
 writePCC :: IO ()
-writePCC = writePetri "viz/pcc" $ asPetri charCreator
+writePCC = writePetri "viz/pcc" $ asPetri (normalize charCreator)

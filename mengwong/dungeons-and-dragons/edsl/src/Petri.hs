@@ -6,7 +6,7 @@ module Petri where
 import qualified Data.Map as Map
 import Control.Monad
 import Data.Maybe (maybeToList)
-import Data.List (nub, intersect, intercalate)
+import Data.List (nub, intersect, intercalate, (\\))
 import Generic.Data (Generic, Generically(..))
 import qualified Prettyprinter as PP
 import Prettyprinter (vsep, hsep, line, pretty, viaShow, hang, indent, Doc)
@@ -133,75 +133,120 @@ getTlabel (T tl _ _) = tl
 
 type Remarks = [String]
 
-type PlayLog = (Marking PLabel, Remarks, [TLabel])
+data PlayLog = PStep { marking :: Marking PLabel  -- marking for the step
+                     , remarks :: Remarks         -- human-readable commentary
+                     , lit     :: Maybe TLabel    -- a lit transition
+                     , events  :: [TLabel]        -- input event transitions.
+                     }
+             deriving (Eq, Show)
 
 -- step as far as possible through a net until we encounter a non-deterministic "choice".
--- we show which steps could autoplay, then we return to the caller with a list of TLabels.
--- we're waiting for input and expecting that input to be one of those TLabels.
+-- we show which steps autoplay given the input events until they're all consumed.
+-- given a marking, we're waiting for input and expecting that input to be one or more of the enabled TLabels.
 play :: PetriNet PLabel TLabel -- immutable petri net "background"
      -> Marking PLabel         -- which places have dots in them?
      -> [TLabel]               -- we receive from the environment a set of events -- those transitions are to fire
-     -> [          -- we return a list of zero or more steps representing subsequent activity in the net.
-  ( Marking PLabel -- marking for the step
-  , Remarks        -- human-readable commentary
-  , [TLabel]       -- transitions that are enabled in the step; the next read from the environment should be one of the TLs.
-  )]
+     -> [PlayLog]
 play pn m events =
-  -- how do we know when to return? when the list of TLabels doesn't change -- we've reached a fixpoint!
-  let starter = (m, ["play: starting"], events)
+  -- how do we know when to return? when there are no events left to handle!
+  let starter = PStep m ["play: starting"] Nothing events
   in
   starter : untilStable (autostep pn) starter
 
-untilStable :: (Eq a) => (a -> a) -> a -> [a]
+-- a step can rewrite the marking and add events to the input list.
+-- all notTL events are auto-fireable. So when a place is enabled, we examine all its ptEdges to look for nonTL transitions.
+-- any notTL transitions get added to the input event list for subsequent firing.
+
+-- a typical step looks like this:
+-- Stage 1:
+--   PStep is unlit -- the "lit" element is Nothing, meaning no transition is being fired at the moment
+--   marking has some marked places
+--   from that we compute which transitions are enabled
+--   we are given some events from the environment in the input stream.
+--   we compute the relevant events as being those which lie in the intersection of enabled ++ input
+--   we auto-fire all the relevant events, calling stage 2 upon each one, collecting a log of the PSteps returned by stages 2a and 2b
+-- Stage 2a:
+--   given a relevant event, we return:
+--     a "during" PStep with a marking showing the input places drained, and the transition lit
+-- Stage 2b:
+--     an "after" PStep showing:
+--       the new place markings populated,
+--       the transition unlit, and
+--       newly enabled auto-fireable (notTL) events added to the input event stream
+-- helper functions for stage 2:
+-- Helper 3a: given a lit transition
+--   drains the sources
+-- Helper 3b: given a lit transition
+--   fills the sinks
+
+untilStable :: (Eq a) => (a -> [a]) -> a -> [a]
 untilStable f i0 =
   let i1 = f i0
-      i2 = f i1
-  in if i1 == i2
-     then [i1]
-     else  i1 : untilStable f i1
+      i2 = f (last i1)
+  in if last i1 == last i2
+     then i1
+     else i1 ++ untilStable f (last i1)
 
-autostep :: PetriNet PLabel TLabel -> PlayLog -> PlayLog
-autostep pn (mm,r,events) =
-  -- only autostep those events which are TLabel typed Noop, Fork, or Join -- but not TL, because that requires user input
-  let autoEnabled = filter notTL events
-  in if null autoEnabled
-     then (mm,["autostep: original events: " ++ show events
-              ,"autostep: no more autoEnabled events found; returning input event set"],events)
-     else step pn (mm,["autostep: stepping..."],autoEnabled)
+autostep :: PetriNet PLabel TLabel -> PlayLog -> [PlayLog]
+autostep pn orig@(PStep mm r l events) =
+  if null events
+  then let ready = filter notTL $ enabled pn mm
+           tentative = if not $ null ready
+                       then [ orig, orig { remarks = ["autostep: event queue empty; found new auto-fireable enabled transitions"] } ] -- surprising if this happens
+                       else [ orig, orig { remarks = ["autostep: event queue empty; no new auto-fireable transitions found"     ] } ]
+       in if not $ null ready
+          then tentative ++ (step pn (PStep mm ["autostep: stepping through auto-fireable transitions"] Nothing ready))
+          else tentative
+  else step pn (PStep mm ["autostep: stepping through P..."] Nothing events)
 
-step :: PetriNet PLabel TLabel -> PlayLog -> PlayLog
-step pn (m,r,events) =
+step :: PetriNet PLabel TLabel -> PlayLog -> [PlayLog]
+step pn orig@(PStep m r l events) =
   -- of those events which are actually enabled (ready to fire)
-  -- perform the transition by deleting dots from the input places
-  -- and create dots in the output places
+  -- perform the transition, logging the before, during, and after
+
   let ready = enabled pn m
       tofire = intersect events ready
-      remarks1 = ["step: enabled: "         ++ show ready
-                 ,"step: received events: " ++ show events
-                 ,"step: intersection: "    ++ show tofire
+      remarks1 = ["p step1: enabled: "         ++ show ready
+                 ,"p step1: received events: " ++ show events
+                 ,"p step1: intersection: "    ++ show tofire
                  ]
-      (newMarking, remarks2) = Prelude.foldl (fire pn) (m,remarks1) tofire
-      expecting = enabled pn newMarking
-      remarks3 = [ "step: new marking: "      ++ show newMarking
-                 , "step: expecting events: " ++ show expecting
-                 ]
-  in (newMarking, intercalate [""] [r, remarks1, remarks2, remarks3], expecting)
 
+      fireLog = Prelude.foldl (fire pn) [orig] tofire
+      aMarking = marking $ head fireLog
+      expecting = enabled pn aMarking
+      newEvents = filter notTL expecting
+      newStream = nub $ (events \\ tofire) ++ newEvents
+  in
+    [ PStep  m       (intercalate [""] [r, remarks1]) Nothing events ]
+    ++ (reverse fireLog) ++
+    [ PStep  aMarking [ "step: calculated new expecting: " ++ show expecting
+                      , "step: calculated new event stream: " ++ show newStream
+                      ] Nothing newStream
+    ]
+
+-- TODO: add support for inhibitor arcs with weight 0
 -- fire a particular transition against a particular marking of a particular petri net
-fire :: PetriNet PLabel TLabel -> (Marking PLabel,Remarks) -> TLabel -> (Marking PLabel, Remarks)
-fire pn (mOrig,remarks) tl' = do
-  -- adjust the marking by removing the appropriate number of dots from source places
-  let adjustments = [ (maybe (Just 0) (Just . subtract n), pl)
-                    | (pl, tl, n) <- ptEdges pn
-                    , tl == tl' ]
-  -- and add the appropriate number of dots to the destination places
-                    ++
-                    [ (maybe (Just n) (Just . (+n)), pl)
-                    | (tl, pl, n) <- tpEdges pn
-                    , tl == tl' ]
-      result = foldl (flip (uncurry Map.alter)) mOrig adjustments
-  (result, ["fire: performing [" ++ show tl' ++ "] (" ++ (show $ length adjustments) ++ " adjustments)"])
-  
+-- show the "during" marking is a PStep lit; the after "after" marking is a PStep unlit.
+
+fire :: PetriNet PLabel TLabel -> [PlayLog] -> TLabel -> [PlayLog]
+fire pn psteps event =
+  let pstep = head psteps
+      m = marking pstep
+      e = events  pstep
+      
+      removal = [ (maybe (Just 0) (Just . subtract n), pl)
+                | (pl, tl, n) <- ptEdges pn
+                , tl == event ]
+      duringMarking = foldl (flip (uncurry Map.alter)) m removal
+
+      addition = [ (maybe (Just n) (Just . (+n)), pl)
+                 | (tl, pl, n) <- tpEdges pn
+                 , tl == event ]
+      afterMarking  = foldl (flip (uncurry Map.alter)) m addition
+  in ( PStep  afterMarking ["fire: [" ++ show event ++ "] filled "  ++ show (length addition) ++ " sinks"]   Nothing      (e \\ [event])
+     : PStep duringMarking ["fire: [" ++ show event ++ "] drained " ++ show (length removal)  ++ " sources"] (Just event) (e \\ [event])
+     : psteps )
+
 
 data Auto = Full | Semi | Manual
   deriving (Eq)
@@ -227,9 +272,10 @@ showpl playlog =
          line <> vsep [ 
                         (hang 4 $ pretty "*** Remarks:" <> line <> vsep (pretty <$> rs)) <> line <> line <>
                         pretty "*** Result Marking:" <> line <> viaShow mpl <> line <> line <>
+                        (if not $ null lit then pretty "*** Lit Transition: " <> line <> viaShow lit else PP.emptyDoc) <>
                         pretty "*** Expecting: " <> line <> viaShow tls
                       ]
-          | (n,(mpl, rs, tls)) <- playlog ]
+          | (n,(PStep mpl rs lit tls)) <- playlog ]
 
 -- references:
 -- http://www.pnml.org/version-2009/version-2009.php

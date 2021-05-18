@@ -262,18 +262,18 @@ run :: PetriNet PLabel TLabel -> Marking PLabel -> IO ()
 run pn marking = do
   let ready = enabled pn start_marking
       playlog = play pn marking ready
-  putStrLn $ "petri net: " ++ show pn
+  putStrLn $ "* petri net:\n" ++ show pn
   putStrLn $ "we start with initial transitions: " ++ show ready
-  putStrLn $ "PLAYLOG:\n" ++ show (showpl (zip [1..] playlog))
+  putStrLn $ "* PLAYLOG:\n" ++ show (showpl (zip [1..] playlog))
 
 showpl :: [(Int,PlayLog)] -> Doc ann
 showpl playlog =
   vsep [   pretty "** " <> viaShow n <>
          line <> vsep [ 
-                        (hang 4 $ pretty "*** Remarks:" <> line <> vsep (pretty <$> rs)) <> line <> line <>
-                        pretty "*** Result Marking:" <> line <> viaShow mpl <> line <> line <>
-                        (if not $ null lit then pretty "*** Lit Transition: " <> line <> viaShow lit else PP.emptyDoc) <>
-                        pretty "*** Expecting: " <> line <> viaShow tls
+                        pretty "*** Marking:" <> line <> vsep ((\m  -> pretty ("- " ++ show m)) <$> Map.toList mpl) <> line <> line <>
+                        pretty "*** Remarks:" <> line <> vsep ((\tl -> pretty ("- " ++ tl)) <$> rs) <> line <>
+                        (if not $ null lit then pretty "*** Lit Transition: " <> line <> viaShow lit <> line else PP.emptyDoc) <>
+                        pretty "*** Event Stream: " <> line <> viaShow tls
                       ]
           | (n,(PStep mpl rs lit tls)) <- playlog ]
 

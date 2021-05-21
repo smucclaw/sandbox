@@ -1,13 +1,7 @@
 {-# LANGUAGE PackageImports #-}
 module Sandbox where
 
-import "svg-builder-sandbox" Lib ( someFunc )
-
-x :: IO ()
-x = someFunc
-
-
-import qualified "diagrams-sandbox" AnyAll (Label, Item(Leaf,Any,All)) as AA
+import qualified "diagrams-sandbox" AnyAll as AA (Label, Item(Leaf,Any,All))
 
 -- let's convert things to Jo Hsi's AnyAll types for visualization purposes
 as_anyall = AA.All "all of the following" [AA.Leaf "Alice", AA.Leaf "Bob", AA.Leaf "Carol"]

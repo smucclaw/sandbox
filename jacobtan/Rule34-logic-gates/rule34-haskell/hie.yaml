@@ -12,6 +12,12 @@ cradle:
     - path: "./test"
       component: "rule34-haskell:test:rule34-haskell-test"
 
+    - path: "../../../johsi/diagrams-sandbox/src"
+      component: "diagrams-sandbox:lib"
+
+    # - path: "../../../johsi/diagrams-sandbox/test"
+    #   component: "diagrams-sandbox:test:diagrams-sandbox-test"
+
     - path: "../../../johsi/svg-builder-sandbox/src"
       component: "svg-builder-sandbox:lib"
 

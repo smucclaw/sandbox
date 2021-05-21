@@ -1,10 +1,10 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.33.0.
+-- This file has been generated from package.yaml by hpack version 0.34.4.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: ddb99745cd686acd27bc5715ead4d94e9782ecbe1f87144c68c94f5428f3e2ed
+-- hash: baf42dc0b83c7314a39f47c68e7341818ea8a3fb1ca5637017caa67a275e5bdc
 
 name:           rule34-haskell
 version:        0.1.0.0
@@ -38,6 +38,7 @@ library
       Rule34_SMT
       Rule34_SMT_gen
       Rule34_SMT_sandbox
+      Sandbox
       Utils
   other-modules:
       Paths_rule34_haskell
@@ -56,6 +57,7 @@ library
     , process
     , sbv
     , split
+    , svg-builder-sandbox
     , text
   default-language: Haskell2010
 
@@ -80,6 +82,7 @@ executable rule34-haskell-exe
     , rule34-haskell
     , sbv
     , split
+    , svg-builder-sandbox
     , text
   default-language: Haskell2010
 
@@ -105,5 +108,6 @@ test-suite rule34-haskell-test
     , rule34-haskell
     , sbv
     , split
+    , svg-builder-sandbox
     , text
   default-language: Haskell2010

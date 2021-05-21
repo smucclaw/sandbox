@@ -31,6 +31,8 @@ resolver:
 #   - wai
 packages:
 - .
+- ../../../johsi/svg-builder-sandbox
+
 # Dependency packages to be pulled from upstream that are not in the resolver.
 # These entries can reference officially published versions as well as
 # forks / in-progress versions pinned to a git hash. For example:
@@ -43,6 +45,7 @@ packages:
 # extra-deps: []
 extra-deps:
 - sbv-8.9@sha256:efb0f16c671869805e57d11e269793d5e5ae512e8e626582cf76b8e46a63e9c6,28985
+- svg-builder-0.1.1@sha256:22de54d326a6b6912e461e1302edb9108b02aac0b6a6368fcdc3c4a224d487fd,1440
 
 # Override default flag values for local packages and extra-deps
 # flags: {}

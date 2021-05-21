@@ -33,6 +33,7 @@ dependencies:
 - casing
 - mtl
 - process
+- svg-builder-sandbox
 
 library:
   source-dirs: src

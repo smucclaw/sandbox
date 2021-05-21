@@ -46,6 +46,7 @@ packages:
 # extra-deps: []
 extra-deps:
 - sbv-8.9@sha256:efb0f16c671869805e57d11e269793d5e5ae512e8e626582cf76b8e46a63e9c6,28985
+
 - svg-builder-0.1.1@sha256:22de54d326a6b6912e461e1302edb9108b02aac0b6a6368fcdc3c4a224d487fd,1440
 - diagrams-1.4@sha256:3e36369e84115b900fd9dcb570672a188339a470eb19ca62170775cd835cf8ca,5483
 - diagrams-contrib-1.4.4@sha256:54afec4e0a1ad5fc151852d993b514168955a23884dca119f6fa294af44ea506,4753
@@ -83,4 +84,4 @@ extra-deps:
 # Allow a newer minor version of GHC than the snapshot specifies
 # compiler-check: newer-minor
 
-allow-newer: true
+# allow-newer: true

@@ -1,5 +1,6 @@
 import pgf
 import itertools
+import sys
 
 ####################################
 # Prerequisites:
@@ -30,7 +31,8 @@ R = gr.embed("RPSTop")
 
 eng = gr.languages["RPSTopEng"]
 
-testCorpus = [
+aRock_cScissors = [
+   "A wins RPS",
    "RPS is a game",
    "A is a participant in RPS",
    "A is a player",
@@ -41,12 +43,48 @@ testCorpus = [
    "rock beats scissors",
 ]
 
+aScissors_cPaper = [
+   "A wins RPS",
+   "RPS is a game",
+   "A is a participant in RPS",
+   "A is a player",
+   "A throws scissors",
+   "C is a player",
+   "C is a participant in RPS",
+   "C throws paper",
+   "scissors beats paper",
+]
+
+
+aPaper_cRock = [
+   "A wins RPS",
+   "RPS is a game",
+   "A is a participant in RPS",
+   "A is a player",
+   "A throws paper",
+   "C is a player",
+   "C is a participant in RPS",
+   "C throws rock",
+   "paper beats rock",
+]
+
+testCorpus = [aRock_cScissors, aScissors_cPaper, aPaper_cRock]
+
+# for e in testCorpus:
+#     print(e)
+
+
 def getExpr(sentence):
     i = eng.parse(sentence)
     prob,expr = next(i)
     return expr
 
-parsedTestCorpus = [getExpr(str) for str in testCorpus]
+parsedTestCorpus = []
+for model in testCorpus:
+    parsedModel = []
+    for s in model:
+        parsedModel.append(getExpr(s))
+    parsedTestCorpus.append(parsedModel)
 
 # for e in parsedTestCorpus:
 #     print(e)
@@ -54,16 +92,22 @@ parsedTestCorpus = [getExpr(str) for str in testCorpus]
 ####################################
 ## Translating the Haskell functions
 
-def aggregateBy(exprs, sortf, groupf, name='', debug=False):
+def aggregateBy(
+    exprs,
+    sortf=lambda e : e,
+    groupf=lambda e : e,
+    name='',
+    debug=False):
     """Generic aggregation function"""
+    sortByShow = lambda e : showExprs(sortf(e))
     results = []
     if debug:
         print("debug: aggregateBy", name)
-        for e in [sortf(e) for e in exprs]:
+        for e in [sortByShow(e) for e in exprs]:
             print(e)
         print("---------")
-    exprs = sorted(exprs, key=sortf)
-    for _, g in itertools.groupby(exprs, sortf):
+    exprs = sorted(exprs, key=sortByShow)
+    for _, g in itertools.groupby(exprs, sortByShow):
         grp = list(g)
         l = len(grp)
         if l==0:
@@ -75,11 +119,10 @@ def aggregateBy(exprs, sortf, groupf, name='', debug=False):
     return results
 
 def aggregateByPredicate(exprs):
-    sortf = lambda e : showExprs(getPred(e))
     # internal aggregation fun
     def aggregate(es):
         subjs = [getSubj(e) for e in es]
-        fullExpr = es[0] # we can take any expr from group, they all have same predicate
+        fullExpr = es[0]
         aggrSubjs = listArg(subjs)
         c, args = fullExpr.unpack()
         if c=="App1":
@@ -91,10 +134,9 @@ def aggregateByPredicate(exprs):
         else:
             raise Exception("aggregatebyPredicate: expected simple expr, got instead", showExprs([fullExpr]))
 
-    return aggregateBy(exprs, sortf, aggregate, name="Predicate", debug=False)
+    return aggregateBy(exprs, getPred, aggregate, name="Predicate", debug=False)
 
 def aggregateBySubject(exprs):
-    sortf = lambda e : showSubj(e)
     # Internal aggregate fun
     def aggregate(es):
         preds = [getPred(e) for e in es]
@@ -106,12 +148,56 @@ def aggregateBySubject(exprs):
             return R.AggregatePred(mkPred(pr1), mkPred(pr2), subjs)
         else:
             raise Exception("aggregateBySubject: expected 2 preds, got instead", showExprs(preds))
-    return aggregateBy(exprs, sortf, aggregate, name="Subject", debug=False)
+    return aggregateBy(exprs, getSubj, aggregate, name="Subject", debug=False)
+
+def aggregateAll(exprs, typography):
+    """Takes a list of expressions and typography (R.Bullets or R.Inline).
+       Returns the expressions aggregated and put in a single
+    """
+    aggr = aggregateBySubject(aggregateByPredicate(exprs))
+    return wrap(typography, aggr)
+
+
+def nlgModels(models):
+    concls = [m[0] for m in models]
+    evidence = [m[1:] for m in models]
+    if all(x == concls[0] for x in concls):
+        conclusion = concls[0]
+    else:
+        raise Exception("nlgModels: expected identical conclusions, got", showExprs(concls))
+
+    allEvidence = [e for es in evidence for e in es] # flatten to find duplicates
+    sharedEvidence = [
+        g[0]
+        for g in aggregateBy(allEvidence)
+        if isinstance(g, list)]
+    aggrShared = aggregateAll(sharedEvidence, R.Bullets)
+
+    uniques = [
+        aggregateAll([e for e in es if e not in sharedEvidence], R.Inline)
+        for es in evidence]
+    aggrUniques = R.DisjStatement(R.Bullets, listStatement(uniques))
+
+    ## Final NLG
+    result = [
+        prettyLin(conclusion) + ",",
+
+        "\nif all of the following hold:",
+        prettyLin(aggrShared),
+
+        "\nand one of the following holds:",
+        prettyLin(aggrUniques)
+    ]
+    return '\n'.join(result)
 
 ### Helper functions
 
 def separateSubjPred(expr):
-    c, args = expr.unpack()
+    try:
+        c, args = expr.unpack()
+    except AttributeError:
+        raise Exception("separateSubjPred: should be applied to pgf.Expr, was applied to", expr)
+
     ### Simple trees: subject is a single Expr
     if c=="App1":
         pred, subj = args
@@ -142,17 +228,11 @@ def getPred(e):
     _, preds = separateSubjPred(e)
     return preds
 
-def showSubj(e):
-    """Separate show fun for subj, because subj may be a list or a single expression"""
-    subj, _ = separateSubjPred(e)
-    if isinstance(subj, list):
-        return showExprs(subj)
-    else:
-        return showExprs([subj])
-
 def showExprs(es):
-    return ' '.join([e.__str__() for e in es])
-
+    if isinstance(es, list):
+        return ' '.join([e.__str__() for e in es])
+    else:
+        return es.__str__()
 
 def myRange(l):
     max = len(l)+1
@@ -170,20 +250,62 @@ def mkPred(args):
         p = args[0]
         return R.IntransPred(p)
 
-def listArg(args):
+### Handle lists
+
+def listGeneric(args, basefun, consfun):
     if len(args)<2:
         raise Exception("listArg: too short list", args)
     elif len(args)==2:
         a, b = args
-        return R.BaseArg(a,b)
+        return basefun(a,b)
     else:
         a = args[0]
         rest = args[1:]
-        return R.ConsArg(a, listArg(rest))
+        return consfun(a, listGeneric(rest, basefun, consfun))
 
-### TESTS
+def listArg(args):
+    return listGeneric(args, R.BaseArg, R.ConsArg)
 
-print("Some rudimentary tests. TODO: use a real testing framework")
+def listStatement(args):
+    return listGeneric(args, R.BaseStatement, R.ConsStatement)
+
+def unListStatement(statement):
+    c, args = statement.unpack()
+    if c=="BaseStatement":
+        return args
+    elif c=="ConsStatement":
+        s1, rest = args
+        return [s1].extend(unListStatement(rest))
+
+### Printing the trees
+
+def wrap(typography, statements):
+    return R.ConjStatement(typography, listStatement(statements))
+
+def unwrap(statement):
+    c, args = statement.unpack()
+    if c=="ConjStatement":
+        _, listSt = args
+        return unListStatement(listSt)
+
+def pretty(s):
+    s = s.replace("\\", "\n")  # \ to newline
+    s = s.replace(" \n", "\n") # remove whitespace at the end of line
+    return s
+
+def prettyLin(e):
+    return pretty(eng.linearize(e))
+
+###### Main
+
+if __name__ == "__main__":
+    print(nlgModels(parsedTestCorpus))
+
+
+################# TESTS #################
+## Some rudimentary tests.
+## TODO: use a real testing framework?
+
 def samePred(expr1, expr2):
     e1p = getPred(expr1)
     e2p = getPred(expr2)
@@ -211,16 +333,30 @@ assert sameSubjComplexTrue == True
 sameSubjComplexFalse = sameSubj(getExpr("A and C are participants in RPS"), getExpr("A and B are players"))
 assert sameSubjComplexFalse == False
 
-print("First aggregation:")
-firstAggr = aggregateByPredicate(parsedTestCorpus)
-for i, t in myRange(firstAggr):
-    #print(t)
-    print(i),
-    print(eng.linearize(t))
 
-print("\nSecond aggregation:")
-secondAggr = aggregateBySubject(firstAggr)
-for i, t in myRange(secondAggr):
-    #print(t)
-    print(i),
-    print(eng.linearize(t))
+def nlgSingleModel(model):
+    conclusion, evidence = model[0], model[1:]
+    firstAggr = aggregateByPredicate(evidence)
+    secondAggr = aggregateBySubject(firstAggr)
+    finalExpr = R.IfThen(conclusion, (wrap(R.Bullets, secondAggr)))
+    return prettyLin(finalExpr)
+
+aRock_cScissors_gold = """A wins RPS if
+* A throws rock,
+* C throws scissors,
+* RPS is a game,
+* rock beats scissors and
+* A and C are players and participants in RPS"""
+
+# print(type(parsedTestCorpus))
+# print(type(parsedTestCorpus[0]))
+
+aRock_cScissors_system = nlgSingleModel(parsedTestCorpus[0])
+
+with open('/tmp/gold', 'w') as g:
+    g.write(aRock_cScissors_gold)
+with open('/tmp/system', 'w') as s:
+    s.write(aRock_cScissors_system)
+
+
+assert aRock_cScissors_system == aRock_cScissors_gold

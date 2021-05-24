@@ -1,6 +1,6 @@
 import pgf
 import itertools
-import sys
+import ttutils
 
 ####################################
 # Prerequisites:
@@ -26,6 +26,7 @@ import sys
 ## Dummy data for testing
 ## Real data is parsed from s(CASP) models
 
+# TODO: replace these with some good way to get the data
 gr = pgf.readPGF("/tmp/RPSTop.pgf")
 R = gr.embed("RPSTop")
 
@@ -70,39 +71,28 @@ aPaper_cRock = [
 
 testCorpus = [aRock_cScissors, aScissors_cPaper, aPaper_cRock]
 
-# for e in testCorpus:
-#     print(e)
-
-
 def getExpr(sentence):
     i = eng.parse(sentence)
     prob,expr = next(i)
     return expr
 
-parsedTestCorpus = []
-for model in testCorpus:
-    parsedModel = []
-    for s in model:
-        parsedModel.append(getExpr(s))
-    parsedTestCorpus.append(parsedModel)
-
-# for e in parsedTestCorpus:
-#     print(e)
+parsedTestCorpus = [
+    [getExpr(s) for s in model]
+    for model in testCorpus]
 
 ####################################
 ## Translating the Haskell functions
 
-def aggregateBy(
-    exprs,
-    sortf=lambda e : e,
-    groupf=lambda e : e,
-    name='',
-    debug=False):
+def aggregateBy(exprs,
+                sortf=lambda e : e,
+                groupf=lambda e : e,
+                name='',
+                debug=False):
     """Generic aggregation function"""
-    sortByShow = lambda e : showExprs(sortf(e))
+    sortByShow = lambda e : ttutils.showExprs(sortf(e))
     results = []
     if debug:
-        print("debug: aggregateBy", name)
+        print("debug: aggregateBy"+name)
         for e in [sortByShow(e) for e in exprs]:
             print(e)
         print("---------")
@@ -121,7 +111,7 @@ def aggregateBy(
 def aggregateByPredicate(exprs):
     # internal aggregation fun
     def aggregate(es):
-        subjs = [getSubj(e) for e in es]
+        subjs = [ttutils.getSubj(e) for e in es]
         fullExpr = es[0]
         aggrSubjs = listArg(subjs)
         c, args = fullExpr.unpack()
@@ -132,14 +122,14 @@ def aggregateByPredicate(exprs):
             pr, _, obj = args
             return R.AggregateSubj2(pr, obj, aggrSubjs)
         else:
-            raise Exception("aggregatebyPredicate: expected simple expr, got instead", showExprs([fullExpr]))
+            raise Exception("aggregatebyPredicate: expected simple expr, got instead", show(fullExpr))
 
-    return aggregateBy(exprs, getPred, aggregate, name="Predicate", debug=False)
+    return aggregateBy(exprs, ttutils.getPred, aggregate, name="Predicate", debug=False)
 
 def aggregateBySubject(exprs):
     # Internal aggregate fun
     def aggregate(es):
-        preds = [getPred(e) for e in es]
+        preds = [ttutils.getPred(e) for e in es]
         fullExpr = es[0] # we can take any expr from group, they all have same subject
         if len(preds)==2: # GF grammar works for only two -- TODO make more generic!
             pr1, pr2 = preds
@@ -147,16 +137,47 @@ def aggregateBySubject(exprs):
             subjs = args[-1]
             return R.AggregatePred(mkPred(pr1), mkPred(pr2), subjs)
         else:
-            raise Exception("aggregateBySubject: expected 2 preds, got instead", showExprs(preds))
-    return aggregateBy(exprs, getSubj, aggregate, name="Subject", debug=False)
+            raise Exception("aggregateBySubject: expected 2 preds, got instead", show(preds))
+    return aggregateBy(exprs, ttutils.getSubj, aggregate, name="Subject", debug=False)
 
 def aggregateAll(exprs, typography):
     """Takes a list of expressions and typography (R.Bullets or R.Inline).
        Returns the expressions aggregated and put in a single
     """
     aggr = aggregateBySubject(aggregateByPredicate(exprs))
-    return wrap(typography, aggr)
+    return wrapStatement(typography, aggr)
 
+
+### Manipulate arguments to become input to aggregation funs
+
+def mkPred(args):
+    if len(args)<1:
+        raise Exception("mkPred: too short list", args)
+    elif len(args)==2:
+        p, o = args
+        return R.TransPred(p,o)
+    else:
+        p = args[0]
+        return R.IntransPred(p)
+
+### Specialised versions of generic functions from ttutils
+
+def wrapStatement(typography, statements):
+    return R.ConjStatement(typography, listStatement(statements))
+
+def listArg(args):
+    return ttutils.listGeneric(args, R.BaseArg, R.ConsArg)
+
+def listStatement(args):
+    return ttutils.listGeneric(args, R.BaseStatement, R.ConsStatement)
+
+def show(e):
+    return ttutils.showExprs(e)
+
+def prettyLin(e):
+    return ttutils.pretty(eng.linearize(e))
+
+### Main function
 
 def nlgModels(models):
     concls = [m[0] for m in models]
@@ -164,7 +185,7 @@ def nlgModels(models):
     if all(x == concls[0] for x in concls):
         conclusion = concls[0]
     else:
-        raise Exception("nlgModels: expected identical conclusions, got", showExprs(concls))
+        raise Exception("nlgModels: expected identical conclusions, got", show(concls))
 
     allEvidence = [e for es in evidence for e in es] # flatten to find duplicates
     sharedEvidence = [
@@ -190,115 +211,12 @@ def nlgModels(models):
     ]
     return '\n'.join(result)
 
-### Helper functions
 
-def separateSubjPred(expr):
-    try:
-        c, args = expr.unpack()
-    except AttributeError:
-        raise Exception("separateSubjPred: should be applied to pgf.Expr, was applied to", expr)
-
-    ### Simple trees: subject is a single Expr
-    if c=="App1":
-        pred, subj = args
-        return (subj, [pred])
-    elif c=="App2":
-        pred, subj, obj = args
-        return (subj, [pred, obj])
-
-    ### Complex trees: subject is [Expr]
-    elif c=="AggregateSubj1":
-        pred, subjs = args
-        return (subjs, [pred])
-    elif c=="AggregateSubj2":
-        pred, obj, subjs = args
-        return (subjs, [pred, obj])
-
-    ### Most complex trees: subject is [Expr], preds are special Pred, not a list of atoms and args anymore
-    elif c=="AggregatePred":
-        pr1, pr2, subjs = args
-        return (subjs, [pr1, pr2])
-    else:
-        raise Exception("separateSubjPred should be applied to a simple tree, got ", str(expr))
-
-def getSubj(e):
-    subj, _ = separateSubjPred(e)
-    return subj
-def getPred(e):
-    _, preds = separateSubjPred(e)
-    return preds
-
-def showExprs(es):
-    if isinstance(es, list):
-        return ' '.join([e.__str__() for e in es])
-    else:
-        return es.__str__()
-
-def myRange(l):
-    max = len(l)+1
-    return zip(list(range(1,max)), l)
-
-### Manipulate arguments to become input to aggregation funs
-
-def mkPred(args):
-    if len(args)<1:
-        raise Exception("mkPred: too short list", args)
-    elif len(args)==2:
-        p, o = args
-        return R.TransPred(p,o)
-    else:
-        p = args[0]
-        return R.IntransPred(p)
-
-### Handle lists
-
-def listGeneric(args, basefun, consfun):
-    if len(args)<2:
-        raise Exception("listArg: too short list", args)
-    elif len(args)==2:
-        a, b = args
-        return basefun(a,b)
-    else:
-        a = args[0]
-        rest = args[1:]
-        return consfun(a, listGeneric(rest, basefun, consfun))
-
-def listArg(args):
-    return listGeneric(args, R.BaseArg, R.ConsArg)
-
-def listStatement(args):
-    return listGeneric(args, R.BaseStatement, R.ConsStatement)
-
-def unListStatement(statement):
-    c, args = statement.unpack()
-    if c=="BaseStatement":
-        return args
-    elif c=="ConsStatement":
-        s1, rest = args
-        return [s1].extend(unListStatement(rest))
-
-### Printing the trees
-
-def wrap(typography, statements):
-    return R.ConjStatement(typography, listStatement(statements))
-
-def unwrap(statement):
-    c, args = statement.unpack()
-    if c=="ConjStatement":
-        _, listSt = args
-        return unListStatement(listSt)
-
-def pretty(s):
-    s = s.replace("\\", "\n")  # \ to newline
-    s = s.replace(" \n", "\n") # remove whitespace at the end of line
-    return s
-
-def prettyLin(e):
-    return pretty(eng.linearize(e))
 
 ###### Main
 
 if __name__ == "__main__":
+    print(type(parsedTestCorpus[0]))
     print(nlgModels(parsedTestCorpus))
 
 
@@ -307,8 +225,8 @@ if __name__ == "__main__":
 ## TODO: use a real testing framework?
 
 def samePred(expr1, expr2):
-    e1p = getPred(expr1)
-    e2p = getPred(expr2)
+    e1p = ttutils.getPred(expr1)
+    e2p = ttutils.getPred(expr2)
     return e1p == e2p
 samePredTrue = samePred(getExpr("A is a player"), getExpr("C is a player"))
 assert samePredTrue == True
@@ -317,8 +235,8 @@ samePredFalse = samePred(getExpr("A is a player"), getExpr("C is a game"))
 assert samePredFalse == False
 
 def sameSubj(expr1, expr2):
-    e1s = getSubj(expr1)
-    e2s = getSubj(expr2)
+    e1s = ttutils.getSubj(expr1)
+    e2s = ttutils.getSubj(expr2)
     return e1s == e2s
 
 sameSubjSimpleTrue = sameSubj(getExpr("A is a participant in RPS"), getExpr("A is a player"))
@@ -338,7 +256,7 @@ def nlgSingleModel(model):
     conclusion, evidence = model[0], model[1:]
     firstAggr = aggregateByPredicate(evidence)
     secondAggr = aggregateBySubject(firstAggr)
-    finalExpr = R.IfThen(conclusion, (wrap(R.Bullets, secondAggr)))
+    finalExpr = R.IfThen(conclusion, (wrapStatement(R.Bullets, secondAggr)))
     return prettyLin(finalExpr)
 
 aRock_cScissors_gold = """A wins RPS if

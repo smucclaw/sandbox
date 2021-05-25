@@ -2,6 +2,6 @@
 
 ```
 $ stack build
-$ stack ghci FilterFlow.hs
-:main -o out.svg -h 500
+$ stack ghci src/AnyAll.hs
+:main -o anyall.svg -h 500 -w 800
 ```

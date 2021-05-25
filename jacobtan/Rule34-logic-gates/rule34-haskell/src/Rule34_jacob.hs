@@ -6,18 +6,26 @@
 {-# LANGUAGE ViewPatterns #-}
 module Rule34_jacob where
 
-import Utils ( foldl', (&), (<&>), (>>>), show', (!) )
+import Utils ( foldl', (&), (<&>), (>>>), show', (!), void, execShell )
 import qualified Data.Map.Strict as Map
 import Data.Text (Text)
 import qualified Data.Text as Text
+import qualified Data.Text.Lazy.IO as Text.Lazy.IO
 import qualified Data.Bifunctor
 import qualified Data.Set
+import Data.Maybe as Maybe ( fromJust, isJust )
 
-import Data.Graph.Inductive.Graph (mkGraph)
+import Data.Tree ( Tree(rootLabel, subForest) )
+
+import Rule34 (rule34_1, Label(..), MyRule(..), ConditionTree, Condition(..), Predicate, Inner(..), Deontic(..))
+
+import Data.Graph.Inductive.Graph (mkGraph, nmap)
 import Data.Graph.Inductive.PatriciaTree (Gr)
 
 import Encoding ( GateType(..) )
-import Graphviz (preview, preview'custom)
+import Graphviz (preview, preview'custom, printDotGraph, defaultVis, checkDirectednessVis'custom)
+
+import Debug.Trace ( traceShow )
 
 data ParaRef = PMustNot | PMay | PMustNotBulb | PMayBulb
   | P341 | P341a | P341b | P341c | P341d | P341e | P341f
@@ -25,6 +33,7 @@ data ParaRef = PMustNot | PMay | PMustNotBulb | PMayBulb
   | P'NotLocum | P'BusinessEntity'NotLawRelated | P'2ndSchedule
   | P'IsLocum | P341a'P341c_tIf
   | P'3rdSchedule
+  | P' Text
   deriving (Eq, Ord, Show)
 
 data Direction = In | Out deriving (Eq, Ord)
@@ -38,38 +47,42 @@ data Statement = Stmt {
   sSubjectTo :: [ParaRef],
   sDespite :: [ParaRef]
 }
+  deriving (Eq, Show)
+
+outputBulbs =
+  [ Stmt PMustNotBulb "Must Not (bulb)" Bulb [PMustNot] [] [] []
+  , Stmt PMustNot "Must Not" OR [] [] [] []
+  , Stmt PMayBulb "May (bulb)" Bulb [PMay] [] [] []
+  , Stmt PMay "May" OR [] [] [] []
+  ]
 
 -- | encoding of the legal text
 rule34_text :: [Statement]
-rule34_text = init [
-  Stmt PMustNotBulb "Must Not (bulb)" Bulb [PMustNot] [] [] [],
-  Stmt PMustNot "Must Not" OR [] [] [] [],
+rule34_text = outputBulbs ++ init [
+
   --- ^ PMustNot originally uses a "Buffer" logic gate due to having only 1 input.
   ---     But OR is probably more appropriate because another rule that appears
   ---     later may also output to PMustNot.
   ---       (An OR gate with 1 input still makes sense.)
 
-  Stmt P341 "34.1 associated with bad business" OR [P341a, P341b, P341c, P341d, P341e, P341f] [PMustNot] [] [],
+  Stmt P341 "34.1 associated with bad business" OR [P341a, P341b, P341c, P341d, P' "341e", P' "341f"] [PMustNot] [] [],
   Stmt P341a "34.1a undignified" Switch [] [] [] [],
   Stmt P341b "34.1b materially interferes" Switch [] [] [] [],
   Stmt P341c "34.1c unfairly attractive" Switch [] [] [] [],
   Stmt P341d "34.1d fee sharing" Switch [] [] [] [],
-  Stmt P341e "34.1e GOTO 1st Schedule" Switch [] [] [] [],
-  Stmt P341f "34.1f otherwise prohibited" Switch [] [] [] [],
-
-  Stmt PMayBulb "May (bulb)" Bulb [PMay] [] [] [],
-  Stmt PMay "May" OR [] [] [] [],
+  Stmt (P' "341e") "34.1e GOTO 1st Schedule" Switch [] [] [] [],
+  mkStmt "34.1f" "otherwise prohibited" Switch [] [] [] [],
 
   Stmt P342 "34.2 connected [see sub conditions]" Switch [] [PMay] [P341] [],
   Stmt P343 "34.3 Law-related, i.e. 4th schedule" Switch [] [PMay] [P341] [],
 
   Stmt P344 "34.4" AND [P'NotLocum, P'BusinessEntity'NotLawRelated, P'2ndSchedule] [PMay] [P341] [],
   Stmt P'NotLocum "not locum" Switch  [] [] [] [],
-  Stmt P'BusinessEntity'NotLawRelated "business entity\nnot law-related" Switch [] [] [] [],
+  Stmt P'BusinessEntity'NotLawRelated "business entity, not law-related" Switch [] [] [] [],
   Stmt P'2ndSchedule "2nd schedule" Switch [] [] [] [],
 
   Stmt P345 "34.5" AND [P'IsLocum, P'BusinessEntity'NotLawRelated, P'2ndSchedule] [PMay] [P341a'P341c_tIf] [P341b],
-  Stmt P341a'P341c_tIf "34.1a, 34.1c-f" OR [P341a, P341c, P341d, P341e, P341f] [] [] [],
+  Stmt P341a'P341c_tIf "34.1a, 34.1c-f" OR [P341a, P341c, P341d, P' "341e", P' "341f"] [] [] [],
   Stmt P'IsLocum "is locum" Switch [] [] [] [],
 
   Stmt P346 "34.6" NOR [P342, P343, P344, P345] [PMustNot] [] [],
@@ -80,6 +93,11 @@ rule34_text = init [
   Stmt undefined undefined undefined undefined undefined undefined undefined
   --- ^ for trailing commas. Used with the @init@ function.
   ]
+
+mkStmt :: Text -> Text -> GateType -> [ParaRef] -> [ParaRef] -> [ParaRef] -> [ParaRef] -> Statement
+mkStmt sPN sPT = Stmt (P' $ label2ref sPN) sPT
+
+label2ref x = Text.filter (/= '.') $ Text.takeWhile (/= ' ') x
 
 -- | check that all pointers used are defined
 validateStatements :: Foldable t => t Statement -> t Statement
@@ -188,13 +206,13 @@ makeGraph1 (validateStatements -> statements) =
                 notEdgeToPara = (ORef sParaRef, I k2)
                 reassignPointer = Map.insert despite k1 mgsOutPointers
 
-makeGraph2 :: MakeGraphState -> Gr Text Text
+makeGraph2 :: MakeGraphState -> Gr (GateType, Text) Text
 makeGraph2 MGState{ mgsOutPointers, mgsInPointers, mgsNodes, mgsEdges } =
   mkGraph @Gr (mgsNodes <&> makeNode) (mgsEdges <&> makeFinalEdge <&> \(x,y) -> (x,y,"" :: Text))
   where
-    makeNode :: (Int, GateType, Text) -> (Int, Text)
+    makeNode :: (Int, GateType, Text) -> (Int, (GateType, Text))
     makeNode (i, gateType, label) =
-      (i, show' gateType <> ": " <> label)
+      (i, (gateType, label))
     makeFinalEdge :: (Output, Input) -> (Int, Int)
     makeFinalEdge = Data.Bifunctor.bimap
       (\case
@@ -204,11 +222,95 @@ makeGraph2 MGState{ mgsOutPointers, mgsInPointers, mgsNodes, mgsEdges } =
         I o -> o
         IRef iParaRef -> mgsInPointers ! iParaRef)
 
-makeGraph :: [Statement] -> Gr Text Text
+makeGraph3 :: Gr (GateType, Text) b -> Gr Text b
+makeGraph3 = nmap makeGraphVizNodeLabel
+  where
+    makeGraphVizNodeLabel (gateType, label) =
+      show' gateType <> ": " <> label
+
+makeGraph :: [Statement] -> Gr (GateType, Text) Text
 makeGraph = makeGraph1 >>> makeGraph2
 
-rule34_jacobMain :: IO ()
-rule34_jacobMain = do
-  putStrLn "__rule34_jacobMain__"
-  preview (makeGraph rule34_text) >> putStrLn "< visualise a graph using the Xlib GraphvizCanvas >"
-  -- preview'custom (makeGraph rule34_text) >> putStrLn "< visualise a graph using the Xlib GraphvizCanvas >"
+makeGraphViz :: [Statement] -> Gr Text Text
+makeGraphViz = makeGraph1 >>> makeGraph2 >>> makeGraph3
+
+preview1 :: IO ()
+preview1 = preview (makeGraphViz rule34_text) >> putStrLn "< visualise a graph using the Xlib GraphvizCanvas >"
+  
+preview2 :: IO ()
+preview2 = preview'custom (makeGraphViz rule34_text) >> putStrLn "< visualise a graph using the Xlib GraphvizCanvas >"
+
+main :: IO ()
+main = do
+  putStrLn "__Rule34_jacob.hs preview graphs"
+  preview1
+  preview2
+
+mainWrite :: IO ()
+mainWrite = do
+  putStrLn "__Rule34_jacob.hs output graphs to .dot and .png"
+  writeDotGraph1
+  writeDotGraph2
+
+-- | graph to .dot and .png
+writeDotGraph1 :: IO ()
+writeDotGraph1 = do
+  rule34_text
+    & makeGraphViz & defaultVis
+    & printDotGraph & Text.Lazy.IO.writeFile "../viz/rule34_graph1.dot"
+  -- dot to png
+  execShell "dot ../viz/rule34_graph1.dot -Tpng > ../viz/rule34_graph1.png"
+
+-- | graph to .dot and .png (customised)
+writeDotGraph2 :: IO ()
+writeDotGraph2 = do
+  rule34_text
+    & makeGraphViz & checkDirectednessVis'custom
+    & printDotGraph & Text.Lazy.IO.writeFile "../viz/rule34_graph2.dot"
+  -- dot to png
+  execShell "dot ../viz/rule34_graph2.dot -Tpng > ../viz/rule34_graph2.png"
+
+
+
+-- Transpile from the format of Rule34.hs (Meng's) to the format of Rule34_jacob.hs
+
+importGraph :: Gr (GateType, Text) Text
+importGraph = makeGraph (outputBulbs ++ myruleToStm rule34_1)
+
+myruleToStm :: MyRule -> [Statement]
+myruleToStm r =
+  let mystmts = myConditionToStm (deontic2PR $ deontic r) $ condition r
+  in traceShow mystmts mystmts
+
+deontic2PR :: Deontic -> [ParaRef]
+deontic2PR MustNot = [PMustNot]
+deontic2PR May = [PMay]
+
+myConditionToStm :: [ParaRef] -> ConditionTree Predicate -> [Statement]
+myConditionToStm sOutputs ctp =
+  let (MkCondition l pre innerpred post) = rootLabel ctp
+      labeledChildren = filter (\c ->  (Maybe.isJust . pncr) c &&
+                                       (Maybe.isJust . ptcr) c) (subForest ctp)
+      conditionRefs = Maybe.fromJust . pncr <$> labeledChildren
+      mygate = if length labeledChildren > 0 then myInnerToGate innerpred else Switch
+      mylabel = P' (label2ref . Text.pack . fromJust . pncr $ ctp)
+      mystmt = mkStmt
+               (Text.pack $ Maybe.fromJust $ pncr ctp)
+               (Text.pack $ Maybe.fromJust $ ptcr ctp)
+               mygate (P' . label2ref . Text.pack <$> conditionRefs) sOutputs [] []
+      mychildren = concatMap (myConditionToStm sOutputs) labeledChildren
+  in
+    traceShow (pre, innerpred, post, mygate) (mystmt : mychildren)
+  where cr = clabel . rootLabel
+        pncr = paraNum . cr
+        ptcr = predTerm . cr
+     
+
+myInnerToGate :: Inner Predicate -> GateType
+myInnerToGate Any        = OR
+myInnerToGate Or         = OR
+myInnerToGate Union      = OR
+myInnerToGate UnionComma = OR
+myInnerToGate All        = AND
+myInnerToGate Compl      = AND
+myInnerToGate (Leaf _)   = Switch

@@ -1,0 +1,12 @@
+* context
+
+- https://github.com/smucclaw/dsl/blob/main/caseStudies/Synchronization/
+- https://smucclaw.slack.com/archives/C01KWPURUE5/p1620535822011400?thread_ts=1620492481.008100&cid=C01KWPURUE5
+- https://smucclaw.slack.com/archives/C01SK6RMN66/p1620617889000500
+
+* Original Diagrams
+
+[[./Screenshot 2021-05-09 at 12.49.00 PM.png]]
+
+[[./Screenshot 2021-05-10 at 11.56.20 AM.png]]
+

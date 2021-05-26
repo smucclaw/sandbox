@@ -6,8 +6,9 @@ module Lib
 
 import qualified Data.Map as Map
 import Data.Tree
-import Data.Graph.Inductive
 import Data.List
+
+import Data.Graph.Inductive
 import Data.GraphViz (preview, GraphvizParams (fmtNode, fmtEdge, globalAttributes), graphToDot, nonClusteredParams, setDirectedness, DotGraph, printDotGraph)
 
 import Petri
@@ -141,8 +142,16 @@ someFunc = do
   let pcc = asPetri (normalize charCreator)
   Petri.run pcc (Map.fromList [(head $ places pcc, 1)])
 
+pccPetriOP :: PetriOptionalParams
+pccPetriOP = petriOP_{
+  markings = Map.fromList [(PL "Begin Character Creation", 3)],
+  transitionHighlights = [Fork "Character Creation FORK"]
+  }
+
 previewPCC :: IO ()
-previewPCC = previewPetri petriOP_ $ asPetri (normalize charCreator)
+previewPCC = previewPetri pccPetriOP $
+  asPetri (normalize charCreator)
 
 writePCC :: IO ()
-writePCC = writePetri "viz/pcc" petriOP_ $ asPetri (normalize charCreator)
+writePCC = writePetri "viz/pcc" pccPetriOP $
+  asPetri (normalize charCreator)

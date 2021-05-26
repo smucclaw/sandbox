@@ -1,2 +1,31 @@
 cradle:
   stack:
+    - path: "./src"
+      component: "rule34-haskell:lib"
+
+    - path: "./app/Main.hs"
+      component: "rule34-haskell:exe:rule34-haskell-exe"
+
+    - path: "./app/Paths_rule34_haskell.hs"
+      component: "rule34-haskell:exe:rule34-haskell-exe"
+
+    - path: "./test"
+      component: "rule34-haskell:test:rule34-haskell-test"
+
+    - path: "../../../johsi/diagrams-sandbox/src"
+      component: "diagrams-sandbox:lib"
+
+    # - path: "../../../johsi/diagrams-sandbox/test"
+    #   component: "diagrams-sandbox:test:diagrams-sandbox-test"
+
+    - path: "../../../johsi/svg-builder-sandbox/src"
+      component: "svg-builder-sandbox:lib"
+
+    # - path: "../../../johsi/svg-builder-sandbox/app/Main.hs"
+    #   component: "svg-builder-sandbox:exe:svg-builder-sandbox-exe"
+
+    # - path: "../../../johsi/svg-builder-sandbox/app/Paths_svg_builder_sandbox.hs"
+    #   component: "svg-builder-sandbox:exe:svg-builder-sandbox-exe"
+
+    # - path: "../../../johsi/svg-builder-sandbox/test"
+    #   component: "svg-builder-sandbox:test:svg-builder-sandbox-test"

@@ -1,10 +1,10 @@
-name:                rule34-haskell
+name:                svg-builder-sandbox
 version:             0.1.0.0
-github:              "githubuser/rule34-haskell"
+github:              "githubuser/svg-builder-sandbox"
 license:             BSD3
-author:              "2jacobtan"
+author:              "Author name here"
 maintainer:          "example@example.com"
-copyright:           "2021 2jacobtan"
+copyright:           "2021 Author name here"
 
 extra-source-files:
 - README.md
@@ -17,30 +17,17 @@ extra-source-files:
 # To avoid duplicated efforts in documentation and dealing with the
 # complications of embedding Haddock markup inside cabal files, it is
 # common to point users to the README.md file.
-description:         Please see the README on GitHub at <https://github.com/githubuser/rule34-haskell#readme>
+description:         Please see the README on GitHub at <https://github.com/githubuser/svg-builder-sandbox#readme>
 
 dependencies:
 - base >= 4.7 && < 5
-- containers
-- pretty-simple
-- split
-- text
-- fgl
-- graphviz
-- generic-data
-- prettyprinter
-- sbv
-- casing
-- mtl
-- process
-- svg-builder-sandbox
-- diagrams-sandbox
+- svg-builder
 
 library:
   source-dirs: src
 
 executables:
-  rule34-haskell-exe:
+  svg-builder-sandbox-exe:
     main:                Main.hs
     source-dirs:         app
     ghc-options:
@@ -48,10 +35,10 @@ executables:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - rule34-haskell
+    - svg-builder-sandbox
 
 tests:
-  rule34-haskell-test:
+  svg-builder-sandbox-test:
     main:                Spec.hs
     source-dirs:         test
     ghc-options:
@@ -59,4 +46,4 @@ tests:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - rule34-haskell
+    - svg-builder-sandbox

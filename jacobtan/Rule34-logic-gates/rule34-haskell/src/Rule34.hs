@@ -225,41 +225,41 @@ rule34_1 =
          , party = lp
          , deontic = MustNot
          , condition = Node (MkCondition
-                              (mkLabel (Just "34.1", Just "rule toplevel", PShidden))
+                              (mkLabel (Just "34.1", Just "Toplevel 34.1", PShidden))
                               (Just "a legal practitioner must not accept any executive appointment associated with ")
                               Any Nothing)
                        [ Node (MkCondition
-                               (mkLabel (Just "34.1.a", Just "undignified", PSheader))
+                               (mkLabel (Just "34.1.a", Just "IncompatibleDignity", PSheader))
                                (Just "any business which") Or (Just "the dignity of the legal profession") )
                          [mkLI "detractsFrom"
                          ,mkLI "isIncompatibleWith"
                          ,mkLI "derogatesFrom"
                          ]
                        , Node (MkCondition
-                               (mkLabel (Just "34.1.b", Just "materially interferes", PSheader))
+                               (mkLabel (Just "34.1.b", Just "MateriallyInterferes", PSheader))
                                (Just "any business which materially interferes with") Or Nothing)
                          [mkLI "primaryOccupation(LP)"
                          ,mkLI "availability(LP)"
                          ,mkLI "representationOfClients(LP)"
                          ]
                        , Node (MkCondition
-                               (mkLabel (Just "34.1.c", Just "unfairly attractive", PSheader))
+                               (mkLabel (Just "34.1.c", Just "UnfairAttractBusiness", PSheader))
                                (Just "any business which is ")
                                (Leaf $ Pred "unfairlyAttractive")
                                Nothing) []
                        , Node (MkCondition
-                               (mkLabel (Just "34.1.d", Just "fee sharing", PSheader))
+                               (mkLabel (Just "34.1.d", Just "ShareLPRFees", PSheader))
                                (Just "any business which involves")
                                Or (Just "any unauthorised person for legal work performed by the legal practitioner"))
                                [mkLI "feeSharing(LP)"
                                ,mkLI "commission"]
                        , Node (MkCondition
-                               (mkLabel (Just "34.1.e", Just "GOTO 1st Schedule", PSheader))
+                               (mkLabel (Just "34.1.e", Just "BusinessFirstSchedule", PSheader))
                                (Just "any business ")
                                 (Leaf $ Pred "inSchedule1")
                                Nothing) []
                        , Node (MkCondition
-                                (mkLabel (Just "34.1.f", Just "otherwise prohibited", PSheader))
+                                (mkLabel (Just "34.1.f", Just "ProhibitedBusiness", PSheader))
                                 (Just "any business which is prohibited by")
                                 Or Nothing)
                          [mkLeaf "34.1.f.i" "theAct"
@@ -310,6 +310,5 @@ as_org = putDocW 120 (org_prefix <> line <>
                       toEnglish rule34_1 <> line)
 
 org_prefix = "#+TITLE: Rule 34 as Org\n#+OPTIONS: num:nil toc:nil" <> line
-
 
 

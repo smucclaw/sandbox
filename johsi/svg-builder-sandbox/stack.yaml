@@ -18,7 +18,7 @@
 # resolver: ./custom-snapshot.yaml
 # resolver: https://example.com/snapshots/2018-01-01.yaml
 resolver:
-  url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/17/9.yaml
+  url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/17/12.yaml
 
 # User packages to be built.
 # Various formats can be used as shown in the example below.
@@ -31,8 +31,7 @@ resolver:
 #   - wai
 packages:
 - .
-- ../../../johsi/svg-builder-sandbox
-- ../../../johsi/diagrams-sandbox
+- ../../../IHaskell
 
 # Dependency packages to be pulled from upstream that are not in the resolver.
 # These entries can reference officially published versions as well as
@@ -43,22 +42,8 @@ packages:
 # - git: https://github.com/commercialhaskell/stack.git
 #   commit: e7b331f14bcffb8367cd58fbfc8b40ec7642100a
 #
-# extra-deps: []
 extra-deps:
-- sbv-8.9@sha256:efb0f16c671869805e57d11e269793d5e5ae512e8e626582cf76b8e46a63e9c6,28985
-
-- svg-builder-0.1.1@sha256:22de54d326a6b6912e461e1302edb9108b02aac0b6a6368fcdc3c4a224d487fd,1440
-- diagrams-1.4@sha256:3e36369e84115b900fd9dcb570672a188339a470eb19ca62170775cd835cf8ca,5483
-- diagrams-contrib-1.4.4@sha256:54afec4e0a1ad5fc151852d993b514168955a23884dca119f6fa294af44ea506,4753
-- diagrams-lib-1.4.3@sha256:04f77778d4b550d3c8e54440800685f88467bef91075e82e009a8a6f45c51033,8232
-- diagrams-svg-1.4.3@sha256:36708b0b4cf35507ccf689f1a25f6f81b8f41c2c4c2900793de820f66d4e241c,3181
-
-- active-0.2.0.14@sha256:e618aba4a7881eb85dc1585e0a01230af6b4fbab6693931e4a5d0d3a5b184406,1823
-- diagrams-core-1.4.2@sha256:47de45658e8a805b7cb7f535e7b093daf7e861604fa3c70e25bd4ef481bf1571,2997
-- dual-tree-0.2.3.0@sha256:5c4a64fb3ff5d46d05080db696c8f59ebdefedf10a2aeb8109957f7dc9afd0b6,2814
-- force-layout-0.4.0.6@sha256:0e3d8887ea2fce3cf3fa6704cc09f93086c70c93dc8732aefb0391e8b41f0b6e,1265
-- monoid-extras-0.5.1@sha256:438dbfd7b4dce47d8f0ca577f56caf94bd1e21391afa545cad09fe7cf2e5793d,2333
-
+- svg-builder-0.1.1
 
 # Override default flag values for local packages and extra-deps
 # flags: {}
@@ -83,5 +68,3 @@ extra-deps:
 #
 # Allow a newer minor version of GHC than the snapshot specifies
 # compiler-check: newer-minor
-
-# allow-newer: true

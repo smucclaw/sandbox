@@ -121,14 +121,20 @@ enabled :: PetriNet PLabel TLabel -> Marking PLabel -> [TLabel]
 enabled pn marking =
   [ transition
   | transition <- transitions pn
-  , all (\(pl, n) -> Map.lookup pl marking >= Just n) [ (pl, n) | (pl, tl, n) <- ptEdges pn , tl == transition ]
+  , all (\(pl, n) -> Map.lookup pl marking >= Just n)
+      [ (pl, n) | (pl, tl, n) <- ptEdges pn , tl == transition ]
   ]
 
+getLabel :: [Transition a pl] -> [a]
 getLabel ts  = [ tl | (T tl _ _) <- ts ]
+pChildren :: [Transition tl pl] -> [Place pl tl]
 pChildren ts = concat [ ps | (T tl _ ps) <- ts ]
+tChildren :: [Place pl tl] -> [Transition tl pl]
 tChildren ps = concat [ ts | (P pl _ ts) <- ps ]
 
+getPlabel :: Place pl tl -> pl
 getPlabel (P pl _ _) = pl
+getTlabel :: Transition tl pl -> tl
 getTlabel (T tl _ _) = tl
 
 type Remarks = [String]
@@ -195,7 +201,7 @@ autostep pn orig@(PStep mm r l events) =
                        then [ orig, orig { remarks = ["autostep: event queue empty; found new auto-fireable enabled transitions"] } ] -- surprising if this happens
                        else [ orig, orig { remarks = ["autostep: event queue empty; no new auto-fireable transitions found"     ] } ]
        in if not $ null ready
-          then tentative ++ (step pn (PStep mm ["autostep: stepping through auto-fireable transitions"] Nothing ready))
+          then tentative ++ step pn (PStep mm ["autostep: stepping through auto-fireable transitions"] Nothing ready)
           else tentative
   else step pn (PStep mm ["autostep: stepping through P..."] Nothing events)
 
@@ -218,7 +224,7 @@ step pn orig@(PStep m r l events) =
       newStream = nub $ (events \\ tofire) ++ newEvents
   in
     [ PStep  m       (intercalate [""] [r, remarks1]) Nothing events ]
-    ++ (reverse fireLog) ++
+    ++ reverse fireLog ++
     [ PStep  aMarking [ "step: calculated new expecting: " ++ show expecting
                       , "step: calculated new event stream: " ++ show newStream
                       ] Nothing newStream
@@ -275,7 +281,7 @@ showpl playlog =
                         (if not $ null lit then pretty "*** Lit Transition: " <> line <> viaShow lit <> line else PP.emptyDoc) <>
                         pretty "*** Event Stream: " <> line <> viaShow tls
                       ]
-          | (n,(PStep mpl rs lit tls)) <- playlog ]
+          | (n, PStep mpl rs lit tls) <- playlog ]
 
 -- references:
 -- http://www.pnml.org/version-2009/version-2009.php

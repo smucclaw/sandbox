@@ -142,7 +142,7 @@ someFunc = do
   Petri.run pcc (Map.fromList [(head $ places pcc, 1)])
 
 previewPCC :: IO ()
-previewPCC = previewPetri $ asPetri (normalize charCreator)
+previewPCC = previewPetri petriOP_ $ asPetri (normalize charCreator)
 
 writePCC :: IO ()
-writePCC = writePetri "viz/pcc" $ asPetri (normalize charCreator)
+writePCC = writePetri "viz/pcc" petriOP_ $ asPetri (normalize charCreator)

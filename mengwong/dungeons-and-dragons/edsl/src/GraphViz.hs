@@ -28,6 +28,16 @@ import Petri (PetriNet (..), PLabel, TLabel)
 instance Labellable PLabel where toLabelValue = toLabelValue . show
 instance Labellable TLabel where toLabelValue = toLabelValue . show
 
+data PetriOptionalParams = PetriOP {
+  markings :: Map PLabel Int,
+  transitionHighlights :: [TLabel]
+  }
+petriOP_ :: PetriOptionalParams
+petriOP_ = PetriOP {
+  markings = mempty,
+  transitionHighlights = []
+}
+
 -- petriGraphViz :: (Graph gr, Ord el, Labellable nl, Labellable el) => gr nl el -> DotGraph Node
 petriGraphViz :: Graph gr => gr (Either PLabel TLabel) Int -> DotGraph Node
 petriGraphViz = setDirectedness graphToDot $
@@ -40,8 +50,8 @@ petriGraphViz = setDirectedness graphToDot $
     --- ^ I added this line to customise the graph's orientation
     }
 
-petriFgl :: Graph gr => PetriNet PLabel TLabel -> gr (Either PLabel TLabel) Int
-petriFgl MkPN { places, transitions, ptEdges, tpEdges} =
+petriFgl :: Graph gr => PetriOptionalParams -> PetriNet PLabel TLabel -> gr (Either PLabel TLabel) Int
+petriFgl petriOP MkPN { places, transitions, ptEdges, tpEdges} =
   mkGraph fglNodes fglEdges
   where
     fglNodes :: [(Int, Either PLabel TLabel)] =
@@ -54,14 +64,18 @@ petriFgl MkPN { places, transitions, ptEdges, tpEdges} =
       ++
       (tpEdges <&> (\(Right -> t, Left -> p, n)
         -> (fglNodesDict ! t, fglNodesDict ! p, n)))
-      
-previewPetri :: PetriNet PLabel TLabel -> IO ()
-previewPetri (petriFgl @Gr -> petriGraphViz -> dotGraph) =
+
+petriPipeline :: PetriOptionalParams -> PetriNet PLabel TLabel -> DotGraph Node
+petriPipeline = (petriGraphViz .) . petriFgl @Gr -- point-free lol
+-- petriPipeline petriOP = petriGraphViz . petriFgl @Gr petriOP
+
+previewPetri :: PetriOptionalParams -> PetriNet PLabel TLabel -> IO ()
+previewPetri petriOP (petriPipeline petriOP -> dotGraph) =
   void $ forkIO (void $ runGraphvizCanvas' dotGraph Xlib)
 
 -- | graph to .dot and .png
-writePetri :: String -> PetriNet PLabel TLabel -> IO ()
-writePetri filePath (petriFgl @Gr -> petriGraphViz -> dotGraph) = do
+writePetri :: String -> PetriOptionalParams -> PetriNet PLabel TLabel -> IO ()
+writePetri filePath petriOP (petriPipeline petriOP -> dotGraph) = do
   printDotGraph dotGraph & Text.Lazy.IO.writeFile (filePath ++ ".dot")
   -- dot to png
   let shellCommand = "dot " ++ filePath ++ ".dot -Tpng > " ++ filePath ++ ".png" 

@@ -14,12 +14,15 @@ import Rule34
       Predicate(Pred,Goto),
       toEnglish
     )
+import qualified Rule34 (rule34_1)
 import Data.Maybe
 import Prettyprinter.Render.String (renderString)
 import Prettyprinter
 
 -- let's convert things to Jo Hsi's AnyAll types for visualization purposes
 as_anyall = AA.All "all of the following" [AA.Leaf "Alice", AA.Leaf "Bob", AA.Leaf "Carol"]
+
+mymain = toAA Rule34.rule34_1
 
 class (Show x) => AA x where
   toAA :: x -> AA.Item

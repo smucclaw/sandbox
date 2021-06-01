@@ -270,7 +270,7 @@ rule34_1 =
                           ,mkLI "otherSubsidiary"]
                          ,Node (MkCondition
                                 (mkLabel (Just "34.1.f.iii", Nothing, PSheader))
-                                (Just "any") Union (Just "issued under section 71(6) of the Act"))
+                                Nothing Union (Just "issued under section 71(6) of the Act"))
                            [mkLI "practiceDirections"
                            ,mkLI "guidanceNotes"
                            ,mkLI "rulings"]
@@ -279,7 +279,7 @@ rule34_1 =
                                 Nothing Compl Nothing)
                            [Node (MkCondition
                                   (mkLabel (Nothing, Nothing, PSheader))
-                                  (Just "any") UnionComma Nothing)
+                                  Nothing UnionComma Nothing)
                                   [mkLI "practiceDirections"
                                   ,mkLI "guidanceNotes"
                                   ,mkLI "rulings"]

@@ -217,7 +217,18 @@ mkNode x = Node x []
 
 -}
 
-
+rule34_1_Any_err :: MyRule
+rule34_1_Any_err =
+  MyRule { rlabel = mkLabel (Just "34.1", Nothing, PSheader)
+         , defeasors = []
+         , party = lp
+         , deontic = MustNot
+         , condition = Node (MkCondition
+                              (mkLabel (Just "34.1", Just "Toplevel 34.1", PShidden))
+                              Nothing
+                              Any
+                              Nothing)
+                       [] }
 rule34_1 :: MyRule
 rule34_1 =
   MyRule { rlabel = mkLabel (Just "34.1", Nothing, PSheader)

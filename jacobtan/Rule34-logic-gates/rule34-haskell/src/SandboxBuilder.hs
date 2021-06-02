@@ -20,21 +20,32 @@ import Rule34
        , MyRule (MyRule)
        , Predicate (Pred,Goto)
        , toEnglish )
-import qualified Rule34 (rule34_1)
+import qualified Rule34 (rule34_1, rule34_1_Any_err)
 import Data.Maybe
 import Prettyprinter.Render.String (renderString)
 import Prettyprinter
 import Graphics.Svg
 
-itemise :: Either String AABuilder.Item
-itemise = toAA Rule34.rule34_1
-
 errorEl :: String -> Element
-errorEl msg = text_ [ X_ <<- "100", Y_ <<- "100" ] (toElement msg)
+errorEl msg =
+     image_ [ XlinkHref_ <<- "https://media.giphy.com/media/wrCicfORd8f7AFkrCs/giphy.gif"
+            , Height_ <<- "200"
+            , Width_ <<- "200"
+            , X_ <<- "200"
+            , Y_ <<- "100" ]
+  <> text_ [ X_ <<- "200", Y_ <<- "300", Fill_ <<- "gray", Font_family_ <<- "sans-serif" ]
+       (  tspan_ [ X_ <<- "200", Dy_ <<- "20", Font_weight_ <<- "bold" ] "Looks like something went wrong!"
+       <> tspan_ [ X_ <<- "200", Dy_ <<- "20", Font_weight_ <<- "lighter" ] (toElement msg))
 
-drawSVG :: Either String AABuilder.Item -> IO ()
-drawSVG (Left err) = renderToFile "rule34_1.svg" $ AABuilder.makeSvg $ (100, errorEl err)
-drawSVG (Right item) = renderToFile "rule34_1.svg" $ AABuilder.makeSvg $ AABuilder.renderItem item
+drawItem :: Either String AABuilder.Item -> IO ()
+drawItem (Left err) = renderToFile "rule34_1_err.svg" $ AABuilder.makeSvg $ (500, errorEl err)
+drawItem (Right item) = renderToFile "rule34_1.svg" $ AABuilder.makeSvg $ AABuilder.renderItem item
+
+main :: IO ()
+main = drawItem $ toAA Rule34.rule34_1
+
+mainErr :: IO ()
+mainErr = drawItem $ toAA Rule34.rule34_1_Any_err
 
 class (Show x) => AABuilder x where
   toAA :: x -> Either String AABuilder.Item
@@ -68,7 +79,7 @@ instance AABuilder (ConditionTree Predicate) where
                              items)
 
   -- are these valid?
-  toAA (Node (MkCondition l Nothing All _) children) = Left "All type should have at least a pre"
+  toAA (Node (MkCondition l Nothing All _) children) = Left "The top-level 'All' type should have at least a pre."
 
   -- Any
   toAA (Node (MkCondition l (Just pre) Any (Just post)) children) =
@@ -89,7 +100,7 @@ instance AABuilder (ConditionTree Predicate) where
                              items)
 
   -- are these valid?
-  toAA (Node (MkCondition l Nothing Any _) children) = Left "Any type should have at least a pre"
+  toAA (Node (MkCondition l Nothing Any _) children) = Left "The top-level 'Any' type should have at least a pre."
 
   -- Or
   toAA (Node (MkCondition l (Just pre) Or (Just post)) children) =
@@ -198,7 +209,7 @@ instance AABuilder (ConditionTree Predicate) where
 
   -- Leaf
   toAA (Node (MkCondition l pre (Leaf b) post) []) = Right $ AABuilder.Leaf (ls l +++ ps pre <> toAAs b <> ps post)
-  toAA (Node (MkCondition l pre (Leaf b) post) children) = Left ("leaf node " ++ (show b) ++ " should have no children! " ++ show children)
+  toAA (Node (MkCondition l pre (Leaf b) post) children) = Left ("leaf node " ++ show b ++ " should have no children " ++ show children)
 
   -- Compl
   toAA (Node (MkCondition l pre Compl post) children) = Left "Compl is not relevant, should never get here"

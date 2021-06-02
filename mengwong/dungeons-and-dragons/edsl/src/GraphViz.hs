@@ -22,7 +22,7 @@ import Data.GraphViz.Attributes.Complete (Attribute(RankDir), RankDir (FromLeft)
 import Data.Map.Strict ( (!), fromList, Map )
 import qualified Data.Map as Map
 
-import Utils ( (<&>), (&), execShell, fromMaybe )
+import JT2.Haskell.Utils ( (<&>), (&), execShell, fromMaybe )
 import Petri (PetriNet (..), PLabel, TLabel)
 
 data PetriOptionalParams = PetriOP {

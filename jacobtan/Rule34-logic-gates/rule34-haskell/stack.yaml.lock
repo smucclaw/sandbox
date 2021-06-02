@@ -5,6 +5,17 @@
 
 packages:
 - completed:
+    size: 4273
+    url: https://github.com/2jacobtan/jt2-haskell-utils/archive/73d218d2ecab2a047a46ddc46cf3789cf28f3ce4.tar.gz
+    name: jt2-haskell-utils
+    version: 0.1.0.0
+    sha256: 00f5b468d8f3f7bdc10166ccebd21e01bebbb25937afa408d1b52225233c637e
+    pantry-tree:
+      size: 682
+      sha256: df4f746199d4aeb1c0b359552630d4850435b1e15531730dcdb2d35fe8374086
+  original:
+    url: https://github.com/2jacobtan/jt2-haskell-utils/archive/73d218d2ecab2a047a46ddc46cf3789cf28f3ce4.tar.gz
+- completed:
     hackage: sbv-8.9@sha256:efb0f16c671869805e57d11e269793d5e5ae512e8e626582cf76b8e46a63e9c6,28985
     pantry-tree:
       size: 62515

@@ -1,0 +1,3 @@
+[submodule "jacobtan/jt2-haskell-utils"]
+	path = jacobtan/jt2-haskell-utils
+	url = git@github.com:2jacobtan/jt2-haskell-utils.git

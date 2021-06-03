@@ -1,0 +1,39 @@
+class Animal
+class Cat extends Animal
+class Mouse extends Animal
+
+decl isCat: Animal -> Boolean
+decl isMouse: Animal -> Boolean
+
+decl Age : Animal -> Integer -> Boolean
+
+decl garfield: Animal
+decl mickey: Animal
+
+
+fact <CatNotMouse>
+for a: Animal
+not (isCat a && isMouse a)
+
+fact <GarfieldCat>
+isCat garfield
+
+fact <MickeyMouse>
+isMouse mickey
+
+# no mice older than 1 year have a chance to survive 
+rule <OldCatsChaseWell>
+for c: Animal, m: Animal, ac: Integer, am: Integer
+if isCat c && isMouse m && Age c ac && ac >= 5 && Age m am 
+then am < 1
+
+# inconsistent, proof fails
+assert {SMT: {consistent}}
+Age garfield 5  && Age mickey 2
+
+# consistent, model found
+assert {SMT: {consistent}}
+Age garfield 3 && Age mickey 2
+
+
+

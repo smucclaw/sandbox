@@ -11,7 +11,7 @@ import qualified Data.Text as Text
 import Data.Graph.Inductive hiding ((&))
 import Text.Casing as Casing
 
-import Utils
+import JT2.Haskell.Utils
 import Encoding ( GateType(..) )
 import Rule34_jacob
 import Data.IntSet (IntSet, member, Key, insert)

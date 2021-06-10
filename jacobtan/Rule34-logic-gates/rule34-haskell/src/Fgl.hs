@@ -15,7 +15,7 @@ import Data.Graph.Inductive.PatriciaTree (Gr)
 import Data.Graph.Inductive.Graph
     ( Graph(mkGraph), Node, pre, suc )
 
-import Utils ( (&), (<&>) )
+import JT2.Haskell.Utils ( (&), (<&>) )
 
 import Encoding
     ( NodeInfo(gType, gDescr),

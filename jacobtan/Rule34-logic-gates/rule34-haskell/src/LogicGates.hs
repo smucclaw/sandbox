@@ -2,7 +2,7 @@
 {-# LANGUAGE LambdaCase #-}
 module LogicGates where
 
-import Utils ( (&), (<&>) )
+import JT2.Haskell.Utils ( (&), (<&>) )
 import Data.List.Split (chunksOf)
 import Text.Pretty.Simple (pPrint)
 

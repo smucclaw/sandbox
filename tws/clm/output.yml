@@ -1,0 +1,1131 @@
+
+
+include:
+  - DADataType.yml
+  - DAScasp.yml
+---
+mandatory: True 
+code: |
+  ruleSource = "r34_amended.pl"
+  query = "holds(must_not(Lawyer,accept,Position))."
+---
+terms:
+- r34_1: "34. Executive appointments\n\n34.\u2014(1)  A legal practitioner must not accept any executive appointment associated with \nany of the following businesses:\n"
+- r34_1_a: "(a)\tany business which detracts from, is incompatible with, or derogates from the dignity of,\nthe legal profession;\n"
+- r34_1_c: "(c)\tany business which is likely to unfairly attract business in the practice of law;\n"
+- r34_1_d: "(d)\tany business which involves the sharing of the legal practitioner\u2019s fees with, \nor the payment of a commission to, any unauthorised person for legal work performed \nby the legal practitioner;\n"
+- r34_1_e: "(e)\tany business set out in the First Schedule;\n"
+- r34_1_f: "(f)\tany business which is prohibited by \u2014\n(i)\tthe Act;\n(ii)\tthese Rules or any other subsidiary legislation made under the Act;\n(iii)\tany practice directions, guidance notes and rulings issued under section 71(6) of the Act; or\n(iv)\tany practice directions, guidance notes and rulings (relating to professional practice,\netiquette, conduct and discipline) issued by the Council or the Society.\n"
+- r34_1_b: "1A (to place it between 1 and 2): A legal practitioner must not accept any executive appointment that:\nmaterially interferes with \u2014\n(i)\tthe legal practitioner\u2019s primary occupation of practising as a lawyer;\n(ii)\tthe legal practitioner\u2019s availability to those who may seek the legal practitioner\u2019s \nservices as a lawyer; or\n(iii)\tthe representation of the legal practitioner\u2019s clients.\n"
+- r34_2_a: "(2)  Subject to paragraph (1), a legal practitioner in a Singapore law practice \n(called in this paragraph the main practice) may accept an executive appointment \nin another Singapore law practice (called in this paragraph the related practice), \nif the related practice is connected to the main practice in either of the following ways:\n(a)\tevery legal or beneficial owner of the related practice is the sole proprietor, \nor a partner or director, of the main practice;\n"
+- r34_2_b: "(b)\tthe legal practitioner accepts the executive appointment as a representative \nof the main practice in the related practice, and the involvement of the main practice \nin the related practice is not prohibited by any of the following:\n(i)\tthe Act;\n(ii)\tthese Rules or any other subsidiary legislation made under the Act;\n(iii)\tany practice directions, guidance notes and rulings issued under section 71(6) of the Act;\n(iv)\tany practice directions, guidance notes and rulings (relating to professional practice,\netiquette, conduct and discipline) issued by the Council or the Society.\n"
+- r34_3: "(3)  Subject to paragraph (1), a legal practitioner may accept an executive appointment \nin a business entity which provides law-related services.\n"
+- r34_4: "(4)  Subject to paragraph (1), a legal practitioner (not being a locum solicitor) may \naccept an executive appointment in a business entity which does not provide any \nlegal services or law-related services, if all of the conditions set out in the \nSecond Schedule are satisfied.\n"
+- r34_5: "(5)  Despite paragraph (1)(b), but subject to paragraph (1)(a) and (c) to (f), \na locum solicitor may accept an executive appointment in a business entity which \ndoes not provide any legal services or law-related services, if all of the \nconditions set out in the Second Schedule are satisfied.\n"
+- r34_6_a: "(6)  Except as provided in paragraphs (2) to (5) \u2014\n(a)\ta legal practitioner in a Singapore law practice must not accept any executive \nappointment in another Singapore law practice; and\n"
+- r34_6_b: "(b)\ta legal practitioner must not accept any executive appointment in a business entity.\n"
+- r34_7: "(7)  To avoid doubt, nothing in this rule prohibits a legal practitioner \nfrom accepting any appointment in any institution set out in the Third Schedule.\n"
+---
+variable name: data_structure
+data:
+- minimum: 0
+  name: person
+  type: String
+- ask: What is the name of the legal practice?
+  attributes:
+  - ask: Is Y a joint law venture?
+    encodings:
+    - joint_law_venture(Y)
+    name: joint_law_venture
+    type: Boolean
+  - ask: Is Y a formal law alliance?
+    encodings:
+    - formal_law_alliance(Y)
+    name: formal_law_alliance
+    type: Boolean
+  - encodings:
+    - foreign_law_practice(Y)
+    name: foreign_law_practice
+    type: Boolean
+  - ask: What is the jurisdiction of Y?
+    encodings:
+    - jurisdiction(Y,X)
+    name: jurisdiction
+    options:
+      other: Somewhere Else
+      singapore: Singapore
+    type: Enum
+  - attributes:
+    - encodings:
+      - locum_solicitor(Y)
+      name: locum_solicitor
+      type: Boolean
+    - encodings:
+      - primary_occupation_of(Y,X)
+      name: primary_occupation
+      options:
+        practicing_as_a_lawyer: Practicing as a lawyer
+        something_else: Something Else
+      type: Enum
+    encodings:
+    - legal_practitioner(X)
+    - in(X,Y)
+    minimum: 0
+    name: legal_practitioner
+    source: person
+    type: Object
+  - attributes:
+    - encodings:
+      - accepts_position_as_representative(_,Y,_)
+      name: accepted_as_representative_of_parent_practice
+      type: Boolean
+    - encodings:
+      - associated_with(Y,X)
+      minimum: 0
+      name: associated_with
+      source: business
+      type: Object
+    - encodings:
+      - entitles_holder(Y)
+      name: entitles_holder_as_executive
+      type: Boolean
+    - encodings:
+      - independent_director(Y)
+      name: independent_director
+      type: Boolean
+    - encodings:
+      - non_executive_director(Y)
+      name: non_executive_director
+      type: Boolean
+    - encodings:
+      - materially_interferes_with(Y,practicing_as_a_lawyer,X)
+      minimum: 0
+      name: materially_interferes_with_practicing_as_a_lawyer_for
+      source: person
+      type: Object
+    - encodings:
+      - materially_interferes_with(Y,availability,X)
+      minimum: 0
+      name: materially_interferes_with_availability_of
+      source: person
+      type: Object
+    - encodings:
+      - materially_interferes_with(Y,representation,X)
+      minimum: 0
+      name: materially_interferes_with_representation_of_clients_for
+      source: person
+      type: Object
+    encodings:
+    - in(X,Y)
+    - position(X)
+    minimum: 0
+    name: position
+    type: String
+  encodings:
+  - law_practice(X)
+  minimum: 0
+  name: legal_practice
+  tell: the legal practice X
+  type: String
+- attributes:
+  - encodings:
+    - carries_on(Y,X)
+    minimum: 0
+    name: carries_on
+    source: business
+    type: Object
+  - encodings:
+    - provides(Y,X)
+    minimum: 0
+    name: provides
+    source: service
+    type: Object
+  - encodings:
+    - in_third_schedule(Y)
+    - institution(Y)
+    name: listed_in_third_schedule
+    type: Boolean
+  - attributes:
+    - encodings:
+      - associated_with(Y,X)
+      minimum: 0
+      name: associated_with
+      source: business
+      type: Object
+    - encodings:
+      - independent_director(Y)
+      name: independent_director
+      type: Boolean
+    - encodings:
+      - non_executive_director(Y)
+      name: non_executive_director
+      type: Boolean
+    - encodings:
+      - entitles_holder(Y)
+      name: entitles_holder_as_executive
+      type: Boolean
+    - encodings:
+      - materially_interferes_with(Y,practicing_as_a_lawyer,X)
+      minimum: 0
+      name: materially_interferes_with_practicing_as_a_lawyer_for
+      source: person
+      type: Object
+    - encodings:
+      - materially_interferes_with(Y,availability,X)
+      minimum: 0
+      name: materially_interferes_with_availability_of
+      source: person
+      type: Object
+    - encodings:
+      - materially_interferes_with(Y,representation,X)
+      minimum: 0
+      name: materially_interferes_with_representation_of_clients_for
+      source: person
+      type: Object
+    encodings:
+    - in(X,Y)
+    - position(X)
+    minimum: 0
+    name: position
+    type: String
+  - encodings:
+    - company(Y)
+    name: company
+    type: Boolean
+  - encodings:
+    - corporation(Y)
+    name: corporation
+    type: Boolean
+  - encodings:
+    - partnership(Y)
+    name: partnership
+    type: Boolean
+  - encodings:
+    - llp(Y)
+    name: llp
+    type: Boolean
+  - encodings:
+    - sole_proprietorship(Y)
+    name: sole_proprietorship
+    type: Boolean
+  - encodings:
+    - business_trust(Y)
+    name: business_trust
+    type: Boolean
+  - encodings:
+    - beneficial_owner_of(X,Y)
+    minimum: 0
+    name: beneficial_owner
+    source: person
+    type: Object
+  - encodings:
+    - legal_owner_of(X,Y)
+    minimum: 0
+    name: legal_owner
+    source: person
+    type: Object
+  - encodings:
+    - partner_of(X,Y)
+    minimum: 0
+    name: partner
+    source: person
+    type: Object
+  - encodings:
+    - sole_proprietor_of(X,Y)
+    maximum: 1
+    minimum: 0
+    name: sole_proprietor
+    source: person
+    type: Object
+  - encodings:
+    - director_of(X,Y)
+    minimum: 0
+    name: director
+    source: person
+    type: Object
+  minimum: 0
+  name: organization
+  type: String
+- attributes:
+  - encodings:
+    - detracts_from_dignity_of_legal_profession(Y)
+    name: detracts_from_dignity_of_legal_profession
+    type: Boolean
+  - encodings:
+    - incompatible_dignity_of_legal_profession(Y)
+    name: incompatible_with_dignity_of_legal_profession
+    type: Boolean
+  - encodings:
+    - derogates_from_dignity_of_legal_profession(Y)
+    name: derogates_from_dignity_of_legal_profession
+    type: Boolean
+  - encodings:
+    - unfair(Y)
+    name: likely_to_unfairly_attract_business_in_the_practice_of_law
+    type: Boolean
+  - encodings:
+    - described_in_first_schedule(Y)
+    name: set_out_in_the_first_schedule
+    type: Boolean
+  - encodings:
+    - prohibited_business(Y)
+    name: prohibited_business
+    type: Boolean
+  - encodings:
+    - trade(Y)
+    name: trade
+    type: Boolean
+  - encodings:
+    - calling(Y)
+    name: calling
+    type: Boolean
+  - encodings:
+    - for_profit(Y)
+    name: for_profit
+    type: Boolean
+  - encodings:
+    - in(Y,singapore)
+    name: in_singapore
+    type: Boolean
+  encodings:
+  - business(X)
+  minimum: 0
+  name: business
+  type: String
+- attributes:
+  - encodings:
+    - legal_service(Y)
+    name: legal
+    type: Boolean
+  - encodings:
+    - law_related_service(Y)
+    name: law_related
+    type: Boolean
+  - encodings:
+    - listed_in_fourth_schedule
+    name: listed_in_fourth_schedule
+    type: Boolean
+  encodings:
+  - service(X)
+  minimum: 0
+  name: service
+  type: String
+- encodings:
+  - conditions_of_second_schedule_satisfied
+  name: all_conditions_of_second_schedule_satisfied
+  type: Boolean
+query: holds(must_not(Lawyer,accept,Position))
+rules: r34_amended.pl
+terms:
+- r34_1: "34. Executive appointments\n\n34.\u2014(1)  A legal practitioner must not accept any executive appointment associated with \nany of the following businesses:\n"
+- r34_1_a: "(a)\tany business which detracts from, is incompatible with, or derogates from the dignity of,\nthe legal profession;\n"
+- r34_1_c: "(c)\tany business which is likely to unfairly attract business in the practice of law;\n"
+- r34_1_d: "(d)\tany business which involves the sharing of the legal practitioner\u2019s fees with, \nor the payment of a commission to, any unauthorised person for legal work performed \nby the legal practitioner;\n"
+- r34_1_e: "(e)\tany business set out in the First Schedule;\n"
+- r34_1_f: "(f)\tany business which is prohibited by \u2014\n(i)\tthe Act;\n(ii)\tthese Rules or any other subsidiary legislation made under the Act;\n(iii)\tany practice directions, guidance notes and rulings issued under section 71(6) of the Act; or\n(iv)\tany practice directions, guidance notes and rulings (relating to professional practice,\netiquette, conduct and discipline) issued by the Council or the Society.\n"
+- r34_1_b: "1A (to place it between 1 and 2): A legal practitioner must not accept any executive appointment that:\nmaterially interferes with \u2014\n(i)\tthe legal practitioner\u2019s primary occupation of practising as a lawyer;\n(ii)\tthe legal practitioner\u2019s availability to those who may seek the legal practitioner\u2019s \nservices as a lawyer; or\n(iii)\tthe representation of the legal practitioner\u2019s clients.\n"
+- r34_2_a: "(2)  Subject to paragraph (1), a legal practitioner in a Singapore law practice \n(called in this paragraph the main practice) may accept an executive appointment \nin another Singapore law practice (called in this paragraph the related practice), \nif the related practice is connected to the main practice in either of the following ways:\n(a)\tevery legal or beneficial owner of the related practice is the sole proprietor, \nor a partner or director, of the main practice;\n"
+- r34_2_b: "(b)\tthe legal practitioner accepts the executive appointment as a representative \nof the main practice in the related practice, and the involvement of the main practice \nin the related practice is not prohibited by any of the following:\n(i)\tthe Act;\n(ii)\tthese Rules or any other subsidiary legislation made under the Act;\n(iii)\tany practice directions, guidance notes and rulings issued under section 71(6) of the Act;\n(iv)\tany practice directions, guidance notes and rulings (relating to professional practice,\netiquette, conduct and discipline) issued by the Council or the Society.\n"
+- r34_3: "(3)  Subject to paragraph (1), a legal practitioner may accept an executive appointment \nin a business entity which provides law-related services.\n"
+- r34_4: "(4)  Subject to paragraph (1), a legal practitioner (not being a locum solicitor) may \naccept an executive appointment in a business entity which does not provide any \nlegal services or law-related services, if all of the conditions set out in the \nSecond Schedule are satisfied.\n"
+- r34_5: "(5)  Despite paragraph (1)(b), but subject to paragraph (1)(a) and (c) to (f), \na locum solicitor may accept an executive appointment in a business entity which \ndoes not provide any legal services or law-related services, if all of the \nconditions set out in the Second Schedule are satisfied.\n"
+- r34_6_a: "(6)  Except as provided in paragraphs (2) to (5) \u2014\n(a)\ta legal practitioner in a Singapore law practice must not accept any executive \nappointment in another Singapore law practice; and\n"
+- r34_6_b: "(b)\ta legal practitioner must not accept any executive appointment in a business entity.\n"
+- r34_7: "(7)  To avoid doubt, nothing in this rule prohibits a legal practitioner \nfrom accepting any appointment in any institution set out in the Third Schedule.\n"
+---
+objects:
+  - person: |
+      DAList.using(object_type=DADTString,minimum=0,complete_attribute="complete")
+  - legal_practice: |
+      DAList.using(object_type=DADTString,minimum=0,complete_attribute="complete")
+  - legal_practice[i].joint_law_venture: |
+      DADTBoolean
+  - legal_practice[i].formal_law_alliance: |
+      DADTBoolean
+  - legal_practice[i].foreign_law_practice: |
+      DADTBoolean
+  - legal_practice[i].jurisdiction: |
+      DADTEnum.using(options={'singapore': 'Singapore', 'other': 'Somewhere Else'})
+  - legal_practice[i].legal_practitioner: |
+      DAList.using(object_type=DADTObjectRef.using(source=person),minimum=0,complete_attribute="complete")
+  - legal_practice[i].legal_practitioner[j].locum_solicitor: |
+      DADTBoolean
+  - legal_practice[i].legal_practitioner[j].primary_occupation: |
+      DADTEnum.using(options={'practicing_as_a_lawyer': 'Practicing as a lawyer', 'something_else': 'Something Else'})
+  - legal_practice[i].position: |
+      DAList.using(object_type=DADTString,minimum=0,complete_attribute="complete")
+  - legal_practice[i].position[j].accepted_as_representative_of_parent_practice: |
+      DADTBoolean
+  - legal_practice[i].position[j].associated_with: |
+      DAList.using(object_type=DADTObjectRef.using(source=business),minimum=0,complete_attribute="complete")
+  - legal_practice[i].position[j].entitles_holder_as_executive: |
+      DADTBoolean
+  - legal_practice[i].position[j].independent_director: |
+      DADTBoolean
+  - legal_practice[i].position[j].non_executive_director: |
+      DADTBoolean
+  - legal_practice[i].position[j].materially_interferes_with_practicing_as_a_lawyer_for: |
+      DAList.using(object_type=DADTObjectRef.using(source=person),minimum=0,complete_attribute="complete")
+  - legal_practice[i].position[j].materially_interferes_with_availability_of: |
+      DAList.using(object_type=DADTObjectRef.using(source=person),minimum=0,complete_attribute="complete")
+  - legal_practice[i].position[j].materially_interferes_with_representation_of_clients_for: |
+      DAList.using(object_type=DADTObjectRef.using(source=person),minimum=0,complete_attribute="complete")
+  - organization: |
+      DAList.using(object_type=DADTString,minimum=0,complete_attribute="complete")
+  - organization[i].carries_on: |
+      DAList.using(object_type=DADTObjectRef.using(source=business),minimum=0,complete_attribute="complete")
+  - organization[i].provides: |
+      DAList.using(object_type=DADTObjectRef.using(source=service),minimum=0,complete_attribute="complete")
+  - organization[i].listed_in_third_schedule: |
+      DADTBoolean
+  - organization[i].position: |
+      DAList.using(object_type=DADTString,minimum=0,complete_attribute="complete")
+  - organization[i].position[j].associated_with: |
+      DAList.using(object_type=DADTObjectRef.using(source=business),minimum=0,complete_attribute="complete")
+  - organization[i].position[j].independent_director: |
+      DADTBoolean
+  - organization[i].position[j].non_executive_director: |
+      DADTBoolean
+  - organization[i].position[j].entitles_holder_as_executive: |
+      DADTBoolean
+  - organization[i].position[j].materially_interferes_with_practicing_as_a_lawyer_for: |
+      DAList.using(object_type=DADTObjectRef.using(source=person),minimum=0,complete_attribute="complete")
+  - organization[i].position[j].materially_interferes_with_availability_of: |
+      DAList.using(object_type=DADTObjectRef.using(source=person),minimum=0,complete_attribute="complete")
+  - organization[i].position[j].materially_interferes_with_representation_of_clients_for: |
+      DAList.using(object_type=DADTObjectRef.using(source=person),minimum=0,complete_attribute="complete")
+  - organization[i].company: |
+      DADTBoolean
+  - organization[i].corporation: |
+      DADTBoolean
+  - organization[i].partnership: |
+      DADTBoolean
+  - organization[i].llp: |
+      DADTBoolean
+  - organization[i].sole_proprietorship: |
+      DADTBoolean
+  - organization[i].business_trust: |
+      DADTBoolean
+  - organization[i].beneficial_owner: |
+      DAList.using(object_type=DADTObjectRef.using(source=person),minimum=0,complete_attribute="complete")
+  - organization[i].legal_owner: |
+      DAList.using(object_type=DADTObjectRef.using(source=person),minimum=0,complete_attribute="complete")
+  - organization[i].partner: |
+      DAList.using(object_type=DADTObjectRef.using(source=person),minimum=0,complete_attribute="complete")
+  - organization[i].sole_proprietor: |
+      DAList.using(object_type=DADTObjectRef.using(source=person),minimum=0,maximum=1,there_is_another=False,complete_attribute="complete")
+  - organization[i].director: |
+      DAList.using(object_type=DADTObjectRef.using(source=person),minimum=0,complete_attribute="complete")
+  - business: |
+      DAList.using(object_type=DADTString,minimum=0,complete_attribute="complete")
+  - business[i].detracts_from_dignity_of_legal_profession: |
+      DADTBoolean
+  - business[i].incompatible_with_dignity_of_legal_profession: |
+      DADTBoolean
+  - business[i].derogates_from_dignity_of_legal_profession: |
+      DADTBoolean
+  - business[i].likely_to_unfairly_attract_business_in_the_practice_of_law: |
+      DADTBoolean
+  - business[i].set_out_in_the_first_schedule: |
+      DADTBoolean
+  - business[i].prohibited_business: |
+      DADTBoolean
+  - business[i].trade: |
+      DADTBoolean
+  - business[i].calling: |
+      DADTBoolean
+  - business[i].for_profit: |
+      DADTBoolean
+  - business[i].in_singapore: |
+      DADTBoolean
+  - service: |
+      DAList.using(object_type=DADTString,minimum=0,complete_attribute="complete")
+  - service[i].legal: |
+      DADTBoolean
+  - service[i].law_related: |
+      DADTBoolean
+  - service[i].listed_in_fourth_schedule: |
+      DADTBoolean
+  - all_conditions_of_second_schedule_satisfied: |
+      DADTBoolean
+---
+code: |
+  person[i].value
+  person[i].complete =  True
+---
+code: |
+  legal_practice[i].value
+  legal_practice[i].joint_law_venture.value
+  legal_practice[i].formal_law_alliance.value
+  legal_practice[i].foreign_law_practice.value
+  legal_practice[i].jurisdiction.value
+  legal_practice[i].legal_practitioner.gather()
+  legal_practice[i].position.gather()
+  legal_practice[i].complete =  True
+---
+code: |
+  legal_practice[i].legal_practitioner[j].value
+  legal_practice[i].legal_practitioner[j].locum_solicitor.value
+  legal_practice[i].legal_practitioner[j].primary_occupation.value
+  legal_practice[i].legal_practitioner[j].complete =  True
+---
+code: |
+  legal_practice[i].position[j].value
+  legal_practice[i].position[j].accepted_as_representative_of_parent_practice.value
+  legal_practice[i].position[j].associated_with.gather()
+  legal_practice[i].position[j].entitles_holder_as_executive.value
+  legal_practice[i].position[j].independent_director.value
+  legal_practice[i].position[j].non_executive_director.value
+  legal_practice[i].position[j].materially_interferes_with_practicing_as_a_lawyer_for.gather()
+  legal_practice[i].position[j].materially_interferes_with_availability_of.gather()
+  legal_practice[i].position[j].materially_interferes_with_representation_of_clients_for.gather()
+  legal_practice[i].position[j].complete =  True
+---
+code: |
+  legal_practice[i].position[j].associated_with[k].value
+  legal_practice[i].position[j].associated_with[k].complete =  True
+---
+code: |
+  legal_practice[i].position[j].materially_interferes_with_practicing_as_a_lawyer_for[k].value
+  legal_practice[i].position[j].materially_interferes_with_practicing_as_a_lawyer_for[k].complete =  True
+---
+code: |
+  legal_practice[i].position[j].materially_interferes_with_availability_of[k].value
+  legal_practice[i].position[j].materially_interferes_with_availability_of[k].complete =  True
+---
+code: |
+  legal_practice[i].position[j].materially_interferes_with_representation_of_clients_for[k].value
+  legal_practice[i].position[j].materially_interferes_with_representation_of_clients_for[k].complete =  True
+---
+code: |
+  organization[i].value
+  organization[i].carries_on.gather()
+  organization[i].provides.gather()
+  organization[i].listed_in_third_schedule.value
+  organization[i].position.gather()
+  organization[i].company.value
+  organization[i].corporation.value
+  organization[i].partnership.value
+  organization[i].llp.value
+  organization[i].sole_proprietorship.value
+  organization[i].business_trust.value
+  organization[i].beneficial_owner.gather()
+  organization[i].legal_owner.gather()
+  organization[i].partner.gather()
+  organization[i].sole_proprietor.gather()
+  organization[i].director.gather()
+  organization[i].complete =  True
+---
+code: |
+  organization[i].carries_on[j].value
+  organization[i].carries_on[j].complete =  True
+---
+code: |
+  organization[i].provides[j].value
+  organization[i].provides[j].complete =  True
+---
+code: |
+  organization[i].position[j].value
+  organization[i].position[j].associated_with.gather()
+  organization[i].position[j].independent_director.value
+  organization[i].position[j].non_executive_director.value
+  organization[i].position[j].entitles_holder_as_executive.value
+  organization[i].position[j].materially_interferes_with_practicing_as_a_lawyer_for.gather()
+  organization[i].position[j].materially_interferes_with_availability_of.gather()
+  organization[i].position[j].materially_interferes_with_representation_of_clients_for.gather()
+  organization[i].position[j].complete =  True
+---
+code: |
+  organization[i].position[j].associated_with[k].value
+  organization[i].position[j].associated_with[k].complete =  True
+---
+code: |
+  organization[i].position[j].materially_interferes_with_practicing_as_a_lawyer_for[k].value
+  organization[i].position[j].materially_interferes_with_practicing_as_a_lawyer_for[k].complete =  True
+---
+code: |
+  organization[i].position[j].materially_interferes_with_availability_of[k].value
+  organization[i].position[j].materially_interferes_with_availability_of[k].complete =  True
+---
+code: |
+  organization[i].position[j].materially_interferes_with_representation_of_clients_for[k].value
+  organization[i].position[j].materially_interferes_with_representation_of_clients_for[k].complete =  True
+---
+code: |
+  organization[i].beneficial_owner[j].value
+  organization[i].beneficial_owner[j].complete =  True
+---
+code: |
+  organization[i].legal_owner[j].value
+  organization[i].legal_owner[j].complete =  True
+---
+code: |
+  organization[i].partner[j].value
+  organization[i].partner[j].complete =  True
+---
+code: |
+  organization[i].sole_proprietor[j].value
+  organization[i].sole_proprietor[j].complete =  True
+---
+code: |
+  organization[i].director[j].value
+  organization[i].director[j].complete =  True
+---
+code: |
+  business[i].value
+  business[i].detracts_from_dignity_of_legal_profession.value
+  business[i].incompatible_with_dignity_of_legal_profession.value
+  business[i].derogates_from_dignity_of_legal_profession.value
+  business[i].likely_to_unfairly_attract_business_in_the_practice_of_law.value
+  business[i].set_out_in_the_first_schedule.value
+  business[i].prohibited_business.value
+  business[i].trade.value
+  business[i].calling.value
+  business[i].for_profit.value
+  business[i].in_singapore.value
+  business[i].complete =  True
+---
+code: |
+  service[i].value
+  service[i].legal.value
+  service[i].law_related.value
+  service[i].listed_in_fourth_schedule.value
+  service[i].complete =  True
+---
+variable name: agenda
+data:
+  - person.gather()
+  - legal_practice.gather()
+  - organization.gather()
+  - business.gather()
+  - service.gather()
+  - all_conditions_of_second_schedule_satisfied.value
+---
+code: |
+  facts = ""
+  # Regarding person
+  for person_element in person:
+    pass # to end empty for loops
+  # Regarding legal_practice
+  for legal_practice_element in legal_practice:
+    facts += "law_practice(" + str(legal_practice_element.value) + ").\n"
+    # Regarding joint_law_venture
+    if legal_practice_element.joint_law_venture.value:
+      facts += "joint_law_venture(" + str(legal_practice_element.value) + ").\n"
+    # Regarding formal_law_alliance
+    if legal_practice_element.formal_law_alliance.value:
+      facts += "formal_law_alliance(" + str(legal_practice_element.value) + ").\n"
+    # Regarding foreign_law_practice
+    if legal_practice_element.foreign_law_practice.value:
+      facts += "foreign_law_practice(" + str(legal_practice_element.value) + ").\n"
+    # Regarding jurisdiction
+    facts += "jurisdiction(" + str(legal_practice_element.value) + "," + str(legal_practice_element.jurisdiction.value) + ").\n"
+    # Regarding legal_practitioner
+    for legal_practitioner_element in legal_practice_element.legal_practitioner:
+      facts += "legal_practitioner(" + str(legal_practitioner_element.value) + ").\n"
+      facts += "in(" + str(legal_practitioner_element.value) + "," + str(legal_practice_element.value) + ").\n"
+      # Regarding locum_solicitor
+      if legal_practitioner_element.locum_solicitor.value:
+        facts += "locum_solicitor(" + str(legal_practitioner_element.value) + ").\n"
+      # Regarding primary_occupation
+      facts += "primary_occupation_of(" + str(legal_practitioner_element.value) + "," + str(legal_practitioner_element.primary_occupation.value) + ").\n"
+      pass # to end empty for loops
+    # Regarding position
+    for position_element in legal_practice_element.position:
+      facts += "in(" + str(position_element.value) + "," + str(legal_practice_element.value) + ").\n"
+      facts += "position(" + str(position_element.value) + ").\n"
+      # Regarding accepted_as_representative_of_parent_practice
+      if position_element.accepted_as_representative_of_parent_practice.value:
+        facts += "accepts_position_as_representative(_," + str(position_element.value) + ",_).\n"
+      # Regarding associated_with
+      for associated_with_element in position_element.associated_with:
+        facts += "associated_with(" + str(position_element.value) + "," + str(associated_with_element.value) + ").\n"
+        pass # to end empty for loops
+      # Regarding entitles_holder_as_executive
+      if position_element.entitles_holder_as_executive.value:
+        facts += "entitles_holder(" + str(position_element.value) + ").\n"
+      # Regarding independent_director
+      if position_element.independent_director.value:
+        facts += "independent_director(" + str(position_element.value) + ").\n"
+      # Regarding non_executive_director
+      if position_element.non_executive_director.value:
+        facts += "non_executive_director(" + str(position_element.value) + ").\n"
+      # Regarding materially_interferes_with_practicing_as_a_lawyer_for
+      for materially_interferes_with_practicing_as_a_lawyer_for_element in position_element.materially_interferes_with_practicing_as_a_lawyer_for:
+        facts += "materially_interferes_with(" + str(position_element.value) + ",practicing_as_a_lawyer," + str(materially_interferes_with_practicing_as_a_lawyer_for_element.value) + ").\n"
+        pass # to end empty for loops
+      # Regarding materially_interferes_with_availability_of
+      for materially_interferes_with_availability_of_element in position_element.materially_interferes_with_availability_of:
+        facts += "materially_interferes_with(" + str(position_element.value) + ",availability," + str(materially_interferes_with_availability_of_element.value) + ").\n"
+        pass # to end empty for loops
+      # Regarding materially_interferes_with_representation_of_clients_for
+      for materially_interferes_with_representation_of_clients_for_element in position_element.materially_interferes_with_representation_of_clients_for:
+        facts += "materially_interferes_with(" + str(position_element.value) + ",representation," + str(materially_interferes_with_representation_of_clients_for_element.value) + ").\n"
+        pass # to end empty for loops
+      pass # to end empty for loops
+    pass # to end empty for loops
+  # Regarding organization
+  for organization_element in organization:
+    # Regarding carries_on
+    for carries_on_element in organization_element.carries_on:
+      facts += "carries_on(" + str(organization_element.value) + "," + str(carries_on_element.value) + ").\n"
+      pass # to end empty for loops
+    # Regarding provides
+    for provides_element in organization_element.provides:
+      facts += "provides(" + str(organization_element.value) + "," + str(provides_element.value) + ").\n"
+      pass # to end empty for loops
+    # Regarding listed_in_third_schedule
+    if organization_element.listed_in_third_schedule.value:
+      facts += "in_third_schedule(" + str(organization_element.value) + ").\n"
+      facts += "institution(" + str(organization_element.value) + ").\n"
+    # Regarding position
+    for position_element in organization_element.position:
+      facts += "in(" + str(position_element.value) + "," + str(organization_element.value) + ").\n"
+      facts += "position(" + str(position_element.value) + ").\n"
+      # Regarding associated_with
+      for associated_with_element in position_element.associated_with:
+        facts += "associated_with(" + str(position_element.value) + "," + str(associated_with_element.value) + ").\n"
+        pass # to end empty for loops
+      # Regarding independent_director
+      if position_element.independent_director.value:
+        facts += "independent_director(" + str(position_element.value) + ").\n"
+      # Regarding non_executive_director
+      if position_element.non_executive_director.value:
+        facts += "non_executive_director(" + str(position_element.value) + ").\n"
+      # Regarding entitles_holder_as_executive
+      if position_element.entitles_holder_as_executive.value:
+        facts += "entitles_holder(" + str(position_element.value) + ").\n"
+      # Regarding materially_interferes_with_practicing_as_a_lawyer_for
+      for materially_interferes_with_practicing_as_a_lawyer_for_element in position_element.materially_interferes_with_practicing_as_a_lawyer_for:
+        facts += "materially_interferes_with(" + str(position_element.value) + ",practicing_as_a_lawyer," + str(materially_interferes_with_practicing_as_a_lawyer_for_element.value) + ").\n"
+        pass # to end empty for loops
+      # Regarding materially_interferes_with_availability_of
+      for materially_interferes_with_availability_of_element in position_element.materially_interferes_with_availability_of:
+        facts += "materially_interferes_with(" + str(position_element.value) + ",availability," + str(materially_interferes_with_availability_of_element.value) + ").\n"
+        pass # to end empty for loops
+      # Regarding materially_interferes_with_representation_of_clients_for
+      for materially_interferes_with_representation_of_clients_for_element in position_element.materially_interferes_with_representation_of_clients_for:
+        facts += "materially_interferes_with(" + str(position_element.value) + ",representation," + str(materially_interferes_with_representation_of_clients_for_element.value) + ").\n"
+        pass # to end empty for loops
+      pass # to end empty for loops
+    # Regarding company
+    if organization_element.company.value:
+      facts += "company(" + str(organization_element.value) + ").\n"
+    # Regarding corporation
+    if organization_element.corporation.value:
+      facts += "corporation(" + str(organization_element.value) + ").\n"
+    # Regarding partnership
+    if organization_element.partnership.value:
+      facts += "partnership(" + str(organization_element.value) + ").\n"
+    # Regarding llp
+    if organization_element.llp.value:
+      facts += "llp(" + str(organization_element.value) + ").\n"
+    # Regarding sole_proprietorship
+    if organization_element.sole_proprietorship.value:
+      facts += "sole_proprietorship(" + str(organization_element.value) + ").\n"
+    # Regarding business_trust
+    if organization_element.business_trust.value:
+      facts += "business_trust(" + str(organization_element.value) + ").\n"
+    # Regarding beneficial_owner
+    for beneficial_owner_element in organization_element.beneficial_owner:
+      facts += "beneficial_owner_of(" + str(beneficial_owner_element.value) + "," + str(organization_element.value) + ").\n"
+      pass # to end empty for loops
+    # Regarding legal_owner
+    for legal_owner_element in organization_element.legal_owner:
+      facts += "legal_owner_of(" + str(legal_owner_element.value) + "," + str(organization_element.value) + ").\n"
+      pass # to end empty for loops
+    # Regarding partner
+    for partner_element in organization_element.partner:
+      facts += "partner_of(" + str(partner_element.value) + "," + str(organization_element.value) + ").\n"
+      pass # to end empty for loops
+    # Regarding sole_proprietor
+    for sole_proprietor_element in organization_element.sole_proprietor:
+      facts += "sole_proprietor_of(" + str(sole_proprietor_element.value) + "," + str(organization_element.value) + ").\n"
+      pass # to end empty for loops
+    # Regarding director
+    for director_element in organization_element.director:
+      facts += "director_of(" + str(director_element.value) + "," + str(organization_element.value) + ").\n"
+      pass # to end empty for loops
+    pass # to end empty for loops
+  # Regarding business
+  for business_element in business:
+    facts += "business(" + str(business_element.value) + ").\n"
+    # Regarding detracts_from_dignity_of_legal_profession
+    if business_element.detracts_from_dignity_of_legal_profession.value:
+      facts += "detracts_from_dignity_of_legal_profession(" + str(business_element.value) + ").\n"
+    # Regarding incompatible_with_dignity_of_legal_profession
+    if business_element.incompatible_with_dignity_of_legal_profession.value:
+      facts += "incompatible_dignity_of_legal_profession(" + str(business_element.value) + ").\n"
+    # Regarding derogates_from_dignity_of_legal_profession
+    if business_element.derogates_from_dignity_of_legal_profession.value:
+      facts += "derogates_from_dignity_of_legal_profession(" + str(business_element.value) + ").\n"
+    # Regarding likely_to_unfairly_attract_business_in_the_practice_of_law
+    if business_element.likely_to_unfairly_attract_business_in_the_practice_of_law.value:
+      facts += "unfair(" + str(business_element.value) + ").\n"
+    # Regarding set_out_in_the_first_schedule
+    if business_element.set_out_in_the_first_schedule.value:
+      facts += "described_in_first_schedule(" + str(business_element.value) + ").\n"
+    # Regarding prohibited_business
+    if business_element.prohibited_business.value:
+      facts += "prohibited_business(" + str(business_element.value) + ").\n"
+    # Regarding trade
+    if business_element.trade.value:
+      facts += "trade(" + str(business_element.value) + ").\n"
+    # Regarding calling
+    if business_element.calling.value:
+      facts += "calling(" + str(business_element.value) + ").\n"
+    # Regarding for_profit
+    if business_element.for_profit.value:
+      facts += "for_profit(" + str(business_element.value) + ").\n"
+    # Regarding in_singapore
+    if business_element.in_singapore.value:
+      facts += "in(" + str(business_element.value) + ",singapore).\n"
+    pass # to end empty for loops
+  # Regarding service
+  for service_element in service:
+    facts += "service(" + str(service_element.value) + ").\n"
+    # Regarding legal
+    if service_element.legal.value:
+      facts += "legal_service(" + str(service_element.value) + ").\n"
+    # Regarding law_related
+    if service_element.law_related.value:
+      facts += "law_related_service(" + str(service_element.value) + ").\n"
+    # Regarding listed_in_fourth_schedule
+    if service_element.listed_in_fourth_schedule.value:
+      facts += "listed_in_fourth_schedule.\n"
+    pass # to end empty for loops
+  # Regarding all_conditions_of_second_schedule_satisfied
+  if all_conditions_of_second_schedule_satisfied.value:
+    facts += "conditions_of_second_schedule_satisfied.\n"
+---
+code: |
+  person.self_value = "person"
+  person.parent_value = ''
+---
+code: |
+  person[i].self_value = "person"
+  person[i].parent_value = ''
+---
+code: |
+  legal_practice.self_value = "legal practice"
+  legal_practice.parent_value = ''
+---
+code: |
+  legal_practice[i].self_value = "legal practice"
+  legal_practice[i].parent_value = ''
+---
+code: |
+  legal_practice[i].joint_law_venture.self_value = "joint law venture"
+  legal_practice[i].joint_law_venture.parent_value = legal_practice[i].value
+---
+code: |
+  legal_practice[i].formal_law_alliance.self_value = "formal law alliance"
+  legal_practice[i].formal_law_alliance.parent_value = legal_practice[i].value
+---
+code: |
+  legal_practice[i].foreign_law_practice.self_value = "foreign law practice"
+  legal_practice[i].foreign_law_practice.parent_value = legal_practice[i].value
+---
+code: |
+  legal_practice[i].jurisdiction.self_value = "jurisdiction"
+  legal_practice[i].jurisdiction.parent_value = legal_practice[i].value
+---
+code: |
+  legal_practice[i].legal_practitioner.self_value = "legal practitioner"
+  legal_practice[i].legal_practitioner.parent_value = legal_practice[i].value
+---
+code: |
+  legal_practice[i].legal_practitioner[j].self_value = "legal practitioner"
+  legal_practice[i].legal_practitioner[j].parent_value = legal_practice[i].value
+---
+code: |
+  legal_practice[i].legal_practitioner[j].locum_solicitor.self_value = "locum solicitor"
+  legal_practice[i].legal_practitioner[j].locum_solicitor.parent_value = legal_practice[i].legal_practitioner[j].value.value
+---
+code: |
+  legal_practice[i].legal_practitioner[j].primary_occupation.self_value = "primary occupation"
+  legal_practice[i].legal_practitioner[j].primary_occupation.parent_value = legal_practice[i].legal_practitioner[j].value.value
+---
+code: |
+  legal_practice[i].position.self_value = "position"
+  legal_practice[i].position.parent_value = legal_practice[i].value
+---
+code: |
+  legal_practice[i].position[j].self_value = "position"
+  legal_practice[i].position[j].parent_value = legal_practice[i].value
+---
+code: |
+  legal_practice[i].position[j].accepted_as_representative_of_parent_practice.self_value = "accepted as representative of parent practice"
+  legal_practice[i].position[j].accepted_as_representative_of_parent_practice.parent_value = legal_practice[i].position[j].value
+---
+code: |
+  legal_practice[i].position[j].associated_with.self_value = "associated with"
+  legal_practice[i].position[j].associated_with.parent_value = legal_practice[i].position[j].value
+---
+code: |
+  legal_practice[i].position[j].associated_with[k].self_value = "associated with"
+  legal_practice[i].position[j].associated_with[k].parent_value = legal_practice[i].position[j].value
+---
+code: |
+  legal_practice[i].position[j].entitles_holder_as_executive.self_value = "entitles holder as executive"
+  legal_practice[i].position[j].entitles_holder_as_executive.parent_value = legal_practice[i].position[j].value
+---
+code: |
+  legal_practice[i].position[j].independent_director.self_value = "independent director"
+  legal_practice[i].position[j].independent_director.parent_value = legal_practice[i].position[j].value
+---
+code: |
+  legal_practice[i].position[j].non_executive_director.self_value = "non executive director"
+  legal_practice[i].position[j].non_executive_director.parent_value = legal_practice[i].position[j].value
+---
+code: |
+  legal_practice[i].position[j].materially_interferes_with_practicing_as_a_lawyer_for.self_value = "materially interferes with practicing as a lawyer for"
+  legal_practice[i].position[j].materially_interferes_with_practicing_as_a_lawyer_for.parent_value = legal_practice[i].position[j].value
+---
+code: |
+  legal_practice[i].position[j].materially_interferes_with_practicing_as_a_lawyer_for[k].self_value = "materially interferes with practicing as a lawyer for"
+  legal_practice[i].position[j].materially_interferes_with_practicing_as_a_lawyer_for[k].parent_value = legal_practice[i].position[j].value
+---
+code: |
+  legal_practice[i].position[j].materially_interferes_with_availability_of.self_value = "materially interferes with availability of"
+  legal_practice[i].position[j].materially_interferes_with_availability_of.parent_value = legal_practice[i].position[j].value
+---
+code: |
+  legal_practice[i].position[j].materially_interferes_with_availability_of[k].self_value = "materially interferes with availability of"
+  legal_practice[i].position[j].materially_interferes_with_availability_of[k].parent_value = legal_practice[i].position[j].value
+---
+code: |
+  legal_practice[i].position[j].materially_interferes_with_representation_of_clients_for.self_value = "materially interferes with representation of clients for"
+  legal_practice[i].position[j].materially_interferes_with_representation_of_clients_for.parent_value = legal_practice[i].position[j].value
+---
+code: |
+  legal_practice[i].position[j].materially_interferes_with_representation_of_clients_for[k].self_value = "materially interferes with representation of clients for"
+  legal_practice[i].position[j].materially_interferes_with_representation_of_clients_for[k].parent_value = legal_practice[i].position[j].value
+---
+code: |
+  organization.self_value = "organization"
+  organization.parent_value = ''
+---
+code: |
+  organization[i].self_value = "organization"
+  organization[i].parent_value = ''
+---
+code: |
+  organization[i].carries_on.self_value = "carries on"
+  organization[i].carries_on.parent_value = organization[i].value
+---
+code: |
+  organization[i].carries_on[j].self_value = "carries on"
+  organization[i].carries_on[j].parent_value = organization[i].value
+---
+code: |
+  organization[i].provides.self_value = "provides"
+  organization[i].provides.parent_value = organization[i].value
+---
+code: |
+  organization[i].provides[j].self_value = "provides"
+  organization[i].provides[j].parent_value = organization[i].value
+---
+code: |
+  organization[i].listed_in_third_schedule.self_value = "listed in third schedule"
+  organization[i].listed_in_third_schedule.parent_value = organization[i].value
+---
+code: |
+  organization[i].position.self_value = "position"
+  organization[i].position.parent_value = organization[i].value
+---
+code: |
+  organization[i].position[j].self_value = "position"
+  organization[i].position[j].parent_value = organization[i].value
+---
+code: |
+  organization[i].position[j].associated_with.self_value = "associated with"
+  organization[i].position[j].associated_with.parent_value = organization[i].position[j].value
+---
+code: |
+  organization[i].position[j].associated_with[k].self_value = "associated with"
+  organization[i].position[j].associated_with[k].parent_value = organization[i].position[j].value
+---
+code: |
+  organization[i].position[j].independent_director.self_value = "independent director"
+  organization[i].position[j].independent_director.parent_value = organization[i].position[j].value
+---
+code: |
+  organization[i].position[j].non_executive_director.self_value = "non executive director"
+  organization[i].position[j].non_executive_director.parent_value = organization[i].position[j].value
+---
+code: |
+  organization[i].position[j].entitles_holder_as_executive.self_value = "entitles holder as executive"
+  organization[i].position[j].entitles_holder_as_executive.parent_value = organization[i].position[j].value
+---
+code: |
+  organization[i].position[j].materially_interferes_with_practicing_as_a_lawyer_for.self_value = "materially interferes with practicing as a lawyer for"
+  organization[i].position[j].materially_interferes_with_practicing_as_a_lawyer_for.parent_value = organization[i].position[j].value
+---
+code: |
+  organization[i].position[j].materially_interferes_with_practicing_as_a_lawyer_for[k].self_value = "materially interferes with practicing as a lawyer for"
+  organization[i].position[j].materially_interferes_with_practicing_as_a_lawyer_for[k].parent_value = organization[i].position[j].value
+---
+code: |
+  organization[i].position[j].materially_interferes_with_availability_of.self_value = "materially interferes with availability of"
+  organization[i].position[j].materially_interferes_with_availability_of.parent_value = organization[i].position[j].value
+---
+code: |
+  organization[i].position[j].materially_interferes_with_availability_of[k].self_value = "materially interferes with availability of"
+  organization[i].position[j].materially_interferes_with_availability_of[k].parent_value = organization[i].position[j].value
+---
+code: |
+  organization[i].position[j].materially_interferes_with_representation_of_clients_for.self_value = "materially interferes with representation of clients for"
+  organization[i].position[j].materially_interferes_with_representation_of_clients_for.parent_value = organization[i].position[j].value
+---
+code: |
+  organization[i].position[j].materially_interferes_with_representation_of_clients_for[k].self_value = "materially interferes with representation of clients for"
+  organization[i].position[j].materially_interferes_with_representation_of_clients_for[k].parent_value = organization[i].position[j].value
+---
+code: |
+  organization[i].company.self_value = "company"
+  organization[i].company.parent_value = organization[i].value
+---
+code: |
+  organization[i].corporation.self_value = "corporation"
+  organization[i].corporation.parent_value = organization[i].value
+---
+code: |
+  organization[i].partnership.self_value = "partnership"
+  organization[i].partnership.parent_value = organization[i].value
+---
+code: |
+  organization[i].llp.self_value = "llp"
+  organization[i].llp.parent_value = organization[i].value
+---
+code: |
+  organization[i].sole_proprietorship.self_value = "sole proprietorship"
+  organization[i].sole_proprietorship.parent_value = organization[i].value
+---
+code: |
+  organization[i].business_trust.self_value = "business trust"
+  organization[i].business_trust.parent_value = organization[i].value
+---
+code: |
+  organization[i].beneficial_owner.self_value = "beneficial owner"
+  organization[i].beneficial_owner.parent_value = organization[i].value
+---
+code: |
+  organization[i].beneficial_owner[j].self_value = "beneficial owner"
+  organization[i].beneficial_owner[j].parent_value = organization[i].value
+---
+code: |
+  organization[i].legal_owner.self_value = "legal owner"
+  organization[i].legal_owner.parent_value = organization[i].value
+---
+code: |
+  organization[i].legal_owner[j].self_value = "legal owner"
+  organization[i].legal_owner[j].parent_value = organization[i].value
+---
+code: |
+  organization[i].partner.self_value = "partner"
+  organization[i].partner.parent_value = organization[i].value
+---
+code: |
+  organization[i].partner[j].self_value = "partner"
+  organization[i].partner[j].parent_value = organization[i].value
+---
+code: |
+  organization[i].sole_proprietor.self_value = "sole proprietor"
+  organization[i].sole_proprietor.parent_value = organization[i].value
+---
+code: |
+  organization[i].sole_proprietor[j].self_value = "sole proprietor"
+  organization[i].sole_proprietor[j].parent_value = organization[i].value
+---
+code: |
+  organization[i].director.self_value = "director"
+  organization[i].director.parent_value = organization[i].value
+---
+code: |
+  organization[i].director[j].self_value = "director"
+  organization[i].director[j].parent_value = organization[i].value
+---
+code: |
+  business.self_value = "business"
+  business.parent_value = ''
+---
+code: |
+  business[i].self_value = "business"
+  business[i].parent_value = ''
+---
+code: |
+  business[i].detracts_from_dignity_of_legal_profession.self_value = "detracts from dignity of legal profession"
+  business[i].detracts_from_dignity_of_legal_profession.parent_value = business[i].value
+---
+code: |
+  business[i].incompatible_with_dignity_of_legal_profession.self_value = "incompatible with dignity of legal profession"
+  business[i].incompatible_with_dignity_of_legal_profession.parent_value = business[i].value
+---
+code: |
+  business[i].derogates_from_dignity_of_legal_profession.self_value = "derogates from dignity of legal profession"
+  business[i].derogates_from_dignity_of_legal_profession.parent_value = business[i].value
+---
+code: |
+  business[i].likely_to_unfairly_attract_business_in_the_practice_of_law.self_value = "likely to unfairly attract business in the practice of law"
+  business[i].likely_to_unfairly_attract_business_in_the_practice_of_law.parent_value = business[i].value
+---
+code: |
+  business[i].set_out_in_the_first_schedule.self_value = "set out in the first schedule"
+  business[i].set_out_in_the_first_schedule.parent_value = business[i].value
+---
+code: |
+  business[i].prohibited_business.self_value = "prohibited business"
+  business[i].prohibited_business.parent_value = business[i].value
+---
+code: |
+  business[i].trade.self_value = "trade"
+  business[i].trade.parent_value = business[i].value
+---
+code: |
+  business[i].calling.self_value = "calling"
+  business[i].calling.parent_value = business[i].value
+---
+code: |
+  business[i].for_profit.self_value = "for profit"
+  business[i].for_profit.parent_value = business[i].value
+---
+code: |
+  business[i].in_singapore.self_value = "in singapore"
+  business[i].in_singapore.parent_value = business[i].value
+---
+code: |
+  service.self_value = "service"
+  service.parent_value = ''
+---
+code: |
+  service[i].self_value = "service"
+  service[i].parent_value = ''
+---
+code: |
+  service[i].legal.self_value = "legal"
+  service[i].legal.parent_value = service[i].value
+---
+code: |
+  service[i].law_related.self_value = "law related"
+  service[i].law_related.parent_value = service[i].value
+---
+code: |
+  service[i].listed_in_fourth_schedule.self_value = "listed in fourth schedule"
+  service[i].listed_in_fourth_schedule.parent_value = service[i].value
+---
+code: |
+  all_conditions_of_second_schedule_satisfied.self_value = "all conditions of second schedule satisfied"
+  all_conditions_of_second_schedule_satisfied.parent_value = ''
+---
+mandatory: True
+code: |
+  for a in agenda:
+    exec(a)
+---
+mandatory: True
+question: Finished
+subquestion: |
+  ${ show_answers }
+---
+

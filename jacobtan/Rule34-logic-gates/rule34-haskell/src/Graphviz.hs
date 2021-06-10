@@ -7,7 +7,6 @@ module Graphviz (
   printDotGraph
 ) where
 
-import Data.Text (Text, pack)
 import Control.Concurrent (forkIO)
 import Control.Monad (void)
 

@@ -1,6 +1,7 @@
+{-# LANGUAGE PackageImports #-}
 module Main where
 
-import Lib ( mainFunc )
+import "rule34-haskell" Lib ( mainFunc )
 import Rule34 ( as_org )
 
 main :: IO ()

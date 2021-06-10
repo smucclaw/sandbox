@@ -312,4 +312,3 @@ as_org = putDocW 120 (org_prefix <> line <>
 org_prefix = "#+TITLE: Rule 34 as Org\n#+OPTIONS: num:nil toc:nil" <> line
 
 
-

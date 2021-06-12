@@ -1,10 +1,10 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.33.0.
+-- This file has been generated from package.yaml by hpack version 0.34.4.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: ddb99745cd686acd27bc5715ead4d94e9782ecbe1f87144c68c94f5428f3e2ed
+-- hash: 6e436400ba47a06d45b41a83a2941ecd5e30afb6ef5fda96dee719e9eb27a703
 
 name:           rule34-haskell
 version:        0.1.0.0
@@ -38,7 +38,7 @@ library
       Rule34_SMT
       Rule34_SMT_gen
       Rule34_SMT_sandbox
-      Utils
+      Sandbox
   other-modules:
       Paths_rule34_haskell
   hs-source-dirs:
@@ -47,15 +47,18 @@ library
       base >=4.7 && <5
     , casing
     , containers
+    , diagrams-sandbox
     , fgl
     , generic-data
     , graphviz
+    , jt2-haskell-utils
     , mtl
     , pretty-simple
     , prettyprinter
     , process
     , sbv
     , split
+    , svg-builder-sandbox
     , text
   default-language: Haskell2010
 
@@ -70,9 +73,11 @@ executable rule34-haskell-exe
       base >=4.7 && <5
     , casing
     , containers
+    , diagrams-sandbox
     , fgl
     , generic-data
     , graphviz
+    , jt2-haskell-utils
     , mtl
     , pretty-simple
     , prettyprinter
@@ -80,6 +85,7 @@ executable rule34-haskell-exe
     , rule34-haskell
     , sbv
     , split
+    , svg-builder-sandbox
     , text
   default-language: Haskell2010
 
@@ -95,9 +101,11 @@ test-suite rule34-haskell-test
       base >=4.7 && <5
     , casing
     , containers
+    , diagrams-sandbox
     , fgl
     , generic-data
     , graphviz
+    , jt2-haskell-utils
     , mtl
     , pretty-simple
     , prettyprinter
@@ -105,5 +113,6 @@ test-suite rule34-haskell-test
     , rule34-haskell
     , sbv
     , split
+    , svg-builder-sandbox
     , text
   default-language: Haskell2010

@@ -1,0 +1,27 @@
+# generated via https://github.com/Avi-D-coder/implicit-hie
+
+cradle:
+  stack:
+    - path: "./src"
+      component: "edsl:lib"
+
+    - path: "./app/Main.hs"
+      component: "edsl:exe:edsl-exe"
+
+    # - path: "./app/Paths_edsl.hs"
+    #   component: "edsl:exe:edsl-exe"
+
+    - path: "./test"
+      component: "edsl:test:edsl-test"
+
+    - path: "../../../jacobtan/Rule34-logic-gates/rule34-haskell/src"
+      component: "rule34-haskell:lib"
+
+    - path: "../../../jacobtan/Rule34-logic-gates/rule34-haskell/app/Main.hs"
+      component: "rule34-haskell:exe:rule34-haskell-exe"
+
+    # - path: "../../../jacobtan/Rule34-logic-gates/rule34-haskell/app/Paths_rule34_haskell.hs"
+    #   component: "rule34-haskell:exe:rule34-haskell-exe"
+
+    - path: "../../../jacobtan/Rule34-logic-gates/rule34-haskell/test"
+      component: "rule34-haskell:test:rule34-haskell-test"

@@ -6,7 +6,7 @@
 {-# LANGUAGE ViewPatterns #-}
 module Rule34_jacob where
 
-import Utils ( foldl', (&), (<&>), (>>>), show', (!), void, execShell )
+import JT2.Haskell.Utils ( foldl', (&), (<&>), (>>>), show', (!), void, execShell )
 import qualified Data.Map.Strict as Map
 import Data.Text (Text)
 import qualified Data.Text as Text

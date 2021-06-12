@@ -1,14 +1,20 @@
+{-# LANGUAGE PackageImports #-}
+
 module Lib
     ( someFunc
     ) where
 
+import qualified Data.Map as Map
 import Data.Tree
-import Data.Graph.Inductive
 import Data.List
+
+import Data.Graph.Inductive
 import Data.GraphViz (preview, GraphvizParams (fmtNode, fmtEdge, globalAttributes), graphToDot, nonClusteredParams, setDirectedness, DotGraph, printDotGraph)
 
+import Petri
+
 -- from rule34-haskell package
-import Graphviz
+import GraphViz
 
 type StateName = String
 type EdgeLabel = String
@@ -44,11 +50,12 @@ charCreator =
     ]
   , state "Choose Description" `contains`
     [ leaf $ state "Choose Age"
-    , leaf $ state "Choose Height"
+    , leaf $ "Choose Height" :-> [(Nothing, "Choose Width")]
+    --- ^ add "Choose Width" (not in original spec) to demonstrate need for recursion in the @grow@ function
     , leaf $ state "Choose Appearance"
     , leaf $ state "Choose Alignment"
     ]
-  , leaf . state $ "Get Ability Scores"
+  , leaf $ state "Choose Ability Scores"
   , leaf $ "Choose Race" :-> [(Just "Dwarf", "Choose Dwarf Sub-Race")
                              ,(Just "Elf",   "Choose Elf Sub-Race")]
   ]
@@ -60,10 +67,12 @@ normalize = grow
 -- In the "grow" phase of normalization, we promote any targets of "siblings", to leaf nodes at the same level, if they don't already exist there.
 grow :: StateTree -> StateTree
 grow (Node parent siblings) =
-  Node parent (siblings ++ nub [ leaf $ state target
-                               | (Node (_ :-> outs) children) <- siblings
+  let grownSiblings = grow <$> siblings
+  in
+  Node parent (grownSiblings ++ nub [ leaf $ state target
+                               | (Node (_ :-> outs) children) <- grownSiblings
                                , (_, target) <- outs
-                               , not $ target `elem` (stateName . rootLabel <$> siblings)
+                               , target `notElem` (stateName . rootLabel <$> grownSiblings)
                                  -- yes I know this is accidentallyquadratic.tumblr.com
                                ])
 
@@ -73,21 +82,76 @@ asHSM :: a
 asHSM = undefined 
 
 -- output to Petri net representation.
--- Petri Nets aren't strictly hierarchical.
--- We flatten the hierarchy by doing a couple of things:
+-- Petri Nets are a graph; they aren't strictly hierarchical -- we're not doing Nets In Nets.
+-- so how do we take a Workflow approach to this?
+-- https://en.wikipedia.org/wiki/Petri_net#Workflow_nets
+-- 
+-- We flatten the hierarchy into a workflow model by doing a couple of things:
 -- we rewrite all targetless children of a state to be indegrees of a join event that points to a parent state.
 -- we rewrite all sourceless children of the root state to be targets of a fork event.
--- that's how we do synchronization!
 
-synchronize :: StateTree -> StateTree
-synchronize = fork . join
+-- a labeled out edge becomes a downstream transition from a place.
+-- "case" conditions are represented as "nondeterminism" where a place can have multiple output transitions;
+-- it's up to the environment to tell us which of the transitions actually fired.
+-- in other words, case race of
+--                        dwarf -> foo
+--                        elf   -> bar
+-- translates to (chose race) place, with two output transitions
+--                -> [ race is dwarf ] -> (ready to choose dwarf sub-race) -> [ choose dwarf sub-race ] ->
+--                -> [ race is elf   ] -> (ready to choose elf   sub-race) -> [ choose elf sub-race ] ->
 
-fork = todo
-join = todo
-todo = id
 
--- asPetri :: StateTree -> DotGraph State
-
+-- (front)    -> [pre]  -> (recurse) -> [post] -> (back)
+-- (awaiting) -> [fork] -> (recurse) -> [join] -> (decided)
+-- (start)    -> [push] -> (recurse) -> [pop]  -> (end)
+asPetri :: StateTree -> PetriNet PLabel TLabel
+asPetri (Node (state :-> nexts) children) =
+  let itemname      = state
+      (front, back) = case take 6 state of
+                        "Choose" -> (PL $ "Awaiting " <> itemname, PL $ "Decided " <> itemname)
+                        _        -> (PL $ "Begin "    <> itemname, PL $ "End "     <> itemname)
+      middle        = TL itemname
+      (pre, post)   = if length children == 1
+                      then (Noop $ itemname ++ " PUSH", Noop $ itemname ++ " POP")
+                      else (Fork $ itemname ++ " FORK", Join $ itemname ++ " JOIN")
+      childPetris   = asPetri <$> children
+      scatter       = [ (pre,startState,1)
+                      | childPetri <- childPetris
+                      , let startState = head $ places childPetri ]
+      gather        = [ (endState,post,1)
+                      | childPetri <- childPetris
+                      , let endState = last $ places childPetri ]
+      withChildren  = case length children of
+        --   places                transitions  p->t edges             t->p edges
+        0 -> MkPN [front, back]    [middle]     [(front, middle, 1)]   [(middle,back,1)]
+        _ -> MkPN [front]          [pre]        [(front, pre, 1)]      scatter
+             <> mconcat childPetris <>
+             MkPN [back]           [post]       gather                 [(post, back, 1)]
+      nextStates    = mconcat
+        [ MkPN    [next]           [proceed]    [(back, proceed, 1)]   [(proceed,next,1)]
+        | (edgeLabel, statename) <- nexts
+        , let next = PL statename
+              proceed = maybe (Noop $ "proceeding directly from " ++ itemname ++ " to " ++ statename)
+                              (\el -> TL $ "from " ++ itemname ++ ", choice \"" ++ el ++ "\" leads to " ++ statename) edgeLabel
+        ]
+   in
+   nubPN $ withChildren <> nextStates
 
 someFunc :: IO ()
-someFunc = putStrLn "someFunc"
+someFunc = do
+  let pcc = asPetri (normalize charCreator)
+  Petri.run pcc (Map.fromList [(head $ places pcc, 1)])
+
+pccPetriOP :: PetriOptionalParams
+pccPetriOP = petriOP_{
+  markings = Map.fromList [(PL "Begin Character Creation", 3)],
+  transitionHighlights = [Fork "Character Creation FORK"]
+  }
+
+previewPCC :: IO ()
+previewPCC = previewPetri pccPetriOP $
+  asPetri (normalize charCreator)
+
+writePCC :: IO ()
+writePCC = writePetri "viz/pcc" pccPetriOP $
+  asPetri (normalize charCreator)

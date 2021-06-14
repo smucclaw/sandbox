@@ -1,7 +1,7 @@
 {-# LANGUAGE PackageImports #-}
 
 module Lib
-    ( someFunc
+    ( writePCC
     ) where
 
 import qualified Data.Map as Map

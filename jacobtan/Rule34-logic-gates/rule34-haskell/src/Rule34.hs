@@ -132,6 +132,7 @@ enlist separator conjunction middle front back =
     dashPrefix :: (NLG a) => ConditionTree a -> Doc ann
     dashPrefix x = (dashFor $ clabel $ rootLabel x) <> toEnglish x
 
+-- we track the initial listLength because the "middle" list shrinks as we recurse
 addConjunction :: Int -> Doc ann -> Maybe String -> [Doc ann] -> [Doc ann]
 addConjunction len separator (Just c) [y, z]
   | len >= 3  = [y <> separator <+> pretty c, z]
@@ -140,6 +141,18 @@ addConjunction _ separator _ [z]    = [z]
 addConjunction _ separator _ []     = []
 addConjunction l separator (Just c) (x:xs) = x <> separator : addConjunction l separator (Just c) xs
 addConjunction l separator Nothing  (x:xs) = x <> separator : addConjunction l separator Nothing xs
+
+-- λ: addConjunction 3 (pretty ";") (Just "and") (pretty <$> ["foo", "bar", "baz"])
+-- [ foo;
+-- , bar; and
+-- , baz
+-- ]
+-- λ: addConjunction 2 (pretty ";") (Just "and") (pretty <$> ["bar", "baz"])
+-- [ bar and
+-- , baz
+-- ]
+-- λ: addConjunction 1 (pretty ";") (Just "and") (pretty <$> ["baz"])
+-- [ baz ]
 
 instance NLG Label where
   toEnglish (MkLabel (Just l) _       PSheader) = toEnglish l <> line

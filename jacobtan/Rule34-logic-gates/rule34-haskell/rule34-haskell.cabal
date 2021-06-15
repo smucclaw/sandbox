@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 60e25f443472dddbd2d19f7d67131ac3bcacc81e1ae86c5ed1eea29e81c78fd3
+-- hash: 19dc42d460e2514f8bb7effe7651fa1009d9dbafc7880133df8e6f2e2449aa35
 
 name:           rule34-haskell
 version:        0.1.0.0
@@ -39,6 +39,7 @@ library
       Rule34_SMT_gen
       Rule34_SMT_sandbox
       Sandbox
+      SandboxBuilder
       Utils
   other-modules:
       Paths_rule34_haskell
@@ -58,16 +59,17 @@ library
     , process
     , sbv
     , split
+    , svg-builder
     , svg-builder-sandbox
     , text
   default-language: Haskell2010
 
-executable rule34-haskell-exe
+executable rule34-org
   main-is: Main.hs
   other-modules:
       Paths_rule34_haskell
   hs-source-dirs:
-      app
+      app/org
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
@@ -84,6 +86,34 @@ executable rule34-haskell-exe
     , rule34-haskell
     , sbv
     , split
+    , svg-builder
+    , svg-builder-sandbox
+    , text
+  default-language: Haskell2010
+
+executable rule34-svg
+  main-is: Main.hs
+  other-modules:
+      Paths_rule34_haskell
+  hs-source-dirs:
+      app/svg
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , casing
+    , containers
+    , diagrams-sandbox
+    , fgl
+    , generic-data
+    , graphviz
+    , mtl
+    , pretty-simple
+    , prettyprinter
+    , process
+    , rule34-haskell
+    , sbv
+    , split
+    , svg-builder
     , svg-builder-sandbox
     , text
   default-language: Haskell2010
@@ -111,6 +141,7 @@ test-suite rule34-haskell-test
     , rule34-haskell
     , sbv
     , split
+    , svg-builder
     , svg-builder-sandbox
     , text
   default-language: Haskell2010

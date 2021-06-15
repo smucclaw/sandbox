@@ -174,13 +174,10 @@ instance AABuilder (ConditionTree Predicate) where
 
   -- UnionComma
   toAA (Node (MkCondition l (Just pre) UnionComma (Just post)) children) =
-    case traverse toAA (filter relevant_aa children) of
-      Left err    -> Left err
-      Right items -> Right (AABuilder.Any
-                             (AABuilder.PrePost
-                               (ls l ++ pre ++ " any of the following")
-                               post)
-                             items)
+      AABuilder.Any (AABuilder.PrePost
+                      (ls l ++ pre ++ " any of the following")
+                      post)
+      <$> traverse toAA (filter relevant_aa children)
 
   toAA (Node (MkCondition l (Just pre) UnionComma Nothing) children) =
     case traverse toAA (filter relevant_aa children) of
@@ -212,9 +209,7 @@ instance AABuilder (ConditionTree Predicate) where
   toAA (Node (MkCondition l pre (Leaf b) post) children) = Left ("leaf node " ++ show b ++ " should have no children " ++ show children)
 
   -- Compl
-  toAA (Node (MkCondition l pre Compl post) children) = Left "Compl is not relevant, should never get here"
-  -- but Compl is used in 34.1.f.iv?
-
+  toAA (Node (MkCondition l pre Compl post) children) = AABuilder.All (AABuilder.Pre (ls l ++ "....")) <$> traverse toAA (filter relevant_aa children)
 
 toAAs :: Predicate -> String
 toAAs (Pred pterm) = renderString $ layoutCompact $ toEnglish pterm
@@ -236,5 +231,5 @@ ps (Just x) = x
 ps (Nothing) = ""
 
 relevant_aa :: ConditionTree a -> Bool
-relevant_aa (Node (MkCondition l pre Compl post) children) = False
+relevant_aa (Node (MkCondition l pre Compl post) children) = True
 relevant_aa _                                              = True

@@ -38,7 +38,7 @@ instance AA (ConditionTree Predicate) where
   toAA (Node (MkCondition l pre Union      post) children) = AA.Any  (ls l +++ ps pre <> " any of the following") $ toAA <$> (filter relevant_aa children)
   toAA (Node (MkCondition l pre UnionComma post) children) = AA.Any  (ls l +++ ps pre <> " any of the following") $ toAA <$> (filter relevant_aa children)
   toAA (Node (MkCondition l pre All        post) children) = AA.All  (ls l +++ ps pre <> " all of the following") $ toAA <$> (filter relevant_aa children)
-  toAA (Node (MkCondition l pre Compl      post) children) = error "not relevant, should never get here"
+  toAA (Node (MkCondition l pre Compl      post) children) = AA.All  (ls l +++ ps pre <> " ....") $ toAA <$> (filter relevant_aa children)
   toAA (Node (MkCondition l pre (Leaf  b)  post) [])       = AA.Leaf (ls l +++ ps pre <> toAAs b <> ps post)
   toAA (Node (MkCondition l pre (Leaf  b)  post) children) = error ("leaf node " ++ (show b) ++ " should have no children! " ++ show children)
 
@@ -62,6 +62,6 @@ ps (Nothing) = ""
 
 
 relevant_aa :: ConditionTree a -> Bool
-relevant_aa (Node (MkCondition l pre Compl      post) children) = False
+relevant_aa (Node (MkCondition l pre Compl      post) children) = True
 relevant_aa _                                                   = True
 

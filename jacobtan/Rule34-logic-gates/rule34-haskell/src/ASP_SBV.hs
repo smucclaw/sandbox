@@ -1,4 +1,4 @@
-module Rule34_SBV where
+module ASP_SBV where
 
 import Data.SBV
 
@@ -17,6 +17,7 @@ asp = do
   constrain $ sNot s .=> q
   constrain $ q .&& sNot s .=> p
   constrain $ s .&& sNot f .=> f
+  constrain $ q .=> sNot s
 
   return sTrue
 

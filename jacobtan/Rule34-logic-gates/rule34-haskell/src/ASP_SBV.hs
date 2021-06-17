@@ -7,7 +7,7 @@ asp :: Symbolic SBool -- synonymous to above
 
 asp = do
 
-  -- declare terms
+  -- declare atoms
   p <- sBool "p"
   q <- sBool "q"
   s <- sBool "s"

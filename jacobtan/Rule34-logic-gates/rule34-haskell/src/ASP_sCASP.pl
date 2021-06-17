@@ -8,4 +8,6 @@ q :- not s.
 p :- q, not s.
 f :- s, not f.
 
+% not p :- q.
+
 ?- true.

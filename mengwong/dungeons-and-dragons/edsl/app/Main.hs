@@ -5,4 +5,4 @@ module Main where
 import "edsl" Lib
 
 main :: IO ()
-main = someFunc
+main = writePCC

@@ -1,0 +1,261 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; SBV: Starting at 2021-06-17 20:52:56.8949871 +08
+;;;
+;;;           Solver    : Z3
+;;;           Executable: /home/jt2/.local/bin/z3
+;;;           Options   : -nw -in -smt2
+;;;
+;;; This file is an auto-generated loadable SMT-Lib file.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+; [20:52:56.896] [Timeout: 5s] Sending:
+(set-option :print-success true)
+; [20:52:56.897] Received: success
+; [20:52:56.897] Sending:
+(set-option :global-declarations true)
+; [20:52:56.897] Received: success
+; [20:52:56.897] Sending:
+(set-option :smtlib2_compliant true)
+; [20:52:56.897] Received: success
+; [20:52:56.897] Sending:
+(set-option :diagnostic-output-channel "stdout")
+; [20:52:56.897] Received: success
+; [20:52:56.897] Sending:
+(set-option :produce-models true)
+; [20:52:56.897] Received: success
+; [20:52:56.897] Sending:
+(set-logic QF_BV)
+; [20:52:56.898] Received: success
+; [20:52:56.898] Sending:
+(declare-fun s0 () Bool) ; tracks user variable "p"
+; [20:52:56.898] Received: success
+; [20:52:56.898] Sending:
+(declare-fun s1 () Bool) ; tracks user variable "q"
+; [20:52:56.898] Received: success
+; [20:52:56.898] Sending:
+(declare-fun s2 () Bool) ; tracks user variable "s"
+; [20:52:56.898] Received: success
+; [20:52:56.898] Sending:
+(declare-fun s3 () Bool) ; tracks user variable "f"
+; [20:52:56.898] Received: success
+; [20:52:56.898] Sending:
+(define-fun s4 () Bool (not s1))
+; [20:52:56.899] Received: success
+; [20:52:56.899] Sending:
+(define-fun s5 () Bool (not s4))
+; [20:52:56.899] Received: success
+; [20:52:56.899] Sending:
+(define-fun s6 () Bool (or s2 s5))
+; [20:52:56.900] Received: success
+; [20:52:56.901] Sending:
+(define-fun s7 () Bool (not s2))
+; [20:52:56.901] Received: success
+; [20:52:56.901] Sending:
+(define-fun s8 () Bool (not s7))
+; [20:52:56.901] Received: success
+; [20:52:56.901] Sending:
+(define-fun s9 () Bool (or s1 s8))
+; [20:52:56.901] Received: success
+; [20:52:56.901] Sending:
+(define-fun s10 () Bool (and s1 s7))
+; [20:52:56.901] Received: success
+; [20:52:56.901] Sending:
+(define-fun s11 () Bool (not s10))
+; [20:52:56.901] Received: success
+; [20:52:56.901] Sending:
+(define-fun s12 () Bool (or s0 s11))
+; [20:52:56.901] Received: success
+; [20:52:56.901] Sending:
+(define-fun s13 () Bool (not s3))
+; [20:52:56.901] Received: success
+; [20:52:56.901] Sending:
+(define-fun s14 () Bool (and s2 s13))
+; [20:52:56.901] Received: success
+; [20:52:56.901] Sending:
+(define-fun s15 () Bool (not s14))
+; [20:52:56.901] Received: success
+; [20:52:56.901] Sending:
+(define-fun s16 () Bool (or s3 s15))
+; [20:52:56.901] Received: success
+; [20:52:56.902] Sending:
+(assert s6)
+; [20:52:56.902] Received: success
+; [20:52:56.902] Sending:
+(assert s9)
+; [20:52:56.902] Received: success
+; [20:52:56.902] Sending:
+(assert s12)
+; [20:52:56.902] Received: success
+; [20:52:56.902] Sending:
+(assert s16)
+; [20:52:56.902] Received: success
+; [20:52:56.902] Sending:
+(check-sat)
+; [20:52:56.903] Received: sat
+; [20:52:56.903] Sending:
+(get-value (s0))
+; [20:52:56.903] Received: ((s0 true))
+; [20:52:56.903] Sending:
+(get-value (s1))
+; [20:52:56.903] Received: ((s1 true))
+; [20:52:56.903] Sending:
+(get-value (s2))
+; [20:52:56.903] Received: ((s2 false))
+; [20:52:56.903] Sending:
+(get-value (s3))
+; [20:52:56.903] Received: ((s3 false))
+; [20:52:56.903] Sending:
+(define-fun s17 () Bool (distinct true s0))
+; [20:52:56.903] Received: success
+; [20:52:56.903] Sending:
+(define-fun s18 () Bool (distinct true s1))
+; [20:52:56.905] Received: success
+; [20:52:56.905] Sending:
+(define-fun s19 () Bool (or s2 s3))
+; [20:52:56.905] Received: success
+; [20:52:56.906] Sending:
+(define-fun s20 () Bool (or s18 s19))
+; [20:52:56.906] Received: success
+; [20:52:56.906] Sending:
+(define-fun s21 () Bool (or s17 s20))
+; [20:52:56.906] Received: success
+; [20:52:56.906] Sending:
+(assert s21)
+; [20:52:56.906] Received: success
+; [20:52:56.906] Sending:
+(check-sat)
+; [20:52:56.906] Received: sat
+; [20:52:56.906] Sending:
+(get-value (s0))
+; [20:52:56.906] Received: ((s0 false))
+; [20:52:56.906] Sending:
+(get-value (s1))
+; [20:52:56.906] Received: ((s1 false))
+; [20:52:56.907] Sending:
+(get-value (s2))
+; [20:52:56.907] Received: ((s2 true))
+; [20:52:56.907] Sending:
+(get-value (s3))
+; [20:52:56.907] Received: ((s3 true))
+; [20:52:56.907] Sending:
+(define-fun s22 () Bool (distinct true s2))
+; [20:52:56.907] Received: success
+; [20:52:56.907] Sending:
+(define-fun s23 () Bool (distinct true s3))
+; [20:52:56.907] Received: success
+; [20:52:56.907] Sending:
+(define-fun s24 () Bool (or s22 s23))
+; [20:52:56.907] Received: success
+; [20:52:56.907] Sending:
+(define-fun s25 () Bool (or s1 s24))
+; [20:52:56.907] Received: success
+; [20:52:56.907] Sending:
+(define-fun s26 () Bool (or s0 s25))
+; [20:52:56.907] Received: success
+; [20:52:56.908] Sending:
+(assert s26)
+; [20:52:56.908] Received: success
+; [20:52:56.908] Sending:
+(check-sat)
+; [20:52:56.908] Received: sat
+; [20:52:56.908] Sending:
+(get-value (s0))
+; [20:52:56.908] Received: ((s0 false))
+; [20:52:56.908] Sending:
+(get-value (s1))
+; [20:52:56.908] Received: ((s1 true))
+; [20:52:56.908] Sending:
+(get-value (s2))
+; [20:52:56.908] Received: ((s2 true))
+; [20:52:56.908] Sending:
+(get-value (s3))
+; [20:52:56.909] Received: ((s3 true))
+; [20:52:56.909] Sending:
+(define-fun s27 () Bool (or s18 s24))
+; [20:52:56.909] Received: success
+; [20:52:56.909] Sending:
+(define-fun s28 () Bool (or s0 s27))
+; [20:52:56.909] Received: success
+; [20:52:56.909] Sending:
+(assert s28)
+; [20:52:56.909] Received: success
+; [20:52:56.909] Sending:
+(check-sat)
+; [20:52:56.909] Received: sat
+; [20:52:56.909] Sending:
+(get-value (s0))
+; [20:52:56.910] Received: ((s0 true))
+; [20:52:56.910] Sending:
+(get-value (s1))
+; [20:52:56.910] Received: ((s1 true))
+; [20:52:56.910] Sending:
+(get-value (s2))
+; [20:52:56.910] Received: ((s2 true))
+; [20:52:56.910] Sending:
+(get-value (s3))
+; [20:52:56.910] Received: ((s3 true))
+; [20:52:56.910] Sending:
+(define-fun s29 () Bool (or s17 s27))
+; [20:52:56.910] Received: success
+; [20:52:56.910] Sending:
+(assert s29)
+; [20:52:56.910] Received: success
+; [20:52:56.910] Sending:
+(check-sat)
+; [20:52:56.911] Received: sat
+; [20:52:56.911] Sending:
+(get-value (s0))
+; [20:52:56.911] Received: ((s0 true))
+; [20:52:56.911] Sending:
+(get-value (s1))
+; [20:52:56.911] Received: ((s1 true))
+; [20:52:56.911] Sending:
+(get-value (s2))
+; [20:52:56.911] Received: ((s2 false))
+; [20:52:56.911] Sending:
+(get-value (s3))
+; [20:52:56.912] Received: ((s3 true))
+; [20:52:56.912] Sending:
+(define-fun s30 () Bool (or s2 s23))
+; [20:52:56.912] Received: success
+; [20:52:56.912] Sending:
+(define-fun s31 () Bool (or s18 s30))
+; [20:52:56.912] Received: success
+; [20:52:56.912] Sending:
+(define-fun s32 () Bool (or s17 s31))
+; [20:52:56.912] Received: success
+; [20:52:56.912] Sending:
+(assert s32)
+; [20:52:56.912] Received: success
+; [20:52:56.912] Sending:
+(check-sat)
+; [20:52:56.912] Received: sat
+; [20:52:56.913] Sending:
+(get-value (s0))
+; [20:52:56.913] Received: ((s0 true))
+; [20:52:56.913] Sending:
+(get-value (s1))
+; [20:52:56.913] Received: ((s1 false))
+; [20:52:56.913] Sending:
+(get-value (s2))
+; [20:52:56.913] Received: ((s2 true))
+; [20:52:56.913] Sending:
+(get-value (s3))
+; [20:52:56.913] Received: ((s3 true))
+; [20:52:56.914] Sending:
+(define-fun s33 () Bool (or s17 s25))
+; [20:52:56.914] Received: success
+; [20:52:56.914] Sending:
+(assert s33)
+; [20:52:56.914] Received: success
+; [20:52:56.914] Sending:
+(check-sat)
+; [20:52:56.914] Received: unsat
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;
+;;; SBV: Finished at 2021-06-17 20:52:56.915275 +08
+;;;
+;;; Exit code: ExitSuccess
+;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

@@ -17,7 +17,7 @@ asp = do
   constrain $ sNot s .=> q
   constrain $ q .&& sNot s .=> p
   constrain $ s .&& sNot f .=> f
-  constrain $ q .=> sNot s
+  -- constrain $ q .=> sNot s
 
   return sTrue
 

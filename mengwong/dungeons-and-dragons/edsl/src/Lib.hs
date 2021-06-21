@@ -30,7 +30,7 @@ type StateTree = Tree State
 -- To satisfy the graph aspect, we make room inside each node for labeled exit edges.
 -- We talk about sources and targets, aka "ins" and "outs".
 data State = (:->) { stateName :: StateName
-                   , outEdges  :: [(Maybe EdgeLabel, StateName)]
+                   , outEdges  :: [(Maybe EdgeLabel, State)]
                    }
              deriving (Eq, Show)
 
@@ -43,21 +43,25 @@ x `contains` y = Node x y
 charCreator :: StateTree
 charCreator =
   state "Character Creation" `contains`
-  [ "Pre-Equipment" :-> [(Nothing, "Choose Equipment")]
-    `contains`
-    [ leaf $ state "Choose Class"
-    , leaf $ state "Choose Background"
-    ]
-  , state "Choose Description" `contains`
-    [ leaf $ state "Choose Age"
-    , leaf $ "Choose Height" :-> [(Nothing, "Choose Width")]
-    --- ^ add "Choose Width" (not in original spec) to demonstrate need for recursion in the @grow@ function
-    , leaf $ state "Choose Appearance"
-    , leaf $ state "Choose Alignment"
-    ]
-  , leaf $ state "Choose Ability Scores"
-  , leaf $ "Choose Race" :-> [(Just "Dwarf", "Choose Dwarf Sub-Race")
-                             ,(Just "Elf",   "Choose Elf Sub-Race")]
+  [
+  --   "Pre-Equipment" :-> [(Nothing, state "Choose Equipment")]
+  --   `contains`
+  --   [ leaf $ state "Choose Class"
+  --   , leaf $ state "Choose Background"
+  --   ]
+  -- ,
+  --   state "Choose Description" `contains`
+  --   [ leaf $ state "Choose Age"
+  --   , leaf $ "Choose Height" :-> [(Nothing, state "Choose Width")]
+  --   --- ^ add "Choose Width" (not in original spec) to demonstrate need for recursion in the @grow@ function
+  --   , leaf $ state "Choose Appearance"
+  --   , leaf $ state "Choose Alignment"
+  --   ]
+  -- ,
+    leaf $ state "Choose Ability Scores"
+  ,
+    leaf $ "Choose Race" :-> [(Just "Dwarf", state "Choose Dwarf Sub-Race")
+                             ,(Just "Elf",   state "Choose Elf Sub-Race")]
   ]
 
 -- The initial graph needs to be slightly cleaned up before it is ready for prime time.
@@ -72,7 +76,7 @@ grow (Node parent siblings) =
   Node parent (grownSiblings ++ nub [ leaf $ state target
                                | (Node (_ :-> outs) children) <- grownSiblings
                                , (_, target) <- outs
-                               , target `notElem` (stateName . rootLabel <$> grownSiblings)
+                               , stateName target `notElem` (stateName . rootLabel <$> grownSiblings)
                                  -- yes I know this is accidentallyquadratic.tumblr.com
                                ])
 
@@ -94,27 +98,26 @@ asHSM = undefined
 -- "case" conditions are represented as "nondeterminism" where a place can have multiple output transitions;
 -- it's up to the environment to tell us which of the transitions actually fired.
 -- in other words, case race of
---                        dwarf -> foo
---                        elf   -> bar
--- translates to (chose race) place, with two output transitions
---                -> [ race is dwarf ] -> (ready to choose dwarf sub-race) -> [ choose dwarf sub-race ] ->
---                -> [ race is elf   ] -> (ready to choose elf   sub-race) -> [ choose elf sub-race ] ->
+--                        dwarf -> let dsr = choose dwarf sub-race; return { race, dsr }
+--                        elf   -> let esr = choose elf   sub-race; return { race, esr }
+ -- translates to:
+--  (Awaiting choose race) -> [ choose race ] -> (Decided race) -> [ race is dwarf ] -> (Awaiting choose dwarf sub-race) -> [ choose d s-r ] -> (Decided choose d s-r)
+--                                                              -> [ race is elf   ] -> (Awaiting choose elf   sub-race) -> [ choose e s-r ] -> (Decided choose e s-r)
 
 
 -- (front)    -> [pre]  -> (recurse) -> [post] -> (back)
 -- (awaiting) -> [fork] -> (recurse) -> [join] -> (decided)
 -- (start)    -> [push] -> (recurse) -> [pop]  -> (end)
 asPetri :: StateTree -> PetriNet PLabel TLabel
-asPetri (Node (state :-> nexts) children) =
-  let itemname      = state
-      (front, back) = case take 6 state of
-                        "Choose" -> (PL $ "Awaiting " <> itemname, PL $ "Decided " <> itemname)
-                        _        -> (PL $ "Begin "    <> itemname, PL $ "End "     <> itemname)
+asPetri (Node (statename :-> nexts) children) =
+  let itemname      = statename
+      (front, back) = plprefix itemname
       middle        = TL itemname
       (pre, post)   = if length children == 1
                       then (Noop $ itemname ++ " PUSH", Noop $ itemname ++ " POP")
                       else (Fork $ itemname ++ " FORK", Join $ itemname ++ " JOIN")
       childPetris   = asPetri <$> children
+      nextPetris    = asPetri <$> (leaf . snd <$> nexts)
       scatter       = [ (pre,startState,1)
                       | childPetri <- childPetris
                       , let startState = head $ places childPetri ]
@@ -128,14 +131,21 @@ asPetri (Node (state :-> nexts) children) =
              <> mconcat childPetris <>
              MkPN [back]           [post]       gather                 [(post, back, 1)]
       nextStates    = mconcat
-        [ MkPN    [next]           [proceed]    [(back, proceed, 1)]   [(proceed,next,1)]
-        | (edgeLabel, statename) <- nexts
-        , let next = PL statename
-              proceed = maybe (Noop $ "proceeding directly from " ++ itemname ++ " to " ++ statename)
-                              (\el -> TL $ "from " ++ itemname ++ ", choice \"" ++ el ++ "\" leads to " ++ statename) edgeLabel
+        [ MkPN    []    [proceed]    [(back, proceed, 1)]   [(proceed,next1,1)]
+        | (edgeLabel, nextstatename) <- nexts
+        , let (next1,next2) = plprefix nextstatename
+              proceed = maybe (Noop $ "proceeding directly from " ++ itemname ++ " to " ++ nextstatename)
+                              (\el -> TL $ "after " ++ show back ++ ", choice \"" ++ el ++ "\" leads to " ++ nextstatename) edgeLabel
         ]
    in
    nubPN $ withChildren <> nextStates
+
+prefix :: String -> (String, String)
+prefix itemname = case take 6 itemname of
+                    "Choose" -> ("Awaiting " <> itemname, "Decided " <> itemname)
+                    _        -> ("Begin "    <> itemname, "End "     <> itemname)
+
+plprefix itemname = let (pl1, pl2) = prefix itemname in (PL pl1, PL pl2)
 
 someFunc :: IO ()
 someFunc = do
@@ -154,4 +164,6 @@ previewPCC = previewPetri pccPetriOP $
 
 writePCC :: IO ()
 writePCC = writePetri "viz/pcc" pccPetriOP $
-  asPetri (normalize charCreator)
+  asPetri $
+  -- normalize $
+  charCreator

@@ -31,19 +31,21 @@ asp = do
 
   -- dilbert example, ASP Primer p15
 
-  let man x = x .== sDilbert
 
+
+  marDilbert :: SBool <- exists "mar(Dilbert)"
+  husDilbert :: SBool <- exists "hus(Dilbert)"
+  sinDilbert :: SBool <- exists "sin(Dilbert)"
   x :: SPerson <- forall "x"
+
   -- x :: SPerson <- exists "x"
   -- let x = free_ :: Symbolic (SBV Person)
 
-  marDilbert :: SBool <- exists "mar(Dilbert)"
   let mar x = symbolicMerge True (x .== sDilbert) marDilbert sFalse
-  husDilbert :: SBool <- exists "hus(Dilbert)"
   let hus x = symbolicMerge True (x .== sDilbert) husDilbert sFalse
-  sinDilbert :: SBool <- exists "sin(Dilbert)"
   let sin x = symbolicMerge True (x .== sDilbert) sinDilbert sFalse
 
+  let man p = p .== sDilbert
   constrain $ mar x .&& man x .=> hus x
   constrain $ sNot (hus x) .&& man x .=> sin x
 

@@ -59,6 +59,11 @@ extra-deps:
 - force-layout-0.4.0.6@sha256:0e3d8887ea2fce3cf3fa6704cc09f93086c70c93dc8732aefb0391e8b41f0b6e,1265
 - monoid-extras-0.5.1@sha256:438dbfd7b4dce47d8f0ca577f56caf94bd1e21391afa545cad09fe7cf2e5793d,2333
 
+- process-streaming-0.9.3.0@sha256:5db7965bc2f6fe5b58598141411bc6c1787907b883bfae9d22027e9f4040a460,3356
+- conceit-0.4.0.0@sha256:e9cd1ac8aeb7f1a76b36b8ab197d99d6bdb999d7eef1c28ebe3636e74671bb16,886
+- pipes-text-1.0.0@sha256:0e5201cd499edbcbfb32bec59279938039a094b246c41d2c49c27288509a3e28,3146
+- pipes-transduce-0.4.4.0@sha256:30b7ee1324ff504d1f357ad8818923b854ee70270b91aedd90d88e3f5f37b073,2189
+
 
 # Override default flag values for local packages and extra-deps
 # flags: {}

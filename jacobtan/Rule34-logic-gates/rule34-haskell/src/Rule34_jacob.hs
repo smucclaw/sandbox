@@ -236,7 +236,7 @@ makeGraphViz = makeGraph1 >>> makeGraph2 >>> makeGraph3
 
 preview1 :: IO ()
 preview1 = preview (makeGraphViz rule34_text) >> putStrLn "< visualise a graph using the Xlib GraphvizCanvas >"
-  
+
 preview2 :: IO ()
 preview2 = preview'custom (makeGraphViz rule34_text) >> putStrLn "< visualise a graph using the Xlib GraphvizCanvas >"
 
@@ -292,7 +292,7 @@ myConditionToStm sOutputs ctp =
       labeledChildren = filter (\c ->  (Maybe.isJust . pncr) c &&
                                        (Maybe.isJust . ptcr) c) (subForest ctp)
       conditionRefs = Maybe.fromJust . pncr <$> labeledChildren
-      mygate = if length labeledChildren > 0 then myInnerToGate innerpred else Switch
+      mygate = if not (null labeledChildren) then myInnerToGate innerpred else Switch
       mylabel = P' (label2ref . Text.pack . fromJust . pncr $ ctp)
       mystmt = mkStmt
                (Text.pack $ Maybe.fromJust $ pncr ctp)
@@ -304,7 +304,7 @@ myConditionToStm sOutputs ctp =
   where cr = clabel . rootLabel
         pncr = paraNum . cr
         ptcr = predTerm . cr
-     
+
 
 myInnerToGate :: Inner Predicate -> GateType
 myInnerToGate Any        = OR

@@ -66,14 +66,15 @@ charCreator =
 
 -- The initial graph needs to be slightly cleaned up before it is ready for prime time.
 normalize :: StateTree -> StateTree
-normalize = grow
+normalize = id
 
 -- In the "grow" phase of normalization, we promote any targets of "siblings", to leaf nodes at the same level, if they don't already exist there.
+-- actually, this is not a good idea, because it ends up introducing incorrect relationships between boxes and their contents.
 grow :: StateTree -> StateTree
 grow (Node parent siblings) =
   let grownSiblings = grow <$> siblings
   in
-  Node parent (grownSiblings ++ nub [ leaf $ state target
+  Node parent (grownSiblings ++ nub [ leaf $ target
                                | (Node (_ :-> outs) children) <- grownSiblings
                                , (_, target) <- outs
                                , stateName target `notElem` (stateName . rootLabel <$> grownSiblings)
@@ -85,29 +86,6 @@ grow (Node parent siblings) =
 asHSM :: a
 asHSM = undefined 
 
--- output to Petri net representation.
--- Petri Nets are a graph; they aren't strictly hierarchical -- we're not doing Nets In Nets.
--- so how do we take a Workflow approach to this?
--- https://en.wikipedia.org/wiki/Petri_net#Workflow_nets
--- 
--- We flatten the hierarchy into a workflow model by doing a couple of things:
--- we rewrite all targetless children of a state to be indegrees of a join event that points to a parent state.
--- we rewrite all sourceless children of the root state to be targets of a fork event.
-
--- a labeled out edge becomes a downstream transition from a place.
--- "case" conditions are represented as "nondeterminism" where a place can have multiple output transitions;
--- it's up to the environment to tell us which of the transitions actually fired.
--- in other words, case race of
---                        dwarf -> let dsr = choose dwarf sub-race; return { race, dsr }
---                        elf   -> let esr = choose elf   sub-race; return { race, esr }
- -- translates to:
---  (Awaiting choose race) -> [ choose race ] -> (Decided race) -> [ race is dwarf ] -> (Awaiting choose dwarf sub-race) -> [ choose d s-r ] -> (Decided choose d s-r)
---                                                              -> [ race is elf   ] -> (Awaiting choose elf   sub-race) -> [ choose e s-r ] -> (Decided choose e s-r)
-
-
--- (front)    -> [pre]  -> (recurse) -> [post] -> (back)
--- (awaiting) -> [fork] -> (recurse) -> [join] -> (decided)
--- (start)    -> [push] -> (recurse) -> [pop]  -> (end)
 asPetri :: StateTree -> PetriNet PLabel TLabel
 asPetri (Node (statename :-> nexts) children) =
   let itemname      = statename
@@ -132,8 +110,9 @@ asPetri (Node (statename :-> nexts) children) =
              MkPN [back]           [post]       gather                 [(post, back, 1)]
       nextStates    = mconcat
         [ MkPN    []    [proceed]    [(back, proceed, 1)]   [(proceed,next1,1)]
-        | (edgeLabel, nextstatename) <- nexts
-        , let (next1,next2) = plprefix nextstatename
+        | (edgeLabel, nextstate) <- nexts
+        , let nextstatename = stateName nextstate
+              (next1,next2) = plprefix nextstatename
               proceed = maybe (Noop $ "proceeding directly from " ++ itemname ++ " to " ++ nextstatename)
                               (\el -> TL $ "after " ++ show back ++ ", choice \"" ++ el ++ "\" leads to " ++ nextstatename) edgeLabel
         ]

@@ -81,34 +81,6 @@ packages:
       sha256: 52bc06f799bd7f19f0a16f89e6cdcfba4db93339fa9a6e4bcfdb4b49245dffdb
   original:
     hackage: monoid-extras-0.5.1@sha256:438dbfd7b4dce47d8f0ca577f56caf94bd1e21391afa545cad09fe7cf2e5793d,2333
-- completed:
-    hackage: process-streaming-0.9.3.0@sha256:5db7965bc2f6fe5b58598141411bc6c1787907b883bfae9d22027e9f4040a460,3356
-    pantry-tree:
-      size: 648
-      sha256: 4d9d6cfb372de82b89ae52201077bd768686319ed2350380d00a2357c8427af3
-  original:
-    hackage: process-streaming-0.9.3.0@sha256:5db7965bc2f6fe5b58598141411bc6c1787907b883bfae9d22027e9f4040a460,3356
-- completed:
-    hackage: conceit-0.4.0.0@sha256:e9cd1ac8aeb7f1a76b36b8ab197d99d6bdb999d7eef1c28ebe3636e74671bb16,886
-    pantry-tree:
-      size: 320
-      sha256: 5693839ee61e0020fe4f387cf9de29b20e0371c0bcc46ca1e7beae93b641cd16
-  original:
-    hackage: conceit-0.4.0.0@sha256:e9cd1ac8aeb7f1a76b36b8ab197d99d6bdb999d7eef1c28ebe3636e74671bb16,886
-- completed:
-    hackage: pipes-text-1.0.0@sha256:0e5201cd499edbcbfb32bec59279938039a094b246c41d2c49c27288509a3e28,3146
-    pantry-tree:
-      size: 555
-      sha256: 2e1f4cd9d6ba296a09b31111a122f1d57392ad8b79251243dbe1915096a63a4b
-  original:
-    hackage: pipes-text-1.0.0@sha256:0e5201cd499edbcbfb32bec59279938039a094b246c41d2c49c27288509a3e28,3146
-- completed:
-    hackage: pipes-transduce-0.4.4.0@sha256:30b7ee1324ff504d1f357ad8818923b854ee70270b91aedd90d88e3f5f37b073,2189
-    pantry-tree:
-      size: 647
-      sha256: c90a7d0c8244bbf5a58ed4bd449b5b3c0cfdc5cb8824c9caf1c8cca4658fcb63
-  original:
-    hackage: pipes-transduce-0.4.4.0@sha256:30b7ee1324ff504d1f357ad8818923b854ee70270b91aedd90d88e3f5f37b073,2189
 snapshots:
 - completed:
     size: 567037

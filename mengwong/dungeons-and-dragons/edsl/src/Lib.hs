@@ -44,20 +44,20 @@ charCreator :: StateTree
 charCreator =
   state "Character Creation" `contains`
   [
-  --   "Pre-Equipment" :-> [(Nothing, state "Choose Equipment")]
-  --   `contains`
-  --   [ leaf $ state "Choose Class"
-  --   , leaf $ state "Choose Background"
-  --   ]
-  -- ,
-  --   state "Choose Description" `contains`
-  --   [ leaf $ state "Choose Age"
-  --   , leaf $ "Choose Height" :-> [(Nothing, state "Choose Width")]
-  --   --- ^ add "Choose Width" (not in original spec) to demonstrate need for recursion in the @grow@ function
-  --   , leaf $ state "Choose Appearance"
-  --   , leaf $ state "Choose Alignment"
-  --   ]
-  -- ,
+    "Pre-Equipment" :-> [(Nothing, state "Choose Equipment")]
+    `contains`
+    [ leaf $ state "Choose Class"
+    , leaf $ state "Choose Background"
+    ]
+  ,
+    state "Choose Description" `contains`
+    [ leaf $ state "Choose Age"
+    , leaf $ "Choose Height" :-> [(Nothing, state "Choose Width")]
+    --- ^ add "Choose Width" (not in original spec) to demonstrate need for recursion in the @grow@ function
+    , leaf $ state "Choose Appearance"
+    , leaf $ state "Choose Alignment"
+    ]
+  ,
     leaf $ state "Choose Ability Scores"
   ,
     leaf $ "Choose Race" :-> [(Just "Dwarf", state "Choose Dwarf Sub-Race")
@@ -86,45 +86,51 @@ grow (Node parent siblings) =
 asHSM :: a
 asHSM = undefined 
 
+-- see Note in README.org [asPetri]
 asPetri :: StateTree -> PetriNet PLabel TLabel
 asPetri (Node (statename :-> nexts) children) =
-  let itemname      = statename
-      (front, back) = plprefix itemname
-      middle        = TL itemname
+  let -- first we deal with the children -- any boxes inside this state.
+      (front, back) = plprefix statename
+      middle        = TL statename
       (pre, post)   = if length children == 1
-                      then (Noop $ itemname ++ " PUSH", Noop $ itemname ++ " POP")
-                      else (Fork $ itemname ++ " FORK", Join $ itemname ++ " JOIN")
+                      then (Noop $ statename ++ " PUSH", Noop $ statename ++ " POP")
+                      else (Fork $ statename ++ " FORK", Join $ statename ++ " JOIN")
       childPetris   = asPetri <$> children
-      nextPetris    = asPetri <$> (leaf . snd <$> nexts)
       scatter       = [ (pre,startState,1)
                       | childPetri <- childPetris
                       , let startState = head $ places childPetri ]
       gather        = [ (endState,post,1)
-                      | childPetri <- childPetris
-                      , let endState = last $ places childPetri ]
+                      | endState <- outless $ mconcat childPetris ]
       withChildren  = case length children of
         --   places                transitions  p->t edges             t->p edges
         0 -> MkPN [front, back]    [middle]     [(front, middle, 1)]   [(middle,back,1)]
         _ -> MkPN [front]          [pre]        [(front, pre, 1)]      scatter
              <> mconcat childPetris <>
              MkPN [back]           [post]       gather                 [(post, back, 1)]
+
+      nextPetris    = asPetri <$> (leaf . snd <$> nexts)
       nextStates    = mconcat
         [ MkPN    []    [proceed]    [(back, proceed, 1)]   [(proceed,next1,1)]
         | (edgeLabel, nextstate) <- nexts
         , let nextstatename = stateName nextstate
               (next1,next2) = plprefix nextstatename
-              proceed = maybe (Noop $ "proceeding directly from " ++ itemname ++ " to " ++ nextstatename)
-                              (\el -> TL $ "after " ++ show back ++ ", choice \"" ++ el ++ "\" leads to " ++ nextstatename) edgeLabel
+              proceed = maybe (Noop $ "proceeding directly from " ++ statename ++ " to " ++ nextstatename)
+                              (\el -> TL $ statename ++ " = " ++ el) edgeLabel
         ]
    in
-   nubPN $ withChildren <> nextStates
+   nubPN $ withChildren <> nextStates <> mconcat nextPetris
+  where
+    outless :: PetriNet PLabel TLabel -> [PLabel]
+    outless pn = let outful = [ place | place <- places pn
+                                      , (place,_,_) <- ptEdges pn ]
+                 in places pn \\ outful
 
 prefix :: String -> (String, String)
-prefix itemname = case take 6 itemname of
-                    "Choose" -> ("Awaiting " <> itemname, "Decided " <> itemname)
-                    _        -> ("Begin "    <> itemname, "End "     <> itemname)
+prefix statename = case take 6 statename of
+                    "Choose" -> ("Awaiting " <> statename, "Decided " <> statename)
+                    _        -> ("Begin "    <> statename, "End "     <> statename)
 
-plprefix itemname = let (pl1, pl2) = prefix itemname in (PL pl1, PL pl2)
+plprefix statename = let (pl1, pl2) = prefix statename in (PL pl1, PL pl2)
 
 someFunc :: IO ()
 someFunc = do

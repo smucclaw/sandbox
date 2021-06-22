@@ -4,19 +4,36 @@
 
 Every ~PetriNet PLabel TLabel~ comprises the following contents:
 
-| item | places | transitions | p -> t | t -> p |
-|------+--------+-------------+--------+--------|
-|      |        |             |        |        |
+- places : PLabel
+- transitions : TLabel
+- p -> t : PLabel -> TLabel
+- t -> p : TLabel -> PLabel
+
+So, if we had a simple PN consisting of:
+
+#+begin_example
+(start) -> [event] -> (end)
+#+end_example
+
+We would represent it like this:
+
+| item | places | transitions | p -> t         | t -> p       |
+|------+--------+-------------+----------------+--------------|
+|      | start  |             |                |              |
+|      |        |             | start -> event |              |
+|      |        | event       |                |              |
+|      |        |             |                | event -> end |
+|      | end    |             |                |              |
 
 The global petri net is an ~mconcat~ of all the sub-nets.
 
 ** Conventions
 
-We represent parallel workflows using a "scatter / gather" pattern: a FORK transition splits activity to multiple places, each of which heads a thread of activity. The threads eventually converge back to a JOIN transition. This is basic synchronization.
+We represent *concurrency* using a "scatter / gather" pattern: after a starting place, a FORK transition splits activity to multiple places, each of which heads a thread of activity. The threads eventually converge back to a JOIN transition, which proceeds to an ending place. This is basic synchronization.
 
-We represent choice among multiple possible events by using labeled edges.
+We represent *choice* among multiple possible events by using labeled edges.
 
-We represent user input by an ~(Await X) -> [X] -> (Decided X)~ set of nodes.
+We represent *external events* by an ~(Await X) -> [X] -> (Decided X)~ set of nodes, where ~[X]~ is read from an event stream.
 
 ** Conversion from StateTree
 
@@ -24,13 +41,13 @@ A StateTree is made of ~Node (stateName :-> outEdges)~ and its children.
 
 We convert a StateTree to a PetriNet using the following transformations:
 
-*** Leaf Node (plain box)
+*** Leaf Node (plain simple box)
 
 | Node | stateName | outEdges | subForest | PetriNet | places       | transitions | p -> t  | t -> p  |
 |------+-----------+----------+-----------+----------+--------------+-------------+---------+---------|
-|      | box       | []       | []        |          | Awaiting box |             |         |         |
-|      |           |          |           |          |              | box         | Ab -> b | b -> Db |
-|      |           |          |           |          | Decided box  |             |         |         |
+|      | box       | []       | []        |          | Awaiting box |             | Ab -> b |         |
+|      |           |          |           |          |              | box         |         |         |
+|      |           |          |           |          | Decided box  |             |         | b -> Db |
 
 *** Box containing one child and no outEdges
 
@@ -38,27 +55,53 @@ We convert a StateTree to a PetriNet using the following transformations:
 |------+-----------+----------+-----------+----------+-----------------+-------------+----------+----------|
 |      | parent    | []       | [box]     |          | Awaiting parent | parentFork  | Ap -> pF | pF -> Ab |
 |      |           |          |           |          | Awaiting box    | box         | Ab -> b  | b -> Db  |
-|      |           |          |           |          | Decided box     | parentJoin  | Db -> pJ |          |
-|      |           |          |           |          | Decided parent  |             |          | pJ -> Dp |
+|      |           |          |           |          | Decided box     |             | Db -> pJ |          |
+|      |           |          |           |          | Decided parent  | parentJoin  |          | pJ -> Dp |
+
+The fork and join seem extraneous, but they make sense when there are multiple children:
 
 *** Box containing two children and no outEdges
 
-| Node | stateName | outEdges | subForest    | PetriNet | places          | transitions | p -> t   | t -> p       |
-|------+-----------+----------+--------------+----------+-----------------+-------------+----------+--------------|
-|      | parent    | []       | [box, child] |          | Awaiting parent | parentFork  | Ap -> pF | Ac |
-|      |           |          |              |          |                 |             |          | q11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111a |
-|      |           |          |              |          | Awaiting box    | box         | Ab -> b  | pF -> Ab, b -> Db |
-|      |           |          |              |          | Decided box     | parentJoin  | Db -> pJ |              |
-|      |           |          |              |          | Awaiting child  | child       | Ac -> c  | c -> Dc      |
-|      |           |          |              |          | Decided child   |             | Dc -> pJ |              |
-|      |           |          |              |          | Decided parent  |             |          | pJ -> Dp     |
-
+| Node | stateName | outEdges | subForest    | PetriNet | places          | transitions | p -> t   | t -> p             |
+|------+-----------+----------+--------------+----------+-----------------+-------------+----------+--------------------|
+|      | parent    | []       | [box, child] |          | Awaiting parent | parentFork  | Ap -> pF | pF -> Ab, pF -> Ac |
+|      |           |          |              |          | Awaiting box    | box         | Ab -> b  | b -> Db            |
+|      |           |          |              |          | Decided box     |             | Db -> pJ |                    |
+|      |           |          |              |          | Awaiting child  | child       | Ac -> c  | c -> Dc            |
+|      |           |          |              |          | Decided child   |             | Dc -> pJ |                    |
+|      |           |          |              |          | Decided parent  | parentJoin  |          | pJ -> Dp           |
 
 *** Plain box with one outEdge, unlabeled
 
+| Node | stateName | outEdges     | subForest | PetriNet | places        | transitions | p -> t    | t -> p    |
+|------+-----------+--------------+-----------+----------+---------------+-------------+-----------+-----------|
+|      | box       | [((), next)] | []        |          | Awaiting box  | box         | Ab -> b   | b -> Db   |
+|      |           |              |           |          | Decided box   |             | Db -> b2n |           |
+|      |           |              |           |          |               | box2next    |           | b2n -> An |
+|      |           |              |           |          | Awaiting next | next        | An -> n   | n -> Dn   |
+|      |           |              |           |          | Decided next  |             |           |           |
+
 *** Plain box with two outEdges, labeled
 
-*** Plain box with one child and one outEdge
+| Node | stateName | outEdges     | subForest | PetriNet | places         | transitions | p -> t    | t -> p    |
+|------+-----------+--------------+-----------+----------+----------------+-------------+-----------+-----------|
+|      | box       | [(b1,next1), | []        |          |                |             |           |           |
+|      |           | (b2,next2)]  |           |          | Awaiting box   | box         | Ab -> b   | b -> Db   |
+|      |           |              |           |          | Decided box    |             |           |           |
+|      |           |              |           |          |                | b1          | Db -> b1  | b1 -> An1 |
+|      |           |              |           |          | Awaiting next1 | next1       | An1 -> n1 | n1 -> Dn1 |
+|      |           |              |           |          | Decided next1  |             |           |           |
+|      |           |              |           |          |                | b2          | Db -> b2  | b2 -> An2 |
+|      |           |              |           |          | Awaiting next2 | next2       | An2 -> n2 | n2 -> Dn2 |
+|      |           |              |           |          | Decided next2  |             |           |           |
+
+Some piece of code then needs to track that both next1 and next2 are terminal states, and need to gather to the top-level.
+
+*** Box with two children and two outEdges, unlabeled                                       :todo:
+
+TODO
+
+
 
 *** Other Remarks
 output to Petri net representation.

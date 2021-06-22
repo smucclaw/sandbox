@@ -62,9 +62,6 @@ library
     , svg-builder
     , svg-builder-sandbox
     , text
-    , pipes-bytestring
-    , pipes
-    , async
   default-language: Haskell2010
 
 executable rule34-org
@@ -92,10 +89,6 @@ executable rule34-org
     , svg-builder
     , svg-builder-sandbox
     , text
-    , pipes-bytestring
-    , pipes
-    , async
-
   default-language: Haskell2010
 
 executable rule34-svg
@@ -123,9 +116,6 @@ executable rule34-svg
     , svg-builder
     , svg-builder-sandbox
     , text
-    , pipes-bytestring
-    , pipes
-    , async
   default-language: Haskell2010
 
 test-suite rule34-haskell-test
@@ -154,7 +144,4 @@ test-suite rule34-haskell-test
     , svg-builder
     , svg-builder-sandbox
     , text
-    , pipes-bytestring
-    , pipes
-    , async
   default-language: Haskell2010

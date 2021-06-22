@@ -109,13 +109,6 @@ packages:
       sha256: c90a7d0c8244bbf5a58ed4bd449b5b3c0cfdc5cb8824c9caf1c8cca4658fcb63
   original:
     hackage: pipes-transduce-0.4.4.0@sha256:30b7ee1324ff504d1f357ad8818923b854ee70270b91aedd90d88e3f5f37b073,2189
-- completed:
-    hackage: shh-0.7.1.0@sha256:c2c9d1c7c6580d802565aa2b5c5ffdbd04815edc0b2e33059161e9cd67cf64eb,2375
-    pantry-tree:
-      size: 581
-      sha256: 9b2b65e80ff0d9669727ff3fbf2fc59b1e99a488dfa68c8a017404a09e30ba43
-  original:
-    hackage: shh-0.7.1.0@sha256:c2c9d1c7c6580d802565aa2b5c5ffdbd04815edc0b2e33059161e9cd67cf64eb,2375
 snapshots:
 - completed:
     size: 567037

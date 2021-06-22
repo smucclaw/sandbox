@@ -26,12 +26,12 @@ import Prettyprinter.Render.String (renderString)
 import Prettyprinter
 import Graphics.Svg
 
-import Control.Concurrent.Async
-import Control.Exception
+
 import System.IO
-import System.Process
-import Pipes
-import qualified Pipes.ByteString as P
+import qualified Data.Text as T
+import qualified Data.Text.Lazy as L
+
+
 
 
 errorEl :: String -> Element
@@ -45,32 +45,16 @@ errorEl msg =
        (  tspan_ [ X_ <<- "200", Dy_ <<- "20", Font_weight_ <<- "bold" ] "Looks like something went wrong!"
        <> tspan_ [ X_ <<- "200", Dy_ <<- "20", Font_weight_ <<- "lighter" ] (toElement msg))
 
-writeToFile :: Handle -> FilePath -> IO ()
-writeToFile handle path = 
-    finally (withFile path WriteMode $ \hOut ->
-                runEffect $ P.fromHandle handle >-> P.toHandle hOut)
-            (hClose handle) 
-
 drawItem :: Either String AABuilder.Item -> IO ()
-drawItem (Left err) = renderToFile "rule34_1_err.svg" $ AABuilder.makeSvg $ (500, errorEl err)
-drawItem (Right item) = renderToFile "rule34_1.svg" $ AABuilder.makeSvg $ AABuilder.renderItem item
+drawItem (Left err) = hPutStr stderr $ T.unpack $ L.toStrict $ renderText $ AABuilder.makeSvg $ (500, errorEl err)
+drawItem (Right item) = putStr $ T.unpack $ L.toStrict $ renderText $ AABuilder.makeSvg $ AABuilder.renderItem item
 
-main :: IO()
-main = do 
-  (_,mOut,mErr,pH) <- createProcess (proc "stack" ["run", "foo.svg"] ) { std_out = CreatePipe , std_err = CreatePipe }
-  let (hOut,hErr) = fromMaybe (error "bogus handles") 
-                           ((,) <$> mOut <*> mErr)
-  a1 <- async $ writeToFile hOut "rule34_1.svg" 
-  a2 <- async $ writeToFile hErr "rule34_1_err.svg" 
-  waitBoth a1 a2
-  return ()
-
--- main :: IO ()
--- main = drawItem $ toAA Rule34.rule34_1
+main :: IO ()
+main = drawItem $ toAA Rule34.rule34_1
                    
 
--- mainErr :: IO ()
--- mainErr = drawItem $ toAA Rule34.rule34_1_Any_err
+mainErr :: IO ()
+mainErr = drawItem $ toAA Rule34.rule34_1_Any_err
 
 class (Show x) => AABuilder x where
   toAA :: x -> Either String AABuilder.Item

@@ -50,8 +50,8 @@ defeated_remedial_act(26,E,T,2):-law_agency_disclosure_prohibition(E,T),time(T).
 :-act(notify_individuals,E,T,T1),law_agency_disclosure_prohibition(E,T),time(T),time(T1).
 
 % Generate remediating actions
-{act(notify_comission,E,T,T1)}:-trigger(26,E,T),T1>T, time(T),time(T1).
-{act(notify_individuals,E,T,T1)}:-trigger(26,E,T),T1>T, time(T),time(T1).
+{act(notify_comission,E,T,T1)}:-trigger(26,E,T),T1>=T, time(T),time(T1).
+{act(notify_individuals,E,T,T1)}:-trigger(26,E,T),T1>=T, time(T),time(T1).
 
 
 

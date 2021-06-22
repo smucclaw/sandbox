@@ -29,9 +29,9 @@ The global petri net is an ~mconcat~ of all the sub-nets.
 
 ** Conventions
 
-We represent *concurrency* using a "scatter / gather" pattern: after a starting place, a FORK transition splits activity to multiple places, each of which heads a thread of activity. The threads eventually converge back to a JOIN transition, which proceeds to an ending place. This is basic synchronization.
+We represent *concurrency* using a "scatter / gather" pattern: after a starting place, a ~FORK~ transition splits activity to multiple places, each of which heads a thread of activity. The threads eventually converge back to a ~JOIN~ transition, which proceeds to an ending place. This is basic synchronization.
 
-We represent *choice* among multiple possible events by using labeled edges.
+We represent *choice* among multiple possible events by labeling the multiple edges that exit a place.
 
 We represent *external events* by an ~(Await X) -> [X] -> (Decided X)~ set of nodes, where ~[X]~ is read from an event stream.
 
@@ -81,29 +81,65 @@ The fork and join seem extraneous, but they make sense when there are multiple c
 |      |           |              |           |          | Awaiting next | next        | An -> n   | n -> Dn   |
 |      |           |              |           |          | Decided next  |             |           |           |
 
+~box2next~ is implemented as a ~Noop "proceeding directly from box to next"~
+
 *** Plain box with two outEdges, labeled
 
 | Node | stateName | outEdges     | subForest | PetriNet | places         | transitions | p -> t    | t -> p    |
 |------+-----------+--------------+-----------+----------+----------------+-------------+-----------+-----------|
-|      | box       | [(b1,next1), | []        |          |                |             |           |           |
-|      |           | (b2,next2)]  |           |          | Awaiting box   | box         | Ab -> b   | b -> Db   |
+|      | box       | [(t1,next1)  | []        |          |                |             |           |           |
+|      |           | ,(t2,next2)] |           |          | Awaiting box   | box         | Ab -> b   | b -> Db   |
 |      |           |              |           |          | Decided box    |             |           |           |
-|      |           |              |           |          |                | b1          | Db -> b1  | b1 -> An1 |
+|      |           |              |           |          |                | t1          | Db -> t1  | t1 -> An1 |
 |      |           |              |           |          | Awaiting next1 | next1       | An1 -> n1 | n1 -> Dn1 |
 |      |           |              |           |          | Decided next1  |             |           |           |
-|      |           |              |           |          |                | b2          | Db -> b2  | b2 -> An2 |
+|      |           |              |           |          |                | t2          | Db -> t2  | t2 -> An2 |
 |      |           |              |           |          | Awaiting next2 | next2       | An2 -> n2 | n2 -> Dn2 |
 |      |           |              |           |          | Decided next2  |             |           |           |
 
-Some piece of code then needs to track that both next1 and next2 are terminal states, and need to gather to the top-level.
+Some piece of code then needs to track that both next1 and next2 are terminal states, and gather to the top-level.
 
-*** Box with two children and two outEdges, unlabeled                                       :todo:
+*** Box with two children and two outEdges, labeled
 
-TODO
+| Node | stateName | outEdges     | subForest | PetriNet | places          | transitions | p -> t    | t -> p    |
+|------+-----------+--------------+-----------+----------+-----------------+-------------+-----------+-----------|
+|      | parent    | [(t1,next1)  | [box      |          |                 |             |           |           |
+|      |           | ,(t2,next2)] | ,child]   |          |                 |             |           |           |
+|      |           |              |           |          | Awaiting parent | parentFork  | Ap -> pF  |           |
+|      |           |              |           |          |                 |             |           | pF -> Ab  |
+|      |           |              |           |          | Awaiting box    | box         | Ab -> b   | b -> Db   |
+|      |           |              |           |          | Decided box     | parentJoin  | Db -> pJ  |           |
+|      |           |              |           |          |                 |             |           | pF -> Ac  |
+|      |           |              |           |          | Awaiting child  | child       | Ac -> c   | c -> Dc   |
+|      |           |              |           |          | Decided child   | parentJoin  | Dc -> pJ  |           |
+|      |           |              |           |          | Decided parent  |             |           | pJ -> Dp  |
+|      |           |              |           |          |                 | t1          | Dp -> t1  | t1 -> An1 |
+|      |           |              |           |          | Awaiting next1  | next1       | An1 -> n1 | n1 -> Dn1 |
+|      |           |              |           |          | Decided next1   |             |           |           |
+|      |           |              |           |          |                 | t2          | Db -> t2  | t2 -> An2 |
+|      |           |              |           |          | Awaiting next2  | next2       | An2 -> n2 | n2 -> Dn2 |
+|      |           |              |           |          | Decided next2   |             |           |           |
+
+*** General Principles
+
+We induce from the above examples that first we deal with children, then we deal with outdegrees.
+
+What do we join? Whatever places are produced by the children, which have no outdegree transitions.
+
+*** Naming conventions n the ~asPetri~ function
+
+Given a state ~X~,
+
+The ~front~ and ~back~ places are labels ~Awaiting X~ and ~Decided X~.
+
+The ~pre~ and ~post~ transitions are either ~X Fork~ and ~X Join~, or ~Noop~s: ~X Push~ and ~X Pop~. These are useful in the parent/subForest case.
+
+~middle~ is just the transition ~X~ itself.
 
 
 
 *** Other Remarks
+
 output to Petri net representation.
 Petri Nets are a graph; they aren't strictly hierarchical -- we're not doing Nets In Nets.
 so how do we take a Workflow approach to this?

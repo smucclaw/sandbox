@@ -44,7 +44,7 @@ remedial_act(26,E,T,2):-act(notify_individuals,E,T,T1),trigger(26,E,T),T<=T1, no
 
 
 % Exceptions and prohibitions for notifying individuals 26D (5a), (6b)
-defeated_remidial_act(26,E,T,2):-defeated_cause_significant_harm(E,T),time(T).
+defeated_remedial_act(26,E,T,2):-defeated_cause_significant_harm(E,T),time(T).
 defeated_remedial_act(26,E,T,2):-law_agency_disclosure_prohibition(E,T),time(T).
 % This line may or may not be strictly necessary
 :-act(notify_individuals,E,T,T1),law_agency_disclosure_prohibition(E,T),time(T),time(T1).

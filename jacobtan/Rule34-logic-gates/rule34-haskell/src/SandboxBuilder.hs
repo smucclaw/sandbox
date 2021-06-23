@@ -40,8 +40,8 @@ errorEl msg =
        <> tspan_ [ X_ <<- "200", Dy_ <<- "20", Font_weight_ <<- "lighter" ] (toElement msg))
 
 drawItem :: Either String AABuilder.Item -> IO ()
-drawItem (Left err) = hPutStr stderr $ T.unpack $ renderText $ AABuilder.makeSvg $ (500, errorEl err)
-drawItem (Right item) = putStr $ T.unpack $ renderText $ AABuilder.makeSvg $ AABuilder.renderItem item
+drawItem (Left err) = hPutStr stderr . T.unpack . renderText . AABuilder.makeSvg $ (500, errorEl err)
+drawItem (Right item) = putStr . T.unpack . renderText . AABuilder.makeSvg $ AABuilder.renderItem item
 
 main :: IO ()
 main = drawItem $ toAA Rule34.rule34_1

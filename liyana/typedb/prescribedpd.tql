@@ -1,0 +1,54 @@
+define
+
+
+    individual sub entity,
+        plays prescribed-personal-data:owner,
+        plays contract:customer,
+        owns salary,
+        owns fee,
+        owns commission,
+        owns bonus,
+        owns gratuity,
+        owns allowance,
+        owns other-remuneration,
+        owns income,
+        owns number-of-card;
+
+    person sub entity,
+        plays prescribed-personal-data:owner,
+        owns name;
+
+    organisation sub entity,
+        plays contract:provider;
+
+
+    contract sub relation,
+        relates provider,
+        relates customer;
+    
+    prescribed-personal-data sub relation,
+        relates owner;
+
+
+    name sub attribute,
+        value string;
+    salary sub attribute,
+        value double;
+    fee sub attribute,
+        value long;
+    commission sub attribute,
+        value long;
+    bonus sub attribute,
+        value long;
+    gratuity sub attribute,
+        value long;
+    allowance sub attribute,
+        value double;
+    other-remuneration sub attribute,
+        value long;
+    income sub attribute,
+        value long;
+    number-of-card sub attribute,
+        value long;
+    likely-to-occur sub attribute,
+        value boolean;

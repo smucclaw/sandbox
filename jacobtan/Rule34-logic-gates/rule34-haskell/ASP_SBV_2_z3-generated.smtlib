@@ -1,0 +1,74 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; SBV: Starting at 2021-06-18 04:13:58.8804035 +08
+;;;
+;;;           Solver    : Z3
+;;;           Executable: /home/jt2/.local/bin/z3
+;;;           Options   : -nw -in -smt2
+;;;
+;;; This file is an auto-generated loadable SMT-Lib file.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+; [04:13:58.880] [Timeout: 5s] Sending:
+(set-option :print-success true)
+; [04:13:58.881] Received: success
+; [04:13:58.881] Sending:
+(set-option :global-declarations true)
+; [04:13:58.881] Received: success
+; [04:13:58.881] Sending:
+(set-option :smtlib2_compliant true)
+; [04:13:58.882] Received: success
+; [04:13:58.882] Sending:
+(set-option :diagnostic-output-channel "stdout")
+; [04:13:58.882] Received: success
+; [04:13:58.882] Sending:
+(set-option :produce-models true)
+; [04:13:58.882] Received: success
+; [04:13:58.882] Sending:
+(set-logic ALL) ; has user-defined sorts, using catch-all.
+; [04:13:58.882] Received: success
+; [04:13:58.882] Sending:
+(declare-datatypes ((Person 0)) (((Dilbert))))
+; [04:13:58.886] Received: success
+; [04:13:58.886] Sending:
+(define-fun Person_constrIndex ((x Person)) Int
+   0
+)
+; [04:13:58.886] Received: success
+; [04:13:58.886] Sending:
+(define-fun s4 () Person Dilbert)
+; [04:13:58.886] Received: success
+; [04:13:58.886] Sending:
+(declare-fun s1 (Person) Bool) ; tracks user variable "mar(Dilbert)"
+; [04:13:58.886] Received: success
+; [04:13:58.887] Sending:
+(declare-fun s2 (Person) Bool) ; tracks user variable "hus(Dilbert)"
+; [04:13:58.887] Received: success
+; [04:13:58.887] Sending:
+(declare-fun s3 (Person) Bool) ; tracks user variable "sin(Dilbert)"
+; [04:13:58.887] Received: success
+; [04:13:58.887] Sending:
+(assert (forall ((s0 Person))
+            (let ((s5 (= s0 s4)))
+            (let ((s6 (and (s1 s0) s5)))
+            (let ((s7 (and s5 s6)))
+            (let ((s8 (not s7)))
+            (let ((s9 (and (s2 s0) s5)))
+            (let ((s10 (or s8 s9)))
+            (let ((s11 (not s9)))
+            (let ((s12 (and s5 s11)))
+            (let ((s13 (not s12)))
+            (let ((s14 (and (s3 s0) s5)))
+            (let ((s15 (or s13 s14)))
+            (and s10 s15))))))))))))))
+; [04:13:58.887] Received: success
+; [04:13:58.887] Sending:
+(check-sat)
+; [04:13:58.891] Received: sat
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;
+;;; SBV: Finished at 2021-06-18 04:13:58.8928327 +08
+;;;
+;;; Exit code: ExitSuccess
+;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

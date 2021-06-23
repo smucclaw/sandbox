@@ -30,7 +30,7 @@ type StateTree = Tree State
 -- To satisfy the graph aspect, we make room inside each node for labeled exit edges.
 -- We talk about sources and targets, aka "ins" and "outs".
 data State = (:->) { stateName :: StateName
-                   , outEdges  :: [(Maybe EdgeLabel, StateName)]
+                   , outEdges  :: [(Maybe EdgeLabel, State)]
                    }
              deriving (Eq, Show)
 
@@ -43,36 +43,41 @@ x `contains` y = Node x y
 charCreator :: StateTree
 charCreator =
   state "Character Creation" `contains`
-  [ "Pre-Equipment" :-> [(Nothing, "Choose Equipment")]
+  [
+    "Pre-Equipment" :-> [(Nothing, state "Choose Equipment")]
     `contains`
     [ leaf $ state "Choose Class"
     , leaf $ state "Choose Background"
     ]
-  , state "Choose Description" `contains`
+  ,
+    state "Choose Description" `contains`
     [ leaf $ state "Choose Age"
-    , leaf $ "Choose Height" :-> [(Nothing, "Choose Width")]
+    , leaf $ "Choose Height" :-> [(Nothing, state "Choose Width")]
     --- ^ add "Choose Width" (not in original spec) to demonstrate need for recursion in the @grow@ function
     , leaf $ state "Choose Appearance"
     , leaf $ state "Choose Alignment"
     ]
-  , leaf $ state "Choose Ability Scores"
-  , leaf $ "Choose Race" :-> [(Just "Dwarf", "Choose Dwarf Sub-Race")
-                             ,(Just "Elf",   "Choose Elf Sub-Race")]
+  ,
+    leaf $ state "Choose Ability Scores"
+  ,
+    leaf $ "Choose Race" :-> [(Just "Dwarf", state "Choose Dwarf Sub-Race")
+                             ,(Just "Elf",   state "Choose Elf Sub-Race")]
   ]
 
 -- The initial graph needs to be slightly cleaned up before it is ready for prime time.
 normalize :: StateTree -> StateTree
-normalize = grow
+normalize = id
 
 -- In the "grow" phase of normalization, we promote any targets of "siblings", to leaf nodes at the same level, if they don't already exist there.
+-- actually, this is not a good idea, because it ends up introducing incorrect relationships between boxes and their contents.
 grow :: StateTree -> StateTree
 grow (Node parent siblings) =
   let grownSiblings = grow <$> siblings
   in
-  Node parent (grownSiblings ++ nub [ leaf $ state target
+  Node parent (grownSiblings ++ nub [ leaf $ target
                                | (Node (_ :-> outs) children) <- grownSiblings
                                , (_, target) <- outs
-                               , target `notElem` (stateName . rootLabel <$> grownSiblings)
+                               , stateName target `notElem` (stateName . rootLabel <$> grownSiblings)
                                  -- yes I know this is accidentallyquadratic.tumblr.com
                                ])
 
@@ -81,61 +86,51 @@ grow (Node parent siblings) =
 asHSM :: a
 asHSM = undefined 
 
--- output to Petri net representation.
--- Petri Nets are a graph; they aren't strictly hierarchical -- we're not doing Nets In Nets.
--- so how do we take a Workflow approach to this?
--- https://en.wikipedia.org/wiki/Petri_net#Workflow_nets
--- 
--- We flatten the hierarchy into a workflow model by doing a couple of things:
--- we rewrite all targetless children of a state to be indegrees of a join event that points to a parent state.
--- we rewrite all sourceless children of the root state to be targets of a fork event.
-
--- a labeled out edge becomes a downstream transition from a place.
--- "case" conditions are represented as "nondeterminism" where a place can have multiple output transitions;
--- it's up to the environment to tell us which of the transitions actually fired.
--- in other words, case race of
---                        dwarf -> foo
---                        elf   -> bar
--- translates to (chose race) place, with two output transitions
---                -> [ race is dwarf ] -> (ready to choose dwarf sub-race) -> [ choose dwarf sub-race ] ->
---                -> [ race is elf   ] -> (ready to choose elf   sub-race) -> [ choose elf sub-race ] ->
-
-
--- (front)    -> [pre]  -> (recurse) -> [post] -> (back)
--- (awaiting) -> [fork] -> (recurse) -> [join] -> (decided)
--- (start)    -> [push] -> (recurse) -> [pop]  -> (end)
+-- see Note in README.org [asPetri]
 asPetri :: StateTree -> PetriNet PLabel TLabel
-asPetri (Node (state :-> nexts) children) =
-  let itemname      = state
-      (front, back) = case take 6 state of
-                        "Choose" -> (PL $ "Awaiting " <> itemname, PL $ "Decided " <> itemname)
-                        _        -> (PL $ "Begin "    <> itemname, PL $ "End "     <> itemname)
-      middle        = TL itemname
+asPetri (Node (statename :-> nexts) children) =
+  let -- first we deal with the children -- any boxes inside this state.
+      (front, back) = plprefix statename
+      middle        = TL statename
       (pre, post)   = if length children == 1
-                      then (Noop $ itemname ++ " PUSH", Noop $ itemname ++ " POP")
-                      else (Fork $ itemname ++ " FORK", Join $ itemname ++ " JOIN")
+                      then (Noop $ statename ++ " PUSH", Noop $ statename ++ " POP")
+                      else (Fork $ statename ++ " FORK", Join $ statename ++ " JOIN")
       childPetris   = asPetri <$> children
       scatter       = [ (pre,startState,1)
                       | childPetri <- childPetris
                       , let startState = head $ places childPetri ]
       gather        = [ (endState,post,1)
-                      | childPetri <- childPetris
-                      , let endState = last $ places childPetri ]
+                      | endState <- outless $ mconcat childPetris ]
       withChildren  = case length children of
         --   places                transitions  p->t edges             t->p edges
         0 -> MkPN [front, back]    [middle]     [(front, middle, 1)]   [(middle,back,1)]
         _ -> MkPN [front]          [pre]        [(front, pre, 1)]      scatter
              <> mconcat childPetris <>
              MkPN [back]           [post]       gather                 [(post, back, 1)]
+
+      nextPetris    = asPetri <$> (leaf . snd <$> nexts)
       nextStates    = mconcat
-        [ MkPN    [next]           [proceed]    [(back, proceed, 1)]   [(proceed,next,1)]
-        | (edgeLabel, statename) <- nexts
-        , let next = PL statename
-              proceed = maybe (Noop $ "proceeding directly from " ++ itemname ++ " to " ++ statename)
-                              (\el -> TL $ "from " ++ itemname ++ ", choice \"" ++ el ++ "\" leads to " ++ statename) edgeLabel
+        [ MkPN    []    [proceed]    [(back, proceed, 1)]   [(proceed,next1,1)]
+        | (edgeLabel, nextstate) <- nexts
+        , let nextstatename = stateName nextstate
+              (next1,next2) = plprefix nextstatename
+              proceed = maybe (Noop $ "proceeding directly from " ++ statename ++ " to " ++ nextstatename)
+                              (\el -> TL $ statename ++ " = " ++ el) edgeLabel
         ]
    in
-   nubPN $ withChildren <> nextStates
+   nubPN $ withChildren <> nextStates <> mconcat nextPetris
+  where
+    outless :: PetriNet PLabel TLabel -> [PLabel]
+    outless pn = let outful = [ place | place <- places pn
+                                      , (place,_,_) <- ptEdges pn ]
+                 in places pn \\ outful
+
+prefix :: String -> (String, String)
+prefix statename = case take 6 statename of
+                    "Choose" -> ("Awaiting " <> statename, "Decided " <> statename)
+                    _        -> ("Begin "    <> statename, "End "     <> statename)
+
+plprefix statename = let (pl1, pl2) = prefix statename in (PL pl1, PL pl2)
 
 someFunc :: IO ()
 someFunc = do
@@ -154,4 +149,6 @@ previewPCC = previewPetri pccPetriOP $
 
 writePCC :: IO ()
 writePCC = writePetri "viz/pcc" pccPetriOP $
-  asPetri (normalize charCreator)
+  asPetri $
+  -- normalize $
+  charCreator

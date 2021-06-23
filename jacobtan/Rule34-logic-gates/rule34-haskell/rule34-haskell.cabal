@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 6e436400ba47a06d45b41a83a2941ecd5e30afb6ef5fda96dee719e9eb27a703
+-- hash: 6b729c5c1f54c150b7c268683ea83164ccfdada5c330efe2679b30418e1d360e
 
 name:           rule34-haskell
 version:        0.1.0.0
@@ -27,6 +27,8 @@ source-repository head
 
 library
   exposed-modules:
+      ASP_SBV
+      ASP_SBV_2
       Defeasible
       Encoding
       Fgl

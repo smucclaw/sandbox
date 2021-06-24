@@ -21,10 +21,14 @@ define
     organisation sub entity,
         plays contract:provider;
 
+    lawyer sub entity,
+        plays contract:drafter;
+
 
     contract sub relation,
         relates provider,
-        relates customer;
+        relates customer,
+        relates drafter;
     
     prescribed-personal-data sub relation,
         relates owner;

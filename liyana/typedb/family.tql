@@ -1,0 +1,43 @@
+define
+
+
+    person sub entity,
+        bowns name, 
+        owns birthdate,
+        plays parentship:child,
+        plays siblings:sibling;
+
+    mom sub entity,
+        plays parentship:mother;
+
+    dad sub entity,
+        plays parentship:father;
+
+    sister sub entity,
+        plays siblings:sibling;
+
+    brother sub entity,
+        plays siblings:sibling;
+
+    siblings sub relation,
+        relates sibling;
+
+    parentship sub relation,
+        relates child,
+        relates mother,
+        relates father;
+    
+    # rule people-with-same-parents-are-siblings:
+    # when {
+    # (mother: $m, $x) isa parentship;
+    # (mother: $m, $y) isa parentship;
+    # (father: $f, $x) isa parentship;
+    # (father: $f, $y) isa parentship;
+    # } then {
+    # (sibling: $x, sibling: $y) isa siblings;
+    # };
+
+    name sub attribute,
+        value string;
+    birthdate sub attribute,
+        value datetime;

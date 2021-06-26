@@ -138,19 +138,34 @@ The ~pre~ and ~post~ transitions are either ~X Fork~ and ~X Join~, or ~Noop~s: ~
 
 
 
-*** Other Remarks
+* Playing a Petri Net
 
-output to Petri net representation.
-Petri Nets are a graph; they aren't strictly hierarchical -- we're not doing Nets In Nets.
-so how do we take a Workflow approach to this?
-https://en.wikipedia.org/wiki/Petri_net#Workflow_nets
+We use a Petri Net to represent a workflow.
 
-we rewrite all targetless children of a state to be indegrees of a join event that points to a parent state.
-we rewrite all sourceless children of the root state to be targets of a fork event.
+We have a notion of an event stream provided by the environment.
 
-a labeled out edge becomes a downstream transition from a place.
-"case" conditions are represented as "nondeterminism" where a place can have multiple output transitions;
-it's up to the environment to tell us which of the transitions actually fired.
+A Petri Net consumes those "external" events -- a.k.a. transitions -- and updates markings accordingly.
+
+Some events are "internal" -- Forks and Joins and Noops are artefacts of our Petri Net encoding. Internal events are not expected from the environment. Instead, they auto-play.
+
+The ~Case~ transition is a special internal transition that implements conditional branch. The edge label is tested against the value received in the immediately preceding event, and if it matches, the transition is fired.
+
+Let's set up this hierarchy of stepper functions:
+
+- play0 :: autoplay all internal events e.g. Fork, Join, Noop, Case until we run out of internal events
+- play1 :: run play0, then consume one event. If the event is not enabled, log a warning, and return the event so it goes back into the input stream.
+- play_stream :: given an event stream, play1 each event in the stream until no events remain  
+
+What are the types of these functions? They rather remind one of a parser combinator: we are consuming input and elaborating structure, together with an error log.
+
+In an ideal world, the the appropriate pattern would be a monadic parser combinator.
+
+In this initial implementation, we just do things the dumb way.
+
+
+...
+
+
 in other words, case race of
                        dwarf -> let dsr = choose dwarf sub-race; return { race, dsr }
                        elf   -> let esr = choose elf   sub-race; return { race, esr }

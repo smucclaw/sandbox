@@ -7,6 +7,7 @@ module Lib
 import qualified Data.Map as Map
 import Data.Tree
 import Data.List
+import Data.List.Split
 
 import Data.Graph.Inductive
 import Data.GraphViz (preview, GraphvizParams (fmtNode, fmtEdge, globalAttributes), graphToDot, nonClusteredParams, setDirectedness, DotGraph, printDotGraph)
@@ -115,7 +116,7 @@ asPetri (Node (statename :-> nexts) children) =
         , let nextstatename = stateName nextstate
               (next1,next2) = plprefix nextstatename
               proceed = maybe (Noop $ "proceeding directly from " ++ statename ++ " to " ++ nextstatename)
-                              (\el -> TL $ statename ++ " = " ++ el) edgeLabel
+                              (mkCase statename) edgeLabel
         ]
    in
    nubPN $ withChildren <> nextStates <> mconcat nextPetris
@@ -124,6 +125,10 @@ asPetri (Node (statename :-> nexts) children) =
     outless pn = let outful = [ place | place <- places pn
                                       , (place,_,_) <- ptEdges pn ]
                  in places pn \\ outful
+    mkCase :: StringText -> StringText -> TLabel
+    mkCase previousPlace edgeLabel
+      | '=' `elem` edgeLabel = let els = wordsBy (=='=') edgeLabel in Case (els !! 0) (els !! 1)
+      | otherwise            = Case previousPlace edgeLabel
 
 prefix :: String -> (String, String)
 prefix statename = case take 6 statename of

@@ -29,6 +29,7 @@ dependencies:
 - jt2-haskell-utils
 - generic-data
 - text
+- split
 
 
 library:

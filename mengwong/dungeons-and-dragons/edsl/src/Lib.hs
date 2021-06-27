@@ -45,24 +45,25 @@ charCreator :: StateTree
 charCreator =
   state "Character Creation" `contains`
   [
-    "Pre-Equipment" :-> [(Nothing, state "Choose Equipment")]
-    `contains`
-    [ leaf $ state "Choose Class"
-    , leaf $ state "Choose Background"
-    ]
-  ,
-    state "Choose Description" `contains`
-    [ leaf $ state "Choose Age"
-    , leaf $ "Choose Height" :-> [(Nothing, state "Choose Width")]
-    --- ^ add "Choose Width" (not in original spec) to demonstrate need for recursion in the @grow@ function
-    , leaf $ state "Choose Appearance"
-    , leaf $ state "Choose Alignment"
-    ]
-  ,
+  --   "Pre-Equipment" :-> [(Nothing, state "Choose Equipment")]
+  --   `contains`
+  --   [ leaf $ state "Choose Class"
+  --   , leaf $ state "Choose Background"
+  --   ]
+  -- ,
+  --   state "Choose Description" `contains`
+  --   [ leaf $ state "Choose Age"
+  --   , leaf $ "Choose Height" :-> [(Nothing, state "Choose Width")]
+  --   --- ^ add "Choose Width" (not in original spec) to demonstrate need for recursion in the @grow@ function
+  --   , leaf $ state "Choose Appearance"
+  --   , leaf $ state "Choose Alignment"
+  --   ]
+  -- ,
     leaf $ state "Choose Ability Scores"
-  ,
-    leaf $ "Choose Race" :-> [(Just "Dwarf", state "Choose Dwarf Sub-Race")
-                             ,(Just "Elf",   state "Choose Elf Sub-Race")]
+    , leaf $ state "Choose Potato Scores"
+  -- ,
+  --   leaf $ "Choose Race" :-> [(Just "Dwarf", state "Choose Dwarf Sub-Race")
+  --                            ,(Just "Elf",   state "Choose Elf Sub-Race")]
   ]
 
 -- The initial graph needs to be slightly cleaned up before it is ready for prime time.
@@ -86,6 +87,10 @@ grow (Node parent siblings) =
 -- every non-leaf node is a cluster
 asHSM :: a
 asHSM = undefined 
+
+mymain = play0 (MyPetri (asPetri charCreator) (Map.fromList [(PL "Begin Character Creation",1)]), ["init"])
+
+myenabled (MyPetri pn mm) = enabled pn mm
 
 -- see Note in README.org [asPetri]
 asPetri :: StateTree -> PetriNet PLabel TLabel

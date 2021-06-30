@@ -16,16 +16,16 @@ packages:
   original:
     url: https://github.com/2jacobtan/G2/archive/b18d6b78249637c7348af9059c57e2a2239d19cd.tar.gz
 - completed:
-    size: 2347
-    url: https://github.com/2jacobtan/G2Q/archive/1a7c178a69a8f229ad26237e6af226e409143ca2.tar.gz
+    size: 2336
+    url: https://github.com/2jacobtan/G2Q/archive/90f020baa462bf9e2b93dc2577864eeffc868377.tar.gz
     name: g2q
     version: 0.1.0.0
-    sha256: 0d05559ae9d550bd9f23548372480d570627fb60cfdc5caf201fcf8a817d748e
+    sha256: 5f8a25f06c8f13f56c196a8418532878d9162e6bcc4e0c7e04ac51b47da52686
     pantry-tree:
       size: 356
-      sha256: ca195d3842bbc594aa4250105b904b6a1a9ec390aafe468b8e5985ef74b3d02f
+      sha256: dfde859e128cdd8eb5b898122347ea96238970650e39f4b455fa5d7892fdfee1
   original:
-    url: https://github.com/2jacobtan/G2Q/archive/1a7c178a69a8f229ad26237e6af226e409143ca2.tar.gz
+    url: https://github.com/2jacobtan/G2Q/archive/90f020baa462bf9e2b93dc2577864eeffc868377.tar.gz
 - completed:
     hackage: bimap-0.3.3@sha256:232518c0410990665b9c8677eb9318ee355c001d58945ddcbedec3baa30b4160,1475
     pantry-tree:

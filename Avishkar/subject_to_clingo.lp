@@ -19,9 +19,9 @@ according_to(3,c).
 subject_to(3,1).
 subject_to(3,2).
 
-% The lower priority rule is defeated by the higher priority rule if the conclusion of the higher priority rule opposess the conclusion from the lower priority rule.
+% The lower priority rule is defeated by the higher priority rule if the conclusion of the higher priority rule opposess the conclusion from the lower priority rule AND the higher priority rule has come into effect.
 
-defeated_legally(R,C,R1):-opposess(C,C1),according_to(R,C),according_to(R1,C1),subject_to(R1,R).
+defeated_legally(R,C,R1):-opposess(C,C1),according_to(R,C),according_to(R1,C1),legally_valid(R1,C1),subject_to(R1,R).
 
 % Definition of not_legally_valid.
 

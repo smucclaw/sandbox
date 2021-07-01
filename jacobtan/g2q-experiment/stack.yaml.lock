@@ -5,16 +5,16 @@
 
 packages:
 - completed:
-    size: 393356
-    url: https://github.com/2jacobtan/G2/archive/b18d6b78249637c7348af9059c57e2a2239d19cd.tar.gz
+    size: 393418
+    url: https://github.com/2jacobtan/G2/archive/1b680f6ac25cf1c29099613e6889148f71deca48.tar.gz
     name: g2
     version: 0.1.0.1
-    sha256: 5c3b0c762edb7cad29bb8019bdb8de720d39e159dfe4a1dcbdbbb5d4dd5c6b2a
+    sha256: dafeacfa0df33c413daeed0d67c9d9f080ce83ea0cc2d85e80492ac95743001e
     pantry-tree:
-      size: 39579
-      sha256: 42a6d380bec8970c38586543468f61f3aade5b32b82799e555fe338fa196c64f
+      size: 39639
+      sha256: 72e6ed572e949d13053e42c39885d6df7f02e02bc06f9c040bcd5c2cdc49e830
   original:
-    url: https://github.com/2jacobtan/G2/archive/b18d6b78249637c7348af9059c57e2a2239d19cd.tar.gz
+    url: https://github.com/2jacobtan/G2/archive/1b680f6ac25cf1c29099613e6889148f71deca48.tar.gz
 - completed:
     size: 2336
     url: https://github.com/2jacobtan/G2Q/archive/90f020baa462bf9e2b93dc2577864eeffc868377.tar.gz

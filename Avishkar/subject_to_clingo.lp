@@ -10,7 +10,7 @@ opposess(b,c):-legally_true(a).
 opposess(b,a):-legally_true(c).
 
 % Opoosess is a symmetric relationship
-opposess(X,Y):-oposess(Y,X).
+opposess(X,Y):-opposess(Y,X).
 
 according_to(1,a).
 according_to(2,b).

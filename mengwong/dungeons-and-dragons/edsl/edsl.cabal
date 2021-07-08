@@ -3,8 +3,6 @@ cabal-version: 1.12
 -- This file has been generated from package.yaml by hpack version 0.34.4.
 --
 -- see: https://github.com/sol/hpack
---
--- hash: 1cf79b46bbc99719bea168f4789a239b6cf3434a6bec52401b123b1deaeb8adb
 
 name:           edsl
 version:        0.1.0.0
@@ -41,10 +39,11 @@ library
     , generic-data
     , graphviz
     , jt2-haskell-utils
+    , optparse-generic
     , pretty-simple
     , prettyprinter
-    , text
     , split
+    , text
   default-language: Haskell2010
 
 executable edsl-exe
@@ -62,8 +61,10 @@ executable edsl-exe
     , generic-data
     , graphviz
     , jt2-haskell-utils
+    , optparse-generic
     , pretty-simple
     , prettyprinter
+    , split
     , text
   default-language: Haskell2010
 
@@ -83,7 +84,9 @@ test-suite edsl-test
     , generic-data
     , graphviz
     , jt2-haskell-utils
+    , optparse-generic
     , pretty-simple
     , prettyprinter
+    , split
     , text
   default-language: Haskell2010

@@ -30,7 +30,7 @@ dependencies:
 - generic-data
 - text
 - split
-
+- optparse-generic
 
 library:
   source-dirs: src

@@ -4,10 +4,12 @@
 
 module Main where
 import "edsl" Lib
-
+import System.Environment
 import Options.Generic
 
-data MyOpts = MyOpts { out :: String }
+data MyOpts = MyOpts { out :: String
+                     , sketch :: String
+                     }
     deriving (Generic, Show)
 
 instance ParseRecord MyOpts
@@ -15,5 +17,5 @@ instance ParseRecord MyOpts
 main = do
     x <- getRecord "edsl-exe"
     -- print (x :: MyOpts)
-    writePCC ( out x )
+    writePCC ( out x ) ( sketch x )
 

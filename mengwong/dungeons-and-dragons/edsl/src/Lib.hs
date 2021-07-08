@@ -41,29 +41,37 @@ state x = x :-> []
 x `contains` y = Node x y
 
 -- Now we have a grammar for specifying the character creator HSM!
+ccSimple :: StateTree
+ccSimple = 
+  state "Character Creation" `contains`
+  [
+    leaf $ state "Choose Ability Scores"
+  , leaf $ state "Choose Potato Scores"
+  ]
+
 charCreator :: StateTree
 charCreator =
   state "Character Creation" `contains`
   [
-  --   "Pre-Equipment" :-> [(Nothing, state "Choose Equipment")]
-  --   `contains`
-  --   [ leaf $ state "Choose Class"
-  --   , leaf $ state "Choose Background"
-  --   ]
-  -- ,
-  --   state "Choose Description" `contains`
-  --   [ leaf $ state "Choose Age"
-  --   , leaf $ "Choose Height" :-> [(Nothing, state "Choose Width")]
-  --   --- ^ add "Choose Width" (not in original spec) to demonstrate need for recursion in the @grow@ function
-  --   , leaf $ state "Choose Appearance"
-  --   , leaf $ state "Choose Alignment"
-  --   ]
-  -- ,
+    "Pre-Equipment" :-> [(Nothing, state "Choose Equipment")]
+    `contains`
+    [ leaf $ state "Choose Class"
+    , leaf $ state "Choose Background"
+    ]
+  ,
+    state "Choose Description" `contains`
+    [ leaf $ state "Choose Age"
+    , leaf $ "Choose Height" :-> [(Nothing, state "Choose Width")]
+    --- ^ add "Choose Width" (not in original spec) to demonstrate need for recursion in the @grow@ function
+    , leaf $ state "Choose Appearance"
+    , leaf $ state "Choose Alignment"
+    ]
+  ,
     leaf $ state "Choose Ability Scores"
     , leaf $ state "Choose Potato Scores"
-  -- ,
-  --   leaf $ "Choose Race" :-> [(Just "Dwarf", state "Choose Dwarf Sub-Race")
-  --                            ,(Just "Elf",   state "Choose Elf Sub-Race")]
+  ,
+    leaf $ "Choose Race" :-> [(Just "Dwarf", state "Choose Dwarf Sub-Race")
+                             ,(Just "Elf",   state "Choose Elf Sub-Race")]
   ]
 
 -- The initial graph needs to be slightly cleaned up before it is ready for prime time.
@@ -157,8 +165,11 @@ previewPCC :: IO ()
 previewPCC = previewPetri pccPetriOP $
   asPetri (normalize charCreator)
 
-writePCC :: String -> IO ()
-writePCC outfile = writePetri outfile pccPetriOP $
+writePCC :: String -> String -> IO ()
+writePCC outfile sketch = writePetri outfile pccPetriOP $
   asPetri $
   -- normalize $
-  charCreator
+  case sketch of
+    "charCreator" -> charCreator
+    "ccSimple" -> ccSimple
+    _ -> error "choose one of: charCreator, ccSimple"

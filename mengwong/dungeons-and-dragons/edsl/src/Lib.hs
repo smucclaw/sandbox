@@ -157,8 +157,8 @@ previewPCC :: IO ()
 previewPCC = previewPetri pccPetriOP $
   asPetri (normalize charCreator)
 
-writePCC :: IO ()
-writePCC = writePetri "viz/pcc" pccPetriOP $
+writePCC :: String -> IO ()
+writePCC outfile = writePetri outfile pccPetriOP $
   asPetri $
   -- normalize $
   charCreator

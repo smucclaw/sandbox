@@ -12,6 +12,7 @@
 {-# LANGUAGE ConstraintKinds #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE IncoherentInstances #-}
+{-# LANGUAGE ImplicitParams #-}
 module LambdaBound where
 
 import Bound
@@ -72,8 +73,20 @@ instance Show (DummyShow a) where
   showsPrec n (DummyShow sp sl a) = sp n a
 --   showList (DummyShow sp sl a) = sp n a
 
+data ShowRec a = ShowRec { shwPrec :: Int -> a -> ShowS}
+
+newtype SmartShow a = SmartShow a
+
+-- class WithShow
+type HasShow a = (?shwPrc :: Int -> a -> ShowS)
+-- instance HasShow a => Show (SmartShow a) where
+instance Show (SmartShow a) where
+  showsPrec n (SmartShow a) = sp n a
+--   showList (SmartShow a) = sp n a
+
 instance Show1 Exp where
   liftShowsPrec sp sl n e = showsPrec n $ fmap (DummyShow sp sl) e
+  liftShowList sp sl = _
 
 -- deriving instance Eq a => Eq (Exp a)
 deriving instance Show a => Show (Exp a)

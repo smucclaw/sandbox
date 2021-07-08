@@ -88,3 +88,24 @@ instance Show ProcessHandle where
 --  getProcessExitCode p
 
 
+-- data Foo = Foo Int
+
+-- x :: Foo
+-- x = _ undefined
+
+-- z :: Char
+-- z = _ "hello"
+
+-- f :: Int -> Int
+-- f x = case x of
+--   0 -> _
+--   1 -> _
+--   2 -> _
+--   3 -> _
+--   4 -> _
+--   5 -> _
+--   6 -> _
+--   7 -> _
+--   8 -> _
+--   9 -> _
+--   10 -> _

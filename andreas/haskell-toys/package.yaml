@@ -26,6 +26,9 @@ dependencies:
 - bound
 - deriving-compat
 - random
+- profunctors
+- process
+- turtle
 
 library:
   source-dirs: src

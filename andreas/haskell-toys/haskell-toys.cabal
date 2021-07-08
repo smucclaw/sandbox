@@ -1,10 +1,10 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.33.0.
+-- This file has been generated from package.yaml by hpack version 0.34.4.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 0afd69c37012127da329836ac108d9051f369ee3588dc1e506fcb42b0894744f
+-- hash: 1c9408f4b6b887ad39bb96f9d8b53325b394a9f59a712d6390517cf6efd96bba
 
 name:           haskell-toys
 version:        0.1.0.0
@@ -28,12 +28,21 @@ source-repository head
 library
   exposed-modules:
       BoundEx
+      CoerceWith
       Euler217
+      Flexible
       FreeStuff
       GenericAlternative
+      GenericIndices
+      GenericIndices2
+      Hyperfunctions
+      Junk.DerivingViaCoherence
+      Junk.Stackoverflow66941010
+      Junk.StackoverflowQuestion66897069
       LambdaBound
       LazyPi
       Lib
+      LspFuzz
       SimplifySums
       Stlc
   other-modules:
@@ -46,7 +55,10 @@ library
     , containers
     , deriving-compat
     , prettyprinter
+    , process
+    , profunctors
     , random
+    , turtle
   default-language: Haskell2010
 
 executable haskell-toys-exe
@@ -63,7 +75,10 @@ executable haskell-toys-exe
     , deriving-compat
     , haskell-toys
     , prettyprinter
+    , process
+    , profunctors
     , random
+    , turtle
   default-language: Haskell2010
 
 test-suite haskell-toys-test
@@ -81,5 +96,8 @@ test-suite haskell-toys-test
     , deriving-compat
     , haskell-toys
     , prettyprinter
+    , process
+    , profunctors
     , random
+    , turtle
   default-language: Haskell2010

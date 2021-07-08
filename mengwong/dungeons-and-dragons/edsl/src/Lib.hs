@@ -74,6 +74,16 @@ charCreator =
                              ,(Just "Elf",   state "Choose Elf Sub-Race")]
   ]
 
+safePost :: StateTree
+safePost =
+  leaf $ "Safe Contract" :-> [(Just "Equity Financing", state "Conversion")
+                             ,(Just "Liquidity Event", "Greater of" :-> [(Just "Cash-Out Amount",   state "Residual Pro-Rata")
+                                                                        ,(Just "Conversion Amount", state "Conversion Pro-Rata")])
+                             ,(Just "Dissolution", state "Residual Pro-Rata")
+                              -- Liquidiation Priority is not a state transition, it is a decorator to the Liquidity and Dissolution Events.
+                             -- Termination is not actually a state transition, it just indicates exclusivity between the other state transitions, which is implicit here
+                             ]
+  
 -- The initial graph needs to be slightly cleaned up before it is ready for prime time.
 normalize :: StateTree -> StateTree
 normalize = id
@@ -171,5 +181,6 @@ writePCC outfile sketch = writePetri outfile pccPetriOP $
   -- normalize $
   case sketch of
     "charCreator" -> charCreator
-    "ccSimple" -> ccSimple
-    _ -> error "choose one of: charCreator, ccSimple"
+    "ccSimple"    -> ccSimple
+    "safePost"    -> safePost
+    _ -> error "choose one of: charCreator, ccSimple, safePost"

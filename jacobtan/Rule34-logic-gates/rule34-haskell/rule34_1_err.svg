@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+    "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg xmlns="http://www.w3.org/2000/svg" height="500.0" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.11.1"><image height="200" width="200" x="200" xlink:href="https://media.giphy.com/media/wrCicfORd8f7AFkrCs/giphy.gif" y="100"/><text fill="gray" font-family="sans-serif" x="200" y="300"><tspan dy="20" x="200" font-weight="bold">Looks like something went wrong!</tspan><tspan dy="20" x="200" font-weight="lighter">The top-level &#39;Any&#39; type should have at least a pre.</tspan></text></svg>

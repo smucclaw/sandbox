@@ -27,7 +27,6 @@ library
       GraphViz
       Lib
       Petri
-      Sandbox
   other-modules:
       Paths_edsl
   hs-source-dirs:

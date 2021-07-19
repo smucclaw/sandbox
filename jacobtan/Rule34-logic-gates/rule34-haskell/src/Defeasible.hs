@@ -6,7 +6,7 @@ module Defeasible where
 data Defeasor pn = Notwithstanding [pn]
                  | SubjectTo       [pn]
                  | Despite         [pn]
-              deriving (Show, Eq)
+              deriving (Show, Eq, Read)
 
 class Defeasible x where
   subjectTo       :: x -> x -> x

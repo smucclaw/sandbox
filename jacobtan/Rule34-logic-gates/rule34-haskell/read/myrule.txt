@@ -1,0 +1,514 @@
+MyRule
+    { rlabel = MkLabel
+        { paraNum = Just "34.1"
+        , predTerm = Nothing
+        , pStyle = PSheader
+        }
+    , defeasors = []
+    , party = "Legal Practitioner"
+    , deontic = MustNot
+    , condition = Node
+        { rootLabel = MkCondition
+            { clabel = MkLabel
+                { paraNum = Just "34.1"
+                , predTerm = Just "Toplevel 34.1"
+                , pStyle = PShidden
+                }
+            , cPre = Just "a legal practitioner must not accept any executive appointment associated with"
+            , inner = Any
+            , cPost = Nothing
+            }
+        , subForest =
+            [ Node
+                { rootLabel = MkCondition
+                    { clabel = MkLabel
+                        { paraNum = Just "34.1.a"
+                        , predTerm = Just "IncompatibleDignity"
+                        , pStyle = PSheader
+                        }
+                    , cPre = Just "any business which"
+                    , inner = Or
+                    , cPost = Just "the dignity of the legal profession"
+                    }
+                , subForest =
+                    [ Node
+                        { rootLabel = MkCondition
+                            { clabel = MkLabel
+                                { paraNum = Nothing
+                                , predTerm = Nothing
+                                , pStyle = PSnormal
+                                }
+                            , cPre = Nothing
+                            , inner = Leaf
+                                ( Pred "detractsFrom" )
+                            , cPost = Nothing
+                            }
+                        , subForest = []
+                        }
+                    , Node
+                        { rootLabel = MkCondition
+                            { clabel = MkLabel
+                                { paraNum = Nothing
+                                , predTerm = Nothing
+                                , pStyle = PSnormal
+                                }
+                            , cPre = Nothing
+                            , inner = Leaf
+                                ( Pred "isIncompatibleWith" )
+                            , cPost = Nothing
+                            }
+                        , subForest = []
+                        }
+                    , Node
+                        { rootLabel = MkCondition
+                            { clabel = MkLabel
+                                { paraNum = Nothing
+                                , predTerm = Nothing
+                                , pStyle = PSnormal
+                                }
+                            , cPre = Nothing
+                            , inner = Leaf
+                                ( Pred "derogatesFrom" )
+                            , cPost = Nothing
+                            }
+                        , subForest = []
+                        }
+                    ]
+                }
+            , Node
+                { rootLabel = MkCondition
+                    { clabel = MkLabel
+                        { paraNum = Just "34.1.b"
+                        , predTerm = Just "MateriallyInterferes"
+                        , pStyle = PSheader
+                        }
+                    , cPre = Just "any business which materially interferes with"
+                    , inner = Or
+                    , cPost = Nothing
+                    }
+                , subForest =
+                    [ Node
+                        { rootLabel = MkCondition
+                            { clabel = MkLabel
+                                { paraNum = Nothing
+                                , predTerm = Nothing
+                                , pStyle = PSnormal
+                                }
+                            , cPre = Nothing
+                            , inner = Leaf
+                                ( Pred "primaryOccupation(LP)" )
+                            , cPost = Nothing
+                            }
+                        , subForest = []
+                        }
+                    , Node
+                        { rootLabel = MkCondition
+                            { clabel = MkLabel
+                                { paraNum = Nothing
+                                , predTerm = Nothing
+                                , pStyle = PSnormal
+                                }
+                            , cPre = Nothing
+                            , inner = Leaf
+                                ( Pred "availability(LP)" )
+                            , cPost = Nothing
+                            }
+                        , subForest = []
+                        }
+                    , Node
+                        { rootLabel = MkCondition
+                            { clabel = MkLabel
+                                { paraNum = Nothing
+                                , predTerm = Nothing
+                                , pStyle = PSnormal
+                                }
+                            , cPre = Nothing
+                            , inner = Leaf
+                                ( Pred "representationOfClients(LP)" )
+                            , cPost = Nothing
+                            }
+                        , subForest = []
+                        }
+                    ]
+                }
+            , Node
+                { rootLabel = MkCondition
+                    { clabel = MkLabel
+                        { paraNum = Just "34.1.c"
+                        , predTerm = Just "UnfairAttractBusiness"
+                        , pStyle = PSheader
+                        }
+                    , cPre = Just "any business which is "
+                    , inner = Leaf
+                        ( Pred "unfairlyAttractive" )
+                    , cPost = Nothing
+                    }
+                , subForest = []
+                }
+            , Node
+                { rootLabel = MkCondition
+                    { clabel = MkLabel
+                        { paraNum = Just "34.1.d"
+                        , predTerm = Just "ShareLPRFees"
+                        , pStyle = PSheader
+                        }
+                    , cPre = Just "any business which involves"
+                    , inner = Or
+                    , cPost = Just "any unauthorised person for legal work performed by the legal practitioner"
+                    }
+                , subForest =
+                    [ Node
+                        { rootLabel = MkCondition
+                            { clabel = MkLabel
+                                { paraNum = Nothing
+                                , predTerm = Nothing
+                                , pStyle = PSnormal
+                                }
+                            , cPre = Nothing
+                            , inner = Leaf
+                                ( Pred "feeSharing(LP)" )
+                            , cPost = Nothing
+                            }
+                        , subForest = []
+                        }
+                    , Node
+                        { rootLabel = MkCondition
+                            { clabel = MkLabel
+                                { paraNum = Nothing
+                                , predTerm = Nothing
+                                , pStyle = PSnormal
+                                }
+                            , cPre = Nothing
+                            , inner = Leaf
+                                ( Pred "commission" )
+                            , cPost = Nothing
+                            }
+                        , subForest = []
+                        }
+                    ]
+                }
+            , Node
+                { rootLabel = MkCondition
+                    { clabel = MkLabel
+                        { paraNum = Just "34.1.e"
+                        , predTerm = Just "BusinessFirstSchedule"
+                        , pStyle = PSheader
+                        }
+                    , cPre = Just "any business "
+                    , inner = Leaf
+                        ( Pred "inSchedule1" )
+                    , cPost = Nothing
+                    }
+                , subForest = []
+                }
+            , Node
+                { rootLabel = MkCondition
+                    { clabel = MkLabel
+                        { paraNum = Just "34.1.f"
+                        , predTerm = Just "ProhibitedBusiness"
+                        , pStyle = PSheader
+                        }
+                    , cPre = Just "any business which is prohibited by"
+                    , inner = Or
+                    , cPost = Nothing
+                    }
+                , subForest =
+                    [ Node
+                        { rootLabel = MkCondition
+                            { clabel = MkLabel
+                                { paraNum = Just "34.1.f.i"
+                                , predTerm = Nothing
+                                , pStyle = PSheader
+                                }
+                            , cPre = Nothing
+                            , inner = Leaf
+                                ( Pred "theAct" )
+                            , cPost = Nothing
+                            }
+                        , subForest = []
+                        }
+                    , Node
+                        { rootLabel = MkCondition
+                            { clabel = MkLabel
+                                { paraNum = Just "34.1.f.ii"
+                                , predTerm = Nothing
+                                , pStyle = PSheader
+                                }
+                            , cPre = Nothing
+                            , inner = Or
+                            , cPost = Nothing
+                            }
+                        , subForest =
+                            [ Node
+                                { rootLabel = MkCondition
+                                    { clabel = MkLabel
+                                        { paraNum = Nothing
+                                        , predTerm = Nothing
+                                        , pStyle = PSnormal
+                                        }
+                                    , cPre = Nothing
+                                    , inner = Leaf
+                                        ( Pred "theseRules" )
+                                    , cPost = Nothing
+                                    }
+                                , subForest = []
+                                }
+                            , Node
+                                { rootLabel = MkCondition
+                                    { clabel = MkLabel
+                                        { paraNum = Nothing
+                                        , predTerm = Nothing
+                                        , pStyle = PSnormal
+                                        }
+                                    , cPre = Nothing
+                                    , inner = Leaf
+                                        ( Pred "otherSubsidiary" )
+                                    , cPost = Nothing
+                                    }
+                                , subForest = []
+                                }
+                            ]
+                        }
+                    , Node
+                        { rootLabel = MkCondition
+                            { clabel = MkLabel
+                                { paraNum = Just "34.1.f.iii"
+                                , predTerm = Nothing
+                                , pStyle = PSheader
+                                }
+                            , cPre = Just "any"
+                            , inner = Union
+                            , cPost = Just "issued under section 71(6) of the Act"
+                            }
+                        , subForest =
+                            [ Node
+                                { rootLabel = MkCondition
+                                    { clabel = MkLabel
+                                        { paraNum = Nothing
+                                        , predTerm = Nothing
+                                        , pStyle = PSnormal
+                                        }
+                                    , cPre = Nothing
+                                    , inner = Leaf
+                                        ( Pred "practiceDirections" )
+                                    , cPost = Nothing
+                                    }
+                                , subForest = []
+                                }
+                            , Node
+                                { rootLabel = MkCondition
+                                    { clabel = MkLabel
+                                        { paraNum = Nothing
+                                        , predTerm = Nothing
+                                        , pStyle = PSnormal
+                                        }
+                                    , cPre = Nothing
+                                    , inner = Leaf
+                                        ( Pred "guidanceNotes" )
+                                    , cPost = Nothing
+                                    }
+                                , subForest = []
+                                }
+                            , Node
+                                { rootLabel = MkCondition
+                                    { clabel = MkLabel
+                                        { paraNum = Nothing
+                                        , predTerm = Nothing
+                                        , pStyle = PSnormal
+                                        }
+                                    , cPre = Nothing
+                                    , inner = Leaf
+                                        ( Pred "rulings" )
+                                    , cPost = Nothing
+                                    }
+                                , subForest = []
+                                }
+                            ]
+                        }
+                    , Node
+                        { rootLabel = MkCondition
+                            { clabel = MkLabel
+                                { paraNum = Just "34.1.f.iv"
+                                , predTerm = Nothing
+                                , pStyle = PSheader
+                                }
+                            , cPre = Nothing
+                            , inner = Compl
+                            , cPost = Nothing
+                            }
+                        , subForest =
+                            [ Node
+                                { rootLabel = MkCondition
+                                    { clabel = MkLabel
+                                        { paraNum = Nothing
+                                        , predTerm = Nothing
+                                        , pStyle = PSheader
+                                        }
+                                    , cPre = Just "any"
+                                    , inner = UnionComma
+                                    , cPost = Nothing
+                                    }
+                                , subForest =
+                                    [ Node
+                                        { rootLabel = MkCondition
+                                            { clabel = MkLabel
+                                                { paraNum = Nothing
+                                                , predTerm = Nothing
+                                                , pStyle = PSnormal
+                                                }
+                                            , cPre = Nothing
+                                            , inner = Leaf
+                                                ( Pred "practiceDirections" )
+                                            , cPost = Nothing
+                                            }
+                                        , subForest = []
+                                        }
+                                    , Node
+                                        { rootLabel = MkCondition
+                                            { clabel = MkLabel
+                                                { paraNum = Nothing
+                                                , predTerm = Nothing
+                                                , pStyle = PSnormal
+                                                }
+                                            , cPre = Nothing
+                                            , inner = Leaf
+                                                ( Pred "guidanceNotes" )
+                                            , cPost = Nothing
+                                            }
+                                        , subForest = []
+                                        }
+                                    , Node
+                                        { rootLabel = MkCondition
+                                            { clabel = MkLabel
+                                                { paraNum = Nothing
+                                                , predTerm = Nothing
+                                                , pStyle = PSnormal
+                                                }
+                                            , cPre = Nothing
+                                            , inner = Leaf
+                                                ( Pred "rulings" )
+                                            , cPost = Nothing
+                                            }
+                                        , subForest = []
+                                        }
+                                    ]
+                                }
+                            , Node
+                                { rootLabel = MkCondition
+                                    { clabel = MkLabel
+                                        { paraNum = Nothing
+                                        , predTerm = Nothing
+                                        , pStyle = PSheader
+                                        }
+                                    , cPre = Just "(relating to"
+                                    , inner = UnionComma
+                                    , cPost = Just ")"
+                                    }
+                                , subForest =
+                                    [ Node
+                                        { rootLabel = MkCondition
+                                            { clabel = MkLabel
+                                                { paraNum = Nothing
+                                                , predTerm = Nothing
+                                                , pStyle = PSnormal
+                                                }
+                                            , cPre = Nothing
+                                            , inner = Leaf
+                                                ( Pred "professional practice" )
+                                            , cPost = Nothing
+                                            }
+                                        , subForest = []
+                                        }
+                                    , Node
+                                        { rootLabel = MkCondition
+                                            { clabel = MkLabel
+                                                { paraNum = Nothing
+                                                , predTerm = Nothing
+                                                , pStyle = PSnormal
+                                                }
+                                            , cPre = Nothing
+                                            , inner = Leaf
+                                                ( Pred "etiquette" )
+                                            , cPost = Nothing
+                                            }
+                                        , subForest = []
+                                        }
+                                    , Node
+                                        { rootLabel = MkCondition
+                                            { clabel = MkLabel
+                                                { paraNum = Nothing
+                                                , predTerm = Nothing
+                                                , pStyle = PSnormal
+                                                }
+                                            , cPre = Nothing
+                                            , inner = Leaf
+                                                ( Pred "conduct" )
+                                            , cPost = Nothing
+                                            }
+                                        , subForest = []
+                                        }
+                                    , Node
+                                        { rootLabel = MkCondition
+                                            { clabel = MkLabel
+                                                { paraNum = Nothing
+                                                , predTerm = Nothing
+                                                , pStyle = PSnormal
+                                                }
+                                            , cPre = Nothing
+                                            , inner = Leaf
+                                                ( Pred "discipline" )
+                                            , cPost = Nothing
+                                            }
+                                        , subForest = []
+                                        }
+                                    ]
+                                }
+                            , Node
+                                { rootLabel = MkCondition
+                                    { clabel = MkLabel
+                                        { paraNum = Nothing
+                                        , predTerm = Nothing
+                                        , pStyle = PSheader
+                                        }
+                                    , cPre = Just "issued by"
+                                    , inner = Or
+                                    , cPost = Nothing
+                                    }
+                                , subForest =
+                                    [ Node
+                                        { rootLabel = MkCondition
+                                            { clabel = MkLabel
+                                                { paraNum = Nothing
+                                                , predTerm = Nothing
+                                                , pStyle = PSnormal
+                                                }
+                                            , cPre = Nothing
+                                            , inner = Leaf
+                                                ( Pred "theCouncil" )
+                                            , cPost = Nothing
+                                            }
+                                        , subForest = []
+                                        }
+                                    , Node
+                                        { rootLabel = MkCondition
+                                            { clabel = MkLabel
+                                                { paraNum = Nothing
+                                                , predTerm = Nothing
+                                                , pStyle = PSnormal
+                                                }
+                                            , cPre = Nothing
+                                            , inner = Leaf
+                                                ( Pred "theSociety" )
+                                            , cPost = Nothing
+                                            }
+                                        , subForest = []
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    }

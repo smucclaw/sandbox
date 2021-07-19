@@ -9,8 +9,8 @@ import Prettyprinter
 import Prettyprinter.Util
 import Data.Maybe (maybeToList, fromJust)
 import Data.Tree
+import Text.Read (Read)
 import qualified Data.Map as Map
-import qualified Data.Text as Text
 
 import Defeasible
 
@@ -20,8 +20,9 @@ data MyRule = MyRule { rlabel    :: Label
                      , deontic   :: Deontic
                      , condition :: ConditionTree Predicate
                      }
-              deriving (Eq, Show)
+              deriving (Eq, Show, Read)
 
+rule_alwaysmay :: MyRule
 rule_alwaysmay = MyRule { rlabel    = mkLabel (Just "Test1", Just "test rule always true, may", PSnormal)
                         , defeasors = []
                         , party     = lp
@@ -29,6 +30,7 @@ rule_alwaysmay = MyRule { rlabel    = mkLabel (Just "Test1", Just "test rule alw
                         , condition = mkLeaf "0.1" "alwaysTrue"
                         }
 
+rule_alwaysmustnot :: MyRule
 rule_alwaysmustnot = MyRule { rlabel    = mkLabel(Just "Test2", Just "test rule always true, mustnot", PSnormal)
                             , defeasors = []
                             , party     = lp
@@ -36,6 +38,7 @@ rule_alwaysmustnot = MyRule { rlabel    = mkLabel(Just "Test2", Just "test rule 
                             , condition = mkLeaf "0.2" "alwaysTrue"
                             }
 
+rule_nevermatch :: MyRule
 rule_nevermatch = MyRule { rlabel = mkLabel(Just "Test3", Just "test rule never match", PSnormal)
                          , defeasors = []
                          , party     = lp
@@ -47,9 +50,9 @@ data Label = MkLabel { paraNum  :: Maybe ParaNum
                      , predTerm :: Maybe String
                      , pStyle   :: ParaStyle
                      }
-           deriving (Eq, Show)
+           deriving (Eq, Show, Read)
 data ParaStyle = PSnormal | PSheader | PShidden
-  deriving (Eq, Show)
+  deriving (Eq, Show, Read)
 mkLabel :: (Maybe ParaNum, Maybe String, ParaStyle) -> Label
 mkLabel (x, y, z) = MkLabel x y z
 
@@ -57,14 +60,14 @@ type ParaNum = String
 type PredicateTerm = String
 data Predicate = Pred PredicateTerm
                | Goto ParaNum
-  deriving (Eq, Show)
+  deriving (Eq, Show, Read)
 
 type ConditionTree a = Tree (Condition a)
 data Condition a = MkCondition { clabel :: Label
                                , cPre   :: Maybe String
                                , inner  :: Inner a
                                , cPost  :: Maybe String }
-  deriving (Eq, Show)
+  deriving (Eq, Show, Read)
 
 data Inner a = Any
              | Or
@@ -72,14 +75,14 @@ data Inner a = Any
              | Union | UnionComma
              | Compl -- allows chaining of conditions as a sugary version of "union", where we use complements to express in-place quantifiers -- see 8.8 of the GF book.
              | Leaf a
-             deriving (Eq, Show)
+             deriving (Eq, Show, Read)
 
 type Party = String
 lp :: Party
 lp = "Legal Practitioner"
 
 data Deontic = MustNot | May
-  deriving (Eq, Show)
+  deriving (Eq, Show, Read)
 
 
 -- we pretend we have queried the user and received certain answers.
@@ -102,9 +105,9 @@ class (Show x) => NLG x where
   dashFor x = "default dashfor " <> viaShow x
 
 instance NLG MyRule where
-  toEnglish (MyRule l defeasors p d condtree) =
+  toEnglish (MyRule l defeasors' _ _ condtree) =
     dashFor l <> toEnglish l <> line
-    <> toEnglishList defeasors
+    <> toEnglishList defeasors'
     <> toEnglish condtree
   toEnglishList rs = vsep (toEnglish <$> rs)
 
@@ -115,8 +118,8 @@ instance (NLG b, Show b) => NLG (ConditionTree b) where
   toEnglish (Node (MkCondition l pre Union      post) children) = toEnglish l <> enlist semi (Just "and") children pre post
   toEnglish (Node (MkCondition l pre UnionComma post) children) = toEnglish l <> enlist comma (Just "and") children pre post
   toEnglish (Node (MkCondition l pre Compl      post) children) = toEnglish l <> enlist emptyDoc Nothing   children pre post
-  toEnglish (Node (MkCondition l pre (Leaf  b)  post) [])       = toEnglish l <> toEnglish pre <> toEnglish b <> toEnglish post
-  toEnglish (Node (MkCondition l pre (Leaf  b)  post) children) = error ("leaf node " ++ (show b) ++ " should have no children! " ++ show children)
+  toEnglish (Node (MkCondition l pre (Leaf  b) post) [])        = toEnglish l <> toEnglish pre <> toEnglish b <> toEnglish post
+  toEnglish (Node (MkCondition _ _ (Leaf  b) _) children)       = error ("leaf node " ++ show b ++ " should have no children! " ++ show children)
 
 enlist :: (NLG a) => Doc ann -> Maybe String -> [ConditionTree a] -> Maybe String -> Maybe String -> Doc ann
 -- todo: omit the last separator in the list
@@ -126,20 +129,34 @@ enlist separator conjunction middle front back =
       listLength = length middle
   in
   vsep (frontPart
-        ++ (indent indentMiddle <$> (addConjunction listLength separator conjunction ( dashPrefix <$> middle )))
+        ++ (indent indentMiddle <$> addConjunction listLength separator conjunction ( dashPrefix <$> middle ))
         ++ (toEnglish <$> maybeToList back))
   where
     dashPrefix :: (NLG a) => ConditionTree a -> Doc ann
-    dashPrefix x = (dashFor $ clabel $ rootLabel x) <> toEnglish x
+    dashPrefix x = dashFor (clabel $ rootLabel x) <> toEnglish x
 
+-- we track the initial listLength because the "middle" list shrinks as we recurse
 addConjunction :: Int -> Doc ann -> Maybe String -> [Doc ann] -> [Doc ann]
 addConjunction len separator (Just c) [y, z]
   | len >= 3  = [y <> separator <+> pretty c, z]
   | otherwise = [y              <+> pretty c, z]
-addConjunction _ separator _ [z]    = [z]
-addConjunction _ separator _ []     = []
+addConjunction _ _ _ [z]    = [z]
+addConjunction _ _ _ []     = []
 addConjunction l separator (Just c) (x:xs) = x <> separator : addConjunction l separator (Just c) xs
 addConjunction l separator Nothing  (x:xs) = x <> separator : addConjunction l separator Nothing xs
+
+
+-- λ: addConjunction 3 (pretty ";") (Just "and") (pretty <$> ["foo", "bar", "baz"])
+-- [ foo;
+-- , bar; and
+-- , baz
+-- ]
+-- λ: addConjunction 2 (pretty ";") (Just "and") (pretty <$> ["bar", "baz"])
+-- [ bar and
+-- , baz
+-- ]
+-- λ: addConjunction 1 (pretty ";") (Just "and") (pretty <$> ["baz"])
+-- [ baz ]
 
 instance NLG Label where
   toEnglish (MkLabel (Just l) _       PSheader) = toEnglish l <> line
@@ -148,7 +165,7 @@ instance NLG Label where
   toEnglish (MkLabel  _       Nothing _       ) = emptyDoc
   dashFor   (MkLabel  _       _       PShidden) = emptyDoc
   dashFor   (MkLabel (Just l) _       PSheader) = dots2stars l <> " "
-  dashFor   (MkLabel (Just l) _       PSnormal) = "- "
+  dashFor   (MkLabel (Just _) _       PSnormal) = "- "
   dashFor   (MkLabel Nothing Nothing  PSnormal) = "- "
   dashFor   (MkLabel Nothing (Just _) PSheader) = "- "
   dashFor   _                                   = emptyDoc
@@ -200,10 +217,16 @@ instance NLG PredicateTerm where
   toEnglish "theSociety" = "the Society"
   toEnglish x = pretty x
 
+mkLI :: PredicateTerm -> Tree (Condition Predicate)
 mkLI     y = mkNode $ MkCondition (mkLabel (Nothing, Nothing, PSnormal)) Nothing (Leaf $ Pred y) Nothing
+
+mkLeaf :: ParaNum -> PredicateTerm -> Tree (Condition Predicate)
 mkLeaf x y = mkNode $ MkCondition (mkLabel (Just x,  Nothing, PSheader)) Nothing (Leaf $ Pred y) Nothing
+
+mkPred :: ParaNum -> String -> Tree (Condition Predicate)
 mkPred x y = mkNode $ MkCondition (mkLabel (Just x,  Just y,  PSnormal)) Nothing (Leaf $ Pred x) Nothing
 
+mkNode :: a -> Tree a
 mkNode x = Node x []
 
 {- the user-facing syntax for this is ultimately relational. In Prolog it would look like:
@@ -217,6 +240,19 @@ mkNode x = Node x []
 
 -}
 
+rule34_1_Any_err :: MyRule
+rule34_1_Any_err =
+  MyRule { rlabel = mkLabel (Just "34.1", Nothing, PSheader)
+         , defeasors = []
+         , party = lp
+         , deontic = MustNot
+         , condition = Node (MkCondition
+                              (mkLabel (Just "34.1", Just "Toplevel 34.1", PShidden))
+                              Nothing
+                              Any
+                              Nothing)
+                       [] }
+
 
 rule34_1 :: MyRule
 rule34_1 =
@@ -226,7 +262,7 @@ rule34_1 =
          , deontic = MustNot
          , condition = Node (MkCondition
                               (mkLabel (Just "34.1", Just "Toplevel 34.1", PShidden))
-                              (Just "a legal practitioner must not accept any executive appointment associated with ")
+                              (Just "a legal practitioner must not accept any executive appointment associated with")
                               Any Nothing)
                        [ Node (MkCondition
                                (mkLabel (Just "34.1.a", Just "IncompatibleDignity", PSheader))
@@ -302,13 +338,16 @@ rule34_1 =
 
 -- todo: rule34_2 etc
 
+ruleBase :: Map.Map ParaNum MyRule
 ruleBase = Map.fromList $ (\r -> (fromJust . paraNum . rlabel $ r, r)) <$>
   [ rule34_1
   ]
 
+as_org :: IO ()
 as_org = putDocW 120 (org_prefix <> line <>
                       toEnglish rule34_1 <> line)
 
+org_prefix :: Doc ann
 org_prefix = "#+TITLE: Rule 34 as Org\n#+OPTIONS: num:nil toc:nil" <> line
 
 

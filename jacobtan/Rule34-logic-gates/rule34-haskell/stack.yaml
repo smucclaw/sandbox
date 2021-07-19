@@ -63,7 +63,6 @@ extra-deps:
 - force-layout-0.4.0.6@sha256:0e3d8887ea2fce3cf3fa6704cc09f93086c70c93dc8732aefb0391e8b41f0b6e,1265
 - monoid-extras-0.5.1@sha256:438dbfd7b4dce47d8f0ca577f56caf94bd1e21391afa545cad09fe7cf2e5793d,2333
 
-
 # Override default flag values for local packages and extra-deps
 # flags: {}
 

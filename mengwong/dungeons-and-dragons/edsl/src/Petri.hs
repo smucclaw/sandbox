@@ -25,6 +25,7 @@ data PLabel = Start | End
 data TLabel = Fork StringText
             | Join StringText
             | Noop StringText
+            | Case StringText StringText -- read from symbol table; conditional branch
             | TL   StringText deriving (Ord, Eq, Show)
 
 notTL (TL _) = False
@@ -146,6 +147,45 @@ data PlayLog = PStep { marking :: Marking PLabel  -- marking for the step
                      }
              deriving (Eq, Show)
 
+
+-- machinery to handle an event stream
+type StreamHandler state event log = (state,log) -> event -> (state,log)
+data MyPetri = MyPetri (PetriNet PLabel TLabel) (Marking PLabel) deriving (Show)
+type Event = (EventName, EventValue)
+type EventName = TLabel
+type EventValue = Maybe StringText
+
+play0 :: (MyPetri,[StringText]) -> (MyPetri,[StringText])
+play0 mp@(MyPetri pn mm,log) =
+  let
+    autoTransitions = filter notTL $ enabled pn mm
+    pnew = foldr step0 (MyPetri pn mm) autoTransitions
+  in
+    (pnew,log ++ ["play0: autoran " ++ show autotransition | autotransition <- autoTransitions])
+
+step0 :: TLabel -> MyPetri -> MyPetri
+step0 event (MyPetri pn mm) =
+  let ready = enabled pn mm
+      removal = [ (maybe (Just 0) (Just . subtract n), pl)
+                | (pl, tl, n) <- ptEdges pn
+                , tl == event ]
+      duringMarking = foldl (flip (uncurry Map.alter)) mm removal
+      addition = [ (maybe (Just n) (Just . (+n)), pl)
+                 | (tl, pl, n) <- tpEdges pn
+                 , tl == event ]
+      afterMarking  = foldl (flip (uncurry Map.alter)) duringMarking addition
+      in MyPetri pn afterMarking
+
+play1 :: (MyPetri,[StringText]) -> Event -> (MyPetri,[StringText],Maybe Event)
+play1 (mp@(MyPetri pn mm),log) e@(ename, evalue) =
+  let acceptable = enabled pn mm
+  in
+    if ename `elem` acceptable
+    then (step0 ename mp,log ++ ["play1: accepted event " ++ show ename],Nothing)
+    else (mp,            log ++ ["play1: rejected event " ++ show ename],Just e)
+
+-- TODO: create symbol table to log choice values
+  
 -- step as far as possible through a net until we encounter a non-deterministic "choice".
 -- we show which steps autoplay given the input events until they're all consumed.
 -- given a marking, we're waiting for input and expecting that input to be one or more of the enabled TLabels.

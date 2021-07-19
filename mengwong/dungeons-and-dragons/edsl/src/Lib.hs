@@ -7,6 +7,7 @@ module Lib
 import qualified Data.Map as Map
 import Data.Tree
 import Data.List
+import Data.List.Split
 
 import Data.Graph.Inductive
 import Data.GraphViz (preview, GraphvizParams (fmtNode, fmtEdge, globalAttributes), graphToDot, nonClusteredParams, setDirectedness, DotGraph, printDotGraph)
@@ -40,6 +41,14 @@ state x = x :-> []
 x `contains` y = Node x y
 
 -- Now we have a grammar for specifying the character creator HSM!
+ccSimple :: StateTree
+ccSimple = 
+  state "Character Creation" `contains`
+  [
+    leaf $ state "Choose Ability Scores"
+  , leaf $ state "Choose Potato Scores"
+  ]
+
 charCreator :: StateTree
 charCreator =
   state "Character Creation" `contains`
@@ -59,11 +68,22 @@ charCreator =
     ]
   ,
     leaf $ state "Choose Ability Scores"
+    , leaf $ state "Choose Potato Scores"
   ,
     leaf $ "Choose Race" :-> [(Just "Dwarf", state "Choose Dwarf Sub-Race")
                              ,(Just "Elf",   state "Choose Elf Sub-Race")]
   ]
 
+safePost :: StateTree
+safePost =
+  leaf $ "Safe Contract" :-> [(Just "Equity Financing", state "Conversion")
+                             ,(Just "Liquidity Event", "Greater of" :-> [(Just "Cash-Out Amount",   state "Residual Pro-Rata")
+                                                                        ,(Just "Conversion Amount", state "Conversion Pro-Rata")])
+                             ,(Just "Dissolution", state "Residual Pro-Rata")
+                              -- Liquidiation Priority is not a state transition, it is a decorator to the Liquidity and Dissolution Events.
+                             -- Termination is not actually a state transition, it just indicates exclusivity between the other state transitions, which is implicit here
+                             ]
+  
 -- The initial graph needs to be slightly cleaned up before it is ready for prime time.
 normalize :: StateTree -> StateTree
 normalize = id
@@ -85,6 +105,10 @@ grow (Node parent siblings) =
 -- every non-leaf node is a cluster
 asHSM :: a
 asHSM = undefined 
+
+mymain = play0 (MyPetri (asPetri charCreator) (Map.fromList [(PL "Begin Character Creation",1)]), ["init"])
+
+myenabled (MyPetri pn mm) = enabled pn mm
 
 -- see Note in README.org [asPetri]
 asPetri :: StateTree -> PetriNet PLabel TLabel
@@ -115,7 +139,7 @@ asPetri (Node (statename :-> nexts) children) =
         , let nextstatename = stateName nextstate
               (next1,next2) = plprefix nextstatename
               proceed = maybe (Noop $ "proceeding directly from " ++ statename ++ " to " ++ nextstatename)
-                              (\el -> TL $ statename ++ " = " ++ el) edgeLabel
+                              (mkCase statename) edgeLabel
         ]
    in
    nubPN $ withChildren <> nextStates <> mconcat nextPetris
@@ -124,6 +148,10 @@ asPetri (Node (statename :-> nexts) children) =
     outless pn = let outful = [ place | place <- places pn
                                       , (place,_,_) <- ptEdges pn ]
                  in places pn \\ outful
+    mkCase :: StringText -> StringText -> TLabel
+    mkCase previousPlace edgeLabel
+      | '=' `elem` edgeLabel = let els = wordsBy (=='=') edgeLabel in Case (els !! 0) (els !! 1)
+      | otherwise            = Case previousPlace edgeLabel
 
 prefix :: String -> (String, String)
 prefix statename = case take 6 statename of
@@ -147,8 +175,12 @@ previewPCC :: IO ()
 previewPCC = previewPetri pccPetriOP $
   asPetri (normalize charCreator)
 
-writePCC :: IO ()
-writePCC = writePetri "viz/pcc" pccPetriOP $
+writePCC :: String -> String -> IO ()
+writePCC outfile sketch = writePetri outfile pccPetriOP $
   asPetri $
   -- normalize $
-  charCreator
+  case sketch of
+    "charCreator" -> charCreator
+    "ccSimple"    -> ccSimple
+    "safePost"    -> safePost
+    _ -> error "choose one of: charCreator, ccSimple, safePost"

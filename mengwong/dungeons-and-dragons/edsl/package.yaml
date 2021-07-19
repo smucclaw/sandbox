@@ -29,7 +29,8 @@ dependencies:
 - jt2-haskell-utils
 - generic-data
 - text
-
+- split
+- optparse-generic
 
 library:
   source-dirs: src

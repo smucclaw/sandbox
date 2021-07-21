@@ -18,6 +18,12 @@ Context:
 
 ---
 
+DMN table
+
+![image](https://user-images.githubusercontent.com/12626411/126429927-2fd577f6-df7b-42f3-bdcc-a62fa7054452.png)
+
+Cf. https://docs.camunda.org/manual/7.15/reference/dmn/decision-table/hit-policy/
+
 Annex A (interpreted strictly) is actually inconsistent with Annex B, specifically the case of a group of size 2 with 2 children from different households.
 
 The rules actually follow a hit policy of "first". I.e. pick the first row that is consistent with the situation.

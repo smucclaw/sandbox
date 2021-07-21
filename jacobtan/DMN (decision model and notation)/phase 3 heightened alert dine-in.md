@@ -38,6 +38,8 @@ The algorithm isn't immediately obvious though.
 
 Seems to work: start from the first relevant variable in the first row. Then move on to the next relevant variable in the first same row. Do likewise for subsequent rows.
 
+The flowchart is essentially a control flow graph of a Haskell function's pattern matching process.
+
 https://flowchart.fun/
 
 ```

@@ -2,26 +2,40 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import Form from "@rjsf/core";
 
-const schema = {
-  title: "Todo",
-  type: "object",
-  required: ["title"],
-  properties: {
-    title: {  type: "string",
-              title: "Title",
-              default: "A new task" },
-    done:  {  type: "boolean",
-              title: "Done?",
-              default: false }
-  }
+
+
+const sign = {
+  title: "sign",
+  type: "string",
+  enum: ["Rock", "Paper", "Scissors"], 
 };
 
 
-function log(type) {console.log(console, type)};
+
+const rpsSchema = {
+  title: "Rock Paper Scissors, a Game",
+  type: "object",
+  properties: {
+    player1:  { 
+      title: "Player 1",
+      type: "object",
+      properties: {
+        name: {type: "string"},
+        sign: sign,
+      }
+    },
+    player2: {
+      title: "Player 2",
+      type: "object",
+      properties: {
+        name: {type: "string"},
+        sign: sign,
+      }
+    }
+  }
+}
+
 
 ReactDOM.render((
-  <Form schema={schema}
-        onChange={() => log("changed")}
-        onSubmit={() => log("submitted")}
-        onError={() => log("errors")} /> 
+  <Form schema={rpsSchema} />
   ), document.getElementById("root"));

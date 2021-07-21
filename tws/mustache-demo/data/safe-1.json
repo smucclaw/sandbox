@@ -1,0 +1,15 @@
+{
+    "company_representative_name": "Tom",
+    "company_representative_title": "Founder",
+    "company_registration_no": "20210126D",
+    "company_name": "Acme",
+    "company_address": "51 Acme Dr",
+    "company_email": "hello@acme.me",
+    "investor_representative_name": "Dick",
+    "investor_representative_title": "Angel Investor",
+    "investor_address": "1 Entrepreneurship Way",
+    "investor_email": "dick@angel.co",
+    "purchase_amount": 250000,
+    "date_of_safe": "1 Jan 2021",
+    "post_money_valuation_cap": 350000
+}

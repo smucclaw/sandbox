@@ -18,7 +18,7 @@
 # resolver: ./custom-snapshot.yaml
 # resolver: https://example.com/snapshots/2018-01-01.yaml
 resolver:
-  url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/17/9.yaml
+  url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/17/14.yaml
 
 # User packages to be built.
 # Various formats can be used as shown in the example below.
@@ -35,11 +35,12 @@ packages:
 # These entries can reference officially published versions as well as
 # forks / in-progress versions pinned to a git hash. For example:
 #
-# extra-deps:
+extra-deps:
 # - acme-missiles-0.3
 # - git: https://github.com/commercialhaskell/stack.git
 #   commit: e7b331f14bcffb8367cd58fbfc8b40ec7642100a
-#
+- diagrams-lib-1.4.3@sha256:04f77778d4b550d3c8e54440800685f88467bef91075e82e009a8a6f45c51033,8232
+- diagrams-svg-1.4.3@sha256:36708b0b4cf35507ccf689f1a25f6f81b8f41c2c4c2900793de820f66d4e241c,3181
 # extra-deps: []
 
 # Override default flag values for local packages and extra-deps

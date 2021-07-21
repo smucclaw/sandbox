@@ -39,9 +39,6 @@ extra-deps:
 - github: 2jacobtan/G2
   commit: 1b680f6ac25cf1c29099613e6889148f71deca48
 
-- github: 2jacobtan/G2Q
-  commit: 90f020baa462bf9e2b93dc2577864eeffc868377
-
 - bimap-0.3.3@sha256:232518c0410990665b9c8677eb9318ee355c001d58945ddcbedec3baa30b4160,1475
 - extra-1.6.17@sha256:af90eeb95b08ac1683c466efd9d4b8d9d426a547eb5fa46af87f615bb67dfae0,2705
 - language-sygus-0.1.1.2@sha256:596a0a82c916336146f77cdad0efa928eb8560e8398330a66a2fc44ac524cae4,1757

@@ -28,3 +28,7 @@ main = hspec $ do
     it "proper event stream, should produce out-marking" $ do
       play pn_1 (start_marking pn_1) [(TL "middle",Just "middle")]
         `shouldBe` Right (end_marking pn_1)
+
+    it "proper event stream, with Case support" $ do
+      play pn_1 (start_marking pn_1) [(TL "Choose Race",Just "Dwarf")]
+        `shouldBe` Right (end_marking pn_1)

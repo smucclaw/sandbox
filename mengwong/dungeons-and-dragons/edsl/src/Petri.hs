@@ -87,6 +87,10 @@ pn_4 = pn_from_simple [example_4]
 -- a "marking" keeps track of how many dots are in which plaes
 type Marking pl = Map.Map pl Int
 
+data Accumulator = Acc { m :: Marking PLabel
+                       , s :: Map.Map StringText StringText -- symbol table for recording Race = Dwarf or Race = Elf
+                       }
+
 -- the start node(s) of a petri net is(are) the node(s) with no indegrees. generously label each with a token.
 start_marking pn =
   let start_places = filter (\x -> length (indegrees pn x) == 0) (places pn)
@@ -165,7 +169,7 @@ play0 pn mm =
   in
     foldl (step0 pn) (Right mm) autoTransitions
 
--- TODO: we need to store the eventValue in a symbol table.
+-- TODO: we need to store the eventValue in a symbol table. Then we can Case on Race = Dwarf vs Race = Elf
 -- TODO: we need to add support for Case transitions
 -- TODO: add support for inhibitor arcs.
 step0 :: PetriNet PLabel TLabel

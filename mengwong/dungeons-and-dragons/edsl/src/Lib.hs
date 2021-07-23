@@ -66,11 +66,9 @@ charCreator =
     , leaf $ state "Choose Appearance"
     , leaf $ state "Choose Alignment"
     ]
-  ,
-    leaf $ state "Choose Ability Scores"
-    , leaf $ state "Choose Potato Scores"
-  ,
-    leaf $ "Choose Race" :-> [(Just "Dwarf", state "Choose Dwarf Sub-Race")
+  , leaf $ state "Choose Ability Scores"
+  , leaf $ state "Choose Potato Scores"
+  , leaf $ "Choose Race" :-> [(Just "Dwarf", state "Choose Dwarf Sub-Race")
                              ,(Just "Elf",   state "Choose Elf Sub-Race")]
   ]
 

@@ -41,7 +41,6 @@ library
       Rule34_SMT_sandbox
       Sandbox
       SandboxBuilder
-      Utils
   other-modules:
       Paths_rule34_haskell
   hs-source-dirs:
@@ -82,6 +81,7 @@ executable rule34-org
     , fgl
     , generic-data
     , graphviz
+    , jt2-haskell-utils
     , mtl
     , optparse-generic
     , pretty-simple
@@ -110,6 +110,7 @@ executable rule34-png
     , fgl
     , generic-data
     , graphviz
+    , jt2-haskell-utils
     , mtl
     , optparse-generic
     , pretty-simple

@@ -148,23 +148,38 @@ A Petri Net consumes those "external" events -- a.k.a. transitions -- and update
 
 Some events are "internal" -- Forks and Joins and Noops are artefacts of our Petri Net encoding. Internal events are not expected from the environment. Instead, they auto-play.
 
+External events are constructed with the "TL" data constructor.
+
+The event stream is provided from the environment and arrives in the form of key/value pairs. The keys are TL strings. The key/value pairs are stored in a symbol lookup available for lookup by downstream parts of the Petri Net.
+
 The ~Case~ transition is a special internal transition that implements conditional branch. The edge label is tested against the value received in the immediately preceding event, and if it matches, the transition is fired.
+
+(We should probably have another transition that does a retrieve/compare from the symbol table, so that the Case transition doesn't have to always run against the previous event.)
 
 Let's set up this hierarchy of stepper functions:
 
 - play0 :: autoplay all internal events e.g. Fork, Join, Noop, Case until we run out of internal events
-- play1 :: run play0, then consume one event. If the event is not enabled, log a warning, and return the event so it goes back into the input stream.
-- play_stream :: given an event stream, play1 each event in the stream until no events remain  
+- play1 :: run play0, then consume one event. If the event is not enabled, return a Left warning; this is equivalent to a parser aborting on "unexpected token encountered".
+- play :: given an event stream, play1 each event in the stream until no events remain.
 
 What are the types of these functions? They rather remind one of a parser combinator: we are consuming input and elaborating structure, together with an error log.
 
 In an ideal world, the the appropriate pattern would be a monadic parser combinator.
 
-In this initial implementation, we just do things the dumb way.
+In this initial implementation, we just do things the dumb way: using Fold.
+
+The accumulator is the marking.
+
+The stepper is actually a ~(stepper petriNet)~ that knows how to step through the given ~petriNet~.
 
 
-...
 
+
+
+
+
+
+* Other Ranting To Be Ignored
 
 in other words, case race of
                        dwarf -> let dsr = choose dwarf sub-race; return { race, dsr }

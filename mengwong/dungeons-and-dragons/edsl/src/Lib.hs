@@ -106,10 +106,6 @@ grow (Node parent siblings) =
 asHSM :: a
 asHSM = undefined 
 
-mymain = play0 (MyPetri (asPetri charCreator) (Map.fromList [(PL "Begin Character Creation",1)]), ["init"])
-
-myenabled (MyPetri pn mm) = enabled pn mm
-
 -- see Note in README.org [asPetri]
 asPetri :: StateTree -> PetriNet PLabel TLabel
 asPetri (Node (statename :-> nexts) children) =

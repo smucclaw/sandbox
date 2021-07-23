@@ -18,5 +18,13 @@ main = hspec $ do
 
   describe "simple example 1" $ do
     it "empty event stream, marking doesn't change" $ do
-      play pn_1 start_marking []
-        `shouldBe` Right start_marking
+      play pn_1 (start_marking pn_1) []
+        `shouldBe` Right (start_marking pn_1)
+
+    it "bogus event stream, should get an error" $ do
+      play pn_1 (start_marking pn_1) [(TL "Bogus",Nothing)]
+        `shouldBe` Left "unable to fire TL \"Bogus\": not enabled! (expecting [TL \"middle\"])"
+
+    it "proper event stream, should produce out-marking" $ do
+      play pn_1 (start_marking pn_1) [(TL "middle",Just "middle")]
+        `shouldBe` Right (end_marking pn_1)

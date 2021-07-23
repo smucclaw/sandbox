@@ -12,6 +12,8 @@ import Generic.Data (Generic, Generically(..))
 import qualified Prettyprinter as PP
 import Prettyprinter (vsep, hsep, line, pretty, viaShow, hang, indent, Doc)
 
+import Debug.Trace
+
 -- the simple version of a petri net assumes all edge weights are 1.
 --                      a P->T edge label means the number of dots needed to fire
 --                      a T->P edge label means the number of dots produced by firing in each place
@@ -84,7 +86,19 @@ pn_4 = pn_from_simple [example_4]
 
 -- a "marking" keeps track of how many dots are in which plaes
 type Marking pl = Map.Map pl Int
-start_marking = Map.fromList [(Start, 1)]
+
+-- the start node(s) of a petri net is(are) the node(s) with no indegrees. generously label each with a token.
+start_marking pn =
+  let start_places = filter (\x -> length (indegrees pn x) == 0) (places pn)
+  in Map.fromList ((, 1) <$> start_places)
+
+-- the end node(s) of a petri net is(are) the node(s) with no outdegrees.
+end_marking pn =
+  let end_places = filter (\x -> length (outdegrees pn x) == 0) (places pn)
+  in Map.fromList ((, 1) <$> end_places)
+
+indegrees  pn p = [ q | (_,q,_) <- tpEdges pn, p == q ]
+outdegrees pn p = [ q | (q,_,_) <- ptEdges pn, p == q ]
 
 -- the above syntax implies a petri net where one of the places (typically the start node)
 -- can be used as a root; but a properly general petri net could have any number of starting places!
@@ -144,17 +158,15 @@ type Event = (EventName, EventValue)
 type EventName = TLabel
 type EventValue = Maybe StringText
 
-play0 :: PetriNet PLabel TLabel -> Marking PLabel -> Marking PLabel
+play0 :: PetriNet PLabel TLabel -> Marking PLabel -> Either String (Marking PLabel)
 play0 pn mm =
   let
     autoTransitions = (,Nothing) <$> filter notTL (enabled pn mm)
-    pnew = foldl (step0 pn) (Right mm) autoTransitions
   in
-    case pnew of
-      Left onoes -> error onoes
-      Right yay  -> yay
+    foldl (step0 pn) (Right mm) autoTransitions
 
 -- TODO: we need to store the eventValue in a symbol table.
+-- TODO: we need to add support for Case transitions
 -- TODO: add support for inhibitor arcs.
 step0 :: PetriNet PLabel TLabel
       -> Either String (Marking PLabel)
@@ -177,44 +189,34 @@ step0 pn (Right mm) (eventName, eventValue) =
     else Right afterMarking
 
 
--- "yellow" because we are doing a FoldPlay
-yellow :: PetriNet PLabel TLabel         -- underlying PN
-       -> Either String (Marking PLabel) -- "accumulator"
-       -> Event                          -- incoming event
-       -> Either String (Marking PLabel) -- output
-yellow _ (Left x) _ = Left x
-yellow pn (Right m0) e =
-  let
-    m1 = play0 pn m0
-  in
-    case step0 pn (Right m1) e of
-      Left  onoes -> Left  onoes
-      Right yay   -> Right yay
+play1 :: PetriNet PLabel TLabel         -- underlying PN
+      -> Either String (Marking PLabel) -- "accumulator"
+      -> Event                          -- incoming event
+      -> Either String (Marking PLabel) -- output
+play1 _ (Left x) _ = Left x
+play1 pn (Right m0) e = do
+  let m1 = play0 pn m0
+  m2 <- step0 pn m1 e
+  play0 pn m2
   
 
 play :: PetriNet PLabel TLabel -> Marking PLabel -> [Event]
  -> Either String (Marking PLabel)
-play pn startM events =
-  case foldl (yellow pn) (Right startM) events of
-    Left onoes -> Left $ "runstream failure: " ++ onoes
-    Right yay  -> Right yay
-
-
--- TODO: create symbol table to log choice values
-  
-data Auto = Full | Semi | Manual
-  deriving (Eq)
-
+play pn startM events = do
+  mm <- foldl (play1 pn) (Right startM) events
+  return $ excludeZeroes mm
+  where
+    excludeZeroes mm = Map.fromList [ m | m@(x,y) <- Map.toList mm, y /= 0 ]
 
 main = do
 -- putStrLn "* example 1"; mydo pn_1
 --  putStrLn "* example 2"; mydo pn_2
   putStrLn "* example 4"; mydo pn_4
-  where mydo pn = print $ play pn start_marking []
+  where mydo pn = print $ play pn (start_marking pn) []
 
 run :: PetriNet PLabel TLabel -> Marking PLabel -> IO ()
 run pn marking = do
-  let ready = enabled pn start_marking
+  let ready = enabled pn (start_marking pn)
       playlog = play pn marking ((,Nothing) <$> ready)
   putStrLn $ "* petri net:\n" ++ show pn
   putStrLn $ "we start with initial transitions: " ++ show ready

@@ -162,12 +162,19 @@ type Event = (EventName, EventValue)
 type EventName = TLabel
 type EventValue = Maybe StringText
 
-play0 :: PetriNet PLabel TLabel -> Marking PLabel -> Either String (Marking PLabel)
+play0 :: PetriNet PLabel TLabel -> Marking PLabel -> Either String [Marking PLabel]
 play0 pn mm =
   let
     autoTransitions = (,Nothing) <$> filter notTL (enabled pn mm)
+    reducer :: Either String [Marking PLabel] -> Event -> Either String [Marking PLabel]
+    reducer l@(Left msg) _ = l
+    reducer (Right currentMarkings) event =
+      case step0 pn (Right (head currentMarkings)) event of
+        Left msg -> Left msg
+        Right nextMarkings -> Right (nextMarkings : currentMarkings)
   in
-    foldl (step0 pn) (Right mm) autoTransitions
+    -- foldl (step0 pn) (Right mm) autoTransitions
+    foldl reducer (Right [mm]) autoTransitions
 
 -- TODO: we need to store the eventValue in a symbol table. Then we can Case on Race = Dwarf vs Race = Elf
 -- TODO: we need to add support for Case transitions
@@ -193,25 +200,44 @@ step0 pn (Right mm) (eventName, eventValue) =
     else Right afterMarking
 
 
+-- play1 :: PetriNet PLabel TLabel         -- underlying PN
+--       -> Either String (Marking PLabel) -- "accumulator"
+--       -> Event                          -- incoming event
+--       -> Either String [Marking PLabel] -- output
+-- play1 _ (Left x) _ = Left x
+-- play1 pn (Right m0) e = do
+--   let m1 = play0 pn m0
+--   m2 <- step0 pn m1 e
+--   play0 pn m2
+
 play1 :: PetriNet PLabel TLabel         -- underlying PN
       -> Either String (Marking PLabel) -- "accumulator"
       -> Event                          -- incoming event
-      -> Either String (Marking PLabel) -- output
+      -> Either String [Marking PLabel] -- output
 play1 _ (Left x) _ = Left x
-play1 pn (Right m0) e = do
-  let m1 = play0 pn m0
-  m2 <- step0 pn m1 e
-  play0 pn m2
+play1 pn (Right m0) e = case play0 pn m0 of
+  l@(Left x) -> l
+  r@(Right []) -> r
+  Right auto1@(m1 : remainder) -> case step0 pn (Right m1) e of
+    Left x -> Left x
+    Right m2 -> case play0 pn m2 of
+      l@(Left x) -> l
+      Right [] -> Right (m2 : auto1)
+      Right auto2 -> Right (auto2 ++ m2 : auto1)
   
-
 play :: PetriNet PLabel TLabel -> Marking PLabel -> [Event]
- -> Either String (Marking PLabel)
+ -> Either String [Marking PLabel]
 play pn startM events = do
-  mm <- foldl (play1 pn) (Right startM) events
-  return $ excludeZeroes mm
+  mm <- foldl reducer (Right [startM]) events
+  return $ excludeZeroes <$> mm
   where
     excludeZeroes mm = Map.fromList [ m | m@(x,y) <- Map.toList mm, y /= 0 ]
-
+    reducer :: Either String [Marking PLabel] -> Event -> Either String [Marking PLabel]
+    reducer l@(Left msg) _ = l
+    reducer (Right currentMarkings) event =
+      case play1 pn (Right (head currentMarkings)) event of
+        Left msg -> Left msg
+        Right nextMarkings -> Right (nextMarkings ++ currentMarkings)
 main = do
 -- putStrLn "* example 1"; mydo pn_1
 --  putStrLn "* example 2"; mydo pn_2

@@ -8,6 +8,7 @@ import qualified Data.Map as Map
 import Data.Tree
 import Data.List
 import Data.List.Split
+import Control.Monad
 
 import Data.Graph.Inductive
 import Data.GraphViz (preview, GraphvizParams (fmtNode, fmtEdge, globalAttributes), graphToDot, nonClusteredParams, setDirectedness, DotGraph, printDotGraph)
@@ -169,12 +170,30 @@ previewPCC :: IO ()
 previewPCC = previewPetri pccPetriOP $
   asPetri (normalize charCreator)
 
-writePCC :: String -> String -> IO ()
-writePCC outfile sketch = writePetri outfile pccPetriOP $
-  asPetri $
-  -- normalize $
-  case sketch of
-    "charCreator" -> charCreator
-    "ccSimple"    -> ccSimple
-    "safePost"    -> safePost
-    _ -> error "choose one of: charCreator, ccSimple, safePost"
+-- writePCC :: String -> String -> IO ()
+-- writePCC outfile sketch = writePetri outfile pccPetriOP $
+--   asPetri $
+--   -- normalize $
+--   case sketch of
+--     "charCreator" -> charCreator
+--     "ccSimple"    -> ccSimple
+--     "safePost"    -> safePost
+--     _ -> error "choose one of: charCreator, ccSimple, safePost"
+
+writePCC :: String -> String -> IO()
+writePCC outfile sketch =
+  let
+    pn = asPetri $ case sketch of
+      "charCreator" -> charCreator
+      "ccSimple" -> ccSimple
+      "safePost" -> safePost
+      _ -> error "choose one of: charCreator, ccSimple, safePost"
+    result = Petri.play pn (Petri.start_marking pn) []
+    opts m = petriOP_{
+      markings = m,
+      transitionHighlights = [Fork "Character Creation FORK"]
+    }
+  in
+    case result of
+      Left msg -> error msg
+      Right frames -> forM_ (zip frames [1..length frames]) (\(m, index) -> writePetri (outfile ++ show index) (opts m) pn)

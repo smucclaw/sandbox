@@ -1,7 +1,9 @@
 {-# LANGUAGE PackageImports #-}
 
 module Lib
-    ( writePCC
+    ( writePCC,
+      asPetri,
+      safePost,
     ) where
 
 import qualified Data.Map as Map

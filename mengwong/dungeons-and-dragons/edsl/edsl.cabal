@@ -24,7 +24,6 @@ source-repository head
 
 library
   exposed-modules:
-      EventStream
       GraphViz
       Lib
       Petri

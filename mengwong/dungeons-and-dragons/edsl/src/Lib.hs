@@ -113,7 +113,7 @@ asHSM = undefined
 asPetri :: StateTree -> PetriNet PLabel TLabel
 asPetri (Node (statename :-> nexts) children) =
   let -- first we deal with the children -- any boxes inside this state.
-      (front, back) = plprefix statename
+      (front, back, gathered) = plprefix statename
       middle        = TL statename
       (pre, post)   = if length children == 1
                       then (Noop $ statename ++ " PUSH", Noop $ statename ++ " POP")
@@ -132,15 +132,31 @@ asPetri (Node (statename :-> nexts) children) =
              MkPN [back]           [post]       gather                 [(post, back, 1)]
 
       nextPetris    = asPetri <$> (leaf . snd <$> nexts)
-      nextStates    = mconcat
-        [ MkPN    []    [proceed]    [(back, proceed, 1)]   [(proceed,next1,1)]
-        | (edgeLabel, nextstate) <- nexts
+      -- If any of the out edges are labeled, we're in a choice situation. To achieve closure for this node and its descendants, we need to OR-join its labeled children.
+      -- To achieve an OR-join, for each labeled out-edge, identify the outless nodes of that out-edge's subgraph, and create an individual exit transition leading to an OR gate place.
+      gatherNextOr  = mconcat
+        [ MkPN    [gathered]    [proceed, gatherNext]
+                                                [(back, proceed, 1)
+                                                ,(oless, gatherNext, 1)]   [(proceed,next1,1)
+                                                                           ,(gatherNext,gathered,1)]
+        | (Just edgeLabel, nextstate) <- nexts
         , let nextstatename = stateName nextstate
-              (next1,next2) = plprefix nextstatename
-              proceed = maybe (Noop $ "proceeding directly from " ++ statename ++ " to " ++ nextstatename)
-                              (mkCase statename) edgeLabel
+              (next1,next2,next3) = plprefix nextstatename
+              orOutless = outless $ asPetri (leaf nextstate)
+              proceed = mkCase statename edgeLabel
+        , oless@(PL ol) <- orOutless
+        , let gatherNext    = Join $ nextstatename ++ " BACK TO " ++ statename
         ]
-   in
+      -- unlabeled children proceed as per usual; their outless children are eventually gathered to the top-level
+      gatherNextAnd = mconcat
+        [ MkPN    []    [proceed]    [(back, proceed, 1)]   [(proceed,next1,1)]
+        | (Nothing, nextstate) <- nexts
+        , let nextstatename = stateName nextstate
+              (next1,next2,next3) = plprefix nextstatename
+              proceed = Noop $ "proceeding directly from " ++ statename ++ " to " ++ nextstatename
+        ]
+      nextStates = gatherNextOr <> gatherNextAnd
+  in
    nubPN $ withChildren <> nextStates <> mconcat nextPetris
   where
     outless :: PetriNet PLabel TLabel -> [PLabel]
@@ -154,12 +170,12 @@ asPetri (Node (statename :-> nexts) children) =
       -- "bar"
       | otherwise            = Case previousPlace (Just edgeLabel)
 
-prefix :: String -> (String, String)
+prefix :: String -> (String, String, String)
 prefix statename = case take 6 statename of
-                    "Choose" -> ("Awaiting " <> statename, "Decided " <> statename)
-                    _        -> ("Begin "    <> statename, "End "     <> statename)
+                    "Choose" -> ("Awaiting " <> statename, "Decided " <> statename, "Gathered " <> statename)
+                    _        -> ("Begin "    <> statename, "End "     <> statename, "Gathered " <> statename)
 
-plprefix statename = let (pl1, pl2) = prefix statename in (PL pl1, PL pl2)
+plprefix statename = let (pl1, pl2, pl3) = prefix statename in (PL pl1, PL pl2, PL pl3)
 
 pccPetriOP :: PetriOptionalParams
 pccPetriOP = petriOP_{

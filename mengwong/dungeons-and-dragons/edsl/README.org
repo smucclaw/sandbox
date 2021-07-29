@@ -85,40 +85,46 @@ The fork and join seem extraneous, but they make sense when there are multiple c
 
 *** Plain box with two outEdges, labeled
 
-| Node | stateName | outEdges     | subForest | PetriNet | places         | transitions | p -> t    | t -> p    |
-|------+-----------+--------------+-----------+----------+----------------+-------------+-----------+-----------|
-|      | box       | [(t1,next1)  | []        |          |                |             |           |           |
-|      |           | ,(t2,next2)] |           |          | Awaiting box   | box         | Ab -> b   | b -> Db   |
-|      |           |              |           |          | Decided box    |             |           |           |
-|      |           |              |           |          |                | t1          | Db -> t1  | t1 -> An1 |
-|      |           |              |           |          | Awaiting next1 | next1       | An1 -> n1 | n1 -> Dn1 |
-|      |           |              |           |          | Decided next1  |             |           |           |
-|      |           |              |           |          |                | t2          | Db -> t2  | t2 -> An2 |
-|      |           |              |           |          | Awaiting next2 | next2       | An2 -> n2 | n2 -> Dn2 |
-|      |           |              |           |          | Decided next2  |             |           |           |
+| Node | stateName | outEdges     | subForest | PetriNet | places          | transitions | p -> t     | t -> p    |
+|------+-----------+--------------+-----------+----------+-----------------+-------------+------------+-----------|
+|      | box       | [(t1,next1)  | []        |          |                 |             |            |           |
+|      |           | ,(t2,next2)] |           |          | Awaiting box    | box         | Ab -> b    | b -> Db   |
+|      |           |              |           |          | Decided box     |             |            |           |
+|      |           |              |           |          |                 | t1          | Db -> t1   | t1 -> An1 |
+|      |           |              |           |          | Awaiting next1  | next1       | An1 -> n1  | n1 -> Dn1 |
+|      |           |              |           |          | Decided next1   |             |            |           |
+|      |           |              |           |          |                 | t2          | Db -> t2   | t2 -> An2 |
+|      |           |              |           |          | Awaiting next2  | next2       | An2 -> n2  | n2 -> Dn2 |
+|      |           |              |           |          | Decided next2   |             |            |           |
+|      |           |              |           |          |                 |             |            |           |
+|      |           |              |           |          | Box gather (Gb) | or1         | Dn1 -> or1 | or1 -> Gb |
+|      |           |              |           |          | Box gather (Gb) | or2         | Dn2 -> or2 | or2 -> Gb |
 
-Some piece of code then needs to track that both next1 and next2 are terminal states, and gather to the top-level.
+The Gathers act as an or-gate to join either next-child back to the box.
 
 *** Box with two children and two outEdges, labeled
 
-| Node | stateName | outEdges     | subForest | PetriNet | places          | transitions | p -> t    | t -> p    |
-|------+-----------+--------------+-----------+----------+-----------------+-------------+-----------+-----------|
-|      | parent    | [(t1,next1)  | [box      |          |                 |             |           |           |
-|      |           | ,(t2,next2)] | ,child]   |          |                 |             |           |           |
-|      |           |              |           |          | Awaiting parent | parentFork  | Ap -> pF  |           |
-|      |           |              |           |          |                 |             |           | pF -> Ab  |
-|      |           |              |           |          | Awaiting box    | box         | Ab -> b   | b -> Db   |
-|      |           |              |           |          | Decided box     | parentJoin  | Db -> pJ  |           |
-|      |           |              |           |          |                 |             |           | pF -> Ac  |
-|      |           |              |           |          | Awaiting child  | child       | Ac -> c   | c -> Dc   |
-|      |           |              |           |          | Decided child   | parentJoin  | Dc -> pJ  |           |
-|      |           |              |           |          | Decided parent  |             |           | pJ -> Dp  |
-|      |           |              |           |          |                 | t1          | Dp -> t1  | t1 -> An1 |
-|      |           |              |           |          | Awaiting next1  | next1       | An1 -> n1 | n1 -> Dn1 |
-|      |           |              |           |          | Decided next1   |             |           |           |
-|      |           |              |           |          |                 | t2          | Db -> t2  | t2 -> An2 |
-|      |           |              |           |          | Awaiting next2  | next2       | An2 -> n2 | n2 -> Dn2 |
-|      |           |              |           |          | Decided next2   |             |           |           |
+| Node | stateName | outEdges     | subForest | PetriNet | places          | transitions | p -> t     | t -> p    |
+|------+-----------+--------------+-----------+----------+-----------------+-------------+------------+-----------|
+|      | parent    | [(t1,next1)  | [box      |          |                 |             |            |           |
+|      |           | ,(t2,next2)] | ,child]   |          |                 |             |            |           |
+|      |           |              |           |          | Awaiting parent | parentFork  | Ap -> pF   |           |
+|      |           |              |           |          |                 |             |            | pF -> Ab  |
+|      |           |              |           |          | Awaiting box    | box         | Ab -> b    | b -> Db   |
+|      |           |              |           |          | Decided box     | parentJoin  | Db -> pJ   |           |
+|      |           |              |           |          |                 |             |            | pF -> Ac  |
+|      |           |              |           |          | Awaiting child  | child       | Ac -> c    | c -> Dc   |
+|      |           |              |           |          | Decided child   | parentJoin  | Dc -> pJ   |           |
+|      |           |              |           |          | Decided parent  |             |            | pJ -> Dp  |
+|      |           |              |           |          |                 | t1          | Dp -> t1   | t1 -> An1 |
+|      |           |              |           |          | Awaiting next1  | next1       | An1 -> n1  | n1 -> Dn1 |
+|      |           |              |           |          | Decided next1   |             |            |           |
+|      |           |              |           |          |                 | t2          | Db -> t2   | t2 -> An2 |
+|      |           |              |           |          | Awaiting next2  | next2       | An2 -> n2  | n2 -> Dn2 |
+|      |           |              |           |          | Decided next2   |             |            |           |
+|      |           |              |           |          |                 |             |            |           |
+|      |           |              |           |          | Box gather (Gb) | or1         | Dn1 -> or1 | or1 -> Gb |
+|      |           |              |           |          | Box gather (Gb) | or2         | Dn2 -> or2 | or2 -> Gb |
 
 *** General Principles
 

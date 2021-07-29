@@ -188,14 +188,15 @@ play0 pn acce = do
     autoTransitions = (,Nothing) <$> filter autoEvent (enabled pn acc)
     afterAuto = foldl (step0 pn) (Right acc) autoTransitions
     afterCase = chooseCase pn afterAuto
-  afterCase
+  if acce /= afterCase
+    then play0 pn afterCase
+    else afterCase
+  -- surely there's a better way to say we want to converge to a fixpoint
 
 autoEvent (TL   _  ) = False
 autoEvent (Case _ _) = False
 autoEvent _          = True
 
--- TODO: we need to store the eventValue in a symbol table. Then we can Case on Race = Dwarf vs Race = Elf
--- TODO: we need to add support for Case transitions
 -- TODO: add support for inhibitor arcs.
 step0 :: PetriNet PLabel TLabel
       -> AccumulatorE

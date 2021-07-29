@@ -4,7 +4,7 @@ MkPN {places = [PL "Begin Character Creation",PL "Begin Pre-Equipment",PL "Await
 #+BEGIN_SRC haskell
 Acc {mp = fromList [(PL "Begin Character Creation",1)], st = fromList []}
 #+END_SRC
-[[./viz/charCreator-1.png]]
+[[../viz/charCreator-1.png]]
 #+BEGIN_EXAMPLE
 Attempting to execute shell command: dot viz/charCreator-1.dot -Tpng > viz/charCreator-1.png
 __exitcode: ExitSuccess

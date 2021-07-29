@@ -37,7 +37,7 @@ type StateTree = Tree State
 data State = (:->) { stateName :: StateName
                    , outEdges  :: [(Maybe EdgeLabel, State)]
                    }
-             deriving (Eq, Show)
+             deriving (Eq, Show, Read)
 
 -- We have some syntactic sugar for constructors
 leaf x = Node x []
@@ -51,7 +51,21 @@ ccSimple =
   [
     leaf $ state "Choose Ability Scores"
   , leaf $ "Choose Race" :-> [(Just "Dwarf", state "Choose Dwarf Sub-Race")
-                             ,(Just "Elf",   state "Choose Elf Sub-Race")]
+                             ,(Just "Elf",   state "Choose Elf Sub-Race")
+                             ]
+  ]
+
+-- Now we have a grammar for specifying the character creator HSM!
+ccMedium :: StateTree
+ccMedium = 
+  state "Character Creation" `contains`
+  [
+    leaf $ state "Choose Ability Scores"
+  , leaf $ "Choose Race" :-> [(Just "Dwarf", state "Choose Dwarf Sub-Race")
+                             ,(Just "Elf",   "Choose Elf Sub-Race" :-> [(Just "High Elf", state "Greet Galadriel")
+                                                                       ,(Just "Low Elf",  state "Greet Elrond")
+                                                                       ])
+                             ]
   ]
 
 charCreator :: StateTree
@@ -131,7 +145,7 @@ asPetri (Node (statename :-> nexts) children) =
              <> mconcat childPetris <>
              MkPN [back]           [post]       gather                 [(post, back, 1)]
 
-      nextPetris    = asPetri <$> (leaf . snd <$> nexts)
+      nextPetris    = mconcat $ asPetri <$> (leaf . snd <$> nexts)
       -- If any of the out edges are labeled, we're in a choice situation. To achieve closure for this node and its descendants, we need to OR-join its labeled children.
       -- To achieve an OR-join, for each labeled out-edge, identify the outless nodes of that out-edge's subgraph, and create an individual exit transition leading to an OR gate place.
       gatherNextOr  = mconcat
@@ -142,10 +156,10 @@ asPetri (Node (statename :-> nexts) children) =
         | (Just edgeLabel, nextstate) <- nexts
         , let nextstatename = stateName nextstate
               (next1,next2,next3) = plprefix nextstatename
-              orOutless = outless $ asPetri (leaf nextstate)
-              proceed = mkCase statename edgeLabel
+              orOutless  = outless $ asPetri (leaf nextstate)
+              proceed    = mkCase statename edgeLabel
+              gatherNext = Join $ nextstatename ++ " BACK TO " ++ statename
         , oless@(PL ol) <- orOutless
-        , let gatherNext    = Join $ nextstatename ++ " BACK TO " ++ statename
         ]
       -- unlabeled children proceed as per usual; their outless children are eventually gathered to the top-level
       gatherNextAnd = mconcat
@@ -155,9 +169,8 @@ asPetri (Node (statename :-> nexts) children) =
               (next1,next2,next3) = plprefix nextstatename
               proceed = Noop $ "proceeding directly from " ++ statename ++ " to " ++ nextstatename
         ]
-      nextStates = gatherNextOr <> gatherNextAnd
   in
-   nubPN $ withChildren <> nextStates <> mconcat nextPetris
+   nubPN $ withChildren <> gatherNextOr <> gatherNextAnd <> nextPetris
   where
     outless :: PetriNet PLabel TLabel -> [PLabel]
     outless pn = let outful = [ place | place <- places pn
@@ -165,10 +178,7 @@ asPetri (Node (statename :-> nexts) children) =
                  in places pn \\ outful
     mkCase :: StringText -> StringText -> TLabel
     mkCase previousPlace edgeLabel
-      -- "foo=bar"
-      | '=' `elem` edgeLabel = let els = wordsBy (=='=') edgeLabel in Case (els !! 0) (Just $ els !! 1)
-      -- "bar"
-      | otherwise            = Case previousPlace (Just edgeLabel)
+      = Case previousPlace (Just edgeLabel)
 
 prefix :: String -> (String, String, String)
 prefix statename = case take 6 statename of
@@ -203,6 +213,7 @@ writePCC outfile sketch eventFile = do
     pn = asPetri $ case sketch of
       "charCreator" -> charCreator
       "ccSimple" -> ccSimple
+      "ccMedium" -> ccMedium
       "safePost" -> safePost
       _ -> error "choose one of: charCreator, ccSimple, safePost"
   events <- (read <$> readFile eventFile) :: IO [Event]
@@ -213,7 +224,7 @@ writePCC outfile sketch eventFile = do
               transitionHighlights = [eventName]
               }
             outfilebase = outfile ++ "-" ++ show count
-        putStrLn $ "[[" ++ "./" ++ outfilebase ++ ".png" ++ "]]"
+        putStrLn $ "[[" ++ "../" ++ outfilebase ++ ".png" ++ "]]"
         putStrLn "#+BEGIN_EXAMPLE"
         writePetri outfilebase opts pn
         putStrLn "#+END_EXAMPLE"

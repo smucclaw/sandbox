@@ -163,7 +163,7 @@ chooseCase pn acce = do
   -- in a future version of this language we will allow cases to use < = > operators
   -- and we will test for totality not just over data constructors but over numbers
   foldl (step0 pn) acce caseReady
-  
+  -- TODO we should probably add some erroring here, like return a Left if the incoming event fails to match a case
 
 getLabel :: [Transition a pl] -> [a]
 getLabel ts  = [ tl | (T tl _ _) <- ts ]
@@ -244,8 +244,7 @@ play1 pn (Right acc0@(Acc m0 symtab)) e = do
 
 play :: PetriNet PLabel TLabel -> AccumulatorE -> [Event]
      -> AccumulatorE
-play pn startAccE events = foldl (play1 pn) startAccE events
-
+play    pn startAccE events = foldl (play1 pn) startAccE events
 playlog pn startAccE events = scanl (play1 pn) startAccE events
 
 main = do

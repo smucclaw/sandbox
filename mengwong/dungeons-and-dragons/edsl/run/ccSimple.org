@@ -4,7 +4,7 @@ MkPN {places = [PL "Begin Character Creation",PL "Awaiting Choose Ability Scores
 #+BEGIN_SRC haskell
 Acc {mp = fromList [(PL "Begin Character Creation",1)], st = fromList []}
 #+END_SRC
-[[./viz/ccSimple-1.png]]
+[[../viz/ccSimple-1.png]]
 #+BEGIN_EXAMPLE
 Attempting to execute shell command: dot viz/ccSimple-1.dot -Tpng > viz/ccSimple-1.png
 __exitcode: ExitSuccess
@@ -15,7 +15,7 @@ __stderr: ""
 #+BEGIN_SRC haskell
 Acc {mp = fromList [(PL "Awaiting Choose Race",1),(PL "Decided Choose Ability Scores",1)], st = fromList [("Choose Ability Scores",Just "100")]}
 #+END_SRC
-[[./viz/ccSimple-2.png]]
+[[../viz/ccSimple-2.png]]
 #+BEGIN_EXAMPLE
 Attempting to execute shell command: dot viz/ccSimple-2.dot -Tpng > viz/ccSimple-2.png
 __exitcode: ExitSuccess
@@ -26,7 +26,7 @@ __stderr: ""
 #+BEGIN_SRC haskell
 Acc {mp = fromList [(PL "Awaiting Choose Dwarf Sub-Race",1),(PL "Decided Choose Ability Scores",1)], st = fromList [("Choose Ability Scores",Just "100"),("Choose Race",Just "Dwarf")]}
 #+END_SRC
-[[./viz/ccSimple-3.png]]
+[[../viz/ccSimple-3.png]]
 #+BEGIN_EXAMPLE
 Attempting to execute shell command: dot viz/ccSimple-3.dot -Tpng > viz/ccSimple-3.png
 __exitcode: ExitSuccess
@@ -37,7 +37,7 @@ __stderr: ""
 #+BEGIN_SRC haskell
 Acc {mp = fromList [(PL "End Character Creation",1)], st = fromList [("Choose Ability Scores",Just "100"),("Choose Dwarf Sub-Race",Just "Mountain"),("Choose Race",Just "Dwarf")]}
 #+END_SRC
-[[./viz/ccSimple-4.png]]
+[[../viz/ccSimple-4.png]]
 #+BEGIN_EXAMPLE
 Attempting to execute shell command: dot viz/ccSimple-4.dot -Tpng > viz/ccSimple-4.png
 __exitcode: ExitSuccess

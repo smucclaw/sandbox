@@ -4,6 +4,7 @@ module Lib
     ( writePCC,
       asPetri,
       safePost,
+      ccSimple
     ) where
 
 import qualified Data.Map as Map
@@ -49,7 +50,8 @@ ccSimple =
   state "Character Creation" `contains`
   [
     leaf $ state "Choose Ability Scores"
-  , leaf $ state "Choose Potato Scores"
+  , leaf $ "Choose Race" :-> [(Just "Dwarf", state "Choose Dwarf Sub-Race")
+                             ,(Just "Elf",   state "Choose Elf Sub-Race")]
   ]
 
 charCreator :: StateTree
@@ -147,8 +149,10 @@ asPetri (Node (statename :-> nexts) children) =
                  in places pn \\ outful
     mkCase :: StringText -> StringText -> TLabel
     mkCase previousPlace edgeLabel
-      | '=' `elem` edgeLabel = let els = wordsBy (=='=') edgeLabel in Case (els !! 0) (els !! 1)
-      | otherwise            = Case previousPlace edgeLabel
+      -- "foo=bar"
+      | '=' `elem` edgeLabel = let els = wordsBy (=='=') edgeLabel in Case (els !! 0) (Just $ els !! 1)
+      -- "bar"
+      | otherwise            = Case previousPlace (Just edgeLabel)
 
 prefix :: String -> (String, String)
 prefix statename = case take 6 statename of
@@ -156,11 +160,6 @@ prefix statename = case take 6 statename of
                     _        -> ("Begin "    <> statename, "End "     <> statename)
 
 plprefix statename = let (pl1, pl2) = prefix statename in (PL pl1, PL pl2)
-
-someFunc :: IO ()
-someFunc = do
-  let pcc = asPetri (normalize charCreator)
-  Petri.run pcc (Map.fromList [(head $ places pcc, 1)])
 
 pccPetriOP :: PetriOptionalParams
 pccPetriOP = petriOP_{
@@ -182,20 +181,21 @@ previewPCC = previewPetri pccPetriOP $
 --     "safePost"    -> safePost
 --     _ -> error "choose one of: charCreator, ccSimple, safePost"
 
-writePCC :: String -> String -> IO()
-writePCC outfile sketch =
+writePCC :: String -> String -> String -> IO()
+writePCC outfile sketch eventFile = do
   let
     pn = asPetri $ case sketch of
       "charCreator" -> charCreator
       "ccSimple" -> ccSimple
       "safePost" -> safePost
       _ -> error "choose one of: charCreator, ccSimple, safePost"
-    result = Petri.play pn (Petri.start_marking pn) []
-    opts m = petriOP_{
-      markings = m,
-      transitionHighlights = [Fork "Character Creation FORK"]
-    }
-  in
-    case result of
-      Left msg -> error msg
-      Right frames -> forM_ (zip frames [1..length frames]) (\(m, index) -> writePetri (outfile ++ show index) (opts m) pn)
+  events <- (read <$> readFile eventFile) :: IO [Event]
+  Petri.run pn
+    (\(count,(eventName, eventValue),acc) -> do
+        let opts = petriOP_{
+              markings = mp acc,
+              transitionHighlights = [eventName]
+              }
+        writePetri (outfile ++ show count) opts pn
+    )
+    events

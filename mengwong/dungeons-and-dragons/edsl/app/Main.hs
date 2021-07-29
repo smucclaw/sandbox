@@ -9,6 +9,7 @@ import Options.Generic
 
 data MyOpts = MyOpts { out :: String
                      , sketch :: String
+                     , events :: String
                      }
     deriving (Generic, Show)
 
@@ -17,5 +18,5 @@ instance ParseRecord MyOpts
 main = do
     x <- getRecord "edsl-exe"
     -- print (x :: MyOpts)
-    writePCC ( out x ) ( sketch x )
+    writePCC ( out x ) ( sketch x ) ( events x )
 

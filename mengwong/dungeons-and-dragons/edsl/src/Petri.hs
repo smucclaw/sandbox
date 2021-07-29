@@ -265,8 +265,11 @@ run pn dumper events = do
                    putStrLn $ "** " ++ show count ++ ": " ++ show event
                    case acce of
                      Left errstr -> putStrLn errstr
-                     Right acc   -> do print acc
-                                       dumper (count,event,acc)
+                     Right acc   -> do
+                       putStrLn "#+BEGIN_SRC haskell"
+                       print acc
+                       putStrLn "#+END_SRC"
+                       dumper (count,event,acc)
                )
 
 

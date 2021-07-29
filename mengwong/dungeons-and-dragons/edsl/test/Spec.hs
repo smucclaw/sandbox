@@ -44,7 +44,7 @@ main = hspec $ do
                                                          ,(TL "Choose Race", Just "Dwarf")
                                                          ,(TL "Choose Dwarf Sub-Race", Just "Mountain Dwarf")]
         `shouldBe`
-        Right (Acc { mp = fromList [(PL "Decided Choose Ability Scores",1),(PL "Decided Choose Dwarf Sub-Race",1)]
+        Right (Acc { mp = fromList [(PL "End Character Creation",1)]
                    , st = fromList [("Choose Ability Scores",Just "100")
                                    ,("Choose Dwarf Sub-Race",Just "Mountain Dwarf")
                                    ,("Choose Race",Just "Dwarf")]})

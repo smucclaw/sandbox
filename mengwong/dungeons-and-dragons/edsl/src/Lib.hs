@@ -31,29 +31,6 @@ import GraphViz
 ccSimple = Sketches.CCSimple.sketch
 safePost = Sketches.SafePost.sketch
 
-  
--- The initial graph needs to be slightly cleaned up before it is ready for prime time.
-normalize :: StateTree -> StateTree
-normalize = id
-
--- In the "grow" phase of normalization, we promote any targets of "siblings", to leaf nodes at the same level, if they don't already exist there.
--- actually, this is not a good idea, because it ends up introducing incorrect relationships between boxes and their contents.
-grow :: StateTree -> StateTree
-grow (Node parent siblings) =
-  let grownSiblings = grow <$> siblings
-  in
-  Node parent (grownSiblings ++ nub [ leaf $ target
-                               | (Node (_ :-> outs) children) <- grownSiblings
-                               , (_, target) <- outs
-                               , stateName target `notElem` (stateName . rootLabel <$> grownSiblings)
-                                 -- yes I know this is accidentallyquadratic.tumblr.com
-                               ])
-
--- output to Dot representation of original spec.
--- every non-leaf node is a cluster
-asHSM :: a
-asHSM = undefined 
-
 -- see Note in README.org [asPetri]
 asPetri :: StateTree -> PetriNet PLabel TLabel
 asPetri (Node (statename :-> nexts) children) =
@@ -118,26 +95,6 @@ prefix statename = case take 6 statename of
 
 plprefix statename = let (pl1, pl2, pl3) = prefix statename in (PL pl1, PL pl2, PL pl3)
 
-pccPetriOP :: PetriOptionalParams
-pccPetriOP = petriOP_{
-  markings = Map.fromList [(PL "Begin Character Creation", 3)],
-  transitionHighlights = [Fork "Character Creation FORK"]
-  }
-
-previewPCC :: IO ()
-previewPCC = previewPetri pccPetriOP $
-  asPetri (normalize Sketches.CharCreator.sketch)
-
--- writePCC :: String -> String -> IO ()
--- writePCC outfile sketch = writePetri outfile pccPetriOP $
---   asPetri $
---   -- normalize $
---   case sketch of
---     "charCreator" -> charCreator
---     "ccSimple"    -> ccSimple
---     "safePost"    -> safePost
---     _ -> error "choose one of: charCreator, ccSimple, safePost"
-
 writePCC :: String -> String -> String -> IO()
 writePCC outfile sketch eventFile = do
   let
@@ -146,7 +103,7 @@ writePCC outfile sketch eventFile = do
       "ccSimple" -> Sketches.CCSimple.sketch
       "ccMedium" -> Sketches.CCMedium.sketch
       "safePost" -> Sketches.SafePost.sketch
-      _ -> error "choose one of: charCreator, ccSimple, safePost"
+      _ -> error "choose one of: charCreator, ccSimple, ccMedium, safePost"
   events <- (read <$> readFile eventFile) :: IO [Event]
   Petri.run pn
     (\(count,(eventName, eventValue),acc) -> do

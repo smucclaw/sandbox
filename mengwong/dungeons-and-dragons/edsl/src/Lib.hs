@@ -144,8 +144,10 @@ asPetri (Node (statename :-> nexts) children) =
                  in places pn \\ outful
     mkCase :: StringText -> StringText -> TLabel
     mkCase previousPlace edgeLabel
-      | '=' `elem` edgeLabel = let els = wordsBy (=='=') edgeLabel in Case (els !! 0) (els !! 1)
-      | otherwise            = Case previousPlace edgeLabel
+      -- "foo=bar"
+      | '=' `elem` edgeLabel = let els = wordsBy (=='=') edgeLabel in Case (els !! 0) (Just $ els !! 1)
+      -- "bar"
+      | otherwise            = Case previousPlace (Just edgeLabel)
 
 prefix :: String -> (String, String)
 prefix statename = case take 6 statename of
@@ -157,7 +159,7 @@ plprefix statename = let (pl1, pl2) = prefix statename in (PL pl1, PL pl2)
 someFunc :: IO ()
 someFunc = do
   let pcc = asPetri (normalize charCreator)
-  Petri.run pcc (Map.fromList [(head $ places pcc, 1)])
+  Petri.run pcc (start_accumulator pcc)
 
 pccPetriOP :: PetriOptionalParams
 pccPetriOP = petriOP_{

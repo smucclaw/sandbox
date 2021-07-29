@@ -28,11 +28,8 @@ data PLabel = Start | End
 data TLabel = Fork StringText
             | Join StringText
             | Noop StringText
-            | Case StringText StringText -- read from symbol table; conditional branch
+            | Case StringText (Maybe StringText) -- read from symbol table; conditional branch; must match Accumulator's st
             | TL   StringText deriving (Ord, Eq, Show)
-
-notTL (TL _) = False
-notTL _      = True
 
 -- a couple of helper functions help to set up a petri net that hasn't started running yet
 p pl ts = P (PL pl) 1 ts
@@ -87,14 +84,17 @@ pn_4 = pn_from_simple [example_4]
 -- a "marking" keeps track of how many dots are in which plaes
 type Marking pl = Map.Map pl Int
 
-data Accumulator = Acc { m :: Marking PLabel
-                       , s :: Map.Map StringText StringText -- symbol table for recording Race = Dwarf or Race = Elf
+data Accumulator = Acc { mp :: Marking PLabel
+                       , st :: Map.Map StringText (Maybe StringText) -- symbol table for recording Race = Dwarf or Race = Elf; must match the TLabel Case type
                        }
+                   deriving (Show, Eq)
 
 -- the start node(s) of a petri net is(are) the node(s) with no indegrees. generously label each with a token.
 start_marking pn =
   let start_places = filter (\x -> length (indegrees pn x) == 0) (places pn)
   in Map.fromList ((, 1) <$> start_places)
+
+start_accumulator pn = Acc (start_marking pn) Map.empty
 
 -- the end node(s) of a petri net is(are) the node(s) with no outdegrees.
 end_marking pn =
@@ -138,13 +138,32 @@ pn_from_simple ps = MkPN
 
 -- which transitions are ready to fire?
 -- return a list of transition labels where all input places meet the edgecount requirement
-enabled :: PetriNet PLabel TLabel -> Marking PLabel -> [TLabel]
-enabled pn marking =
+enabled :: PetriNet PLabel TLabel -> Accumulator -> [TLabel]
+enabled pn (Acc marking symtab) =
   [ transition
   | transition <- transitions pn
   , all (\(pl, n) -> Map.lookup pl marking >= Just n)
       [ (pl, n) | (pl, tl, n) <- ptEdges pn , tl == transition ]
   ]
+
+type AccumulatorE = Either String Accumulator
+
+-- complication: step0 matches on tl == eventName, so we have to reformat
+-- the list of events to be a ((Case n v),v) for it to match the tl eventNames
+chooseCase :: PetriNet PLabel TLabel -> AccumulatorE -> AccumulatorE
+chooseCase pn acce = do
+  acc <- acce
+  let
+    caseReady = [ (transition,evalue)
+                | transition@(Case ename evalue) <- enabled pn acc
+                , st acc Map.!? ename == Just evalue
+                ]
+  -- the actual choice(s) is the intersection between caseReady and the symbol table
+  -- where the values match
+  -- in a future version of this language we will allow cases to use < = > operators
+  -- and we will test for totality not just over data constructors but over numbers
+  foldl (step0 pn) acce caseReady
+  
 
 getLabel :: [Transition a pl] -> [a]
 getLabel ts  = [ tl | (T tl _ _) <- ts ]
@@ -162,23 +181,29 @@ type Event = (EventName, EventValue)
 type EventName = TLabel
 type EventValue = Maybe StringText
 
-play0 :: PetriNet PLabel TLabel -> Marking PLabel -> Either String (Marking PLabel)
-play0 pn mm =
+play0 :: PetriNet PLabel TLabel -> AccumulatorE -> AccumulatorE
+play0 pn acce = do
+  acc <- acce
   let
-    autoTransitions = (,Nothing) <$> filter notTL (enabled pn mm)
-  in
-    foldl (step0 pn) (Right mm) autoTransitions
+    autoTransitions = (,Nothing) <$> filter autoEvent (enabled pn acc)
+    afterAuto = foldl (step0 pn) (Right acc) autoTransitions
+    afterCase = chooseCase pn afterAuto
+  afterCase
+
+autoEvent (TL   _  ) = False
+autoEvent (Case _ _) = False
+autoEvent _          = True
 
 -- TODO: we need to store the eventValue in a symbol table. Then we can Case on Race = Dwarf vs Race = Elf
 -- TODO: we need to add support for Case transitions
 -- TODO: add support for inhibitor arcs.
 step0 :: PetriNet PLabel TLabel
-      -> Either String (Marking PLabel)
+      -> AccumulatorE
       -> Event
-      -> Either String (Marking PLabel)
-step0 _ (Left mm) _ = Left mm
-step0 pn (Right mm) (eventName, eventValue) =
-  let ready = enabled pn mm
+      -> AccumulatorE
+step0 _ (Left acc) _ = Left acc
+step0 pn (Right acc@(Acc mm symtab)) (eventName, eventValue) =
+  let ready = enabled pn acc
       removal = [ (maybe (Just 0) (Just . subtract n), pl)
                 | (pl, tl, n) <- ptEdges pn
                 , tl == eventName ]
@@ -190,40 +215,39 @@ step0 pn (Right mm) (eventName, eventValue) =
   in
     if   eventName `notElem` ready
     then Left ("unable to fire " ++ show eventName ++ ": not enabled! (expecting "++show ready++ ")")
-    else Right afterMarking
+    else Right (Acc afterMarking (case eventName of
+                                    TL ename -> Map.union (Map.singleton ename eventValue) symtab
+                                    _        -> symtab))
 
 
 play1 :: PetriNet PLabel TLabel         -- underlying PN
-      -> Either String (Marking PLabel) -- "accumulator"
+      -> AccumulatorE                   -- marking and symbol table
       -> Event                          -- incoming event
-      -> Either String (Marking PLabel) -- output
+      -> AccumulatorE                   -- wrapped in Either for error handling
 play1 _ (Left x) _ = Left x
-play1 pn (Right m0) e = do
-  let m1 = play0 pn m0
-  m2 <- step0 pn m1 e
-  play0 pn m2
-  
+play1 pn (Right acc0@(Acc m0 symtab)) e = do
+  let acc1 = play0 pn (Right acc0)
+      acc2 = step0 pn acc1 e
+  acc3 <- play0 pn acc2
+  return $ acc3 { mp = Map.filter (/= 0) (mp acc3) }
 
-play :: PetriNet PLabel TLabel -> Marking PLabel -> [Event]
- -> Either String (Marking PLabel)
-play pn startM events = do
-  mm <- foldl (play1 pn) (Right startM) events
-  return $ excludeZeroes mm
-  where
-    excludeZeroes mm = Map.fromList [ m | m@(x,y) <- Map.toList mm, y /= 0 ]
+play :: PetriNet PLabel TLabel -> AccumulatorE -> [Event]
+     -> AccumulatorE
+play pn startAccE events = foldl (play1 pn) startAccE events
+
+playlog pn startAccE events = scanl (play1 pn) startAccE events
 
 main = do
 -- putStrLn "* example 1"; mydo pn_1
 --  putStrLn "* example 2"; mydo pn_2
   putStrLn "* example 4"; mydo pn_4
-  where mydo pn = print $ play pn (start_marking pn) []
+  where mydo pn = print $ play pn (Right $ start_accumulator pn) []
 
-run :: PetriNet PLabel TLabel -> Marking PLabel -> IO ()
-run pn marking = do
-  let ready = enabled pn (start_marking pn)
-      playlog = play pn marking ((,Nothing) <$> ready)
+run :: PetriNet PLabel TLabel -> Accumulator -> IO ()
+run pn acc = do
+  let playlog = play pn (Right acc)
   putStrLn $ "* petri net:\n" ++ show pn
-  putStrLn $ "we start with initial transitions: " ++ show ready
+  putStrLn $ "we start with initial accumulator: " ++ show acc
 
 
 -- references:

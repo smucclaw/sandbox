@@ -174,3 +174,8 @@ The accumulator is the marking.
 
 The stepper is actually a ~(stepper petriNet)~ that knows how to step through the given ~petriNet~.
 
+* Future Work
+
+Suppose a downstream event wants to refer to the value of an event received previously. To support this:
+- extend the syntax for a node to be "Lookup X" with labeled out edges.
+- change the semantics of a "Choose X" event to save the value in the symbol table under "X" rather than under "Choose X"

@@ -6,7 +6,7 @@ module Petri where
 
 import qualified Data.Map as Map
 import Control.Monad
-import Data.Maybe (maybeToList)
+import Data.Maybe (listToMaybe)
 import Data.List (nub, intersect, intercalate, (\\))
 import Generic.Data (Generic, Generically(..))
 import qualified Prettyprinter as PP
@@ -166,15 +166,8 @@ play0 :: PetriNet PLabel TLabel -> Marking PLabel -> Either String [Marking PLab
 play0 pn mm =
   let
     autoTransitions = (,Nothing) <$> filter notTL (enabled pn mm)
-    reducer :: Either String [Marking PLabel] -> Event -> Either String [Marking PLabel]
-    reducer l@(Left msg) _ = l
-    reducer (Right currentMarkings) event =
-      case step0 pn (Right (head currentMarkings)) event of
-        Left msg -> Left msg
-        Right nextMarkings -> Right (nextMarkings : currentMarkings)
   in
-    -- foldl (step0 pn) (Right mm) autoTransitions
-    foldl reducer (Right [mm]) autoTransitions
+    sequence $ scanl (step0 pn) (Right mm) autoTransitions
 
 -- TODO: we need to store the eventValue in a symbol table. Then we can Case on Race = Dwarf vs Race = Elf
 -- TODO: we need to add support for Case transitions
@@ -215,29 +208,31 @@ play1 :: PetriNet PLabel TLabel         -- underlying PN
       -> Event                          -- incoming event
       -> Either String [Marking PLabel] -- output
 play1 _ (Left x) _ = Left x
-play1 pn (Right m0) e = case play0 pn m0 of
-  l@(Left x) -> l
-  r@(Right []) -> r
-  Right auto1@(m1 : remainder) -> case step0 pn (Right m1) e of
-    Left x -> Left x
-    Right m2 -> case play0 pn m2 of
-      l@(Left x) -> l
-      Right [] -> Right (m2 : auto1)
-      Right auto2 -> Right (auto2 ++ m2 : auto1)
-  
+play1 pn (Right m0) e = do
+  auto1 <- play0 pn m0
+  case listToMaybe $ reverse auto1 of
+    Nothing -> return []
+    Just m1 -> do
+      m2 <- step0 pn (pure m1) e
+      auto2 <- play0 pn m2
+      return (auto1 ++ m2 : auto2)
+
 play :: PetriNet PLabel TLabel -> Marking PLabel -> [Event]
  -> Either String [Marking PLabel]
 play pn startM events = do
-  mm <- foldl reducer (Right [startM]) events
-  return $ excludeZeroes <$> mm
+  mm <- sequence $ scanl reducer (Right [startM]) events
+  return $ excludeZeroes <$> concat mm
   where
     excludeZeroes mm = Map.fromList [ m | m@(x,y) <- Map.toList mm, y /= 0 ]
-    reducer :: Either String [Marking PLabel] -> Event -> Either String [Marking PLabel]
+    -- reducer :: Either String [Marking PLabel] -> Event -> Either String [Marking PLabel]
     reducer l@(Left msg) _ = l
-    reducer (Right currentMarkings) event =
-      case play1 pn (Right (head currentMarkings)) event of
-        Left msg -> Left msg
-        Right nextMarkings -> Right (nextMarkings ++ currentMarkings)
+    reducer acc@(Right previousMarkings) event = case listToMaybe $ reverse previousMarkings of
+      Nothing -> acc
+      Just m -> case play1 pn (Right m) event of
+        l@(Left msg) -> l
+        Right [] -> acc
+        r@(Right newMarkings) -> r
+
 main = do
 -- putStrLn "* example 1"; mydo pn_1
 --  putStrLn "* example 2"; mydo pn_2

@@ -1,0 +1,46 @@
+* petri net:
+MkPN {places = [PL "Begin Character Creation",PL "Awaiting Choose Ability Scores",PL "Decided Choose Ability Scores",PL "Awaiting Choose Race",PL "Decided Choose Race",PL "Gathered Choose Race",PL "Awaiting Choose Dwarf Sub-Race",PL "Decided Choose Dwarf Sub-Race",PL "Awaiting Choose Elf Sub-Race",PL "Decided Choose Elf Sub-Race",PL "End Character Creation"], transitions = [Fork "Character Creation FORK",TL "Choose Ability Scores",TL "Choose Race",Case "Choose Race" (Just "Dwarf"),Join "Choose Dwarf Sub-Race BACK TO Choose Race",Case "Choose Race" (Just "Elf"),Join "Choose Elf Sub-Race BACK TO Choose Race",TL "Choose Dwarf Sub-Race",TL "Choose Elf Sub-Race",Join "Character Creation JOIN"], ptEdges = [(PL "Begin Character Creation",Fork "Character Creation FORK",1),(PL "Awaiting Choose Ability Scores",TL "Choose Ability Scores",1),(PL "Awaiting Choose Race",TL "Choose Race",1),(PL "Decided Choose Race",Case "Choose Race" (Just "Dwarf"),1),(PL "Decided Choose Dwarf Sub-Race",Join "Choose Dwarf Sub-Race BACK TO Choose Race",1),(PL "Decided Choose Race",Case "Choose Race" (Just "Elf"),1),(PL "Decided Choose Elf Sub-Race",Join "Choose Elf Sub-Race BACK TO Choose Race",1),(PL "Awaiting Choose Dwarf Sub-Race",TL "Choose Dwarf Sub-Race",1),(PL "Awaiting Choose Elf Sub-Race",TL "Choose Elf Sub-Race",1),(PL "Decided Choose Ability Scores",Join "Character Creation JOIN",1),(PL "Gathered Choose Race",Join "Character Creation JOIN",1)], tpEdges = [(Fork "Character Creation FORK",PL "Awaiting Choose Ability Scores",1),(Fork "Character Creation FORK",PL "Awaiting Choose Race",1),(TL "Choose Ability Scores",PL "Decided Choose Ability Scores",1),(TL "Choose Race",PL "Decided Choose Race",1),(Case "Choose Race" (Just "Dwarf"),PL "Awaiting Choose Dwarf Sub-Race",1),(Join "Choose Dwarf Sub-Race BACK TO Choose Race",PL "Gathered Choose Race",1),(Case "Choose Race" (Just "Elf"),PL "Awaiting Choose Elf Sub-Race",1),(Join "Choose Elf Sub-Race BACK TO Choose Race",PL "Gathered Choose Race",1),(TL "Choose Dwarf Sub-Race",PL "Decided Choose Dwarf Sub-Race",1),(TL "Choose Elf Sub-Race",PL "Decided Choose Elf Sub-Race",1),(Join "Character Creation JOIN",PL "End Character Creation",1)]}
+** 1: (Noop "start",Nothing)
+#+BEGIN_SRC haskell
+Acc {mp = fromList [(PL "Begin Character Creation",1)], st = fromList []}
+#+END_SRC
+[[./viz/ccSimple-1.png]]
+#+BEGIN_EXAMPLE
+Attempting to execute shell command: dot viz/ccSimple-1.dot -Tpng > viz/ccSimple-1.png
+__exitcode: ExitSuccess
+__stdout: ""
+__stderr: ""
+#+END_EXAMPLE
+** 2: (TL "Choose Ability Scores",Just "100")
+#+BEGIN_SRC haskell
+Acc {mp = fromList [(PL "Awaiting Choose Race",1),(PL "Decided Choose Ability Scores",1)], st = fromList [("Choose Ability Scores",Just "100")]}
+#+END_SRC
+[[./viz/ccSimple-2.png]]
+#+BEGIN_EXAMPLE
+Attempting to execute shell command: dot viz/ccSimple-2.dot -Tpng > viz/ccSimple-2.png
+__exitcode: ExitSuccess
+__stdout: ""
+__stderr: ""
+#+END_EXAMPLE
+** 3: (TL "Choose Race",Just "Dwarf")
+#+BEGIN_SRC haskell
+Acc {mp = fromList [(PL "Awaiting Choose Dwarf Sub-Race",1),(PL "Decided Choose Ability Scores",1)], st = fromList [("Choose Ability Scores",Just "100"),("Choose Race",Just "Dwarf")]}
+#+END_SRC
+[[./viz/ccSimple-3.png]]
+#+BEGIN_EXAMPLE
+Attempting to execute shell command: dot viz/ccSimple-3.dot -Tpng > viz/ccSimple-3.png
+__exitcode: ExitSuccess
+__stdout: ""
+__stderr: ""
+#+END_EXAMPLE
+** 4: (TL "Choose Dwarf Sub-Race",Just "Mountain")
+#+BEGIN_SRC haskell
+Acc {mp = fromList [(PL "End Character Creation",1)], st = fromList [("Choose Ability Scores",Just "100"),("Choose Dwarf Sub-Race",Just "Mountain"),("Choose Race",Just "Dwarf")]}
+#+END_SRC
+[[./viz/ccSimple-4.png]]
+#+BEGIN_EXAMPLE
+Attempting to execute shell command: dot viz/ccSimple-4.dot -Tpng > viz/ccSimple-4.png
+__exitcode: ExitSuccess
+__stdout: ""
+__stderr: ""
+#+END_EXAMPLE

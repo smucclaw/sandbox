@@ -212,7 +212,7 @@ writePCC outfile sketch eventFile = do
               markings = mp acc,
               transitionHighlights = [eventName]
               }
-            outfilebase = outfile ++ show count
+            outfilebase = outfile ++ "-" ++ show count
         putStrLn $ "[[" ++ "./" ++ outfilebase ++ ".png" ++ "]]"
         putStrLn "#+BEGIN_EXAMPLE"
         writePetri outfilebase opts pn

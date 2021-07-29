@@ -28,6 +28,11 @@ library
       Lib
       Petri
       Sandbox
+      Sketches.CCMedium
+      Sketches.CCSimple
+      Sketches.CharCreator
+      Sketches.SafePost
+      Types
   other-modules:
       Paths_edsl
   hs-source-dirs:

@@ -7,6 +7,12 @@ module Lib
       ccSimple
     ) where
 
+import Types
+import qualified Sketches.CCSimple
+import qualified Sketches.CCMedium
+import qualified Sketches.CharCreator
+import qualified Sketches.SafePost
+
 import qualified Data.Map as Map
 import Data.Tree
 import Data.List
@@ -21,85 +27,10 @@ import Petri
 -- from rule34-haskell package
 import GraphViz
 
-type StateName = String
-type EdgeLabel = String
-
--- What we think of as a "state" is a node -- in two ways:
--- 1. it is a node in a TREE -- a containment hierarchy, in the sense of "hierarchical state machine"
--- 2. it is a node in a GRAPH -- of possibly labeled edges, pointing to next-states
-
--- To satisfy the hierarchical aspect, we define a tree of states.
--- We talk about parents and children. And clusters.
-type StateTree = Tree State
-
--- To satisfy the graph aspect, we make room inside each node for labeled exit edges.
--- We talk about sources and targets, aka "ins" and "outs".
-data State = (:->) { stateName :: StateName
-                   , outEdges  :: [(Maybe EdgeLabel, State)]
-                   }
-             deriving (Eq, Show, Read)
-
--- We have some syntactic sugar for constructors
-leaf x = Node x []
-state x = x :-> []
-x `contains` y = Node x y
-
 -- Now we have a grammar for specifying the character creator HSM!
-ccSimple :: StateTree
-ccSimple = 
-  state "Character Creation" `contains`
-  [
-    leaf $ state "Choose Ability Scores"
-  , leaf $ "Choose Race" :-> [(Just "Dwarf", state "Choose Dwarf Sub-Race")
-                             ,(Just "Elf",   state "Choose Elf Sub-Race")
-                             ]
-  ]
+ccSimple = Sketches.CCSimple.sketch
+safePost = Sketches.SafePost.sketch
 
--- Now we have a grammar for specifying the character creator HSM!
-ccMedium :: StateTree
-ccMedium = 
-  state "Character Creation" `contains`
-  [
-    leaf $ state "Choose Ability Scores"
-  , leaf $ "Choose Race" :-> [(Just "Dwarf", state "Choose Dwarf Sub-Race")
-                             ,(Just "Elf",   "Choose Elf Sub-Race" :-> [(Just "High Elf", state "Greet Galadriel")
-                                                                       ,(Just "Low Elf",  state "Greet Elrond")
-                                                                       ])
-                             ]
-  ]
-
-charCreator :: StateTree
-charCreator =
-  state "Character Creation" `contains`
-  [
-    "Pre-Equipment" :-> [(Nothing, state "Choose Equipment")]
-    `contains`
-    [ leaf $ state "Choose Class"
-    , leaf $ state "Choose Background"
-    ]
-  ,
-    state "Choose Description" `contains`
-    [ leaf $ state "Choose Age"
-    , leaf $ "Choose Height" :-> [(Nothing, state "Choose Width")]
-    --- ^ add "Choose Width" (not in original spec) to demonstrate need for recursion in the @grow@ function
-    , leaf $ state "Choose Appearance"
-    , leaf $ state "Choose Alignment"
-    ]
-  , leaf $ state "Choose Ability Scores"
-  , leaf $ state "Choose Potato Scores"
-  , leaf $ "Choose Race" :-> [(Just "Dwarf", state "Choose Dwarf Sub-Race")
-                             ,(Just "Elf",   state "Choose Elf Sub-Race")]
-  ]
-
-safePost :: StateTree
-safePost =
-  leaf $ "Safe Contract" :-> [(Just "Equity Financing", state "Conversion")
-                             ,(Just "Liquidity Event", "Greater of" :-> [(Just "Cash-Out Amount",   state "Residual Pro-Rata")
-                                                                        ,(Just "Conversion Amount", state "Conversion Pro-Rata")])
-                             ,(Just "Dissolution", state "Residual Pro-Rata")
-                              -- Liquidiation Priority is not a state transition, it is a decorator to the Liquidity and Dissolution Events.
-                             -- Termination is not actually a state transition, it just indicates exclusivity between the other state transitions, which is implicit here
-                             ]
   
 -- The initial graph needs to be slightly cleaned up before it is ready for prime time.
 normalize :: StateTree -> StateTree
@@ -195,7 +126,7 @@ pccPetriOP = petriOP_{
 
 previewPCC :: IO ()
 previewPCC = previewPetri pccPetriOP $
-  asPetri (normalize charCreator)
+  asPetri (normalize Sketches.CharCreator.sketch)
 
 -- writePCC :: String -> String -> IO ()
 -- writePCC outfile sketch = writePetri outfile pccPetriOP $
@@ -211,10 +142,10 @@ writePCC :: String -> String -> String -> IO()
 writePCC outfile sketch eventFile = do
   let
     pn = asPetri $ case sketch of
-      "charCreator" -> charCreator
-      "ccSimple" -> ccSimple
-      "ccMedium" -> ccMedium
-      "safePost" -> safePost
+      "charCreator" -> Sketches.CharCreator.sketch
+      "ccSimple" -> Sketches.CCSimple.sketch
+      "ccMedium" -> Sketches.CCMedium.sketch
+      "safePost" -> Sketches.SafePost.sketch
       _ -> error "choose one of: charCreator, ccSimple, safePost"
   events <- (read <$> readFile eventFile) :: IO [Event]
   Petri.run pn

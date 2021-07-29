@@ -220,17 +220,6 @@ step0 pn (Right acc@(Acc mm symtab)) (eventName, eventValue) =
                                     TL ename -> Map.union (Map.singleton ename eventValue) symtab
                                     _        -> symtab))
 
-
--- play1 :: PetriNet PLabel TLabel         -- underlying PN
---       -> Either String (Marking PLabel) -- "accumulator"
---       -> Event                          -- incoming event
---       -> Either String [Marking PLabel] -- output
--- play1 _ (Left x) _ = Left x
--- play1 pn (Right m0) e = do
---   let m1 = play0 pn m0
---   m2 <- step0 pn m1 e
---   play0 pn m2
-
 play1 :: PetriNet PLabel TLabel         -- underlying PN
       -> AccumulatorE                   -- marking and symbol table
       -> Event                          -- incoming event
@@ -246,12 +235,6 @@ play :: PetriNet PLabel TLabel -> AccumulatorE -> [Event]
      -> AccumulatorE
 play    pn startAccE events = foldl (play1 pn) startAccE events
 playlog pn startAccE events = scanl (play1 pn) startAccE events
-
-main = do
--- putStrLn "* example 1"; mydo pn_1
---  putStrLn "* example 2"; mydo pn_2
-  putStrLn "* example 4"; mydo pn_4
-  where mydo pn = print $ play pn (Right $ start_accumulator pn) []
 
 run :: PetriNet PLabel TLabel
     -> ((Int, Event, Accumulator) -> IO ())

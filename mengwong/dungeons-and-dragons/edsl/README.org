@@ -160,9 +160,10 @@ The ~Case~ transition is a special internal transition that implements condition
 
 Let's set up this hierarchy of stepper functions:
 
-- play0 :: autoplay all internal events e.g. Fork, Join, Noop, Case until we run out of internal events
-- play1 :: run play0, then consume one event. If the event is not enabled, return a Left warning; this is equivalent to a parser aborting on "unexpected token encountered".
 - play :: given an event stream, play1 each event in the stream until no events remain.
+- play1 :: run play0 to autoplay, then consume one event. If the event is not enabled, return a Left warning; this is equivalent to a parser aborting on "unexpected token encountered".
+- play0 :: autoplay all internal events e.g. Fork, Join, Noop, Case until we run out of internal events
+- step0 :: actually do the work of stepping through a transition by updating the marking
 
 What are the types of these functions? They rather remind one of a parser combinator: we are consuming input and elaborating structure, together with an error log.
 

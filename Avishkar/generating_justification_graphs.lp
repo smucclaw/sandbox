@@ -27,7 +27,7 @@ directedEdge(Sgn,X,Y):-explains(Sgn,X,Y,M).
 
 % Generate full graph for the given query, while taking care of cycles.
 generate_full_exp.
-level(0):-generate_full_exp
+level(0):-generate_full_exp.
 
 % Check for reeated edges at lower level
 repeatedEdge(pos,X,Y,M):-explains(pos,X,Y,M),explains(pos,X,Y,M1),0<=M1,M1<M.

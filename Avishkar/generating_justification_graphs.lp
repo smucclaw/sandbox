@@ -35,7 +35,7 @@ repeatedEdge(pos,X,Y,M):-explains(pos,X,Y,M),explains(pos,X,Y,M1),0<=M1,M1<M.
 % Generate next level if not all positive atoms are facts or correspond to repeated edges
 level(M+1):-explains(pos,X,Y,M),X!=fact,not repeatedEdge(pos,X,Y,M),generate_full_exp.
 
-#Show directedEdge/3.
+#show directedEdge/3.
 
 % This example is for a ground program, however the same method seems to work for an unground program or a program with constraints as well.
 

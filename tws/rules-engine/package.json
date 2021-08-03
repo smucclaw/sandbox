@@ -1,0 +1,14 @@
+{
+  "name": "rules-engine",
+  "version": "1.0.0",
+  "description": "prototype rules engine",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Teo Wei Shen",
+  "license": "ISC",
+  "dependencies": {
+    "json-rules-engine": "^6.1.2"
+  }
+}

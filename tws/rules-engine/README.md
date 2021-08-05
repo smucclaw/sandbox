@@ -2,6 +2,19 @@
 
 This is a demo of the `json-rules-engine`, a lightweight yet powerful rules engine written in Node.
 
+## Rule Engine
+
+- Runs rules which are constraints based on certain facts
+- Begin with a set of facts which we want to determine whether they meet the rules
+- Feed through a set of rules, usually business or legal decisions
+- Forward vs Backward Chaining
+    - Forward Chaining base on previously known facts
+    - Backward Chaining infers from the conclusion
+- Advantages
+    - Flexibility: vs Imperative Model - fixed sequence of steps
+    - Reduced complexity, especially when laws or rules keep changing (e.g. P3 -> P3HA -> P2HA)
+    - Reusability, follows DRY principle
+
 ## Components
 
 ### Rules
@@ -21,7 +34,6 @@ This is a demo of the `json-rules-engine`, a lightweight yet powerful rules engi
 ### Engine
 
 - Stores and execute rules based on facts
-- Example: With the rules, the CCLAW lunch gathering of 6 people is not possible
 - Determines, with the rule constraints, whether the facts can be met
 
 ### Almanac
@@ -38,9 +50,6 @@ node src/<name_of_file>.js
 
 ## Comparison / Relevance to Work at CCLAW
 
-- vs imperative model - sequence of steps
-    - "If at least one not vaccinated, immediately maximum 2 pax"
-    - "If all are vaccinated, then we can get more people who must also be fully vaccinated"
 - Similar to the expert systems done at CCLAW (e.g. docAssemble), but with less complexity
 - Can be used off the shelf - possible to have a L4 -> Node implementation?
 

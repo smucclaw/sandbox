@@ -8,13 +8,15 @@ This is a demo of the `json-rules-engine`, a lightweight yet powerful rules engi
 
 - Set of conditions and a single event
 - Examples:
-    - If all vaccinated, group size should be less than or equal to 5
+    - If business is in first schedule of LPA 2015, legal practitioner cannot accept any executive appointment
     - If children are from different household, number of children within group should be half
 
 ### Facts
 
 - Methods / constraints registered with engine **prior** to runtime and referenced within rule conditions
-- e.g. It is known that there is a CCLAW lunch gathering of 6 people with no children and all are vaccinated
+- Examples:
+    - The Dean of YPHSL is not in a housing or estate agency business
+    - There are 3 children in our household
 
 ### Engine
 
@@ -31,15 +33,20 @@ This is a demo of the `json-rules-engine`, a lightweight yet powerful rules engi
 ## Demo
 
 ```console
-node src/dinein.js
+node src/<name_of_file>.js
 ```
 
-## Relevance to Work at CCLAW
+## Comparison / Relevance to Work at CCLAW
 
-- Our work in FV revolves around verifiying facts based on a set of rules
-- Possible to find a solution that we can easily take off the shelf, and then use it to ???
+- vs imperative model - sequence of steps
+    - "If at least one not vaccinated, immediately maximum 2 pax"
+    - "If all are vaccinated, then we can get more people who must also be fully vaccinated"
+- Similar to the expert systems done at CCLAW (e.g. docAssemble), but with less complexity
+- Can be used off the shelf - possible to have a L4 -> Node implementation?
 
 ## Resources & Other Work
 
 - [json-rules-engine](https://github.com/CacheControl/json-rules-engine)
 - [Microsoft Rules Engine](https://github.com/microsoft/RulesEngine)
+- [Explanation on Rules Engine](https://martinfowler.com/bliki/RulesEngine.html)
+- [Another Explanation on Rules Engine](http://www.mastertheboss.com/bpm/drools/what-is-a-rule-engine/)

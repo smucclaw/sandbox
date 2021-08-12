@@ -1,0 +1,79 @@
+\documentclass{beamer}
+
+\usetheme{Singapore}
+\title{Form-Filling with Templates}
+\author{Teo Wei Shen}
+\date{12 August 2021}
+
+\setbeamertemplate{navigation symbols}{}
+
+\begin{document}
+
+\frame{\titlepage}
+
+\begin{frame}
+    \frametitle{Outline}
+    \tableofcontents
+\end{frame}
+
+\section{Motivations}
+\begin{frame}
+\frametitle{Motivations}
+    \begin{itemize}
+    \item Development of l4meta
+    \item Time and Cost Savings
+    \item Integration with computational law ecosystem
+    \end{itemize}
+\end{frame}
+
+\section{Objectives}
+\begin{frame}
+\frametitle{Objectives}
+    \begin{itemize}
+    \item Use open standard file formats (e.g.\ json or yaml) to quickly fill forms and contracts
+    \item Automate and speed up the process of form filling
+    \item Integrate with other existing tools developed at CCLAW
+    \end{itemize}
+\end{frame}
+
+\section{Proposed Workflow}
+\begin{frame}
+\frametitle{Proposed Workflow}
+    \begin{itemize}
+    \item Prepare L4
+    \item Prepare metadata according to predefined fields in L4
+    \item Process and generate from both L4 and metadata:
+        \begin{itemize}
+        \item Plain text (e.g.\ markdown, LaTeX)
+        \item Word document
+        \item PDF with embedded metadata
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\section{Demo}
+\begin{frame}
+\frametitle{Demo}
+\end{frame}
+
+\section{Considerations}
+\begin{frame}
+\frametitle{Considerations}
+    \begin{itemize}
+    \item Level of Control
+    \item Other Competing Programs: pandoc
+    \item Level or degree of integration with existing work
+    \end{itemize}
+\end{frame}
+
+\section{Next Steps}
+\begin{frame}
+\frametitle{Next Steps}
+    \begin{itemize}
+    \item Output to multiple formats
+    \item Direct formatting (LaTeX, Word, PDF)
+    \item Embed metadata into PDF
+    \end{itemize}
+\end{frame}
+
+\end{document}

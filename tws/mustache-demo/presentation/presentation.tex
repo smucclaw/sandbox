@@ -3,9 +3,15 @@
 \usetheme{Singapore}
 \title{Form-Filling with Templates}
 \author{Teo Wei Shen}
-\date{12 August 2021}
+\date{12 Aug 2021}
 
 \setbeamertemplate{navigation symbols}{}
+\addtobeamertemplate{navigation symbols}{}{%
+    \usebeamerfont{footline}%
+    \usebeamercolor[fg]{footline}%
+    \hspace{1em}%
+    \insertframenumber%
+}
 
 \begin{document}
 
@@ -26,6 +32,15 @@
     \end{itemize}
 \end{frame}
 
+\begin{frame}
+\frametitle{Motivations}
+    \begin{block}{Use Case 3: generating a signable instance of a legal contract by parameterizing a template}
+    Logic: lambda calculus.
+
+    The UI collects input as needed to fill the template, and at the end generates a filled template in Word or PDF format.
+    \end{block}
+\end{frame}
+
 \section{Objectives}
 \begin{frame}
 \frametitle{Objectives}
@@ -36,19 +51,42 @@
     \end{itemize}
 \end{frame}
 
-\section{Proposed Workflow}
+\section{Proposed Program}
 \begin{frame}
-\frametitle{Proposed Workflow}
+\frametitle{Workflow}
     \begin{itemize}
-    \item Prepare L4
-    \item Prepare metadata according to predefined fields in L4
-    \item Process and generate from both L4 and metadata:
+    \item Prepare L4/template document
+    \item Prepare metadata according to predefined fields
+    \item Program inserts the metadata
         \begin{itemize}
-        \item Plain text (e.g.\ markdown, LaTeX)
+        \item If L4, first output to proper language and insert metadata
+        \item Otherwise insert metadata directly
+        \end{itemize}
+    \item Program outputs according to desired format
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Inputs and Outputs}
+    \begin{columns}
+        \column{.5\linewidth}
+        \textbf{Inputs} \\
+        With templating syntax in place
+        \begin{itemize}
+        \item L4
+        \item Markdown, Org-Mode, LaTeX
+        \item Word document, etc
+        \end{itemize}
+        
+        \column{.5\linewidth}
+        \textbf{Outputs} \\
+        With metadata already written
+        \begin{itemize}
+        \item Markdown, Org-Mode, LaTeX
         \item Word document
         \item PDF with embedded metadata
         \end{itemize}
-    \end{itemize}
+    \end{columns}
 \end{frame}
 
 \section{Demo}

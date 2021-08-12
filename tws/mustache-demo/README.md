@@ -33,16 +33,34 @@ Preliminary, please propose as you think fit.
 ### System
 - Output to Selected Format
 
-## Proposed Workflow of the Program
+## Proposed Program
 
-- Prepare L4
-- Prepare metadata according to predefined fields in L4
-- Program process and generate from both L4 and metadata any of the following outputs:
-    - Plain text (e.g. markdown, LaTeX)
-    - Word document
-    - PDF with embedded metadata
+### Workflow
 
-Note that from plain text, we can convert them into a PDF, but it is likely they will not have embedded metadata, which is where `l4meta` comes in.
+- Prepare L4 or any template document
+- Prepare metadata according to predefined fields
+- Program inserts the metadata
+    - If using L4, output to proper language and insert the metadata
+    - Otherwise insert the metadata directly
+- Program outputs according to desired format
+
+### Inputs
+
+All with some form of templating syntax already inserted.
+
+- L4
+- Any plain text format (markdown, org-mode, LaTeX)
+- Any other textual formats (including Word)
+
+### Outputs
+
+All with the data from the metadata already written.
+
+- Plain text (e.g. markdown, LaTeX)
+- Word document
+- PDF with embedded metadata
+
+Note that from plain text, we can convert them into a PDF, but it is likely they will not have embedded metadata, which is where we will need to pair with `l4meta`.
 
 For the PDF with embedded metadata, we propose first converting into LaTeX, then to PDF.
 

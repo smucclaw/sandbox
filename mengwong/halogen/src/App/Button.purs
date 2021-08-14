@@ -5,6 +5,8 @@ import Halogen as H
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 
+import Euler (answer)
+
 type State
   = { count :: Int }
 
@@ -27,6 +29,8 @@ render state =
     , HH.button
         [ HE.onClick \_ -> Increment ]
         [ HH.text "Click me" ]
+    , HH.p_
+      [ HH.text $ "BTW the Euler answer is: " <> show (answer state.count) ]
     ]
 
 handleAction :: forall cs o m. Action → H.HalogenM State Action cs o m Unit

@@ -1,0 +1,40 @@
+* Setup Log
+
+I created a new Halogen app by running:
+
+#+begin_example
+  mkdir halogen-parent-child
+  cd halogen-parent-child
+  spago init
+  spago install halogen maybe halogen-hooks
+#+end_example
+
+I copy-pasted the Full Example out of [[https://purescript-halogen.github.io/purescript-halogen/guide/05-Parent-Child-Components.html][the Halogen Guide 2.5]] into ~src/Main.purs~
+
+(I tweaked the ~H.requestAll~ line to read ~HQ.requestAll~ and imported ~Halogen.Query~ as HQ. I shouldn't have had to do this, but I did.)
+
+#+begin_example
+  spago build
+  spago bundle-app --to ./dist/app.js
+#+end_example
+
+I made a simple ~index.html~ wrapper to run the app:
+
+#+begin_src html
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <meta charset="UTF-8">
+      <title>Halogen6 Template</title>
+    </head>
+    <body>
+      <script src="app.js"></script>
+    </body>
+  </html>
+#+end_src
+
+I refactored the Full Example into Main, Form, and Button.
+
+I experimented with Halogen-Hooks to add an increment/decrement component.
+
+

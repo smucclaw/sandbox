@@ -15,6 +15,10 @@ var PS = {};
           };
       };
   });
+  var compose = function (dict) {
+      return dict.compose;
+  };
+  exports["compose"] = compose;
   exports["semigroupoidFn"] = semigroupoidFn;
 })(PS);
 (function($PS) {
@@ -91,6 +95,7 @@ var PS = {};
   $PS["Data.Functor"] = $PS["Data.Functor"] || {};
   var exports = $PS["Data.Functor"];
   var $foreign = $PS["Data.Functor"];
+  var Control_Semigroupoid = $PS["Control.Semigroupoid"];
   var Data_Function = $PS["Data.Function"];
   var Data_Unit = $PS["Data.Unit"];                  
   var Functor = function (map) {
@@ -108,12 +113,14 @@ var PS = {};
               return map(dictFunctor)(Data_Function["const"](x))(f);
           };
       };
-  };                                                                                             
+  }; 
+  var functorFn = new Functor(Control_Semigroupoid.compose(Control_Semigroupoid.semigroupoidFn));
   var functorArray = new Functor($foreign.arrayMap);
   exports["Functor"] = Functor;
   exports["map"] = map;
   exports["void"] = $$void;
   exports["voidLeft"] = voidLeft;
+  exports["functorFn"] = functorFn;
   exports["functorArray"] = functorArray;
 })(PS);
 (function($PS) {
@@ -382,6 +389,30 @@ var PS = {};
     return n.toString();
   };
 
+  exports.showStringImpl = function (s) {
+    var l = s.length;
+    return "\"" + s.replace(
+      /[\0-\x1F\x7F"\\]/g, // eslint-disable-line no-control-regex
+      function (c, i) {
+        switch (c) {
+          case "\"":
+          case "\\":
+            return "\\" + c;
+          case "\x07": return "\\a";
+          case "\b": return "\\b";
+          case "\f": return "\\f";
+          case "\n": return "\\n";
+          case "\r": return "\\r";
+          case "\t": return "\\t";
+          case "\v": return "\\v";
+        }
+        var k = i + 1;
+        var empty = k < l && s[k] >= "0" && s[k] <= "9" ? "\\&" : "";
+        return "\\" + c.charCodeAt(0).toString(10) + empty;
+      }
+    ) + "\"";
+  };
+
   exports.showArrayImpl = function (f) {
     return function (xs) {
       var ss = [];
@@ -400,7 +431,8 @@ var PS = {};
   var $foreign = $PS["Data.Show"];
   var Show = function (show) {
       this.show = show;
-  };                                                 
+  };
+  var showString = new Show($foreign.showStringImpl);
   var showInt = new Show($foreign.showIntImpl);  
   var showBoolean = new Show(function (v) {
       if (v) {
@@ -421,6 +453,7 @@ var PS = {};
   exports["show"] = show;
   exports["showBoolean"] = showBoolean;
   exports["showInt"] = showInt;
+  exports["showString"] = showString;
   exports["showArray"] = showArray;
 })(PS);
 (function($PS) {
@@ -531,7 +564,13 @@ var PS = {};
           });
       };
   };
+  var get = function (dictMonadState) {
+      return state(dictMonadState)(function (s) {
+          return new Data_Tuple.Tuple(s, s);
+      });
+  };
   exports["MonadState"] = MonadState;
+  exports["get"] = get;
   exports["gets"] = gets;
   exports["modify_"] = modify_;
 })(PS);
@@ -544,7 +583,8 @@ var PS = {};
   var Control_Bind = $PS["Control.Bind"];
   var Control_Category = $PS["Control.Category"];
   var Data_Function = $PS["Data.Function"];
-  var Data_Functor = $PS["Data.Functor"];          
+  var Data_Functor = $PS["Data.Functor"];
+  var Data_Show = $PS["Data.Show"];                
   var Nothing = (function () {
       function Nothing() {
 
@@ -561,6 +601,17 @@ var PS = {};
       };
       return Just;
   })();
+  var showMaybe = function (dictShow) {
+      return new Data_Show.Show(function (v) {
+          if (v instanceof Just) {
+              return "(Just " + (Data_Show.show(dictShow)(v.value0) + ")");
+          };
+          if (v instanceof Nothing) {
+              return "Nothing";
+          };
+          throw new Error("Failed pattern match at Data.Maybe (line 216, column 1 - line 218, column 28): " + [ v.constructor.name ]);
+      });
+  };
   var maybe = function (v) {
       return function (v1) {
           return function (v2) {
@@ -630,6 +681,7 @@ var PS = {};
   exports["fromJust"] = fromJust;
   exports["functorMaybe"] = functorMaybe;
   exports["bindMaybe"] = bindMaybe;
+  exports["showMaybe"] = showMaybe;
 })(PS);
 (function(exports) {
   "use strict";
@@ -788,6 +840,7 @@ var PS = {};
   var $foreign = $PS["Data.Foldable"];
   var Control_Applicative = $PS["Control.Applicative"];
   var Control_Apply = $PS["Control.Apply"];
+  var Control_Category = $PS["Control.Category"];
   var Data_Function = $PS["Data.Function"];
   var Data_Maybe = $PS["Data.Maybe"];
   var Data_Monoid = $PS["Data.Monoid"];
@@ -816,6 +869,11 @@ var PS = {};
   var for_ = function (dictApplicative) {
       return function (dictFoldable) {
           return Data_Function.flip(traverse_(dictApplicative)(dictFoldable));
+      };
+  };
+  var sequence_ = function (dictApplicative) {
+      return function (dictFoldable) {
+          return traverse_(dictApplicative)(dictFoldable)(Control_Category.identity(Control_Category.categoryFn));
       };
   };
   var foldl = function (dict) {
@@ -881,6 +939,7 @@ var PS = {};
   exports["foldMap"] = foldMap;
   exports["traverse_"] = traverse_;
   exports["for_"] = for_;
+  exports["sequence_"] = sequence_;
   exports["foldableArray"] = foldableArray;
   exports["foldableMaybe"] = foldableMaybe;
 })(PS);
@@ -2352,8 +2411,16 @@ var PS = {};
           return unwrap();
       };
   };
+  var over = function (dictNewtype) {
+      return function (dictNewtype1) {
+          return function (v) {
+              return Safe_Coerce.coerce();
+          };
+      };
+  };
   exports["unwrap"] = unwrap;
   exports["un"] = un;
+  exports["over"] = over;
 })(PS);
 (function($PS) {
   // Generated by purs version 0.14.3
@@ -2508,6 +2575,333 @@ var PS = {};
   exports["pop"] = pop;
   exports["slots"] = slots;
   exports["foreachSlot"] = foreachSlot;
+})(PS);
+(function($PS) {
+  // Generated by purs version 0.14.3
+  "use strict";
+  $PS["Data.Either"] = $PS["Data.Either"] || {};
+  var exports = $PS["Data.Either"];
+  var Data_Show = $PS["Data.Show"];                
+  var Left = (function () {
+      function Left(value0) {
+          this.value0 = value0;
+      };
+      Left.create = function (value0) {
+          return new Left(value0);
+      };
+      return Left;
+  })();
+  var Right = (function () {
+      function Right(value0) {
+          this.value0 = value0;
+      };
+      Right.create = function (value0) {
+          return new Right(value0);
+      };
+      return Right;
+  })();
+  var showEither = function (dictShow) {
+      return function (dictShow1) {
+          return new Data_Show.Show(function (v) {
+              if (v instanceof Left) {
+                  return "(Left " + (Data_Show.show(dictShow)(v.value0) + ")");
+              };
+              if (v instanceof Right) {
+                  return "(Right " + (Data_Show.show(dictShow1)(v.value0) + ")");
+              };
+              throw new Error("Failed pattern match at Data.Either (line 173, column 1 - line 175, column 46): " + [ v.constructor.name ]);
+          });
+      };
+  };
+  var either = function (v) {
+      return function (v1) {
+          return function (v2) {
+              if (v2 instanceof Left) {
+                  return v(v2.value0);
+              };
+              if (v2 instanceof Right) {
+                  return v1(v2.value0);
+              };
+              throw new Error("Failed pattern match at Data.Either (line 208, column 1 - line 208, column 64): " + [ v.constructor.name, v1.constructor.name, v2.constructor.name ]);
+          };
+      };
+  };
+  exports["Left"] = Left;
+  exports["Right"] = Right;
+  exports["either"] = either;
+  exports["showEither"] = showEither;
+})(PS);
+(function($PS) {
+  // Generated by purs version 0.14.3
+  "use strict";
+  $PS["Data.NonEmpty"] = $PS["Data.NonEmpty"] || {};
+  var exports = $PS["Data.NonEmpty"];
+  var Control_Plus = $PS["Control.Plus"];                        
+  var NonEmpty = (function () {
+      function NonEmpty(value0, value1) {
+          this.value0 = value0;
+          this.value1 = value1;
+      };
+      NonEmpty.create = function (value0) {
+          return function (value1) {
+              return new NonEmpty(value0, value1);
+          };
+      };
+      return NonEmpty;
+  })();
+  var singleton = function (dictPlus) {
+      return function (a) {
+          return new NonEmpty(a, Control_Plus.empty(dictPlus));
+      };
+  };
+  exports["NonEmpty"] = NonEmpty;
+  exports["singleton"] = singleton;
+})(PS);
+(function($PS) {
+  // Generated by purs version 0.14.3
+  "use strict";
+  $PS["Data.List.NonEmpty"] = $PS["Data.List.NonEmpty"] || {};
+  var exports = $PS["Data.List.NonEmpty"];
+  var Data_List_Types = $PS["Data.List.Types"];
+  var Data_NonEmpty = $PS["Data.NonEmpty"];
+  var singleton = (function () {
+      var $172 = Data_NonEmpty.singleton(Data_List_Types.plusList);
+      return function ($173) {
+          return Data_List_Types.NonEmptyList($172($173));
+      };
+  })();
+  var cons = function (y) {
+      return function (v) {
+          return new Data_NonEmpty.NonEmpty(y, new Data_List_Types.Cons(v.value0, v.value1));
+      };
+  };
+  exports["singleton"] = singleton;
+  exports["cons"] = cons;
+})(PS);
+(function($PS) {
+  // Generated by purs version 0.14.3
+  "use strict";
+  $PS["Control.Applicative.Free"] = $PS["Control.Applicative.Free"] || {};
+  var exports = $PS["Control.Applicative.Free"];
+  var Control_Applicative = $PS["Control.Applicative"];
+  var Control_Apply = $PS["Control.Apply"];
+  var Control_Category = $PS["Control.Category"];
+  var Data_Either = $PS["Data.Either"];
+  var Data_Functor = $PS["Data.Functor"];
+  var Data_List_NonEmpty = $PS["Data.List.NonEmpty"];
+  var Data_List_Types = $PS["Data.List.Types"];
+  var Data_NonEmpty = $PS["Data.NonEmpty"];
+  var Data_Tuple = $PS["Data.Tuple"];                
+  var Pure = (function () {
+      function Pure(value0) {
+          this.value0 = value0;
+      };
+      Pure.create = function (value0) {
+          return new Pure(value0);
+      };
+      return Pure;
+  })();
+  var Lift = (function () {
+      function Lift(value0) {
+          this.value0 = value0;
+      };
+      Lift.create = function (value0) {
+          return new Lift(value0);
+      };
+      return Lift;
+  })();
+  var Ap = (function () {
+      function Ap(value0, value1) {
+          this.value0 = value0;
+          this.value1 = value1;
+      };
+      Ap.create = function (value0) {
+          return function (value1) {
+              return new Ap(value0, value1);
+          };
+      };
+      return Ap;
+  })();
+  var mkAp = function (fba) {
+      return function (fb) {
+          return new Ap(fba, fb);
+      };
+  };
+  var liftFreeAp = Lift.create;
+  var goLeft = function ($copy_dictApplicative) {
+      return function ($copy_fStack) {
+          return function ($copy_valStack) {
+              return function ($copy_nat) {
+                  return function ($copy_func) {
+                      return function ($copy_count) {
+                          var $tco_var_dictApplicative = $copy_dictApplicative;
+                          var $tco_var_fStack = $copy_fStack;
+                          var $tco_var_valStack = $copy_valStack;
+                          var $tco_var_nat = $copy_nat;
+                          var $tco_var_func = $copy_func;
+                          var $tco_done = false;
+                          var $tco_result;
+                          function $tco_loop(dictApplicative, fStack, valStack, nat, func, count) {
+                              if (func instanceof Pure) {
+                                  $tco_done = true;
+                                  return new Data_Tuple.Tuple(new Data_List_Types.Cons({
+                                      func: Control_Applicative.pure(dictApplicative)(func.value0),
+                                      count: count
+                                  }, fStack), valStack);
+                              };
+                              if (func instanceof Lift) {
+                                  $tco_done = true;
+                                  return new Data_Tuple.Tuple(new Data_List_Types.Cons({
+                                      func: nat(func.value0),
+                                      count: count
+                                  }, fStack), valStack);
+                              };
+                              if (func instanceof Ap) {
+                                  $tco_var_dictApplicative = dictApplicative;
+                                  $tco_var_fStack = fStack;
+                                  $tco_var_valStack = Data_List_NonEmpty.cons(func.value1)(valStack);
+                                  $tco_var_nat = nat;
+                                  $tco_var_func = func.value0;
+                                  $copy_count = count + 1 | 0;
+                                  return;
+                              };
+                              throw new Error("Failed pattern match at Control.Applicative.Free (line 102, column 41 - line 105, column 81): " + [ func.constructor.name ]);
+                          };
+                          while (!$tco_done) {
+                              $tco_result = $tco_loop($tco_var_dictApplicative, $tco_var_fStack, $tco_var_valStack, $tco_var_nat, $tco_var_func, $copy_count);
+                          };
+                          return $tco_result;
+                      };
+                  };
+              };
+          };
+      };
+  };
+  var goApply = function ($copy_dictApplicative) {
+      return function ($copy_fStack) {
+          return function ($copy_vals) {
+              return function ($copy_gVal) {
+                  var $tco_var_dictApplicative = $copy_dictApplicative;
+                  var $tco_var_fStack = $copy_fStack;
+                  var $tco_var_vals = $copy_vals;
+                  var $tco_done = false;
+                  var $tco_result;
+                  function $tco_loop(dictApplicative, fStack, vals, gVal) {
+                      if (fStack instanceof Data_List_Types.Nil) {
+                          $tco_done = true;
+                          return new Data_Either.Left(gVal);
+                      };
+                      if (fStack instanceof Data_List_Types.Cons) {
+                          var gRes = Control_Apply.apply(dictApplicative.Apply0())(fStack.value0.func)(gVal);
+                          var $14 = fStack.value0.count === 1;
+                          if ($14) {
+                              if (fStack.value1 instanceof Data_List_Types.Nil) {
+                                  $tco_done = true;
+                                  return new Data_Either.Left(gRes);
+                              };
+                              $tco_var_dictApplicative = dictApplicative;
+                              $tco_var_fStack = fStack.value1;
+                              $tco_var_vals = vals;
+                              $copy_gVal = gRes;
+                              return;
+                          };
+                          if (vals instanceof Data_List_Types.Nil) {
+                              $tco_done = true;
+                              return new Data_Either.Left(gRes);
+                          };
+                          if (vals instanceof Data_List_Types.Cons) {
+                              $tco_done = true;
+                              return Data_Either.Right.create(new Data_Tuple.Tuple(new Data_List_Types.Cons({
+                                  func: gRes,
+                                  count: fStack.value0.count - 1 | 0
+                              }, fStack.value1), new Data_NonEmpty.NonEmpty(vals.value0, vals.value1)));
+                          };
+                          throw new Error("Failed pattern match at Control.Applicative.Free (line 83, column 11 - line 88, column 50): " + [ vals.constructor.name ]);
+                      };
+                      throw new Error("Failed pattern match at Control.Applicative.Free (line 72, column 3 - line 88, column 50): " + [ fStack.constructor.name ]);
+                  };
+                  while (!$tco_done) {
+                      $tco_result = $tco_loop($tco_var_dictApplicative, $tco_var_fStack, $tco_var_vals, $copy_gVal);
+                  };
+                  return $tco_result;
+              };
+          };
+      };
+  };
+  var functorFreeAp = new Data_Functor.Functor(function (f) {
+      return function (x) {
+          return mkAp(new Pure(f))(x);
+      };
+  });
+  var foldFreeAp = function (dictApplicative) {
+      return function (nat) {
+          return function (z) {
+              var go = function ($copy_v) {
+                  var $tco_done = false;
+                  var $tco_result;
+                  function $tco_loop(v) {
+                      if (v.value1.value0 instanceof Pure) {
+                          var v1 = goApply(dictApplicative)(v.value0)(v.value1.value1)(Control_Applicative.pure(dictApplicative)(v.value1.value0.value0));
+                          if (v1 instanceof Data_Either.Left) {
+                              $tco_done = true;
+                              return v1.value0;
+                          };
+                          if (v1 instanceof Data_Either.Right) {
+                              $copy_v = v1.value0;
+                              return;
+                          };
+                          throw new Error("Failed pattern match at Control.Applicative.Free (line 54, column 17 - line 56, column 24): " + [ v1.constructor.name ]);
+                      };
+                      if (v.value1.value0 instanceof Lift) {
+                          var v1 = goApply(dictApplicative)(v.value0)(v.value1.value1)(nat(v.value1.value0.value0));
+                          if (v1 instanceof Data_Either.Left) {
+                              $tco_done = true;
+                              return v1.value0;
+                          };
+                          if (v1 instanceof Data_Either.Right) {
+                              $copy_v = v1.value0;
+                              return;
+                          };
+                          throw new Error("Failed pattern match at Control.Applicative.Free (line 57, column 17 - line 59, column 24): " + [ v1.constructor.name ]);
+                      };
+                      if (v.value1.value0 instanceof Ap) {
+                          var nextVals = new Data_NonEmpty.NonEmpty(v.value1.value0.value1, v.value1.value1);
+                          $copy_v = goLeft(dictApplicative)(v.value0)(nextVals)(nat)(v.value1.value0.value0)(1);
+                          return;
+                      };
+                      throw new Error("Failed pattern match at Control.Applicative.Free (line 53, column 5 - line 62, column 47): " + [ v.value1.value0.constructor.name ]);
+                  };
+                  while (!$tco_done) {
+                      $tco_result = $tco_loop($copy_v);
+                  };
+                  return $tco_result;
+              };
+              return go(new Data_Tuple.Tuple(Data_List_Types.Nil.value, Data_List_NonEmpty.singleton(z)));
+          };
+      };
+  };
+  var retractFreeAp = function (dictApplicative) {
+      return foldFreeAp(dictApplicative)(Control_Category.identity(Control_Category.categoryFn));
+  };
+  var applyFreeAp = new Control_Apply.Apply(function () {
+      return functorFreeAp;
+  }, function (fba) {
+      return function (fb) {
+          return mkAp(fba)(fb);
+      };
+  });
+  var applicativeFreeAp = new Control_Applicative.Applicative(function () {
+      return applyFreeAp;
+  }, Pure.create);
+  var hoistFreeAp = function (f) {
+      return foldFreeAp(applicativeFreeAp)(function ($37) {
+          return liftFreeAp(f($37));
+      });
+  };
+  exports["liftFreeAp"] = liftFreeAp;
+  exports["retractFreeAp"] = retractFreeAp;
+  exports["hoistFreeAp"] = hoistFreeAp;
+  exports["applicativeFreeAp"] = applicativeFreeAp;
 })(PS);
 (function($PS) {
   // Generated by purs version 0.14.3
@@ -3087,6 +3481,19 @@ var PS = {};
           };
       })()));
   };
+  var substFree = function (k) {
+      var go = function (f) {
+          var v = toView(f);
+          if (v instanceof Return) {
+              return Control_Applicative.pure(freeApplicative)(v.value0);
+          };
+          if (v instanceof Bind) {
+              return Control_Bind.bind(freeBind)(k(v.value0))(Data_Functor.map(Data_Functor.functorFn)(go)(v.value1));
+          };
+          throw new Error("Failed pattern match at Control.Monad.Free (line 168, column 10 - line 170, column 33): " + [ v.constructor.name ]);
+      };
+      return go;
+  };
   var foldFree = function (dictMonadRec) {
       return function (k) {
           var go = function (f) {
@@ -3106,9 +3513,11 @@ var PS = {};
   };
   exports["liftF"] = liftF;
   exports["foldFree"] = foldFree;
+  exports["substFree"] = substFree;
   exports["freeFunctor"] = freeFunctor;
   exports["freeBind"] = freeBind;
   exports["freeApplicative"] = freeApplicative;
+  exports["freeApply"] = freeApply;
   exports["freeMonad"] = freeMonad;
 })(PS);
 (function($PS) {
@@ -3165,6 +3574,7 @@ var PS = {};
   $PS["Halogen.Query.HalogenM"] = $PS["Halogen.Query.HalogenM"] || {};
   var exports = $PS["Halogen.Query.HalogenM"];
   var Control_Applicative = $PS["Control.Applicative"];
+  var Control_Applicative_Free = $PS["Control.Applicative.Free"];
   var Control_Category = $PS["Control.Category"];
   var Control_Monad_Free = $PS["Control.Monad.Free"];
   var Control_Monad_State_Class = $PS["Control.Monad.State.Class"];
@@ -3293,6 +3703,9 @@ var PS = {};
       };
       return GetRef;
   })();
+  var HalogenAp = function (x) {
+      return x;
+  };
   var HalogenM = function (x) {
       return x;
   };
@@ -3370,6 +3783,7 @@ var PS = {};
   var functorHalogenM = Control_Monad_Free.freeFunctor;
   var bindHalogenM = Control_Monad_Free.freeBind;           
   var applicativeHalogenM = Control_Monad_Free.freeApplicative;
+  var applicativeHalogenAp = Control_Applicative_Free.applicativeFreeAp;
   exports["State"] = State;
   exports["Subscribe"] = Subscribe;
   exports["Unsubscribe"] = Unsubscribe;
@@ -3380,6 +3794,8 @@ var PS = {};
   exports["Fork"] = Fork;
   exports["Kill"] = Kill;
   exports["GetRef"] = GetRef;
+  exports["HalogenM"] = HalogenM;
+  exports["HalogenAp"] = HalogenAp;
   exports["raise"] = raise;
   exports["query"] = query;
   exports["queryAll"] = queryAll;
@@ -3390,6 +3806,7 @@ var PS = {};
   exports["bindHalogenM"] = bindHalogenM;
   exports["monadEffectHalogenM"] = monadEffectHalogenM;
   exports["monadStateHalogenM"] = monadStateHalogenM;
+  exports["applicativeHalogenAp"] = applicativeHalogenAp;
   exports["ordSubscriptionId"] = ordSubscriptionId;
   exports["ordForkId"] = ordForkId;
 })(PS);
@@ -3609,6 +4026,15 @@ var PS = {};
 (function(exports) {
   "use strict";
 
+  exports.all = function (f) {
+    return function (m) {
+      for (var k in m) {
+        if (hasOwnProperty.call(m, k) && !f(k)(m[k])) return false;
+      }
+      return true;
+    };
+  };
+
   exports._lookup = function (no, yes, k, m) {
     return k in m ? yes(m[k]) : no;
   };
@@ -3657,6 +4083,12 @@ var PS = {};
   var Data_Function_Uncurried = $PS["Data.Function.Uncurried"];
   var Data_Maybe = $PS["Data.Maybe"];
   var lookup = Data_Function_Uncurried.runFn4($foreign["_lookup"])(Data_Maybe.Nothing.value)(Data_Maybe.Just.create);
+  var isEmpty = $foreign.all(function (v) {
+      return function (v1) {
+          return false;
+      };
+  });
+  exports["isEmpty"] = isEmpty;
   exports["lookup"] = lookup;
 })(PS);
 (function($PS) {
@@ -4212,15 +4644,24 @@ var PS = {};
   // Generated by purs version 0.14.3
   "use strict";
   $PS["Data.Bifunctor"] = $PS["Data.Bifunctor"] || {};
-  var exports = $PS["Data.Bifunctor"];               
+  var exports = $PS["Data.Bifunctor"];
+  var Data_Tuple = $PS["Data.Tuple"];                
   var Bifunctor = function (bimap) {
       this.bimap = bimap;
   };
   var bimap = function (dict) {
       return dict.bimap;
   };
+  var bifunctorTuple = new Bifunctor(function (f) {
+      return function (g) {
+          return function (v) {
+              return new Data_Tuple.Tuple(f(v.value0), g(v.value1));
+          };
+      };
+  });
   exports["bimap"] = bimap;
   exports["Bifunctor"] = Bifunctor;
+  exports["bifunctorTuple"] = bifunctorTuple;
 })(PS);
 (function($PS) {
   // Generated by purs version 0.14.3
@@ -4393,11 +4834,22 @@ var PS = {};
   var Data_Maybe = $PS["Data.Maybe"];
   var Halogen_HTML_Core = $PS["Halogen.HTML.Core"];
   var element = Halogen_HTML_Core.element(Data_Maybe.Nothing.value);
+  var h2 = element("h2");
+  var h2_ = h2([  ]);        
+  var p = element("p");
+  var p_ = p([  ]);  
   var div = element("div");
   var div_ = div([  ]);
   var button = element("button");
+  var br = function (props) {
+      return element("br")(props)([  ]);
+  };
+  var br_ = br([  ]);
+  exports["br_"] = br_;
   exports["button"] = button;
   exports["div_"] = div_;
+  exports["h2_"] = h2_;
+  exports["p_"] = p_;
 })(PS);
 (function($PS) {
   // Generated by purs version 0.14.3
@@ -4624,316 +5076,6 @@ var PS = {};
   exports["GetEnabled"] = GetEnabled;
   exports["SetEnabled"] = SetEnabled;
   exports["button"] = button;
-})(PS);
-(function($PS) {
-  // Generated by purs version 0.14.3
-  "use strict";
-  $PS["Data.Either"] = $PS["Data.Either"] || {};
-  var exports = $PS["Data.Either"];                
-  var Left = (function () {
-      function Left(value0) {
-          this.value0 = value0;
-      };
-      Left.create = function (value0) {
-          return new Left(value0);
-      };
-      return Left;
-  })();
-  var Right = (function () {
-      function Right(value0) {
-          this.value0 = value0;
-      };
-      Right.create = function (value0) {
-          return new Right(value0);
-      };
-      return Right;
-  })();
-  var either = function (v) {
-      return function (v1) {
-          return function (v2) {
-              if (v2 instanceof Left) {
-                  return v(v2.value0);
-              };
-              if (v2 instanceof Right) {
-                  return v1(v2.value0);
-              };
-              throw new Error("Failed pattern match at Data.Either (line 208, column 1 - line 208, column 64): " + [ v.constructor.name, v1.constructor.name, v2.constructor.name ]);
-          };
-      };
-  };
-  exports["Left"] = Left;
-  exports["Right"] = Right;
-  exports["either"] = either;
-})(PS);
-(function($PS) {
-  // Generated by purs version 0.14.3
-  "use strict";
-  $PS["Data.NonEmpty"] = $PS["Data.NonEmpty"] || {};
-  var exports = $PS["Data.NonEmpty"];
-  var Control_Plus = $PS["Control.Plus"];                        
-  var NonEmpty = (function () {
-      function NonEmpty(value0, value1) {
-          this.value0 = value0;
-          this.value1 = value1;
-      };
-      NonEmpty.create = function (value0) {
-          return function (value1) {
-              return new NonEmpty(value0, value1);
-          };
-      };
-      return NonEmpty;
-  })();
-  var singleton = function (dictPlus) {
-      return function (a) {
-          return new NonEmpty(a, Control_Plus.empty(dictPlus));
-      };
-  };
-  exports["NonEmpty"] = NonEmpty;
-  exports["singleton"] = singleton;
-})(PS);
-(function($PS) {
-  // Generated by purs version 0.14.3
-  "use strict";
-  $PS["Data.List.NonEmpty"] = $PS["Data.List.NonEmpty"] || {};
-  var exports = $PS["Data.List.NonEmpty"];
-  var Data_List_Types = $PS["Data.List.Types"];
-  var Data_NonEmpty = $PS["Data.NonEmpty"];
-  var singleton = (function () {
-      var $172 = Data_NonEmpty.singleton(Data_List_Types.plusList);
-      return function ($173) {
-          return Data_List_Types.NonEmptyList($172($173));
-      };
-  })();
-  var cons = function (y) {
-      return function (v) {
-          return new Data_NonEmpty.NonEmpty(y, new Data_List_Types.Cons(v.value0, v.value1));
-      };
-  };
-  exports["singleton"] = singleton;
-  exports["cons"] = cons;
-})(PS);
-(function($PS) {
-  // Generated by purs version 0.14.3
-  "use strict";
-  $PS["Control.Applicative.Free"] = $PS["Control.Applicative.Free"] || {};
-  var exports = $PS["Control.Applicative.Free"];
-  var Control_Applicative = $PS["Control.Applicative"];
-  var Control_Apply = $PS["Control.Apply"];
-  var Control_Category = $PS["Control.Category"];
-  var Data_Either = $PS["Data.Either"];
-  var Data_Functor = $PS["Data.Functor"];
-  var Data_List_NonEmpty = $PS["Data.List.NonEmpty"];
-  var Data_List_Types = $PS["Data.List.Types"];
-  var Data_NonEmpty = $PS["Data.NonEmpty"];
-  var Data_Tuple = $PS["Data.Tuple"];                
-  var Pure = (function () {
-      function Pure(value0) {
-          this.value0 = value0;
-      };
-      Pure.create = function (value0) {
-          return new Pure(value0);
-      };
-      return Pure;
-  })();
-  var Lift = (function () {
-      function Lift(value0) {
-          this.value0 = value0;
-      };
-      Lift.create = function (value0) {
-          return new Lift(value0);
-      };
-      return Lift;
-  })();
-  var Ap = (function () {
-      function Ap(value0, value1) {
-          this.value0 = value0;
-          this.value1 = value1;
-      };
-      Ap.create = function (value0) {
-          return function (value1) {
-              return new Ap(value0, value1);
-          };
-      };
-      return Ap;
-  })();
-  var mkAp = function (fba) {
-      return function (fb) {
-          return new Ap(fba, fb);
-      };
-  };
-  var liftFreeAp = Lift.create;
-  var goLeft = function ($copy_dictApplicative) {
-      return function ($copy_fStack) {
-          return function ($copy_valStack) {
-              return function ($copy_nat) {
-                  return function ($copy_func) {
-                      return function ($copy_count) {
-                          var $tco_var_dictApplicative = $copy_dictApplicative;
-                          var $tco_var_fStack = $copy_fStack;
-                          var $tco_var_valStack = $copy_valStack;
-                          var $tco_var_nat = $copy_nat;
-                          var $tco_var_func = $copy_func;
-                          var $tco_done = false;
-                          var $tco_result;
-                          function $tco_loop(dictApplicative, fStack, valStack, nat, func, count) {
-                              if (func instanceof Pure) {
-                                  $tco_done = true;
-                                  return new Data_Tuple.Tuple(new Data_List_Types.Cons({
-                                      func: Control_Applicative.pure(dictApplicative)(func.value0),
-                                      count: count
-                                  }, fStack), valStack);
-                              };
-                              if (func instanceof Lift) {
-                                  $tco_done = true;
-                                  return new Data_Tuple.Tuple(new Data_List_Types.Cons({
-                                      func: nat(func.value0),
-                                      count: count
-                                  }, fStack), valStack);
-                              };
-                              if (func instanceof Ap) {
-                                  $tco_var_dictApplicative = dictApplicative;
-                                  $tco_var_fStack = fStack;
-                                  $tco_var_valStack = Data_List_NonEmpty.cons(func.value1)(valStack);
-                                  $tco_var_nat = nat;
-                                  $tco_var_func = func.value0;
-                                  $copy_count = count + 1 | 0;
-                                  return;
-                              };
-                              throw new Error("Failed pattern match at Control.Applicative.Free (line 102, column 41 - line 105, column 81): " + [ func.constructor.name ]);
-                          };
-                          while (!$tco_done) {
-                              $tco_result = $tco_loop($tco_var_dictApplicative, $tco_var_fStack, $tco_var_valStack, $tco_var_nat, $tco_var_func, $copy_count);
-                          };
-                          return $tco_result;
-                      };
-                  };
-              };
-          };
-      };
-  };
-  var goApply = function ($copy_dictApplicative) {
-      return function ($copy_fStack) {
-          return function ($copy_vals) {
-              return function ($copy_gVal) {
-                  var $tco_var_dictApplicative = $copy_dictApplicative;
-                  var $tco_var_fStack = $copy_fStack;
-                  var $tco_var_vals = $copy_vals;
-                  var $tco_done = false;
-                  var $tco_result;
-                  function $tco_loop(dictApplicative, fStack, vals, gVal) {
-                      if (fStack instanceof Data_List_Types.Nil) {
-                          $tco_done = true;
-                          return new Data_Either.Left(gVal);
-                      };
-                      if (fStack instanceof Data_List_Types.Cons) {
-                          var gRes = Control_Apply.apply(dictApplicative.Apply0())(fStack.value0.func)(gVal);
-                          var $14 = fStack.value0.count === 1;
-                          if ($14) {
-                              if (fStack.value1 instanceof Data_List_Types.Nil) {
-                                  $tco_done = true;
-                                  return new Data_Either.Left(gRes);
-                              };
-                              $tco_var_dictApplicative = dictApplicative;
-                              $tco_var_fStack = fStack.value1;
-                              $tco_var_vals = vals;
-                              $copy_gVal = gRes;
-                              return;
-                          };
-                          if (vals instanceof Data_List_Types.Nil) {
-                              $tco_done = true;
-                              return new Data_Either.Left(gRes);
-                          };
-                          if (vals instanceof Data_List_Types.Cons) {
-                              $tco_done = true;
-                              return Data_Either.Right.create(new Data_Tuple.Tuple(new Data_List_Types.Cons({
-                                  func: gRes,
-                                  count: fStack.value0.count - 1 | 0
-                              }, fStack.value1), new Data_NonEmpty.NonEmpty(vals.value0, vals.value1)));
-                          };
-                          throw new Error("Failed pattern match at Control.Applicative.Free (line 83, column 11 - line 88, column 50): " + [ vals.constructor.name ]);
-                      };
-                      throw new Error("Failed pattern match at Control.Applicative.Free (line 72, column 3 - line 88, column 50): " + [ fStack.constructor.name ]);
-                  };
-                  while (!$tco_done) {
-                      $tco_result = $tco_loop($tco_var_dictApplicative, $tco_var_fStack, $tco_var_vals, $copy_gVal);
-                  };
-                  return $tco_result;
-              };
-          };
-      };
-  };
-  var functorFreeAp = new Data_Functor.Functor(function (f) {
-      return function (x) {
-          return mkAp(new Pure(f))(x);
-      };
-  });
-  var foldFreeAp = function (dictApplicative) {
-      return function (nat) {
-          return function (z) {
-              var go = function ($copy_v) {
-                  var $tco_done = false;
-                  var $tco_result;
-                  function $tco_loop(v) {
-                      if (v.value1.value0 instanceof Pure) {
-                          var v1 = goApply(dictApplicative)(v.value0)(v.value1.value1)(Control_Applicative.pure(dictApplicative)(v.value1.value0.value0));
-                          if (v1 instanceof Data_Either.Left) {
-                              $tco_done = true;
-                              return v1.value0;
-                          };
-                          if (v1 instanceof Data_Either.Right) {
-                              $copy_v = v1.value0;
-                              return;
-                          };
-                          throw new Error("Failed pattern match at Control.Applicative.Free (line 54, column 17 - line 56, column 24): " + [ v1.constructor.name ]);
-                      };
-                      if (v.value1.value0 instanceof Lift) {
-                          var v1 = goApply(dictApplicative)(v.value0)(v.value1.value1)(nat(v.value1.value0.value0));
-                          if (v1 instanceof Data_Either.Left) {
-                              $tco_done = true;
-                              return v1.value0;
-                          };
-                          if (v1 instanceof Data_Either.Right) {
-                              $copy_v = v1.value0;
-                              return;
-                          };
-                          throw new Error("Failed pattern match at Control.Applicative.Free (line 57, column 17 - line 59, column 24): " + [ v1.constructor.name ]);
-                      };
-                      if (v.value1.value0 instanceof Ap) {
-                          var nextVals = new Data_NonEmpty.NonEmpty(v.value1.value0.value1, v.value1.value1);
-                          $copy_v = goLeft(dictApplicative)(v.value0)(nextVals)(nat)(v.value1.value0.value0)(1);
-                          return;
-                      };
-                      throw new Error("Failed pattern match at Control.Applicative.Free (line 53, column 5 - line 62, column 47): " + [ v.value1.value0.constructor.name ]);
-                  };
-                  while (!$tco_done) {
-                      $tco_result = $tco_loop($copy_v);
-                  };
-                  return $tco_result;
-              };
-              return go(new Data_Tuple.Tuple(Data_List_Types.Nil.value, Data_List_NonEmpty.singleton(z)));
-          };
-      };
-  };
-  var retractFreeAp = function (dictApplicative) {
-      return foldFreeAp(dictApplicative)(Control_Category.identity(Control_Category.categoryFn));
-  };
-  var applyFreeAp = new Control_Apply.Apply(function () {
-      return functorFreeAp;
-  }, function (fba) {
-      return function (fb) {
-          return mkAp(fba)(fb);
-      };
-  });
-  var applicativeFreeAp = new Control_Applicative.Applicative(function () {
-      return applyFreeAp;
-  }, Pure.create);
-  var hoistFreeAp = function (f) {
-      return foldFreeAp(applicativeFreeAp)(function ($37) {
-          return liftFreeAp(f($37));
-      });
-  };
-  exports["retractFreeAp"] = retractFreeAp;
-  exports["hoistFreeAp"] = hoistFreeAp;
 })(PS);
 (function($PS) {
   // Generated by purs version 0.14.3
@@ -6435,6 +6577,20 @@ var PS = {};
     return xs.length;
   };
 
+  //------------------------------------------------------------------------------
+  // Indexed operations ----------------------------------------------------------
+  //------------------------------------------------------------------------------
+
+  exports.indexImpl = function (just) {
+    return function (nothing) {
+      return function (xs) {
+        return function (i) {
+          return i < 0 || i >= xs.length ? nothing :  just(xs[i]);
+        };
+      };
+    };
+  };
+
   exports.findIndexImpl = function (just) {
     return function (nothing) {
       return function (f) {
@@ -6460,14 +6616,96 @@ var PS = {};
       };
     };
   };
+
+  exports._updateAt = function (just) {
+    return function (nothing) {
+      return function (i) {
+        return function (a) {
+          return function (l) {
+            if (i < 0 || i >= l.length) return nothing;
+            var l1 = l.slice();
+            l1[i] = a;
+            return just(l1);
+          };
+        };
+      };
+    };
+  };
 })(PS["Data.Array"] = PS["Data.Array"] || {});
+(function(exports) {
+  "use strict";
+
+  exports.pushAll = function (as) {
+    return function (xs) {
+      return function () {
+        return xs.push.apply(xs, as);
+      };
+    };
+  };
+
+  exports.unsafeFreeze = function (xs) {
+    return function () {
+      return xs;
+    };
+  };
+
+  function copyImpl(xs) {
+    return function () {
+      return xs.slice();
+    };
+  }                         
+
+  exports.thaw = copyImpl;
+})(PS["Data.Array.ST"] = PS["Data.Array.ST"] || {});
+(function($PS) {
+  // Generated by purs version 0.14.3
+  "use strict";
+  $PS["Data.Array.ST"] = $PS["Data.Array.ST"] || {};
+  var exports = $PS["Data.Array.ST"];
+  var $foreign = $PS["Data.Array.ST"];                     
+  var withArray = function (f) {
+      return function (xs) {
+          return function __do() {
+              var result = $foreign.thaw(xs)();
+              f(result)();
+              return $foreign.unsafeFreeze(result)();
+          };
+      };
+  };
+  var push = function (a) {
+      return $foreign.pushAll([ a ]);
+  };
+  exports["withArray"] = withArray;
+  exports["push"] = push;
+})(PS);
 (function($PS) {
   // Generated by purs version 0.14.3
   "use strict";
   $PS["Data.Array"] = $PS["Data.Array"] || {};
   var exports = $PS["Data.Array"];
   var $foreign = $PS["Data.Array"];
+  var Data_Array_ST = $PS["Data.Array.ST"];
   var Data_Maybe = $PS["Data.Maybe"];
+  var updateAt = $foreign["_updateAt"](Data_Maybe.Just.create)(Data_Maybe.Nothing.value);
+  var snoc = function (xs) {
+      return function (x) {
+          return Data_Array_ST.withArray(Data_Array_ST.push(x))(xs)();
+      };
+  };
+  var $$null = function (xs) {
+      return $foreign.length(xs) === 0;
+  };
+  var index = $foreign.indexImpl(Data_Maybe.Just.create)(Data_Maybe.Nothing.value);
+  var modifyAt = function (i) {
+      return function (f) {
+          return function (xs) {
+              var go = function (x) {
+                  return updateAt(i)(f(x))(xs);
+              };
+              return Data_Maybe.maybe(Data_Maybe.Nothing.value)(go)(index(xs)(i));
+          };
+      };
+  };
   var findIndex = $foreign.findIndexImpl(Data_Maybe.Just.create)(Data_Maybe.Nothing.value);
   var deleteAt = $foreign["_deleteAt"](Data_Maybe.Just.create)(Data_Maybe.Nothing.value);
   var deleteBy = function (v) {
@@ -6482,6 +6720,9 @@ var PS = {};
           };
       };
   };
+  exports["null"] = $$null;
+  exports["snoc"] = snoc;
+  exports["modifyAt"] = modifyAt;
   exports["deleteBy"] = deleteBy;
   exports["length"] = $foreign.length;
 })(PS);
@@ -6574,6 +6815,1222 @@ var PS = {};
   exports["heytingAlgebraBoolean"] = heytingAlgebraBoolean;
   exports["heytingAlgebraFunction"] = heytingAlgebraFunction;
 })(PS);
+(function($PS) {
+  // Generated by purs version 0.14.3
+  "use strict";
+  $PS["Halogen.Hooks.Hook"] = $PS["Halogen.Hooks.Hook"] || {};
+  var exports = $PS["Halogen.Hooks.Hook"];
+  var Control_Applicative = $PS["Control.Applicative"];
+  var Control_Bind = $PS["Control.Bind"];
+  var Control_Monad_Free = $PS["Control.Monad.Free"];
+  var Hook = function (x) {
+      return x;
+  };
+  var unsafeToHook = function ($11) {
+      return Hook(Control_Monad_Free.liftF($11));
+  };
+  var unsafeFromHook = function (v) {
+      return v;
+  };
+  var pure = (function () {
+      var $12 = Control_Applicative.pure(Control_Monad_Free.freeApplicative);
+      return function ($13) {
+          return Hook($12($13));
+      };
+  })();
+  var bind = function (v) {
+      return function (f) {
+          return Hook(Control_Bind.bind(Control_Monad_Free.freeBind)(v)(function (a) {
+              var v1 = f(a);
+              return v1;
+          }));
+      };
+  };
+  exports["bind"] = bind;
+  exports["pure"] = pure;
+  exports["unsafeFromHook"] = unsafeFromHook;
+  exports["unsafeToHook"] = unsafeToHook;
+})(PS);
+(function($PS) {
+  // Generated by purs version 0.14.3
+  "use strict";
+  $PS["Halogen.Hooks.Internal.Types"] = $PS["Halogen.Hooks.Internal.Types"] || {};
+  var exports = $PS["Halogen.Hooks.Internal.Types"];
+  var Unsafe_Coerce = $PS["Unsafe.Coerce"];                
+  var toStateValue = Unsafe_Coerce.unsafeCoerce;
+  var toQueryValue = Unsafe_Coerce.unsafeCoerce;
+  var fromStateValue = Unsafe_Coerce.unsafeCoerce; 
+  var fromMemoValues = Unsafe_Coerce.unsafeCoerce;
+  var fromMemoValue = Unsafe_Coerce.unsafeCoerce;
+  exports["toStateValue"] = toStateValue;
+  exports["fromStateValue"] = fromStateValue;
+  exports["toQueryValue"] = toQueryValue;
+  exports["fromMemoValues"] = fromMemoValues;
+  exports["fromMemoValue"] = fromMemoValue;
+})(PS);
+(function($PS) {
+  // Generated by purs version 0.14.3
+  "use strict";
+  $PS["Halogen.Hooks.Internal.UseHookF"] = $PS["Halogen.Hooks.Internal.UseHookF"] || {};
+  var exports = $PS["Halogen.Hooks.Internal.UseHookF"];  
+  var UseState = (function () {
+      function UseState(value0, value1) {
+          this.value0 = value0;
+          this.value1 = value1;
+      };
+      UseState.create = function (value0) {
+          return function (value1) {
+              return new UseState(value0, value1);
+          };
+      };
+      return UseState;
+  })();
+  var UseEffect = (function () {
+      function UseEffect(value0, value1, value2) {
+          this.value0 = value0;
+          this.value1 = value1;
+          this.value2 = value2;
+      };
+      UseEffect.create = function (value0) {
+          return function (value1) {
+              return function (value2) {
+                  return new UseEffect(value0, value1, value2);
+              };
+          };
+      };
+      return UseEffect;
+  })();
+  var UseQuery = (function () {
+      function UseQuery(value0, value1, value2) {
+          this.value0 = value0;
+          this.value1 = value1;
+          this.value2 = value2;
+      };
+      UseQuery.create = function (value0) {
+          return function (value1) {
+              return function (value2) {
+                  return new UseQuery(value0, value1, value2);
+              };
+          };
+      };
+      return UseQuery;
+  })();
+  var UseMemo = (function () {
+      function UseMemo(value0, value1, value2) {
+          this.value0 = value0;
+          this.value1 = value1;
+          this.value2 = value2;
+      };
+      UseMemo.create = function (value0) {
+          return function (value1) {
+              return function (value2) {
+                  return new UseMemo(value0, value1, value2);
+              };
+          };
+      };
+      return UseMemo;
+  })();
+  var UseRef = (function () {
+      function UseRef(value0, value1) {
+          this.value0 = value0;
+          this.value1 = value1;
+      };
+      UseRef.create = function (value0) {
+          return function (value1) {
+              return new UseRef(value0, value1);
+          };
+      };
+      return UseRef;
+  })();
+  exports["UseState"] = UseState;
+  exports["UseEffect"] = UseEffect;
+  exports["UseQuery"] = UseQuery;
+  exports["UseMemo"] = UseMemo;
+  exports["UseRef"] = UseRef;
+})(PS);
+(function($PS) {
+  // Generated by purs version 0.14.3
+  "use strict";
+  $PS["Halogen.Hooks"] = $PS["Halogen.Hooks"] || {};
+  var exports = $PS["Halogen.Hooks"];
+  var Data_Tuple = $PS["Data.Tuple"];
+  var Halogen_Hooks_Hook = $PS["Halogen.Hooks.Hook"];
+  var Halogen_Hooks_Internal_Types = $PS["Halogen.Hooks.Internal.Types"];
+  var Halogen_Hooks_Internal_UseHookF = $PS["Halogen.Hooks.Internal.UseHookF"];
+  var useState = function (initialState) {
+      var $$interface = function (v) {
+          return new Data_Tuple.Tuple(Halogen_Hooks_Internal_Types.fromStateValue(v.value0), v.value1);
+      };
+      var initialState$prime = Halogen_Hooks_Internal_Types.toStateValue(initialState);
+      return Halogen_Hooks_Hook.unsafeToHook(new Halogen_Hooks_Internal_UseHookF.UseState(initialState$prime, $$interface));
+  };
+  exports["useState"] = useState;
+})(PS);
+(function(exports) {
+  "use strict";
+
+  exports.error = function (msg) {
+    return new Error(msg);
+  };
+
+  exports.throwException = function (e) {
+    return function () {
+      throw e;
+    };
+  };
+})(PS["Effect.Exception"] = PS["Effect.Exception"] || {});
+(function($PS) {
+  // Generated by purs version 0.14.3
+  "use strict";
+  $PS["Effect.Exception"] = $PS["Effect.Exception"] || {};
+  var exports = $PS["Effect.Exception"];
+  var $foreign = $PS["Effect.Exception"];
+  var $$throw = function ($2) {
+      return $foreign.throwException($foreign.error($2));
+  };
+  exports["throw"] = $$throw;
+  exports["error"] = $foreign.error;
+  exports["throwException"] = $foreign.throwException;
+})(PS);
+(function($PS) {
+  // Generated by purs version 0.14.3
+  "use strict";
+  $PS["Effect.Exception.Unsafe"] = $PS["Effect.Exception.Unsafe"] || {};
+  var exports = $PS["Effect.Exception.Unsafe"];
+  var Effect_Exception = $PS["Effect.Exception"];
+  var Effect_Unsafe = $PS["Effect.Unsafe"];                
+  var unsafeThrowException = function ($0) {
+      return Effect_Unsafe.unsafePerformEffect(Effect_Exception.throwException($0));
+  };
+  var unsafeThrow = function ($1) {
+      return unsafeThrowException(Effect_Exception.error($1));
+  };
+  exports["unsafeThrow"] = unsafeThrow;
+})(PS);
+(function($PS) {
+  // Generated by purs version 0.14.3
+  "use strict";
+  $PS["Halogen.Hooks.HookM"] = $PS["Halogen.Hooks.HookM"] || {};
+  var exports = $PS["Halogen.Hooks.HookM"];
+  var Control_Monad_Free = $PS["Control.Monad.Free"];
+  var Data_Function = $PS["Data.Function"];
+  var Data_Functor = $PS["Data.Functor"];
+  var Data_Unit = $PS["Data.Unit"];
+  var Halogen_Hooks_Internal_Types = $PS["Halogen.Hooks.Internal.Types"];
+  var HookM = function (x) {
+      return x;
+  };
+  var Modify = (function () {
+      function Modify(value0, value1, value2) {
+          this.value0 = value0;
+          this.value1 = value1;
+          this.value2 = value2;
+      };
+      Modify.create = function (value0) {
+          return function (value1) {
+              return function (value2) {
+                  return new Modify(value0, value1, value2);
+              };
+          };
+      };
+      return Modify;
+  })();
+  var Subscribe = (function () {
+      function Subscribe(value0, value1) {
+          this.value0 = value0;
+          this.value1 = value1;
+      };
+      Subscribe.create = function (value0) {
+          return function (value1) {
+              return new Subscribe(value0, value1);
+          };
+      };
+      return Subscribe;
+  })();
+  var Unsubscribe = (function () {
+      function Unsubscribe(value0, value1) {
+          this.value0 = value0;
+          this.value1 = value1;
+      };
+      Unsubscribe.create = function (value0) {
+          return function (value1) {
+              return new Unsubscribe(value0, value1);
+          };
+      };
+      return Unsubscribe;
+  })();
+  var Lift = (function () {
+      function Lift(value0) {
+          this.value0 = value0;
+      };
+      Lift.create = function (value0) {
+          return new Lift(value0);
+      };
+      return Lift;
+  })();
+  var ChildQuery = (function () {
+      function ChildQuery(value0) {
+          this.value0 = value0;
+      };
+      ChildQuery.create = function (value0) {
+          return new ChildQuery(value0);
+      };
+      return ChildQuery;
+  })();
+  var Raise = (function () {
+      function Raise(value0, value1) {
+          this.value0 = value0;
+          this.value1 = value1;
+      };
+      Raise.create = function (value0) {
+          return function (value1) {
+              return new Raise(value0, value1);
+          };
+      };
+      return Raise;
+  })();
+  var Par = (function () {
+      function Par(value0) {
+          this.value0 = value0;
+      };
+      Par.create = function (value0) {
+          return new Par(value0);
+      };
+      return Par;
+  })();
+  var Fork = (function () {
+      function Fork(value0, value1) {
+          this.value0 = value0;
+          this.value1 = value1;
+      };
+      Fork.create = function (value0) {
+          return function (value1) {
+              return new Fork(value0, value1);
+          };
+      };
+      return Fork;
+  })();
+  var Kill = (function () {
+      function Kill(value0, value1) {
+          this.value0 = value0;
+          this.value1 = value1;
+      };
+      Kill.create = function (value0) {
+          return function (value1) {
+              return new Kill(value0, value1);
+          };
+      };
+      return Kill;
+  })();
+  var GetRef = (function () {
+      function GetRef(value0, value1) {
+          this.value0 = value0;
+          this.value1 = value1;
+      };
+      GetRef.create = function (value0) {
+          return function (value1) {
+              return new GetRef(value0, value1);
+          };
+      };
+      return GetRef;
+  })();
+  var modify = function (identifier) {
+      return function (f) {
+          var f$prime = function ($88) {
+              return Halogen_Hooks_Internal_Types.toStateValue(f(Halogen_Hooks_Internal_Types.fromStateValue($88)));
+          };
+          return HookM(Control_Monad_Free.liftF(new Modify(identifier, f$prime, Halogen_Hooks_Internal_Types.fromStateValue)));
+      };
+  };
+  var functorHookM = Control_Monad_Free.freeFunctor;
+  var modify_ = function (identifier) {
+      var $91 = Data_Functor.map(functorHookM)(Data_Function["const"](Data_Unit.unit));
+      var $92 = modify(identifier);
+      return function ($93) {
+          return $91($92($93));
+      };
+  };                                          
+  var applyHookM = Control_Monad_Free.freeApply;         
+  var applicativeHookM = Control_Monad_Free.freeApplicative;
+  exports["Modify"] = Modify;
+  exports["Subscribe"] = Subscribe;
+  exports["Unsubscribe"] = Unsubscribe;
+  exports["Lift"] = Lift;
+  exports["ChildQuery"] = ChildQuery;
+  exports["Raise"] = Raise;
+  exports["Par"] = Par;
+  exports["Fork"] = Fork;
+  exports["Kill"] = Kill;
+  exports["GetRef"] = GetRef;
+  exports["modify_"] = modify_;
+  exports["functorHookM"] = functorHookM;
+  exports["applyHookM"] = applyHookM;
+  exports["applicativeHookM"] = applicativeHookM;
+})(PS);
+(function($PS) {
+  // Generated by purs version 0.14.3
+  "use strict";
+  $PS["Halogen.Hooks.Internal.Eval.Types"] = $PS["Halogen.Hooks.Internal.Eval.Types"] || {};
+  var exports = $PS["Halogen.Hooks.Internal.Eval.Types"];
+  var Data_Eq = $PS["Data.Eq"];
+  var Unsafe_Coerce = $PS["Unsafe.Coerce"];                
+  var Initialize = (function () {
+      function Initialize() {
+
+      };
+      Initialize.value = new Initialize();
+      return Initialize;
+  })();
+  var Queued = (function () {
+      function Queued() {
+
+      };
+      Queued.value = new Queued();
+      return Queued;
+  })();
+  var Step = (function () {
+      function Step() {
+
+      };
+      Step.value = new Step();
+      return Step;
+  })();
+  var Finalize = (function () {
+      function Finalize() {
+
+      };
+      Finalize.value = new Finalize();
+      return Finalize;
+  })();
+  var HookState = function (x) {
+      return x;
+  };
+  var toQueryFn = Unsafe_Coerce.unsafeCoerce;
+  var toHalogenM = function (slotToken) {
+      return function (outputToken) {
+          return function (hm) {
+              return hm;
+          };
+      };
+  }; 
+  var fromQueryFn = Unsafe_Coerce.unsafeCoerce;
+  var eqInterpretHookReason = new Data_Eq.Eq(function (x) {
+      return function (y) {
+          if (x instanceof Initialize && y instanceof Initialize) {
+              return true;
+          };
+          if (x instanceof Queued && y instanceof Queued) {
+              return true;
+          };
+          if (x instanceof Step && y instanceof Step) {
+              return true;
+          };
+          if (x instanceof Finalize && y instanceof Finalize) {
+              return true;
+          };
+          return false;
+      };
+  });
+  exports["toHalogenM"] = toHalogenM;
+  exports["Initialize"] = Initialize;
+  exports["Queued"] = Queued;
+  exports["Step"] = Step;
+  exports["Finalize"] = Finalize;
+  exports["toQueryFn"] = toQueryFn;
+  exports["fromQueryFn"] = fromQueryFn;
+  exports["HookState"] = HookState;
+  exports["eqInterpretHookReason"] = eqInterpretHookReason;
+})(PS);
+(function(exports) {
+  "use strict";
+
+  exports.reallyUnsafeRefEq = function (a) {
+    return function (b) {
+      return a === b;
+    };
+  };
+})(PS["Unsafe.Reference"] = PS["Unsafe.Reference"] || {});
+(function($PS) {
+  // Generated by purs version 0.14.3
+  "use strict";
+  $PS["Unsafe.Reference"] = $PS["Unsafe.Reference"] || {};
+  var exports = $PS["Unsafe.Reference"];
+  var $foreign = $PS["Unsafe.Reference"];
+  var unsafeRefEq = $foreign.reallyUnsafeRefEq;
+  exports["unsafeRefEq"] = unsafeRefEq;
+})(PS);
+(function($PS) {
+  // Generated by purs version 0.14.3
+  "use strict";
+  $PS["Halogen.Hooks.Internal.Eval"] = $PS["Halogen.Hooks.Internal.Eval"] || {};
+  var exports = $PS["Halogen.Hooks.Internal.Eval"];
+  var Control_Applicative = $PS["Control.Applicative"];
+  var Control_Applicative_Free = $PS["Control.Applicative.Free"];
+  var Control_Apply = $PS["Control.Apply"];
+  var Control_Bind = $PS["Control.Bind"];
+  var Control_Monad_Free = $PS["Control.Monad.Free"];
+  var Control_Monad_State_Class = $PS["Control.Monad.State.Class"];
+  var Data_Array = $PS["Data.Array"];
+  var Data_Bifunctor = $PS["Data.Bifunctor"];
+  var Data_Coyoneda = $PS["Data.Coyoneda"];
+  var Data_Eq = $PS["Data.Eq"];
+  var Data_Foldable = $PS["Data.Foldable"];
+  var Data_Function = $PS["Data.Function"];
+  var Data_Functor = $PS["Data.Functor"];
+  var Data_HeytingAlgebra = $PS["Data.HeytingAlgebra"];
+  var Data_Maybe = $PS["Data.Maybe"];
+  var Data_Newtype = $PS["Data.Newtype"];
+  var Data_Tuple = $PS["Data.Tuple"];
+  var Data_Unit = $PS["Data.Unit"];
+  var Effect_Exception_Unsafe = $PS["Effect.Exception.Unsafe"];
+  var Effect_Ref = $PS["Effect.Ref"];
+  var Effect_Unsafe = $PS["Effect.Unsafe"];
+  var Foreign_Object = $PS["Foreign.Object"];
+  var Halogen_Hooks_HookM = $PS["Halogen.Hooks.HookM"];
+  var Halogen_Hooks_Internal_Eval_Types = $PS["Halogen.Hooks.Internal.Eval.Types"];
+  var Halogen_Hooks_Internal_Types = $PS["Halogen.Hooks.Internal.Types"];
+  var Halogen_Hooks_Internal_UseHookF = $PS["Halogen.Hooks.Internal.UseHookF"];
+  var Halogen_Query_HalogenM = $PS["Halogen.Query.HalogenM"];
+  var Halogen_Query_HalogenQ = $PS["Halogen.Query.HalogenQ"];
+  var Unsafe_Reference = $PS["Unsafe.Reference"];                
+  var unsafeSetCell = function (index) {
+      return function (a) {
+          return function (array) {
+              return Data_Maybe.fromJust()(Data_Array.modifyAt(index)(Data_Function["const"](a))(array));
+          };
+      };
+  };
+  var unsafeGetCell = function (index) {
+      return function (array) {
+          return array[index];
+      };
+  };
+  var stepIndex = function (index) {
+      return function (array) {
+          var $69 = (index + 1 | 0) < Data_Array.length(array);
+          if ($69) {
+              return index + 1 | 0;
+          };
+          return 0;
+      };
+  };
+  var modify_ = function (ref) {
+      return function (fn) {
+          return Effect_Unsafe.unsafePerformEffect(Effect_Ref.modify_(fn)(ref));
+      };
+  };
+  var get = function ($196) {
+      return Effect_Unsafe.unsafePerformEffect(Effect_Ref.read($196));
+  };
+  var mkEval = function (inputEq) {
+      return function (_evalHookM) {
+          return function (_evalHook) {
+              var executeHooksAndEffects = function (stateRef) {
+                  return function (reason) {
+                      return Control_Bind.bind(Halogen_Query_HalogenM.bindHalogenM)(_evalHook(reason))(function () {
+                          var v = get(stateRef);
+                          return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(Control_Applicative.when(Halogen_Query_HalogenM.applicativeHalogenM)(!Data_Array["null"](v.evalQueue))((function () {
+                              var v1 = modify_(stateRef)(function (v2) {
+                                  return {
+                                      input: v2.input,
+                                      componentRef: v2.componentRef,
+                                      queryFn: v2.queryFn,
+                                      evalQueue: [  ],
+                                      stateCells: v2.stateCells,
+                                      effectCells: v2.effectCells,
+                                      memoCells: v2.memoCells,
+                                      refCells: v2.refCells,
+                                      stateDirty: false
+                                  };
+                              });
+                              return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(Data_Foldable.sequence_(Halogen_Query_HalogenM.applicativeHalogenM)(Data_Foldable.foldableArray)(v.evalQueue))(function () {
+                                  var v2 = get(stateRef);
+                                  var initializeOrStepReason = Data_Eq.eq(Halogen_Hooks_Internal_Eval_Types.eqInterpretHookReason)(reason)(Halogen_Hooks_Internal_Eval_Types.Initialize.value) || Data_Eq.eq(Halogen_Hooks_Internal_Eval_Types.eqInterpretHookReason)(reason)(Halogen_Hooks_Internal_Eval_Types.Step.value);
+                                  return Control_Applicative.when(Halogen_Query_HalogenM.applicativeHalogenM)(v2.stateDirty && initializeOrStepReason)(Data_Functor["void"](Halogen_Query_HalogenM.functorHalogenM)(executeHooksAndEffects(stateRef)(Halogen_Hooks_Internal_Eval_Types.Step.value)));
+                              });
+                          })()))(function () {
+                              return Control_Monad_State_Class.gets(Halogen_Query_HalogenM.monadStateHalogenM)((function () {
+                                  var $197 = Data_Newtype.unwrap();
+                                  return function ($198) {
+                                      return (function (v1) {
+                                          return v1.result;
+                                      })($197($198));
+                                  };
+                              })());
+                          });
+                      });
+                  };
+              };
+              return function (v) {
+                  if (v instanceof Halogen_Query_HalogenQ.Initialize) {
+                      return Control_Bind.bind(Halogen_Query_HalogenM.bindHalogenM)(Control_Monad_State_Class.get(Halogen_Query_HalogenM.monadStateHalogenM))(function (v1) {
+                          return Control_Bind.bind(Halogen_Query_HalogenM.bindHalogenM)(executeHooksAndEffects(v1.stateRef)(Halogen_Hooks_Internal_Eval_Types.Initialize.value))(function () {
+                              return Control_Applicative.pure(Halogen_Query_HalogenM.applicativeHalogenM)(v.value0);
+                          });
+                      });
+                  };
+                  if (v instanceof Halogen_Query_HalogenQ.Query) {
+                      return Control_Bind.bind(Halogen_Query_HalogenM.bindHalogenM)(Control_Monad_State_Class.get(Halogen_Query_HalogenM.monadStateHalogenM))(function (v1) {
+                          var v2 = get(v1.stateRef);
+                          if (v2.queryFn instanceof Data_Maybe.Nothing) {
+                              return Control_Applicative.pure(Halogen_Query_HalogenM.applicativeHalogenM)(v.value1(Data_Unit.unit));
+                          };
+                          if (v2.queryFn instanceof Data_Maybe.Just) {
+                              return _evalHookM(executeHooksAndEffects(v1.stateRef)(Halogen_Hooks_Internal_Eval_Types.Step.value))(Data_Coyoneda.unCoyoneda(function (g) {
+                                  var $199 = Data_Functor.map(Halogen_Hooks_HookM.functorHookM)(Data_Maybe.maybe(v.value1(Data_Unit.unit))(g));
+                                  var $200 = Halogen_Hooks_Internal_Eval_Types.fromQueryFn(v2.queryFn.value0);
+                                  return function ($201) {
+                                      return $199($200($201));
+                                  };
+                              })(v.value0));
+                          };
+                          throw new Error("Failed pattern match at Halogen.Hooks.Internal.Eval (line 46, column 5 - line 51, column 81): " + [ v2.queryFn.constructor.name ]);
+                      });
+                  };
+                  if (v instanceof Halogen_Query_HalogenQ.Action) {
+                      return Control_Bind.bind(Halogen_Query_HalogenM.bindHalogenM)(Control_Monad_State_Class.get(Halogen_Query_HalogenM.monadStateHalogenM))(function (v1) {
+                          return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(_evalHookM(executeHooksAndEffects(v1.stateRef)(Halogen_Hooks_Internal_Eval_Types.Step.value))(v.value0))(function () {
+                              return Control_Applicative.pure(Halogen_Query_HalogenM.applicativeHalogenM)(v.value1);
+                          });
+                      });
+                  };
+                  if (v instanceof Halogen_Query_HalogenQ.Receive) {
+                      return Control_Bind.bind(Halogen_Query_HalogenM.bindHalogenM)(Control_Monad_State_Class.get(Halogen_Query_HalogenM.monadStateHalogenM))(function (v1) {
+                          var v2 = get(v1.stateRef);
+                          return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(Control_Applicative.unless(Halogen_Query_HalogenM.applicativeHalogenM)(inputEq(v2.input)(v.value0))((function () {
+                              var v3 = modify_(v1.stateRef)(function (v4) {
+                                  return {
+                                      input: v.value0,
+                                      componentRef: v4.componentRef,
+                                      queryFn: v4.queryFn,
+                                      evalQueue: v4.evalQueue,
+                                      stateCells: v4.stateCells,
+                                      effectCells: v4.effectCells,
+                                      memoCells: v4.memoCells,
+                                      refCells: v4.refCells,
+                                      stateDirty: v4.stateDirty
+                                  };
+                              });
+                              return Data_Functor["void"](Halogen_Query_HalogenM.functorHalogenM)(executeHooksAndEffects(v1.stateRef)(Halogen_Hooks_Internal_Eval_Types.Step.value));
+                          })()))(function () {
+                              return Control_Applicative.pure(Halogen_Query_HalogenM.applicativeHalogenM)(v.value1);
+                          });
+                      });
+                  };
+                  if (v instanceof Halogen_Query_HalogenQ.Finalize) {
+                      return Control_Bind.bind(Halogen_Query_HalogenM.bindHalogenM)(Control_Monad_State_Class.get(Halogen_Query_HalogenM.monadStateHalogenM))(function (v1) {
+                          return Control_Bind.bind(Halogen_Query_HalogenM.bindHalogenM)(executeHooksAndEffects(v1.stateRef)(Halogen_Hooks_Internal_Eval_Types.Finalize.value))(function () {
+                              return Control_Applicative.pure(Halogen_Query_HalogenM.applicativeHalogenM)(v.value0);
+                          });
+                      });
+                  };
+                  throw new Error("Failed pattern match at Halogen.Hooks.Internal.Eval (line 37, column 39 - line 71, column 11): " + [ v.constructor.name ]);
+              };
+          };
+      };
+  };
+  var evalHookM = function (v) {
+      return function (v1) {
+          var interpretHalogenHook = function (v2) {
+              if (v2 instanceof Halogen_Hooks_HookM.Modify) {
+                  return Control_Bind.bind(Control_Monad_Free.freeBind)(Control_Monad_Free.liftF(new Halogen_Query_HalogenM.State(function (state) {
+                      return new Data_Tuple.Tuple(state, state);
+                  })))(function (v3) {
+                      var v4 = get(v3.stateRef);
+                      return Control_Bind.discard(Control_Bind.discardUnit)(Control_Monad_Free.freeBind)((function () {
+                          var v5 = Unsafe_Reference.unsafeRefEq(v4.componentRef)(v2.value0.value0);
+                          if (v5) {
+                              return Control_Applicative.pure(Control_Monad_Free.freeApplicative)(Data_Unit.unit);
+                          };
+                          return Effect_Exception_Unsafe.unsafeThrow("Attempted to use state-modifying `HookM` code outside the component where it was defined.");
+                      })())(function () {
+                          var current = unsafeGetCell(v2.value0.value1)(v4.stateCells.queue);
+                          var next = v2.value1(current);
+                          return Control_Bind.discard(Control_Bind.discardUnit)(Control_Monad_Free.freeBind)((function () {
+                              var v5 = Unsafe_Reference.unsafeRefEq(current)(next);
+                              if (v5) {
+                                  return Control_Applicative.pure(Control_Monad_Free.freeApplicative)(Data_Unit.unit);
+                              };
+                              var newQueue = unsafeSetCell(v2.value0.value1)(next);
+                              var v6 = modify_(v3.stateRef)(function (s) {
+                                  return {
+                                      input: s.input,
+                                      componentRef: s.componentRef,
+                                      queryFn: s.queryFn,
+                                      evalQueue: s.evalQueue,
+                                      stateCells: {
+                                          queue: newQueue(s.stateCells.queue),
+                                          index: s.stateCells.index
+                                      },
+                                      effectCells: s.effectCells,
+                                      memoCells: s.memoCells,
+                                      refCells: s.refCells,
+                                      stateDirty: true
+                                  };
+                              });
+                              return Data_Functor["void"](Control_Monad_Free.freeFunctor)(v);
+                          })())(function () {
+                              return Control_Applicative.pure(Control_Monad_Free.freeApplicative)(v2.value2(next));
+                          });
+                      });
+                  });
+              };
+              if (v2 instanceof Halogen_Hooks_HookM.Subscribe) {
+                  return Control_Monad_Free.liftF(new Halogen_Query_HalogenM.Subscribe(v2.value0, v2.value1));
+              };
+              if (v2 instanceof Halogen_Hooks_HookM.Unsubscribe) {
+                  return Control_Monad_Free.liftF(new Halogen_Query_HalogenM.Unsubscribe(v2.value0, v2.value1));
+              };
+              if (v2 instanceof Halogen_Hooks_HookM.Lift) {
+                  return Control_Monad_Free.liftF(new Halogen_Query_HalogenM.Lift(v2.value0));
+              };
+              if (v2 instanceof Halogen_Hooks_HookM.ChildQuery) {
+                  return Control_Monad_Free.liftF(new Halogen_Query_HalogenM.ChildQuery(v2.value0));
+              };
+              if (v2 instanceof Halogen_Hooks_HookM.Raise) {
+                  return Control_Monad_Free.liftF(new Halogen_Query_HalogenM.Raise(v2.value0, v2.value1));
+              };
+              if (v2 instanceof Halogen_Hooks_HookM.Par) {
+                  return Control_Monad_Free.liftF(Halogen_Query_HalogenM.Par.create(Control_Applicative_Free.retractFreeAp(Halogen_Query_HalogenM.applicativeHalogenAp)(Control_Applicative_Free.hoistFreeAp((function () {
+                      var $202 = evalHookM(v);
+                      return function ($203) {
+                          return Halogen_Query_HalogenM.HalogenAp(Control_Applicative_Free.liftFreeAp($202($203)));
+                      };
+                  })())(v2.value0))));
+              };
+              if (v2 instanceof Halogen_Hooks_HookM.Fork) {
+                  return Control_Monad_Free.liftF(new Halogen_Query_HalogenM.Fork(evalHookM(v)(v2.value0), v2.value1));
+              };
+              if (v2 instanceof Halogen_Hooks_HookM.Kill) {
+                  return Control_Monad_Free.liftF(new Halogen_Query_HalogenM.Kill(v2.value0, v2.value1));
+              };
+              if (v2 instanceof Halogen_Hooks_HookM.GetRef) {
+                  return Control_Monad_Free.liftF(new Halogen_Query_HalogenM.GetRef(v2.value0, v2.value1));
+              };
+              throw new Error("Failed pattern match at Halogen.Hooks.Internal.Eval (line 293, column 26 - line 363, column 31): " + [ v2.constructor.name ]);
+          };
+          return Halogen_Query_HalogenM.HalogenM(Control_Monad_Free.substFree(interpretHalogenHook)(v1));
+      };
+  };
+  var evalHook = function (_evalHookM) {
+      return function (_evalHook) {
+          return function (reason) {
+              return function (stateRef) {
+                  return function (v) {
+                      if (v instanceof Halogen_Hooks_Internal_UseHookF.UseState) {
+                          if (reason instanceof Halogen_Hooks_Internal_Eval_Types.Initialize) {
+                              var v1 = get(stateRef);
+                              var newQueue = Data_Array.snoc(v1.stateCells.queue)(v.value0);
+                              var identifier = new Data_Tuple.Tuple(v1.componentRef, Data_Array.length(newQueue) - 1 | 0);
+                              var v2 = modify_(stateRef)(function (v3) {
+                                  return {
+                                      input: v3.input,
+                                      componentRef: v3.componentRef,
+                                      queryFn: v3.queryFn,
+                                      evalQueue: v3.evalQueue,
+                                      stateCells: {
+                                          queue: newQueue,
+                                          index: v3.stateCells.index
+                                      },
+                                      effectCells: v3.effectCells,
+                                      memoCells: v3.memoCells,
+                                      refCells: v3.refCells,
+                                      stateDirty: v3.stateDirty
+                                  };
+                              });
+                              return Control_Applicative.pure(Control_Monad_Free.freeApplicative)(v.value1(new Data_Tuple.Tuple(v.value0, identifier)));
+                          };
+                          var v1 = get(stateRef);
+                          var value = unsafeGetCell(v1.stateCells.index)(v1.stateCells.queue);
+                          var identifier = new Data_Tuple.Tuple(v1.componentRef, v1.stateCells.index);
+                          var v2 = modify_(stateRef)(function (v3) {
+                              return {
+                                  input: v3.input,
+                                  componentRef: v3.componentRef,
+                                  queryFn: v3.queryFn,
+                                  evalQueue: v3.evalQueue,
+                                  stateCells: {
+                                      queue: v3.stateCells.queue,
+                                      index: stepIndex(v1.stateCells.index)(v1.stateCells.queue)
+                                  },
+                                  effectCells: v3.effectCells,
+                                  memoCells: v3.memoCells,
+                                  refCells: v3.refCells,
+                                  stateDirty: v3.stateDirty
+                              };
+                          });
+                          return Control_Applicative.pure(Control_Monad_Free.freeApplicative)(v.value1(new Data_Tuple.Tuple(value, identifier)));
+                      };
+                      if (v instanceof Halogen_Hooks_Internal_UseHookF.UseQuery) {
+                          var handler$prime = function ($204) {
+                              return v.value1(Halogen_Hooks_Internal_Types.toQueryValue($204));
+                          };
+                          var v1 = modify_(stateRef)(function (v2) {
+                              return {
+                                  input: v2.input,
+                                  componentRef: v2.componentRef,
+                                  queryFn: Data_Maybe.Just.create(Halogen_Hooks_Internal_Eval_Types.toQueryFn(handler$prime)),
+                                  evalQueue: v2.evalQueue,
+                                  stateCells: v2.stateCells,
+                                  effectCells: v2.effectCells,
+                                  memoCells: v2.memoCells,
+                                  refCells: v2.refCells,
+                                  stateDirty: v2.stateDirty
+                              };
+                          });
+                          return Control_Applicative.pure(Control_Monad_Free.freeApplicative)(v.value2);
+                      };
+                      if (v instanceof Halogen_Hooks_Internal_UseHookF.UseEffect) {
+                          if (reason instanceof Halogen_Hooks_Internal_Eval_Types.Initialize) {
+                              var $$eval = Control_Bind.bind(Halogen_Query_HalogenM.bindHalogenM)(_evalHookM(_evalHook(Halogen_Hooks_Internal_Eval_Types.Queued.value))(v.value1))(function (mbFinalizer) {
+                                  var finalizer = Data_Maybe.fromMaybe(Control_Applicative.pure(Halogen_Hooks_HookM.applicativeHookM)(Data_Unit.unit))(mbFinalizer);
+                                  var newQueue = function (st) {
+                                      return Data_Array.snoc(st.effectCells.queue)(new Data_Tuple.Tuple(v.value0, finalizer));
+                                  };
+                                  var v1 = modify_(stateRef)(function (s) {
+                                      return {
+                                          input: s.input,
+                                          componentRef: s.componentRef,
+                                          queryFn: s.queryFn,
+                                          evalQueue: s.evalQueue,
+                                          stateCells: s.stateCells,
+                                          effectCells: {
+                                              queue: newQueue(s),
+                                              index: s.effectCells.index
+                                          },
+                                          memoCells: s.memoCells,
+                                          refCells: s.refCells,
+                                          stateDirty: s.stateDirty
+                                      };
+                                  });
+                                  return Control_Applicative.pure(Halogen_Query_HalogenM.applicativeHalogenM)(Data_Unit.unit);
+                              });
+                              var v1 = modify_(stateRef)(function (s) {
+                                  return {
+                                      input: s.input,
+                                      componentRef: s.componentRef,
+                                      queryFn: s.queryFn,
+                                      evalQueue: Data_Array.snoc(s.evalQueue)($$eval),
+                                      stateCells: s.stateCells,
+                                      effectCells: s.effectCells,
+                                      memoCells: s.memoCells,
+                                      refCells: s.refCells,
+                                      stateDirty: s.stateDirty
+                                  };
+                              });
+                              return Control_Applicative.pure(Control_Monad_Free.freeApplicative)(v.value2);
+                          };
+                          if (reason instanceof Halogen_Hooks_Internal_Eval_Types.Queued) {
+                              return Control_Applicative.pure(Control_Monad_Free.freeApplicative)(v.value2);
+                          };
+                          if (reason instanceof Halogen_Hooks_Internal_Eval_Types.Step) {
+                              var v1 = get(stateRef);
+                              var nextIndex = stepIndex(v1.effectCells.index)(v1.effectCells.queue);
+                              var v2 = unsafeGetCell(v1.effectCells.index)(v1.effectCells.queue);
+                              if (v.value0 instanceof Data_Maybe.Just && v2.value0 instanceof Data_Maybe.Just) {
+                                  var memos$prime = {
+                                      old: Halogen_Hooks_Internal_Types.fromMemoValues(v2.value0.value0),
+                                      "new": Halogen_Hooks_Internal_Types.fromMemoValues(v.value0.value0)
+                                  };
+                                  var $150 = Foreign_Object.isEmpty(memos$prime["new"].memos) || Data_HeytingAlgebra.not(Data_HeytingAlgebra.heytingAlgebraFunction(Data_HeytingAlgebra.heytingAlgebraFunction(Data_HeytingAlgebra.heytingAlgebraBoolean)))(memos$prime["new"].eq)(memos$prime.old.memos)(memos$prime["new"].memos);
+                                  if ($150) {
+                                      var $$eval = Control_Bind.bind(Halogen_Query_HalogenM.bindHalogenM)(_evalHookM(_evalHook(Halogen_Hooks_Internal_Eval_Types.Queued.value))(Control_Apply.applySecond(Halogen_Hooks_HookM.applyHookM)(v2.value1)(v.value1)))(function (mbFinalizer) {
+                                          var v3 = get(stateRef);
+                                          var newFinalizer = Data_Maybe.fromMaybe(Control_Applicative.pure(Halogen_Hooks_HookM.applicativeHookM)(Data_Unit.unit))(mbFinalizer);
+                                          var newValue = new Data_Tuple.Tuple(v.value0, newFinalizer);
+                                          var newQueue = unsafeSetCell(v1.effectCells.index)(newValue)(v3.effectCells.queue);
+                                          var v4 = modify_(stateRef)(function (v5) {
+                                              return {
+                                                  input: v5.input,
+                                                  componentRef: v5.componentRef,
+                                                  queryFn: v5.queryFn,
+                                                  evalQueue: v5.evalQueue,
+                                                  stateCells: v5.stateCells,
+                                                  effectCells: {
+                                                      queue: newQueue,
+                                                      index: v5.effectCells.index
+                                                  },
+                                                  memoCells: v5.memoCells,
+                                                  refCells: v5.refCells,
+                                                  stateDirty: v5.stateDirty
+                                              };
+                                          });
+                                          return Control_Applicative.pure(Halogen_Query_HalogenM.applicativeHalogenM)(Data_Unit.unit);
+                                      });
+                                      var v3 = modify_(stateRef)(function (s) {
+                                          return {
+                                              input: s.input,
+                                              componentRef: s.componentRef,
+                                              queryFn: s.queryFn,
+                                              evalQueue: Data_Array.snoc(s.evalQueue)($$eval),
+                                              stateCells: s.stateCells,
+                                              effectCells: {
+                                                  queue: s.effectCells.queue,
+                                                  index: nextIndex
+                                              },
+                                              memoCells: s.memoCells,
+                                              refCells: s.refCells,
+                                              stateDirty: s.stateDirty
+                                          };
+                                      });
+                                      return Control_Applicative.pure(Control_Monad_Free.freeApplicative)(v.value2);
+                                  };
+                                  var v3 = modify_(stateRef)(function (v4) {
+                                      return {
+                                          input: v4.input,
+                                          componentRef: v4.componentRef,
+                                          queryFn: v4.queryFn,
+                                          evalQueue: v4.evalQueue,
+                                          stateCells: v4.stateCells,
+                                          effectCells: {
+                                              queue: v4.effectCells.queue,
+                                              index: nextIndex
+                                          },
+                                          memoCells: v4.memoCells,
+                                          refCells: v4.refCells,
+                                          stateDirty: v4.stateDirty
+                                      };
+                                  });
+                                  return Control_Applicative.pure(Control_Monad_Free.freeApplicative)(v.value2);
+                              };
+                              var v3 = modify_(stateRef)(function (v4) {
+                                  return {
+                                      input: v4.input,
+                                      componentRef: v4.componentRef,
+                                      queryFn: v4.queryFn,
+                                      evalQueue: v4.evalQueue,
+                                      stateCells: v4.stateCells,
+                                      effectCells: {
+                                          queue: v4.effectCells.queue,
+                                          index: nextIndex
+                                      },
+                                      memoCells: v4.memoCells,
+                                      refCells: v4.refCells,
+                                      stateDirty: v4.stateDirty
+                                  };
+                              });
+                              return Control_Applicative.pure(Control_Monad_Free.freeApplicative)(v.value2);
+                          };
+                          if (reason instanceof Halogen_Hooks_Internal_Eval_Types.Finalize) {
+                              var v1 = get(stateRef);
+                              var v2 = unsafeGetCell(v1.effectCells.index)(v1.effectCells.queue);
+                              var finalizeHook = _evalHookM(_evalHook(Halogen_Hooks_Internal_Eval_Types.Queued.value))(v2.value1);
+                              var v3 = modify_(stateRef)(function (s) {
+                                  return {
+                                      input: s.input,
+                                      componentRef: s.componentRef,
+                                      queryFn: s.queryFn,
+                                      evalQueue: Data_Array.snoc(s.evalQueue)(finalizeHook),
+                                      stateCells: s.stateCells,
+                                      effectCells: {
+                                          queue: s.effectCells.queue,
+                                          index: stepIndex(v1.effectCells.index)(v1.effectCells.queue)
+                                      },
+                                      memoCells: s.memoCells,
+                                      refCells: s.refCells,
+                                      stateDirty: s.stateDirty
+                                  };
+                              });
+                              return Control_Applicative.pure(Control_Monad_Free.freeApplicative)(v.value2);
+                          };
+                          throw new Error("Failed pattern match at Halogen.Hooks.Internal.Eval (line 140, column 5 - line 222, column 17): " + [ reason.constructor.name ]);
+                      };
+                      if (v instanceof Halogen_Hooks_Internal_UseHookF.UseMemo) {
+                          if (reason instanceof Halogen_Hooks_Internal_Eval_Types.Initialize) {
+                              var v1 = get(stateRef);
+                              var newValue = v.value1(Data_Unit.unit);
+                              var v2 = modify_(stateRef)(function (v3) {
+                                  return {
+                                      input: v3.input,
+                                      componentRef: v3.componentRef,
+                                      queryFn: v3.queryFn,
+                                      evalQueue: v3.evalQueue,
+                                      stateCells: v3.stateCells,
+                                      effectCells: v3.effectCells,
+                                      memoCells: {
+                                          queue: Data_Array.snoc(v1.memoCells.queue)(new Data_Tuple.Tuple(v.value0, newValue)),
+                                          index: v3.memoCells.index
+                                      },
+                                      refCells: v3.refCells,
+                                      stateDirty: v3.stateDirty
+                                  };
+                              });
+                              return Control_Applicative.pure(Control_Monad_Free.freeApplicative)(v.value2(newValue));
+                          };
+                          var v1 = get(stateRef);
+                          var nextIndex = stepIndex(v1.memoCells.index)(v1.memoCells.queue);
+                          var m = (function () {
+                              var v2 = Data_Bifunctor.bimap(Data_Bifunctor.bifunctorTuple)(Halogen_Hooks_Internal_Types.fromMemoValues)(Halogen_Hooks_Internal_Types.fromMemoValue)(unsafeGetCell(v1.memoCells.index)(v1.memoCells.queue));
+                              var newMemos = Halogen_Hooks_Internal_Types.fromMemoValues(v.value0);
+                              return {
+                                  eq: newMemos.eq,
+                                  old: v2.value0.memos,
+                                  "new": newMemos.memos,
+                                  value: v2.value1
+                              };
+                          })();
+                          var $179 = Foreign_Object.isEmpty(m["new"]) || !m.eq(m["new"])(m.old);
+                          if ($179) {
+                              var newValue = v.value1(Data_Unit.unit);
+                              var newQueue = unsafeSetCell(v1.memoCells.index)(new Data_Tuple.Tuple(v.value0, newValue))(v1.memoCells.queue);
+                              var v2 = modify_(stateRef)(function (v3) {
+                                  return {
+                                      input: v3.input,
+                                      componentRef: v3.componentRef,
+                                      queryFn: v3.queryFn,
+                                      evalQueue: v3.evalQueue,
+                                      stateCells: v3.stateCells,
+                                      effectCells: v3.effectCells,
+                                      memoCells: {
+                                          index: nextIndex,
+                                          queue: newQueue
+                                      },
+                                      refCells: v3.refCells,
+                                      stateDirty: v3.stateDirty
+                                  };
+                              });
+                              return Control_Applicative.pure(Control_Monad_Free.freeApplicative)(v.value2(newValue));
+                          };
+                          var v2 = modify_(stateRef)(function (v3) {
+                              return {
+                                  input: v3.input,
+                                  componentRef: v3.componentRef,
+                                  queryFn: v3.queryFn,
+                                  evalQueue: v3.evalQueue,
+                                  stateCells: v3.stateCells,
+                                  effectCells: v3.effectCells,
+                                  memoCells: {
+                                      queue: v3.memoCells.queue,
+                                      index: nextIndex
+                                  },
+                                  refCells: v3.refCells,
+                                  stateDirty: v3.stateDirty
+                              };
+                          });
+                          return Control_Applicative.pure(Control_Monad_Free.freeApplicative)(v.value2(m.value));
+                      };
+                      if (v instanceof Halogen_Hooks_Internal_UseHookF.UseRef) {
+                          if (reason instanceof Halogen_Hooks_Internal_Eval_Types.Initialize) {
+                              var v1 = get(stateRef);
+                              var ref = Effect_Unsafe.unsafePerformEffect(Effect_Ref["new"](v.value0));
+                              var v2 = modify_(stateRef)(function (v3) {
+                                  return {
+                                      input: v3.input,
+                                      componentRef: v3.componentRef,
+                                      queryFn: v3.queryFn,
+                                      evalQueue: v3.evalQueue,
+                                      stateCells: v3.stateCells,
+                                      effectCells: v3.effectCells,
+                                      memoCells: v3.memoCells,
+                                      refCells: {
+                                          queue: Data_Array.snoc(v1.refCells.queue)(ref),
+                                          index: v3.refCells.index
+                                      },
+                                      stateDirty: v3.stateDirty
+                                  };
+                              });
+                              return Control_Applicative.pure(Control_Monad_Free.freeApplicative)(v.value1(new Data_Tuple.Tuple(v.value0, ref)));
+                          };
+                          var v1 = get(stateRef);
+                          var ref = unsafeGetCell(v1.refCells.index)(v1.refCells.queue);
+                          var value = Effect_Unsafe.unsafePerformEffect(Effect_Ref.read(ref));
+                          var v2 = modify_(stateRef)(function (v3) {
+                              return {
+                                  input: v3.input,
+                                  componentRef: v3.componentRef,
+                                  queryFn: v3.queryFn,
+                                  evalQueue: v3.evalQueue,
+                                  stateCells: v3.stateCells,
+                                  effectCells: v3.effectCells,
+                                  memoCells: v3.memoCells,
+                                  refCells: {
+                                      queue: v3.refCells.queue,
+                                      index: stepIndex(v1.refCells.index)(v1.refCells.queue)
+                                  },
+                                  stateDirty: v3.stateDirty
+                              };
+                          });
+                          return Control_Applicative.pure(Control_Monad_Free.freeApplicative)(v.value1(new Data_Tuple.Tuple(value, ref)));
+                      };
+                      throw new Error("Failed pattern match at Halogen.Hooks.Internal.Eval (line 106, column 49 - line 284, column 41): " + [ v.constructor.name ]);
+                  };
+              };
+          };
+      };
+  };
+  exports["mkEval"] = mkEval;
+  exports["evalHook"] = evalHook;
+  exports["evalHookM"] = evalHookM;
+  exports["get"] = get;
+})(PS);
+(function($PS) {
+  // Generated by purs version 0.14.3
+  "use strict";
+  $PS["Halogen.Hooks.Component"] = $PS["Halogen.Hooks.Component"] || {};
+  var exports = $PS["Halogen.Hooks.Component"];
+  var Control_Applicative = $PS["Control.Applicative"];
+  var Control_Bind = $PS["Control.Bind"];
+  var Control_Monad_Free = $PS["Control.Monad.Free"];
+  var Control_Monad_State_Class = $PS["Control.Monad.State.Class"];
+  var Data_Maybe = $PS["Data.Maybe"];
+  var Data_Newtype = $PS["Data.Newtype"];
+  var Effect_Ref = $PS["Effect.Ref"];
+  var Effect_Unsafe = $PS["Effect.Unsafe"];
+  var Halogen_Component = $PS["Halogen.Component"];
+  var Halogen_HTML_Core = $PS["Halogen.HTML.Core"];
+  var Halogen_Hooks_Hook = $PS["Halogen.Hooks.Hook"];
+  var Halogen_Hooks_Internal_Eval = $PS["Halogen.Hooks.Internal.Eval"];
+  var Halogen_Hooks_Internal_Eval_Types = $PS["Halogen.Hooks.Internal.Eval.Types"];
+  var Halogen_Query_HalogenM = $PS["Halogen.Query.HalogenM"];                
+  var memoComponent = function (eqInput) {
+      return function (inputHookFn) {
+          var initialState = function (input) {
+              return {
+                  result: Halogen_HTML_Core.text(""),
+                  stateRef: Effect_Unsafe.unsafePerformEffect(Effect_Ref["new"]({
+                      input: input,
+                      componentRef: {},
+                      queryFn: Data_Maybe.Nothing.value,
+                      stateCells: {
+                          queue: [  ],
+                          index: 0
+                      },
+                      effectCells: {
+                          queue: [  ],
+                          index: 0
+                      },
+                      memoCells: {
+                          queue: [  ],
+                          index: 0
+                      },
+                      refCells: {
+                          queue: [  ],
+                          index: 0
+                      },
+                      evalQueue: [  ],
+                      stateDirty: false
+                  }))
+              };
+          };
+          var slotToken = {};
+          var queryToken = {};
+          var outputToken = {};
+          var hookFn = inputHookFn({
+              queryToken: queryToken,
+              slotToken: slotToken,
+              outputToken: outputToken
+          });
+          var evalHook = function (reason) {
+              return Control_Bind.bind(Halogen_Query_HalogenM.bindHalogenM)(Control_Monad_State_Class.get(Halogen_Query_HalogenM.monadStateHalogenM))(function (v) {
+                  var $$eval = Halogen_Hooks_Internal_Eval.evalHook(Halogen_Hooks_Internal_Eval.evalHookM)(evalHook)(reason)(v.stateRef);
+                  var v1 = Halogen_Hooks_Internal_Eval.get(v.stateRef);
+                  var hookF = Halogen_Hooks_Hook.unsafeFromHook(hookFn(v1.input));
+                  return Control_Bind.bind(Halogen_Query_HalogenM.bindHalogenM)(Control_Monad_Free.substFree($$eval)(hookF))(function (a) {
+                      return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(Control_Monad_State_Class.modify_(Halogen_Query_HalogenM.monadStateHalogenM)(Data_Newtype.over()()(Halogen_Hooks_Internal_Eval_Types.HookState)(function (v2) {
+                          return {
+                              result: a,
+                              stateRef: v2.stateRef
+                          };
+                      })))(function () {
+                          return Control_Applicative.pure(Halogen_Query_HalogenM.applicativeHalogenM)(a);
+                      });
+                  });
+              });
+          };
+          return Halogen_Component.mkComponent({
+              initialState: initialState,
+              render: function (v) {
+                  return v.result;
+              },
+              "eval": (function () {
+                  var $12 = Halogen_Hooks_Internal_Eval_Types.toHalogenM(slotToken)(outputToken);
+                  var $13 = Halogen_Hooks_Internal_Eval.mkEval(eqInput)(Halogen_Hooks_Internal_Eval.evalHookM)(evalHook);
+                  return function ($14) {
+                      return $12($13($14));
+                  };
+              })()
+          });
+      };
+  };
+  var component = memoComponent(function (v) {
+      return function (v1) {
+          return false;
+      };
+  });
+  exports["component"] = component;
+})(PS);
+(function($PS) {
+  // Generated by purs version 0.14.3
+  "use strict";
+  $PS["Defaultable"] = $PS["Defaultable"] || {};
+  var exports = $PS["Defaultable"];
+  var Data_Either = $PS["Data.Either"];
+  var Data_Functor = $PS["Data.Functor"];
+  var Data_Maybe = $PS["Data.Maybe"];
+  var Data_Semigroup = $PS["Data.Semigroup"];
+  var Data_Show = $PS["Data.Show"];
+  var Halogen_HTML_Core = $PS["Halogen.HTML.Core"];
+  var Halogen_HTML_Elements = $PS["Halogen.HTML.Elements"];
+  var Halogen_HTML_Events = $PS["Halogen.HTML.Events"];
+  var Halogen_Hooks = $PS["Halogen.Hooks"];
+  var Halogen_Hooks_Component = $PS["Halogen.Hooks.Component"];
+  var Halogen_Hooks_Hook = $PS["Halogen.Hooks.Hook"];
+  var Halogen_Hooks_HookM = $PS["Halogen.Hooks.HookM"];                
+  var component = function (dictShow) {
+      return Halogen_Hooks_Component.component(function (v) {
+          return function (input) {
+              return Halogen_Hooks_Hook.bind(Halogen_Hooks.useState(input))(function (v1) {
+                  var text_en = (function () {
+                      if (v1.value0.value instanceof Data_Either.Left && v1.value0.value.value0 instanceof Data_Maybe.Nothing) {
+                          return "You have not made a selection. There is no default.";
+                      };
+                      if (v1.value0.value instanceof Data_Either.Left && v1.value0.value.value0 instanceof Data_Maybe.Just) {
+                          return "You have not made a selection. The default is " + (Data_Show.show(dictShow)(v1.value0.value.value0.value0) + ".");
+                      };
+                      if (v1.value0.value instanceof Data_Either.Right && v1.value0.value.value0 instanceof Data_Maybe.Nothing) {
+                          return "You have averred that you have no answer.";
+                      };
+                      if (v1.value0.value instanceof Data_Either.Right && v1.value0.value.value0 instanceof Data_Maybe.Just) {
+                          return "You have chosen answer " + (Data_Show.show(dictShow)(v1.value0.value.value0.value0) + ".");
+                      };
+                      throw new Error("Failed pattern match at Defaultable (line 34, column 17 - line 38, column 69): " + [ v1.value0.value.constructor.name ]);
+                  })();
+                  var reset_en = Halogen_HTML_Elements.button([ Halogen_HTML_Events.onClick(function (v2) {
+                      return Halogen_Hooks_HookM.modify_(v1.value1)(function (st) {
+                          return {
+                              value: input.value,
+                              label: st.label,
+                              options: st.options
+                          };
+                      });
+                  }) ])([ Halogen_HTML_Core.text("Reset to default") ]);
+                  var pickColor = function (x) {
+                      return Halogen_HTML_Elements.button([ Halogen_HTML_Events.onClick(function (v2) {
+                          return Halogen_Hooks_HookM.modify_(v1.value1)(function (st) {
+                              return {
+                                  value: Data_Either.Right.create(new Data_Maybe.Just(x)),
+                                  label: st.label,
+                                  options: st.options
+                              };
+                          });
+                      }) ])([ Halogen_HTML_Core.text(Data_Show.show(dictShow)(x)) ]);
+                  };
+                  var dunno_en = Halogen_HTML_Elements.button([ Halogen_HTML_Events.onClick(function (v2) {
+                      return Halogen_Hooks_HookM.modify_(v1.value1)(function (st) {
+                          return {
+                              value: new Data_Either.Right(Data_Maybe.Nothing.value),
+                              label: st.label,
+                              options: st.options
+                          };
+                      });
+                  }) ])([ Halogen_HTML_Core.text("I don't know") ]);
+                  return Halogen_Hooks_Hook.pure(Halogen_HTML_Elements.div_([ Halogen_HTML_Elements.p_(Data_Semigroup.append(Data_Semigroup.semigroupArray)([ Halogen_HTML_Elements.h2_([ Halogen_HTML_Core.text(v1.value0.label) ]) ])(Data_Semigroup.append(Data_Semigroup.semigroupArray)(Data_Functor.map(Data_Functor.functorArray)(pickColor)(input.options))(Data_Semigroup.append(Data_Semigroup.semigroupArray)([ dunno_en, reset_en ])(Data_Semigroup.append(Data_Semigroup.semigroupArray)([ Halogen_HTML_Elements.br_, Halogen_HTML_Core.text(text_en) ])([ Halogen_HTML_Elements.br_, Halogen_HTML_Core.text(Data_Show.show(Data_Either.showEither(Data_Maybe.showMaybe(dictShow))(Data_Maybe.showMaybe(dictShow)))(v1.value0.value)) ]))))) ]));
+              });
+          };
+      });
+  };
+  exports["component"] = component;
+})(PS);
 (function(exports) {
   "use strict";
 
@@ -6622,40 +8079,30 @@ var PS = {};
   };
   exports["logShow"] = logShow;
 })(PS);
-(function(exports) {
-  "use strict";
-
-  exports.error = function (msg) {
-    return new Error(msg);
-  };
-
-  exports.throwException = function (e) {
-    return function () {
-      throw e;
-    };
-  };
-})(PS["Effect.Exception"] = PS["Effect.Exception"] || {});
-(function($PS) {
-  // Generated by purs version 0.14.3
-  "use strict";
-  $PS["Effect.Exception"] = $PS["Effect.Exception"] || {};
-  var exports = $PS["Effect.Exception"];
-  var $foreign = $PS["Effect.Exception"];
-  var $$throw = function ($2) {
-      return $foreign.throwException($foreign.error($2));
-  };
-  exports["throw"] = $$throw;
-  exports["error"] = $foreign.error;
-  exports["throwException"] = $foreign.throwException;
-})(PS);
 (function($PS) {
   // Generated by purs version 0.14.3
   "use strict";
   $PS["Halogen.HTML"] = $PS["Halogen.HTML"] || {};
   var exports = $PS["Halogen.HTML"];
+  var Data_Function = $PS["Data.Function"];
   var Data_Maybe = $PS["Data.Maybe"];
   var Halogen_Component = $PS["Halogen.Component"];
-  var Halogen_HTML_Core = $PS["Halogen.HTML.Core"];
+  var Halogen_HTML_Core = $PS["Halogen.HTML.Core"];        
+  var slot_ = function (dictCons) {
+      return function (dictIsSymbol) {
+          return function (dictOrd) {
+              return function (label) {
+                  return function (p) {
+                      return function (component) {
+                          return function (input) {
+                              return Halogen_HTML_Core.widget(new Halogen_Component.ComponentSlot(Halogen_Component.componentSlot()(dictIsSymbol)(dictOrd)(label)(p)(component)(input)(Data_Function["const"](Data_Maybe.Nothing.value))));
+                          };
+                      };
+                  };
+              };
+          };
+      };
+  };
   var slot = function (dictCons) {
       return function (dictIsSymbol) {
           return function (dictOrd) {
@@ -6676,6 +8123,7 @@ var PS = {};
       };
   };
   exports["slot"] = slot;
+  exports["slot_"] = slot_;
 })(PS);
 (function($PS) {
   // Generated by purs version 0.14.3
@@ -6721,16 +8169,20 @@ var PS = {};
   var Button = $PS["Button"];
   var Control_Bind = $PS["Control.Bind"];
   var Control_Monad_State_Class = $PS["Control.Monad.State.Class"];
+  var Data_Either = $PS["Data.Either"];
   var Data_Map_Internal = $PS["Data.Map.Internal"];
+  var Data_Maybe = $PS["Data.Maybe"];
   var Data_Ord = $PS["Data.Ord"];
   var Data_Show = $PS["Data.Show"];
   var Data_Symbol = $PS["Data.Symbol"];
+  var Defaultable = $PS["Defaultable"];
   var Effect_Class_Console = $PS["Effect.Class.Console"];
   var Halogen_Component = $PS["Halogen.Component"];
   var Halogen_HTML = $PS["Halogen.HTML"];
   var Halogen_HTML_Elements = $PS["Halogen.HTML.Elements"];
   var Halogen_Query = $PS["Halogen.Query"];
-  var Halogen_Query_HalogenM = $PS["Halogen.Query.HalogenM"];                
+  var Halogen_Query_HalogenM = $PS["Halogen.Query.HalogenM"];
+  var Type_Proxy = $PS["Type.Proxy"];                
   var HandleButton = (function () {
       function HandleButton(value0) {
           this.value0 = value0;
@@ -6740,6 +8192,7 @@ var PS = {};
       };
       return HandleButton;
   })();
+  var _defaultable = Type_Proxy["Proxy"].value;
   var parent = function (dictMonadEffect) {
       var render = function (v) {
           var clicks = Data_Show.show(Data_Show.showInt)(v.clicked);
@@ -6755,7 +8208,13 @@ var PS = {};
               return "button";
           }))(Data_Ord.ordInt)(Button["_button"])(2)(Button.button)({
               label: clicks + " Switch"
-          })(HandleButton.create) ]);
+          })(HandleButton.create), Halogen_HTML.slot_()(new Data_Symbol.IsSymbol(function () {
+              return "defaultable";
+          }))(Data_Ord.ordInt)(_defaultable)(1)(Defaultable.component(Data_Show.showString))({
+              label: "foo",
+              value: new Data_Either.Left(new Data_Maybe.Just("brown")),
+              options: [ "pink", "blue" ]
+          }) ]);
       };
       var initialState = function (v) {
           return {
@@ -6879,24 +8338,6 @@ var PS = {};
   exports["renderStateX_"] = renderStateX_;
   exports["unRenderStateX"] = unRenderStateX;
   exports["initDriverState"] = initDriverState;
-})(PS);
-(function(exports) {
-  "use strict";
-
-  exports.reallyUnsafeRefEq = function (a) {
-    return function (b) {
-      return a === b;
-    };
-  };
-})(PS["Unsafe.Reference"] = PS["Unsafe.Reference"] || {});
-(function($PS) {
-  // Generated by purs version 0.14.3
-  "use strict";
-  $PS["Unsafe.Reference"] = $PS["Unsafe.Reference"] || {};
-  var exports = $PS["Unsafe.Reference"];
-  var $foreign = $PS["Unsafe.Reference"];
-  var unsafeRefEq = $foreign.reallyUnsafeRefEq;
-  exports["unsafeRefEq"] = unsafeRefEq;
 })(PS);
 (function($PS) {
   // Generated by purs version 0.14.3

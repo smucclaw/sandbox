@@ -6,7 +6,7 @@ I created a new Halogen app by running:
   mkdir halogen-parent-child
   cd halogen-parent-child
   spago init
-  spago install halogen maybe halogen-hooks
+  spago install halogen maybe halogen-hooks tuples
 #+end_example
 
 I copy-pasted the Full Example out of [[https://purescript-halogen.github.io/purescript-halogen/guide/05-Parent-Child-Components.html][the Halogen Guide 2.5]] into ~src/Main.purs~
@@ -35,6 +35,8 @@ I made a simple ~index.html~ wrapper to run the app:
 
 I refactored the Full Example into Main, Form, and Button.
 
-I experimented with Halogen-Hooks to add an increment/decrement component.
+* Next Steps
 
+** I experimented with Halogen-Hooks to add an increment/decrement component called Counter.
 
+** The number of buttons in the form is determined by the current Counter value.

@@ -6,14 +6,22 @@ import Effect.Class.Console (logShow)
 import Halogen as H
 import Halogen.Query as HQ
 import Halogen.HTML as HH
+import Data.Either
+import Data.Maybe
 
 import Button as Button
 import Button (_button, button)
+import Counter
+import Defaultable as Defaultable
+import Type.Proxy (Proxy(..))
+_defaultable = Proxy :: Proxy "defaultable"
 
 -- The parent component supports one type of child component, which uses the
 -- `ButtonSlot` slot type. You can have as many of this type of child component
 -- as there are integers.
-type Slots = ( button :: Button.ButtonSlot Int )
+type Slots = ( button      :: Button.ButtonSlot Int
+             , counter     :: forall query output. H.Slot query output Unit
+             , defaultable :: forall query output. H.Slot query output Int)
 
 -- The parent component can only evaluate one action: handling output messages
 -- from the button component, of type `ButtonOutput`.
@@ -52,6 +60,10 @@ parent =
       , HH.slot _button 1 button { label: clicks <> " Power" } HandleButton
         -- We render our third button with the slot id 2
       , HH.slot _button 2 button { label: clicks <> " Switch" } HandleButton
+      , HH.slot_ _defaultable 1 Defaultable.component { label: "foo"
+                                                , value: Left (Just "brown")
+                                                , options: ["pink", "blue"]
+                                                }
       ]
 
   handleAction :: ParentAction -> H.HalogenM ParentState ParentAction Slots output m Unit

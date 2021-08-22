@@ -14,11 +14,13 @@ to generate this file without the comments in this block.
 , dependencies =
   [ "console"
   , "effect"
+  , "either"
   , "halogen"
   , "halogen-hooks"
   , "maybe"
   , "prelude"
   , "psci-support"
+  , "tuples"
   ]
 , packages = ./packages.dhall
 , sources = [ "src/**/*.purs", "test/**/*.purs" ]

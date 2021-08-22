@@ -17,7 +17,9 @@ import Data.Either
 -- 4. they aver actively that their favourite colour is pink:                        Right (Just "pink")
 type Default a = Either (Maybe a) (Maybe a)
 
-type MyState a = { label :: String, value :: Default a, options :: Array a }
+type MyState a = { label   :: String
+                 , value   :: Default a
+                 , options :: Array a }
 
 component :: forall q o m a. Show a => H.Component q (MyState a) o m
 component = Hooks.component \_ input -> Hooks.do
@@ -31,14 +33,14 @@ component = Hooks.component \_ input -> Hooks.do
       reset_en = HH.button
                  [ HE.onClick \_ -> Hooks.modify_ countId \st -> st { value = input.value } ]
                  [ HH.text "Reset to default" ]
-      text_en = case state.value of
-        Left Nothing   -> "You have not made a selection. There is no default."
-        Left (Just x)  -> "You have not made a selection. The default is " <> show x <> "."
-        Right Nothing  -> "You have averred that you have no answer."
-        Right (Just x) -> "You have chosen answer " <> show x <> "."
+      short_en /\ text_en = case state.value of
+        Left Nothing   -> "None" /\ "You have not made a selection. There is no default."
+        Left (Just x)  -> show x /\ ("You have not made a selection. The default is " <> show x <> ".")
+        Right Nothing  -> "None" /\ "You have averred that you have no answer."
+        Right (Just x) -> show x /\ ("You have chosen answer " <> show x <> ".")
   Hooks.pure do
     HH.div_
-      [ HH.p_ ( [ HH.h2_ [ HH.text state.label ] ]
+      [ HH.p_ ( [ HH.h2_ [ HH.text $ state.label <> " = " <> short_en ] ]
                 <> (pickColor <$> input.options) <> [ dunno_en, reset_en ]
                 <> [ HH.br_, HH.text text_en ]
                 <> [ HH.br_, HH.text $ show state.value ]

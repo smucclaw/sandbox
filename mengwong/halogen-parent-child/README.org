@@ -35,8 +35,66 @@ I made a simple ~index.html~ wrapper to run the app:
 
 I refactored the Full Example into Main, Form, and Button.
 
+I experimented with Halogen-Hooks to add an increment/decrement component called Counter.
+
+
 * Next Steps
 
-** I experimented with Halogen-Hooks to add an increment/decrement component called Counter.
+a Logic module knows how to decide if some components should be turned on or off depending on other components.
 
-** The number of buttons in the form is determined by the current Counter value.
+* Logic
+
+How do we decide if a given component is displayed?
+
+Each component carries an array of zero or more dependency predicates.
+
+Each dependency predicate evaluates part of the world and returns a boolean.
+
+That part of the world may involve zero or more other components.
+
+By default, if a prerequisite is
+
+| Individual Prerequisite | Prerequisite Predicate | Result           |
+|-------------------------+------------------------+------------------|
+| Left Nothing            | show                   | Left true        |
+| Left Just               | test                   | Left testresult  |
+| Right Nothing           | test                   | Right testresult |
+| Right Just              | test                   | Right testresult |
+
+So the test function needs to take a ~Maybe a~ and return ~Boolean~.
+
+If the part of the world involves more than one predicate, we use this truth table, which represents a form of ternary logic
+
+| list                  | test                                   | result        |
+|-----------------------+----------------------------------------+---------------|
+| conjunction (AND/ALL) | any element is Right false             | Right false   |
+| conjunction (AND/ALL) | every element is Right true            | Right true    |
+| conjunction (AND/ALL) | every element is Right true or Nothing | Right nothing |
+| conjunction (AND/ALL) | every element is Left true             | Left true     |
+| conjunction (AND/ALL) | some element is Left Nothing           | Left Nothing  |
+| conjunction (AND/ALL) | every element is Left false            | Left false    |
+|-----------------------+----------------------------------------+---------------|
+| disjunction ( OR/ANY) | any element is Right true              | Right true    |
+
+* Test Case 1
+
+Suppose we have a very simple bit of logic:
+
+- *Choose Age*
+  - /if/ Age > 21 /then/ *Choose Height*
+- *Choose Race*
+  - /if/ race = dwarf /then/ *Choose Dwarf Sub-Race*
+  - /if/ race = elf /then/ *Choose Elf Sub-Race*
+
+Hm, maybe we need to implement a Rete kind of thing
+
+* Test Case 2
+
+evaluating an and/or tree, we implement short-circuiting logic:
+
+- if any element of an OR list is true, then we short-circuit
+- if any element of an AND list is false, then we short-circuit
+
+
+
+

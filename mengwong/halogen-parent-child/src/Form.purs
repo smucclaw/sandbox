@@ -55,15 +55,14 @@ parent =
     let clicks = show clicked
     HH.div_
       [ -- We render our first button with the slot id 0
-        HH.slot _button 0 button { label: clicks <> " Enabled" } HandleButton
-        -- We render our second button with the slot id 1
-      , HH.slot _button 1 button { label: clicks <> " Power" } HandleButton
-        -- We render our third button with the slot id 2
-      , HH.slot _button 2 button { label: clicks <> " Switch" } HandleButton
-      , HH.slot_ _defaultable 1 Defaultable.component { label: "foo"
-                                                , value: Left (Just "brown")
-                                                , options: ["pink", "blue"]
-                                                }
+--        HH.slot _button 0 button { label: clicks <> " Enabled" } HandleButton
+--        -- We render our second button with the slot id 1
+--      , HH.slot _button 1 button { label: clicks <> " Power" } HandleButton
+--        -- We render our third button with the slot id 2
+--      , HH.slot _button 2 button { label: clicks <> " Switch" } HandleButton
+
+        HH.slot_ _defaultable 1 Defaultable.component { label: "favourite colour" , value: Left (Just "brown") , options: ["pink", "blue"] }
+
       ]
 
   handleAction :: ParentAction -> H.HalogenM ParentState ParentAction Slots output m Unit

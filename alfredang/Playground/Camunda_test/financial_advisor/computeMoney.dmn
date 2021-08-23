@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" id="Definitions_1ke3j9j" name="DRD" namespace="http://camunda.org/schema/1.0/dmn" exporter="Camunda Modeler" exporterVersion="4.9.0">
+  <decision id="compute-money" name="Compute Money">
+    <decisionTable id="DecisionTable_1i0b2cx">
+      <input id="Input_1" label="Amount Saved">
+        <inputExpression id="InputExpression_1" typeRef="integer">
+          <text>amountSaved</text>
+        </inputExpression>
+      </input>
+      <output id="Output_1" label="Has money" name="hasMoney" typeRef="boolean" />
+      <rule id="DecisionRule_1iycrme">
+        <inputEntry id="UnaryTests_1o3pcks">
+          <text>[0..10],[20..30]</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_06n8bs5">
+          <text>true</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1t6a18f">
+        <inputEntry id="UnaryTests_0k2h5lj">
+          <text>&lt;=0 </text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1gnxjdv">
+          <text>false</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_0dh9bff">
+        <inputEntry id="UnaryTests_1qlzgym">
+          <text>[11..19], &gt;=31</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0qb7v2s">
+          <text>false</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <dmndi:DMNDI>
+    <dmndi:DMNDiagram>
+      <dmndi:DMNShape dmnElementRef="compute-money">
+        <dc:Bounds height="80" width="180" x="160" y="100" />
+      </dmndi:DMNShape>
+    </dmndi:DMNDiagram>
+  </dmndi:DMNDI>
+</definitions>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_0yjtopm" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.9.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.15.0">
+  <bpmn:process id="financial-advisor" name="Financial Advisor" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>Flow_11bn8fj</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="Activity_1vi75ez" name="Get inputs">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="dependents" label="Number of Dependents" type="long" />
+          <camunda:formField id="amountSaved" label="What is amount saved?" type="long" />
+          <camunda:formField id="earningsAmount" label="What is the amount of earnings?" type="long" />
+          <camunda:formField id="earningsSteady" label="Are the earnings steady?" type="boolean" />
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_11bn8fj</bpmn:incoming>
+      <bpmn:outgoing>Flow_00wvd2d</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_11bn8fj" sourceRef="StartEvent_1" targetRef="Activity_1vi75ez" />
+    <bpmn:serviceTask id="Activity_1ajrsim" name="Report if has money" camunda:type="external" camunda:topic="report-strategy">
+      <bpmn:incoming>Flow_10hqskg</bpmn:incoming>
+      <bpmn:outgoing>Flow_0rdmxqu</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="Event_00cdgk8">
+      <bpmn:incoming>Flow_0rdmxqu</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0rdmxqu" sourceRef="Activity_1ajrsim" targetRef="Event_00cdgk8" />
+    <bpmn:sequenceFlow id="Flow_00wvd2d" sourceRef="Activity_1vi75ez" targetRef="Activity_1nfe3gw" />
+    <bpmn:businessRuleTask id="Activity_1nfe3gw" name="Income Inadequate?" camunda:resultVariable="hasMoney" camunda:decisionRef="income-inadequate" camunda:mapDecisionResult="singleEntry">
+      <bpmn:incoming>Flow_00wvd2d</bpmn:incoming>
+      <bpmn:outgoing>Flow_10hqskg</bpmn:outgoing>
+    </bpmn:businessRuleTask>
+    <bpmn:sequenceFlow id="Flow_10hqskg" sourceRef="Activity_1nfe3gw" targetRef="Activity_1ajrsim" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="financial-advisor">
+      <bpmndi:BPMNEdge id="Flow_10hqskg_di" bpmnElement="Flow_10hqskg">
+        <di:waypoint x="590" y="120" />
+        <di:waypoint x="770" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_00wvd2d_di" bpmnElement="Flow_00wvd2d">
+        <di:waypoint x="320" y="120" />
+        <di:waypoint x="490" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0rdmxqu_di" bpmnElement="Flow_0rdmxqu">
+        <di:waypoint x="870" y="120" />
+        <di:waypoint x="1062" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_11bn8fj_di" bpmnElement="Flow_11bn8fj">
+        <di:waypoint x="188" y="120" />
+        <di:waypoint x="220" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="152" y="102" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_06kebty_di" bpmnElement="Activity_1vi75ez">
+        <dc:Bounds x="220" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0o83cov_di" bpmnElement="Activity_1ajrsim">
+        <dc:Bounds x="770" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_00cdgk8_di" bpmnElement="Event_00cdgk8">
+        <dc:Bounds x="1062" y="102" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0hm4pxv_di" bpmnElement="Activity_1nfe3gw">
+        <dc:Bounds x="490" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

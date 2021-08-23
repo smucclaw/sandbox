@@ -21,7 +21,7 @@
       <bpmn:incoming>Flow_167p0ut</bpmn:incoming>
       <bpmn:outgoing>Flow_14drqv0</bpmn:outgoing>
     </bpmn:userTask>
-    <bpmn:businessRuleTask id="Activity_0laukrv" name="x &#62; y" camunda:resultVariable="xGTy" camunda:decisionRef="greater-than" camunda:mapDecisionResult="singleEntry">
+    <bpmn:businessRuleTask id="Activity_0laukrv" name="x &#62; y" camunda:resultVariable="xGTy" camunda:decisionRef="income-adequacy" camunda:mapDecisionResult="singleEntry">
       <bpmn:incoming>Flow_14drqv0</bpmn:incoming>
       <bpmn:outgoing>Flow_0nv20d6</bpmn:outgoing>
     </bpmn:businessRuleTask>
@@ -32,6 +32,10 @@
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1te35ct">
+      <bpmndi:BPMNEdge id="Flow_14drqv0_di" bpmnElement="Flow_14drqv0">
+        <di:waypoint x="430" y="117" />
+        <di:waypoint x="580" y="117" />
+      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_167p0ut_di" bpmnElement="Flow_167p0ut">
         <di:waypoint x="215" y="117" />
         <di:waypoint x="330" y="117" />
@@ -43,10 +47,6 @@
       <bpmndi:BPMNEdge id="Flow_1t6cf9y_di" bpmnElement="Flow_1t6cf9y">
         <di:waypoint x="890" y="117" />
         <di:waypoint x="1012" y="117" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_14drqv0_di" bpmnElement="Flow_14drqv0">
-        <di:waypoint x="430" y="117" />
-        <di:waypoint x="580" y="117" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
         <dc:Bounds x="179" y="99" width="36" height="36" />

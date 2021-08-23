@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" xmlns:camunda="http://camunda.org/schema/1.0/dmn" xmlns:biodi="http://bpmn.io/schema/dmn/biodi/2.0" id="Definitions_1djfjp2" name="DRD" namespace="http://camunda.org/schema/1.0/dmn" exporter="Camunda Modeler" exporterVersion="4.9.0">
+  <decision id="income-adequacy" name="Income Adequacy">
+    <decisionTable id="DecisionTable_0d3kbbb">
+      <input id="InputClause_0s4olcb" label="Earnings" biodi:width="192" camunda:inputVariable="earnings">
+        <inputExpression id="LiteralExpression_0nhw0vd" typeRef="long" expressionLanguage="feel">
+          <text>x</text>
+        </inputExpression>
+      </input>
+      <input id="InputClause_1fhkbhy" label="Dependents" camunda:inputVariable="dependents">
+        <inputExpression id="LiteralExpression_1wze9ob" typeRef="long">
+          <text>y</text>
+        </inputExpression>
+      </input>
+      <input id="InputClause_0y7cdhm" label="minIncome" camunda:inputVariable="minIncome">
+        <inputExpression id="LiteralExpression_1ghprvp" typeRef="long">
+          <text>15000 + 4000 * y</text>
+        </inputExpression>
+      </input>
+      <output id="Output_1" label="Return String" name="xGTy" typeRef="string" biodi:width="192">
+        <outputValues id="UnaryTests_0bj4qvy">
+          <text>"income adequate","income inadequate"</text>
+        </outputValues>
+      </output>
+      <rule id="DecisionRule_0cjbjx3">
+        <inputEntry id="UnaryTests_05l3n6y" expressionLanguage="javascript">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0p1r4s1" expressionLanguage="javascript">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_10u954d" expressionLanguage="javascript">
+          <text>x &gt; minIncome</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_11e9yf8">
+          <text>"income adequate"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1suwlts">
+        <inputEntry id="UnaryTests_05o5zqw" expressionLanguage="javascript">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0mnjysr" expressionLanguage="javascript">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_02e49zn" expressionLanguage="javascript">
+          <text>x &lt;= minIncome</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_00rh97z">
+          <text>"income inadequate"</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <dmndi:DMNDI>
+    <dmndi:DMNDiagram>
+      <dmndi:DMNShape dmnElementRef="income-adequacy">
+        <dc:Bounds height="80" width="180" x="160" y="100" />
+      </dmndi:DMNShape>
+    </dmndi:DMNDiagram>
+  </dmndi:DMNDI>
+</definitions>

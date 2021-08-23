@@ -21,8 +21,10 @@ type MyState a = { label   :: String
                  , value   :: Default a
                  , options :: Array a }
 
-component :: forall q o m a. Show a => H.Component q (MyState a) o m
-component = Hooks.component \_ input -> Hooks.do
+type Tokens a = Hooks.ComponentTokens () () (Default a)
+
+component :: forall q m a. Show a => H.Component q (Default a) (Default a) m
+component = Hooks.component \(tokens :: Tokens a) input -> Hooks.do
   state /\ countId <- Hooks.useState input
   let pickColor x = HH.button
                     [ HE.onClick \_ -> Hooks.modify_ countId \st -> st { value = Right $ Just x  } ]
@@ -46,5 +48,6 @@ component = Hooks.component \_ input -> Hooks.do
                 <> [ HH.br_, HH.text $ show state.value ]
               )
       ]
+  -- TODO: need to send an Output token to update the parent component with new top-level world state. consider using Store
 
 

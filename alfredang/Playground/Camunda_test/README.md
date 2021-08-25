@@ -45,6 +45,11 @@ The criteria of evaluation consists of the following:
 - custom forms possible? 
 - Unlikely that a "reactive" front end would be representable by BPMN (How would you model a unending process?)
 
+See:
+- https://camunda.com/blog/2015/08/start-and-complete-process-with-rest-api/
+- Camunda for Modern Web Applications: https://www.youtube.com/watch?v=HhxghzKMFBg
+- https://blog.bernd-ruecker.com/use-camunda-without-touching-java-and-get-an-easy-to-use-rest-based-orchestration-and-workflow-7bdf25ac198e
+
 ### Integration with baby-L4 
 - Intention of programmatically generating a camunda-compatible xml is complicated by the need of a "bpmn:diagram" element consisting of descriptions (coordinate information, shapes, arrows)
 - Certain things cannot be expressed with DMN tables? How would we represent predicate logic with DMN? 

@@ -48,6 +48,8 @@ function StrategyProvider({ children }) {
 function ReportStrategy(props) {
   const queryClient = useQueryClient()
   const { amountSaved } = useContext(StrategyContext)
+
+  // Here be dragons... Should probably change it to a promise-based sequential update 
   const { status } = useQuery(
     [props.process_id, 'amountSaved', amountSaved, "long"],
     updateVariable

@@ -1,67 +1,31 @@
-import { useState, memo, createContext, useContext } from 'react';
 import ReactDOM from 'react-dom';
-import 'bootstrap/dist/css/bootstrap.css'
-import styles from './index.css'
-
+import { App } from './components.js'
+import { startInstance } from './async.js'
 // https://www.youtube.com/watch?v=FzlurzsCW4M
 
 
+// To start a camunda process instance:
+//  https://docs.camunda.org/manual/7.15/reference/rest/process-definition/post-start-process-instance/
 
-export default function Home() {
-  return (
-  <CountryProvider>
-    <HomeContent />
-  </CountryProvider>
-  )
-}
+// Retrieve defaults:
+//  https://docs.camunda.org/manual/7.15/reference/rest/process-instance/variables/get-variables/
 
-const HomeContent = memo(() => {
-  return (
-    <div> 
-      <CountryDetails />
-      <CountryPicker />
-    </div>
-  )
-});
+const process_defKey = 'event-driven'
 
-const CountryContext = createContext();
+startInstance(process_defKey).then(
+  (response) => {
+    const process_id = response.data.id
+    // console.log(response) 
+    ReactDOM.render(
+      <App process_id={process_id} />,
+      // <h1>hello</h1>,
+      document.getElementById('root')
+    );
 
-function CountryProvider({ children }) {
-  const [country, setCountry] = useState("CA")
-
-  return <CountryContext.Provider value={{country, setCountry}}>
-    {children}
-  </CountryContext.Provider>
-}
-
-function CountryDetails() {
-  const {country} = useContext(CountryContext)
-  return (
-    <h1>{country}</h1>
-  )
-}
-
-function CountryPicker() {
-  const {country, setCountry } = useContext(CountryContext)
-  return (
-    <select 
-      value={country} 
-      onChange={(event) => { 
-        setCountry(event.target.value) 
-      }}
-    >
-      <option value="CA">Canada</option>
-      <option value="CO">Colombia</option>
-    </select>
-  )
-}
+  }
+)
 
 
-
-ReactDOM.render(
-  <Home />,
-  document.getElementById('root')
-);
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))

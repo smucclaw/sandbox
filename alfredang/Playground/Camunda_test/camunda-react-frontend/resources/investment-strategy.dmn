@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" id="investment-strategy" name="DRD" namespace="http://camunda.org/schema/1.0/dmn" exporter="Camunda Modeler" exporterVersion="4.9.0">
+  <decision id="compute-investment-strategy" name="Investment Strategy">
+    <decisionTable id="DecisionTable_1wp56ht" hitPolicy="FIRST">
+      <input id="Input_1" label="Savings">
+        <inputExpression id="InputExpression_1" typeRef="string">
+          <text>amountSaved</text>
+        </inputExpression>
+      </input>
+      <output id="Output_1" label="Investment Strategy" name="investmentStrategy" typeRef="string">
+        <outputValues id="UnaryTests_1s1qtjb">
+          <text>"start vc","invest stocks","save more"</text>
+        </outputValues>
+      </output>
+      <rule id="DecisionRule_0l9t3sp">
+        <inputEntry id="UnaryTests_1ifwju1" expressionLanguage="javascript">
+          <text>amountSaved &gt; 1000000</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0zczjkl">
+          <text>"start vc"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_0yi47d6">
+        <inputEntry id="UnaryTests_1im7xjg" expressionLanguage="javascript">
+          <text>amountSaved &gt; 1000</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_129oxx6">
+          <text>"invest stocks"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1ipt0zq">
+        <inputEntry id="UnaryTests_1g9qx5q">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_16ytz6p">
+          <text>"save more"</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <dmndi:DMNDI>
+    <dmndi:DMNDiagram>
+      <dmndi:DMNShape dmnElementRef="compute-investment-strategy">
+        <dc:Bounds height="80" width="180" x="160" y="100" />
+      </dmndi:DMNShape>
+    </dmndi:DMNDiagram>
+  </dmndi:DMNDI>
+</definitions>

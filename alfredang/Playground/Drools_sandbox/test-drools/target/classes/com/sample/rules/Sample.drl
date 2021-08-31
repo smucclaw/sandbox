@@ -1,0 +1,223 @@
+package com.sample.rules
+
+// declare enum FinancialStatus
+//     ADEQUATE("adequate"),
+//     INADEQUATE("inadequate");
+// end
+
+// declare enum EarningsStatus
+//     STEADY("steady"),
+//     UNSTEADY("unsteady");
+// end
+
+// declare enum InvestmentStrategy
+//     SAVINGS("savings"),
+//     COMBINATION("combination"),
+//     STOCKS("stocks");
+// end
+
+declare Person
+    name: String @position(0)
+    age: Integer @position(1)
+end
+
+// Derivables
+function Integer minIncome(Integer numDeps) {
+    return (15000 + (4000 * numDeps));
+}
+
+function Integer minSavings(Integer numDeps) {
+    return (5000 * numDeps);
+}
+
+// Intermediate Predicates (Nodes)
+declare Investment
+    strategy: String
+end
+
+declare SavingsAccount 
+    status: String
+end
+
+declare Income
+    status: String 
+end
+
+
+// Facts (Leaves)
+declare Earnings
+    amount: Integer
+    status: String
+end
+
+declare AmountSaved
+    value: Integer
+end
+
+declare Dependents
+    number: Integer
+end
+
+
+
+
+rule "initInterPreds"
+    when
+    then
+        insert(new Person("John",26));
+        insert(new Person("Mary",28));
+        insert(new Investment());
+        insert(new SavingsAccount());
+        insert(new Income());
+end		
+
+
+rule "findPerson"
+    when
+        Person($name, $age;)
+    then   
+        System.out.println($name);
+end
+
+// 1
+rule "accInad"
+    when 
+        SavingsAccount(status == "inadequate")
+        $inv: Investment()
+    then
+        $inv.setStrategy("savings");
+        System.out.println("Investement strategy: Savings");
+end
+
+// 2
+rule "accAdIncAd"
+    when
+        SavingsAccount(status == "adequate")
+        Income(status == "adequate")
+        $inv: Investment()
+    then
+        $inv.setStrategy("stocks");
+        System.out.println("Investement strategy: Stocks");
+end
+
+// 3
+rule "accAdIncInad"
+    when
+        SavingsAccount(status == "adequate")
+        Income(status == "inadequate")
+        $inv: Investment()
+    then
+        $inv.setStrategy("combination");
+        System.out.println("Investement strategy: Combination");
+end
+
+// 4
+rule "savingsAd"
+    when
+        // Dependents( $n: number )
+        $dep: Dependents()
+        // AmountSaved( value > minSavings($n))
+        $sav : AmountSaved( $sav.getValue() > minSavings($dep.getNumber()))
+        $acc: SavingsAccount()
+    then
+        $acc.setStatus("adequate");
+        update($acc);
+        System.out.println("Savings adequate");
+end
+
+// 5
+rule "savingsInad"
+    when
+        Dependents( $n: number )
+        AmountSaved( value <= minSavings($n) )
+        $sa: SavingsAccount()
+    then
+        $sa.setStatus("inadequate");
+        update($sa);
+        System.out.println("Savings inadequate");
+end
+
+// 6
+rule "incomeAd"
+    when
+        Dependents( $n: number )
+        Earnings(status == "steady", amount > minIncome($n) )
+        $inc: Income()
+    then
+        $inc.setStatus("adequate");
+        update($inc);
+        System.out.println("Income adequate");
+end
+
+// 7
+rule "incomeInadESteady"
+    when
+		Dependents( $n: number )
+		Earnings( status == "steady", amount <= minIncome($n))
+        $inc: Income()
+    then
+        $inc.setStatus("inadequate");
+        update($inc);
+        System.out.println("Income inadequate (Earnings steady)");
+end
+
+// 8
+rule "incomeInadEUnsteady"
+    when
+		Earnings( status == "unsteady")
+        $inc: Income()
+    then
+        $inc.setStatus("inadequate");
+        update($inc);
+        System.out.println("Income inadequate (Earnings unsteady)");
+end
+
+
+
+rule "amoundSavedF"
+    when
+    then
+        AmountSaved as = new AmountSaved();
+        as.setValue(22000);
+        insert(as);
+        update(as);
+        System.out.println("Amount saved is 22000");
+end
+
+rule "earningsF"
+    when
+    then
+        Earnings e = new Earnings();
+        e.setAmount(25000);
+        e.setStatus("steady");
+        insert(e);
+        update(e);
+        System.out.println("Earnings are 25000, steady");
+end
+
+rule "dependentsF"
+    when
+    then
+        Dependents d = new Dependents();
+        d.setNumber(1);
+        insert(d);
+        update(d);
+        System.out.println("Dependents are 1");
+end
+
+// rule "Hello World"
+//     when
+//         m : Message( status == Message.HELLO, myMessage : message )
+//     then
+//         System.out.println( myMessage );
+//         m.setMessage( "Goodbye cruel world" );
+//         m.setStatus( Message.GOODBYE );
+//         update( m );
+// end
+
+// rule "GoodBye"
+//     when
+//         Message( status == Message.GOODBYE, myMessage : message )
+//     then
+//         System.out.println( myMessage );
+// end

@@ -39,7 +39,6 @@ library
       Rule34_SMT
       Rule34_SMT_gen
       Rule34_SMT_sandbox
-      Sandbox
       SandboxBuilder
   other-modules:
       Paths_rule34_haskell
@@ -50,11 +49,9 @@ library
     , base >=4.7 && <5
     , casing
     , containers
-    , diagrams-sandbox
     , fgl
     , generic-data
     , graphviz
-    , jt2-haskell-utils
     , mtl
     , optparse-generic
     , pretty-simple
@@ -78,11 +75,9 @@ executable rule34-org
     , base >=4.7 && <5
     , casing
     , containers
-    , diagrams-sandbox
     , fgl
     , generic-data
     , graphviz
-    , jt2-haskell-utils
     , mtl
     , optparse-generic
     , pretty-simple
@@ -107,11 +102,9 @@ executable rule34-png
     , base >=4.7 && <5
     , casing
     , containers
-    , diagrams-sandbox
     , fgl
     , generic-data
     , graphviz
-    , jt2-haskell-utils
     , mtl
     , optparse-generic
     , pretty-simple
@@ -136,11 +129,9 @@ executable rule34-svg
     , base >=4.7 && <5
     , casing
     , containers
-    , diagrams-sandbox
     , fgl
     , generic-data
     , graphviz
-    , jt2-haskell-utils
     , mtl
     , optparse-generic
     , pretty-simple
@@ -166,11 +157,9 @@ test-suite rule34-haskell-test
     , base >=4.7 && <5
     , casing
     , containers
-    , diagrams-sandbox
     , fgl
     , generic-data
     , graphviz
-    , jt2-haskell-utils
     , mtl
     , optparse-generic
     , pretty-simple

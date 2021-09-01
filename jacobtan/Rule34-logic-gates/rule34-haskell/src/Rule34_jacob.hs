@@ -6,7 +6,16 @@
 {-# LANGUAGE ViewPatterns #-}
 module Rule34_jacob where
 
-import JT2.Haskell.Utils ( foldl', (&), (<&>), (>>>), show', (!), void, execShell )
+import Data.Function ((&))
+import Data.Functor ((<&>))
+import Control.Arrow ((>>>))
+import Data.Foldable (foldl')
+import Data.Maybe (fromMaybe)
+import Control.Monad (void)
+import System.Process (readCreateProcessWithExitCode, shell)
+
+import qualified Data.Map.Internal
+import qualified Data.Map (lookup)
 import qualified Data.Map.Strict as Map
 import Data.Text (Text)
 import qualified Data.Text as Text
@@ -26,6 +35,26 @@ import Encoding ( GateType(..) )
 import Graphviz (preview, preview'custom, printDotGraph, defaultVis, checkDirectednessVis'custom)
 
 import Debug.Trace ( traceShow )
+
+execShell' :: String -> String -> IO ()
+execShell' command input = readCreateProcessWithExitCode
+  (shell command) input
+  >>= \(exitcode, stdout, stderr) -> do
+    putStrLn ("__exitcode: " ++ show exitcode)
+    putStrLn ("__stdout: " ++ show stdout)
+    putStrLn ("__stderr: " ++ show stderr)
+
+execShell :: String -> IO ()
+execShell command =  execShell' command ""
+
+show' :: Show a => a -> Text.Text
+show' = Text.pack . show
+(!) :: (Show k, Show a, Ord k) => Data.Map.Internal.Map k a -> k -> a
+(!) dict key = fromMaybe (error $ "*** Error *** dictionary lookup: key not found: " ++ show key) (Data.Map.lookup key dict)
+
+
+
+
 
 data ParaRef = PMustNot | PMay | PMustNotBulb | PMayBulb
   | P341 | P341a | P341b | P341c | P341d | P341e | P341f

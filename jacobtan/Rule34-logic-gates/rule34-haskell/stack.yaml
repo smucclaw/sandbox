@@ -31,8 +31,6 @@ resolver:
 #   - wai
 packages:
 - .
-# - ../../../jacobtan/jt2-haskell-utils
-- ../../../johsi/diagrams-sandbox
 
 # Dependency packages to be pulled from upstream that are not in the resolver.
 # These entries can reference officially published versions as well as
@@ -50,9 +48,6 @@ extra-deps:
   commit: d561043fed8abfd8333318af5882713b6da13c6b
   subdirs:
   - lib/haskell/anyall
-
-- github: 2jacobtan/jt2-haskell-utils
-  commit: 0fc35800d603a5802af7ad186ed93844273f9506
 
 - sbv-8.9@sha256:efb0f16c671869805e57d11e269793d5e5ae512e8e626582cf76b8e46a63e9c6,28985
 

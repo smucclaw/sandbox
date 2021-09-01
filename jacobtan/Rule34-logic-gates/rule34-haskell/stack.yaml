@@ -32,7 +32,6 @@ resolver:
 packages:
 - .
 # - ../../../jacobtan/jt2-haskell-utils
-- ../../../johsi/svg-builder-sandbox
 - ../../../johsi/diagrams-sandbox
 
 # Dependency packages to be pulled from upstream that are not in the resolver.
@@ -46,6 +45,12 @@ packages:
 #
 # extra-deps: []
 extra-deps:
+
+- github: smucclaw/dsl
+  commit: d561043fed8abfd8333318af5882713b6da13c6b
+  subdirs:
+  - lib/haskell/anyall
+
 - github: 2jacobtan/jt2-haskell-utils
   commit: 0fc35800d603a5802af7ad186ed93844273f9506
 

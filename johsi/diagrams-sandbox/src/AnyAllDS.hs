@@ -2,7 +2,7 @@
 {-# LANGUAGE NoMonomorphismRestriction #-}
 {-# LANGUAGE TypeFamilies #-}
 
-module AnyAll where
+module AnyAllDS where
 
 import Diagrams.Backend.SVG.CmdLine
 import Diagrams.Prelude hiding (Any, All)

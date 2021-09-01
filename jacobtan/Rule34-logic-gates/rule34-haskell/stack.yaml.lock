@@ -5,6 +5,19 @@
 
 packages:
 - completed:
+    size: 2937504
+    subdir: lib/haskell/anyall
+    url: https://github.com/smucclaw/dsl/archive/d561043fed8abfd8333318af5882713b6da13c6b.tar.gz
+    name: anyall
+    version: 0.1.0.0
+    sha256: 76ccbba346c91f8e14d4166f46a9f51f297c3239fe0dc64269f652c90c993b75
+    pantry-tree:
+      size: 727
+      sha256: 76c4074ecce1d8405536d010fc1d9f558e0384902b20954d72c0af930ca325d3
+  original:
+    subdir: lib/haskell/anyall
+    url: https://github.com/smucclaw/dsl/archive/d561043fed8abfd8333318af5882713b6da13c6b.tar.gz
+- completed:
     size: 4430
     url: https://github.com/2jacobtan/jt2-haskell-utils/archive/0fc35800d603a5802af7ad186ed93844273f9506.tar.gz
     name: jt2-haskell-utils

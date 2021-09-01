@@ -1,3 +1,20 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
-    "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg xmlns="http://www.w3.org/2000/svg" height="500.0" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.11.1"><image height="200" width="200" x="200" xlink:href="https://media.giphy.com/media/wrCicfORd8f7AFkrCs/giphy.gif" y="100"/><text fill="gray" font-family="sans-serif" x="200" y="300"><tspan dy="20" x="200" font-weight="bold">Looks like something went wrong!</tspan><tspan dy="20" x="200" font-weight="lighter">The top-level &#39;Any&#39; type should have at least a pre.</tspan></text></svg>
+diagrams-sandbox-0.1.0.0: unregistering (local file changes: .stack-work/dist/x86_64-osx/Cabal-3.2.1.0/build/autogen/Paths_diagrams_sandbox.hs)
+rule34-haskell-0.1.0.0: unregistering (missing dependencies: diagrams-sandbox)
+diagrams-sandbox> build (lib)
+diagrams-sandbox> Preprocessing library for diagrams-sandbox-0.1.0.0..
+diagrams-sandbox> Building library for diagrams-sandbox-0.1.0.0..
+diagrams-sandbox> copy/register
+diagrams-sandbox> Installing library in /Users/mengwong/src/smucclaw/sandbox/jacobtan/Rule34-logic-gates/rule34-haskell/.stack-work/install/x86_64-osx/c08869a2677201532143866aada0954752efebf3ec695c51f4ad01027a95706e/8.10.4/lib/x86_64-osx-ghc-8.10.4/diagrams-sandbox-0.1.0.0-HJwDCyLQWWf3k2IFCWZOVN
+diagrams-sandbox> Registering library for diagrams-sandbox-0.1.0.0..
+rule34-haskell  > build (lib + exe)
+Preprocessing library for rule34-haskell-0.1.0.0..
+Building library for rule34-haskell-0.1.0.0..
+Preprocessing executable 'rule34-svg' for rule34-haskell-0.1.0.0..
+Building executable 'rule34-svg' for rule34-haskell-0.1.0.0..
+rule34-haskell  > copy/register
+Installing library in /Users/mengwong/src/smucclaw/sandbox/jacobtan/Rule34-logic-gates/rule34-haskell/.stack-work/install/x86_64-osx/c08869a2677201532143866aada0954752efebf3ec695c51f4ad01027a95706e/8.10.4/lib/x86_64-osx-ghc-8.10.4/rule34-haskell-0.1.0.0-HoDDnl1RshoDNiZaWcklI
+Installing executable rule34-png in /Users/mengwong/src/smucclaw/sandbox/jacobtan/Rule34-logic-gates/rule34-haskell/.stack-work/install/x86_64-osx/c08869a2677201532143866aada0954752efebf3ec695c51f4ad01027a95706e/8.10.4/bin
+Installing executable rule34-org in /Users/mengwong/src/smucclaw/sandbox/jacobtan/Rule34-logic-gates/rule34-haskell/.stack-work/install/x86_64-osx/c08869a2677201532143866aada0954752efebf3ec695c51f4ad01027a95706e/8.10.4/bin
+Installing executable rule34-svg in /Users/mengwong/src/smucclaw/sandbox/jacobtan/Rule34-logic-gates/rule34-haskell/.stack-work/install/x86_64-osx/c08869a2677201532143866aada0954752efebf3ec695c51f4ad01027a95706e/8.10.4/bin
+Registering library for rule34-haskell-0.1.0.0..
+Completed 2 action(s).

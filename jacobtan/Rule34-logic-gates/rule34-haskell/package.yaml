@@ -35,9 +35,9 @@ dependencies:
 - mtl
 - process
 - svg-builder
-- svg-builder-sandbox
 - diagrams-sandbox
 - optparse-generic
+- anyall
 
 library:
   source-dirs: src

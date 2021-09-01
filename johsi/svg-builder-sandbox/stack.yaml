@@ -31,7 +31,6 @@ resolver:
 #   - wai
 packages:
 - .
-- ../../../IHaskell
 
 # Dependency packages to be pulled from upstream that are not in the resolver.
 # These entries can reference officially published versions as well as
@@ -44,6 +43,8 @@ packages:
 #
 extra-deps:
 - svg-builder-0.1.1
+# - github: gibiansky/IHaskell
+#   commit: refs/tags/GHC7
 
 # Override default flag values for local packages and extra-deps
 # flags: {}

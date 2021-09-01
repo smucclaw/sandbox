@@ -2,7 +2,7 @@
 {-# LANGUAGE FlexibleInstances #-}
 module Sandbox where
 
-import qualified "diagrams-sandbox" AnyAll as AA (Label, Item(Leaf,Any,All))
+import qualified "diagrams-sandbox" AnyAllDS as AA (Label, Item(Leaf,Any,All))
 import Data.Tree (Tree(Node))
 import Rule34
     ( NLG,

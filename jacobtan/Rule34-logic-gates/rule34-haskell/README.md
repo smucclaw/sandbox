@@ -72,6 +72,13 @@ and
 
 This code will live in `smucclaw/dsl/caseStudies/LPAPCR34` under the stack project already created there. Don't worry about the science-fictional L4 code present in the README.org ... we will merge those strands of activity eventually.
 
+### rule34-svg
+
+Usage:
+
+	┌─[mengwong@rosegold] - [~/src/smucclaw/sandbox/jacobtan/Rule34-logic-gates/rule34-haskell] - [2021-09-01 03:13:56]
+	└─[0] <git:(anyall-refactor c122d97✈) > stack run rule34-svg > rule34_1.svg 2> rule34_1_err.svg
+
 ## pdpa
 
 PDPA is another "consumer" application that imports MyRule and AnyAll. Its application-specific business logic is produced by an interpretor toolchain that starts out with magic like

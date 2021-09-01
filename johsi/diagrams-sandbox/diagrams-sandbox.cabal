@@ -1,10 +1,10 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.33.0.
+-- This file has been generated from package.yaml by hpack version 0.34.4.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: efaf0d06c67444d457c5d48e750ad939cf21bb8504cee2d2e0659423922a8fe5
+-- hash: c62c779354baa0434fbde82913f41f9d370fef7205bfa77aeff86381797803d5
 
 name:           diagrams-sandbox
 version:        0.1.0.0
@@ -26,7 +26,7 @@ source-repository head
 
 library
   exposed-modules:
-      AnyAll
+      AnyAllDS
       FilterFlow
       Lib
       Prototype

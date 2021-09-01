@@ -21,7 +21,7 @@ type MyState a = { label   :: String
                  , value   :: Default a
                  , options :: Array a }
 
-type Tokens a = Hooks.ComponentTokens () () (Default a)
+type Tokens a = forall q. Hooks.ComponentTokens q () (Default a)
 
 component :: forall q m a. Show a => H.Component q (Default a) (Default a) m
 component = Hooks.component \(tokens :: Tokens a) input -> Hooks.do

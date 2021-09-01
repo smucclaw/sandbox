@@ -72,7 +72,7 @@ parent =
   handleAction = case _ of
     HandleMessage msg -> case msg of
       Defaultable.Default x -> case x.label of
-        "age" -> do H.modify_ \state -> state.age = x.value
+        "age" -> do H.modify_ \state -> state { age = x.value }
         _     -> do H.modify_ \state -> state
 
     -- We handle one action, `HandleButton`, which itself handles the output messages

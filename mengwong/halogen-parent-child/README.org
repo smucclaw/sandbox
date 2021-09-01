@@ -96,5 +96,9 @@ evaluating an and/or tree, we implement short-circuiting logic:
 - if any element of an AND list is false, then we short-circuit
 
 
+* Let's use Halogen Store
+
+https://github.com/thomashoneyman/purescript-halogen-store
+
 
 

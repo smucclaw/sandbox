@@ -18,6 +18,7 @@ to generate this file without the comments in this block.
   , "either"
   , "halogen"
   , "halogen-hooks"
+  , "halogen-store"
   , "maybe"
   , "prelude"
   , "psci-support"

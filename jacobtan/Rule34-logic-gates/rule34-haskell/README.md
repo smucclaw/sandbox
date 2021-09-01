@@ -26,11 +26,9 @@ AnyAll is a library that constructs AnyAll objects. These objects know how to "e
 
 The capability for that started life in SandboxBuilder but should move into the AnyAll library.
 
-The code that knows how to convert an AnyAll into an SVG and PNG currently lives in svg-builder-sandbox.
+The code that knows how to convert an AnyAll into an SVG and PNG currently lives in `smucclaw/dsl/lib/haskell/anyall`
 
-After refactoring, this becomes another hackage library.
-
-In Github, this code lives in `smucclaw/dsl/lib/haskell/anyall`
+After refactoring, this will become another hackage library, perhaps conservativelly named under `smucclaw` rather than hackage toplevel.
 
 ## connecting anyall to myrule
 

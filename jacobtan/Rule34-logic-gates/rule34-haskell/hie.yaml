@@ -18,14 +18,3 @@ cradle:
     # - path: "../../../johsi/diagrams-sandbox/test"
     #   component: "diagrams-sandbox:test:diagrams-sandbox-test"
 
-    - path: "../../../johsi/svg-builder-sandbox/src"
-      component: "svg-builder-sandbox:lib"
-
-    # - path: "../../../johsi/svg-builder-sandbox/app/Main.hs"
-    #   component: "svg-builder-sandbox:exe:svg-builder-sandbox-exe"
-
-    # - path: "../../../johsi/svg-builder-sandbox/app/Paths_svg_builder_sandbox.hs"
-    #   component: "svg-builder-sandbox:exe:svg-builder-sandbox-exe"
-
-    # - path: "../../../johsi/svg-builder-sandbox/test"
-    #   component: "svg-builder-sandbox:test:svg-builder-sandbox-test"

@@ -1,0 +1,104 @@
+* Setup Log
+
+I created a new Halogen app by running:
+
+#+begin_example
+  mkdir halogen-parent-child
+  cd halogen-parent-child
+  spago init
+  spago install halogen maybe halogen-hooks tuples
+#+end_example
+
+I copy-pasted the Full Example out of [[https://purescript-halogen.github.io/purescript-halogen/guide/05-Parent-Child-Components.html][the Halogen Guide 2.5]] into ~src/Main.purs~
+
+(I tweaked the ~H.requestAll~ line to read ~HQ.requestAll~ and imported ~Halogen.Query~ as HQ. I shouldn't have had to do this, but I did.)
+
+#+begin_example
+  spago build
+  spago bundle-app --to ./dist/app.js
+#+end_example
+
+I made a simple ~index.html~ wrapper to run the app:
+
+#+begin_src html
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <meta charset="UTF-8">
+      <title>Halogen6 Template</title>
+    </head>
+    <body>
+      <script src="app.js"></script>
+    </body>
+  </html>
+#+end_src
+
+I refactored the Full Example into Main, Form, and Button.
+
+I experimented with Halogen-Hooks to add an increment/decrement component called Counter.
+
+
+* Next Steps
+
+a Logic module knows how to decide if some components should be turned on or off depending on other components.
+
+* Logic
+
+How do we decide if a given component is displayed?
+
+Each component carries an array of zero or more dependency predicates.
+
+Each dependency predicate evaluates part of the world and returns a boolean.
+
+That part of the world may involve zero or more other components.
+
+By default, if a prerequisite is
+
+| Individual Prerequisite | Prerequisite Predicate | Result           |
+|-------------------------+------------------------+------------------|
+| Left Nothing            | show                   | Left true        |
+| Left Just               | test                   | Left testresult  |
+| Right Nothing           | test                   | Right testresult |
+| Right Just              | test                   | Right testresult |
+
+So the test function needs to take a ~Maybe a~ and return ~Boolean~.
+
+If the part of the world involves more than one predicate, we use this truth table, which represents a form of ternary logic
+
+| list                  | test                                   | result        |
+|-----------------------+----------------------------------------+---------------|
+| conjunction (AND/ALL) | any element is Right false             | Right false   |
+| conjunction (AND/ALL) | every element is Right true            | Right true    |
+| conjunction (AND/ALL) | every element is Right true or Nothing | Right nothing |
+| conjunction (AND/ALL) | every element is Left true             | Left true     |
+| conjunction (AND/ALL) | some element is Left Nothing           | Left Nothing  |
+| conjunction (AND/ALL) | every element is Left false            | Left false    |
+|-----------------------+----------------------------------------+---------------|
+| disjunction ( OR/ANY) | any element is Right true              | Right true    |
+
+* Test Case 1
+
+Suppose we have a very simple bit of logic:
+
+- *Choose Age*
+  - /if/ Age > 21 /then/ *Choose Height*
+- *Choose Race*
+  - /if/ race = dwarf /then/ *Choose Dwarf Sub-Race*
+  - /if/ race = elf /then/ *Choose Elf Sub-Race*
+
+Hm, maybe we need to implement a Rete kind of thing
+
+* Test Case 2
+
+evaluating an and/or tree, we implement short-circuiting logic:
+
+- if any element of an OR list is true, then we short-circuit
+- if any element of an AND list is false, then we short-circuit
+
+
+* Let's use Halogen Store
+
+https://github.com/thomashoneyman/purescript-halogen-store
+
+
+

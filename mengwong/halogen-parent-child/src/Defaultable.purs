@@ -11,10 +11,10 @@ import Data.Maybe
 import Data.Either
 
 -- as the user fills in a form, they encounter this progression:
--- 1. we start them out with a default value, but their input has not been received: Left (Just "blue")
--- 2. or maybe there is no default colour; we don't want to be sexist.               Left Nothing
--- 3. they aver actively that they do not have a favourite colour:                   Right Nothing
--- 4. they aver actively that their favourite colour is pink:                        Right (Just "pink")
+-- 1. their input has not been received, so we start them out with a default value:   Left (Just "blue")
+-- 2. or maybe there is no default colour; we don't want to be leading.               Left Nothing
+-- 3. they come along and aver actively that they do not have a favourite colour:    Right Nothing
+-- 4. they come along and aver actively that their favourite colour is pink:         Right (Just "pink")
 type Default a = Either (Maybe a) (Maybe a)
 
 type MyState a = { label   :: String

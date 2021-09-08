@@ -90,6 +90,19 @@ end
 //         System.out.println($name);
 // end
 
+rule "badOr"
+    when
+        (or Dependents($x : number) Dependents($y:number))
+    then
+        insertLogical(new Dependents(number = $x + $y));
+end
+
+rule "badNot"
+    when
+        not (Dependents($x : number))
+    then
+        insertLogical(new Dependents($x));
+end
 // 1
 rule "accInad"
     when 
@@ -159,7 +172,8 @@ end
 rule "incomeAd"
     when
         Dependents( $n: number )
-        Earnings(status == "steady", amount > minIncome($n) )
+        Earnings(status == "steady", $amt: amount)
+        eval($amt > minIncome($n))
         // $inc: Income()
     then
         // $inc.setStatus("adequate");

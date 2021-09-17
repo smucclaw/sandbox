@@ -7,8 +7,9 @@ Translating a set of L4 rules into the corresponding ASP program:
 Given a set of L4 rules that satisfies the condtions above, we have to write the sets of ASP rules for our expert system ASP program.
 
 We assume a genric L4 rule has the fillowing form:
+```javascript
 pre_con_1(V1),pre_con_2(V2)...,pre_con_n(Vn) -> post_con(V).
-
+```
 Here V1,V2,...,Vn denote the set of variables present in each of the atomic preconditions. V is the set of variables in the post-condition. In accordance with the syntactic restrictions above the union of V1, V2,...,Vn  must equal V. 
 
 Assume that this rule has rule id n.
@@ -22,6 +23,8 @@ according_to(n,post_con(V)):-legally_holds(pre_con(V1)),...,legally_holds(pre_co
 
 After doing this for each rule we add some ASP rules to encode defeasibility:
 
+```javascript
+
 defeated(R2,C2):-overrides(R1,R2),according_to(R2,C2),legally_enforces(R1,C1),opposes(C1,C2).
 
 
@@ -32,16 +35,17 @@ legally_enforces(R,C):-according_to(R,C),not defeated(R,C).
 legally_holds(C):-legally_enforces(R,C).
 
 :-opposes(C1,C2),legally_holds(C1),legally_holds(C2).
-
+```
 Next we add overrides and opposes facts according to which rule overrides which rule and which sets of atoms are opposites of each other.
 
 Generating Abducibles.
 
 Given as before, the generic L4 rule:
+```javascript
 pre_con_1(V1),pre_con_2(V2)...,pre_con_n(Vn) -> post_con(V).
-
+```
 We add the following set of ASP rules to our ASP program:
-
+```javascript
 explains(pre_con(V1),post_con(V),N+1):-query(post_con(V),N).
 explains(pre_con(V2),post_con(V),N+1):-query(post_con(V),N).
                           .
@@ -50,10 +54,10 @@ explains(pre_con(V2),post_con(V),N+1):-query(post_con(V),N).
                           
 explains(pre_con(Vn),post_con(V),N+1):-query(post_con(V),N).
 
-
+```
 
 Next we add the following ASP rules:
-
+```javascript
 query(X,N):-explains(X,Y,N),q_level(N).
 q_level(N+1):-query(X,N).
 
@@ -81,7 +85,7 @@ legally_holds(X):-user_input(pos,X).
 :-user_input(neg,X),legally_holds(X).
 
 :~choose(X,M).[1@M,X,M]
-
+```
 
 
 

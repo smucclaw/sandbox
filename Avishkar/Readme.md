@@ -15,7 +15,10 @@ Assume that this rule has rule id n.
 
 Then we write the following ASP rule.
 
+```javascript
+
 according_to(n,post_con(V)):-legally_holds(pre_con(V1)),...,legally_holds(pre_con(Vn)).
+```
 
 After doing this for each rule we add some ASP rules to encode defeasibility:
 

@@ -59,6 +59,9 @@ For each L4 rule we add the corresponding set of ASP rules as above.
 
 Next we add the following ASP rules:
 ```javascript
+query(C,0):-generate_q(C).
+query(C1,0):-generate_q(C),opposes(C,C1).
+
 query(X,N):-explains(X,Y,N),q_level(N).
 q_level(N+1):-query(X,N).
 
@@ -133,7 +136,9 @@ graph_level(0..N):-max_graph_level(N).
 justify(X,0):-gen_graph(X).
 ```
 
+What we have described so far covers most aspects of a general translation from L4 to ASP. Further additions to the ASP program are more specific to the scenario and the particular set of L4 rules in question.
 
+We will now describe the entire ASP encoding of a small section of the PDPA, explaining what each section of the ASP encoding does in greater detail. We will condider a section of the PDPA act (and not the associated regulations).
 
 
 

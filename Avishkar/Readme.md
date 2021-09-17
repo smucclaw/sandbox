@@ -20,9 +20,14 @@ according_to(n,post_con(V)):-legally_holds(pre_con(V1)),...,legally_holds(pre_co
 After doing this for each rule we add some ASP rules to encode defeasibility:
 
 defeated(R2,C2):-overrides(R1,R2),according_to(R2,C2),legally_enforces(R1,C1),opposes(C1,C2).
+
+
 opposes(C1,C2):-opposes(C2,C1).
+
 legally_enforces(R,C):-according_to(R,C),not defeated(R,C).
+
 legally_holds(C):-legally_enforces(R,C).
+
 :-opposes(C1,C2),legally_holds(C1),legally_holds(C2).
 
 Next we add overrides and opposes facts according to which rule overrides which rule and which sets of atoms are opposites of each other.

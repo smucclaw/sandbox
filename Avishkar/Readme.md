@@ -173,7 +173,71 @@ The next two lines of ASP code are relevant to the defeasible aspect of this par
 overrides(30,27).
 opposes(is_notifiable_data_breach(E,T),not_is_notifiable_data_breach(E,T)):-data_event(E,T).
 ```
+The following 3 lines of triggers the generation of abducibles for the generation and of appropriate questions
+```javascript
+generate_q(is_notifiable_data_breach(E,T)):-data_event(E,T).
+query(C,0):-generate_q(C).
+query(C1,0):-generate_q(C),opposes(C,C1).
+```
+The following two integrity constraints are used as 'goals' in order to facilitate question optimization process.
+
+'''javascript
+%Strong Constraint-data breach notifiable
+
+:-data_event(E,T),not legally_holds(is_notifiable_data_breach(E,T)),const(N),not opp_const(N+1).
+
+%Strong Constraint-data breach NOT notifiable
+:-data_event(E,T), legally_holds(is_notifiable_data_breach(E,T)),opp_const(N),not const(N+1).
+```
+
+Next we have the ASP rules derived from the encoding of the main legal rules, that help generate the questions as abducibles
+
+```javascript
+explains(unauthorised_access(E,T),occurs_data_breach(E,T),N+1):-query(occurs_data_breach(E,T),N).
+explains(unauthorised_collection(E,T),occurs_data_breach(E,T),N+1):-query(occurs_data_breach(E,T),N).
+
+explains(cause_significant_harm(E,T),is_notifiable_data_breach(E,T),N+1):-query(is_notifiable_data_breach(E,T),N).
+explains(occurs_data_breach(E,T),is_notifiable_data_breach(E,T),N+1):-query(is_notifiable_data_breach(E,T),N).
+explains(has_significant_scale(E,T),is_notifiable_data_breach(E,T),N+1):-query(is_notifiable_data_breach(E,T),N).
+
+explains(is_personal_data(E,T),cause_significant_harm(E,T),N+1):-query(cause_significant_harm(E,T),N).
 
 
+explains(affects_many_individuals(E,T),has_significant_scale(E,T),N+1):-query(has_significant_scale(E,T),N).
+
+explains(data_breach_within_organisation(E,T),not_is_notifiable_data_breach(E,T),N+1):-query(not_is_notifiable_data_breach(E,T),N).
+```
+The next part of the program is again part of the question generation and optimization process
+
+```javascript
+query(X,N):-explains(X,Y,N),q_level(N).
+q_level(N+1):-query(X,N).
+
+
+
+not_leaf(X):-explains(X,Y,N),explains(Z,X,N+1).
+abducible(leaf,X,N):-explains(X,Y,N),not not_leaf(X).
+abducible(nleaf,X,N):-explains(X,Y,N),not_leaf(X).
+
+
+
+ask(X,N):-abducible(leaf,X,N).
+ask(X,N):-abducible(nleaf,X,N),N>M,min_q_level(M).
+
+
+max_q_level(N):-not q_level(N+1),q_level(N),N>0.
+
+
+% Integrate with main program
+
+{choose(X,N-M)}:-ask(X,M),max_q_level(N).
+legally_holds(X):-choose(X,K).
+ask_user(X):-choose(X,M).
+legally_holds(X):-user_input(pos,X).
+:-user_input(neg,X),legally_holds(X).
+
+:~choose(X,M).[1@M,X,M]
+
+```
 
 

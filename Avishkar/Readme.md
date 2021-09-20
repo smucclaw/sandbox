@@ -140,6 +140,39 @@ What we have described so far covers most aspects of a general translation from 
 
 We will now describe the entire ASP encoding of a small section of the PDPA, explaining what each section of the ASP encoding does in greater detail. We will condider a section of the PDPA act (and not the associated regulations).
 
+We first begin with the core rules in the PDPA. These are encoded using the general schema given above
+```javascript
+%Definition of data breach 26A(a). In general a data breach is represented as a pair (E,T), where E is the 'name' of the data breach and T is the time at which it occured.
+according_to(26,occurs_data_breach(E,T)):-legally_holds(unauthorised_access(E,T)).
+according_to(26,occurs_data_breach(E,T)):-legally_holds(unauthorised_collection(E,T)).
+
+
+% When is a data breach notifiable? 26B(1)
+according_to(27,is_notifiable_data_breach(E,T)):-legally_holds(cause_significant_harm(E,T)),legally_holds(occurs_data_breach(E,T)).
+according_to(27,is_notifiable_data_breach(E,T)):-legally_holds(has_significant_scale(E,T)), legally_holds(occurs_data_breach(E,T)).
+
+% Definitions of significant harm and significant scale 26B (2,3)
+according_to(28,cause_significant_harm(E,T)):-legally_holds(is_personal_data(E,T)).
+according_to(29,has_significant_scale(E,T)):-legally_holds(affects_many_individuals(E,T)).
+
+% Exception for notification requirement 26B (4)
+according_to(30,not_is_notifiable_data_breach(E,T)):-legally_holds(data_breach_within_organisation(E,T)).
+```
+Next there are meta-rules including the rules that encode defeasibility
+```javascript
+% Meta-rules and facts
+
+defeated(R2,C2):-overrides(R1,R2),according_to(R2,C2),legally_enforces(R1,C1),opposes(C1,C2).
+opposes(C1,C2):-opposes(C2,C1).
+legally_enforces(R,C):-according_to(R,C),not defeated(R,C).
+legally_holds(C):-legally_enforces(R,C).
+:-opposes(C1,C2),legally_holds(C1),legally_holds(C2).
+```
+The next two lines of ASP code are relevant to the defeasible aspect of this particular rule set. Namely that rule 30 overrides rule 27 and it is not possible for a data-breach to be both notifiable and not notifiable.
+```javascript
+overrides(30,27).
+opposes(is_notifiable_data_breach(E,T),not_is_notifiable_data_breach(E,T)):-data_event(E,T).
+```
 
 
 

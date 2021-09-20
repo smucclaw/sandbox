@@ -181,7 +181,7 @@ query(C1,0):-generate_q(C),opposes(C,C1).
 ```
 The following two integrity constraints are used as 'goals' in order to facilitate question optimization process.
 
-'''javascript
+```javascript
 %Strong Constraint-data breach notifiable
 
 :-data_event(E,T),not legally_holds(is_notifiable_data_breach(E,T)),const(N),not opp_const(N+1).

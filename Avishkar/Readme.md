@@ -239,5 +239,52 @@ legally_holds(X):-user_input(pos,X).
 :~choose(X,M).[1@M,X,M]
 
 ```
+The next part of the program is for generating the justification graph
 
+```javascript
+% Generate justification graph
+caused_by(pos,legally_holds(unauthorised_access(E,T)),according_to(26,occurs_data_breach(E,T)),N+1):-according_to(26,occurs_data_breach(E,T)),legally_holds(unauthorised_access(E,T)),justify(according_to(26,occurs_data_breach(E,T)),N).
+caused_by(pos,legally_holds(unauthorised_collection(E,T)),according_to(26,occurs_data_breach(E,T)),N+1):-according_to(26,occurs_data_breach(E,T)),legally_holds(unauthorised_collection(E,T)),justify(according_to(26,occurs_data_breach(E,T)),N).
+
+caused_by(pos,legally_holds(cause_significant_harm(E,T)),according_to(27,is_notifiable_data_breach(E,T)),N+1):-according_to(27,is_notifiable_data_breach(E,T)),legally_holds(cause_significant_harm(E,T)), legally_holds(occurs_data_breach(E,T)),justify(according_to(27,is_notifiable_data_breach(E,T)),N).
+caused_by(pos,legally_holds(occurs_data_breach(E,T)),according_to(27,is_notifiable_data_breach(E,T)),N+1):-according_to(27,is_notifiable_data_breach(E,T)),legally_holds(cause_significant_harm(E,T)), legally_holds(occurs_data_breach(E,T)),justify(according_to(27,is_notifiable_data_breach(E,T)),N).
+
+
+caused_by(pos,legally_holds(has_significant_scale(E,T)),according_to(27,is_notifiable_data_breach(E,T)),N+1):-according_to(27,is_notifiable_data_breach(E,T)),legally_holds(has_significant_scale(E,T)), legally_holds(occurs_data_breach(E,T)),justify(according_to(27,is_notifiable_data_breach(E,T)),N).
+caused_by(pos,legally_holds(occurs_data_breach(E,T)),according_to(27,is_notifiable_data_breach(E,T)),N+1):-according_to(27,is_notifiable_data_breach(E,T)),legally_holds(has_significant_scale(E,T)), legally_holds(occurs_data_breach(E,T)),justify(according_to(27,is_notifiable_data_breach(E,T)),N).
+
+
+caused_by(pos,legally_holds(is_personal_data(E,T)),according_to(28,cause_significant_harm(E,T)),N+1):-according_to(28,cause_significant_harm(E,T)),legally_holds(is_personal_data(E,T)),justify(according_to(28,cause_significant_harm(E,T)),N).
+
+caused_by(pos,legally_holds(affects_many_individuals(E,T)),according_to(29,has_significant_scale(E,T)),N+1):-according_to(29,has_significant_scale(E,T)),legally_holds(affects_many_individuals(E,T)),justify(according_to(29,has_significant_scalem(E,T)),N).
+
+
+caused_by(pos,legally_holds(data_breach_within_organisation(E,T)),according_to(30,not_is_notifiable_data_breach(E,T)),N+1):-according_to(30,not_is_notifiable_data_breach(E,T)),legally_holds(data_breach_within_organisation(E,T)),justify(according_to(30,not_is_notifiable_data_breach(E,T)),N).
+
+caused_by(pos,overrides(R1,R2),defeated(R2,C2),N+1):-defeated(R2,C2),overrides(R1,R2),according_to(R2,C2),legally_enforces(R1,C1),opposes(C1,C2),justify(defeated(R2,C2),N).
+caused_by(pos,according_to(R2,C2),defeated(R2,C2),N+1):-defeated(R2,C2),overrides(R1,R2),according_to(R2,C2),legally_enforces(R1,C1),opposes(C1,C2),justify(defeated(R2,C2),N).
+caused_by(pos,legally_enforces(R1,C1),defeated(R2,C2),N+1):-defeated(R2,C2),overrides(R1,R2),according_to(R2,C2),legally_enforces(R1,C1),opposes(C1,C2),justify(defeated(R2,C2),N).
+caused_by(pos,opposes(C1,C2),defeated(R2,C2),N+1):-defeated(R2,C2),overrides(R1,R2),according_to(R2,C2),legally_enforces(R1,C1),opposes(C1,C2),justify(defeated(R2,C2),N).
+
+
+caused_by(pos,according_to(R,C),legally_enforces(R,C),N+1):-legally_enforces(R,C),according_to(R,C),not defeated(R,C),justify(legally_enforces(R,C),N).
+caused_by(neg,defeated(R,C),legally_enforces(R,C),N+1):-legally_enforces(R,C),according_to(R,C),not defeated(R,C),justify(legally_enforces(R,C),N).
+
+
+caused_by(pos,legally_enforces(R,C),legally_holds(C),N+1):-legally_holds(C),legally_enforces(R,C),not user_input(pos,C), justify(legally_holds(C),N).
+
+caused_by(pos,user_input(pos,C),legally_holds(C),N+1):-legally_holds(C), user_input(pos,C), justify(legally_holds(C),N).
+
+justify(X,N):-caused_by(pos,X,Y,N),graph_level(N+1), not user_input(pos,X).
+directedEdge(Sgn,X,Y):-caused_by(Sgn,X,Y,M).
+
+graph_level(0..N):-max_graph_level(N).
+
+justify(X,0):-gen_graph(X).
+
+
+
+#show ask_user/1.
+#show directedEdge/3.
+```
 

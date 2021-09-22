@@ -58,10 +58,10 @@ query(C1,0):-generate_q(C),opposes(C,C1).
 
 %Strong Constraint-data breach notifiable
 
-:-data_event(E,T),not legally_holds(is_notifiable_data_breach(E,T)),const(N),not opp_const(N+1).
+:-generate_q(C),not legally_holds(C),const(N),not opp_const(N+1).
 
 %Strong Constraint-data breach NOT notifiable
-:-data_event(E,T), legally_holds(is_notifiable_data_breach(E,T)),opp_const(N),not const(N+1).
+:-generate_q(C), legally_holds(C),opp_const(N),not const(N+1).
 
 
 

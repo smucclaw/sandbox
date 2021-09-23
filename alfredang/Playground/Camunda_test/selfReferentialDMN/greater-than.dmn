@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" xmlns:camunda="http://camunda.org/schema/1.0/dmn" id="Definitions_1djfjp2" name="DRD" namespace="http://camunda.org/schema/1.0/dmn" exporter="Camunda Modeler" exporterVersion="4.9.0">
+  <decision id="greater-than" name="Greater than">
+    <decisionTable id="DecisionTable_0d3kbbb">
+      <input id="Input_1" label="x &#62; y" camunda:inputVariable="teletubby">
+        <inputExpression id="InputExpression_1" typeRef="string">
+          <text>x &gt; y</text>
+        </inputExpression>
+      </input>
+      <input id="InputClause_0dpm7er" label="negate teletubby">
+        <inputExpression id="LiteralExpression_13xl3fv" typeRef="boolean">
+          <text>teletubby = "true"</text>
+        </inputExpression>
+      </input>
+      <output id="Output_1" label="Return String" name="xGTy" typeRef="string" />
+      <rule id="DecisionRule_0cjbjx3">
+        <inputEntry id="UnaryTests_1g6w20i">
+          <text>"true"</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0pmtlrg">
+          <text>true</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_11e9yf8">
+          <text>"X greater than y"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1suwlts">
+        <inputEntry id="UnaryTests_0b9zttb">
+          <text>"false"</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0305ikt">
+          <text>false</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_00rh97z">
+          <text>"X not greater than y"</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <dmndi:DMNDI>
+    <dmndi:DMNDiagram>
+      <dmndi:DMNShape dmnElementRef="greater-than">
+        <dc:Bounds height="80" width="180" x="160" y="100" />
+      </dmndi:DMNShape>
+    </dmndi:DMNDiagram>
+  </dmndi:DMNDI>
+</definitions>

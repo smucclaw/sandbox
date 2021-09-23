@@ -1,0 +1,270 @@
+package com.sample.rules
+
+// declare enum FinancialStatus
+//     ADEQUATE("adequate"),
+//     INADEQUATE("inadequate");
+// end
+
+// declare enum EarningsStatus
+//     STEADY("steady"),
+//     UNSTEADY("unsteady");
+// end
+
+// declare enum InvestmentStrategy
+//     SAVINGS("savings"),
+//     COMBINATION("combination"),
+//     STOCKS("stocks");
+// end
+
+// declare Person
+//     name: String 
+//     age: Integer 
+// end
+
+// vs
+// declare Person
+//     name: String 
+//     age: Integer 
+//     earnings: Earnings
+//     amountSaved: SavingsAmount
+//     dependents: Dependents
+// end
+
+
+// Derivables
+function Integer minIncome(Integer numDeps) {
+    return (15000 + (4000 * numDeps));
+}
+
+function Integer minSavings(Integer numDeps) {
+    return (5000 * numDeps);
+}
+
+// Intermediate Predicates (Nodes)
+declare Investment
+    strategy: String @position(0)
+end
+
+declare SavingsAccount 
+    status: String @position(0)
+end
+
+declare Income
+    status: String  @position(0)
+end
+
+
+// Facts (Leaves)
+declare Earnings
+    amount: Integer @position(0)
+    status: String @position(1)
+end
+
+declare AmountSaved
+    value: Integer @position(0)
+end
+
+declare Dependents
+    number: Integer @position(0)
+end
+
+
+
+
+// rule "initInterPreds"
+//     when
+//     then
+        // insert(new Person());
+        // insert(new Investment());
+        // insert(new SavingsAccount());
+        // insert(new Income());
+        // insert(new Dependents(3));
+        // insert(new Dependents(2));
+// end		
+
+// How to have Positional arguments in Drools
+// rule "findPerson"
+//     when
+//         Person($name, $age;)
+//     then   
+//         System.out.println($name);
+// end
+
+rule "badOr"
+    when
+        (or Dependents($x : number) Dependents($y:number))
+    then
+        insertLogical(new Dependents(number = $x + $y));
+end
+
+rule "badNot"
+    when
+        not (Dependents($x : number))
+    then
+        insertLogical(new Dependents($x));
+end
+// 1
+rule "accInad"
+    when 
+        //Person($name; $e: Earnings())
+        SavingsAccount(status == "inadequate")
+        // $inv: Investment()
+    then
+        // $inv.setStrategy("savings");
+        insertLogical(new Investment("savings"));
+        System.out.println("Investement strategy: Savings");
+end
+
+// 2
+rule "accAdIncAd"
+    when
+        SavingsAccount(status == "adequate")
+        Income(status == "adequate")
+        // $inv: Investment()
+    then
+        // $inv.setStrategy("stocks");
+        insertLogical(new Investment("stocks"));
+        System.out.println("Investement strategy: Stocks");
+end
+
+// 3
+rule "accAdIncInad"
+    when
+        SavingsAccount(status == "adequate")
+        Income(status == "inadequate")
+        // $inv: Investment()
+    then
+        // $inv.setStrategy("combination");
+        insertLogical(new Investment("combination"));
+        System.out.println("Investement strategy: Combination");
+end
+
+// 4
+rule "savingsAd"
+    when
+        // Dependents( $n: number )
+        $dep: Dependents()
+        // AmountSaved( value > minSavings($n))
+        $sav : AmountSaved()
+        eval($sav.getValue() > minSavings($dep.getNumber()))
+        // $acc: SavingsAccount()
+    then
+        // $acc.setStatus("adequate");
+        // update($acc);
+        insertLogical(new SavingsAccount("adequate"));
+        System.out.println("Savings adequate");
+end
+
+// 5
+rule "savingsInad"
+    when
+        Dependents( $n: number )
+        AmountSaved( value <= minSavings($n) )
+        // $sa: SavingsAccount()
+    then
+        // $sa.setStatus("inadequate");
+        // update($sa);
+        insertLogical(new SavingsAccount("inadequate"));
+        System.out.println("Savings inadequate");
+end
+
+// 6
+rule "incomeAd"
+    when
+        Dependents( $n: number )
+        Earnings(status == "steady", $amt: amount)
+        eval($amt > minIncome($n))
+        // $inc: Income()
+    then
+        // $inc.setStatus("adequate");
+        // update($inc);
+        insertLogical(new Income("adequate"));
+        System.out.println("Income adequate");
+end
+
+// 7
+rule "incomeInadESteady"
+    when
+		Dependents( $n: number )
+		Earnings( status == "steady", amount <= minIncome($n))
+        // $inc: Income()
+    then
+        // $inc.setStatus("inadequate");
+        // update($inc);
+        insertLogical(new Income("inadequate"));
+        System.out.println("Income inadequate (Earnings steady)");
+end
+
+// 8
+rule "incomeInadEUnsteady"
+    when
+		Earnings( status == "unsteady")
+        // $inc: Income()
+    then
+        // $inc.setStatus("inadequate");
+        // update($inc);
+        insertLogical(new Income("inadequate"));
+        System.out.println("Income inadequate (Earnings unsteady)");
+end
+
+
+
+rule "amoundSavedF"
+    when
+    then
+        // AmountSaved as = new AmountSaved();
+        // as.setValue(22000);
+        // insert(as);
+        // update(as);
+        insertLogical(new AmountSaved(22000));
+        System.out.println("Amount saved is 22000");
+end
+
+rule "earningsF"
+    when
+    then
+        // Earnings e = new Earnings();
+        // e.setAmount(25000);
+        // e.setStatus("steady");
+        // insert(e);
+        // update(e);
+        insertLogical(new Earnings(25000, "steady"));
+        System.out.println("Earnings are 25000, steady");
+end
+
+rule "dependentsF"
+    when
+    then
+        // Dependents d = new Dependents();
+        // d.setNumber(3);
+        // insert(d);
+        // update(d);
+        insertLogical(new Dependents(3));
+        System.out.println("Dependents are 3");
+end
+
+// rule "dependents2"
+//     when
+//     then
+//         Dependents d = new Dependents();
+//         d.setNumber(2);
+//         insert(d);
+//         update(d);
+//         System.out.println("Dependents are 2");
+// end
+// rule "Hello World"
+//     when
+//         m : Message( status == Message.HELLO, myMessage : message )
+//     then
+//         System.out.println( myMessage );
+//         m.setMessage( "Goodbye cruel world" );
+//         m.setStatus( Message.GOODBYE );
+//         update( m );
+// end
+
+// rule "GoodBye"
+//     when
+//         Message( status == Message.GOODBYE, myMessage : message )
+//     then
+//         System.out.println( myMessage );
+// end

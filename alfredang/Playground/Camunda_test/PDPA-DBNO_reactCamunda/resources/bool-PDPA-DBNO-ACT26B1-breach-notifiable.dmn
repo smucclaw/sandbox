@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" xmlns:biodi="http://bpmn.io/schema/dmn/biodi/2.0" xmlns:camunda="http://camunda.org/schema/1.0/dmn" id="Definitions_1hwnlxe" name="DRD" namespace="http://camunda.org/schema/1.0/dmn" exporter="Camunda Modeler" exporterVersion="4.9.0">
+  <decision id="bool-PDPA-DBNO-ACT26B1-breach-notifiable" name="[Bool] Breach notifiable">
+    <decisionTable id="DecisionTable_0y5o4dw" hitPolicy="FIRST">
+      <input id="Input_1" label="act26b_4" biodi:width="150" camunda:inputVariable="act26b_4">
+        <inputExpression id="InputExpression_1" typeRef="boolean">
+          <text></text>
+        </inputExpression>
+      </input>
+      <input id="InputClause_1d61tvk" label="act26b_1_a" camunda:inputVariable="act26b_1_a">
+        <inputExpression id="LiteralExpression_146z01x" typeRef="boolean">
+          <text></text>
+        </inputExpression>
+      </input>
+      <input id="InputClause_0he3nux" label="act26b_1_b" camunda:inputVariable="act26b_1_b">
+        <inputExpression id="LiteralExpression_1rrrvqx" typeRef="boolean">
+          <text></text>
+        </inputExpression>
+      </input>
+      <output id="Output_1" label="act26b_1" name="act26b_1" typeRef="boolean" />
+      <rule id="DecisionRule_0kcpy2i">
+        <description>Unless it relates to the unauthorized access, collection, use, disclosure, copying or modification of personal data only within an organiation</description>
+        <inputEntry id="UnaryTests_1f8bpdh" expressionLanguage="feel">
+          <text>true</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0iwb9e8">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1nj8rs7">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0y4vh45">
+          <text>false</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_0ur8xbk">
+        <description>If it results in, or is likely to result in, significant harm to an affected individual</description>
+        <inputEntry id="UnaryTests_19s0oq7" expressionLanguage="feel">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0toeggo">
+          <text>true</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1olc407">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0j5izdk">
+          <text>true</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1430g6q">
+        <description>Or it is, or is likely to be, of a significant scale</description>
+        <inputEntry id="UnaryTests_1vg5axc">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0z9hw2p">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_10s7mhb">
+          <text>true</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0gsdaee">
+          <text>true</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_0h5jen7">
+        <description>Default to false</description>
+        <inputEntry id="UnaryTests_0hgwguo">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1lhbh4q">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1cbz67s">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1kdset2">
+          <text>false</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <dmndi:DMNDI>
+    <dmndi:DMNDiagram>
+      <dmndi:DMNShape dmnElementRef="bool-PDPA-DBNO-ACT26B1-breach-notifiable">
+        <dc:Bounds height="80" width="180" x="160" y="100" />
+      </dmndi:DMNShape>
+    </dmndi:DMNDiagram>
+  </dmndi:DMNDI>
+</definitions>

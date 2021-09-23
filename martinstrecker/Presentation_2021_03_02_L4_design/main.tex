@@ -718,11 +718,278 @@ contract entrypoint sale3 =
 \end{frame}
 
 
+
+% -------------------------------------------------------------
+\section{Automata}
+% -------------------------------------------------------------
+
+% -------------------------------------------------------------
+\subsection{Introduction to Automata with JFLAP}
+% -------------------------------------------------------------
+
+
 %-------------------------------------------------------------
-\begin{frame}[fragile]\frametitle{}
+\begin{frame}[fragile]\frametitle{Downloading and starting JFLAP}
+
+
+  Download site: \url{http://www.jflap.org/jflaptmp/}
+
+  How to run it?
+  \begin{itemize}
+  \item Install Java 
+  \item \texttt{java -jar JFLAP7.1.jar\&}
+  \end{itemize}
+
+  Tutorial: \url{http://www.jflap.org/tutorial/}
+
+\end{frame}
+
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{The trinity}
+
+  \blue{Three essential notions:}
+  \begin{itemize}
+  \item \emph{Languages} as sets of strings made up of symbols.
+
+    Examples: 
+
+    \begin{itemize}
+    \item The set of legal identifiers:
+      $L_1 = \{ a, a\_1, b2, xyz, myVar, \dots \}$
+
+      Note: $2b \notin L_1$
+    \item The set of legal positive numbers:
+      $L_2 = \{ 1, 11, 21, 42, 2021, \dots \}$
+
+      Note: $007 \notin L_2$
+    \end{itemize}
+
+    
+  \item \emph{Grammars} for a compact representation of languages
+  \item \emph{Automata} for recognizing languages
+  \end{itemize}
+
+  \blue{Questions:}
+  \begin{itemize}
+  \item Can every language be represented by a grammar?
+  \item What is the relation between grammars and automata?
+  \end{itemize}
+
+\end{frame}
+
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Automata in JFLAP}
+
+  The chewing gum vending automaton
+
+  \begin{onlyenv}<1>
+    \blue{Scenario~1:}
+    \begin{enumerate}
+    \item Insert two dollars.
+    \item Get chewing gum.
+    \item Chew it.
+    \end{enumerate}
+
+    \blue{Actions:}
+
+    \begin{itemize}
+    \item $d$: insert one dollar
+    \item $g$: get chewing gum
+    \item $c$: chew for one hour
+    \end{itemize}
+
+    Corresponding \blue{language}: $ddgc$
+  \end{onlyenv}
+
+  \begin{onlyenv}<2>
+    \blue{Scenario~2:}
+    \begin{enumerate}
+    \item Insert two dollars.
+    \item Get chewing gum.
+    \item If you travel to Singapore: chew for one hour, then go to prison
+    \item If you travel to Europe: chew for one hour, then get toothache
+    \end{enumerate}
+
+    \blue{Actions:}
+
+    \begin{itemize}
+    \item $d$: insert one dollar
+    \item $g$: get chewing gum
+    \item $c$: chew for one hour
+    \item $s$~/~$e$: travel to Singapore / Europe
+    \item $p$: go to prison
+    \item $a$: get toothache
+    \end{itemize}
+
+    Corresponding \blue{language}: $ddg(scp|eca)$
+  \end{onlyenv}
+
+
+  \begin{onlyenv}<3>
+    \blue{Scenario~3:} as Scenario~2, but:
+    \begin{itemize}
+    \item If in Europe: chew until you get toothache
+    \end{itemize}
+
+    \blue{Actions:}
+
+    \begin{itemize}
+    \item $d$: insert one dollar
+    \item $g$: get chewing gum
+    \item $c$: chew for one hour
+    \item $s$~/~$e$: travel to Singapore / Europe
+    \item $p$: go to prison
+    \item $a$: get toothache
+    \end{itemize}
+
+    Corresponding \blue{language}: $ddg(scp|e(c^*)a)$
+  \end{onlyenv}
+
+
+  
+  \begin{onlyenv}<4>
+    \blue{Scenario~4:} as Scenario~3, but:
+    \begin{itemize}
+    \item If in Singapore: be released from prison, start chewing again, go to prison again (indefinitely) until you throw away the chewing gum. 
+    \end{itemize}
+
+    \blue{Actions:}
+
+    \begin{itemize}
+    \item $d$: insert one dollar
+    \item $g$: get chewing gum
+    \item $c$: chew for one hour
+    \item $s$~/~$e$: travel to Singapore / Europe
+    \item $p$: go to prison
+    \item $a$: get toothache
+    \item $r$: get released from prison
+    \item $t$: throw away chewing gum
+    \end{itemize}
+
+    Corresponding \blue{language} ???
+  \end{onlyenv}
+
+
+  
+  \begin{onlyenv}<5>
+    \blue{Scenario~5:} as Scenario~4, but:\\
+    Start chewing first. If you are in Singapore, you will go to prison (etc.). If you are in Europe, you will get toothache.
+
+    \emph{Note:} the automaton is now \emph{nondeterministic}.
+  \end{onlyenv}
+  
+    
+\end{frame}
+
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Automata in JFLAP}
+
+  Further questions / examples:
+
+  \begin{itemize}
+  \item Is it possible to avoid going to prison after having bought chewing gum in Singapore?
+
+    If yes, provide a \emph{trace}
+    
+  \item How to model the fact that you only go to prison after chewing for at least 3 hours?
+
+    
+  \item Write an automaton that accepts exactly the positive natural numbers without leading 0 (unless the number is zero).
+    
+  \item Write an automaton that accepts the legal identifiers of (... your favorite programming language)
+  \end{itemize}
+  
+\end{frame}
+
+
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Some fundamental questions}
+
+    \begin{itemize}
+    \item Automaton to grammar:
+      \begin{itemize}
+      \item Set up a system of equations:
+        
+        For each state $S$, generate $S = a_1 S_1 | \dots a_n S_n$
+        if $S$ has outgoing edges $a_i$ to states $S_i$
+      
+      \item Simplify expressions using algebraic equations like:
+        $aS | bS = (a | b) S$
+      \item Use Arden's lemma $L = PL | R$ $\IFF$ $L = P^*R$
+      \end{itemize}
+      
+    \item Grammar to automaton:
+      \begin{itemize}
+      \item The other way around, building up a \emph{nondeterministic} automaton
+      \item Then determinize
+      \end{itemize}
+    \end{itemize}
+    Thus: perfect correspondence between finite automata and regular expressions.
+
+    \emph{Question:} Does every language have an automaton?
+
+    \begin{itemize}
+    \item Is every language representable by  a finite automaton?
+
+      \emph{No}, for example the language of correctly parenthesized expressions.
+
+      \emph{But:} there are other types of automata and languages\\
+      $\leadsto$ Chomsky hierarchy
+      
+    \item Can every language be represented by (whatever kind of) automaton?
+
+      \emph{No:} there are too many languages (question of cardinality)
+    \end{itemize}
+
+\end{frame}
+
+
+
+
+% -------------------------------------------------------------
+\subsection{News from Symboleo}
+% -------------------------------------------------------------
+
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Links to Team and Github}
+
+
+Team webpage
+\begin{itemize}
+\item Team webpage: \url{https://sites.google.com/uottawa.ca/csmlab/team}
+\item More (?) info here: \url{https://sites.google.com/uottawa.ca/csmlab}
+\end{itemize}
+
+Github directories:
+\begin{itemize}
+\item Compliance checker:
+\url{https://github.com/Smart-Contract-Modelling-uOttawa/Symboleo-Compliance-Checker/tree/0.3}
+\item IDE:
+\url{https://github.com/Smart-Contract-Modelling-uOttawa/Symboleo-IDE/tree/v0.2}
+\end{itemize}
+
+\end{frame}
+
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Papers}
+
+
+Papers:
+\begin{itemize}
+\item \url{https://www.researchgate.net/profile/Alireza-Parvizimosaed}
+\item \url{https://www.researchgate.net/profile/Sepehr-Sharifi}
+\item Announcing coding in nuXmv: \url{http://ceur-ws.org/Vol-2835/abstract3.pdf}
+\end{itemize}
 
 
 \end{frame}
+
 
 
 %-------------------------------------------------------------

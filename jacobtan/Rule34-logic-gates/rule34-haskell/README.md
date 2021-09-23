@@ -26,11 +26,9 @@ AnyAll is a library that constructs AnyAll objects. These objects know how to "e
 
 The capability for that started life in SandboxBuilder but should move into the AnyAll library.
 
-The code that knows how to convert an AnyAll into an SVG and PNG currently lives in svg-builder-sandbox.
+The code that knows how to convert an AnyAll into an SVG and PNG currently lives in `smucclaw/dsl/lib/haskell/anyall`
 
-After refactoring, this becomes another hackage library.
-
-In Github, this code lives in `smucclaw/dsl/lib/haskell/anyall`
+After refactoring, this will become another hackage library, perhaps conservativelly named under `smucclaw` rather than hackage toplevel.
 
 ## connecting anyall to myrule
 
@@ -71,6 +69,13 @@ and
 
 
 This code will live in `smucclaw/dsl/caseStudies/LPAPCR34` under the stack project already created there. Don't worry about the science-fictional L4 code present in the README.org ... we will merge those strands of activity eventually.
+
+### rule34-svg
+
+Usage:
+
+	┌─[mengwong@rosegold] - [~/src/smucclaw/sandbox/jacobtan/Rule34-logic-gates/rule34-haskell] - [2021-09-01 03:13:56]
+	└─[0] <git:(anyall-refactor c122d97✈) > stack run rule34-svg > rule34_1.svg 2> rule34_1_err.svg
 
 ## pdpa
 

@@ -21,7 +21,6 @@ description:         Please see the README on GitHub at <https://github.com/gith
 
 dependencies:
 - base >= 4.7 && < 5
-- jt2-haskell-utils
 - containers
 - pretty-simple
 - split
@@ -35,9 +34,8 @@ dependencies:
 - mtl
 - process
 - svg-builder
-- svg-builder-sandbox
-- diagrams-sandbox
 - optparse-generic
+- anyall
 
 library:
   source-dirs: src

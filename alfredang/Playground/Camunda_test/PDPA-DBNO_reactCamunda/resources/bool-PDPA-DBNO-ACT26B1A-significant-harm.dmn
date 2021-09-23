@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" xmlns:biodi="http://bpmn.io/schema/dmn/biodi/2.0" xmlns:camunda="http://camunda.org/schema/1.0/dmn" id="Definitions_1jol6u2" name="DRD" namespace="http://camunda.org/schema/1.0/dmn" exporter="Camunda Modeler" exporterVersion="4.9.0">
+  <decision id="bool-PDPA-DBNO-ACT26B1A-significant-harm" name="Significant harm?">
+    <decisionTable id="DecisionTable_1pxjzlq" hitPolicy="FIRST">
+      <input id="Input_1" label="act26b_2_a" biodi:width="192" camunda:inputVariable="act26b_2_a">
+        <inputExpression id="InputExpression_1" typeRef="boolean">
+          <text></text>
+        </inputExpression>
+      </input>
+      <input id="InputClause_05jtn3v" label="act26b_2_b" camunda:inputVariable="act26b_2_b">
+        <inputExpression id="LiteralExpression_09v96ws" typeRef="boolean">
+          <text></text>
+        </inputExpression>
+      </input>
+      <input id="InputClause_1hx5vvb" label="regs3_1" camunda:inputVariable="regs3_1">
+        <inputExpression id="LiteralExpression_1ynr7gq" typeRef="boolean">
+          <text></text>
+        </inputExpression>
+      </input>
+      <input id="InputClause_110ep0e" label="regs3_1_b" camunda:inputVariable="regs3_1_b">
+        <inputExpression id="LiteralExpression_0edwv10" typeRef="boolean">
+          <text></text>
+        </inputExpression>
+      </input>
+      <output id="Output_1" label="act26b_1_a" name="act26b_1_a" typeRef="boolean" />
+      <rule id="DecisionRule_04udjsr">
+        <description>IF the data breach is in relation to any prescribed personal data or class of personal data relating to the individual</description>
+        <inputEntry id="UnaryTests_1emi8vu">
+          <text>true</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_10j32e4">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_01u408z">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0e98yn1">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_12mlwkw">
+          <text>true</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1b9n0hj">
+        <description>OR in other prescribed circumstances.</description>
+        <inputEntry id="UnaryTests_0yvtr99">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1sd1oar">
+          <text>true</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1bk7cyv">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_00zzkgy">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_16w1s3q">
+          <text>true</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_0tjde75">
+        <description>IF regs3.1 applies (see associated table)</description>
+        <inputEntry id="UnaryTests_0vu2ftc">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0tn0w3n">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1nhp747">
+          <text>true</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1i4yjna">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1u1dmn6">
+          <text>true</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1yd9xy1">
+        <description>OR regs3.1.b applies (see associated table)</description>
+        <inputEntry id="UnaryTests_08ra2lt">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_047o42e">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_01jvlhy">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0ym3zhn">
+          <text>true</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0ojfmbk">
+          <text>true</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_0zrj5bx">
+        <description>default: FALSE</description>
+        <inputEntry id="UnaryTests_13p2hk8">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_06z1a1k">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_16jnhib">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0lp61tu">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0zopy8m">
+          <text>false</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <dmndi:DMNDI>
+    <dmndi:DMNDiagram>
+      <dmndi:DMNShape dmnElementRef="bool-PDPA-DBNO-ACT26B1A-significant-harm">
+        <dc:Bounds height="80" width="180" x="160" y="100" />
+      </dmndi:DMNShape>
+    </dmndi:DMNDiagram>
+  </dmndi:DMNDI>
+</definitions>

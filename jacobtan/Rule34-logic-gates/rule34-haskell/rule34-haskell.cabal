@@ -39,21 +39,19 @@ library
       Rule34_SMT
       Rule34_SMT_gen
       Rule34_SMT_sandbox
-      Sandbox
       SandboxBuilder
   other-modules:
       Paths_rule34_haskell
   hs-source-dirs:
       src
   build-depends:
-      base >=4.7 && <5
+      anyall
+    , base >=4.7 && <5
     , casing
     , containers
-    , diagrams-sandbox
     , fgl
     , generic-data
     , graphviz
-    , jt2-haskell-utils
     , mtl
     , optparse-generic
     , pretty-simple
@@ -62,7 +60,6 @@ library
     , sbv
     , split
     , svg-builder
-    , svg-builder-sandbox
     , text
   default-language: Haskell2010
 
@@ -74,14 +71,13 @@ executable rule34-org
       app/org
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
+      anyall
+    , base >=4.7 && <5
     , casing
     , containers
-    , diagrams-sandbox
     , fgl
     , generic-data
     , graphviz
-    , jt2-haskell-utils
     , mtl
     , optparse-generic
     , pretty-simple
@@ -91,7 +87,6 @@ executable rule34-org
     , sbv
     , split
     , svg-builder
-    , svg-builder-sandbox
     , text
   default-language: Haskell2010
 
@@ -103,14 +98,13 @@ executable rule34-png
       app/png
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
+      anyall
+    , base >=4.7 && <5
     , casing
     , containers
-    , diagrams-sandbox
     , fgl
     , generic-data
     , graphviz
-    , jt2-haskell-utils
     , mtl
     , optparse-generic
     , pretty-simple
@@ -120,7 +114,6 @@ executable rule34-png
     , sbv
     , split
     , svg-builder
-    , svg-builder-sandbox
     , text
   default-language: Haskell2010
 
@@ -132,14 +125,13 @@ executable rule34-svg
       app/svg
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
+      anyall
+    , base >=4.7 && <5
     , casing
     , containers
-    , diagrams-sandbox
     , fgl
     , generic-data
     , graphviz
-    , jt2-haskell-utils
     , mtl
     , optparse-generic
     , pretty-simple
@@ -149,7 +141,6 @@ executable rule34-svg
     , sbv
     , split
     , svg-builder
-    , svg-builder-sandbox
     , text
   default-language: Haskell2010
 
@@ -162,14 +153,13 @@ test-suite rule34-haskell-test
       test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
+      anyall
+    , base >=4.7 && <5
     , casing
     , containers
-    , diagrams-sandbox
     , fgl
     , generic-data
     , graphviz
-    , jt2-haskell-utils
     , mtl
     , optparse-generic
     , pretty-simple
@@ -179,6 +169,5 @@ test-suite rule34-haskell-test
     , sbv
     , split
     , svg-builder
-    , svg-builder-sandbox
     , text
   default-language: Haskell2010

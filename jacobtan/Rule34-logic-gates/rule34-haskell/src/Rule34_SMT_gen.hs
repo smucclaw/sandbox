@@ -11,11 +11,15 @@ import qualified Data.Text as Text
 import Data.Graph.Inductive hiding ((&))
 import Text.Casing as Casing
 
-import JT2.Haskell.Utils
 import Encoding ( GateType(..) )
+import Data.Functor ((<&>))
 import Rule34_jacob
 import Data.IntSet (IntSet, member, Key, insert)
 import Control.Monad.RWS.Strict
+import Data.Foldable (foldl')
+import Data.String (fromString, IsString)
+import Data.Maybe (fromMaybe)
+import Data.List (foldl1')
 
 {-
 
@@ -32,6 +36,10 @@ http://dev.stephendiehl.com/hask/#rws-monad
 It was perfect for the job.
 
 -}
+
+(<+>) :: (Semigroup a, IsString a) => a -> a -> a
+x <+> y = x <> fromString " " <> y
+
 
 -- | use this to generate the SMT code
 rule34_SMT_gen :: IO ()

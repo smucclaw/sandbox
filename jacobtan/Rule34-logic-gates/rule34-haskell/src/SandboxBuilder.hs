@@ -5,11 +5,11 @@
 
 module SandboxBuilder where
 
-import qualified "svg-builder-sandbox" AnyAll as AA
-                                                 ( Label (Pre, PrePost)
-                                                 , Item (Leaf, Any, All)
-                                                 , makeSvg
-                                                 , renderItem )
+import qualified AnyAll as AA
+       ( Label (Pre, PrePost)
+       , Item (Leaf, Any, All)
+       , makeSvg
+       , renderItem )
 import Data.Tree (Tree (Node))
 import Rule34
        ( Label (MkLabel)

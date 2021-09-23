@@ -5,16 +5,18 @@
 
 packages:
 - completed:
-    size: 4430
-    url: https://github.com/2jacobtan/jt2-haskell-utils/archive/0fc35800d603a5802af7ad186ed93844273f9506.tar.gz
-    name: jt2-haskell-utils
+    size: 2937504
+    subdir: lib/haskell/anyall
+    url: https://github.com/smucclaw/dsl/archive/d561043fed8abfd8333318af5882713b6da13c6b.tar.gz
+    name: anyall
     version: 0.1.0.0
-    sha256: f9d353709a4d88a6ef51e932be7a79f1a51cd1ab95200600d18b5f4de51e1fbf
+    sha256: 76ccbba346c91f8e14d4166f46a9f51f297c3239fe0dc64269f652c90c993b75
     pantry-tree:
-      size: 730
-      sha256: 817796741d73ad061bb3d42c83c72c2719a25fe1f10398d5577322715e4ea8f4
+      size: 727
+      sha256: 76c4074ecce1d8405536d010fc1d9f558e0384902b20954d72c0af930ca325d3
   original:
-    url: https://github.com/2jacobtan/jt2-haskell-utils/archive/0fc35800d603a5802af7ad186ed93844273f9506.tar.gz
+    subdir: lib/haskell/anyall
+    url: https://github.com/smucclaw/dsl/archive/d561043fed8abfd8333318af5882713b6da13c6b.tar.gz
 - completed:
     hackage: sbv-8.9@sha256:efb0f16c671869805e57d11e269793d5e5ae512e8e626582cf76b8e46a63e9c6,28985
     pantry-tree:

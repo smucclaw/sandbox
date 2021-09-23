@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" xmlns:camunda="http://camunda.org/schema/1.0/dmn" xmlns:biodi="http://bpmn.io/schema/dmn/biodi/2.0" id="Definitions_1d8iwiu" name="DRD" namespace="http://camunda.org/schema/1.0/dmn" exporter="Camunda Modeler" exporterVersion="4.9.0">
+  <decision id="bool-PDPA-DBNO-ACT26B1B-significant-scale" name="Significant Scale">
+    <decisionTable id="DecisionTable_1nss1wf" hitPolicy="FIRST">
+      <input id="Input_1" label="act26b_3_a" camunda:inputVariable="act26b_3_a">
+        <inputExpression id="InputExpression_1" typeRef="boolean">
+          <text></text>
+        </inputExpression>
+      </input>
+      <input id="InputClause_1dipv6b" label="act26b_3_b" camunda:inputVariable="act26b_3_b">
+        <inputExpression id="LiteralExpression_05z2pke" typeRef="boolean">
+          <text></text>
+        </inputExpression>
+      </input>
+      <output id="Output_1" label="act26b_1_b" name="act26b_1_b" typeRef="boolean" biodi:width="192" />
+      <rule id="DecisionRule_12d3p3z">
+        <description>IF the data breach affects not fewer than the prescribed number of affected individuals,</description>
+        <inputEntry id="UnaryTests_1h1mv7j">
+          <text>true</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0w87luz">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0x0t6pd">
+          <text>true</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1pamonb">
+        <description>OR in other prescribed circumstances </description>
+        <inputEntry id="UnaryTests_09c4se5">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0mvzify">
+          <text>true</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1yqy3a7">
+          <text>true</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_14mzme5">
+        <description>default: FALSE</description>
+        <inputEntry id="UnaryTests_1tq8wjc">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0dy8i48">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1nmyh08">
+          <text>false</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <dmndi:DMNDI>
+    <dmndi:DMNDiagram>
+      <dmndi:DMNShape dmnElementRef="bool-PDPA-DBNO-ACT26B1B-significant-scale">
+        <dc:Bounds height="80" width="180" x="160" y="100" />
+      </dmndi:DMNShape>
+    </dmndi:DMNDiagram>
+  </dmndi:DMNDI>
+</definitions>

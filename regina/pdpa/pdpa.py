@@ -46,6 +46,13 @@ option_6 = st.checkbox("modification")
 option_7 = st.checkbox("disposal of personal data")
 
 st.markdown("___")
+#D single select drop box - hard code method
+st.text("Select Data Breach method -- another way")
+display = ("(choose one)", "access","collection","use", "disclosure", "copying", "modification", "disposal of personal data")
+options = list(range(len(display)))
+value = st.selectbox("Select one from dropdown list", options, format_func=lambda x: display[x])
+
+st.text("You have selected: "+ display[value])
 
 #02 Selection for Qn 2
 st.markdown("### Q2. What was the impact of the data breach?")

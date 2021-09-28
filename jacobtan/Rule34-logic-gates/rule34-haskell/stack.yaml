@@ -45,7 +45,7 @@ packages:
 extra-deps:
 
 - github: smucclaw/dsl
-  commit: 609f96caa4b71dabab17dfade7e660add964a373
+  commit: d561043fed8abfd8333318af5882713b6da13c6b
   subdirs:
   - lib/haskell/anyall
 

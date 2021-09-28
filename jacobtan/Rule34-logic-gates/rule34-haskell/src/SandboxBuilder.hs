@@ -28,7 +28,6 @@ import System.IO
 import qualified Data.Text.Lazy as T
 import qualified Data.List as L
 import qualified Data.Maybe as M
-import Data.String (IsString)
 
 errorEl :: String -> Element
 errorEl msg =
@@ -41,7 +40,7 @@ errorEl msg =
        (  tspan_ [ X_ <<- "200", Dy_ <<- "20", Font_weight_ <<- "bold" ] "Looks like something went wrong!"
        <> tspan_ [ X_ <<- "200", Dy_ <<- "20", Font_weight_ <<- "lighter" ] (toElement msg))
 
-drawItem :: IsString a => Either String (AA.Item a) -> IO ()
+drawItem :: Either String AA.Item -> IO ()
 drawItem (Left err) = hPutStr stderr . T.unpack . renderText . AA.makeSvg $ (500, errorEl err)
 drawItem (Right item) = putStr . T.unpack . renderText . AA.makeSvg $ AA.renderItem item
 
@@ -52,7 +51,7 @@ main = drawItem $ toAA rule34_1
 -- main = drawItem $ toAA rule34_1_Any_err
 
 class (Show x) => AA x where
-  toAA :: x -> Either String (AA.Item x)
+  toAA :: x -> Either String AA.Item
 
 instance AA MyRule where
   toAA (MyRule _ _ _ _ condtree) = toAA condtree
@@ -63,7 +62,7 @@ instance AA (ConditionTree Predicate) where
   -- l :: Label
   -- pre, post :: Maybe String
   -- All, Any, Or, Union, UnionComma, Compl, Leaf a :: Inner a
-  toAA :: IsString a => ConditionTree Predicate -> Either a (AA.Item a)
+  toAA :: ConditionTree Predicate -> Either String AA.Item
 
   -- All
   toAA (Node (MkCondition _ Nothing All _) _) =
@@ -136,7 +135,7 @@ instance AA (ConditionTree Predicate) where
       glom = glomItems "" Nothing
       build = AA.All (AA.Pre (ls l ++ "...."))
 
-toAAs :: IsString a => Predicate -> a
+toAAs :: Predicate -> String
 toAAs (Pred pterm) = renderString $ layoutCompact $ toEnglish pterm
 toAAs (Goto pnum)  = "See paragraph " ++ pnum
 
@@ -148,10 +147,10 @@ toAAs (Goto pnum)  = "See paragraph " ++ pnum
 --   | null x || null y = x ++ y
 --   | otherwise        = x ++ " " ++ y
 
-unwords' :: IsString a => [a] -> a
+unwords' :: [String] -> String
 unwords' = unwords . filter (/= "")
 
-ls :: IsString a => Label -> a
+ls :: Label -> String
 ls (MkLabel (Just paraNum) _ _) = "(" ++ paraNum ++ ")"
 ls (MkLabel Nothing _ _) = ""
 
@@ -168,7 +167,7 @@ ls (MkLabel Nothing _ _) = ""
 type Sep = String
 type SWord = String
 
-glomItems :: IsString a => Sep -> Maybe SWord -> [AA.Item a] -> [AA.Item a]
+glomItems :: Sep -> Maybe SWord -> [AA.Item] -> [AA.Item]
 glomItems _ _ []                 = []
 glomItems _ _ [item]             = [item]
 glomItems sepr Nothing [x1, x2]  = [glomItem (Just sepr) Nothing x1, x2]
@@ -178,11 +177,11 @@ glomItems sepr mword xs =
   in L.init ys ++ [glomItem Nothing mword (L.last ys)] ++ [L.last xs]
 
 -- determines placement of separators
-glomItem :: IsString a => Maybe Sep -> Maybe SWord -> AA.Item a -> AA.Item a
+glomItem :: Maybe Sep -> Maybe SWord -> AA.Item -> AA.Item
 glomItem msep mword item =
   case item of
     -- e.g. (Leaf "hello;") , (Leaf "hello or")
-    AA.Leaf l -> AA.Leaf (l <> M.fromMaybe "" msep <> M.maybe "" (" " <>) mword)
+    AA.Leaf l -> AA.Leaf (l ++ M.fromMaybe "" msep ++ M.maybe "" (" " ++) mword)
 
     AA.Any label items -> go AA.Any label items
     AA.All label items -> go AA.All label items
@@ -191,28 +190,28 @@ glomItem msep mword item =
       -- e.g. (PrePost "before" "after;") , (PrePost "before" "after or")
       go aa (AA.PrePost pre post) children =
         aa
-          (AA.PrePost pre (post <> (M.fromMaybe "" msep <> M.maybe "" (" " <>) mword)))
+          (AA.PrePost pre (post ++ (M.fromMaybe "" msep ++ M.maybe "" (" " ++) mword)))
           children
 
       -- when only pre is given, sep/word is glommed to last child
       go aa pre children =
         aa
           pre
-          (L.init children <> [glomItem msep mword (L.last children)])
+          (L.init children ++ [glomItem msep mword (L.last children)])
 
 
 -- adds terminator
 type Ter = String
 
-termItems :: IsString a => Ter -> [AA.Item a] -> [AA.Item a]
+termItems :: Ter -> [AA.Item] -> [AA.Item]
 termItems _ []       = []
 termItems ter [item] = [termItem ter item]
-termItems ter xs     = L.init xs <> [termItem ter (L.last xs)]
+termItems ter xs     = L.init xs ++ [termItem ter (L.last xs)]
 
-termItem :: IsString a => Ter -> AA.Item a -> AA.Item a
+termItem :: Ter -> AA.Item -> AA.Item
 termItem ter item =
   case item of
-    AA.Leaf l          -> AA.Leaf (l <> ter)
+    AA.Leaf l          -> AA.Leaf (l ++ ter)
     AA.Any label items -> go AA.Any label items
     AA.All label items -> go AA.All label items
     where

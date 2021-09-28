@@ -35,7 +35,7 @@ st.write("Selected Data Breach: ", selected_class_M)
 
 st.markdown("___")
 
-#03 multi-select Checkbox - hard code method
+#C multi-select Checkbox - hard code method
 st.text("Select Data Breach method -- select all that apply")
 option_1 = st.checkbox("access")
 option_2 = st.checkbox("collection")

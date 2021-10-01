@@ -1,3 +1,4 @@
+# Frontend
 ## Limitations
 1. radio button will always have first option as default instead of unselected nulls
 2. balloons need to be last because once activated, it will always appear upon any click of checkbox, button, radio
@@ -18,3 +19,9 @@
 7.  A browser page should pop up that you can interact with. Otherwise try clicking on the URL that appears in the terminal
 8.  To exit, hit `Ctrl` and `C` button
 9.  To exit environment, simply `deactivate`
+
+# Universal Dependencies
+1. Make sure you have the necessary libraries and modules in your virtual environment
+   1. `pip install spacy-udpipe`
+   2. `pip install nltk`
+2. Visualisze the trees of (i) text in terminal and (ii) tags in terminal and (iii) combo of text with UD pos in browser, do `python3 pdpa_ud.py`

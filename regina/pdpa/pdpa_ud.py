@@ -1,9 +1,10 @@
 import spacy_udpipe
 from nltk import Tree
 from spacy import displacy
+from pathlib import Path  # for having the browser displacy version into a svg file
 
 # download model for 1st execution only
-# spacy_udpipe.download("en") # download English model
+spacy_udpipe.download("en") # download English model
 
 nlp = spacy_udpipe.load("en")
 text = "Wikipedia is a free online encyclopedia, created and edited by volunteers around the world." # "personal data in part 1 of schedule subject to part 2 of schedule"
@@ -36,3 +37,9 @@ def to_nltk_tree(node):
 
 # 3. A combi of text + POS
 displacy.serve(doc, style='dep')
+
+# 4. A combi of text + POS into svg
+output_path = Path("ud_trees_svg/ud.svg")
+svg = displacy.render(doc, style='dep')
+with output_path.open("w", encoding="utf-8") as fh:
+    fh.write(svg)

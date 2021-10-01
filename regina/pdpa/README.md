@@ -21,7 +21,11 @@
 9.  To exit environment, simply `deactivate`
 
 # Universal Dependencies
-1. Make sure you have the necessary libraries and modules in your virtual environment
+1. Make sure you have the necessary libraries and modules in your virtual environment by
    1. `pip install spacy-udpipe`
    2. `pip install nltk`
-2. Visualisze the trees of (i) text in terminal and (ii) tags in terminal and (iii) combo of text with UD pos in browser, do `python3 pdpa_ud.py`
+2. `python3 pdpa_ud.py` to visualisze the trees of
+   1. text in terminal
+   2. tags in terminal
+   3. combo of text with UD pos in browser
+   4. combo of text with UD pos in svg format in the folder sandbox/regina/pdpa/ud_trees_svg . Note that this will only be generated when you exit the program unlike the other 3 visualisations

@@ -20,7 +20,7 @@
 8.  To exit, hit `Ctrl` and `C` button
 9.  To exit environment, simply `deactivate`
 
-# Universal Dependencies
+# Universal Dependencies (UD)
 1. Make sure you have the necessary libraries and modules in your virtual environment by
    1. `pip install spacy-udpipe`
    2. `pip install nltk`
@@ -29,3 +29,8 @@
    2. tags in terminal
    3. combo of text with UD pos in browser
    4. combo of text with UD pos in svg format in the folder sandbox/regina/pdpa/ud_trees_svg . Note that this will only be generated when you exit the program unlike the other 3 visualisations
+3. Web app to visualise UD for text input by user on frontend
+   1. `source pdpaenv/bin/activate`
+   2. `streamlit run pdpa_ud_web.py`
+4. To open and see the ud.svg rendered, open the file in vsc and on it, do
+   1. shift + option + S (then release) and press O

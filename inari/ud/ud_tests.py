@@ -31,5 +31,5 @@ def create_conllu(text, filename):
         print(udString)
 
 
-if __name__ == "__main__()":
+if __name__ == "__main__":
     create_conllu("the cat sleeps", "/tmp/cat.conllu")

@@ -11,8 +11,8 @@ st.title("Universal Dependencies Trees Web App")
 st.header("Visualise Universal Dependencies")
 
 # Create spaces for the user input
-user_para = st.text_area("Put in your paragraphs in the grey box", height=300)
-user_text = st.text_input("Put in your sentence here")
+# user_para = st.text_area("Put in your paragraphs in the grey box", height=300)
+user_text = st.text_input("Put your sentence in here")
 
 # download model for 1st execution only
 # spacy_udpipe.download("en") # download English model

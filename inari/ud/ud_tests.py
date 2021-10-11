@@ -1,12 +1,15 @@
+from catalogue import create
 import spacy_udpipe
 
 spacy_udpipe.download("en") # download English model
 nlp = spacy_udpipe.load("en")
 
+testfile = "/tmp/legalese-fragments.conllu"
+
 def create_conllu(text, filename):
     doc = nlp(text)
     for token in doc:
-        udID     = str(token.i+1)      # word position
+        udID     = str(token.i+1)  # word position
         udFORM   = token.text     # surface form
         udLEMMA  = token.lemma_   # lemma
         udPOS    = token.pos_     # UD universal POS
@@ -28,8 +31,14 @@ def create_conllu(text, filename):
         print(udString, file=open(filename, 'a'))
 
         # also print it to stdout
-        print(udString)
+        #print(udString)
+
 
 
 if __name__ == "__main__":
-    create_conllu("the cat sleeps", "/tmp/cat.conllu")
+    texts = open("corpus.txt").readlines()
+    for text in texts:
+        create_conllu(text, testfile)
+        print("\n", file=open(testfile, 'a'))
+
+#    create_conllu("the cat sleeps", "/tmp/cat.conllu")

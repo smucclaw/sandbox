@@ -1,0 +1,54 @@
+,,,,,,,,,,,,,,,,,,,,
+,"A Person Who Walks; and Eats, or Drinks; Must Sing.",,,,,,,,,,,,,,,,6 Sep 2021,,,
+,,,,,,,,,,,,,,,,,,,,
+,,"Imagine a provision that says something like –
+
+   A person who –
+    (a) walks; and
+    (b) (i)   eats, or
+           (ii) drinks,
+    must sing.",,,,,,,,,,,,,,,,,,
+,,,,,"by Matthew Waddington, 4 Sep 2021",,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,
+,How would our algebra tackle this problem?,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,
+,,"Here's a simple ""isomorphic"" version:",,,,,,,,,,Checkboxes show the flow of the logic explicitly:,,,,,,,,
+,,{,,EVERY,Person,,,,,,,{,EVERY,Person,,,,,,
+,,,,WHO,walks,,(the thick line means and),,,,,,WHO,TRUE,TRUE,walks,,,"To watch the checkboxes light up when you click,",
+,,,,AND,eats,,(the lack of a line means or),,,,,,,AND,FALSE,eats,,,make a copy of this spreadsheet,
+,,,,OR,drinks,,,,,,,,,OR,TRUE,drinks,,,by clicking File / Make a Copy.,
+,,,,MUST,,,,,,,,,MUST,,,,,,,
+,,,,➔,sing,},,,,,,,➔,sing,,,},,,
+,,,,,,,,,,,,,,,,,,,,
+,"A checkbox on the ""who"" indicates if the entity qualifiers hold.",,,,,,,,,A rule-level checkbox at far left assesses if the rule itself is satisfied.,,,,,,,,,,
+,,,,,,,,,{,FALSE,That rule-level checkbox is checked when:,,,,,,,,,
+,{,,,EVERY,Person,,,,,,FALSE,the conditions do not hold,,,,,,,,
+,,,TRUE,WHO,TRUE,walks,,,,,OR,,,,,,,,,
+,,,,,FALSE,eats,,,,,TRUE,"the conditions do hold, and",,,,,,,,
+,,,,,TRUE,drinks,,,,,FALSE,the action is satisfied,,,,,},,,
+,,FALSE,,MUST,,,,,,"In other words, we have ""logical implication"": the ⇒ operator.",,,,,,,,,,
+,,,,➔,FALSE,sing,},,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,
+,"A conjunction of rule-level checkboxes, running down the page, is tantamount to a compliance report!",,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,
+,"As documents grow in complexity, it is natural to introduce defined terms:
+    A Qualifying Person is a person who walks and (eats or drinks).
+    Every Qualifying Person must sing.",,,,,,,,,,,,,,,,,,,
+,"Such ""Re-factoring"" allows other code to refer to, and thus reuse, this definition.",,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,if (x || y || z),,,,will short circuit if any are true
+,,,{,EVERY,FALSE,Qualifying Person,,,,,,,,,,if (x && y && z),,,,will short circuit if any are false
+,,,,,,TRUE,walks,,,,,,,,,,,,,
+,,,,,,FALSE,eats,,,,,,,,,,,,,
+,,,,,,FALSE,drinks,,,,,,,,,,,,,
+,,,,MUST,,,,,,,,,,,,,,,,
+,,,,➔,sing,,,,},,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,
+,"Read for the regulative component, we obtain ""Every Qualifying Person must sing.""
+
+Read for the constitutive component, we obtain ""A Qualifying Person is one who walks and (eats or drinks).""",,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,
+,See Also,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,
+,Deon Digital's CSL inspired the logic and semantics of this approach to regulative rules and contract composition. The spreadsheet syntax is original.,,,,,,,,,,,,,,,,,,,
+,Tweetstorm citing historical references.,,,,,,,,,,,,,,,,,,,

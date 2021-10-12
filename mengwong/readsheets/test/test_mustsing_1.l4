@@ -1,0 +1,9 @@
+  RULE 1           :en-uk:"Waddington"
+ EVERY Person
+  WHEN [ walk      :en-uk:"walks slowly"
+       , run       :en-uk:"runs quickly"
+       & [ eat     :en-uk:"eat food"
+         | drink   :en-uk:"drink beverage"
+         ]
+       ]
+  MUST sing        :en-uk:"sing loudly"

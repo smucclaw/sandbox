@@ -1,0 +1,54 @@
+name:                readsheets
+version:             0.1.0.0
+github:              "mengwong/readsheets"
+license:             BSD3
+author:              "Wong Meng Weng"
+maintainer:          "mwwong@smu.edu.sg"
+copyright:           "2020"
+
+extra-source-files:
+- README.org
+- ChangeLog.md
+
+# Metadata used when publishing your package
+# synopsis:            Short description of your package
+# category:            Web
+
+# To avoid duplicated efforts in documentation and dealing with the
+# complications of embedding Haddock markup inside cabal files, it is
+# common to point users to the README.md file.
+description:         Please see the README on GitHub at <https://github.com/mengwong/readsheets#readme>
+
+dependencies:
+- base >= 4.7 && < 5
+- cassava
+- bytestring
+- text
+- vector
+- containers
+- megaparsec
+
+library:
+  source-dirs: src
+
+executables:
+  readsheets-exe:
+    main:                Main.hs
+    source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - readsheets
+
+tests:
+  readsheets-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - readsheets

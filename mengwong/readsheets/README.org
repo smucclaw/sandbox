@@ -1,0 +1,17 @@
+#+TITLE: readsheets parses L4 out of a CSV downloaded from Google Sheets
+
+* Background
+
+- [[https://docs.google.com/spreadsheets/d/1qMGwFhgPYLm-bmoN2es2orGkTaTN382pG2z3RjZ_s-4/edit#gid=1099960232][Legal Spreadsheets]] offers a simple syntax for defining rules.
+
+* Summary
+
+This Haskell library parses a CSV spreadsheet into a form of L4.
+
+Those L4 types are expected to be consumed by other projects e.g. baby-l4 or NLG.
+
+We also serialize our L4 as JSON.
+
+
+
+

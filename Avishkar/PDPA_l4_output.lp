@@ -38,4 +38,3 @@ caused_by(pos, legally_holds((N > 5)), according_to(s64_3_1bDisj1, significantHa
 caused_by(pos, legally_holds(isAccessCode(Indiv, Dt)), according_to(s64_3_1bDisj1, significantHarm(Db, Indiv)), _N+1) :- according_to(s64_3_1bDisj1, significantHarm(Db, Indiv)), legally_holds(dataOfBreach(Dt, Db)), legally_holds((N > 5)), legally_holds(isAccessCode(Indiv, Dt)), justify(according_to(s64_3_1bDisj1, significantHarm(Db, Indiv)), _N).
 caused_by(pos, legally_holds((numberOfAffectedIndividuals(Db) >= 500)), according_to(s64_4, exceedsPrescrNumberOfIndividuals(Db)), _N+1) :- according_to(s64_4, exceedsPrescrNumberOfIndividuals(Db)), legally_holds((numberOfAffectedIndividuals(Db) >= 500)), justify(according_to(s64_4, exceedsPrescrNumberOfIndividuals(Db)), _N).
 
-%opposes(dataSchedulePart2(V0, V1), notdataSchedulePart2(V0, V1)).

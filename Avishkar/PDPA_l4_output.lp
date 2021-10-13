@@ -2,9 +2,9 @@ according_to(s64_3_1aDisj0, significantHarm(Db, Indiv)) :- legally_holds(dataOfB
 according_to(s64_3_1aDisj1, significantHarm(Db, Indiv)) :- legally_holds(dataOfBreach(Dt, Db)), legally_holds(isAliasOf(Indiv, Dt)).
 according_to(s64_3_1aDisj2, significantHarm(Db, Indiv)) :- legally_holds(dataOfBreach(Dt, Db)), legally_holds(isIdentificationNumberOf(Indiv, Dt)).
 according_to(s64_3_1aDisj3, significantHarm(Db, Indiv)) :- legally_holds(dataOfBreach(Dt, Db)), legally_holds(dataSchedulePart1(Indiv, Dt)), legally_holds(notdataSchedulePart2(Indiv, Dt)).
-according_to(s64_3_1bDisj0, significantHarm(Db, Indiv)) :- legally_holds(dataOfBreach(Dt, Db)), legally_holds((N > 5)), legally_holds(isAccountIdentifier(Indiv, Dt)).
-according_to(s64_3_1bDisj1, significantHarm(Db, Indiv)) :- legally_holds(dataOfBreach(Dt, Db)), legally_holds((N > 5)), legally_holds(isAccessCode(Indiv, Dt)).
-according_to(s64_4, exceedsPrescrNumberOfIndividuals(Db)) :- legally_holds((numberOfAffectedIndividuals(Db) >= 500)).
+according_to(s64_3_1bDisj0, significantHarm(Db, Indiv)) :- legally_holds(dataOfBreach(Dt, Db)), legally_holds(isAccountIdentifier(Indiv, Dt)).
+according_to(s64_3_1bDisj1, significantHarm(Db, Indiv)) :- legally_holds(dataOfBreach(Dt, Db)), legally_holds(isAccessCode(Indiv, Dt)).
+according_to(s64_4, exceedsPrescrNumberOfIndividuals(Db)) :- legally_holds(numberOfAffectedIndividuals(Db,N)),N >= 500.
 explains(dataOfBreach(Dt, Db), significantHarm(Db, Indiv) _N+1) :- query(significantHarm(Db, Indiv) _N).
 explains(isNameOf(Indiv, Dt), significantHarm(Db, Indiv) _N+1) :- query(significantHarm(Db, Indiv) _N).
 explains(dataOfBreach(Dt, Db), significantHarm(Db, Indiv) _N+1) :- query(significantHarm(Db, Indiv) _N).

@@ -25,10 +25,10 @@ not_walk:-not walk.
 Optimal Solution:
 not_walk, eat,drink
 
-On the other hand with the following weak constraints instead that minimize the number of actions performed while avoiding having to sing:
+% On the other hand with the following weak constraints instead that minimize the number of actions performed while avoiding having to sing:
 :~eat.[1@1,eat]
 :~drink.[1@1,drink]
 :~walk.[1@1,walk]
 
-We get the obvious optimal solution which is just don't do anything. Ie:
+% We get the obvious optimal solution which is just don't do anything. Ie:
 not_walk, not_eat, not_drink

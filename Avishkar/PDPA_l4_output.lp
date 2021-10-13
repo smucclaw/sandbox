@@ -15,12 +15,12 @@ explains(dataOfBreach(Dt, Db), significantHarm(Db, Indiv) _N+1) :- query(signifi
 explains(dataSchedulePart1(Indiv, Dt), significantHarm(Db, Indiv) _N+1) :- query(significantHarm(Db, Indiv) _N).
 explains(notdataSchedulePart2(Indiv, Dt), significantHarm(Db, Indiv) _N+1) :- query(significantHarm(Db, Indiv) _N).
 explains(dataOfBreach(Dt, Db), significantHarm(Db, Indiv) _N+1) :- query(significantHarm(Db, Indiv) _N).
-explains((N > 5), significantHarm(Db, Indiv) _N+1) :- query(significantHarm(Db, Indiv) _N).
+explains(significantHarm(Db, Indiv) _N+1) :- query(significantHarm(Db, Indiv) _N).
 explains(isAccountIdentifier(Indiv, Dt), significantHarm(Db, Indiv) _N+1) :- query(significantHarm(Db, Indiv) _N).
 explains(dataOfBreach(Dt, Db), significantHarm(Db, Indiv) _N+1) :- query(significantHarm(Db, Indiv) _N).
-explains((N > 5), significantHarm(Db, Indiv) _N+1) :- query(significantHarm(Db, Indiv) _N).
+explains(significantHarm(Db, Indiv) _N+1) :- query(significantHarm(Db, Indiv) _N).
 explains(isAccessCode(Indiv, Dt), significantHarm(Db, Indiv) _N+1) :- query(significantHarm(Db, Indiv) _N).
-explains((numberOfAffectedIndividuals(Db) >= 500), exceedsPrescrNumberOfIndividuals(Db) _N+1) :- query(exceedsPrescrNumberOfIndividuals(Db) _N).
+%explains((numberOfAffectedIndividuals(Db) >= 500), exceedsPrescrNumberOfIndividuals(Db) _N+1) :- query(exceedsPrescrNumberOfIndividuals(Db) _N).
 caused_by(pos, legally_holds(dataOfBreach(Dt, Db)), according_to(s64_3_1aDisj0, significantHarm(Db, Indiv)), _N+1) :- according_to(s64_3_1aDisj0, significantHarm(Db, Indiv)), legally_holds(dataOfBreach(Dt, Db)), legally_holds(isNameOf(Indiv, Dt)), justify(according_to(s64_3_1aDisj0, significantHarm(Db, Indiv)), _N).
 caused_by(pos, legally_holds(isNameOf(Indiv, Dt)), according_to(s64_3_1aDisj0, significantHarm(Db, Indiv)), _N+1) :- according_to(s64_3_1aDisj0, significantHarm(Db, Indiv)), legally_holds(dataOfBreach(Dt, Db)), legally_holds(isNameOf(Indiv, Dt)), justify(according_to(s64_3_1aDisj0, significantHarm(Db, Indiv)), _N).
 caused_by(pos, legally_holds(dataOfBreach(Dt, Db)), according_to(s64_3_1aDisj1, significantHarm(Db, Indiv)), _N+1) :- according_to(s64_3_1aDisj1, significantHarm(Db, Indiv)), legally_holds(dataOfBreach(Dt, Db)), legally_holds(isAliasOf(Indiv, Dt)), justify(according_to(s64_3_1aDisj1, significantHarm(Db, Indiv)), _N).

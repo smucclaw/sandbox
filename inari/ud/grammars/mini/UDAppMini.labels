@@ -1,0 +1,42 @@
+#fun nsubj_ head -- NP -> nsubj
+#fun obj_ head -- NP -> obj
+#fun iobj_ head -- NP -> iobj
+#fun xcomp_ head -- Comp -> xcomp
+#fun nmod_ head -- Adv -> nmod
+#fun rootV_ head -- VP -> root
+#fun rootV2_ head -- VPSlash -> root
+#fun rootA_ head -- AP -> root
+#fun rootN_ head -- NP -> root
+
+#fun intransitive head nsubj -- root -> nsubj -> UDS ;  -- the cat sleeps
+#fun transitive head nsubj obj -- root -> nsubj -> obj -> UDS ; -- the cat sees us
+#fun apred head nsubj cop -- root -> nsubj -> cop -> UDS ; -- the cat is small
+#fun advpred head nsubj nmod cop -- root -> nsubj -> cop -> nmod -> UDS ; -- my hovercraft is full of eels
+
+#fun AdjCN	amod head
+#fun AdvVP 	head advmod
+#fun ComplV2	head obj
+#fun CoordS	cc head conj
+#fun DetCN	det head
+#fun PredVP	nsubj head
+#fun PrepNP	case head
+#fun QuestIAdv  advmod head
+#fun UseCl	aux advmod head
+#fun UseQCl	aux advmod head
+#fun UttImpSg      aux head
+
+#cat cop      AUX
+#cat A	      ADJ
+#cat Adv      ADV
+#cat Conj     CCONJ
+#cat Det      DET
+#cat IAdv     ADV
+#cat N	      NOUN
+#cat PN	      PROPN
+#cat Pol	      PART
+#cat Prep	      ADP
+#cat Pron	      PRON
+#cat Temp	      AUX
+#cat V	      VERB
+#cat V2	      VERB
+

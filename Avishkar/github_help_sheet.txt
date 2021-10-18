@@ -1,0 +1,50 @@
+Github instructions/help
+
+Local Repo --> Remote repo
+
+git status
+git add .
+git status
+git commit -m "edit..."
+git push origin main
+
+Remote repo --> local repo
+
+git fetch
+git log --oneline
+git pull origin main
+
+New branch in remote repo --> local repo
+git fetch
+git checkout test
+
+Switch between branches on local repo
+git checkout test
+
+Generate key for git push
+
+Profile-->settings--->developer settings--->personal access tokens--->generate new token
+
+**In all the above replace branch names with the relevant branch names.
+
+To do:
+Figure out how merging/pull requests work 
+
+Pull requests:
+To merge some branch into main branch:
+Open pull request
+Merge Pull request
+Confirm
+
+This is all done via the github UI
+Works only if there are no conflicts.
+You can choose a different branch than the main branch as the target of the merge via the github gui, when you create the pull request. 
+
+How to create new branch locally and push it to remote repo (this automatically uses main as the base branch):
+
+git checkout -b new-branch
+git push origin new-branch
+
+To use a different branch as the base branch do: 
+
+git checkout -b new-branch [<base-branch-name>]

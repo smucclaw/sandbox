@@ -20,26 +20,33 @@ abstract BareRG =
     VP,AdV,Adv,AP,Comp,NP,V,Tense,
     UseV      , -- V   -> VP ;             -- sleep
     --    UseComp,
-    CompAP,
-    CompAdv,
-    CompNP,
+   --  CompAP,
+   --  CompAdv,
+   --  CompNP,
     UseAdv,     -- Adv -> VP ;             -- be in the house ---s
     AdvVP,      -- VP -> Adv -> VP ;       -- sleep here
     AdVVP
   ],
 
-  Noun [
-    NP,CN,AP,Adv,Ord,RS,Pron,PN,Det,Numeral,N,
-    DetCN     , -- Det -> CN -> NP ;       -- the man
-    UsePN     , -- PN -> NP ;              -- John
-    UsePron   , -- Pron -> NP ;            -- he
-    MassNP    , -- CN -> NP ;              -- milk
-    UseN      , -- N -> CN ;               -- house
-    AdjCN,      -- AP -> CN -> CN ;        -- big house
-    OrdNumeral,
-    RelCN,
-    AdvCN
-  ],
+   Noun - [
+      CountNP,
+      PartNP,
+      ApposCN
+   ],
+-- [
+--     NP,CN,AP,Adv,Ord,RS,Pron,PN,Det,Numeral,N,
+--     DetCN     , -- Det -> CN -> NP ;       -- the man
+--     UsePN     , -- PN -> NP ;              -- John
+--     UsePron   , -- Pron -> NP ;            -- he
+--     MassNP    , -- CN -> NP ;              -- milk
+--     UseN      , -- N -> CN ;               -- house
+--     AdjCN,      -- AP -> CN -> CN ;        -- big house
+--     OrdNumeral,
+--     RelCN,
+--     AdvCN,
+--     AdvNP,
+--     IndefArt,DefArt,NumSg,NumPl
+--   ],
 
   Adjective [
     AP,AdA,A,Ord,
@@ -67,5 +74,9 @@ abstract BareRG =
 
   -- hacks and workarounds
   fun
-    the_Det : Det ;
+    theSg_Det,
+    thePl_Det,
+    aSg_Det,
+    aPl_Det : Det ;
+
   }

@@ -18,25 +18,32 @@ concrete BareRGEng of BareRG =
   VP,AdV,Adv,AP,Comp,NP,V,Tense,
   UseV      , -- V   -> VP ;             -- sleep
   --    UseComp,
-  CompAP,
-  CompAdv,
-  CompNP,
+  -- CompAP,
+  -- CompAdv,
+  -- CompNP,
   AdvVP    , -- VP -> Adv -> VP ;       -- sleep here
   AdVVP
   ],
 
-  NounEng [
-  NP,CN,AP,Adv,Ord,RS,Pron,PN,Det,Numeral,N,
-  DetCN     , -- Det -> CN -> NP ;       -- the man
-  UsePN     , -- PN -> NP ;              -- John
-  UsePron   , -- Pron -> NP ;            -- he
-  MassNP    , -- CN -> NP ;              -- milk
-  UseN      , -- N -> CN ;               -- house
-  AdjCN,       -- AP -> CN -> CN ;        -- big house
-  OrdNumeral,
-  RelCN,
-  AdvCN
-  ],
+  NounEng - [
+      CountNP,
+      PartNP,
+      ApposCN
+   ],
+  --  [
+  -- NP,CN,AP,Adv,Ord,RS,Pron,PN,Det,Numeral,N,
+  -- DetCN     , -- Det -> CN -> NP ;       -- the man
+  -- UsePN     , -- PN -> NP ;              -- John
+  -- UsePron   , -- Pron -> NP ;            -- he
+  -- MassNP    , -- CN -> NP ;              -- milk
+  -- UseN      , -- N -> CN ;               -- house
+  -- AdjCN,       -- AP -> CN -> CN ;        -- big house
+  -- OrdNumeral,
+  -- RelCN,
+  -- AdvCN,
+  -- AdvNP,
+  -- IndefArt,DefArt,NumSg,NumPl
+  -- ],
 
   AdjectiveEng [
   AP,AdA,A,Ord,
@@ -57,9 +64,11 @@ concrete BareRGEng of BareRG =
   RelativeEng,
   QuestionEng,
   NumeralEng,
-  TenseX - [CAdv,Pol, PPos, PNeg] ** {
+  TenseX - [CAdv,Pol, PPos, PNeg] ** open StructuralEng in {
 
- lin
-   the_Det = DetQuant DefArt NumSg ;
-
+  lin
+    theSg_Det = DetQuant DefArt NumSg ;
+    thePl_Det = DetQuant DefArt NumPl ;
+    aSg_Det = DetQuant IndefArt NumSg ;
+    aPl_Det = DetQuant IndefArt NumPl ;
 }

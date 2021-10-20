@@ -1,69 +1,4 @@
-abstract UDApp =
-  JustWordsWordNet,
-
-   Extend [
-      Temp, Pol, NP, Tense,
-      S, ExistS, ExistNP,
-      N, CompoundN -- : N -> N -> N    -- control system
-   ],
-
- Sentence [
-    S,QS,Cl,QCl,NP,Temp,Pol,VP,Imp,Adv,
-    ImpVP ,      -- VP -> Imp ;                 -- walk / do not walk
-    AdvS ,
-    ExtAdvS
-    ],
-
- Verb [
-    VP,AdV,Adv,AP,Comp,NP,V,Tense,
-    UseV      , -- V   -> VP ;             -- sleep
---    UseComp,
-    CompAP,
-    CompAdv,
-    CompNP,
-    UseAdv,     -- Adv -> VP ;             -- be in the house ---s
-    AdvVP,      -- VP -> Adv -> VP ;       -- sleep here
-    AdVVP
-    ],
-
- Noun [
-    NP,CN,AP,Adv,Ord,RS,Pron,PN,Det,Numeral,N,
-    DetCN     , -- Det -> CN -> NP ;       -- the man
-    UsePN     , -- PN -> NP ;              -- John
-    UsePron   , -- Pron -> NP ;            -- he
-    MassNP    , -- CN -> NP ;              -- milk
-    UseN      , -- N -> CN ;               -- house
-    AdjCN,      -- AP -> CN -> CN ;        -- big house
-    OrdNumeral,
-    RelCN,
-    AdvCN
-    ],
-
- Adjective [
-    AP,AdA,A,Ord,
-    PositA    , -- A  -> AP ;              -- warm
-    UseComparA,
-    AdAP,
-    AdjOrd
-    ],
-
- Adverb [
-    A,
-    Prep,NP,Adv,Subj,S,
-    PrepNP    , -- Prep -> NP -> Adv ;     -- in the house
-    SubjS,
-    PositAdvAdj -- A -> Adv  --- not sure if this should be used
-
-    ],
-
- Conjunction,
- Relative,
- Question,
- Numeral,
-
- Tense
-
-** {
+abstract UDApp = BareRG, JustWordsWordNet ** {
   flags startcat = UDS ;
 
   cat
@@ -91,6 +26,8 @@ abstract UDApp =
     nmod ;
     --amod ;
     advmod ;
+    cc ;
+    conj ;
 
    -- skip the lexical layer AUX, COP
     aux ;
@@ -112,6 +49,8 @@ abstract UDApp =
     -- detCN : DET -> NOUN -> nsubj ;
 
    nsubj_ : NP -> nsubj ; -- it can be NOUN, DET, PRON, but all those can be NPs in GF
+--   nsubjPossPron_ : Pron -> CN -> nsubj ; -- my hovercraft
+   nsubjPoss_   : NP -> CN -> nsubj ; -- my/Clinton's hovercraft
    obj_ : NP -> obj ;
    iobj_ : NP -> iobj ;
    xcomp_ : Comp -> xcomp ; -- like Comp, it can be from AP, CN, NP, Adv (how about gerund?)
@@ -121,23 +60,28 @@ abstract UDApp =
    rootA_ : AP -> root ;
    rootN_ : NP -> root ;
 
-   case_noun_nmod : Prep -> NP -> nmod ; -- UD-specific version of PrepNP
+   conjA_ : AP -> conj ;
+   conjN_ : NP -> conj ;
+   conjAdv_ : Adv -> conj ;
+
+   cc_ : Conj -> cc ;
+
+   advmod_ : Adv -> advmod ;
+
+   nmod_ : Prep -> NP -> nmod ; -- UD-specific version of PrepNP
 
    -- syntactic functions
-   intransitive : root -> nsubj -> UDS ;  -- the cat sleeps
-   transitive : root -> nsubj -> obj -> UDS ; -- the cat sees us
+   intransitive : VP -> nsubj -> UDS ;  -- the cat sleeps
+   transitive : VP -> nsubj -> obj -> UDS ; -- the cat sees us
 
    -- Constructions with copula
    pred        : root -> nsubj -> cop -> UDS ; -- the cat is small
    pred_nmod   : root -> nsubj -> cop -> nmod -> UDS ; -- my hovercraft is full [of eels] (eels is nmod)
    pred_advmod : root -> nsubj -> cop -> advmod -> UDS ; -- the party is [here] (here is advmod)
 
+   nsubj_cop_cc_conj : root -> nsubj -> cop -> cc -> conj -> UDS ; -- he is big and old
 
    punct_ : UDS -> punct -> UDS ;
    --anyUDS : Utt -> UDS ;
-
-   -- hacks and workarounds
-   the_Det : Det ;
-
 
 }

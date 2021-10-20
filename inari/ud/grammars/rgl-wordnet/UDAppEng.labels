@@ -22,44 +22,33 @@
 #word ' ' _
 #word , , _
 
-#lemma MkVPI to To mark head
-#lemma AddStoVP that That mark head
-#lemma UseComp,ProgrVP be Cop cop head
-#lemma UseComp,ProgrVP,UseV have Have aux head
-#lemma UseV,ImpVP do Do aux head
-#lemma UseComp,UseV will Will aux head
-#lemma UseComp,UseV would Would aux head
-#lemma UseComp,ProgrVP,UseV,ImpVP,PassVP not Neg advmod head
-#lemma PossPron 's Gen case head
-#lemma PossPron ' Gen case head
-#lemma ExtAdvS , Comma punct head
-#lemma PassVP be Cop aux:pass head
+#lemma DEFAULT_ be cop cop head
 
-#lemma ExistS there There expl head
-#lemma ExistS be V cop head  --- in UD, the copula is the head!
+-- #altfun DetCN nmod:poss head
+-- Det -> CN -> NP
 
-#morpho N 0 Number=Sing
-#morpho N 2 Number=Plur
+-- The following copied from gf-ud/grammars/ShallowParseEng.labels
 
-#morpho A 0 Degree=Pos
-#morpho A 2 Degree=Cmp
-#morpho A 4 Degree=Sup
+-- To handle "my hovercraft": i_Pron is not by default parsed as Det
+#auxfun PossSgNP_ pron cn : Pron -> CN -> NP = DetCN (DetQuant (PossPron pron) NumSg) cn ; nmod:poss head[Number=Sing]
+#auxfun PossPlNP_ pron cn : Pron -> CN -> NP = DetCN (DetQuant (PossPron pron) NumPl) cn ; nmod:poss head[Number=Plur]
 
-#morpho Pron 0 Case=Nom|PronType=Prs -- --- Case=Nom|Number=Sing|Person=1|PronType=Prs
-#morpho Pron 1 Poss=Yes|PronType=Prs -- --- Number=Plur|Person=3|Poss=Yes|PronType=Prs ; as Det, nmod:poss
-#morpho Pron 2 Case=Acc|PronType=Prs -- --- Case=Acc|Number=Sing|Person=1|PronType=Prs
+-- disable plurals as mass terms
+#auxfun MassNP_sg cn : CN -> NP = MassNP cn ; head[Number=Sing]
+#auxfun DetCN_aPl cn : CN -> NP = DetCN aPl_Det cn ; head[Number=Plur]
+#disable MassNP
 
-#morpho V,V2,VS,VV,V2V 0 VerbForm=Inf
-#morpho V,V2,VS,VV,V2V 1 Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin
-#morpho V,V2,VS,VV,V2V 2 Tense=Past|VerbForm=Part
-#morpho V,V2,VS,VV,V2V 3 Tense=Pres|VerbForm=Part
-#morpho V,V2,VS,VV,V2V 4 Mood=Ind|Tense=Past|VerbForm=Fin
+#auxcat The DET
+#auxfun DetCN_theSg det cn : The -> CN -> NP = DetCN the_Det cn ; det head[Number=Sing]
+#auxfun DetCN_thePl det cn : The -> CN -> NP = DetCN thePl_Det cn ; det head[Number=Plur]
+#disable the_Det thePl_Det
 
-#discont   V2    0-4,head  5,ADP,case,obj   6,ADP,compound:prt,head
-#discont   V2V   0-4,head  5,ADP,case,obj   6,ADP,mark,xcomp  7,ADP,compound:prt,head  --- 6 PART if to?
+#auxfun UttImpSg_Pos vp : VP -> Utt = UttImpSg PPos (ImpVP vp) ; head[VerbForm=Inf]
+#auxfun UttImpSg_Neg do neg vp : Do -> Neg -> VP -> Utt = UttImpSg PNeg (ImpVP vp) ; aux[VerbForm=Inf] advmod head[VerbForm=Inf]
 
-#multiword Prep head-first fixed
-#multiword PN head-first flat
+#auxfun PositA_ a : A -> AP = PositA a ; head[Degree=Pos]
+#auxfun UseComparA_ a : A -> AP = UseComparA a ; head[Degree=Cmp]
+#auxfun SuperlA_ a : A -> AP = AdjOrd (OrdSuperl a) ; head[Degree=Sup]
+#disable UseComparA OrdSuperl AdjOrd
 
--- to deal with the_Det / thePl_Det, together with #auxfun annotations in ShallowParse.labels
-#lemma the_Det,thePl_Det the The head head
+#auxfun ExtAdvS_ adv comma s : Adv -> Comma -> S -> S = ExtAdvS adv s ; advmod punct head

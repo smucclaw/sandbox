@@ -46,8 +46,6 @@ concrete UDAppEng of UDApp =
    obj_,
    iobj_ = id NP ;
    xcomp_ = id Comp ;
-   --nsubjPoss_ pron cn = mkNP (mkDet pron) cn ;
---   nsubjPoss_ np cn = mkNP (ExtendEng.)
 
    rootV_ vp = mkRoot vp ;
    rootV2_ vp = mkRoot vp ;
@@ -67,7 +65,7 @@ concrete UDAppEng of UDApp =
 
    -- syntactic functions
    -- : root -> nsubj -> UDS ;  -- the cat sleeps
-   intransitive rt np = mkUDS np rt ;
+   intransitive rt np = mkUDS np rt.vp ;
 
    -- : root -> nsubj -> obj -> UDS ; -- the cat sees us
   transitive rt sub ob = mkUDS sub (mkVP (root2vpslash rt) ob) ;
@@ -113,17 +111,10 @@ concrete UDAppEng of UDApp =
       c2 = []
    } ;
 
-   -- root2vpslash : Root -> VPSlash = \root -> root.vp ** {
-   --    c2 = root.c2 ;
-   --    gapInMiddle,
-   --    missingAdv = False  -- TODO check
-   --    } ;
-
-   root2vpslash : VP -> VPSlash = \root -> root ** {
-      c2 = [] ;
+   root2vpslash : Root -> VPSlash = \root -> root.vp ** {
+      c2 = root.c2 ;
       gapInMiddle,
       missingAdv = False  -- TODO check
       } ;
-
 
 }

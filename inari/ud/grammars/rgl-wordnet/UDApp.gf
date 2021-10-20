@@ -49,8 +49,6 @@ abstract UDApp = BareRG, JustWordsWordNet ** {
     -- detCN : DET -> NOUN -> nsubj ;
 
    nsubj_ : NP -> nsubj ; -- it can be NOUN, DET, PRON, but all those can be NPs in GF
---   nsubjPossPron_ : Pron -> CN -> nsubj ; -- my hovercraft
-   nsubjPoss_   : NP -> CN -> nsubj ; -- my/Clinton's hovercraft
    obj_ : NP -> obj ;
    iobj_ : NP -> iobj ;
    xcomp_ : Comp -> xcomp ; -- like Comp, it can be from AP, CN, NP, Adv (how about gerund?)
@@ -71,8 +69,8 @@ abstract UDApp = BareRG, JustWordsWordNet ** {
    nmod_ : Prep -> NP -> nmod ; -- UD-specific version of PrepNP
 
    -- syntactic functions
-   intransitive : VP -> nsubj -> UDS ;  -- the cat sleeps
-   transitive : VP -> nsubj -> obj -> UDS ; -- the cat sees us
+   intransitive : root -> nsubj -> UDS ;  -- the cat sleeps
+   transitive : root -> nsubj -> obj -> UDS ; -- the cat sees us
 
    -- Constructions with copula
    pred        : root -> nsubj -> cop -> UDS ; -- the cat is small

@@ -58,7 +58,7 @@ concrete UDAppEng of UDApp =
     rootV2_ vp = mkRoot vp ;
     rootA_ ap = mkRoot ap ;
     rootN_ np = mkRoot np ;
-
+    auxPass_ x = x ;
     nmod_ = PrepNP ;
 
     conjA_ ap = mkUtt ap ; -- : AP -> conj ;
@@ -74,16 +74,15 @@ concrete UDAppEng of UDApp =
        in  (mkRCl rp is_affected) ;
 
 
-
     -- syntactic functions
     -- : root -> nsubj -> UDS ;  -- the cat sleeps
-    root_nsubj rt np = mkUDS np rt.vp ;
+    root_nsubj rt sub = mkUDS sub rt.vp ;
 
     -- : root -> nsubj -> obj -> UDS ; -- the cat sees us
     root_nsubj_obj rt sub ob = mkUDS sub (mkVP (root2vpslash rt) ob) ;
 
     -- : root -> nsubj -> cop -> UDS ; -- the cat is small
-    root_nsubj_cop rt sub cp = mkUDS sub rt.vp ;
+    root_nsubj_cop rt sub cp = root_nsubj rt sub ;
 
     -- : root -> nsubj -> cop -> nmod/advmod -> UDS ;
     root_nsubj_cop_advmod,
@@ -101,6 +100,13 @@ concrete UDAppEng of UDApp =
       let uds : UDS = root_nsubj_cop_aclRelcl rt sub cop rcl
        in uds ** {vp = mkVP rt.vp obl} ;
 
+    -- : root -> nsubjPass -> Deontic -> cop (more exactly, aux:pass) -> UDS ; -- everyone should be notified
+    root_nsubjPass_deontic_auxPass rt sub deo auxpass =
+      let should_be_notified : Root = rt ** {vp = mkVP deo rt.vp} ; -- mkVP : VV -> VP -> VP
+       in root_nsubj should_be_notified sub ;
+
+
+
 
   linref
      UDS = linUDS ;
@@ -117,6 +123,9 @@ concrete UDAppEng of UDApp =
     linUDS : LinUDS -> Str = \uds -> (mkS (mkCl uds.subj uds.pred)).s ;
 
     Root : Type = {vp : VP ; c2 : Str ; adv : Adv} ;
+
+    -- alternative Root: {a : A ; n : N ; v : V ; adv : Adv ; whichFieldIsLegit : LegitField}
+
 
     mkRoot = overload {
        mkRoot : AP -> Root = \ap -> emptyRoot ** {vp = mkVP ap ; adv = lin Adv (mkUtt ap)} ;

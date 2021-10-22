@@ -53,13 +53,27 @@
 
 -- the person [whose data]:RP is affected
 #auxcat RelPron PRON
-#auxfun FunRP_ whose data : RelPron -> CN -> RP = FunRP possess_Prep (MassNP data) IdRP ; nmod:poss[Poss=Yes] head
+#auxfun FunRP_ whose data : RelPron -> CN -> RP = FunRP possess_Prep (MassNP data) IdRP ; nmod:poss[PronType=Int|Poss=Yes] head
 #disable FunRP
 
 -- the person [whose data is affected]:RCl
-#auxfun PassRelCl_ affected whose_data is : V -> RP -> cop -> RCl = RelVP whose_data (PassV affected) ; head[Tense=Past|VerbForm=Part|Voice=Pass] nsubj:pass aux:pass
+#auxfun PassRelCl_ affected whose_data is : V -> RP -> auxPass -> RCl = RelVP whose_data (PassV affected) ; head[Voice=Pass] nsubj:pass aux:pass
 #disable PassV
 
 -- the person [whose data is affected by the breach]:RCl
-#auxfun PassRelClObl_ affected whose_data is by_breach : V -> RP -> cop -> Adv -> RCl = RelVP whose_data (AdvVP (PassV affected) by_breach) ; head[Tense=Past|VerbForm=Part|Voice=Pass] nsubj:pass aux:pass obl
+#auxfun PassRelClObl_ affected whose_data is by_breach : V -> RP -> auxPass -> Adv -> RCl = RelVP whose_data (PassVAgent affected by_breach) ; head[Voice=Pass] nsubj:pass aux:pass obl
 #disable PassV
+
+-- be notified
+#auxfun PassV_ v : V -> VP = PassV v ; head[Voice=Pass]
+
+-- TODO: can we make macros that can look below a level? would like to use PassVAgent : V -> NP -> VP directly, not have explicit prep
+-- be affected by breach
+#auxcat By ADP
+#auxfun Agent_ the_breach by : NP -> By -> Adv = PrepNP by8agent_Prep the_breach ; head case
+
+#auxfun PassVAgent_ affected by_the_breach : V -> Adv -> VP = PassVAgent affected by_the_breach ; head obl
+
+
+-- everyone who is affected
+#auxfun RelNP_ np rcl : NP -> RCl -> NP = RelNP np (UseRCl (TTAnt TPres ASimul) PPos rcl) ; head acl:relcl

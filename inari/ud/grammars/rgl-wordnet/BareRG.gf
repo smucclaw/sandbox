@@ -10,10 +10,11 @@ abstract BareRG =
   ],
 
   Sentence [
-    S,QS,Cl,QCl,NP,Temp,Pol,VP,Imp,Adv,
+    S,QS,RS,Cl,RCl,QCl,NP,Temp,Tense,Pol,VP,Imp,Adv,
     ImpVP ,      -- VP -> Imp ;                 -- walk / do not walk
     AdvS ,
     ExtAdvS
+    ,UseCl, UseRCl
   ],
 
   Verb [
@@ -31,23 +32,9 @@ abstract BareRG =
    Noun - [
       CountNP,
       PartNP,
-      ApposCN,
-      IndefArt, DefArt
+      ApposCN
+    ---  IndefArt, DefArt
    ],
--- [
---     NP,CN,AP,Adv,Ord,RS,Pron,PN,Det,Numeral,N,
---     DetCN     , -- Det -> CN -> NP ;       -- the man
---     UsePN     , -- PN -> NP ;              -- John
---     UsePron   , -- Pron -> NP ;            -- he
---     MassNP    , -- CN -> NP ;              -- milk
---     UseN      , -- N -> CN ;               -- house
---     AdjCN,      -- AP -> CN -> CN ;        -- big house
---     OrdNumeral,
---     RelCN,
---     AdvCN,
---     AdvNP,
---     IndefArt,DefArt,NumSg,NumPl
---   ],
 
   Adjective [
     AP,AdA,A,Ord,
@@ -65,7 +52,7 @@ abstract BareRG =
     PositAdvAdj -- A -> Adv  --- not sure if this should be used
   ],
 
-  Structural [possess_Prep],
+  Structural [Prep, possess_Prep, by8agent_Prep],
   Conjunction,
   Relative,
   Question,
@@ -81,6 +68,24 @@ abstract BareRG =
     aSg_Det,
     aPl_Det : Det ;
 
-    PassV : V -> VP ;
+    everyone_Pron : Pron ;
+    who_RP : RP ;
+
+  -- passives
+  cat
+    Agent ;
+  fun
+    PassV : V -> VP ;            -- affected
+    PassVAgent : V -> Adv -> VP ; -- affected by the breach
+
+  -- Domain-specifics: we care about some specific modals and want special cats and funs for them
+  cat
+    Deontic ;
+  fun
+    may_Deontic,
+    must_Deontic,
+    shall_Deontic,
+    shant_Deontic,
+    should_Deontic : Deontic ;
 
   }

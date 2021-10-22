@@ -4,11 +4,6 @@ abstract UDApp = BareRG, JustWordsWordNet ** {
   cat
     UDS ;
 
-    -- Direct translation of Universal POSes
---    AUX ;
-    SYM ;
-    X ;
-
 
     -- Phrasal categories are derived from UD relations https://universaldependencies.org/u/dep/
     root ; -- can be V*, A*, N*, Adv, …
@@ -36,6 +31,7 @@ abstract UDApp = BareRG, JustWordsWordNet ** {
 
    -- skip the lexical layer AUX, COP
     aux ;
+    auxPass ;
     cop ;
 
   -- passives
@@ -46,10 +42,10 @@ abstract UDApp = BareRG, JustWordsWordNet ** {
   fun
 
     -- in UD, syncategorematics (copula, tenses) are all AUX
-   may_aux,
-   have_aux : aux ;
+  may_aux,
+  have_aux : aux ;
 
-   be_cop : cop ;
+  be_cop : cop ;
 
     -- Functions to UD phrasal categories
     -- detCN : DET -> NOUN -> nsubj ;
@@ -71,12 +67,11 @@ abstract UDApp = BareRG, JustWordsWordNet ** {
   cc_ : Conj -> cc ;
   aclRelcl_ : RCl -> aclRelcl ; -- whose personal data is affected
 
+  obl_,
   advmod_ : Adv -> advmod ;
-
   nmod_ : Prep -> NP -> nmod ; -- UD-specific version of PrepNP
-
+  auxPass_ : cop -> auxPass ;
   nsubjPass_ : NP -> nsubjPass ;
---  passRelCl_ : root -> RP -> cop -> aclRelcl ;
 
   -- syntactic functions
   root_nsubj : root -> nsubj -> UDS ;  -- the cat sleeps
@@ -92,7 +87,7 @@ abstract UDApp = BareRG, JustWordsWordNet ** {
   root_nsubj_cop_aclRelcl : root -> nsubj -> cop -> aclRelcl -> UDS ; -- the affected individual is the person whose personal data is affected by the breach
   root_nsubj_cop_aclRelcl_obl :  root -> nsubj -> cop -> aclRelcl -> obl -> UDS ; -- the affected individual is the person whose personal data is affected by the breach
 
-
+  root_nsubjPass_deontic_auxPass : root -> nsubjPass -> Deontic -> auxPass -> UDS ; -- everyone should be notified
 --  punct_ : UDS -> punct -> UDS ;
    --anyUDS : Utt -> UDS ;
 

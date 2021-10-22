@@ -1,17 +1,17 @@
 concrete BareRGEng of BareRG =
 
   ExtendEng [
-  Temp, Pol, NP, Tense,
-  S, ExistS, ExistNP,
-  N, CompoundN
-
+    Temp, Pol, NP, Tense,
+    S, ExistS, ExistNP,
+    N, CompoundN
   ],
 
   SentenceEng [
-  S,QS,Cl,QCl,NP,Tense,Temp,Pol,VP,Imp,Adv,
-  ImpVP ,      -- VP -> Imp ;                 -- walk / do not walk
-  AdvS ,
-  ExtAdvS
+    S,QS,RS,Cl,RCl,QCl,NP,Temp,Tense,Ant,Pol,VP,Imp,Adv,
+    ImpVP ,      -- VP -> Imp ;                 -- walk / do not walk
+    AdvS ,
+    ExtAdvS
+    ,UseCl, UseRCl
   ],
 
   VerbEng [
@@ -28,23 +28,9 @@ concrete BareRGEng of BareRG =
   NounEng - [
       CountNP,
       PartNP,
-      ApposCN,
-      IndefArt, DefArt
+      ApposCN
    ],
-  --  [
-  -- NP,CN,AP,Adv,Ord,RS,Pron,PN,Det,Numeral,N,
-  -- DetCN     , -- Det -> CN -> NP ;       -- the man
-  -- UsePN     , -- PN -> NP ;              -- John
-  -- UsePron   , -- Pron -> NP ;            -- he
-  -- MassNP    , -- CN -> NP ;              -- milk
-  -- UseN      , -- N -> CN ;               -- house
-  -- AdjCN,       -- AP -> CN -> CN ;        -- big house
-  -- OrdNumeral,
-  -- RelCN,
-  -- AdvCN,
-  -- AdvNP,
-  -- IndefArt,DefArt,NumSg,NumPl
-  -- ],
+
 
   AdjectiveEng [
   AP,AdA,A,Ord,
@@ -61,19 +47,48 @@ concrete BareRGEng of BareRG =
   PositAdvAdj -- A -> Adv  --- not sure if this should be used
   ],
 
-  StructuralEng [possess_Prep],
+  StructuralEng [Prep, possess_Prep, by8agent_Prep],
 
   ConjunctionEng,
   RelativeEng,
   QuestionEng,
   NumeralEng,
-  TenseX - [CAdv,Pol, PPos, PNeg] ** open ParadigmsEng in {
+  TenseX - [CAdv,Pol, PPos, PNeg] ** open (G=GrammarEng), MorphoEng, ExtraEng, (P=ParadigmsEng), ExtraEng, ResEng in {
 
   lin
+    PPos = G.PPos ;
+    PNeg = G.PNeg ;
+
     theSg_Det = DetQuant DefArt NumSg ;
     thePl_Det = DetQuant DefArt NumPl ;
     aSg_Det = DetQuant IndefArt NumSg ;
     aPl_Det = DetQuant IndefArt NumPl ;
 
-    PassV v = PassV2 (mkV2 v) ;
+    everyone_Pron = mkPron "everyone" "everyone" "everyone's" "everyone's" P.singular P3 P.human ;
+    who_RP = ExtraEng.who_RP ;
+
+    PassV v = PassV2 (P.mkV2 v) ;
+    PassVAgent v ag = AdvVP (PassV v) ag ;
+
+  -- Application-specific additions to RGL
+  lincat
+    Deontic = VV ;
+  lin
+    may_Deontic = ExtraEng.may_VV ;
+    must_Deontic = G.must_VV ;
+    shall_Deontic = ExtraEng.shall_VV ;
+--    shant_Deontic,
+    should_Deontic = lin VV {
+      s = table {
+        VVF VInf => ["be obliged to"] ;
+        VVF VPres => "should" ;
+        VVF VPPart => ["been obliged to"] ;
+        VVF VPresPart => ["being obliged to"] ;
+        VVF VPast => "shall" ;
+        VVPastNeg => "shall not" ;
+        VVPresNeg => "shouldn't"
+        } ;
+      p = [] ;
+      typ = VVAux
+    } ;
 }

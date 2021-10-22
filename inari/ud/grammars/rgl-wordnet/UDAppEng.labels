@@ -24,14 +24,11 @@
 
 #lemma DEFAULT_ be cop cop head
 
--- #altfun DetCN nmod:poss head
--- Det -> CN -> NP
-
 -- The following copied from gf-ud/grammars/ShallowParseEng.labels
 
 -- To handle "my hovercraft": i_Pron is not by default parsed as Det
-#auxfun PossSgNP_ pron cn : Pron -> CN -> NP = DetCN (DetQuant (PossPron pron) NumSg) cn ; nmod:poss head[Number=Sing]
-#auxfun PossPlNP_ pron cn : Pron -> CN -> NP = DetCN (DetQuant (PossPron pron) NumPl) cn ; nmod:poss head[Number=Plur]
+#auxfun PossSgNP_ pron cn : Pron -> CN -> NP = DetCN (DetQuant (PossPron pron) NumSg) cn ; nmod:poss[PronType=Prs] head[Number=Sing]
+#auxfun PossPlNP_ pron cn : Pron -> CN -> NP = DetCN (DetQuant (PossPron pron) NumPl) cn ; nmod:poss[PronType=Prs] head[Number=Plur]
 
 -- disable plurals as mass terms
 #auxfun MassNP_sg cn : CN -> NP = MassNP cn ; head[Number=Sing]
@@ -51,4 +48,18 @@
 #auxfun SuperlA_ a : A -> AP = AdjOrd (OrdSuperl a) ; head[Degree=Sup]
 #disable UseComparA OrdSuperl AdjOrd
 
+#auxcat Comma PUNCT
 #auxfun ExtAdvS_ adv comma s : Adv -> Comma -> S -> S = ExtAdvS adv s ; advmod punct head
+
+-- the person [whose data]:RP is affected
+#auxcat RelPron PRON
+#auxfun FunRP_ whose data : RelPron -> CN -> RP = FunRP possess_Prep (MassNP data) IdRP ; nmod:poss[Poss=Yes] head
+#disable FunRP
+
+-- the person [whose data is affected]:RCl
+#auxfun PassRelCl_ affected whose_data is : V -> RP -> cop -> RCl = RelVP whose_data (PassV affected) ; head[Tense=Past|VerbForm=Part|Voice=Pass] nsubj:pass aux:pass
+#disable PassV
+
+-- the person [whose data is affected by the breach]:RCl
+#auxfun PassRelClObl_ affected whose_data is by_breach : V -> RP -> cop -> Adv -> RCl = RelVP whose_data (AdvVP (PassV affected) by_breach) ; head[Tense=Past|VerbForm=Part|Voice=Pass] nsubj:pass aux:pass obl
+#disable PassV

@@ -1,5 +1,4 @@
 #fun nsubj_ head              -- NP -> nsubj
---#fun nsubjPoss_ nmod:poss head -- Pron -> CN -> nsubj
 #fun obj_ head                -- NP -> obj
 #fun iobj_ head               -- NP -> iobj
 #fun xcomp_ head              -- Comp -> xcomp
@@ -12,16 +11,22 @@
 #fun conjAdv_ head            -- Adv -> conj ;
 #fun cc_ head                 -- Conj -> cc ;
 #fun advmod_ head             -- Adv -> advmod
+#fun obl_ head                -- Adv -> obl
 #fun nmod_ case head          -- Prep -> NP -> nmod ;
+#fun nsubjPass_ head          -- NP -> nsubjPass
 #fun punct_ head dep
 
-#fun intransitive head nsubj                 -- root -> nsubj -> UDS ;               -- the cat sleeps
-#fun transitive head nsubj obj               -- root -> nsubj -> obj -> UDS ;   -- the cat sees us
-#fun pred head nsubj cop                      -- root -> nsubj -> cop -> UDS ; -- the cat is small
-#fun pred_nmod   head nsubj cop nmod          -- my hovercraft is full [of eels] (eels is nmod)
-#fun pred_advmod head nsubj cop advmod        -- the party is [here] (here is advmod)
+#fun root_nsubj head nsubj                         -- root -> nsubj -> UDS ;               -- the cat sleeps
+#fun root_nsubj_obj head nsubj obj                 -- root -> nsubj -> obj -> UDS ;   -- the cat sees us
+#fun root_nsubj_cop head nsubj cop                 -- root -> nsubj -> cop -> UDS ; -- the cat is small
+#fun root_nsubj_cop_nmod head nsubj cop nmod       -- my hovercraft is full [of eels] (eels is nmod)
+#fun root_nsubj_cop_advmod head nsubj cop advmod   -- the party is [here] (here is advmod)
+#fun root_nsubj_cop_aclRelcl head nsubj cop acl:relcl
+#fun root_nsubj_cop_aclRelcl_obl head nsubj cop acl:relcl obl
 
-#fun nsubj_cop_cc_conj head nsubj cop cc conj  -- he is big and old
+#fun root_nsubj_cop_cc_conj head nsubj cop cc conj  -- he is big and old
+
+#fun passRelCl_ head nsubj:pass cop                -- root -> nsubjPass -> cop -> aclRelcl ;
 
 -- Labels for the core RGL functions, copied from the original gf-rgl/Lang.labels and gf-ud/grammars/Parse.labels
 
@@ -37,6 +42,11 @@
 #fun AdjCN amod head
 
 #fun UseV head
+
+#fun AdvIP head advmod
+#fun FunRP case nsubj head
+#fun ExistS dep dep head
+
 
 -- numerals
 #fun pot0 head -- Digit -> Sub10
@@ -141,6 +151,7 @@
 #fun AdVVP 	advmod head
 #fun QuestIAdv 	advmod head		-- "where does John sleep" cf. AdvVP
 #fun AdvVP 	head advmod
+#fun PassV head
 
 #cat cop AUX
 #cat A ADJ primary

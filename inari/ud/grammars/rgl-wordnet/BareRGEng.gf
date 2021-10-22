@@ -28,7 +28,8 @@ concrete BareRGEng of BareRG =
   NounEng - [
       CountNP,
       PartNP,
-      ApposCN
+      ApposCN,
+      IndefArt, DefArt
    ],
   --  [
   -- NP,CN,AP,Adv,Ord,RS,Pron,PN,Det,Numeral,N,
@@ -60,15 +61,19 @@ concrete BareRGEng of BareRG =
   PositAdvAdj -- A -> Adv  --- not sure if this should be used
   ],
 
+  StructuralEng [possess_Prep],
+
   ConjunctionEng,
   RelativeEng,
   QuestionEng,
   NumeralEng,
-  TenseX - [CAdv,Pol, PPos, PNeg] ** open StructuralEng in {
+  TenseX - [CAdv,Pol, PPos, PNeg] ** open ParadigmsEng in {
 
   lin
     theSg_Det = DetQuant DefArt NumSg ;
     thePl_Det = DetQuant DefArt NumPl ;
     aSg_Det = DetQuant IndefArt NumSg ;
     aPl_Det = DetQuant IndefArt NumPl ;
+
+    PassV v = PassV2 (mkV2 v) ;
 }

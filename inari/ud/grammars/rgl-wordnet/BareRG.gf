@@ -31,7 +31,8 @@ abstract BareRG =
    Noun - [
       CountNP,
       PartNP,
-      ApposCN
+      ApposCN,
+      IndefArt, DefArt
    ],
 -- [
 --     NP,CN,AP,Adv,Ord,RS,Pron,PN,Det,Numeral,N,
@@ -64,6 +65,7 @@ abstract BareRG =
     PositAdvAdj -- A -> Adv  --- not sure if this should be used
   ],
 
+  Structural [possess_Prep],
   Conjunction,
   Relative,
   Question,
@@ -78,5 +80,7 @@ abstract BareRG =
     thePl_Det,
     aSg_Det,
     aPl_Det : Det ;
+
+    PassV : V -> VP ;
 
   }

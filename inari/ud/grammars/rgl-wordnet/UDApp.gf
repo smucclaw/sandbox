@@ -19,20 +19,28 @@ abstract UDApp = BareRG, JustWordsWordNet ** {
 
     -- More like GF NPs, APs or Comps
     nsubj ;
-    -- nsubjPass ; --TODO
     obj ;
     iobj ;
     xcomp ;
+    obl ;
     nmod ;
-    --amod ;
     advmod ;
     cc ;
     conj ;
 
+    acl ;
+    aclRelcl ;
+    --acl_for  -- reason for living
+    --acl_of   -- process of writing grammars
+    --acl_in   -- skill in getting answers
+
    -- skip the lexical layer AUX, COP
     aux ;
     cop ;
-    punct ;
+
+  -- passives
+    nsubjPass ;
+--    auxPass ; --be_cop
 
 
   fun
@@ -43,43 +51,49 @@ abstract UDApp = BareRG, JustWordsWordNet ** {
 
    be_cop : cop ;
 
-   '._punct' : punct ;
-
     -- Functions to UD phrasal categories
     -- detCN : DET -> NOUN -> nsubj ;
 
-   nsubj_ : NP -> nsubj ; -- it can be NOUN, DET, PRON, but all those can be NPs in GF
-   obj_ : NP -> obj ;
-   iobj_ : NP -> iobj ;
-   xcomp_ : Comp -> xcomp ; -- like Comp, it can be from AP, CN, NP, Adv (how about gerund?)
+  nsubj_ : NP -> nsubj ; -- it can be NOUN, DET, PRON, but all those can be NPs in GF
+  obj_ : NP -> obj ;
+  iobj_ : NP -> iobj ;
+  xcomp_ : Comp -> xcomp ; -- like Comp, it can be from AP, CN, NP, Adv (how about gerund?)
 
-   rootV_ : VP -> root ; -- TODO: figure out good way for this
-   rootV2_ : VPSlash -> root ;
-   rootA_ : AP -> root ;
-   rootN_ : NP -> root ;
+  rootV_ : VP -> root ; -- TODO: figure out good way for this
+  rootV2_ : VPSlash -> root ;
+  rootA_ : AP -> root ;
+  rootN_ : NP -> root ;
 
-   conjA_ : AP -> conj ;
-   conjN_ : NP -> conj ;
-   conjAdv_ : Adv -> conj ;
+  conjA_ : AP -> conj ;
+  conjN_ : NP -> conj ;
+  conjAdv_ : Adv -> conj ;
 
-   cc_ : Conj -> cc ;
+  cc_ : Conj -> cc ;
+  aclRelcl_ : RCl -> aclRelcl ; -- whose personal data is affected
 
-   advmod_ : Adv -> advmod ;
+  advmod_ : Adv -> advmod ;
 
-   nmod_ : Prep -> NP -> nmod ; -- UD-specific version of PrepNP
+  nmod_ : Prep -> NP -> nmod ; -- UD-specific version of PrepNP
 
-   -- syntactic functions
-   intransitive : root -> nsubj -> UDS ;  -- the cat sleeps
-   transitive : root -> nsubj -> obj -> UDS ; -- the cat sees us
+  nsubjPass_ : NP -> nsubjPass ;
+--  passRelCl_ : root -> RP -> cop -> aclRelcl ;
 
-   -- Constructions with copula
-   pred        : root -> nsubj -> cop -> UDS ; -- the cat is small
-   pred_nmod   : root -> nsubj -> cop -> nmod -> UDS ; -- my hovercraft is full [of eels] (eels is nmod)
-   pred_advmod : root -> nsubj -> cop -> advmod -> UDS ; -- the party is [here] (here is advmod)
+  -- syntactic functions
+  root_nsubj : root -> nsubj -> UDS ;  -- the cat sleeps
+  root_nsubj_obj : root -> nsubj -> obj -> UDS ;  -- the cat sees us
 
-   nsubj_cop_cc_conj : root -> nsubj -> cop -> cc -> conj -> UDS ; -- he is big and old
+  -- Constructions with copula
+  root_nsubj_cop        : root -> nsubj -> cop -> UDS ; -- the cat is small
+  root_nsubj_cop_nmod   : root -> nsubj -> cop -> nmod -> UDS ; -- my hovercraft is full [of eels] (eels is nmod)
+  root_nsubj_cop_advmod : root -> nsubj -> cop -> advmod -> UDS ; -- the party is [here] (here is advmod)
 
-   punct_ : UDS -> punct -> UDS ;
+  root_nsubj_cop_cc_conj : root -> nsubj -> cop -> cc -> conj -> UDS ; -- he is big and old
+
+  root_nsubj_cop_aclRelcl : root -> nsubj -> cop -> aclRelcl -> UDS ; -- the affected individual is the person whose personal data is affected by the breach
+  root_nsubj_cop_aclRelcl_obl :  root -> nsubj -> cop -> aclRelcl -> obl -> UDS ; -- the affected individual is the person whose personal data is affected by the breach
+
+
+--  punct_ : UDS -> punct -> UDS ;
    --anyUDS : Utt -> UDS ;
 
 }

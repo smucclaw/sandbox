@@ -140,11 +140,7 @@ concrete UDAppEng of UDApp =
        c2 = []
     } ;
 
-    root2vpslash : Root -> VPSlash = \root -> root.vp ** {
-       c2 = root.c2 ;
-       gapInMiddle,
-       missingAdv = False  -- TODO check
-       } ;
+    root2vpslash : Root -> VPSlash = \root -> slashV root.vp ;
 
     -- unstable hack, TODO fixme
     addRcl : Root -> RCl -> Root = \rt,rcl ->

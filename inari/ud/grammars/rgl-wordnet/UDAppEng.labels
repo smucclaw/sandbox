@@ -24,6 +24,8 @@
 
 #lemma DEFAULT_ be cop cop head
 
+
+------------------------------------------------------------------
 -- The following copied from gf-ud/grammars/ShallowParseEng.labels
 
 -- To handle "my hovercraft": i_Pron is not by default parsed as Det
@@ -51,29 +53,47 @@
 #auxcat Comma PUNCT
 #auxfun ExtAdvS_ adv comma s : Adv -> Comma -> S -> S = ExtAdvS adv s ; advmod punct head
 
+-----------------------
+-- Inari's additions --
+-----------------------
+
+-- ** obl **
+-- stored [in electronic formats]:obl
+-- default for AdvVP is head advmod, this is for head obl (i.e. Adv made by PrepNP)
+#auxfun OblVP_ vp adv : VP -> Adv -> VP = AdvVP vp adv ; head obl
+
+
+-- ** acl **
+-- [personal data]:CN [stored in electronic formats]:acl
+#auxfun PPartCN_ cn vp : CN -> VP -> CN = AdjCN (PastPartAP vp) cn ; head acl[Tense=Past|VerbForm=Part]
+
+-- [data breach]:CN [affecting 500 people]:acl
+#auxfun PPresCN_ cn vp : CN -> VP -> CN = AdjCN (PresPartAP vp) cn ; head acl[VerbForm=Ger]
+
+#disable PresPartAP PastPartAP
+
+
+-- The construction "whose X" in the RGL is done using FunRP with possess_Prep.
+
 -- the person [whose data]:RP is affected
 #auxcat RelPron PRON
 #auxfun FunRP_ whose data : RelPron -> CN -> RP = FunRP possess_Prep (MassNP data) IdRP ; nmod:poss[PronType=Int|Poss=Yes] head
 #disable FunRP
 
--- the person [whose data is affected]:RCl
+-- the person [who is affected]:RCl
 #auxfun PassRelCl_ affected whose_data is : V -> RP -> auxPass -> RCl = RelVP whose_data (PassV affected) ; head[Voice=Pass] nsubj:pass aux:pass
-#disable PassV
+
+-- the data [which is stored in electronic formats]
+--#auxfun PassRelClObl_ stored which is in_format : V -> RP -> auxPass -> Adv -> RCl = RelVP which (AdvVP (PassV stored) in_formats) ; head[Voice=Pass] nsubj:pass aux:pass obl
 
 -- the person [whose data is affected by the breach]:RCl
-#auxfun PassRelClObl_ affected whose_data is by_breach : V -> RP -> auxPass -> Adv -> RCl = RelVP whose_data (PassVAgent affected by_breach) ; head[Voice=Pass] nsubj:pass aux:pass obl
+#auxfun PassRelClAgent_ affected whose_data is breach : V -> RP -> auxPass -> NP -> RCl = RelVP whose_data (PassVAgent affected breach) ; head[Voice=Pass] nsubj:pass aux:pass obl
 #disable PassV
 
--- be notified
+-- be notified -- TODO: is this rule used on its own?
 #auxfun PassV_ v : V -> VP = PassV v ; head[Voice=Pass]
-
--- TODO: can we make macros that can look below a level? would like to use PassVAgent : V -> NP -> VP directly, not have explicit prep
--- be affected by breach
-#auxcat By ADP
-#auxfun Agent_ the_breach by : NP -> By -> Adv = PrepNP by8agent_Prep the_breach ; head case
-
-#auxfun PassVAgent_ affected by_the_breach : V -> Adv -> VP = PassVAgent affected by_the_breach ; head obl
 
 
 -- everyone who is affected
 #auxfun RelNP_ np rcl : NP -> RCl -> NP = RelNP np (UseRCl (TTAnt TPres ASimul) PPos rcl) ; head acl:relcl
+

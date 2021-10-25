@@ -3,6 +3,7 @@ concrete BareRGEng of BareRG =
   ExtendEng [
     Temp, Pol, NP, Tense,
     S, ExistS, ExistNP,
+    AP, VP, PresPartAP,
     N, CompoundN
   ],
 
@@ -53,7 +54,7 @@ concrete BareRGEng of BareRG =
   RelativeEng,
   QuestionEng,
   NumeralEng,
-  TenseX - [CAdv,Pol, PPos, PNeg] ** open (G=GrammarEng), MorphoEng, ExtraEng, (P=ParadigmsEng), ExtraEng, ResEng in {
+  TenseX - [CAdv,Pol, PPos, PNeg] ** open Prelude, (G=GrammarEng), MorphoEng, ExtraEng, (P=ParadigmsEng), (E=ExtendEng), ResEng in {
 
   lin
     PPos = G.PPos ;
@@ -68,7 +69,16 @@ concrete BareRGEng of BareRG =
     who_RP = ExtraEng.who_RP ;
 
     PassV v = PassV2 (P.mkV2 v) ;
-    PassVAgent v ag = AdvVP (PassV v) ag ;
+    PassVAgent v ag = AdvVP (PassV v) (PrepNP by8agent_Prep ag) ;
+
+    PastPartAP vp = E.PastPartAP (slashV vp) ;
+
+  oper
+    slashV : VP -> VPSlash = \vp -> vp ** {
+      c2 = [] ;
+      gapInMiddle = True ;
+      missingAdv = False
+      } ;
 
   -- Application-specific additions to RGL
   lincat
@@ -91,4 +101,6 @@ concrete BareRGEng of BareRG =
       p = [] ;
       typ = VVAux
     } ;
+
+    PDPA_N = P.mkN "PDPA" ;
 }

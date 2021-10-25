@@ -6,6 +6,7 @@ abstract BareRG =
   Extend [
     Temp, Pol, NP, Tense,
     S, ExistS, ExistNP,
+    AP, VP, PresPartAP,
     N, CompoundN -- : N -> N -> N    -- control system
   ],
 
@@ -75,8 +76,9 @@ abstract BareRG =
   cat
     Agent ;
   fun
-    PassV : V -> VP ;            -- affected
-    PassVAgent : V -> Adv -> VP ; -- affected by the breach
+    PassV : V -> VP ;             -- affected
+    PassVAgent : V -> NP -> VP ; -- affected by the breach
+    PastPartAP : VP -> AP ;       -- stored in electronic formats (Extend.PastPartAP takes a VPSlash)
 
   -- Domain-specifics: we care about some specific modals and want special cats and funs for them
   cat
@@ -87,5 +89,7 @@ abstract BareRG =
     shall_Deontic,
     shant_Deontic,
     should_Deontic : Deontic ;
+
+    PDPA_N : N ;
 
   }

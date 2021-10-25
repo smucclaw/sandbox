@@ -154,6 +154,12 @@
 #fun QuestIAdv 	advmod head		-- "where does John sleep" cf. AdvVP
 #fun AdvVP 	head advmod
 #fun PassV head
+ComparAdvAdj
+-- #fun ComparAdvAdjS
+-- #fun UseRCl
+-- #fun UseCl
+#fun ComplV head obj
+-- #fun PassVAgent
 
 #cat cop AUX
 #cat aux AUX

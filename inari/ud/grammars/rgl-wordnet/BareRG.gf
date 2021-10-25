@@ -34,6 +34,7 @@ abstract BareRG =
       CountNP,
       PartNP,
       ApposCN
+      ,UseN2, Use2N3
     ---  IndefArt, DefArt
    ],
 
@@ -50,7 +51,10 @@ abstract BareRG =
     Prep,NP,Adv,Subj,S,
     PrepNP    , -- Prep -> NP -> Adv ;     -- in the house
     SubjS,
-    PositAdvAdj -- A -> Adv  --- not sure if this should be used
+    PositAdvAdj,   -- : A -> Adv  --- not sure if this should be used
+    ComparAdvAdj,  -- : CAdv -> A -> NP -> Adv ; -- more warmly than John
+    ComparAdvAdjS, -- : CAdv -> A -> S  -> Adv ; -- more warmly than he runs
+    AdnCAdv        -- : CAdv -> AdN ;
   ],
 
   Structural [Prep, possess_Prep, by8agent_Prep],
@@ -77,6 +81,12 @@ abstract BareRG =
     PassVAgent : V -> NP -> VP ; -- affected by the breach
     PastPartAP : VP -> AP ;       -- stored in electronic formats (Extend.PastPartAP takes a VPSlash)
 
+  -- TODO revisit
+    -- PredetPrep : Predet -> Prep -> Prep ;               -- more than
+    -- PredetPrepCard : Predet -> Prep -> Card -> Prep ;   -- more than 500/enough
+
+    ComplV : V -> NP -> VP ; -- JustWordsWordNet has no V2 etc
+
   -- Domain-specifics: we care about some specific modals and want special cats and funs for them
   cat
     Deontic ;
@@ -88,5 +98,7 @@ abstract BareRG =
     should_Deontic : Deontic ;
 
     PDPA_N : N ;
+    '500_Digit' : Digit ;
+    more_than_Quant : Quant ;
 
   }

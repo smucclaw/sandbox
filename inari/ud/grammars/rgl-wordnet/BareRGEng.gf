@@ -22,30 +22,34 @@ concrete BareRGEng of BareRG =
   -- CompAP,
   -- CompAdv,
   -- CompNP,
-  AdvVP    , -- VP -> Adv -> VP ;       -- sleep here
-  AdVVP
+    AdvVP    , -- VP -> Adv -> VP ;       -- sleep here
+    AdVVP
   ],
 
   NounEng - [
-      CountNP,
-      PartNP,
-      ApposCN
+    CountNP,
+    PartNP,
+    ApposCN
+    ,UseN2, Use2N3
    ],
 
 
   AdjectiveEng [
-  AP,AdA,A,Ord,
-  PositA    , -- A  -> AP ;              -- warm
-  UseComparA,
-  AdAP,
-  AdjOrd
+    AP,AdA,A,Ord,
+    PositA    , -- A  -> AP ;              -- warm
+    UseComparA,
+    AdAP,
+    AdjOrd
   ],
 
   AdverbEng [
-  A,Prep,NP,Adv,Subj,S,
-  PrepNP    , -- Prep -> NP -> Adv ;     -- in the house
-  SubjS,
-  PositAdvAdj -- A -> Adv  --- not sure if this should be used
+    A,Prep,NP,Adv,Subj,S,
+    PrepNP    , -- Prep -> NP -> Adv ;     -- in the house
+    SubjS,
+    PositAdvAdj,   -- : A -> Adv  --- not sure if this should be used
+    ComparAdvAdj,  -- : CAdv -> A -> NP -> Adv ; -- more warmly than John
+    ComparAdvAdjS, -- : CAdv -> A -> S  -> Adv ; -- more warmly than he runs
+    AdnCAdv        -- : CAdv -> AdN ;
   ],
 
   StructuralEng [Prep, possess_Prep, by8agent_Prep],
@@ -74,6 +78,8 @@ concrete BareRGEng of BareRG =
         } ;
       a = RNoAg
       } ;
+
+    ComplV v np = ComplSlash (slashV (UseV v)) np ;
 
     -- : V -> VP ;       -- affected
     PassV v = PassV2 (P.mkV2 v) ;
@@ -113,5 +119,5 @@ concrete BareRGEng of BareRG =
       typ = VVAux
     } ;
 
-    PDPA_N = P.mkN "PDPA" ;
+   PDPA_N = P.mkN "PDPA" ;
 }

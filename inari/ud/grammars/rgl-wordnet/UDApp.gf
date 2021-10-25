@@ -65,7 +65,7 @@ abstract UDApp = BareRG, JustWordsWordNet ** {
   conjAdv_ : Adv -> conj ;
 
   cc_ : Conj -> cc ;
-  aclRelcl_ : RCl -> aclRelcl ; -- whose personal data is affected
+  aclRelcl_ : RS -> aclRelcl ; -- whose personal data is/was/has been affected
 
   obl_,
   advmod_ : Adv -> advmod ;

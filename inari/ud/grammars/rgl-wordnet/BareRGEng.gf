@@ -67,10 +67,21 @@ concrete BareRGEng of BareRG =
 
     everyone_Pron = mkPron "everyone" "everyone" "everyone's" "everyone's" P.singular P3 P.human ;
     who_RP = ExtraEng.who_RP ;
+    that_RP = lin RP {
+      s = table {
+        RC _ (NCase Gen) | RC _ NPNomPoss => "whose" ;
+        _     => "that"
+        } ;
+      a = RNoAg
+      } ;
 
+    -- : V -> VP ;       -- affected
     PassV v = PassV2 (P.mkV2 v) ;
+
+    -- : V -> NP -> VP ; -- affected by the breach
     PassVAgent v ag = AdvVP (PassV v) (PrepNP by8agent_Prep ag) ;
 
+    -- : VP -> AP ;      -- stored in electronic formats (Extend.PastPartAP takes a VPSlash)
     PastPartAP vp = E.PastPartAP (slashV vp) ;
 
   oper

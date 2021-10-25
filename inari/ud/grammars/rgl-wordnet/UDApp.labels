@@ -156,6 +156,7 @@
 #fun PassV head
 
 #cat cop AUX
+#cat aux AUX
 #cat auxPass AUX
 #cat Deontic AUX
 #cat A ADJ primary

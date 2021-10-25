@@ -31,7 +31,7 @@ concrete UDAppEng of UDApp =
 --   conj = {s : Number => Str} ;
     cc = Conj ;
 
-    aclRelcl = RCl ;
+    aclRelcl = RS ;
 
   lin
 
@@ -49,7 +49,7 @@ concrete UDAppEng of UDApp =
     obj_,
     iobj_ = id NP ;
     xcomp_ = id Comp ;
-    aclRelcl_ = id RCl ;
+    aclRelcl_ = id RS ;
     cc_ = id Conj ;
     obl_,
     advmod_ = id Adv ;
@@ -143,8 +143,8 @@ concrete UDAppEng of UDApp =
     root2vpslash : Root -> VPSlash = \root -> slashV root.vp ;
 
     -- unstable hack, TODO fixme
-    addRcl : Root -> RCl -> Root = \rt,rcl ->
-      let dummyNP : NP = mkNP emptyNP (mkRS rcl) ;
+    addRcl : Root -> RS -> Root = \rt,rs ->
+      let dummyNP : NP = mkNP emptyNP rs ;
           dummyVPSlash : VPSlash = root2vpslash rt ;
        in rt ** {
             vp = mkVP dummyVPSlash dummyNP

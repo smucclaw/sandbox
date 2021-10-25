@@ -57,10 +57,6 @@
 -- Inari's additions --
 -----------------------
 
--- ** obl **
--- stored [in electronic formats]:obl
--- default for AdvVP is head advmod, this is for head obl (i.e. Adv made by PrepNP)
-#auxfun OblVP_ vp adv : VP -> Adv -> VP = AdvVP vp adv ; head obl
 
 
 -- ** acl **
@@ -75,25 +71,42 @@
 
 -- The construction "whose X" in the RGL is done using FunRP with possess_Prep.
 
--- the person [whose data]:RP is affected
+-- (the person) [whose data]:RP (is affected)
 #auxcat RelPron PRON
 #auxfun FunRP_ whose data : RelPron -> CN -> RP = FunRP possess_Prep (MassNP data) IdRP ; nmod:poss[PronType=Int|Poss=Yes] head
 #disable FunRP
 
--- the person [who is affected]:RCl
-#auxfun PassRelCl_ affected whose_data is : V -> RP -> auxPass -> RCl = RelVP whose_data (PassV affected) ; head[Voice=Pass] nsubj:pass aux:pass
+-- the person [who is affected]:RS
+#auxfun PassRelPres_ affected who is : V -> RP -> auxPass -> RS = UseRCl (TTAnt TPres ASimul) PPos (RelVP who (PassV affected)) ; head[Voice=Pass] nsubj:pass aux:pass[Tense=Pres]
 
--- the data [which is stored in electronic formats]
---#auxfun PassRelClObl_ stored which is in_format : V -> RP -> auxPass -> Adv -> RCl = RelVP which (AdvVP (PassV stored) in_formats) ; head[Voice=Pass] nsubj:pass aux:pass obl
+-- … [who was affected]:RS
+#auxfun PassRelPast_ affected who was : V -> RP -> auxPass -> RS = UseRCl (TTAnt TPast ASimul) PPos (RelVP who (PassV affected)) ; head[Voice=Pass] nsubj:pass aux:pass[Tense=Past]
 
+-- … [who has been affected]:RS
+#auxfun PassRelPart_ affected who has been : V -> RP -> aux -> auxPass -> RS = UseRCl (TTAnt TPres AAnter) PPos (RelVP who (PassV affected)) ; head[Voice=Pass] nsubj:pass aux[Tense=Pres] aux:pass[VerbForm=Part]
+
+-- the data [which is stored in electronic formats]:RS
+#auxfun PassRelOblPres_ stored which is in_formats : V -> RP -> auxPass -> Adv -> RS = UseRCl (TTAnt TPres ASimul) PPos (RelVP which (AdvVP (PassV stored) in_formats)) ; head[Voice=Pass] nsubj:pass aux:pass obl
+
+-- [which has been stored in electronic formats]:RS
+#auxfun PassRelOblPart_ stored which has been in_formats : V -> RP -> aux -> auxPass -> Adv -> RS = UseRCl (TTAnt TPres AAnter) PPos (RelVP which (AdvVP (PassV stored) in_formats)) ; head[Voice=Pass] nsubj:pass aux[Tense=Pres] aux:pass[VerbForm=Part] obl
+
+-- TODO: ideally would choose this, if we saw the preposition "by" attaching to the obl. But that doesn't seem to be possible? Allowing this rule changes "stored in formats" to "stored by formats"
 -- the person [whose data is affected by the breach]:RCl
-#auxfun PassRelClAgent_ affected whose_data is breach : V -> RP -> auxPass -> NP -> RCl = RelVP whose_data (PassVAgent affected breach) ; head[Voice=Pass] nsubj:pass aux:pass obl
-#disable PassV
+--#auxfun PassRelClAgent_ affected whose_data is breach : V -> RP -> auxPass -> NP -> RCl = RelVP whose_data (PassVAgent affected breach) ; head[Voice=Pass] nsubj:pass aux:pass obl
 
 -- be notified -- TODO: is this rule used on its own?
 #auxfun PassV_ v : V -> VP = PassV v ; head[Voice=Pass]
 
+#disable PassV
 
+-- attach RCl to a NP
 -- everyone who is affected
-#auxfun RelNP_ np rcl : NP -> RCl -> NP = RelNP np (UseRCl (TTAnt TPres ASimul) PPos rcl) ; head acl:relcl
+#auxfun RelNP_ np rs : NP -> RS -> NP = RelNP np rs ; head acl:relcl
+
+
+-- ** obl **
+-- stored [in electronic formats]:obl
+-- default for AdvVP is head advmod, this is for head obl (i.e. Adv made by PrepNP)
+#auxfun OblVP_ vp adv : VP -> Adv -> VP = AdvVP vp adv ; head obl
 

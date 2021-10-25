@@ -70,12 +70,9 @@ abstract BareRG =
     aPl_Det : Det ;
 
     everyone_Pron : Pron ;
-    who_RP : RP ;
+    who_RP, that_RP : RP ;
 
   -- passives
-  cat
-    Agent ;
-  fun
     PassV : V -> VP ;             -- affected
     PassVAgent : V -> NP -> VP ; -- affected by the breach
     PastPartAP : VP -> AP ;       -- stored in electronic formats (Extend.PastPartAP takes a VPSlash)

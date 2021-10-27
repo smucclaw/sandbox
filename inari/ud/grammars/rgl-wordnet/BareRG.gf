@@ -35,7 +35,7 @@ abstract BareRG =
       PartNP,
       ApposCN
       ,UseN2, Use2N3
-    ---  IndefArt, DefArt
+--      ,IndefArt, DefArt
    ],
 
   Adjective [
@@ -99,6 +99,7 @@ abstract BareRG =
 
     PDPA_N : N ;
     '500_Digit' : Digit ;
+    at_least_Quant,
     more_than_Quant : Quant ;
 
   }

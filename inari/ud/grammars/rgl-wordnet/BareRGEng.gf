@@ -31,6 +31,7 @@ concrete BareRGEng of BareRG =
     PartNP,
     ApposCN
     ,UseN2, Use2N3
+--    ,IndefArt, DefArt
    ],
 
 
@@ -68,6 +69,8 @@ concrete BareRGEng of BareRG =
     thePl_Det = DetQuant DefArt NumPl ;
     aSg_Det = DetQuant IndefArt NumSg ;
     aPl_Det = DetQuant IndefArt NumPl ;
+
+--    at_least_Quant
 
     everyone_Pron = mkPron "everyone" "everyone" "everyone's" "everyone's" P.singular P3 P.human ;
     who_RP = ExtraEng.who_RP ;

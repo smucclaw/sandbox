@@ -3619,6 +3619,8 @@ fun asynergy_N : N ;
 fun asystole_N : N ;
 fun at_AdN : AdN ;
 fun at_AdV : AdV ;
+fun at_least_AdN : AdN ;
+fun at_most_AdN : AdN ;
 fun at_Adv : Adv ;
 fun at_N : N ;
 fun at_PN : PN ;

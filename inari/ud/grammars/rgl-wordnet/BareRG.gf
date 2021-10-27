@@ -7,6 +7,7 @@ abstract BareRG =
     Temp, Pol, NP, Tense,
     S, ExistS, ExistNP,
     AP, VP, PresPartAP,
+    Num, CN, NP, GenModNP, GenNP,
     N, CompoundN -- : N -> N -> N    -- control system
   ],
 

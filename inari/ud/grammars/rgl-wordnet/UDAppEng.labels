@@ -31,9 +31,28 @@
 -- To handle "my hovercraft": i_Pron is not by default parsed as Det
 #auxfun PossSgNP_ pron cn : Pron -> CN -> NP = DetCN (DetQuant (PossPron pron) NumSg) cn ; nmod:poss[PronType=Prs] head[Number=Sing]
 #auxfun PossPlNP_ pron cn : Pron -> CN -> NP = DetCN (DetQuant (PossPron pron) NumPl) cn ; nmod:poss[PronType=Prs] head[Number=Plur]
+#disable PossPron
 
-#auxfun PossNumSgNP_ pron num cn : Pron -> Num -> CN -> NP = DetCN (DetQuant (PossPron pron) num) cn ; nmod:poss[PronType=Prs] head[Number=Sing]
-#auxfun PossNumPlNP_ pron num cn : Pron -> Num -> CN -> NP = DetCN (DetQuant (PossPron pron) num) cn ; nmod:poss[PronType=Prs] head[Number=Plur]
+-- my 5 hovercrafts
+#auxfun PossNumSgNP_ pron num cn : Pron -> Num -> CN -> NP = DetCN (DetQuant (PossPron pron) num) cn ; nmod:poss[PronType=Prs] nummod head[Number=Sing]
+#auxfun PossNumPlNP_ pron num cn : Pron -> Num -> CN -> NP = DetCN (DetQuant (PossPron pron) num) cn ; nmod:poss[PronType=Prs] nummod head[Number=Plur]
+
+-- [my mother's]:Quant
+#auxcat Gen PART
+#auxfun GenNP_ np gen : NP -> Gen -> Quant = GenNP np ; head case
+#disable GenNP
+
+-- [my mother's]:Quant [hovercraft]:CN
+#auxfun DetCNSgNmod_ quant cn : Quant -> CN -> NP = DetCN (DetQuant quant NumSg) cn ; nmod:poss head[Number=Sing]
+#auxfun DetCNPlNmod_ quant cn : Quant -> CN -> NP = DetCN (DetQuant quant NumPl) cn ; nmod:poss head[Number=Plur]
+
+
+-- [my mother's]:Quant [5]:Num [hovercrafts]:CN
+#auxfun DetCNNumNmod_ quant num cn : Quant -> Num -> CN -> NP = DetCN (DetQuant quant num) cn ; nmod:poss nummod head
+
+
+-- #auxfun PossGenmodSgNP_ np cn : NP -> CN -> NP = GenModNP NumSg np cn ; nmod:poss head[Number=Sing]
+-- #auxfun PossGenmodSgPl_ np cn : NP -> CN -> NP = GenModNP NumPl np cn ; nmod:poss head[Number=Plur]
 
 -- disable plurals as mass terms
 #auxfun MassNP_sg cn : CN -> NP = MassNP cn ; head[Number=Sing]
@@ -59,6 +78,8 @@
 -----------------------
 -- Inari's additions --
 -----------------------
+
+#disable pot1 pot2 pot3 pot4 pot1to19
 
 -- Some multiwords
 -- ** more than **

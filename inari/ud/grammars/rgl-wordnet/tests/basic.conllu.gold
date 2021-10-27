@@ -1,0 +1,31 @@
+DetCN (DetQuant IndefArt (NumCard (NumNumeral (num (pot2as3 (pot1as2 (pot0as1 (pot0 '500_Digit')))))))) (UseN people_N)
+
+LIN: ['500_Digit'] people
+
+DetCN (DetQuant more_than_Quant (NumCard (NumNumeral (num (pot2as3 (pot1as2 (pot0as1 (pot0 '500_Digit')))))))) (UseN people_N)
+
+LIN: [more_than_Quant] ['500_Digit'] people
+
+AdNum at_least_AdN (NumNumeral (num (pot2as3 (pot1as2 (pot0as1 (pot0 '500_Digit'))))))
+
+LIN: at least ['500_Digit']
+
+DetCN (DetQuant IndefArt (NumCard (AdNum at_least_AdN (NumNumeral (num (pot2as3 (pot1as2 (pot0as1 (pot0 '500_Digit'))))))))) (UseN people_N)
+
+LIN: at least ['500_Digit'] people
+
+DetCN (DetQuant (PossPron i_Pron) NumPl) (UseN cat_N)
+
+LIN: my cats
+
+DetCN (DetQuant (PossPron i_Pron) (NumCard (NumNumeral (num (pot2as3 (pot1as2 (pot0as1 (pot0 n5)))))))) (UseN cat_N)
+
+LIN: my five cats
+
+DetCN (DetQuant (GenNP (UsePN sylvia_PN)) (NumCard (NumNumeral (num (pot2as3 (pot1as2 (pot0as1 (pot0 '500_Digit')))))))) (UseN cat_N)
+
+LIN: Sylvia's ['500_Digit'] cats
+
+DetCN (DetQuant (GenNP (DetCN (DetQuant (PossPron i_Pron) NumSg) (UseN mother_N))) (NumCard (NumNumeral (num (pot2as3 (pot1as2 (pot0as1 (pot0 n5)))))))) (UseN cat_N)
+
+LIN: my mother's five cats

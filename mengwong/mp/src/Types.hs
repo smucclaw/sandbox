@@ -1,6 +1,7 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE DeriveGeneric, DeriveAnyClass #-}
 
 module Types ( module BasicTypes
              , module Types) where
@@ -13,13 +14,15 @@ import qualified Data.Set           as Set
 import Control.Monad
 import qualified AnyAll as AA
 import Control.Monad.Reader (ReaderT, asks)
+import Data.Aeson (ToJSON, FromJSON)
+import GHC.Generics
 
 import BasicTypes
 
 type Parser = ReaderT RunConfig (Parsec Void MyStream)
 type Depth = Int
 type Preamble = MyToken
-type BoolRules = (Maybe BoolStruct, [Rule])
+type BoolStruct = AA.Item Text.Text
 
 data Rule = Regulative
             { every    :: EntityType         -- every person
@@ -32,36 +35,42 @@ data Rule = Regulative
             , lest     :: Maybe [Rule]
             , rlabel   :: Maybe Text.Text
             , lsource  :: Maybe Text.Text
-            , srcref   :: Maybe SrcRef 
+            , srcref   :: Maybe SrcRef
             }
           | Constitutive
             { term     :: ConstitutiveTerm
             , cond     :: Maybe BoolStruct
             , rlabel   :: Maybe Text.Text
             , lsource  :: Maybe Text.Text
-            , srcref   :: Maybe SrcRef 
+            , srcref   :: Maybe SrcRef
             }
           | DefTermAlias -- inline alias, like     some thing ("Thing")
             { term   :: ConstitutiveTerm -- "Thing"
             , detail :: Text.Text        -- "some thing"
             , nlhint :: Maybe Text.Text  -- "lang=en number=singular"
-            , srcref :: Maybe SrcRef 
+            , srcref :: Maybe SrcRef
             }
           | RegAlias Text.Text -- internal softlink to a regulative rule label
           | ConAlias Text.Text -- internal softlink to a constitutive rule label
-          deriving (Eq, Show)
+          deriving (Eq, Show, Generic, ToJSON, FromJSON)
+
+noLabel, noLSource :: Maybe Text.Text
+noLabel   = Nothing
+noLSource = Nothing
+noSrcRef :: Maybe SrcRef
+noSrcRef  = Nothing
+
 -- everything is stringly typed at the moment but as this code matures these will become more specialized.
 data TemporalConstraint a = TBefore a
                           | TAfter  a
                           | TBy     a
                           | TOn     a
-                          deriving (Eq, Show)
+                          deriving (Eq, Show, Generic, ToJSON, FromJSON)
 type ConstitutiveTerm = Text.Text
 type EntityType = Text.Text
 type ActionType = (Text.Text,[(Text.Text,[Text.Text])])
-type BoolStruct = AA.Item Text.Text
 data Deontic = DMust | DMay | DShant
-  deriving (Eq, Show)
+  deriving (Eq, Show, Generic, ToJSON, FromJSON)
 
 data SrcRef = SrcRef { url      :: Text.Text
                      , short    :: Text.Text
@@ -69,7 +78,7 @@ data SrcRef = SrcRef { url      :: Text.Text
                      , srccol   :: Int
                      , version  :: Maybe Text.Text
                      }
-              deriving (Eq, Show)
+              deriving (Eq, Show, Generic, ToJSON, FromJSON)
 
 mkTC :: MyToken -> Text.Text -> Maybe (TemporalConstraint Text.Text)
 mkTC Before     tt = Just $ TBefore tt
@@ -83,6 +92,8 @@ data RunConfig = RC { debug     :: Bool
                     , callDepth :: Int
                     , parseCallStack :: [String]
                     , sourceURL :: Text.Text
+                    , asJSON    :: Bool
+                    , toNLG     :: Bool
                     }
 
 nestLevel :: RunConfig -> Int
@@ -101,6 +112,7 @@ toToken "PARTY" =  Party
 
 -- start a boolstruct
 toToken "ALWAYS" = Always
+toToken "NEVER"  = Never
 toToken "WHO" =    Who
 toToken "WHEN" =   When
 toToken "IF" =     If
@@ -112,6 +124,8 @@ toToken "IS" =     Is
 toToken "OR" =     Or
 toToken "AND" =    And
 toToken "UNLESS" = Unless
+toToken "IF NOT" = Unless
+toToken "NOT"    = MPNot
 
 -- deontics
 toToken "MUST" =   Must
@@ -143,7 +157,7 @@ toToken "LEST"  = Lest
 toToken ";"      = EOL
 
 -- we recognize numbers
-toToken s | [(n,"")] <- reads $ Text.unpack s = Number n
+toToken s | [(n,"")] <- reads $ Text.unpack s = TNumber n
 
 -- any other value becomes an Other -- "walks", "runs", "eats", "drinks"
 toToken x = Other x

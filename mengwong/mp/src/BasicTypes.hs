@@ -18,12 +18,12 @@ data MyStream = MyStream
   }
   deriving Show
 
-data MyToken = Every | Party | Who | Means | Includes | When | Is | Always
-             | Must | May | Shant | If | Or | And
+data MyToken = Every | Party | Who | Means | Includes | When | Is | Always | Never
+             | Must | May | Shant | If | Or | And | MPNot
              | Before | After | By | On | Eventually
              | Unless
              | Hence | Lest
-             | Number Int
+             | TNumber Int
              | Other Text.Text
              | Do
              | Checkbox

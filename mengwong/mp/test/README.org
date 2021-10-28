@@ -436,59 +436,223 @@ do the individual components work?
 
 Suppose we downloaded as CSV an entire spreadsheet containing multiple stanzas. How do parse only the relevant bits?
 
-|   | EVERY      | person |                |          |        |    |       |
-|   | WHO        | walks  |                |          |        |    |       |
-|   | AND        | eats   |                |          |        |    |       |
-|   | OR         | drinks |                |          |        |    |       |
-|   | MUST       |        |                |          |        |    |       |
-|   | ->         | sing   |                |          |        |    |       |
-|   |            |        |                |          |        |    |       |
-|   |            | EVERY  | person         |          |        |    |       |
-|   |            | MAY    | after          | lunch    |        |    |       |
-|   |            | ->     | eat potato     |          |        |    |       |
-|   |            | WHEN   | tasty(potato)  |          |        |    |       |
-|   |            | UNLESS | green(potato)  |          |        |    |       |
-|   |            |        |                |          |        |    |       |
-|   | You        | MUST   | before         | midnight |        |    |       |
-|   |            | ->     | discard potato |          |        |    |       |
-|   |            | WHEN   | green(potato)  |          |        |    |       |
-|   |            |        |                |          |        |    |       |
-|   |            |        |                |          |        |    |       |
-|   | degustates | MEANS  | eats           | AND      | drinks | OR | farts |
-|   |            |        |                |          |        |    |       |
-|   |            |        |                |          |        |    |       |
+|   | EVERY    | person |                |          |         |   |   |
+|   | WHO      | walks  |                |          |         |   |   |
+|   | AND      | eats   |                |          |         |   |   |
+|   | OR       | drinks |                |          |         |   |   |
+|   | MUST     |        |                |          |         |   |   |
+|   | ->       | sing   |                |          |         |   |   |
+|   |          |        |                |          |         |   |   |
+|   | we add a | line   | to separate    | the      | stanzas |   |   |
+|   |          |        |                |          |         |   |   |
+|   |          | EVERY  | person         |          |         |   |   |
+|   |          | MAY    | AFTER          | lunch    |         |   |   |
+|   |          | ->     | eat potato     |          |         |   |   |
+|   |          | WHEN   | tasty(potato)  |          |         |   |   |
+|   |          | UNLESS | green(potato)  |          |         |   |   |
+|   |          |        |                |          |         |   |   |
+|   | we add a | line   | to separate    | the      | stanzas |   |   |
+|   |          |        |                |          |         |   |   |
+|   | You      | MUST   | BEFORE         | midnight |         |   |   |
+|   |          | ->     | discard potato |          |         |   |   |
+|   |          | WHEN   | green(potato)  |          |         |   |   |
+|   |          |        |                |          |         |   |   |
+|   |          |        |                |          |         |   |   |
 
 
-** Unless has special semantics
+** The ~Unless~ preamble
 :PROPERTIES:
 :TABLE_EXPORT_FILE: /dev/null
 :TABLE_EXPORT_FORMAT: orgtbl-to-csv
 :END:
 
+*** UNLESS for entity qualification vs for regular conditionals
+
+The preamble ~WHO~ introduces a Boolean structure which qualifies the party.
+
+The preamble ~IF~ introduces a Boolean structure which qualifies preconditions generally.
+
+The preamble ~UNLESS~ is like ~IF~, but reversed.
+
+What preamble do we use to reverse a WHO? Let's use the keyword ~EXCEPT~ for now.
+
+|          | qualifies party | qualifies preconditions generally |
+| positive | WHO             | IF / WHEN                         |
+| negative | EXCEPT          | UNLESS                            |
+
 *** Unless /in/ the tail
+:PROPERTIES:
+:TABLE_EXPORT_FILE: bob-tail-1.csv
+:TABLE_EXPORT_FORMAT: orgtbl-to-csv
+:END:
 
 |        | Bob's your uncle             |
-| IF     | Bob is your mother's brother |
+| MEANS  | Bob is your mother's brother |
 | OR     | Bob is your father's brother |
 | UNLESS | Bob is estranged             |
 
 if ((morbror or farbror) and not estranged)
 
-*** Unless /as/ the head
+*** You can't have an UNLESS being the head of a constitutive rule -- it has to be MEANS or UNLESS or IS
+:PROPERTIES:
+:TABLE_EXPORT_FILE: bob-head-1.csv
+:TABLE_EXPORT_FORMAT: orgtbl-to-csv
+:END:
 
-|        | Bob's your uncle |
-| UNLESS | Bob is estranged |
-| OR     | Bob is dead      |
+|       | Bob's your uncle |                  |
+| MEANS | NOT              | Bob is estranged |
+|       | OR               | Bob is dead      |
 
 if (not (estranged or dead))
 
-*** Unless expands to and
+*** Unless as the only term in a regulative rule
+:PROPERTIES:
+:TABLE_EXPORT_FILE: unless-regulative-1.csv
+:TABLE_EXPORT_FORMAT: orgtbl-to-csv
+:END:
 
-|        | Bob's your uncle             |
-| IF     | Bob is your parent's brother |
-| UNLESS | Bob is estranged             |
+| EVERY  | person         |
+| MUST   | sing           |
+| UNLESS | day of silence |
 
-if (parentBrother and not estranged)
+*** Unless as the first term in a regulative rule
+:PROPERTIES:
+:TABLE_EXPORT_FILE: unless-regulative-2.csv
+:TABLE_EXPORT_FORMAT: orgtbl-to-csv
+:END:
+
+| EVERY  | person          |
+| MUST   | sing            |
+| UNLESS | day of silence  |
+| IF     | the king wishes |
+
+The intepreter combines two conditions into one: ~if ((not (day of silence)) && (the king wishes))~
+
+*** Unless as the second term in a regulative rule
+:PROPERTIES:
+:TABLE_EXPORT_FILE: unless-regulative-3.csv
+:TABLE_EXPORT_FORMAT: orgtbl-to-csv
+:END:
+
+| EVERY  | person          |
+| MUST   | sing            |
+| IF     | the king wishes |
+| UNLESS | day of silence  |
+
+same as above
+
+*** Unless as a separated first term in a regulative rule
+:PROPERTIES:
+:TABLE_EXPORT_FILE: unless-regulative-4.csv
+:TABLE_EXPORT_FORMAT: orgtbl-to-csv
+:END:
+
+| EVERY  | person          |
+| UNLESS | day of silence  |
+| MUST   | sing            |
+| IF     | the king wishes |
+
+*** Unless as a separated second term in a regulative rule
+:PROPERTIES:
+:TABLE_EXPORT_FILE: unless-regulative-5.csv
+:TABLE_EXPORT_FORMAT: orgtbl-to-csv
+:END:
+
+| EVERY  | person          |
+| IF     | the king wishes |
+| MUST   | sing            |
+| UNLESS | day of silence  |
+
+*** Unless preambles an OR
+:PROPERTIES:
+:TABLE_EXPORT_FILE: unless-regulative-6.csv
+:TABLE_EXPORT_FORMAT: orgtbl-to-csv
+:END:
+
+| EVERY  | person          |
+| IF     | the king wishes |
+| MUST   | sing            |
+| UNLESS | day of silence  |
+| OR     | day of mourning |
+
+*** Unless preambles an AND
+:PROPERTIES:
+:TABLE_EXPORT_FILE: unless-regulative-7.csv
+:TABLE_EXPORT_FORMAT: orgtbl-to-csv
+:END:
+
+| EVERY  | person                   |
+| IF     | the king wishes          |
+| MUST   | sing                     |
+| UNLESS | day of mourning          |
+| AND    | mourning forbids singing |
+
+** NOT is a thing
+
+*** Should be the same as an IF NOT (joined):
+:PROPERTIES:
+:TABLE_EXPORT_FILE: ifnot-1-joined.csv
+:TABLE_EXPORT_FORMAT: orgtbl-to-csv
+:END:
+
+| EVERY  | person         |
+| MUST   | sing           |
+| IF NOT | day of silence |
+
+*** Should be the same as an IF NOT (separated):
+:PROPERTIES:
+:TABLE_EXPORT_FILE: ifnot-2-separate.csv
+:TABLE_EXPORT_FORMAT: orgtbl-to-csv
+:END:
+
+| EVERY | person |                |
+| MUST  | sing   |                |
+| IF    | NOT    | day of silence |
+
+How does this interact with our indentation syntax?
+
+*** Maybe IF NOT indentation binds looser than AND
+:PROPERTIES:
+:TABLE_EXPORT_FILE: ifnot-3-undefined.csv
+:TABLE_EXPORT_FORMAT: orgtbl-to-csv
+:END:
+
+| EVERY | person |                         |         |
+| MUST  | sing   |                         |         |
+| IF    | NOT    | day of silence          |         |
+|       | AND    | observance is mandatory |         |
+
+This could trigger an error, forcing the user to choose one of the explicit forms below.
+
+(Right now it matches 4 immediately below, we are being lenient.)
+
+If we get around to https://github.com/smucclaw/sandbox/issues/33 we can revisit this and outlaw it.
+
+*** Maybe IF NOT indentation is required to appear at its own level to reduce human error
+:PROPERTIES:
+:TABLE_EXPORT_FILE: ifnot-4-indentation-explicit.csv
+:TABLE_EXPORT_FORMAT: orgtbl-to-csv
+:END:
+
+| EVERY | person |     |                         |
+| MUST  | sing   |     |                         |
+| IF    | NOT    |     | day of silence          |
+|       |        | AND | observance is mandatory |
+
+We already squash AND and OR to the same column, even though they have different precedence, so maybe we should force NOT to be explicit.
+
+*** Maybe IF NOT indentation is required to appear at its own level to reduce human error
+:PROPERTIES:
+:TABLE_EXPORT_FILE: ifnot-5-indentation-explicit.csv
+:TABLE_EXPORT_FORMAT: orgtbl-to-csv
+:END:
+
+| EVERY | person      |                |
+| MUST  | sing        |                |
+| IF    | NOT         | day of silence |
+| AND   | day of song |                |
+
+Moving the AND to the level of the IF is an accepted and common form.
 
 
 

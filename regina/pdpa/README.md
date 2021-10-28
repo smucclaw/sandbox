@@ -36,5 +36,5 @@
    1. shift + option + S (then release) and press O
 
 # UD to abstract and skeleton concrete GF.
-1. Extract predicates with `python pdpa_read_predicates.py pdpa_predicates > input`
+1. Extract predicates with `python pdpa_read_predicates.py pdpa_predicates.csv > input`
 2. See steps for processing into conllu , more processing to generate GF files in [spacyconlltree](https://github.com/1Regina/spacyconlltree)

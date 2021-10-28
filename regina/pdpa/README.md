@@ -34,3 +34,7 @@
    2. `streamlit run pdpa_ud_web.py`
 4. To open and see the ud.svg rendered, open the file in vsc and on it, do
    1. shift + option + S (then release) and press O
+
+# UD to abstract and skeleton concrete GF.
+1. Extract predicates with `python pdpa_read_predicates.py pdpa_predicates > input`
+2. See steps for processing into conllu , more processing to generate GF files in [spacyconlltree](https://github.com/1Regina/spacyconlltree)

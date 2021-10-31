@@ -25,12 +25,18 @@ source-repository head
 
 library
   exposed-modules:
-      BasicTypes
-      Error
-      KW
-      Lib
-      NLG
-      Types
+      L4
+      L4.BasicTypes
+      L4.Error
+      L4.Lib
+      L4.NLG
+      L4.Types
+      L4.XPile.BabyL4
+      L4.XPile.CSV
+      L4.XPile.Odoyle
+      L4.XPile.SVG
+      L4.XPile.Uppaal
+      L4.XPile.VueJSON
   other-modules:
       Paths_mp
   hs-source-dirs:

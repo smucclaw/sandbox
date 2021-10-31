@@ -7,7 +7,7 @@
 {-# LANGUAGE BangPatterns #-}
 {-# LANGUAGE DeriveFunctor #-}
 
-module Lib where
+module L4.Lib where
 
 -- import qualified Data.Tree      as Tree
 import qualified Data.Text.Lazy as Text
@@ -20,9 +20,8 @@ import qualified Data.Csv as Cassava
 import qualified Data.Vector as V
 import Generic.Data (Generic)
 import Data.Vector ((!), (!?))
-import Data.Maybe (fromMaybe, catMaybes, maybeToList)
+import Data.Maybe (fromMaybe, catMaybes)
 import Text.Pretty.Simple (pPrint)
-import Control.Monad (guard, when, forM_)
 import qualified AnyAll as AA
 import qualified Text.PrettyPrint.Boxes as Box
 import           Text.PrettyPrint.Boxes hiding ((<>))
@@ -33,10 +32,11 @@ import Text.Parser.Permutation
 import Debug.Trace
 import Data.Aeson.Encode.Pretty
 
-import Types
-import Error ( errorBundlePrettyCustom )
-import NLG (nlg)
-import Control.Monad.Reader (ReaderT(runReaderT), asks, MonadReader (local))
+import L4.Types
+import L4.Error ( errorBundlePrettyCustom )
+import L4.NLG (nlg)
+import Control.Monad.Reader (asks, local)
+import Control.Monad.Writer.Lazy
 
 -- our task: to parse an input CSV into a collection of Rules.
 -- example "real-world" input can be found at https://docs.google.com/spreadsheets/d/1qMGwFhgPYLm-bmoN2es2orGkTaTN382pG2z3RjZ_s-4/edit
@@ -106,17 +106,17 @@ checkDepth = do
 
 runExample :: RunConfig -> ByteString -> IO ()
 runExample rc str = forM_ (exampleStreams str) $ \stream ->
-    case runParser (runReaderT (pRule <* eof) rc) "dummy" stream of
+    case runMyParser id rc pRule "dummy" stream of
       Left bundle -> putStr (errorBundlePrettyCustom bundle)
       -- Left bundle -> putStr (errorBundlePretty bundle)
       -- Left bundle -> pPrint bundle
-      Right xs -> do
+      Right (xs, xs') -> do
         when (asJSON rc) $
           putStrLn $ toString $ encodePretty xs
         when (toNLG rc) $ do
           naturalLangSents <- mapM nlg xs
           mapM_ (putStrLn . Text.unpack) naturalLangSents
-        pPrint xs
+        unless (null (xs ++ xs')) $ pPrint $ xs ++ xs'
 
 exampleStream :: ByteString -> MyStream
 exampleStream s = case getStanzas (asCSV s) of
@@ -340,22 +340,6 @@ stanzaAsStream _s rs = do
 
 -- deriving (Eq, Ord, Show)
 
--- | Used for collecting nested rules and flattening them out to a single list
-data BoolRulesF a = BR { brCond :: a, brExtraRules :: [Rule]}
-  deriving (Eq, Show, Functor)
-
-type BoolRules = BoolRulesF (Maybe BoolStruct)
-
-emptyBoolRules :: BoolRules
-emptyBoolRules = mempty
-
-instance Semigroup a => Semigroup (BoolRulesF a) where
-  (BR a b) <> (BR a' b') = BR {brCond = a <> a', brExtraRules = b <> b'}
-
-instance Monoid a => Monoid (BoolRulesF a) where
-  mempty = BR { brCond = mempty , brExtraRules = [] }
-
-
 --
 -- MyStream is the primary input for our Parsers below.
 --
@@ -364,28 +348,34 @@ instance Monoid a => Monoid (BoolRulesF a) where
 pRule :: Parser [Rule]
 pRule = withDepth 1 $ do
   _ <- optional dnl
-  try (pRegRule <?> "regulative rule")
-    <|> (pConstitutiveRule <?> "constitutive rule")
+  try ((:[]) <$> pRegRule <?> "regulative rule")
+    <|> ((:[]) <$> pConstitutiveRule <?> "constitutive rule")
     <|> (eof >> return [])
 
-pConstitutiveRule :: Parser [Rule]
+pConstitutiveRule :: Parser Rule
 pConstitutiveRule = debugName "pConstitutiveRule" $ do
   leftY              <- lookAhead pYLocation
   checkDepth
   (term,termalias)   <- pTermParens
   leftX              <- lookAhead pXLocation -- this is the column where we expect IF/AND/OR etc.
-  ( (_meansis, BR posp posbr), unlesses) <- withDepth leftX $ permutationsCon [Means,Is,Includes] [Unless]
-
-  let (_unless, BR negp negbr) = mergePBRS Never unlesses
-
   srcurl <- asks sourceURL
   let srcref = SrcRef srcurl srcurl leftX leftY Nothing
-  let defalias = maybe [] (\t -> pure (DefTermAlias t term Nothing (Just srcref))) termalias
+  let defalias = maybe mempty (\t -> singeltonDL (DefTermAlias t term Nothing (Just srcref))) termalias
+  tell defalias
 
-  return $ Constitutive term (addneg posp negp) noLabel noLSource noSrcRef : defalias ++ posbr ++ negbr
+  ( (_meansis, posp), unlesses) <- withDepth leftX $ permutationsCon [Means,Is,Includes,When] [Unless]
 
-pRegRule :: Parser [Rule]
-pRegRule = debugName "pRegRule" $ (try pRegRuleSugary <|> pRegRuleNormal) <* optional dnl
+  let (_unless, negp) = mergePBRS Never unlesses
+
+  return $ Constitutive term (addneg posp negp) noLabel noLSource noSrcRef
+
+pRegRule :: Parser Rule
+pRegRule = debugName "pRegRule" $
+  (try pRegRuleSugary
+    <|> try pRegRuleNormal
+    <|> (pToken Fulfilled >> return RegFulfilled)
+    <|> (pToken Breach    >> return RegBreach)
+  ) <* optional dnl
 
 -- "You MAY" has no explicit PARTY or EVERY keyword:
 --
@@ -398,17 +388,19 @@ pRegRule = debugName "pRegRule" $ (try pRegRuleSugary <|> pRegRuleNormal) <* opt
 --   BEFORE  midnight
 --       IF  a potato is available
 
-pRegRuleSugary :: Parser [Rule]
+pRegRuleSugary :: Parser Rule
 pRegRuleSugary = debugName "pRegRuleSugary" $ do
   entitytype         <- pOtherVal
   leftX              <- lookAhead pXLocation -- this is the column where we expect IF/AND/OR etc.
 
-  rulebody           <- withDepth leftX (permutationsReg [When,If] [Unless])
+  rulebody           <- withDepth leftX (permutationsReg [When,If] [Unless] [Upon] [Given])
   -- TODO: refactor and converge the rest of this code block with Normal below
   henceLimb          <- optional $ pHenceLest Hence
   lestLimb           <- optional $ pHenceLest Lest
-  let (posPreamble, BR pcbs pbrs) = mergePBRS Always (rbpbrs   rulebody)
-  let (negPreamble, BR ncbs nbrs) = mergePBRS Never  (rbpbrneg rulebody)
+  let (posPreamble,   pcbs) = mergePBRS Always (rbpbrs   rulebody)
+  let (negPreamble,   ncbs) = mergePBRS Never  (rbpbrneg rulebody)
+  let (_uponP,        ucbs) = mergePBRS Always (rbupon   rulebody)
+  let (_givenP,       gcbs) = mergePBRS Always (rbgiven  rulebody)
       toreturn = Regulative
                  entitytype
                  Nothing
@@ -421,12 +413,12 @@ pRegRuleSugary = debugName "pRegRuleSugary" $ do
                  Nothing -- rule label
                  Nothing -- legal source
                  Nothing -- internal SrcRef
+                 ucbs    -- upon
+                 gcbs    -- given
   myTraceM $ "pRegRuleSugary: the positive preamble is " ++ show posPreamble
   myTraceM $ "pRegRuleSugary: the negative preamble is " ++ show negPreamble
   myTraceM $ "pRegRuleSugary: returning " ++ show toreturn
-  let appendix = pbrs ++ nbrs
-  myTraceM $ "pRegRuleNormal: with appendix = " ++ show appendix
-  return ( toreturn : appendix )
+  return toreturn
 
 -- EVERY   person
 -- WHO     sings
@@ -436,26 +428,28 @@ pRegRuleSugary = debugName "pRegRuleSugary" $ do
 -- IF      a potato is available
 --    AND  the potato is not green
 
-pRegRuleNormal :: Parser [Rule]
+pRegRuleNormal :: Parser Rule
 pRegRuleNormal = debugName "pRegRuleNormal" $ do
   leftX              <- lookAhead pXLocation -- this is the column where we expect IF/AND/OR etc.
   checkDepth
-  (_party_every, entitytype, _entityalias, defalias)   <- try (pActor Party) <|> pActor Every
+  (_party_every, entitytype, _entityalias)   <- try (pActor Party) <|> pActor Every
   -- (Who, (BoolStruct,[Rule]))
   whoBool                     <- optional (withDepth leftX (preambleBoolRules [Who]))
   -- the below are going to be permutables
   myTraceM $ "pRegRuleNormal: preambleBoolRules returned " ++ show whoBool
-  rulebody <- permutationsReg [When, If] [Unless]
+  rulebody <- permutationsReg [When, If] [Unless] [Upon] [Given]
   henceLimb                   <- optional $ pHenceLest Hence
   lestLimb                    <- optional $ pHenceLest Lest
   myTraceM $ "pRegRuleNormal: permutations returned rulebody " ++ show rulebody
 
   -- qualifying conditions generally; we merge all positive groups (When, If) and negative groups (Unless)
-  let (posPreamble, BR pcbs pbrs) = mergePBRS Always (rbpbrs   rulebody)
-  let (negPreamble, BR ncbs nbrs) = mergePBRS Never  (rbpbrneg rulebody)
+  let (posPreamble,   pcbs) = mergePBRS Always (rbpbrs   rulebody)
+  let (negPreamble,   ncbs) = mergePBRS Never  (rbpbrneg rulebody)
+  let (_uponP,        ucbs) = mergePBRS Always (rbupon   rulebody)
+  let (_givenP,       gcbs) = mergePBRS Always (rbgiven  rulebody)
 
   -- qualifying conditions for the subject entity
-  let (ewho, BR ebs ebrs) = fromMaybe (Always, emptyBoolRules) whoBool
+  let (ewho, ebs) = fromMaybe (Always, Nothing) whoBool
 
   let toreturn = Regulative
                  entitytype
@@ -469,12 +463,15 @@ pRegRuleNormal = debugName "pRegRuleNormal" $ do
                  Nothing -- rule label
                  Nothing -- legal source
                  Nothing -- internal SrcRef
+                 ucbs    -- upon
+                 gcbs    -- given
   myTraceM $ "pRegRuleNormal: the positive preamble is " ++ show posPreamble
   myTraceM $ "pRegRuleNormal: the negative preamble is " ++ show negPreamble
   myTraceM $ "pRegRuleNormal: returning " ++ show toreturn
-  let appendix = pbrs ++ nbrs ++ ebrs ++ defalias
-  myTraceM $ "pRegRuleNormal: with appendix = " ++ show appendix
-  return ( toreturn : appendix )
+  -- let appendix = pbrs ++ nbrs ++ ebrs ++ defalias
+  -- myTraceM $ "pRegRuleNormal: with appendix = " ++ show appendix
+  -- return ( toreturn : appendix )
+  return toreturn
 
 addneg :: Maybe BoolStruct -> Maybe BoolStruct -> Maybe BoolStruct
 addneg Nothing  Nothing   = Nothing
@@ -482,7 +479,7 @@ addneg p        Nothing   = p
 addneg Nothing  (Just n)  = pure $ AA.Not n
 addneg (Just p) (Just n)  = pure (p <> AA.Not n)
 
-pHenceLest :: MyToken -> Parser [Rule]
+pHenceLest :: MyToken -> Parser Rule
 pHenceLest henceLest = debugName ("pHenceLest-" ++ show henceLest) $ do
   leftX              <- lookAhead pXLocation -- this is the column where we expect IF/AND/OR etc.
   checkDepth
@@ -499,25 +496,26 @@ pTemporal = ( do
                 t0 <- pToken Eventually
                 return (mkTC t0 "")
             ) <|> do
-  t1 <- pToken Before <|> pToken After <|> pToken By
+  t1 <- pToken Before <|> pToken After <|> pToken By <|> pToken On
   t2 <- pOtherVal
   return $ mkTC t1 t2
 
 -- "PARTY Bob       (the "Seller")
 -- "EVERY Seller"
-pActor :: MyToken -> Parser (MyToken, Text.Text, Maybe Text.Text, [Rule])
+pActor :: MyToken -> Parser (MyToken, Text.Text, Maybe Text.Text)
 pActor party = debugName ("pActor " ++ show party) $ do
   leftY       <- lookAhead pYLocation
   leftX       <- lookAhead pXLocation -- this is the column where we expect IF/AND/OR etc.
   -- add pConstitutiveRule here -- we could have "MEANS"
   _           <- pToken party
   (entitytype, entityalias)   <- lookAhead pTermParens
-  omgARule <- try pConstitutiveRule <|> ([] <$ pTermParens)
+  omgARule <- pure <$> try pConstitutiveRule <|> (mempty <$ pTermParens)
   myTraceM $ "pActor: omgARule = " ++ show omgARule
   srcurl <- asks sourceURL
   let srcref = SrcRef srcurl srcurl leftX leftY Nothing
-  let defalias = maybe [] (\t -> pure (DefTermAlias t entitytype Nothing (Just srcref))) entityalias
-  return (party, entitytype, entityalias, defalias ++ omgARule)
+  let defalias = maybe mempty (\t -> singeltonDL (DefTermAlias t entitytype Nothing (Just srcref))) entityalias
+  tell $ defalias <> listToDL omgARule
+  return (party, entitytype, entityalias)
 
 -- two tokens of the form | some thing | ("A Thing") | ; |
 pTermParens :: Parser (Text.Text, Maybe Text.Text)
@@ -544,43 +542,53 @@ data RuleBody = RuleBody { rbaction   :: ActionType -- pay(to=Seller, amount=$10
                          , rbpbrneg   :: [(Preamble, BoolRules)] -- negative global conditions
                          , rbdeon     :: Deontic
                          , rbtemporal :: Maybe (TemporalConstraint Text.Text)
+                         , rbupon     :: [(Preamble, BoolRules)] -- Upon  event conditions
+                         , rbgiven    :: [(Preamble, BoolRules)] -- Given history conditions
                          }
                       deriving (Eq, Show, Generic)
 
 mkRBfromDT :: ActionType
            -> [(Preamble, BoolRules)] -- positive  -- IF / WHEN
            -> [(Preamble, BoolRules)] -- negative  -- UNLESS
+           -> [(Preamble, BoolRules)] -- upon  conditions
+           -> [(Preamble, BoolRules)] -- given conditions
            -> (Deontic, Maybe (TemporalConstraint Text.Text))
            -> RuleBody
-mkRBfromDT rba rbpb rbpbneg (rbd,rbt) = RuleBody rba rbpb rbpbneg rbd rbt
+mkRBfromDT rba rbpb rbpbneg rbu rbg (rbd,rbt) = RuleBody rba rbpb rbpbneg rbd rbt rbu rbg
 
 mkRBfromDA :: (Deontic, ActionType)
            -> [(Preamble, BoolRules)]
            -> [(Preamble, BoolRules)]
+           -> [(Preamble, BoolRules)] -- upon  conditions
+           -> [(Preamble, BoolRules)] -- given conditions
            -> Maybe (TemporalConstraint Text.Text)
            -> RuleBody
-mkRBfromDA (rbd,rba) rbpb rbpbneg rbt = RuleBody rba rbpb rbpbneg rbd rbt
+mkRBfromDA (rbd,rba) rbpb rbpbneg rbu rbg rbt = RuleBody rba rbpb rbpbneg rbd rbt rbu rbg
 
 permutationsCon :: [MyToken] -> [MyToken] -> Parser ((Preamble, BoolRules), [(Preamble, BoolRules)])
-permutationsCon ifwhen unless = debugName ("permutationsCon positive=" <> show ifwhen <> ", negative=" <> show unless) $ do
+permutationsCon ifwhen l4unless = debugName ("permutationsCon positive=" <> show ifwhen <> ", negative=" <> show l4unless) $ do
   try ( debugName "constitutive permutation" $ permute ( (,)
             <$$> preambleBoolRules ifwhen
-            <|?> ([], some $ preambleBoolRules unless)
+            <|?> ([], some $ preambleBoolRules l4unless)
           ) )
 
-permutationsReg :: [MyToken] -> [MyToken] -> Parser RuleBody
-permutationsReg ifwhen unless = debugName ("permutationsReg positive=" <> show ifwhen <> ", negative=" <> show unless) $ do
+permutationsReg :: [MyToken] -> [MyToken] -> [MyToken] -> [MyToken] -> Parser RuleBody
+permutationsReg ifwhen l4unless l4upon l4given = debugName ("permutationsReg positive=" <> show ifwhen <> ", negative=" <> show l4unless <> ", upon=" <> show l4upon <> ", given=" <> show l4given) $ do
   try ( debugName "regulative permutation with deontic-temporal" $ permute ( mkRBfromDT
             <$$> pDoAction
-            <|?> ([], some $ preambleBoolRules ifwhen) -- syntactic constraint, all the if/when need to be contiguous.
-            <|?> ([], some $ preambleBoolRules unless) -- syntactic constraint, all the if/when need to be contiguous.
+            <|?> ([], some $ preambleBoolRules ifwhen)   -- syntactic constraint, all the if/when need to be contiguous.
+            <|?> ([], some $ preambleBoolRules l4unless) -- unless
+            <|?> ([], some $ preambleBoolRules l4upon)   -- upon
+            <|?> ([], some $ preambleBoolRules l4given)  -- given
             <||> try pDT
           ) )
   <|>
   try ( debugName "regulative permutation with deontic-action" $ permute ( mkRBfromDA
             <$$> try pDA
             <|?> ([], some $ preambleBoolRules ifwhen) -- syntactic constraint, all the if/when need to be contiguous.
-            <|?> ([], some $ preambleBoolRules unless) -- syntactic constraint, all the if/when need to be contiguous.
+            <|?> ([], some $ preambleBoolRules l4unless) -- syntactic constraint, all the if/when need to be contiguous.
+            <|?> ([], some $ preambleBoolRules l4upon)   -- upon
+            <|?> ([], some $ preambleBoolRules l4given)  -- given
             <|?> (Nothing, pTemporal <* dnl)
           ) )
 
@@ -612,22 +620,17 @@ newPre t (AA.Any (AA.Pre     _p)    x) = AA.Any (AA.Pre     t   ) x
 newPre t (AA.Any (AA.PrePost _p pp) x) = AA.Any (AA.PrePost t pp) x
 
 preambleBoolRules :: [MyToken] -> Parser (Preamble, BoolRules)
-preambleBoolRules whoifwhen = debugName "preambleBoolRules" $ do
+preambleBoolRules wanted = debugName ("preambleBoolRules " <> show wanted)  $ do
   leftX     <- lookAhead pXLocation -- this is the column where we expect IF/AND/OR etc.
-  myTraceM ("preambleBoolRules: x location is " ++ show leftX)
   checkDepth
-  depth <- asks callDepth
-  myTraceM ("preambleBoolRules: passed guard! depth is " ++ show depth)
-  myTraceM $ "preambleBoolRules: Expecting one of: " ++ show whoifwhen
-  debugPrint "preambleBoolRules"
-  condWord <- choice (try . pToken <$> whoifwhen)
-  myTraceM ("preambleBoolRules: found condWord: " ++ show condWord)
-  BR ands rs <- withDepth leftX dBoolRules -- (foo AND (bar OR baz), [constitutive and regulative sub-rules])
+  condWord <- choice (try . pToken <$> wanted)
+  myTraceM ("preambleBoolRules: found: " ++ show condWord)
+  ands <- withDepth leftX dBoolRules -- (foo AND (bar OR baz), [constitutive and regulative sub-rules])
 --   let bs = if subForest ands) == 1 -- upgrade the single OR child of the AND group to the top level
 --            then newPre (Text.pack $ show condWord) (head ands)
 --            else AA.All (AA.Pre (Text.pack $ show condWord)) ands -- return the AND group
 
-  return (condWord, BR { brCond = ands , brExtraRules = rs })
+  return (condWord, ands)
 
 dBoolRules ::  Parser BoolRules
 dBoolRules = debugName "dBoolRules" $ do
@@ -639,11 +642,10 @@ pAndGroup = debugName "pAndGroup" $ do
   orGroupN <- many $ dToken And *> pOrGroup
   let toreturn = if null orGroupN
                  then orGroup1
-                 else BR { brCond = Just (AA.All (AA.Pre "all of:") (catMaybes $ brCond <$> (orGroup1 : orGroupN)))
-                         , brExtraRules = concatMap brExtraRules (orGroup1 : orGroupN) }
+                 else Just (AA.All (AA.Pre "all of:") (catMaybes (orGroup1 : orGroupN)))
   return toreturn
   -- Alternative implementation:
-  -- let allGroups = mconcat $ fmap maybeToList <$> (orGroup1 : orGroupN)
+  -- let allGroups = mconcat $ maybeToList <$> (orGroup1 : orGroupN)
   -- return $ if null orGroupN then orGroup1 else fmap (Just . AA.All (AA.Pre "all of:")) allGroups
 
 pOrGroup ::  Parser BoolRules
@@ -653,8 +655,7 @@ pOrGroup = debugName "pOrGroup" $ do
   elems    <- many $ dToken Or *> withDepth (depth+1) pElement
   let toreturn = if null elems
                  then elem1
-                 else BR { brCond = Just (AA.Any (AA.Pre "any of:") (catMaybes $ brCond <$> (elem1 : elems)))
-                         , brExtraRules = concatMap brExtraRules (elem1 : elems) }
+                 else Just (AA.Any (AA.Pre "any of:") (catMaybes (elem1 : elems)))
   return toreturn
 
 pElement ::  Parser BoolRules
@@ -662,25 +663,29 @@ pElement = debugName "pElement" $ do
   -- think about importing Control.Applicative.Combinators so we get the `try` for free
   try pNestedBool
     <|> pNotElement
-    <|> try (constitutiveAsElement <$> pConstitutiveRule)
+    <|> try (constitutiveAsElement <$> tellIdFirst pConstitutiveRule)
     <|> pLeafVal
 
-constitutiveAsElement :: [Rule] -> BoolRules
-constitutiveAsElement (cr:rs) = BR { brCond = Just (AA.Leaf (term cr))
-                                   , brExtraRules = cr:rs }
-constitutiveAsElement [] = error "constitutiveAsElement: cannot convert an empty list of rules to a BoolRules structure!"
+-- | Like `\m -> do a <- m; tell [a]; return a` but add the value before the child elements instead of after
+tellIdFirst :: (Functor m) => WriterT (DList w) m w -> WriterT (DList w) m w
+tellIdFirst = mapWriterT . fmap $ \(a, m) -> (a, singeltonDL a <> m)
+
+-- Makes a leaf with just the name of a constitutive rule
+constitutiveAsElement ::  Rule -> BoolRules
+constitutiveAsElement cr = Just (AA.Leaf (term cr))
+-- constitutiveAsElement _ = error "constitutiveAsElement: cannot convert an empty list of rules to a BoolRules structure!"
 
 pNotElement :: Parser BoolRules
 pNotElement = debugName "pNotElement" $ do
   inner <- pToken MPNot *> pElement
-  return $ (fmap . fmap) AA.Not inner
+  return $ fmap AA.Not inner
 
 pLeafVal ::  Parser BoolRules
 pLeafVal = debugName "pLeafVal" $ do
   checkDepth
   leafVal <- pOtherVal <* dnl
   myTraceM $ "pLeafVal returning " ++ Text.unpack leafVal
-  return $  Just (AA.Leaf leafVal) <$ emptyBoolRules
+  return $ Just (AA.Leaf leafVal)
 
 -- should be possible to merge pLeafVal with pNestedBool.
 

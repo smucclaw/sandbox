@@ -2,7 +2,7 @@
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module BasicTypes where
+module L4.BasicTypes where
 import Data.Proxy
 import qualified Data.Text.Lazy as Text
 import Text.Megaparsec
@@ -21,8 +21,9 @@ data MyStream = MyStream
 data MyToken = Every | Party | Who | Means | Includes | When | Is | Always | Never
              | Must | May | Shant | If | Or | And | MPNot
              | Before | After | By | On | Eventually
+             | Given | Upon
              | Unless
-             | Hence | Lest
+             | Hence | Lest | Fulfilled | Breach
              | TNumber Int
              | Other Text.Text
              | Do

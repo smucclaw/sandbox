@@ -25,8 +25,8 @@
 #lemma DEFAULT_ be cop cop head
 
 
-------------------------------------------------------------------
--- The following copied from gf-ud/grammars/ShallowParseEng.labels
+-------------------------------------------------------------------
+-- Exceptions and special cases, when UD structure doesn't match GF
 
 -- To handle "my hovercraft": i_Pron is not by default parsed as Det
 #auxfun PossSgNP_ pron cn : Pron -> CN -> NP = DetCN (DetQuant (PossPron pron) NumSg) cn ; nmod:poss[PronType=Prs] head[Number=Sing]
@@ -46,9 +46,32 @@
 #auxfun DetCNSgNmod_ quant cn : Quant -> CN -> NP = DetCN (DetQuant quant NumSg) cn ; nmod:poss head[Number=Sing]
 #auxfun DetCNPlNmod_ quant cn : Quant -> CN -> NP = DetCN (DetQuant quant NumPl) cn ; nmod:poss head[Number=Plur]
 
-
 -- [my mother's]:Quant [5]:Num [hovercrafts]:CN
 #auxfun DetCNNumNmod_ quant num cn : Quant -> Num -> CN -> NP = DetCN (DetQuant quant num) cn ; nmod:poss nummod head
+
+-- fluffy and cute
+#auxcat Comma PUNCT
+#auxfun CommaAP_ ap comma : AP -> Comma -> APComma =  ap ; head punct
+
+-- Pattern match, and the corresponding continuation-based syntax
+-- #auxfun AndCutePatternMatch_ and cute : Conj -> AP -> AP2AP = MkAP2AP and cute ; cc head
+#auxfun AndCuteCont_ and cute cont : Conj -> AP -> ConjAP2AP = cont and cute ; cc head
+
+-- #auxfun AP2_ small (MkAP2AP and cute) : AP -> AP2AP -> AP = ConjAP and (BaseAP small cute)) ; head conj
+#auxfun AP2_ small andCute : AP -> ConjAP2AP -> AP = andCute (AP2_helper_ small) ; head conj
+#auxfun AP2_helper_ small and cute :  AP -> Conj -> AP -> AP = ConjAP and (BaseAP small cute) ; head dummy nonexistent
+
+-- #auxfun APBaseComma_ small fluffy (MkAP2AP and cute)  : AP -> APComma -> AP2AP -> ConjListAP = ConjConsAP and small (BaseAP fluffy cute) ; head conj conj
+#auxfun APBaseComma_ small fluffy andCute cont : AP -> APComma -> ConjAP2AP -> ConjListAP = andCute (APBaseComma_helper_ small fluffy cont) ; head conj conj
+#auxfun APBaseComma_helper_ small fluffy cont and cute : AP -> APComma -> Contin -> Conj -> AP -> ConjListAP = cont and small (BaseAP fluffy cute) ; head dummy dummy
+
+-- #auxfun ConjListToAP2_ (ConjConsAP and small furryFluffyCute) : ConjListAP -> AP = ConjAP and (ConsAP small furryFluffyCute) ; head
+#auxfun ConjListToAP2_ and_small_furryFluffyCute : ConjListAP -> AP = and_small_furryFluffyCute ConjListToAP2_helper_ ; head
+#auxfun ConjListToAP2_helper_ and small furryFluffyCute : Conj -> AP -> ListAP -> AP = ConjAP and (ConsAP small furryFluffyCute) ; notreal head dummy
+
+-- #auxfun APAddComma_ furry (ConjConsAP and small fluffyAndCute)  : APComma -> ConjListAP -> ConjListAP = ConjConsAP and small (ConsAP furry fluffyAndCute) ; conj head
+#auxfun APAddComma_ furry and_small_fluffyCute  : APComma -> ConjListAP -> ConjListAP = and_small_fluffyCute (APAddComma_helper_ furry) ; conj head
+#auxfun APAddComma_helper_ furry and small fluffyCute cont : APComma -> Conj -> AP -> ListAP -> ConjListAP = cont and small (ConsAP furry fluffyCute) ; dummy head
 
 
 -- #auxfun PossGenmodSgNP_ np cn : NP -> CN -> NP = GenModNP NumSg np cn ; nmod:poss head[Number=Sing]

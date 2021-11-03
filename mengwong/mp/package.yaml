@@ -41,6 +41,8 @@ dependencies:
 - utf8-string
 - gf
 - gf-ud
+- typed-process
+- stm
 
 ghc-options: -Wall
 

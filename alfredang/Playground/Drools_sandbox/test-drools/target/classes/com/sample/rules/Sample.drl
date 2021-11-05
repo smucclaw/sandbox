@@ -16,10 +16,39 @@ package com.sample.rules
 //     STOCKS("stocks");
 // end
 
+declare Trace end
+
+declare EmptyTrace extends Trace
+    factName: String @position(0)
+    // ruleName: String
+end
+
+declare OneTrace extends Trace
+    prior: Trace @position(0)
+    ruleName: String @position(1)
+end
+
+declare TwoTrace extends Trace
+    priorOne: Trace @position(0)
+    priorTwo: Trace @position(1)
+    ruleName: String @position(2)
+end
+
+
 declare Person
     name: String @position(0)
-    age: Integer @position(1)
+    //age: Integer @position(0)
 end
+
+// vs
+// declare Person
+//     name: String 
+//     age: Integer 
+//     earnings: Earnings
+//     amountSaved: SavingsAmount
+//     dependents: Dependents
+// end
+
 
 // Derivables
 function Integer minIncome(Integer numDeps) {
@@ -32,82 +61,193 @@ function Integer minSavings(Integer numDeps) {
 
 // Intermediate Predicates (Nodes)
 declare Investment
-    strategy: String
+	justification: Trace @position(0)
+    strategy: String @position(1)
 end
 
 declare SavingsAccount 
-    status: String
+	justification: Trace @position(0)
+    status: String @position(1)
 end
 
 declare Income
-    status: String 
+    justification: Trace @position(0)
+    status: String  @position(1)
 end
 
 
 // Facts (Leaves)
 declare Earnings
-    amount: Integer
-    status: String
+	justification: Trace @position(0)
+    amount: Integer @position(1)
+    status: String @position(2)
 end
 
 declare AmountSaved
-    value: Integer
+	justification: Trace @position(0)
+	value: Integer @position(1)
 end
 
 declare Dependents
-    number: Integer
+	justification: Trace @position(0)
+    number: Integer @position(1)
 end
 
+// declare House
+// 	owner: Person @position(0)
+// 	name: String @position(1)
+// end
+
+// Cases where `not` is used
+// rule "thereAreNoHouses"
+// 	when
+// 		not (House())
+// 	then
+// 		System.out.println("There are no houses at all");
+// end
+
+// rule "joOwnsNoHouses"
+// 	when
+// 		$p: Person(name == "jo")
+// 		not (House(owner == $p))
+// 	then
+// 		System.out.println("Jo owns no houses");
+// end
+
+// rule "notJosHouse"
+// 	when
+// 		$p: Person(name == "jo")
+// 		not (House(owner == $p, name == "H2"))
+// 	then
+// 		System.out.println("H2 is not jo's house");
+// end
+
+// rule "allPeopleWithoutHousesAreHomeless"
+// 	when 
+// 		forall ( $p: Person() 
+// 				 (House(owner == $p)) ) 
+// 	then
+// 		System.out.println("Everyone is homeless");
+// end
+
+
+// rule "JosHousesF"
+// 	when
+// 	then
+// 		insert(new Person("jo"));
+// end
 
 
 
-rule "initInterPreds"
-    when
-    then
-        insert(new Person("John",26));
-        insert(new Person("Mary",28));
-        insert(new Investment());
-        insert(new SavingsAccount());
-        insert(new Income());
-end		
+// rule "initInterPreds"
+//     when
+//     then
+        // insert(new Person());
+        // insert(new Investment());
+        // insert(new SavingsAccount());
+        // insert(new Income());
+        // insert(new Dependents(3));
+        // insert(new Dependents(2));
+// end		
+
+// How to have Positional arguments in Drools
+// rule "findPerson"
+//     when
+//         Person($name, $age;)
+//     then   
+//         System.out.println($name);
+// end
+
+// rule "badOr"
+//     when
+//         (or Dependents($x : number) Dependents($y : number))
+//     then
+//         insertLogical(new Dependents(number = $x + $y));
+// end
+
+// rule "bindingNot"
+//     // This wouldn't fire in a rule engine, but would in an SMT solver (which l4 syntax allows)
+//     when
+//         Dependents($x: number)
+//     then
+//         // insertLogical(new Dependents($x));
+//         System.out.println("bindingNot fires" + $x);
+// end
+
+// rule "illegalExpressionInBinding"
+//     when 
+//         Dependents($x + 1 : number)
+//         not (Dependents($x))
+//     then
+//         insertLogical(new Dependents($x));
+// end
+
+// rule "legalNot"
+//     when
+//         Dependents($x: number)
+//         not (Dependents(number == $x + 1))
+//     then
+//         System.out.println("legalNot fires");
+// end
+
+// rule "illegalNot" // Conceptual gap: `not` checks for existence of a single instance of the object, and thus ignores bindings
+//     when
+//         not (Dependents(number == $x + 1))
+//         Dependents($x: number)
+//     then
+//         System.out.println("legalNot fires");
+// end
+
+// rule "arithmeticPostCond"
+// 	when
+// 		Dependents($j1: justification,$n: number)
+// 		// Earnings($v: amount)
+// 	then
+// 		insertLogical(new AmountSaved($n * $v));
+// 		System.out.println("arithmetic in postconditions work");
+// end
 
 
-rule "findPerson"
-    when
-        Person($name, $age;)
-    then   
-        System.out.println($name);
-end
+
 
 // 1
 rule "accInad"
     when 
-        SavingsAccount(status == "inadequate")
-        $inv: Investment()
+        //Person($name; $e: Earnings())
+        SavingsAccount($j: justification, status == "inadequate")
+        // $inv: Investment()
     then
-        $inv.setStrategy("savings");
+        // $inv.setStrategy("savings");
+        insertLogical(new Investment( new OneTrace($j, "accInad"), "savings"));
+        insertLogical(new JustificationAccInad($j)))
         System.out.println("Investement strategy: Savings");
 end
 
 // 2
 rule "accAdIncAd"
     when
+        // SavingsAccount($j1: justification, status == "adequate")
+        // Income($j2: justification, status == "adequate")
         SavingsAccount(status == "adequate")
         Income(status == "adequate")
-        $inv: Investment()
+
+        // $inv: Investment()
     then
-        $inv.setStrategy("stocks");
+        // $inv.setStrategy("stocks");
+        insertLogical(new Investment( new TwoTrace($j1, $j2, "accAdIncAd"), "stocks"));
+        insertLogical(new JustificationAccAdIncAd($j1, $j2));
         System.out.println("Investement strategy: Stocks");
 end
 
 // 3
 rule "accAdIncInad"
     when
-        SavingsAccount(status == "adequate")
-        Income(status == "inadequate")
-        $inv: Investment()
+        SavingsAccount($j1: justification, status == "adequate")
+        Income($j2: justification, status == "inadequate")
+        // $inv: Investment()
     then
-        $inv.setStrategy("combination");
+        // $inv.setStrategy("combination");
+        insertLogical(new Investment( new TwoTrace($j1, $j2, "accAdIncInad"), "combination"));
         System.out.println("Investement strategy: Combination");
 end
 
@@ -115,96 +255,145 @@ end
 rule "savingsAd"
     when
         // Dependents( $n: number )
-        $dep: Dependents()
+        $dep: Dependents($j1: justification)
         // AmountSaved( value > minSavings($n))
-        $sav : AmountSaved( $sav.getValue() > minSavings($dep.getNumber()))
-        $acc: SavingsAccount()
+        $sav : AmountSaved($j2: justification)
+        eval($sav.getValue() > minSavings($dep.getNumber()))
+        // $acc: SavingsAccount()
     then
-        $acc.setStatus("adequate");
-        update($acc);
+        // $acc.setStatus("adequate");
+        // update($acc);
+        insertLogical(new SavingsAccount( new TwoTrace($j1, $j2, "savingsAd"), "adequate"));
         System.out.println("Savings adequate");
 end
 
 // 5
 rule "savingsInad"
     when
-        Dependents( $n: number )
-        AmountSaved( value <= minSavings($n) )
-        $sa: SavingsAccount()
+        Dependents( $j1: justification, $n := number )
+        AmountSaved( $j2: justification, $v := value )
+        eval($v <= minSavings($n))
     then
-        $sa.setStatus("inadequate");
-        update($sa);
-        System.out.println("Savings inadequate");
+        insertLogical(new SavingsAccount( new TwoTrace($j1, $j2, "savingsInad"), "inadequate"));
+        System.out.println("Rule 5 fires! yay!");
 end
 
 // 6
 rule "incomeAd"
     when
-        Dependents( $n: number )
-        Earnings(status == "steady", amount > minIncome($n) )
-        $inc: Income()
+		Dependents( $j1: justification, $n: number )
+        Earnings( $j2: justification, status == "steady", $amt: amount)
+        eval($amt > minIncome($n))
+        // $inc: Income()
     then
-        $inc.setStatus("adequate");
-        update($inc);
+        // $inc.setStatus("adequate");
+        // update($inc);
+        insertLogical(new Income( new TwoTrace($j1, $j2, "incomeAd"), "adequate"));
         System.out.println("Income adequate");
 end
 
 // 7
 rule "incomeInadESteady"
     when
-		Dependents( $n: number )
-		Earnings( status == "steady", amount <= minIncome($n))
-        $inc: Income()
+		Dependents( $j1: justification, $n: number )
+		Earnings( $j2: justification, status == "steady", amount <= minIncome($n))
+        // $inc: Income()
     then
-        $inc.setStatus("inadequate");
-        update($inc);
+        // $inc.setStatus("inadequate");
+        // update($inc);
+        insertLogical(new Income(new TwoTrace($j1, $j2, "incomeInadESteady"), "inadequate"));
         System.out.println("Income inadequate (Earnings steady)");
 end
 
 // 8
 rule "incomeInadEUnsteady"
     when
-		Earnings( status == "unsteady")
-        $inc: Income()
+		Earnings( $j: justification, status == "unsteady")
+        // $inc: Income()
     then
-        $inc.setStatus("inadequate");
-        update($inc);
-        System.out.println("Income inadequate (Earnings unsteady)");
+        // $inc.setStatus("inadequate");
+        // update($inc);
+        insertLogical(new Income( new OneTrace($j, "incomeInadEUnsteady"), "inadequate"));
 end
 
 
 
-rule "amoundSavedF"
+rule "amountSavedF"
     when
     then
-        AmountSaved as = new AmountSaved();
-        as.setValue(22000);
-        insert(as);
-        update(as);
-        System.out.println("Amount saved is 22000");
+        // AmountSaved as = new AmountSaved();
+        // as.getValue();   // throws a null pointer exception
+        // as.setValue(22000);
+        // insert(as);
+        // update(as);
+        insert(new AmountSaved(new EmptyTrace("amountSavedF"), 1));
+        System.out.println("Amount saved is 1");
 end
 
 rule "earningsF"
     when
     then
-        Earnings e = new Earnings();
-        e.setAmount(25000);
-        e.setStatus("steady");
-        insert(e);
-        update(e);
-        System.out.println("Earnings are 25000, steady");
+        // Earnings e = new Earnings();
+        // e.setAmount(25000);
+        // e.setStatus("steady");
+        // insert(e);
+        // update(e);
+        insert(new Earnings(new EmptyTrace("earningsF"), 25000, "unsteady"));
+        // System.out.println("Earnings are 25000, steady");
 end
 
 rule "dependentsF"
     when
     then
-        Dependents d = new Dependents();
-        d.setNumber(1);
-        insert(d);
-        update(d);
-        System.out.println("Dependents are 1");
+        // Dependents d = new Dependents();
+        // d.setNumber(3);
+        // insert(d);
+        // update(d);
+        insert(new Dependents(new EmptyTrace("dependentsF"), 3));
+        // System.out.println("Dependents are 3");
 end
 
+query "rule trace"
+    $rule: Investment()
+end
+
+
+
+// rule "newBaby"
+//     when
+//     then
+//         insert(new Person(1));
+//     end
+
+// rule ""
+//     when
+//         $b : Person(age == 1)
+//         Person($n : age)
+//         eval($n == 10)
+//     then
+//         retract($b);
+//        System.out.println("Remove initial baby");
+// end
+
+// rule "infinitePersons"
+//     when 
+//        Person($n : age)
+//         eval($n < 18)
+//     then
+//         insertLogical(new Person($n + 1));
+//         System.out.println("Inserted new Person of age " + $n);
+// end
+
+
+// rule "dependents2"
+//     when
+//     then
+//         Dependents d = new Dependents();
+//         d.setNumber(2);
+//         insert(d);
+//         update(d);
+//         System.out.println("Dependents are 2");
+// end
 // rule "Hello World"
 //     when
 //         m : Message( status == Message.HELLO, myMessage : message )

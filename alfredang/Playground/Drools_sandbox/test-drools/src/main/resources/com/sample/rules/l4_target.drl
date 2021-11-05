@@ -1,0 +1,206 @@
+
+declare Savings_account
+  arg0: Justification @position(0)
+  arg1: String @position(1)
+  arg2: String @position(2)
+end
+
+declare Income
+  arg0: Justification @position(0)
+  arg1: String @position(1)
+  arg2: String @position(2)
+end
+
+declare Earnings
+  arg0: Justification @position(0)
+  arg1: String @position(1)
+  arg2: Integer @position(2)
+  arg3: String @position(3)
+end
+
+declare Investment
+  arg0: Justification @position(0)
+  arg1: String @position(1)
+  arg2: String @position(2)
+end
+
+declare Amount_saved
+  arg0: Justification @position(0)
+  arg1: String @position(1)
+  arg2: Integer @position(2)
+end
+
+declare Dependents
+  arg0: Justification @position(0)
+  arg1: String @position(1)
+  arg2: Integer @position(2)
+end
+
+declare Member
+  arg0: Justification @position(0)
+  arg1: String @position(1)
+  arg2: String @position(2)
+end
+
+declare IsDead
+  arg0: Justification @position(0)
+  arg1: String @position(1)
+end
+
+declare Spendthrift
+  arg0: Justification @position(0)
+  arg1: String @position(1)
+end
+
+declare Person
+    name: String @postiion(0)
+end
+
+
+rule "accInad"
+  when
+    Savings_account($j0 := arg0, $p := arg1, arg2 == "inadequate")
+  then
+    insertLogical(new Investment( new JustificationAccInad($j0, $p), $p, "savings"));
+end
+
+declare JustificationAccInad extends Justification
+    priorOne : Justification
+    argOne : String
+end
+
+rule "accAdIncAd"
+  when
+    Savings_account($j0 := arg0, $p := arg1, arg2 == "adequate")
+    Income($j1 := arg0, $p := arg1, arg2 == "adequate")
+  then
+    insertLogical(new Investment(new JustificationAccAdIncAd($j0, $j1, $p), $p, "stocks"));
+end
+
+declare JustificationAccAdIncAd extends Justification
+    priorOne : Justification
+    priorTwo : Justification
+    argOne : String
+end
+
+rule "accAdIncInad"
+  when
+    Savings_account($j0 := arg0, $p := arg1, arg2 == "adequate")
+    Income($j1 := arg0, $p := arg1, arg2 == "inadequate")
+  then
+    insertLogical(new Investment(new JustificationAccAdIncInad($j0, $j1, $p), $p, "combination"));
+end
+
+declare JustificationAccAdIncInad extends Justification
+    priorOne : Justification
+    priorTwo : Justification
+    argOne : String
+end
+
+rule "savingsAd"
+  when
+    Amount_saved($j0 := arg0, $p := arg1, $x := arg2)
+    Dependents($j1 := arg0, $p := arg1, $y := arg2)
+    eval($x > minsavings($y))
+  then
+    insertLogical(new Savings_account( new JustificationSavingsAd($j0, $j1, $p, $x, $y), $p, "adequate"));
+end
+
+declare JustificationSavingsAd extends Justification
+    priorOne : Justification 
+    priorTwo : Justification
+    argOne : String
+    argTwo : Integer
+    argThree : Integer
+end
+
+
+rule "savingsInad"
+  when
+    Amount_saved($j0 := arg0, $p := arg1, $x := arg2)
+    Dependents($j1 := arg0, $p := arg1, $y := arg2)
+    eval($x <= minsavings($y))
+  then
+    insertLogical(new Savings_account( new JustificationSavingsInad($j0, $j1, $p, $x, $y), $p, "inadequate"));
+end
+
+declare JustificationSavingsInad extends Justification
+    priorOne : Justification
+    priorTwo : Justification
+    argOne : String
+    argTwo : Integer
+    argThree : Integer
+end
+
+rule "incomeAd"
+  when
+    Earnings($j0 := arg0, $p := arg1, $x := arg2, arg3 == "steady")
+    Dependents($j1 := arg0, $p := arg1, $y := arg2)
+    eval($x > minincome($y))
+    not (Spendthrift())// $j2 := arg0, $p := arg1)) // we return to the issue with bindings not making sense within not 
+  then
+    insertLogical(new Income( new JustificationIncomeAd($j0, $j1, $p, $x, $y), $p, "adequate"));
+end
+
+declare JustificationIncomeAd extends Justification
+    priorOne : Justification
+    priorTwo : Justification
+    // priorThree : Justification
+    argOne : String 
+    argTwo : Integer
+    argThree : Integer
+end
+
+rule "incomeInadSpendthrift"
+  when
+    Spendthrift($j0 := arg0, $p := arg1)
+  then
+    insertLogical(new Income( new JustificationIncomeInadSpendthrift($j0, $p), $p, "inadequate"));
+end
+
+declare JustificationIncomeInadSpendthrift extends Justification
+    priorOne: Justification
+    argOne : String 
+end
+
+rule "incomeInadESteady"
+  when
+    Earnings($j0 := arg0, $p := arg1, $x := arg2, arg3 == "steady")
+    Dependents($j1 := arg0, $p := arg1, $y := arg2)
+    eval($x <= minincome($y))
+  then
+    insertLogical(new Income( new JustificationIncomeInadESteady($j0, $j1, $p, $x, $y), $p, "inadequate"));
+end
+
+declare JustificationIncomeInadESteady extends Justification
+    priorOne : Justification
+    priorTwo : Justification
+    argOne : String 
+    argTwo : Integer
+    argThree : Integer
+end
+
+rule "incomeInadEUnsteady"
+  when
+    Earnings($j0 := arg0, $p := arg1, $x := arg2, arg3 == "unsteady")
+  then
+    insertLogical(new Income( new JustificationIncomeInadEUnsteady($j0, $p, $x), $p, "inadequate"));
+end
+
+declare JustificationIncomeInadEUnsteady extends Justification
+    priorOne : Justification
+    argOne : String 
+    argTwo : Integer
+end
+
+rule "noEarningsForDead"
+    when
+        IsDead($j0 := arg0, $p := arg1)
+    then
+        insertLogical(new Earnings(new JustificationNoEarningsForDead($j0, $p), $p, 0, "steady"));
+end
+
+declare JustificationNoEarningsForDead extends Justification
+    priorOne: Justification
+    argOne : String 
+end

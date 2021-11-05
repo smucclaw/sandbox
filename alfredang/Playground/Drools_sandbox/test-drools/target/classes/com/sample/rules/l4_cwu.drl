@@ -1,0 +1,189 @@
+package com.sample.cwu
+
+// Proposed treatment of L4 syntax structures in drools transpilation
+// 
+//  class 
+//      -> type declaration with a single field
+//    A -> associated VarDecl is transformed into a rule that 
+//         inserts instance of object with the VarDecl name as field value
+//
+//  decl 
+//      -> transpilation dependent on l4 type signature
+//      -> single literal type      : No transpilation occurs
+//      -> single non-literal type  : transpiled to rule that inserts global constant (see point A under `class`)
+//      -> multi arg ending boolean : transpiled to type declaration with (no. args - 1) fields
+//
+//
+//
+//      -> 
+//      -> 
+//      -> 
+//      -> 
+//      -> 
+//
+
+declare FinancialStatus 
+  arg0: String @position(0)
+end
+
+rule "constant"
+  when
+  then
+    insert(FinancialStatus("inadequate"))
+end
+
+declare EarningsStatus
+  arg0: String @position(0)
+end
+
+declare InvestmentStrategy 
+  arg0: String @position(0)
+end
+
+declare Person
+  arg0: String @position(0)
+end
+
+declare Family
+  arg0: String @position(0)
+end
+
+
+declare Justification end
+
+declare Savings_account
+  arg0: Justification @position(0)
+  arg1: Person @position(1)
+  arg2: FinancialStatus @position(2)
+end
+
+declare Income
+  arg0: Justification @position(0)
+  arg1: Person @position(1)
+  arg2: FinancialStatus @position(2)
+end
+
+declare Earnings
+  arg0: Justification @position(0)
+  arg1: Person @position(1)
+  arg2: Integer @position(2)
+  arg3: EarningsStatus @position(3)
+end
+
+declare Investment
+  arg0: Justification @position(0)
+  arg1: Person @position(1)
+  arg2: InvestmentStrategy @position(2)
+end
+
+declare Amount_saved
+  arg0: Justification @position(0)
+  arg1: Person @position(1)
+  arg2: Integer @position(2)
+end
+
+declare Dependents
+  arg0: Justification @position(0)
+  arg1: Person @position(1)
+  arg2: Integer @position(2)
+end
+
+declare Member
+  arg0: Justification @position(0)
+  arg1: Person @position(1)
+  arg2: Family @position(2)
+end
+
+declare IsDead
+  arg0: Justification @position(0)
+  arg1: Person @position(1)
+end
+
+declare Spendthrift
+  arg0: Justification @position(0)
+  arg1: Person @position(1)
+end
+
+
+rule "accInad"
+  when
+    // Bindings to global constants
+    $finInad : FinancialStatus(arg0 == 'inadequate') 
+    // $invSavi : InvestmentStrategy(arg0 == 'savings')
+    // preconditions
+    // would creating and testing for equivalence work here?
+    Savings_account($j0 := arg0, $p := arg1, arg2 == $finInad) // FinancialStatus('inadequate'))   
+    // or does drools have a mechanism for creating constants
+    // enumeration types in drools? if drools already has support for enums then all this can be circumvented
+  then
+    insertLogical(new Investment(new JustificationAccInad($j0, $p), $p, new InvestmentStrategy(arg0 == 'savings')));
+end
+
+declare JustificationAccInad extends Justification
+  prior0: Justification @position(0)
+  arg0: Person @position(1)
+end
+
+rule "accAdIncAd"
+  when
+    // Bindings to global constants
+    // $p : Person()
+    // $finAdeq : FinancialStatus(arg0 == 'adequate')
+    // $invStoc : InvestmentStrategy(arg0 == 'stocks')
+    // preconditions
+    Savings_account($j0 := arg0, $p := arg1, arg2 == FinancialStatus(arg0 == 'adequate'))
+    Income($j1 := arg0, $p := arg1, arg2 == FinancialStatus(arg0 == 'adequate'))
+  then
+    insertLogical(new Investment(new JustificationAccAdIncAd($j0, $j1, $p), $p, new InvestmentStrategy(arg0 == 'stocks')));
+end
+
+declare JustificationAccAdIncAd extends Justification
+  prior0: Justification @position(0)
+  prior1: Justification @position(1)
+  arg0: Person @position(2)
+end
+
+rule "accAdIncInad"
+  when
+    // bindings to global constants
+    // $p : Person()
+    // $finAdeq : FinancialStatus(arg0 == 'adequate')
+    // $finInad : FinancialStatus(arg0 == 'inadequate')
+    // $invComb : InvestmentStrategy(arg0 == 'combination')
+    // preconditions
+    Savings_account($j0 := arg0, $p := arg1, arg2 == FinancialStatus(arg0 == 'adequate'))
+    Income($j1 := arg0, arg1 == $p, arg2 == FinancialStatus(arg0 == 'inadequate'))
+  then
+    insertLogical(new Investment(new JustificationAccAdIncInad($j0, $j1, $p), $p, new InvestmentStrategy(arg0 == 'combination')));
+end
+
+declare JustificationAccAdIncInad extends Justification
+  prior0: Justification @position(0)
+  prior1: Justification @position(1)
+  arg0: Person @position(2)
+end
+
+rule "savingsAd"
+  when
+    // $finAdeq : FinancialStatus(arg0 == 'adequate')
+    Amount_saved($j0 := arg0, $p := arg1, $x := arg2)
+    Dependents($j1 := arg0, $p := arg1, $y := arg2)
+    // eval($x > minsavings $y)
+    eval($x > $y)
+  then
+    insertLogical(new Savings_account(new JustificationSavingsAd($j0, $j1, $p, $x, $y) $p, new FinancialStatus(arg0 == "adequate")))
+end
+
+declare JustificationSavingsAd extends Justification
+  prior0: Justification @position(0)
+  prior1: Justification @position(1)
+  arg0: Person @position(2)
+  arg1: Integer @position(3)
+  arg2: Integer @position(4)
+end
+
+
+
+// facts 
+declare Fact extends Justification end
+

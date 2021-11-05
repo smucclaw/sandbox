@@ -1,0 +1,103 @@
+//created on: Oct 21, 2021
+package com.sample.outBackup
+
+//list any import classes here.
+
+// generated 
+declare Savings_account
+  arg0: String @position(0)
+end
+
+declare Income
+  arg0: String @position(0)
+end
+
+declare Earnings
+  arg0: Integer @position(0)
+  arg1: String @position(1)
+end
+
+declare Investment
+  arg0: String @position(0)
+end
+
+declare Amount_saved
+  arg0: Integer @position(0)
+end
+
+declare Dependents
+  arg0: Integer @position(0)
+end
+
+rule "accInad"
+  when
+    Savings_account(arg0 == 'inadequate')
+  then
+    insertLogical(new Investment('savings'));
+end
+
+
+rule "accAdIncAd"
+  when
+    Savings_account(arg0 == 'adequate')
+    Income(arg0 == 'adequate')
+  then
+    insertLogical(new Investment('stocks'));
+end
+
+
+rule "accAdIncInad"
+  when
+    Savings_account(arg0 == 'adequate')
+    Income(arg0 == 'inadequate')
+  then
+    insertLogical(new Investment('combination'));
+end
+
+
+rule "savingsAd"
+  when
+    Amount_saved($x := arg0)
+    Dependents($y := arg0)
+    eval($x > minsavings($y))
+  then
+    insertLogical(new Savings_account('adequate'));
+end
+
+
+rule "savingsInad"
+  when
+    Amount_saved($x := arg0)
+    Dependents($y := arg0)
+    eval($x <= minsavings($y))
+  then
+    insertLogical(new Savings_account('inadequate'));
+end
+
+
+rule "incomeAd"
+  when
+    Earnings($x := arg0, arg1 == 'steady')
+    Dependents($y := arg0)
+    eval($x > minincome($y))
+  then
+    insertLogical(new Income('adequate'));
+end
+
+
+rule "incomeInadESteady"
+  when
+    Earnings($x := arg0, arg1 == 'steady')
+    Dependents($y := arg0)
+    eval($x <= minincome($y))
+  then
+    insertLogical(new Income('inadequate'));
+end
+
+
+rule "incomeInadEUnsteady"
+  when
+    Earnings($x := arg0, arg1 == 'unsteady')
+  then
+    insertLogical(new Income('inadequate'));
+end

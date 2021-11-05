@@ -1,0 +1,134 @@
+//created on: Oct 19, 2021
+package com.sample.Out
+
+// Derivables
+function Integer minincome(Integer numDeps) {
+    return (15000 + (4000 * numDeps));
+}
+
+function Integer minsavings(Integer numDeps) {
+    return (5000 * numDeps);
+}
+
+// Hard-coded facts
+rule "amountSavedF"
+    when
+    then
+        insert(new Amount_saved(100000000));
+end
+
+rule "earningsF"
+    when
+    then
+        insert(new Earnings(25000, "steady"));
+end
+
+rule "dependentsF"
+    when
+    then
+        insert(new Dependents(0));
+end
+
+query "rule trace"
+    $rule: Investment()
+end
+
+
+// generated
+declare Savings_account
+  arg0: String @position(0)
+end
+
+declare Income
+  arg0: String @position(0)
+end
+
+declare Earnings
+  arg0: Integer @position(0)
+  arg1: String @position(1)
+end
+
+declare Investment
+  arg0: String @position(0)
+end
+
+declare Amount_saved
+  arg0: Integer @position(0)
+end
+
+declare Dependents
+  arg0: Integer @position(0)
+end
+
+rule "accInad"
+  when
+    Savings_account(arg0 == 'inadequate')
+  then
+    insertLogical(new Investment('savings'));
+end
+
+
+rule "accAdIncAd"
+  when
+    Savings_account(arg0 == 'adequate')
+    Income(arg0 == 'adequate')
+  then
+    insertLogical(new Investment('stocks'));
+end
+
+
+rule "accAdIncInad"
+  when
+    Savings_account(arg0 == 'adequate')
+    Income(arg0 == 'inadequate')
+  then
+    insertLogical(new Investment('combination'));
+end
+
+
+rule "savingsAd"
+  when
+    Amount_saved($x := arg0)
+    Dependents($y := arg0)
+    eval($x > minsavings($y))
+  then
+    insertLogical(new Savings_account('adequate'));
+end
+
+
+rule "savingsInad"
+  when
+    Amount_saved($x := arg0)
+    Dependents($y := arg0)
+    eval($x <= minsavings($y))
+  then
+    insertLogical(new Savings_account('inadequate'));
+end
+
+
+rule "incomeAd"
+  when
+    Earnings($x := arg0, arg1 == 'steady')
+    Dependents($y := arg0)
+    eval($x > minincome($y))
+  then
+    insertLogical(new Income('adequate'));
+end
+
+
+rule "incomeInadESteady"
+  when
+    Earnings($x := arg0, arg1 == 'steady')
+    Dependents($y := arg0)
+    eval($x <= minincome($y))
+  then
+    insertLogical(new Income('inadequate'));
+end
+
+
+rule "incomeInadEUnsteady"
+  when
+    Earnings($x := arg0, arg1 == 'unsteady')
+  then
+    insertLogical(new Income('inadequate'));
+end

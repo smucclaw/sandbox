@@ -1,0 +1,30 @@
+//created on: Oct 19, 2021
+package com.sample.facts
+
+//list any import classes here.
+import com.sample.Out.*
+
+// Hard-coded facts
+rule "amountSavedF"
+    when
+    then
+        insert(new Amount_saved(1));
+end
+
+rule "earningsF"
+    when
+    then
+        insert(new Earnings(25000, "unsteady"));
+end
+
+rule "dependentsF"
+    when
+    then
+        insert(new Dependents(3));
+end
+
+query "rule trace"
+    $rule: Investment()
+end
+
+//declare any global variables here

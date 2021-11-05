@@ -27,5 +27,9 @@ For reference: see
 - not fully complete
 - stores the current l4 output when running `l4 expsys rules filename`
 
-
+<b>cwu.drl</b>
+- not fully complete
+- exploratory representation of drools output from l4
+- differs from parametric.drl & nonParametric.drl in how classDecls are transformed
+- On hold until we concretely know what L4 classes need to do, and correspondingly look like
 

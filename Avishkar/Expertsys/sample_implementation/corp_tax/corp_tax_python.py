@@ -2,17 +2,26 @@ from clorm import Predicate, ConstantField, IntegerField, RawField
 from clorm.clingo import Control
 from clorm import *
 
-#"user_input(neg,majorityShareholder(gates,microsoft))." "user_input(pos,majorityShareholder(gates,microsoft)).","user_input(pos,highMarketShare(microsoft)).","user_input(pos,madeLoss(microsoft))."
-user_inputs_list = []
+
+user_inputs_list = [
+#    "user_input(neg,majorityShareholder(gates,microsoft)).",
+    "user_input(pos,majorityShareholder(gates,microsoft)).",
+    "user_input(pos,highMarketShare(microsoft)).",
+    "user_input(pos,madeLoss(microsoft)).",
+]
 textfile = open("user_inputs.lp", "w")
 for element in user_inputs_list:
     textfile.write(element + "\n")
 textfile.close()
 
-params=["min_q_level(2).","max_query_lvl(12).","max_graph_level(10).","generate_q(mustPayCorpTax(gates,microsoft)).","overrides(b_2,b_1)."]
 textfile = open("params.lp", "w")
-for element in params:
-    textfile.write(element + "\n")
+textfile.write("""
+min_q_level(2).
+max_query_lvl(12).
+max_graph_level(10).
+generate_q(mustPayCorpTax(gates,microsoft)).
+overrides(b_2,b_1).
+""")
 textfile.close()
 
 

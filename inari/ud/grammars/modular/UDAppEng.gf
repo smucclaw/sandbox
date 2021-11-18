@@ -35,8 +35,8 @@ lin
 
     -- : root -> nsubj -> cop -> aclRelcl -> obl -> UDS ;  -- the person whose personal data is affected by the breach
     root_nsubj_cop_aclRelcl_obl rt sub cop rcl obl =
-      let uds : UDS = root_nsubj_cop_aclRelcl rt sub cop rcl
-       in uds ** {vp = mkVP rt.vp obl} ;
+      let root_obl : Root = rt ** {vp = mkVP rt.vp obl} ;
+       in root_nsubj_cop_aclRelcl root_obl sub cop rcl ;
 
     -- : root -> nsubjPass -> Deontic -> auxPass -> UDS ; -- everyone should be notified
     root_nsubjPass_deontic_auxPass rt sub deo auxpass =
@@ -53,10 +53,14 @@ lin
 	--the notifiable data [breach] will [result] in significant [harm] to the individual ;
 	root_nsubj_aux_obl result breach will in_harm = {
       subj = breach ;
-      pred = case will.auxType of {
-               RealAux => mkVP will.vv barePred ; -- may, must, –
-               Will|Have => barePred } -- TODO: Will and Have are tenses, use VPS?
-      } where { barePred : VP = mkVP result.vp in_harm } ;
+      pred = willResultInHarm
+      } where {
+		  barePred : VP = mkVP result.vp in_harm ;
+		  willResultInHarm : VPS = case will.auxType of {
+               RealAux => myVPS (mkVP will.vv barePred) ; -- may, must, –
+               Will => myVPS futureTense barePred ;
+			   Have => myVPS anteriorAnt barePred }
+	  };
 
 
   oper

@@ -1,6 +1,7 @@
 --# -path=./../rgl-wordnet
 
-concrete UDCatEng of UDCat = BareRGEng ** open SyntaxEng, Prelude, (P=ParadigmsEng), ExtraEng in {
+concrete UDCatEng of UDCat = BareRGEng **
+  open SyntaxEng, Prelude, (P=ParadigmsEng), (E=ExtraEng), ExtendEng in {
 
   lincat
     UDS = LinUDS ; -- TODO: use VPS instead of VP???
@@ -39,7 +40,7 @@ concrete UDCatEng of UDCat = BareRGEng ** open SyntaxEng, Prelude, (P=ParadigmsE
 
   lin
 
-    may_aux = mkAux "may" may_VV ;
+    may_aux = mkAux "may" E.may_VV ;
     have_aux = mkAux "have" Have ;
     will_aux = mkAux "will" Will ;
     can_aux = mkAux "can" can_VV ;
@@ -75,21 +76,28 @@ concrete UDCatEng of UDCat = BareRGEng ** open SyntaxEng, Prelude, (P=ParadigmsE
   oper
     emptyNP : NP = it_NP ** {s = \\_ => ""} ;
 
-    LinUDS : Type = {subj : NP ; pred : VP} ;
+    LinUDS : Type = {subj : NP ; pred : VPS} ;
 
     mkUDS : NP -> VP -> LinUDS = \np,vp -> {
-       subj = np ; pred = vp } ;
+       subj = np ; pred = myVPS vp } ;
 
-    linUDS : LinUDS -> Str = \uds -> (mkS (mkCl uds.subj uds.pred)).s ;
+    linUDS : LinUDS -> Str = \uds -> (PredVPS uds.subj uds.pred).s ;
     emptyNP : NP = it_NP ** {s = \\_ => ""} ;
 
+    myVPS = overload {
+      myVPS : VP -> VPS = \vp ->
+        MkVPS (mkTemp presentTense simultaneousAnt) positivePol vp ;
+      myVPS : Tense -> VP -> VPS = \tns,vp ->
+        MkVPS (mkTemp tns simultaneousAnt) positivePol vp ;
+      myVPS : Ant -> VP -> VPS = \ant,vp ->
+        MkVPS (mkTemp presentTense ant) positivePol vp
+    } ;
     --Aux : Type = {v : V ; isCop : Bool} ;
 --   Root : Type = {vp : VP ; comp : Comp ; c2 : Str} ;
 
     Root : Type = {vp : VP ; c2 : Str ; adv : Adv} ;
 
     -- alternative Root: {a : A ; n : N ; v : V ; adv : Adv ; whichFieldIsLegit : LegitField}
-
 
     mkRoot = overload {
        mkRoot : AP -> Root = \ap -> emptyRoot ** {vp = mkVP ap ; adv = lin Adv (mkUtt ap)} ;

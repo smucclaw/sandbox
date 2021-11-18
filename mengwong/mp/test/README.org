@@ -377,12 +377,25 @@ do the individual components work?
 :TABLE_EXPORT_FORMAT: orgtbl-to-csv
 :END:
 
-| EVERY | person          | ("singer") |   |
-| WHO   | walks           |            |   |
-| AND   | eats            |            |   |
-| MUST  |                 |            |   |
-| IF    | the King wishes |            |   |
-| ->    | sing            |            |   |
+| EVERY | person          | AKA | singer |
+| WHO   | walks           |     |        |
+| AND   | eats            |     |        |
+| MUST  |                 |     |        |
+| IF    | the King wishes |     |        |
+| ->    | sing            |     |        |
+
+** vague temporal spec
+:PROPERTIES:
+:TABLE_EXPORT_FILE: t-vaguely.csv
+:TABLE_EXPORT_FORMAT: orgtbl-to-csv
+:END:
+
+| EVERY | person          | AKA | singer |
+| WHO   | walks           |     |        |
+| AND   | eats            |     |        |
+| MUST  | sooner or later |     |        |
+| IF    | the King wishes |     |        |
+| ->    | sing            |     |        |
 
 ** stanzas interrupted by blank lines
 :PROPERTIES:
@@ -390,18 +403,18 @@ do the individual components work?
 :TABLE_EXPORT_FORMAT: orgtbl-to-csv
 :END:
 
-|                                                     |                 |            |   |
-| A paragraph with irrelevant text should be ignored. |                 | Like so.   |   |
-|                                                     |                 |            |   |
-|                                                     |                 |            |   |
-| EVERY                                               | person          | ("singer") |   |
-| WHO                                                 | walks           |            |   |
-| AND                                                 | eats            |            |   |
-| MUST                                                |                 |            |   |
-|                                                     |                 |            |   |
-|                                                     |                 |            |   |
-| IF                                                  | the King wishes |            |   |
-| ->                                                  | sing            |            |   |
+|                                                     |                 |          |        |
+| A paragraph with irrelevant text should be ignored. |                 | Like so. |        |
+|                                                     |                 |          |        |
+|                                                     |                 |          |        |
+| EVERY                                               | person          | AKA      | singer |
+| WHO                                                 | walks           |          |        |
+| AND                                                 | eats            |          |        |
+| MUST                                                |                 |          |        |
+|                                                     |                 |          |        |
+|                                                     |                 |          |        |
+| IF                                                  | the King wishes |          |        |
+| ->                                                  | sing            |          |        |
 
 ** qualifying person
 :PROPERTIES:
@@ -409,11 +422,11 @@ do the individual components work?
 :TABLE_EXPORT_FORMAT: orgtbl-to-csv
 :END:
 
-| EVERY | Qualifying Person | ("QP") |   |
-|       | MEANS             | walks  |   |
-|       | AND               | eats   |   |
-| MUST  |                   |        |   |
-| ->    | sing              |        |   |
+| EVERY | Qualifying Person | AKA   | QP |
+|       | MEANS             | walks |    |
+|       | AND               | eats  |    |
+| MUST  |                   |       |    |
+| ->    | sing              |       |    |
 
 ** legislative source citations
 :PROPERTIES:
@@ -656,9 +669,187 @@ Moving the AND to the level of the IF is an accepted and common form.
 
 
 
+** The semantics of GIVEN and HAVING
+
+Currently GIVEN is a boolstruct / boolrules thingy that has happened previously
+
+maybe we want it to be a ParamText instead?
+
+*** Given in a simple constitutive rule
+:PROPERTIES:
+:TABLE_EXPORT_FILE: given-consti-1.csv
+:TABLE_EXPORT_FORMAT: orgtbl-to-csv
+:END:
+
+We look back in the history:
+
+|       | songFee    |    |      |
+| GIVEN | songLength |    |      |
+| WHEN  | songLength | >= | 2min |
+| IS    | $200       |    |      |
+|       |            |    |      |
+| but   |            |    |      |
+|       |            |    |      |
+|       | songFee    |    |      |
+| GIVEN | songLength | <  | 2min |
+| IS    | $100       |    |      |
+
+*** HAVING
+:PROPERTIES:
+:TABLE_EXPORT_FILE: /dev/null
+:TABLE_EXPORT_FORMAT: orgtbl-to-csv
+:END:
+
+How about we then make HAVING be the ParamText that refers to something in the trace also?
+
+| GIVEN  | tax rate   | :: | Number |
+|        | income     | :: | Number |
+|        |            |    |        |
+| DEFINE | payableTax | :: | Float  |
+| IS     | tax rate   | *  | income |
+
+**** Simple Having
+:PROPERTIES:
+:TABLE_EXPORT_FILE: having-1.csv
+:TABLE_EXPORT_FORMAT: orgtbl-to-csv
+:END:
+
+| EVERY  | Party      |                  |      |
+| HAVING | sung       |                  |      |
+|        | songLength | >=               | 2min |
+| MAY    | claim      | songFee          |      |
+|        | amount     | $10 * songLength |      |
+
 ** Tracking citations and sources
 
 In the spreadsheet we allow a prefix on each line that shows the source of the legislation.
 
 To handle this we may need to augment our types so that each bit of logic can be annotated with a source Text.Text.
 
+
+
+* Ontology
+:PROPERTIES:
+:TABLE_EXPORT_FILE: define-1.csv
+:TABLE_EXPORT_FORMAT: orgtbl-to-csv
+:END:
+
+|   | DEFINE | Chirality |       |           |           |
+|   | ONE OF | Left      |       |           |           |
+|   |        | Right     |       |           |           |
+|   |        |           |       |           |           |
+|   | so     | now we    | can   |           |           |
+|   |        |           |       |           |           |
+|   | DEFINE | Hand      | ::    | Chirality |           |
+|   |        |           |       |           |           |
+|   | ;      |           |       |           |           |
+|   |        |           |       |           |           |
+|   | DEFINE | Arm       | ::    | Chirality |           |
+|   |        |           |       |           |           |
+|   | ;      |           |       |           |           |
+|   |        |           |       |           |           |
+|   | DEFINE | Sign      |       |           |           |
+|   | ONE OF | Rock      |       |           |           |
+|   |        | Scissors  |       |           |           |
+|   |        | Paper     |       |           |           |
+|   |        |           |       |           |           |
+|   | ;      |           |       |           |           |
+|   |        |           |       |           |           |
+|   | DEFINE | Name      | IS    | A         | String    |
+|   |        |           |       |           |           |
+|   | ;      |           |       |           |           |
+|   |        |           |       |           |           |
+|   | DEFINE | BirthYear | IS    | A         | Number    |
+|   |        |           |       |           |           |
+|   | ;      |           |       |           |           |
+|   |        |           |       |           |           |
+|   | DEFINE | Player    | IS    | AN        | Entity    |
+|   | HAS    | yearBorn  | IS    | A         | BirthYear |
+|   |        | fullName  | IS    | A         | Name      |
+|   |        | dynamic   | --    | untyped!  |           |
+|   |        |           |       |           |           |
+|   | ;      |           |       |           |           |
+|   |        |           |       |           |           |
+|   |        |           | beats |           |           |
+|   | MEANS  | rock      | beats | scissors  |           |
+|   |        | paper     | beats | rock      |           |
+|   |        | scissors  | beats | paper     |           |
+|   |        |           |       |           |           |
+
+
+** GIVEN ... DEEM
+:PROPERTIES:
+:TABLE_EXPORT_FILE: define-2.csv
+:TABLE_EXPORT_FORMAT: orgtbl-to-csv
+:END:
+
+optional Given ParamText
+permute
+  required Deem ParamText
+  optional BoolStruct [If,When]
+
+|   |       |               |       |    |      |
+|   | GIVEN | x             | y     | :: | Sign |
+|   | DEEM  | x             | beats | y  |      |
+|   | WHEN  | x == Rock     |       |    |      |
+|   | AND   | y == Scissors |       |    |      |
+
+creates a Constitutive Rule; the "assig" (assignment) is "deem".
+
+** Constitutive Rule syntax
+
+Normally we have X MEANS Y
+
+Y could be a boolstruct
+
+#+begin_example
+  degustates
+       MEANS eats
+          OR drinks
+#+end_example
+
+but it could be something else:
+
+#+begin_example
+    Maximum Number Of People AKA MaxPeople
+                       MEANS 500
+#+end_example
+
+so let's try parsing as a boolrule and if that doesn't work we just shoehorn it into a paramtext.
+
+** More Deem Syntax
+:PROPERTIES:
+:TABLE_EXPORT_FILE: define-3.csv
+:TABLE_EXPORT_FORMAT: orgtbl-to-csv
+:END:
+
+what if we say
+|       |         |   |    |        |
+| GIVEN | x       | y | :: | Number |
+| DEEM  | product |   |    |        |
+| MEANS | x       | * | y  |        |
+|       |         |   |    |        |
+
+
+
+** defeating
+:PROPERTIES:
+:TABLE_EXPORT_FILE: define-4.csv
+:TABLE_EXPORT_FORMAT: orgtbl-to-csv
+:END:
+
+
+| GIVEN | Player1        |         |   | Player2        | :: | Player |
+| DEEM  | Player1        | defeats |   | Player2        |    |        |
+| WHEN  | Player1.choice | beats   |   | Player2.choice |    |        |
+        
+** Pilcrows
+:PROPERTIES:
+:TABLE_EXPORT_FILE: pilcrows-1.csv
+:TABLE_EXPORT_FORMAT: orgtbl-to-csv
+:END:
+
+| EVERY  | person         |  | ¶ | | EVERY | person      |                |
+| MUST   | sing           |  | ¶ | | MUST  | sing        |                |
+| IF NOT | day of silence |  | ¶ | | IF    | NOT         | day of silence |
+|        |                |  | ¶ | | AND   | day of song |                |

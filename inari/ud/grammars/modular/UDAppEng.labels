@@ -49,6 +49,9 @@
 -- [my mother's]:Quant [5]:Num [hovercrafts]:CN
 #auxfun DetCNNumNmod_ quant num cn : Quant -> Num -> CN -> NP = DetCN (DetQuant quant num) cn ; nmod:poss nummod head
 
+-- [one]:NP that processes data
+#auxfun CardNP_ card : Card -> root = rootN_ (DetNP (DetQuant IndefArt (NumCard card))) ; head
+
 -- fluffy and cute
 #auxcat Comma PUNCT
 #auxfun CommaAP_ ap comma : AP -> Comma -> APComma =  ap ; head punct
@@ -187,3 +190,12 @@
 -- default for AdvVP is head advmod, this is for head obl (i.e. Adv made by PrepNP)
 #auxfun OblVP_ vp adv : VP -> Adv -> VP = AdvVP vp adv ; head obl
 
+#auxfun RelVPObl_ -- TODO: make it work for "that is processing personal data for another organisation
+    8   processing      processe        VERB    VBG     Tense=Pres|VerbForm=Part        5       acl:relcl       _       FUN=processeVBG
+        6       that    that    PRON    WDT     PronType=Rel    8       nsubj   _       FUN=PRONWDT
+        7       is      be      AUX     VBZ     Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin   8       aux     _       FUN=UseComp
+        10      data    data    NOUN    NN      Number=Sing     8       obj     _       FUN=data_N
+            9   personal        personal        ADJ     JJ      Degree=Pos      10      amod    _       FUN=personal_A
+        13      organisation    organisation    NOUN    NN      Number=Sing     8       obl     _       FUN=organisation_N
+            11  for     for     ADP     IN      _       13      case    _       _
+            12  another another DET     DT      _       13      det     _       FUN=another_Det

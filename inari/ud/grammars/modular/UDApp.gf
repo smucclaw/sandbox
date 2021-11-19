@@ -41,7 +41,7 @@ abstract UDApp = UDCat, JustWordsWordNet ** {
 	--not legal advice." ;
 
 		root_advmod_nsubj_cop_obl : root -> advmod -> nsubj -> cop -> obl -> UDS ;
-	--"once an organisation is aware of a data breach ;
+	--"[once]:advmod an [organisation]:nsubj is [aware]:root of a data [breach]:obl ;
 
 		root_amod : root -> amod -> UDS ;
 	--green(potato) ;
@@ -306,6 +306,10 @@ abstract UDApp = UDCat, JustWordsWordNet ** {
 
 		root_mark_nsubj_cop_obl : root -> mark -> nsubj -> cop -> obl -> UDS ;
 	--"when an organisation is aware of a data breach ;
+
+		root_nsubj_cop_obl : root -> nsubj -> cop -> obl -> UDS ;
+	--"an organisation is aware of a data breach ;
+
 
 		root_mark_nsubj_obj : root -> mark -> nsubj -> obj -> UDS ;
 	--"if it harms the affected individual ;

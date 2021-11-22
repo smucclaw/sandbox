@@ -31,6 +31,8 @@ abstract BareRG =
     AdVVP
   ],
 
+  Idiom [ProgrVP],
+
    Noun - [
       CountNP,
       PartNP,

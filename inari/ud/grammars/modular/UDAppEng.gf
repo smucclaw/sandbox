@@ -105,9 +105,10 @@ lin
     -- unstable hack, TODO fixme
     addRcl : Root -> RS -> Root = \rt,rs ->
       let dummyNP : NP = mkNP emptyNP rs ;
-          dummyVPSlash : VPSlash = root2vpslash rt ;
+      --     dummyVPSlash : VPSlash = root2vpslash rt ;
+          RSasAdv : Adv = lin Adv (mkUtt dummyNP) ;
        in rt ** {
-            vp = mkVP dummyVPSlash dummyNP
+            vp = mkVP rt.vp RSasAdv
           } ;
 	onlyPred : VP -> UDS = \vp -> mkUDS emptyNP vp ;
 }

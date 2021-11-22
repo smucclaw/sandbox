@@ -51,6 +51,7 @@ library
     , bytestring
     , cassava
     , containers
+    , extra
     , generic-data
     , gf
     , gf-ud
@@ -60,6 +61,7 @@ library
     , mtl
     , parsers
     , pretty-simple
+    , replace-megaparsec
     , split
     , stm
     , text
@@ -84,6 +86,7 @@ executable mp-exe
     , bytestring
     , cassava
     , containers
+    , extra
     , generic-data
     , gf
     , gf-ud
@@ -94,6 +97,7 @@ executable mp-exe
     , mtl
     , parsers
     , pretty-simple
+    , replace-megaparsec
     , split
     , stm
     , text
@@ -119,6 +123,7 @@ test-suite mp-test
     , bytestring
     , cassava
     , containers
+    , extra
     , generic-data
     , gf
     , gf-ud
@@ -129,6 +134,7 @@ test-suite mp-test
     , mtl
     , parsers
     , pretty-simple
+    , replace-megaparsec
     , split
     , stm
     , text

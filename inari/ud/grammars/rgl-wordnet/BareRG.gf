@@ -38,6 +38,7 @@ abstract BareRG =
       PartNP,
       ApposCN
       ,UseN2, Use2N3
+      ,PPartNP
 --      ,IndefArt, DefArt
    ],
 

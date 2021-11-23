@@ -2,9 +2,14 @@
 
 concrete UDAppEng of UDApp =
   UDCatEng, JustWordsWordNetEng **
-  open Prelude, SyntaxEng, IrregEng, ExtendEng in {
+  open Prelude, SyntaxEng, IrregEng, ExtendEng, SymbolicEng, (P=ParadigmsEng) in {
 
 lin
+
+  StrPN str = {s = \\_ => str.s ; g = P.human} ;
+  StrN str = {s = \\_,_  => str.s ; g = P.human} ;
+
+
 -- The concrete syntax is sketchy on purpose.
 -- One could say that it doesn't even have to bother to linearise properly,
 -- but we do it for the sake of ud2gf: checking linearisations against the original.
@@ -15,9 +20,9 @@ lin
 
 -- Most of this file is a rather mechanical effort of cutting and pasting the internal trees together.
 
--- 1) The basic building blocks. Most other funs can be reduced to these.
+-----------------------------------------------------------------------------
+-- Variations on root_nsubj_*
 
-    -- syntactic functions
     -- : root -> nsubj -> UDS ;  -- the cat sleeps
     root_nsubj rt sub = mkUDS sub rt.vp ;
 
@@ -33,6 +38,73 @@ lin
     root_nsubj_cop_obl,
     root_nsubj_cop_nmod = \rt,sub,cop,adv -> mkUDS sub (mkVP rt.vp adv) ;
 
+-----------------------------------------------------------------------------
+-- Variations on root_obl_*
+
+    -- : root -> obl -> UDS ;
+  	-- subject to X ;
+		root_obl subject to_X = onlyPred (mkVP subject.vp to_X) ;
+
+    -- : root -> advmod -> advmod -> obl -> UDS ;
+    -- [publicly] available [solely] because of any data [breach]. ;
+  	root_advmod_advmod_obl available publicly solely because_of_breach =
+      root_obl  -- TODO is this too overfitting? "publicly available solely …"
+        (mkRoot (mkVP <publicly : AdV> (mkVP available.vp solely)))
+        because_of_breach ;
+
+    -- : root -> obl -> appos -> UDS ;
+  	-- mentioned in [sub-paragraph] [(a)] -- this UDpipe output has wrong attachment
+		root_obl_appos root obl appos = root_obl (mkRoot (mkVP root.vp <appos : Adv>)) obl ;
+
+    -- : root -> obl -> aux -> UDS ;
+  	--as the case may be -- TODO: this is definitely wrong parse
+  	-- root_obl_aux
+
+    -- : root -> obl -> case_ -> UDS ;
+    --together with justification for why ; -- TODO: also wrong parse by UDpipe
+		-- root_obl_case
+
+		-- : root -> obl -> obj -> UDS ;
+	  --provide to the PDPC an explanation for why your notification was late ;
+    root_obl_obj provide to_pdpc explanation =
+      let provide_to_PDPC : VP = mkVP provide.vp to_pdpc ;
+       in root_obj (mkRoot provide_to_PDPC) explanation ;
+
+    -- : root -> obl -> obl -> UDS ;
+	  -- mentioned in paragraph 11 on behalf of the individual. ;
+		root_obl_obl mentioned in_paragraph on_behalf =
+      onlyPred (mkVP (mkVP mentioned.vp in_paragraph) on_behalf) ;
+
+		-- : root -> obl -> obl -> obl -> UDS ;
+	  --authorised in that behalf in writing by the Director-General
+    root_obl_obl_obl_cc mentioned in_paragraph on_behalf by_director =
+      onlyPred (mkVP (mkVP (mkVP mentioned.vp in_paragraph) on_behalf) by_director) ;
+
+    --  : root -> obl -> xcomp -> UDS ;
+	  -- for an adoption order to be made -- TODO: wrong UD parse
+		-- root_obl_xcomp
+
+-----------------------------------------------------------------------------
+-- No subject, only root
+   -- : root -> UDS ;  -- sing ;
+    root_only rt = onlyPred rt.vp ;
+
+-- Variations on root_obj_*
+
+		-- : root -> obj -> UDS ;
+    --eat potato ;
+    root_obj rt obj = onlyPred (mkVP (root2vpslash rt) obj) ;
+
+    -- : root -> obj -> ccomp -> UDS ;
+    --includes a [number] assigned to any account the individual [has]:ccomp with an organisation that is a bank or finance company. ;
+    -- root_obj_ccomp
+
+    -- : root -> obj -> nmod -> UDS ;
+    --processes personal data on behalf of and for the purposes of a public agency ;
+    root_obj_nmod processes personal_data for_purposes =
+      root_obj processes (mkNP personal_data for_purposes) ;
+
+-----------------------------------------------------------------------------
     -- Hack for lists. TODO: use the new generic way to handle lists of arbitrary length.
     root_nsubj_cop_cc_conj rt sub cop cc conj =
       let big_and_old : Adv = mkAdv cc rt.adv <conj : Adv> ;
@@ -40,7 +112,7 @@ lin
 
     -- We don't care that addRcl is a hack. For later applications, we can always attach the aclRelcl differently.
     -- : root -> nsubj -> cop -> aclRelcl -> UDS ;
-    -- a data intermediary is one that is processing personal data on behalf of and for the purposes of another organisation ;
+    -- a data [intermediary]:nsubj is [one]:root that is [processing]:acl:relcl personal data  ;
     root_nsubj_cop_aclRelcl rt sub cop rcl = root_nsubj_cop (addRcl rt rcl) sub cop ;
 
     -- : root -> nsubj -> cop -> aclRelcl -> obl -> UDS ;  -- the person whose personal data is affected by the breach

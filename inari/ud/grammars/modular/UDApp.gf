@@ -6,6 +6,11 @@ abstract UDApp = UDCat, JustWordsWordNet ** {
 		startcat = UDS ;
 
 	fun
+
+
+	StrPN : String -> PN ;
+	StrN : String -> N ;
+
 	-- from the first test corpus, full sentences
 
 	passRelcl_               : root -> RP -> auxPass -> aclRelcl ; -- [whose data]:RP is affected
@@ -18,8 +23,8 @@ abstract UDApp = UDCat, JustWordsWordNet ** {
 
 	-- from the text fragments in Legal Spreadsheets PDPA mockup
 
-		root_only : root -> UDS ;
-	--sing ;
+			root_only : root -> UDS ;
+		--sing ;
 
 
 	root_acl : root -> acl -> UDS ;
@@ -539,8 +544,8 @@ abstract UDApp = UDCat, JustWordsWordNet ** {
 		root_obl_obl : root -> obl -> obl -> UDS ;
 	--mentioned in paragraph 11 on behalf of the individual. ;
 
-		root_obl_obl_obl_cc : root -> obl -> obl -> obl -> cc -> UDS ;
-	--authorised in that behalf in writing by the Director-General or ;
+		root_obl_obl_obl_cc : root -> obl -> obl -> obl -> UDS ;
+	--authorised in that behalf in writing by the Director-General
 
 		root_obl_xcomp : root -> obl -> xcomp -> UDS ;
 	--"for an adoption order to be made ;

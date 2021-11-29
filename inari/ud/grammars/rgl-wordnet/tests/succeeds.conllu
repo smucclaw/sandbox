@@ -36,3 +36,17 @@
 11	notifiable	notifiable	ADJ	JJ	Degree=Pos	13	amod	_	FUN=notifiable_A
 12	data	data	NOUN	NN	Number=Sing	13	compound	_	FUN=data_N
 13	breach	breach	NOUN	NN	Number=Sing	0	root	_	FUN=breach_N
+
+1	a	a	DET	DT	Definite=Ind|PronType=Art	3	det	_	FUN=a_Det
+2	data	data	NOUN	NN	Number=Sing	3	compound	_	FUN=data_N
+3	intermediary	intermediary	NOUN	NN	Number=Sing	5	nsubj	_	FUN=intermediary_N
+4	is	be	AUX	VBZ	Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin	5	cop	_	FUN=UseComp
+5	one	one	NUM	CD	NumType=Card	0	root	_	_
+6	that	that	PRON	WDT	PronType=Rel	8	nsubj	_	FUN=PRONWDT
+7	is	be	AUX	VBZ	Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin	8	aux	_	FUN=UseComp
+8	processing	process	VERB	VBG	Tense=Pres|VerbForm=Part	5	acl:relcl	_	FUN=processeVBG
+9	personal	personal	ADJ	JJ	Degree=Pos	10	amod	_	FUN=personal_A
+10	data	data	NOUN	NN	Number=Sing	8	obj	_	FUN=data_N
+11	for	for	ADP	IN	_	13	case	_	_
+12	another	another	DET	DT	_	13	det	_	FUN=another_Det
+13	organisation	organisation	NOUN	NN	Number=Sing	8	obl	_	FUN=organisation_N

@@ -27,11 +27,14 @@ concrete BareRGEng of BareRG =
     AdVVP
   ],
 
+  IdiomEng [ProgrVP],
+
   NounEng - [
     CountNP,
     PartNP,
     ApposCN
     ,UseN2, Use2N3
+    ,PPartNP
 --    ,IndefArt, DefArt
    ],
 

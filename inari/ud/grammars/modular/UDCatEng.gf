@@ -56,6 +56,7 @@ concrete UDCatEng of UDCat = BareRGEng **
     cc_ = id Conj ;
     obl_,
     advmod_ = id Adv ;
+    oblPrep_ to = mkAdv to emptyNP ;
 
     rootV_ vp = mkRoot vp ;
     rootA_ ap = mkRoot ap ;

@@ -31,11 +31,14 @@ abstract BareRG =
     AdVVP
   ],
 
+  Idiom [ProgrVP],
+
    Noun - [
       CountNP,
       PartNP,
       ApposCN
       ,UseN2, Use2N3
+      ,PPartNP
 --      ,IndefArt, DefArt
    ],
 

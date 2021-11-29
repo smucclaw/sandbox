@@ -6,6 +6,11 @@ abstract UDApp = UDCat, JustWordsWordNet ** {
 		startcat = UDS ;
 
 	fun
+
+
+	StrPN : String -> PN ;
+	StrN : String -> N ;
+
 	-- from the first test corpus, full sentences
 
 	passRelcl_               : root -> RP -> auxPass -> aclRelcl ; -- [whose data]:RP is affected
@@ -18,8 +23,8 @@ abstract UDApp = UDCat, JustWordsWordNet ** {
 
 	-- from the text fragments in Legal Spreadsheets PDPA mockup
 
-		root_only : root -> UDS ;
-	--sing ;
+			root_only : root -> UDS ;
+		--sing ;
 
 
 	root_acl : root -> acl -> UDS ;
@@ -41,7 +46,7 @@ abstract UDApp = UDCat, JustWordsWordNet ** {
 	--not legal advice." ;
 
 		root_advmod_nsubj_cop_obl : root -> advmod -> nsubj -> cop -> obl -> UDS ;
-	--"once an organisation is aware of a data breach ;
+	--"[once]:advmod an [organisation]:nsubj is [aware]:root of a data [breach]:obl ;
 
 		root_amod : root -> amod -> UDS ;
 	--green(potato) ;
@@ -307,6 +312,10 @@ abstract UDApp = UDCat, JustWordsWordNet ** {
 		root_mark_nsubj_cop_obl : root -> mark -> nsubj -> cop -> obl -> UDS ;
 	--"when an organisation is aware of a data breach ;
 
+		root_nsubj_cop_obl : root -> nsubj -> cop -> obl -> UDS ;
+	--"an organisation is aware of a data breach ;
+
+
 		root_mark_nsubj_obj : root -> mark -> nsubj -> obj -> UDS ;
 	--"if it harms the affected individual ;
 
@@ -535,8 +544,8 @@ abstract UDApp = UDCat, JustWordsWordNet ** {
 		root_obl_obl : root -> obl -> obl -> UDS ;
 	--mentioned in paragraph 11 on behalf of the individual. ;
 
-		root_obl_obl_obl_cc : root -> obl -> obl -> obl -> cc -> UDS ;
-	--authorised in that behalf in writing by the Director-General or ;
+		root_obl_obl_obl_cc : root -> obl -> obl -> obl -> UDS ;
+	--authorised in that behalf in writing by the Director-General
 
 		root_obl_xcomp : root -> obl -> xcomp -> UDS ;
 	--"for an adoption order to be made ;

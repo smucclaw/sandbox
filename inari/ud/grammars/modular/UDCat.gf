@@ -153,6 +153,7 @@ abstract UDCat = BareRG ** {
         aclRelcl_ : RS -> aclRelcl ; -- whose personal data is/was/has been affected
 
         obl_    : Adv -> obl ;
+		oblPrep_ : Prep -> obl ; -- sometimes empty preps are analysed as obl, e.g. "subject to"
         advmod_ : Adv -> advmod ;
         nmod_ : Prep -> NP -> nmod ; -- UD-specific version of PrepNP
         auxPass_ : auxPass ;

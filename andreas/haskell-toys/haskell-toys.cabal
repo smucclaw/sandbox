@@ -1,10 +1,10 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.34.2.
+-- This file has been generated from package.yaml by hpack version 0.34.4.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 642a43b4f2bb4ee124291639f91af077e22a51fb3577f20635b679a3575a8152
+-- hash: ff97fe3d6ea984f48ca3d944a88727170cfa3b8b4a931279397da31c5bc650ad
 
 name:           haskell-toys
 version:        0.1.0.0
@@ -33,6 +33,7 @@ library
       LambdaBound
       LazyPi
       Lib
+      LinearTemporalLogic
       SimplifySums
       Stlc
   other-modules:

@@ -1,15 +1,15 @@
-root_nsubjPass_deontic_auxPass (rootV_ (PassV notify_V)) (nsubjPass_ (RelNP (UsePron everyone_Pron) (UseRCl (TTAnt TPres ASimul) PPos (RelVP who_RP (PassVAgent affect_V (DetCN (DetQuant DefArt NumSg) (UseN (CompoundN data_N breach_N)))))))) should_Deontic (auxPass_ be_cop)
+root_nsubjPass_aux_auxPass (rootV_ (PassV notify_V)) (nsubjPass_ (RelNP (UsePron everyone_Pron) (UseRCl (TTAnt TPres ASimul) PPos (RelVP who_RP (AdvVP (PassV affect_V) (PrepNP by8agent_Prep (DetCN (DetQuant DefArt NumSg) (UseN (CompoundN data_N breach_N))))))))) should_aux be_auxPass
 
 LIN: everyone , who is affected by the data breach , should be notified
 
-root_nsubj_obj (rootV_ (UseV cover_V)) (nsubj_ (DetCN (DetQuant DefArt NumSg) (UseN PDPA_N))) (obj_ (MassNP (AdjCN (PastPartAP (AdvVP (UseV store_V) (PrepNP in_Prep (DetCN aPl_Det (AdjCN (PositA electronic_A) (UseN format_N)))))) (AdjCN (PositA personal_A) (UseN data_N)))))
+root_nsubj (rootV_ (ComplV cover_V (MassNP (AdjCN (PastPartAP (AdvVP (UseV store_V) (PrepNP in_Prep (DetCN aPl_Det (AdjCN (ConjAP and_Conj (BaseAP (PositA electronic_A) (StrAP "non-electronic"))) (UseN format_N)))))) (AdjCN (PositA personal_A) (UseN data_N)))))) (nsubj_ (DetCN (DetQuant DefArt NumSg) (UseN PDPA_N)))
 
-LIN: the PDPA covers personal data stored in electronic formats
+LIN: the PDPA covers personal data stored in electronic and non-electronic formats
 
-root_nsubj_cop (rootN_ (DetCN (DetQuant IndefArt NumSg) (AdjCN (PositA notifiable_A) (UseN (CompoundN data_N breach_N))))) (nsubj_ (DetCN (DetQuant IndefArt NumSg) (AdjCN (PresPartAP (ComplV affect_V (DetCN (DetQuant more_than_Quant (NumCard (NumNumeral (num (pot2as3 (pot1as2 (pot0as1 (pot0 '500_Digit')))))))) (UseN people_N)))) (UseN (CompoundN data_N breach_N))))) be_cop
+root_nsubj_cop (rootN_ (DetCN (DetQuant IndefArt NumSg) (AdjCN (PositA notifiable_A) (UseN (CompoundN data_N breach_N))))) (nsubj_ (DetCN (DetQuant IndefArt NumSg) (AdjCN (PresPartAP (ComplV affect_V (DetCN (DetQuant IndefArt (NumCard (AdNum (AdnCAdv more_CAdv) (StrCard "500")))) (UseN people_N)))) (UseN (CompoundN data_N breach_N))))) be_cop
 
-LIN: a data breach affecting [more_than_Quant] ['500_Digit'] people is a notifiable data breach
+LIN: a data breach affecting more than 500 people is a notifiable data breach
 
-root_nsubj_cop_aclRelcl (rootN_ (DetNP (DetQuant IndefArt (NumCard (NumNumeral (num (pot2as3 (pot1as2 (pot0as1 pot01))))))))) (nsubj_ (DetCN (DetQuant IndefArt NumSg) (UseN (CompoundN data_N intermediary_N)))) be_cop (aclRelcl_ (UseRCl (TTAnt TPres ASimul) PPos (RelVP that_RP (AdvVP (ProgrVP (UseV process_V)) (PrepNP for_Prep (DetCN (DetQuant another_Quant NumSg) (UseN organization_N)))))))
+root_nsubj_aux_aclRelcl (rootN_ (DetNP (DetQuant IndefArt (NumCard (NumNumeral (num (pot2as3 (pot1as2 (pot0as1 pot01))))))))) (nsubj_ (DetCN (DetQuant IndefArt NumSg) (UseN (CompoundN data_N intermediary_N)))) be_aux (aclRelclRS_ (UseRCl (TTAnt TPres ASimul) PPos (RelVP that_RP (ProgrVP (AdvVP (ComplV process_V (MassNP (AdjCN (PositA personal_A) (UseN data_N)))) (PrepNP for_Prep (DetCN (DetQuant another_Quant NumSg) (UseN organization_N))))))))
 
-LIN: a data intermediary is one , that is processing for another organization
+LIN: a data intermediary is one , that is processing personal data for another organization

@@ -17,14 +17,14 @@ concrete BareRGEng of BareRG =
   ],
 
   VerbEng [
-  VP,AdV,Adv,AP,Comp,NP,V,Tense,
-  UseV      , -- V   -> VP ;             -- sleep
+   VP,AdV,Adv,AP,Comp,NP,V,Tense
+  ,UseV       -- V   -> VP ;             -- sleep
   --    UseComp,
   -- CompAP,
   -- CompAdv,
   -- CompNP,
-    AdvVP    , -- VP -> Adv -> VP ;       -- sleep here
-    AdVVP
+  ,AdvVP    -- VP -> Adv -> VP ;       -- sleep here
+  ,AdVVP
   ],
 
   IdiomEng [ProgrVP],

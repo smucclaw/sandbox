@@ -20,15 +20,15 @@ abstract BareRG =
   ],
 
   Verb [
-    VP,AdV,Adv,AP,Comp,NP,V,Tense,
-    UseV      , -- V   -> VP ;             -- sleep
+     VP,AdV,Adv,AP,Comp,NP,V,Tense
+    ,UseV       -- V   -> VP ;             -- sleep
     --    UseComp,
    --  CompAP,
    --  CompAdv,
    --  CompNP,
-    UseAdv,     -- Adv -> VP ;             -- be in the house ---s
-    AdvVP,      -- VP -> Adv -> VP ;       -- sleep here
-    AdVVP
+   ,UseAdv     -- Adv -> VP ;             -- be in the house ---s
+   ,AdvVP      -- VP -> Adv -> VP ;       -- sleep here
+   ,AdVVP
   ],
 
   Idiom [ProgrVP],

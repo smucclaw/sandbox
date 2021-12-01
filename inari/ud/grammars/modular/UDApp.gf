@@ -21,9 +21,10 @@ abstract UDApp = UDCat, JustWordsWordNet ** {
 	root_nsubj_cop_advmod    : root -> nsubj -> cop -> advmod -> UDS ;
     root_nsubj_cop_nmod      : root -> nsubj -> cop -> nmod -> UDS ;
     root_nsubj_cop_cc_conj   : root -> nsubj -> cop -> cc -> conj -> UDS ;
-    root_nsubj_cop_aclRelcl  : root -> nsubj -> cop -> aclRelcl -> UDS ;
-    root_nsubj_cop_aclRelcl_obl : root -> nsubj -> cop -> aclRelcl -> obl -> UDS ;  -- the person whose personal data is affected by the breach
-    root_nsubjPass_deontic_auxPass : root -> nsubjPass -> Deontic -> auxPass -> UDS ; -- everyone should be notified
+    root_nsubj_aux_aclRelcl  : root -> nsubj -> aux -> aclRelcl -> UDS ; -- [nsubj] is [root] that [aux] [aclRelcl]ed (aux for tense etc.)
+    root_nsubj_aux_aclRelcl_obl : root -> nsubj -> aux -> aclRelcl -> obl -> UDS ;  -- the person whose personal data [will]:aux disappear in the breach
+    root_nsubj_cop_aclRelcl_obl : root -> nsubj -> cop -> aclRelcl -> obl -> UDS ;  -- the person whose personal data [is]:cop affected by the breach
+    root_nsubjPass_aux_auxPass : root -> nsubjPass -> aux -> auxPass -> UDS ; -- everyone should be notified
 
 	-- from the text fragments in Legal Spreadsheets PDPA mockup
 
@@ -43,7 +44,7 @@ abstract UDApp = UDCat, JustWordsWordNet ** {
 		root_advmod : root -> advmod -> UDS ;
 	--y == Scissors ;
 
-		root_advmod_advmod_obl : root -> advmod -> advmod -> obl -> UDS ;
+		root_advmod_advmod_obl : root -> advmod -> advmod -> obl -> UDS ; -- VP -> Adv -> Adv -> Adv -> VP
 	--publicly available solely because of any data breach. ;
 
 		root_advmod_amod : root -> advmod -> amod -> UDS ;

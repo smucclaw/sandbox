@@ -1,7 +1,7 @@
 --# -path=./../rgl-wordnet
 
-concrete UDCatEng of UDCat = BareRGEng **
-  open SyntaxEng, Prelude, (P=ParadigmsEng), (E=ExtraEng), ExtendEng in {
+concrete UDCatEng of UDCat = BareRGEng - [Deontic,may_Deontic,must_Deontic,should_Deontic,shall_Deontic,shant_Deontic] **
+  open SyntaxEng, Prelude, (P=ParadigmsEng), (E=ExtraEng), ResEng, ExtendEng in {
 
   lincat
     UDS = LinUDS ; -- TODO: use VPS instead of VP???
@@ -21,13 +21,17 @@ concrete UDCatEng of UDCat = BareRGEng **
     cc = Conj ;
     aclRelcl = RS ;
     aux = LinAux ;
+    det = Det ;
+    vocative = NP ;
+    expl = Pron ;
+    amod = AP ;
 
   linref
     UDS = linUDS ;
 
 
   param
-    AuxType = Have | Will | RealAux ;
+    AuxType = Be | Have | Will | RealAux ;
   oper
 
     LinAux : Type = {s : Str ; vv : VV ; auxType : AuxType} ;
@@ -40,19 +44,23 @@ concrete UDCatEng of UDCat = BareRGEng **
 
   lin
 
+    be_aux = mkAux "be" Be ;
     may_aux = mkAux "may" E.may_VV ;
     have_aux = mkAux "have" Have ;
     will_aux = mkAux "will" Will ;
     can_aux = mkAux "can" can_VV ;
     must_aux = mkAux "must" must_VV ;
-    should_aux = mkAux "should" should_Deontic ;
-
-    be_cop = ss "" ;
+    should_aux = mkAux "should" should_VV ; --Deontic ;
+    be_cop,
+    be_auxPass = ss "be" ;
 
     nsubj_,
     obj_,
     iobj_ = id NP ;
-    aclRelcl_ = id RS ;
+    aclRelclRS_ = id RS ;
+    aclRelclUDS_ uds =
+      let dummyRS : RS = mkRS (mkRCl (genericCl (mkVP (P.mkV "dummy")))) ;
+       in dummyRS ** {s = \\_ => linUDS uds};
     cc_ = id Conj ;
     obl_,
     advmod_ = id Adv ;
@@ -61,7 +69,6 @@ concrete UDCatEng of UDCat = BareRGEng **
     rootV_ vp = mkRoot vp ;
     rootA_ ap = mkRoot ap ;
     rootN_ np = mkRoot np ;
-    auxPass_ = be_cop ;
     nmod_ = PrepNP ;
 
     conjA_ ap = mkUtt ap ; -- : AP -> conj ;
@@ -70,6 +77,11 @@ concrete UDCatEng of UDCat = BareRGEng **
     ccomp_ uds = lin S {s = linUDS uds} ; -- TODO: later switch to PredVPS?
     xcomp_ adv = adv ;
     xcompA_ ap = lin Adv (mkUtt ap) ;
+
+    expl_ = id Pron ;
+    det_ = id Det ;
+    vocative_ = id NP ;
+    amod_ = id AP ;
 
     -- passives
     nsubjPass_ = id NP ;
@@ -111,5 +123,19 @@ concrete UDCatEng of UDCat = BareRGEng **
        vp = mkVP (P.mkN "dummy") ;
        adv = ss "dummy" ;
        c2 = []
+    } ;
+
+    should_VV : VV = lin VV {
+      s = table {
+        VVF VInf => ["obliged to"] ;
+        VVF VPres => "should" ;
+        VVF VPPart => ["been obliged to"] ;
+        VVF VPresPart => ["being obliged to"] ;
+        VVF VPast => "shall" ;
+        VVPastNeg => "shall not" ;
+        VVPresNeg => "shouldn't"
+        } ;
+      p = [] ;
+      typ = VVAux
     } ;
 }

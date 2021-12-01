@@ -22,7 +22,7 @@
 #fun root_nsubj_cop_nmod head nsubj cop nmod       -- my hovercraft is full [of eels] (eels is nmod)
 #fun root_nsubj_cop_advmod head nsubj cop advmod   -- the party is [here] (here is advmod)
 #fun root_nsubj_cop_aclRelcl head nsubj cop acl:relcl
-#fun root_nsubj_cop_aclRelcl_obl head nsubj cop acl:relcl obl
+#fun root_nsubj_aux_aclRelcl_obl head nsubj aux acl:relcl obl
 #fun root_nsubjPass_deontic_auxPass head nsubj:pass aux aux:pass  -- everyone should be notified
 #fun root_nsubj_aux_obl head nsubj aux obl
 #fun root_nsubj_cop_cc_conj head nsubj cop cc conj  -- he is big and old
@@ -166,7 +166,6 @@
 #cat auxPass AUX
 #cat expl PRON
 #cat auxPass AUX
-#cat Deontic AUX
 #cat A ADJ primary
 #cat A2 ADJ
 #cat ACard ADV

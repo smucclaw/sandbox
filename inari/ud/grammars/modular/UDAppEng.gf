@@ -42,6 +42,7 @@ lin
     root_nsubj_cop_obl,
     root_nsubj_cop_nmod = \rt,sub,cop,adv -> mkUDS sub (mkVP rt.vp adv) ;
 
+    root_nsubj_obl rt sub adv = mkUDS sub (mkVP rt.vp adv) ;
 -----------------------------------------------------------------------------
 -- Variations on root_obl_*
 
@@ -119,15 +120,18 @@ lin
     -- a data [intermediary]:nsubj is [one]:root that is [processing]:acl:relcl personal data  ;
     root_nsubj_cop_aclRelcl rt sub cop rcl = root_nsubj_cop (addRcl rt rcl) sub cop ;
 
+    root_nsubj_aux_aclRelcl rt sub aux rcl = root_nsubj_cop_aclRelcl rt sub be_cop rcl ;
+
     -- : root -> nsubj -> cop -> aclRelcl -> obl -> UDS ;  -- the person whose personal data is affected by the breach
     root_nsubj_cop_aclRelcl_obl rt sub cop rcl obl =
       let root_obl : Root = rt ** {vp = mkVP rt.vp obl} ;
        in root_nsubj_cop_aclRelcl root_obl sub cop rcl ;
 
-    -- : root -> nsubjPass -> Deontic -> auxPass -> UDS ; -- everyone should be notified
-    root_nsubjPass_deontic_auxPass rt sub deo auxpass =
-      let should_be_notified : Root = rt ** {vp = mkVP deo rt.vp} ; -- mkVP : VV -> VP -> VP
-       in root_nsubj should_be_notified sub ;
+    -- : root -> nsubjPass -> aux -> auxPass -> UDS ; -- everyone should be notified
+    root_nsubjPass_aux_auxPass notified pdpa should auxpass = {
+      subj = pdpa ;
+      pred = applyAux should notified.vp -- TODO: has PassVP already been applied?
+    } ;
 
 	-- : root -> xcomp -> ccomp -> UDS ;	--[render] it [unlikely] that the notifiable data breach will [result] in significant [harm] to the individual ;
 	root_xcomp_ccomp render unlikely result_harm =
@@ -139,14 +143,7 @@ lin
 	--the notifiable data [breach] will [result] in significant [harm] to the individual ;
 	root_nsubj_aux_obl result breach will in_harm = {
       subj = breach ;
-      pred = willResultInHarm
-      } where {
-		  barePred : VP = mkVP result.vp in_harm ;
-		  willResultInHarm : VPS = case will.auxType of {
-               RealAux => myVPS (mkVP will.vv barePred) ; -- may, must, –
-               Will => myVPS futureTense barePred ;
-			   Have => myVPS anteriorAnt barePred }
-	  };
+      pred = applyAux will (mkVP result.vp in_harm) };
 
   -- Two identical structures, just different cat but should be same lincat
 	-- : root -> mark -> nsubj -> cop -> obl -> UDS ;
@@ -171,11 +168,7 @@ lin
       let is_affected : VP = ExtendEng.PassVPSlash (root2vpslash rt) ;
        in mkRS (mkRCl rp is_affected) ;
 
-
-
   oper
-
-
     root2vpslash : Root -> VPSlash = \root -> slashV root.vp ;
 
     -- unstable hack, TODO fixme
@@ -187,4 +180,11 @@ lin
             vp = mkVP rt.vp RSasAdv
           } ;
 	onlyPred : VP -> UDS = \vp -> mkUDS emptyNP vp ;
+
+  applyAux : LinAux -> VP -> VPS = \will,sleep ->
+    case will.auxType of {
+         RealAux => myVPS (mkVP will.vv sleep) ; -- may, must, –
+         Will => myVPS futureTense sleep ;
+			   Have => myVPS anteriorAnt sleep ;
+         Be => myVPS sleep } ;
 }

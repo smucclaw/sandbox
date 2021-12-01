@@ -24,6 +24,7 @@
 
 #lemma DEFAULT_ be cop cop head
 
+#disable ProgrVP
 
 -------------------------------------------------------------------
 -- Exceptions and special cases, when UD structure doesn't match GF
@@ -186,4 +187,3 @@
 -- stored [in electronic formats]:obl
 -- default for AdvVP is head advmod, this is for head obl (i.e. Adv made by PrepNP)
 #auxfun OblVP_ vp adv : VP -> Adv -> VP = AdvVP vp adv ; head obl
-

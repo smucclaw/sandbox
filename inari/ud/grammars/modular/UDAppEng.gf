@@ -2,13 +2,17 @@
 
 concrete UDAppEng of UDApp =
   UDCatEng, JustWordsWordNetEng **
-  open Prelude, SyntaxEng, IrregEng, ExtendEng, SymbolicEng, (P=ParadigmsEng) in {
+  open Prelude, SyntaxEng, IrregEng, ExtendEng, SymbolicEng,
+    (N=NounEng), (P=ParadigmsEng) in {
 
 lin
 
   StrPN str = {s = \\_ => str.s ; g = P.human} ;
   StrN str = {s = \\_,_  => str.s ; g = P.human} ;
-
+	StrA str = <P.mkA "dummy" : A> ** {s = \\_ => str.s ; isMost=True};
+  StrAP str = <mkAP (P.mkA "dummy") : AP> ** {s = \\_ => str.s};
+	StrCard str = symb (mkSymb str.s) ;
+	StrNum str = N.NumSg ** {s,sp = \\_,_ => str.s} ;
 
 -- The concrete syntax is sketchy on purpose.
 -- One could say that it doesn't even have to bother to linearise properly,

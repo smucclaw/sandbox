@@ -10,6 +10,10 @@ abstract UDApp = UDCat, JustWordsWordNet ** {
 
 	StrPN : String -> PN ;
 	StrN : String -> N ;
+	StrA : String -> A ;
+	StrAP : String -> AP ;
+	StrCard : String -> Card ;
+	StrNum : String -> Num ;
 
 	-- from the first test corpus, full sentences
 

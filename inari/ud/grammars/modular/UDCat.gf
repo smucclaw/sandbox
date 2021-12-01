@@ -103,7 +103,6 @@ abstract UDCat = BareRG - [Deontic,may_Deontic,must_Deontic,should_Deontic,shall
         flatName_ : X -> flatName ;
         goeswith_ : X -> goeswith ;
         list_ : X -> list ;
-        mark_ : X -> mark ;
         nmodPoss_ : X -> nmodPoss ;
         nmodTmod_ : X -> nmodTmod ;
         nummod_ : X -> nummod ;
@@ -118,7 +117,7 @@ abstract UDCat = BareRG - [Deontic,may_Deontic,must_Deontic,should_Deontic,shall
         reparandum_ : X -> reparandum ;
 
         --
-        xcomp_ : Adv -> xcomp ;
+        xcompAdv_ : Adv -> xcomp ;
         xcompA_ : AP -> xcomp ; -- become [aware]:
 
         ccomp_ : UDS -> ccomp ; -- just missing a complementiser, like "that"
@@ -126,7 +125,7 @@ abstract UDCat = BareRG - [Deontic,may_Deontic,must_Deontic,should_Deontic,shall
         expl_ : Pron -> expl ;
         det_ : Det -> det ;
         vocative_ : NP -> vocative ;
-
+        mark_ : Subj -> mark ;
 
         -- in UD, syncategorematics (copula, tenses) are all AUX
         -- It's a bit clumsy to have e.g. be in 3 cats (aux, cop, auxPass), but it's good because ud2gf is parsing the string in the primary category

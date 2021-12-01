@@ -194,6 +194,15 @@ abstract UDApp = UDCat, JustWordsWordNet ** {
 		root_csubj_aux_aux : root -> csubj -> aux -> aux -> UDS ;
 	--becoming aware a data breach may have occurred ;
 
+		root_nsubj_aux : root -> nsubj -> aux -> UDS ;
+	--a data breach may occur ;
+
+		root_nsubj_aux_aux : root -> nsubj -> aux -> aux -> UDS ;
+	--a data breach may have occurred ;
+
+		root_mark_nsubj_aux_aux : root -> mark -> nsubj -> aux -> aux -> UDS ;
+	--that a data breach may have occurred
+
 		root_det : root -> det -> UDS ;
 	--the PDPC ;
 

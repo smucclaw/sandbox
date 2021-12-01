@@ -3,6 +3,7 @@
 concrete UDAppEng of UDApp =
   UDCatEng, JustWordsWordNetEng **
   open Prelude, SyntaxEng, IrregEng, ExtendEng, SymbolicEng,
+    (PE=ParseExtendEng), -- from WordNet
     (N=NounEng), (P=ParadigmsEng) in {
 
 lin
@@ -12,7 +13,7 @@ lin
 	StrA str = <P.mkA "dummy" : A> ** {s = \\_ => str.s ; isMost=True};
   StrAP str = <mkAP (P.mkA "dummy") : AP> ** {s = \\_ => str.s};
 	StrCard str = symb (mkSymb str.s) ;
-	StrNum str = N.NumSg ** {s,sp = \\_,_ => str.s} ;
+	StrNum str = N.NumPl ** {s,sp = \\_,_ => str.s} ;
 
 -- The concrete syntax is sketchy on purpose.
 -- One could say that it doesn't even have to bother to linearise properly,
@@ -43,6 +44,29 @@ lin
     root_nsubj_cop_nmod = \rt,sub,cop,adv -> mkUDS sub (mkVP rt.vp adv) ;
 
     root_nsubj_obl rt sub adv = mkUDS sub (mkVP rt.vp adv) ;
+
+    -- : root -> nsubj -> aux -> UDS ; --a data breach may occur
+		root_nsubj_aux occur breach may = {
+      subj = breach ;
+      pred = applyAux may occur.vp
+      } ;
+
+    -- : root -> nsubj -> aux -> aux -> UDS ; --a data breach may have occurred
+		root_nsubj_aux_aux occur breach may have = {
+      subj = breach ;
+      pred = applyAux2 may have occur.vp
+      } ;
+
+
+
+    -- root_nsubj_* structure in a subordinate clause
+    -- We assume this doesn't appear in top level, so ignore mark
+    root_mark_nsubj rt _mark sub = root_nsubj rt sub ;
+
+    -- : root -> mark -> nsubj -> aux -> aux -> UDS ; --that a data breach may have occurred
+		root_mark_nsubj_aux_aux rt _mark sub may have = root_nsubj_aux_aux rt sub may have ;
+
+
 -----------------------------------------------------------------------------
 -- Variations on root_obl_*
 
@@ -139,6 +163,11 @@ lin
 	      that_result_harm : Adv = mkAdv that_Subj result_harm
 	   in onlyPred (mkVP render_unlikely that_result_harm) ;
 
+  -- : root -> ccomp -> UDS -- unlikely that X
+  root_ccomp unlikely result_harm =
+    let that_result_harm : Adv = mkAdv that_Subj result_harm ;
+     in onlyPred (mkVP unlikely.vp that_result_harm) ;
+
 	-- root_nsubj_aux_obl : root -> nsubj -> aux -> obl -> UDS ;
 	--the notifiable data [breach] will [result] in significant [harm] to the individual ;
 	root_nsubj_aux_obl result breach will in_harm = {
@@ -187,4 +216,19 @@ lin
          Will => myVPS futureTense sleep ;
 			   Have => myVPS anteriorAnt sleep ;
          Be => myVPS sleep } ;
+
+  applyAux2 : (may, have : LinAux) -> VP -> VPS = \may,have,sleep ->
+    case <may.auxType, have.auxType> of {
+      <Be,x> => applyAux have sleep ;
+      <x,Be> => applyAux may  sleep ;
+      <RealAux,Have> => myVPS (ParseExtendComplVV may.vv anteriorAnt positivePol sleep) ; -- for may have slept
+      <Have,RealAux> => myVPS (ParseExtendComplVV have.vv anteriorAnt positivePol sleep) ;
+      <RealAux,Will> => applyAux have (mkVP may.vv sleep) ;
+      <Will,RealAux> => applyAux may (mkVP have.vv sleep) ;
+      <Will,Have>|
+      <Have,Will> => MkVPS (mkTemp futureTense anteriorAnt) positivePol sleep ;
+      _ => applyAux have sleep -- TODO: andra combos?
+      } ;
+
+
 }

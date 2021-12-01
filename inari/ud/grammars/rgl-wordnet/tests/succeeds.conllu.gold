@@ -13,3 +13,11 @@ LIN: a data breach affecting more than 500 people is a notifiable data breach
 root_nsubj_aux_aclRelcl (rootN_ (DetNP (DetQuant IndefArt (NumCard (NumNumeral (num (pot2as3 (pot1as2 (pot0as1 pot01))))))))) (nsubj_ (DetCN (DetQuant IndefArt NumSg) (UseN (CompoundN data_N intermediary_N)))) be_aux (aclRelclRS_ (UseRCl (TTAnt TPres ASimul) PPos (RelVP that_RP (ProgrVP (AdvVP (ComplV process_V (MassNP (AdjCN (PositA personal_A) (UseN data_N)))) (PrepNP for_Prep (DetCN (DetQuant another_Quant NumSg) (UseN organization_N))))))))
 
 LIN: a data intermediary is one , that is processing personal data for another organization
+
+root_nsubj_obl (rootV_ (UseV occur_V)) (nsubj_ (DetCN (DetQuant DefArt NumSg) (UseN (CompoundN data_N breach_N)))) (obl_ (PrepNP after_Prep (AdvNP (DetCN (DetQuant DefArt NumSg) (UseN date_N)) (PrepNP of_Prep (MassNP (UseN commencement_N))))))
+
+LIN: the data breach occurs after the date of commencement
+
+root_xcomp_ccomp (rootV_ (UseV become_V)) (xcompA_ (PositA aware_A)) (ccomp_ (root_mark_nsubj_aux_aux (rootV_ (UseV occur_V)) (mark_ that_Subj) (nsubj_ (DetCN (DetQuant IndefArt NumSg) (UseN (CompoundN data_N breach_N)))) may_aux have_aux))
+
+LIN: becomes aware that a data breach may have occurred

@@ -25,6 +25,7 @@ concrete UDCatEng of UDCat = BareRGEng - [Deontic,may_Deontic,must_Deontic,shoul
     vocative = NP ;
     expl = Pron ;
     amod = AP ;
+    mark = Subj ;
 
   linref
     UDS = linUDS ;
@@ -74,14 +75,15 @@ concrete UDCatEng of UDCat = BareRGEng - [Deontic,may_Deontic,must_Deontic,shoul
     conjA_ ap = mkUtt ap ; -- : AP -> conj ;
     conjN_ np = mkUtt np ; -- : NP -> conj ;
     conjAdv_ a = mkUtt a ; -- : Adv -> conj ;
-    ccomp_ uds = lin S {s = linUDS uds} ; -- TODO: later switch to PredVPS?
-    xcomp_ adv = adv ;
+    ccomp_ uds = lin S {s = linUDS uds} ;
+    xcompAdv_ adv = adv ;
     xcompA_ ap = lin Adv (mkUtt ap) ;
 
     expl_ = id Pron ;
     det_ = id Det ;
     vocative_ = id NP ;
     amod_ = id AP ;
+    mark_ = id Subj ;
 
     -- passives
     nsubjPass_ = id NP ;
@@ -127,7 +129,7 @@ concrete UDCatEng of UDCat = BareRGEng - [Deontic,may_Deontic,must_Deontic,shoul
 
     should_VV : VV = lin VV {
       s = table {
-        VVF VInf => ["obliged to"] ;
+        VVF VInf => ["be obliged to"] ;
         VVF VPres => "should" ;
         VVF VPPart => ["been obliged to"] ;
         VVF VPresPart => ["being obliged to"] ;
@@ -138,4 +140,13 @@ concrete UDCatEng of UDCat = BareRGEng - [Deontic,may_Deontic,must_Deontic,shoul
       p = [] ;
       typ = VVAux
     } ;
+
+    -- copied this from ParseExtendEng, easier to duplicate code than to introduce new dependency?
+    ParseExtendComplVV : VV -> Ant -> Pol -> VP -> VP ;
+    ParseExtendComplVV v ant pol vp =
+      insertObj (variants {\\agr => ant.s ++ pol.s ++
+                                    infVP v.typ vp True  ant.a pol.p agr;
+                           \\agr => ant.s ++ pol.s ++
+                                    infVP v.typ vp False ant.a pol.p agr})
+                (predVV v) ;
 }

@@ -2,7 +2,7 @@
 #fun nsubj_ head              -- NP -> nsubj
 #fun obj_ head                -- NP -> obj
 #fun iobj_ head               -- NP -> iobj
-#fun xcomp_ head              -- Comp -> xcomp
+#fun xcompA_ head             -- AP -> xcomp
 #fun rootV_ head              -- VP -> root
 #fun rootA_ head              -- AP -> root
 #fun rootN_ head              -- NP -> root
@@ -26,6 +26,13 @@
 #fun root_nsubjPass_deontic_auxPass head nsubj:pass aux aux:pass  -- everyone should be notified
 #fun root_nsubj_aux_obl head nsubj aux obl
 #fun root_nsubj_cop_cc_conj head nsubj cop cc conj  -- he is big and old
+
+#fun root_mark_nsubj_aux_aux head mark nsubj aux aux
+#fun root_nsubj_aux head nsubj aux
+#fun root_nsubj_aux_aclRelcl head nsubj aux acl:relcl
+#fun root_nsubj_aux_aux head nsubj aux aux
+#fun root_nsubj_cop_aclRelcl_obl head nsubj cop acl:relcl obl
+#fun root_nsubj_cop_obl head nsubj cop obl
 
 #fun passRelcl_ head nsubj:pass cop                -- root -> nsubj:pass -> cop -> acl:relcl ;
 

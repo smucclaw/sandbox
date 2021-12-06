@@ -17,6 +17,7 @@ abstract UDApp = UDCat, JustWordsWordNet ** {
 
 	-- from the first test corpus, full sentences
 
+	root_cop_advmod          : root -> cop -> advmod -> UDS ; -- is not a breach
 	passRelcl_               : root -> RP -> auxPass -> aclRelcl ; -- [whose data]:RP is affected
 	root_nsubj_cop_advmod    : root -> nsubj -> cop -> advmod -> UDS ;
     root_nsubj_cop_nmod      : root -> nsubj -> cop -> nmod -> UDS ;

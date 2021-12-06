@@ -12,14 +12,16 @@ concrete UDCatEng of UDCat = BareRGEng - [Deontic,may_Deontic,must_Deontic,shoul
     nsubj,
     obj = NP ;
     iobj = NP ;
-    xcomp = Adv ;
     ccomp = S ;
     obl,
     nmod,
-    advmod = Adv ;
+    xcomp = Adv ;
+    advmod = LinAdvmod ;
 --   conj = {s : Number => Str} ;
     cc = Conj ;
-    aclRelcl = RS ;
+    aclRelcl = RS ; -- which is a breach
+    acl,
+    advcl = Adv ; -- if it is a breach
     aux = LinAux ;
     det = Det ;
     vocative = NP ;
@@ -34,7 +36,7 @@ concrete UDCatEng of UDCat = BareRGEng - [Deontic,may_Deontic,must_Deontic,shoul
   param
     AuxType = Be | Have | Will | RealAux ;
   oper
-
+    LinAdvmod : Type = {adv : Adv ; isNot : Bool} ;
     LinAux : Type = {s : Str ; vv : VV ; auxType : AuxType} ;
     mkAux = overload {
       mkAux : Str -> VV -> LinAux = \str,vv -> {
@@ -54,6 +56,7 @@ concrete UDCatEng of UDCat = BareRGEng - [Deontic,may_Deontic,must_Deontic,shoul
     should_aux = mkAux "should" should_VV ; --Deontic ;
     be_cop,
     be_auxPass = ss "be" ;
+    not_advmod = {adv = lin Adv (ss "not") ; isNot = True} ;
 
     nsubj_,
     obj_,
@@ -63,8 +66,8 @@ concrete UDCatEng of UDCat = BareRGEng - [Deontic,may_Deontic,must_Deontic,shoul
       let dummyRS : RS = mkRS (mkRCl (genericCl (mkVP (P.mkV "dummy")))) ;
        in dummyRS ** {s = \\_ => linUDS uds};
     cc_ = id Conj ;
-    obl_,
-    advmod_ = id Adv ;
+    obl_ = id Adv ;
+    advmod_ adv = {adv = adv ; isNot = False} ;
     oblPrep_ to = mkAdv to emptyNP ;
 
     rootV_ vp = mkRoot vp ;
@@ -78,6 +81,8 @@ concrete UDCatEng of UDCat = BareRGEng - [Deontic,may_Deontic,must_Deontic,shoul
     ccomp_ uds = lin S {s = linUDS uds} ;
     xcompAdv_ adv = adv ;
     xcompA_ ap = lin Adv (mkUtt ap) ;
+    aclUDS_,
+    advclUDS_ = \uds -> lin Adv {s = linUDS uds} ;
 
     expl_ = id Pron ;
     det_ = id Det ;

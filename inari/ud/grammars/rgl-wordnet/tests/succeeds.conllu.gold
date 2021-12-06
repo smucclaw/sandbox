@@ -10,7 +10,7 @@ root_nsubj_cop (rootN_ (DetCN (DetQuant IndefArt NumSg) (AdjCN (PositA notifiabl
 
 LIN: a data breach affecting more than 500 people is a notifiable data breach
 
-root_nsubj_aux_aclRelcl (rootN_ (DetNP (DetQuant IndefArt (NumCard (NumNumeral (num (pot2as3 (pot1as2 (pot0as1 pot01))))))))) (nsubj_ (DetCN (DetQuant IndefArt NumSg) (UseN (CompoundN data_N intermediary_N)))) be_aux (aclRelclRS_ (UseRCl (TTAnt TPres ASimul) PPos (RelVP that_RP (ProgrVP (AdvVP (ComplV process_V (MassNP (AdjCN (PositA personal_A) (UseN data_N)))) (PrepNP for_Prep (DetCN (DetQuant another_Quant NumSg) (UseN organization_N))))))))
+root_nsubj_cop_aclRelcl (rootN_ (DetNP (DetQuant IndefArt (NumCard (NumNumeral (num (pot2as3 (pot1as2 (pot0as1 pot01))))))))) (nsubj_ (DetCN (DetQuant IndefArt NumSg) (UseN (CompoundN data_N intermediary_N)))) be_cop (aclRelclRS_ (UseRCl (TTAnt TPres ASimul) PPos (RelVP that_RP (ProgrVP (AdvVP (ComplV process_V (MassNP (AdjCN (PositA personal_A) (UseN data_N)))) (PrepNP for_Prep (DetCN (DetQuant another_Quant NumSg) (UseN organization_N))))))))
 
 LIN: a data intermediary is one , that is processing personal data for another organization
 
@@ -21,3 +21,11 @@ LIN: the data breach occurs after the date of commencement
 root_xcomp_ccomp (rootV_ (UseV become_V)) (xcompA_ (PositA aware_A)) (ccomp_ (root_mark_nsubj_aux_aux (rootV_ (UseV occur_V)) (mark_ that_Subj) (nsubj_ (DetCN (DetQuant IndefArt NumSg) (UseN (CompoundN data_N breach_N)))) may_aux have_aux))
 
 LIN: becomes aware that a data breach may have occurred
+
+root_advcl (rootV_ (UseV assess_V)) (advclUDS_ (root_mark_nsubj_cop (rootN_ (DetCN (DetQuant IndefArt NumSg) (AdjCN (PositA notifiable_A) (UseN (CompoundN data_N breach_N))))) (mark_ if_Subj) (nsubj_ (DetNP (DetQuant DefArt NumSg))) be_cop))
+
+LIN: assesses if it is a notifiable data breach
+
+root_cop_advmod (rootN_ (DetCN (DetQuant IndefArt NumSg) (AdjCN (PositA public_A) (UseN agency_N)))) be_cop not_advmod
+
+LIN: isn't a public agency

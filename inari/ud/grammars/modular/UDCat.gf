@@ -127,6 +127,8 @@ abstract UDCat = BareRG - [Deontic,may_Deontic,must_Deontic,should_Deontic,shall
         vocative_ : NP -> vocative ;
         mark_ : Subj -> mark ;
 
+        --------
+        -- Lexicon
         -- in UD, syncategorematics (copula, tenses) are all AUX
         -- It's a bit clumsy to have e.g. be in 3 cats (aux, cop, auxPass), but it's good because ud2gf is parsing the string in the primary category
 		be_aux,
@@ -141,6 +143,10 @@ abstract UDCat = BareRG - [Deontic,may_Deontic,must_Deontic,should_Deontic,shall
         be_cop : cop ;
 
         it_expl : expl ; -- render [it] unlikely that …
+
+        not_advmod : advmod ;
+
+        -------
 
         nsubj_ : NP -> nsubj ; -- can be NOUN, DET, PRON, but all those can be NPs in GF
         obj_ : NP -> obj ;
@@ -160,6 +166,8 @@ abstract UDCat = BareRG - [Deontic,may_Deontic,must_Deontic,should_Deontic,shall
 --        aclRelcl_ : RS -> aclRelcl ; -- whose personal data is/was/has been affected
 		aclRelclUDS_ : UDS -> aclRelcl ; -- TODO figure out how this works properly, maybe needs some more auxfuns
 		aclRelclRS_ : RS -> aclRelcl ;
+        aclUDS_ : UDS -> acl ;
+        advclUDS_ : UDS -> advcl ;
 
         obl_    : Adv -> obl ;
 	    oblPrep_ : Prep -> obl ; -- sometimes empty preps are analysed as obl, e.g. "subject to"

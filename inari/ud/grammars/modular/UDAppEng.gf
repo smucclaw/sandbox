@@ -39,7 +39,12 @@ lin
 
     -- UD has many names for Adv
     -- : root -> nsubj -> cop -> nmod/advmod/obl -> UDS ;
-    root_nsubj_cop_advmod,
+    root_nsubj_cop_advmod rt sub cop am =
+      case am.isNot of {
+        True => applyNeg rt sub ;
+        False => root_nsubj_cop_obl rt sub cop am.adv
+      } ;
+
     root_nsubj_cop_obl,
     root_nsubj_cop_nmod = \rt,sub,cop,adv -> mkUDS sub (mkVP rt.vp adv) ;
 
@@ -56,8 +61,6 @@ lin
       subj = breach ;
       pred = applyAux2 may have occur.vp
       } ;
-
-
 
     -- root_nsubj_* structure in a subordinate clause
     -- We assume this doesn't appear in top level, so ignore mark
@@ -78,7 +81,7 @@ lin
     -- [publicly] available [solely] because of any data [breach]. ;
   	root_advmod_advmod_obl available publicly solely because_of_breach =
       root_obl  -- TODO is this too overfitting? "publicly available solely …"
-        (mkRoot (mkVP <publicly : AdV> (mkVP available.vp solely)))
+        (mkRoot (mkVP <publicly.adv : AdV> (mkVP available.vp solely.adv)))
         because_of_breach ;
 
     -- : root -> obl -> appos -> UDS ;
@@ -174,6 +177,13 @@ lin
       subj = breach ;
       pred = applyAux will (mkVP result.vp in_harm) };
 
+  -- : root -> mark -> nsubj -> cop -> UDS ; -- if it is a breach
+  root_advmod_nsubj_cop,
+  root_mark_nsubj_cop = \breach,if,it,is ->
+    let if_Predet : Predet = lin Predet if ; -- hack
+        if_it : NP = mkNP if_Predet it ;
+     in root_nsubj_cop breach if_it is ;
+
   -- Two identical structures, just different cat but should be same lincat
 	-- : root -> mark -> nsubj -> cop -> obl -> UDS ;
 	--"when an organisation is aware of a data breach ;
@@ -181,11 +191,30 @@ lin
   -- : root -> advmod -> nsubj -> cop -> obl -> UDS ;
   -- [once]:advmod an [organisation]:nsubj is [aware]:root of a data [breach]:obl ;
   -- hack: we just put "once" in subject. TODO investigate how we want to use these fragments
-	  root_mark_nsubj_cop_obl,
-    root_advmod_nsubj_cop_obl = \aware, once, organisation, is, of_breach ->
+	  root_mark_nsubj_cop_obl aware once organisation is of_breach =
     let once_Predet : Predet = lin Predet once ; -- hack
         once_organisation : NP = mkNP once_Predet organisation ;
      in root_nsubj_cop_obl aware once_organisation is of_breach ;
+
+    root_advmod_nsubj_cop_obl rt am sub cp obl = root_mark_nsubj_cop_obl rt am.adv sub cp obl ;
+
+	-- : root -> cop -> advmod -> UDS ; -- is not beer
+  root_cop_advmod rt cp am = case am.isNot of {
+    True => applyNeg rt emptyNP ;
+    False => onlyPred (mkVP rt.vp am.adv) -- TODO or should it be AdV instead of Adv? Does word order matter?
+  } ;
+
+---------------------------------------------------------------------------
+-- acl, advcl
+
+  -- : root -> acl -> UDS ;	--day of mourning ;
+	root_acl rt acl = onlyPred (mkVP rt.vp acl) ;
+
+  -- : root -> acl -> nmod -> UDS ;
+	root_acl_nmod rt acl nm = root_acl (mkRoot (mkVP rt.vp nm)) acl ;
+
+  -- : root -> advcl -> UDS ; --assess if it is a breach ;
+	root_advcl rt adv = root_acl rt adv ;
 
 ---------------------------------------------------------------------------
 -- Cases where GF and UD structures map less neatly to each other
@@ -208,7 +237,14 @@ lin
        in rt ** {
             vp = mkVP rt.vp RSasAdv
           } ;
+
 	onlyPred : VP -> UDS = \vp -> mkUDS emptyNP vp ;
+
+  applyNeg : Root -> NP -> LinUDS = \root,subj -> {
+    subj = subj ;
+    pred = MkVPS (mkTemp presentTense simultaneousAnt) negativePol root.vp
+  } ;
+
 
   applyAux : LinAux -> VP -> VPS = \will,sleep ->
     case will.auxType of {

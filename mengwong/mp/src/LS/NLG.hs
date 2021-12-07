@@ -32,7 +32,7 @@ import Data.Either (rights)
 
 -- typeprocess to run a python
 import System.IO ()
-import System.Process.Typed ( proc, readProcessStdout_ )
+import System.Process.Typed ( proc, readProcessStdout_, shell )
 import qualified Data.ByteString.Lazy.Char8 as L8
 import qualified Control.Monad.IO.Class
 import Control.Monad (join)
@@ -62,6 +62,9 @@ getString txt = intercalate "\n" [ intercalate "\t" $ grabStrings ('\'','\'') l 
 getPy :: Control.Monad.IO.Class.MonadIO m => String -> m L8.ByteString
 getPy x = readProcessStdout_ (proc "python3" ["src/L4/sentence.py", x])
 
+getWNCmd :: Control.Monad.IO.Class.MonadIO m => String -> m L8.ByteString
+getWNCmd x = readProcessStdout_ (shell ("wn " ++ x ++ " -deriv"))
+
 parseCoNLLU :: UDEnv -> String -> [[Expr]]
 parseCoNLLU = getExprs []
 
@@ -73,7 +76,7 @@ parseOut env txt = do
   let exprs = parseCoNLLU env conll -- env -> str -> [[expr]]
       expr = case exprs of
         (x : _xs) : _xss -> x  -- TODO: add code that tries to parse with the words in lowercase, if at first it doesn't succeed
-        _ -> mkApp (mkCId "dummy_N") [] -- dummy expr
+        _ -> mkApp (mkCId "assess_V") [] -- dummy expr
   mapM_ print exprs
   putStrLn conll
   return expr
@@ -100,6 +103,9 @@ nlg rl = do
        finalTree = mkApp (mkCId "subjAction") [peel subjectRaw, actionRaw]
        linText = linearize gr lang finalTree
        linTree = showExpr [] finalTree
+   print ("action" :: [Char])
+   fromWN <- getWNCmd $ linearize gr lang actionRaw
+   print $ unpacked fromWN
    return (Text.pack (linText ++ "\n" ++ linTree))
 
 

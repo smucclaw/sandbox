@@ -71,16 +71,217 @@ The chewing gum automaton:
 \begin{frame}[fragile]\frametitle{Towards Timed Automata}
 
   \blue{What remains:} Notion of \emph{discrete state}\\
-    not appropriate for \emph{continuous} events (\emph{e.g.} ball rolling down a slope)
+    not appropriate for \emph{continuous} actions (\emph{e.g.} ball rolling down a slope)
 
-
-  \blue{What remains:} Two kinds of transitions:
+\vspace{5mm}
+\blue{What is new:}
+\begin{itemize}
+\item Two kinds of transitions:
   \begin{itemize}
-  \item Action transition (inducing state change)
-  \item Delay transition (inducing progression of time)
+  \item \emph{Action} transition $\to^a$, inducing state change
+  \item \emph{Delay} transition  $\to^d$, inducing progression of time
+  \end{itemize}
+\item Notion of timer / \emph{clock}
+\item Further annotations on
+  \begin{itemize}
+  \item states (\emph{invariants})
+  \item transitions (\emph{guards})
+  \end{itemize}
+\item Executions may be infinite
+\end{itemize}
+
+\end{frame}
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Using Uppaal}
+
+  \begin{itemize}
+  \item Download from \url{https://uppaal.org/downloads/}
+  \item Unpack archive
+  \item In the resulting repository:
+    \begin{itemize}
+    \item launch \texttt{./uppaal\&}
+    \item \emph{or} run Java jar file: \texttt{java -jar uppaal.jar\&}
+    \end{itemize}
+  \item On Mac, it may be necessary to authorize file system access (?)
+  \item Open project with \texttt{File / Open System}
+  \end{itemize}
+
+\end{frame}
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Some hints}
+
+  \blue{File formats:}
+  \begin{itemize}
+  \item \texttt{*.xml} Full system information, incl.{} graphics and queries
+  \item \texttt{*.xta} Human-readable textual format for automata, no graphics
+    info, no queries
+  \item \texttt{*.q} queries only
+  \end{itemize}
+
+  \blue{Edit node / transition info:}
+  \begin{itemize}
+  \item by double click on element
+  \end{itemize}
+
+  \blue{If information is scattered over the canvas:}
+  \begin{itemize}
+  \item Click on node / arc to see elements associated with it
+  \end{itemize}
+
+  \blue{Notable:}
+  \begin{itemize}
+  \item Initial state with double circle
+  \item No final states (see: queries for verification)
   \end{itemize}
   
 \end{frame}
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Example automaton}
+
+  \begin{center}
+    \includegraphics[scale=0.4]{Figures/system_access_automaton.png}
+  \end{center}
+
+  See: \texttt{fv} repository,  \texttt{Experiments/Uppaal/system\_access.xml}
+\end{frame}
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Annotations}
+
+  \blue{States} can be annotated with:
+  \begin{itemize}
+  \item \emph{invariant:} a condition to be satisfied to remain in this state.\\
+    \emph{e.g.:} \texttt{clock1 <= 4} of \texttt{awaiting\_access}
+  \end{itemize}
+
+  \vspace{3mm}
+  \blue{Transitions} can be annotated with:
+  \begin{itemize}
+  \item \emph{guard:} a condition to be satisfied to take the transition\\
+        \emph{e.g.:} \texttt{clock1 >= 3} 
+  \item \emph{update:} an assignment to a clock or data variable:
+         \texttt{clock1 = 0} 
+      \item \emph{synchronisation} of the form \texttt{e!} (send event) or
+        \texttt{e?} (receive event)
+  \end{itemize}
+
+  \vspace{3mm}
+  \emph{Note:} a \blue{condition} is a conjunction of
+  \begin{itemize}
+  \item clock comparisons: \texttt{clock1 >= 3}
+  \item non-temporal Boolean conditions (\texttt{access\_granted})
+  \end{itemize}
+  
+\end{frame}
+
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Traces}
+
+  A \emph{configuration} consists of:
+  \begin{itemize}
+  \item a state 
+  \item the values of the clocks
+  \item the values of data variables
+  \end{itemize}
+
+  A \emph{trace} describes a sequence of transitions (action or delay) a TA can
+  take. A trace is \emph{valid} if it respects the node and arc conditions.
+
+  \vspace{3mm}
+  For config (state, clock0, clock1, access\_granted):
+  \begin{itemize}
+  \item Example of valid trace:
+  \[(start, 0, 0, false) \to^d (start, 2, 2, false) \to^a (aw, 2, 2, false) \to^d \]
+  \[(aw, 3, 3, false) \to^a (req, 3, 0, false) \to^d (req, 7, 4, false) \to^a \]
+  \[(aw, 7, 4, true) \to^a (entered, 7, 4, true) \]
+  \item Example of invalid trace (arc constraint not satisfied):
+  \[(start, 0, 0, false)  \to^a (aw, 0, 0, false) \to^a (entered, 0, 0, false)\]
+  \end{itemize}
+\end{frame}
+
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Using the simulator}
+  
+\end{frame}
+
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Verifying properties}
+
+  Specify system properties with formulas of \blue{CTL} (Computation Tree Logic)
+
+  \vspace{3mm}
+
+  Two kinds of quantifiers:
+  \begin{itemize}
+  \item \blue{Path quantifiers} over alternative execution paths:
+    \begin{itemize}
+    \item $A \phi$: for all executions, $\phi$ holds
+    \item $E \phi$: there exists an execution such that $\phi$
+    \end{itemize}
+  \item \blue{State quantifiers} over states on one path:
+    \begin{itemize}
+    \item $\Box \phi$ (ASCII: \texttt{[]}): for all states on the path, $\phi$ holds
+    \item $\Diamond \phi$ (ASCII: \texttt{<>}): there exists a state on the path such that $\phi$
+    \end{itemize}
+  \end{itemize}
+  
+  \vspace{3mm}
+  In Uppaal:
+  \begin{itemize}
+  \item \dots{} and in general in CTL:\\
+    Quantifiers only come in pairs $A \Box, A \Diamond, E \Box, E \Diamond$
+  \item Apart from that, quantifiers cannot be nested.
+  \end{itemize}
+  
+\end{frame}
+
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Path and state quantifiers, graphically}
+
+  \begin{center}
+    \includegraphics[scale=0.4]{Figures/path_and_state_quantifiers.png}
+  \end{center}
+
+\end{frame}
+
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Verifying properties in Uppaal}
+
+  \begin{itemize}
+  \item Open \texttt{Verifier} tab
+  \item Type in formula (in \texttt{Query})
+  \item Run \texttt{Check}, read off \texttt{Status}
+  \item For:
+    \begin{itemize}
+    \item Satisfied existential properties
+    \item Not satisfied universal properties
+    \end{itemize}
+    generate example / counterexample trace with \texttt{Get Trace}
+  \item View trace in \texttt{Simulator} tab
+  \end{itemize}
+
+  \vspace{3mm}
+  \emph{Example:} It is possible to enter the system:\\
+  \texttt{E<> Aut.entered\_system}
+
+  \vspace{3mm}
+  \emph{Other queries} (possibly modify automaton):
+  \begin{itemize}
+  \item Sooner or later, one necessarily enters the system
+  \item Clock1 always remains lower than 10
+  \end{itemize}
+
+
+\end{frame}
+
 
 
 
@@ -89,547 +290,101 @@ The chewing gum automaton:
 \section{Timed Automata in Baby L4}
 
 
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Textual formats Uppaal / L4}
+
+  \begin{itemize}
+  \item Uppaal can be saved in human-readable \texttt{*.xta} format:
+    \begin{itemize}
+    \item \texttt{Save system as:} \texttt{system\_access.xta}
+    \item save queries as \texttt{system\_access.q}
+    \end{itemize}
+  \item This is almost the L4 input format:
+    \begin{itemize}
+    \item Enclose system in declaration
+    \item Change comments from \texttt{//} (Uppaal) to \texttt{\#} (L4)
+    \item Move variable declarations to top level
+    \item Rename some constants: \texttt{true} $\leadsto$ \texttt{True}
+    \end{itemize}
+  \end{itemize}
+  
+\end{frame}
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Textual format L4}
+
+  \begin{lstlisting}
+system Access {
+bool access_granted;
+process Aut() {
+clock clock0, clock1;
+state
+    start,
+    awaiting_access { clock1 <= 4 },
+    request_pending { clock1 <= 5 },
+    entered_system;
+init
+    start;
+trans
+    awaiting_access -> entered_system { guard clock0 == 7 ; },
+    request_pending -> awaiting_access { guard clock1 >= 3;  },
+    awaiting_access -> request_pending { guard clock1 >= 3; assign clock1 = 0; },
+    start -> awaiting_access { }; } }
+
+assert {printUp} True
+  \end{lstlisting}
+  
+
+\end{frame}
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Work in Progress}
+
+  \begin{itemize}
+  \item TYpe checking of automata\\
+    (needs generation of elements in the typing context: states, clocks,
+    \dots)
+  \item Structures and substructures (systems having automata as components)
+  \item Model checking of complex systems via SMT 
+  \item Difficulty: computation of fixed points
+  \item Longer-reaching aim: Push the limits of what is currently possible in
+    TA model checking (``parametric'' systems, more complex conditions)
+  \end{itemize}
+
+\end{frame}
+
 %======================================================================
 \section{Translating to Timed Automata}
 
 
-
-
-
-
 %-------------------------------------------------------------
-\begin{frame}[fragile]\frametitle{Satisfiability}
-
-
-The \blue{satisfiability} problem aims at determining whether a formula is
-satisfiable.
-
-\emph{Reminder:}
-\begin{itemize}
-\item A formula is \blue{satisfiable} if it can be made true under \emph{one}
-  possible interpretation: \emph{possibly true}
-\item (It is  \blue{unsatisfiable} if it can not.)
-\item A formula is \blue{valid} if it is true under \emph{every}
-  possible interpretation: \emph{necessarily true}
-\end{itemize}
-
-\vspace{3mm}
-Examples:
-\begin{itemize}
-\item $a \AND (\NOT a \OR b)$ is satisfiable but not valid:
-  \begin{itemize}
-  \item true for $a \mapsto True, b \mapsto True$
-  \item false for $a \mapsto False$ ($b$ indifferent)
-  \end{itemize}
-\item $a \OR \NOT a$ is valid  
-\end{itemize}
-
-\end{frame}
-
-%-------------------------------------------------------------
-\begin{frame}[fragile]\frametitle{Satisfiability}
-
-  \blue{Validity} and \blue{satisfiability} are related:\\
-  $F$ valid \hspace{5mm} iff \hspace{5mm} $\NOT F$ unsatisfiable
-
-  \vspace{5mm}
-  Thus: one of the notions suffices.
-  \vspace{5mm}
-  
-  The satisfiability checking problem (SAT)
-  \begin{itemize}
-  \item Concerns formulas of propositional logic\\
-    but not only (the notion extends to arbitrary logics)
-  \item In the propositional case:
-    \begin{itemize}
-    \item solutions (interpretations) can be checked efficiently
-      (\emph{polynomial} time)
-    \item solutions can be hard to find\\
-      worst-case: exponential time
-    \item current \blue{SAT solvers} can typically treat problems of thousands of
-      propositional variables
-    \end{itemize}
-  \end{itemize}
-
-\end{frame}
-
-%-------------------------------------------------------------
-\begin{frame}[fragile]\frametitle{Satisfiability Modulo Theories (SMT)}
-
-Typically, formulas have internal structure that pure SAT solvers cannot
-handle.
-
-\vspace{5mm}
-\emph{Example:}\\
-$(g(a) = g(b)) \AND (f(g(b), c) \neq f(g(a), c) \OR x = 2) \AND (\exists y:Int.\; 1 < y \AND y < x)$
-
-has the propositional form:\\
-$F_1 \AND (F_2 \OR F_3) \AND F_4$\\
-which is satisfiable. Is the original formula satisfiable?
-
-\vspace{5mm}
-\blue{SMT} solvers are brokers between SAT solvers and specialized reasoners
-for specific \blue{theories}.
-
-\vspace{5mm}
-In the example: uninterpreted functions and (quantified) arithmetic.
-
-
-\end{frame}
-
-%-------------------------------------------------------------
-\begin{frame}[fragile]\frametitle{Satisfiability Modulo Theories (SMT)}
-
-  \emph{Example:}\\
-$(g(a) = g(b)) \AND (f(g(b), c) \neq f(g(a), c) \OR x = 2) \AND (\exists y:Int.\; 1 < y \AND y < x)$
-
-\begin{enumerate}
-\item Project \emph{uninterpreted function} subformulas:\\
-  $(g(a) = g(b))$,  $f(g(b), c) \neq f(g(a), c)$
-\item Propagate information: Under condition $(g(a) = g(b))$:\\
-  $f(g(b), c) \neq f(g(a), c) \; \leadsto \; f(g(b), c) \neq f(g(b), c) \;
-  \leadsto \; False$
-\item Send information to SAT solver and propagate info:\\
-  $(g(a) = g(b)) \AND (False \OR x = 2) \AND (\exists y:Int.\; 1 < y \AND y < x)$ $\leadsto$\\
-  $(g(a) = g(b)) \AND (x = 2) \AND (\exists y:Int.\; 1 < y \AND y < x)$ 
-\item Project \emph{quantified arithmetic} subformulas:\\
-  $(x = 2)$, $\exists y:Int.\; 1 < y \AND y < x$
-\item Propagate information: Under condition $x = 2$:\\
-  $\exists y:Int.\; 1 < y \AND y < x$ \hspace{3mm} $\leadsto$ \hspace{3mm}
-  $\exists y:Int.\; 1 < y \AND y < 2$ \hspace{3mm} $\leadsto$ \hspace{3mm} $False$
-\item Send information to SAT solver and propagate info:\\
-  $(g(a) = g(b)) \AND (x = 2) \AND False$ \hspace{3mm} $\leadsto$ \hspace{3mm} $False$
-\end{enumerate}
-Formula not satisfiable
-
-\end{frame}
-
-%-------------------------------------------------------------
-\begin{frame}[fragile]\frametitle{Satisfiability Modulo Theories (SMT)}
-
-  Results may depend on the \blue{mathematical theory} under consideration:
-
-  \emph{Example:}
-  \begin{itemize}
-  \item $(\exists y:\textbf{Int}.\; 1 < y \AND y < 2) \; \leadsto \; False$
-  \item $(\exists y:\textbf{Real}.\; 1 < y \AND y < 2) \; \leadsto \; True$
-  \item $(\exists y:\textbf{Real}.\; 1 < y \AND y < 1 + \epsilon) \; \leadsto \; True$
-  \item $(\exists y:\textbf{Float}.\; 1 < y \AND y < 1 + \epsilon) \; \leadsto \; ???$
-  \end{itemize}
-
-  \vspace{5mm}
-Specific reasoners have specialized capabilities:
-\begin{itemize}
-\item Uninterpreted function symbols:
-  $f(x, 3) = f(3, y)$ cannot be simplified further
-\item In arithmetics:\\
-    $x + 3 = 3 + y$ $\; \leadsto \;$ [commutativity]\\
-    $x + 3 = y + 3$ $\; \leadsto \;$ [cancellation]\\
-    $x = y$
-\end{itemize}
-  
-\end{frame}
-
-%-------------------------------------------------------------
-\begin{frame}[fragile]\frametitle{Mathematical theory}
-
-  A mathematical theory is a signature (set of function and predicate symbols)
-  with associated properties.
-
-  \emph{Example:} Theory of Arrays (SMT Lib standard p. 39):
-
-\small
-\begin{verbatim}
-(theory ArraysEx
-:sorts ( (Array 2) )
-:funs ((par (X Y) (select (Array X Y) X Y))
-       (par (X Y) (store (Array X Y) X Y (Array X Y))) )
-:definition
-" - (forall ((a (Array s1 s2)) (i s1) (e s2))
-       (= (select (store a i e) i) e))
-  - (forall ((a (Array s1 s2)) (i s1) (j s1) (e s2))
-     (=> (distinct i j) 
-         (= (select (store a i e) j) (select a j))))
-  - (forall ((a (Array s1 s2)) (b (Array s1 s2)))
-     (=>
-      (forall ((i s1)) (= (select a i) (select b i))) 
-      (= a b))) "
-)
-\end{verbatim}
-\normalsize  
-
-\end{frame}
-
-%-------------------------------------------------------------
-\begin{frame}[fragile]\frametitle{Mathematical theory}
-
-  \begin{itemize}
-  \item QF for the restriction to quantifier free formulas
-  \item  A or AX for the theory ArraysEx
-  \item     BV for the theory FixedSizeBitVectors
-  \item     FP (forthcoming) for the theory FloatingPoint
-  \item     IA for the theory Ints (Integer Arithmetic)
-  \item     RA for the theory Reals (Real Arithmetic)
-  \item     IRA for the theory Reals-Ints (mixed Integer Real Arithmetic)
-  \item     IDL for Integer Difference Logic
-  \item     RDL for Rational Difference Logic
-  \item     L before IA, RA, or IRA for the linear fragment of those
-    arithmetics
-  \item     N before IA, RA, or IRA for the non-linear fragment of those
-    arithmetics
-  \item     UF for the extension allowing free sort and function symbols
-  \end{itemize}
-  
-\end{frame}
-
-%-------------------------------------------------------------
-\begin{frame}[fragile]\frametitle{Theories and their interaction}
-  see \url{http://smtlib.cs.uiowa.edu/logics.shtml}
-
-
-\end{frame}
-
-
-
-
-%======================================================================
-\section{SMT-LIB: Interacting with an SMT solver}
-
-
-%-------------------------------------------------------------
-\begin{frame}[fragile]\frametitle{SMT solvers}
-
-  Several solvers support these logics to varying degrees:
-
-  \begin{itemize}
-  \item Z3 (*) \url{https://github.com/Z3Prover/z3/wiki}
-  \item CVC4 (*) \url{https://cvc4.github.io/}\\
-    with CVC5 \url{https://cvc5.github.io/} under development
-  \item Boolector \url{https://github.com/Boolector}\\
-    specialized on byte arrays
-  \item Yices \url{https://yices.csl.sri.com/} (PVS)
-  \item Alt-Ergo \url{https://ocamlpro.github.io/alt-ergo/} (Frama-C)
-  \item Mathsat (*) \url{https://mathsat.fbk.eu/}
-  \end{itemize}
-
-(*): works at least partly with L4
-\end{frame}
-
-
-%-------------------------------------------------------------
-\begin{frame}[fragile]\frametitle{SMT-LIB}
-
-  SMT-LIB is:
-  \begin{itemize}
-  \item a standardized common input format for describing proof problems
-  \item a partly standardized output format for retrieving proof results
-  \item a protocol for interacting with solvers
-  \end{itemize}
-
-  Purpose: 
-  \begin{itemize}
-  \item Make SMT solvers more easily accessible to third-party tools
-  \item Facilitate benchmarking / contests
-  \end{itemize}
-\end{frame}
-
-
-%-------------------------------------------------------------
-\begin{frame}[fragile]\frametitle{SMT Input file}
-
-  \blue{Declarations of sorts and constants / predicates}
-\begin{verbatim}
-(set-option :print-success true )
-(set-option :produce-models true )
-(set-logic LIA )
-(declare-sort Class 0 )
-(declare-sort Animal 0 )
-(declare-sort Cat 0 )
-(declare-sort Mouse 0 )
-(declare-fun isCat (Animal ) Bool )
-(declare-fun isMouse (Animal ) Bool )
-(declare-fun Age (Animal Int ) Bool )
-(declare-fun garfield () Animal )
-(declare-fun mickey () Animal )
-\end{verbatim}
-\end{frame}
-
-  
-%-------------------------------------------------------------
-\begin{frame}[fragile]\frametitle{SMT Input file}
-
-\blue{ Formula to be proved and call of checker}
-\begin{verbatim}
-(assert 
-(and (and (Age garfield 3 ) (Age mickey 2 ) ) 
-(and (forall ((a Animal ) ) 
-   (=> true (not (and (isCat a ) (isMouse a ) ) ) ) ) 
-   (and (=> true (isCat garfield ) ) 
-   (and (=> true (isMouse mickey ) ) (forall ((c Animal ) ) 
-   (forall ((m Animal ) ) (forall ((ac Int ) ) 
-   (forall ((am Int ) ) 
-   (=> (and (isCat c ) (and (isMouse m ) 
-         (and (Age c ac )
-         (and (>= ac 5 ) (Age m am ) ) ) ) ) 
-       (< am 1 ) ) ) ) ) ) ) ) ) ) )
-(check-sat )
-\end{verbatim}
-
-\end{frame}
-
-%-------------------------------------------------------------
-\begin{frame}[fragile]\frametitle{SMT Output file}
-
-  \blue{Generated model} (not meant to be readable)
-  \small
-  \begin{verbatim}
-(model 
-(declare-fun Animal!val!1 () Animal ) 
-(declare-fun Animal!val!0 () Animal ) 
-(define-fun garfield () Animal Animal!val!0 ) 
-(define-fun mickey () Animal Animal!val!1 ) 
-(define-fun isMouse ((x!0 Animal ) ) Bool 
-  (= (ite(= x!0 Animal!val!0 ) Animal!val!0 Animal!val!1) 
-     Animal!val!1)) 
-
-(define-fun isCat ((x!0 Animal ) ) Bool 
-   (= (ite (= x!0 Animal!val!0 ) Animal!val!0 Animal!val!1)
-   Animal!val!0 ) ) 
-
-(define-fun Age ((x!0 Animal ) (x!1 Int ) ) Bool  ... ) )
-
-\end{verbatim}  
-\normalsize
-\end{frame}
-
-
-%======================================================================
-\section{L4 and SMT}
-
-%-------------------------------------------------------------
-\begin{frame}[fragile]\frametitle{Proving statements in L4}
-
-  \begin{itemize}
-  \item \texttt{assert} statements in L4 can lead to SMT prover calls
-  \item \dots{} using information some or parts of the facts / rules of a spec
-  \end{itemize}
-
-
-  \vspace{5mm}
-  \blue{ What is checked, based on which information?}
-  \vspace{5mm}
-  
-  Can in part be configured with \emph{instructions} accompanying
-  \texttt{assert} (and in the future: \texttt{rule}) statements.
+\begin{frame}[fragile]\frametitle{Approach~1: Actor-based}
+
+  \begin{center}
+    \includegraphics[scale=0.3]{Figures/actor_based_translation.png}
+  \end{center}
 
 \end{frame}
 
 
 %-------------------------------------------------------------
-\begin{frame}[fragile]\frametitle{Configuring the reasoner}
+\begin{frame}[fragile]\frametitle{Approach~2: Rule-based}
 
-\begin{verbatim}
-assert {SMT: {...},
-        sCASP: {...},
-        foobar: {...}
-       }
-Goal
-\end{verbatim}
-
-  \begin{itemize}
-  \item All the registered reasoners will be invoked on the \texttt{Goal}
-    (see below).
-  \item Inexistent reasoners will be ignored
-  \end{itemize}
+  \begin{center}
+    \includegraphics[scale=0.5]{Figures/rule_sf_l4.png}
+  \end{center}
 
 \end{frame}
-
 
 %-------------------------------------------------------------
-\begin{frame}[fragile]\frametitle{What will be proved?}
+\begin{frame}[fragile]\frametitle{Approach~2: Rule-based}
 
-  \blue{Prerequisites:} Each rule gives rise to a formula
-
-  \emph{Example:}
-
-\begin{alltt}  
-  \textbf{rule} <R>
-  \textbf{for} x : Integer
-  \textbf{if} P(x)
-  \textbf{then} Q(x)
-\end{alltt}
-generates the formula $\forall x: Integer.\; P(x) \IMPL Q(X)$
-
-\vspace{3mm}
-
-There is an \blue{active ruleset} $R_1, \dots,  R_n$ (configurable, see below).
-
-\begin{itemize}
-\item 
-\begin{verbatim}
-assert {SMT: {consistent, ...} }  Goal
-\end{verbatim}
-checks if $R_1 \AND \dots \AND R_n \AND Goal$ is \emph{satisfiable}
-
-\item 
-\begin{verbatim}
-assert {SMT: {valid, ...} } Goal
-\end{verbatim}
-checks if $R_1 \AND \dots \AND R_n \IMPL Goal$ is \emph{valid}\\
-(corresponds to: $R_1 \AND \dots \AND R_n \AND \NOT Goal$ unsatisfiable)
-  
-\end{itemize}
+  \begin{center}
+    \includegraphics[scale=0.4]{Figures/rule_based_translation.png}
+  \end{center}
 
 \end{frame}
 
-
-%-------------------------------------------------------------
-\begin{frame}[fragile]\frametitle{Which formulas are taken into
-    consideration?}
-
-  \blue{Prerequisites:} a \emph{default rule set}:
-  \begin{itemize}
-  \item currently the set of all rules of the spec
-  \item to be reconsidered \dots
-  \end{itemize}
-  
-  
-The \blue{active ruleset} is configurable by the \texttt{rules} section:
-\begin{verbatim}
-assert {SMT: { rules: {rulespec}, ...} }
-Goal
-\end{verbatim}
-
-where the \emph{rulespec} is a combination of:
-  \begin{itemize}
-  \item \verb|only: {list of rules}|: only take these rules
-  \item \verb|del:  {list of rules}|: rules to be removed from ruleset
-  \item \verb|add:  {list of rules}|: rules to be added to ruleset after
-    removing the \texttt{del}-rules (currently not useful)
-  \end{itemize}
-
-\end{frame}
-
-
-%-------------------------------------------------------------
-\begin{frame}[fragile]\frametitle{How to configure the solver?}
-
-Configure the solver with the \texttt{config} clause
-\begin{verbatim}
-assert {SMT: { config: {solver: z3, 
-                        logic: LIA, 
-                        loglevel: 0}, ...} }
-Goal
-\end{verbatim}
-
-\begin{itemize}
-\item Solver:
-  \begin{itemize}
-  \item Has to be installed in advance, executable on execution path
-  \item Cannot be done on the fly (invocation parameters hard-wired)
-  \item Currently, only \texttt{z4}, \texttt{cvc3}, \texttt{mathsat} are configured
-  \end{itemize}
-\item Logic: Any of the SMT-LIB logics. 
-\item \texttt{loglevel}: Level of verbosity for tracing interaction with SMT solver
-\end{itemize}
-
-\end{frame}
-
-
-%-------------------------------------------------------------
-\begin{frame}[fragile]\frametitle{L4 example model}
-
-  \blue{Declarations}
-
-  \begin{verbatim}
-class Animal
-class Cat extends Animal
-class Mouse extends Animal
-
-decl isCat: Animal -> Boolean
-decl isMouse: Animal -> Boolean
-
-decl Age : Animal -> Integer -> Boolean
-
-decl garfield: Animal
-decl mickey: Animal
-\end{verbatim}
-  
-\end{frame}
-
-
-%-------------------------------------------------------------
-\begin{frame}[fragile]\frametitle{L4 example model}
-
-  \blue{Facts}
-
-\begin{verbatim}
-fact <CatNotMouse>
-for a: Animal
-not (isCat a && isMouse a)
-
-fact <GarfieldCat>
-isCat garfield
-
-fact <MickeyMouse>
-isMouse mickey
-\end{verbatim}
-  
-\end{frame}
-
-
-%-------------------------------------------------------------
-\begin{frame}[fragile]\frametitle{L4 example model}
-
-  \blue{Main rule and assertions}
-
-\begin{verbatim}
-# no mice older than 1 year have a chance to survive 
-# being chased by cats older than 5 years
-rule <OldCatsChaseWell>
-for c: Animal, m: Animal, ac: Integer, am: Integer
-if isCat c && isMouse m && Age c ac 
-   && ac >= 5 && Age m am 
-then am < 1
-
-# inconsistent, proof fails
-assert {SMT: {consistent}}
-Age garfield 5  && Age mickey 2
-
-# consistent, model found
-assert {SMT: {consistent}} 
-Age garfield 3 && Age mickey 2
-
-\end{verbatim}
-
-\end{frame}
-
-
-
-%-------------------------------------------------------------
-\begin{frame}[fragile]\frametitle{L4 example model}
-
-  \blue{Run checker:}
-\texttt{stack run -- l4 smt l4/garfield.l4}
-
-\begin{itemize}
-\item First formula: \texttt{Formula unsatisfiable.}
-\item Second formula:
-\begin{verbatim}
-Formula satisfiable, found model.
-Predicates: 
-isMouse mickey = true
-isCat garfield = true
-Age mickey intArg1 = 
-   (and (<= 2 intArg1) (not (<= 3 intArg1)))
-Age garfield intArg1 = 
-  (and (<= 2 intArg1) 
-  (and (<= 3 intArg1) (not (<= 5 intArg1))))
-Remaining predicates: false
-\end{verbatim}
-\end{itemize}
-
-\end{frame}
 
 %-------------------------------------------------------------
 

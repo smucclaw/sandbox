@@ -155,6 +155,7 @@ abstract UDCat = BareRG - [Deontic,may_Deontic,must_Deontic,should_Deontic,shall
         rootV_ : VP -> root ; -- TODO: figure out good way for this
         rootA_ : AP -> root ;
         rootN_ : NP -> root ;
+        rootAdv_ : Adv -> root ; -- within 30 days
 
         conjA_ : AP -> conj ;
         conjN_ : NP -> conj ;

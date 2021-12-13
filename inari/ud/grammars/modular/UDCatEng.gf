@@ -73,6 +73,7 @@ concrete UDCatEng of UDCat = BareRGEng - [Deontic,may_Deontic,must_Deontic,shoul
     rootV_ vp = mkRoot vp ;
     rootA_ ap = mkRoot ap ;
     rootN_ np = mkRoot np ;
+    rootAdv_ adv = mkRoot (mkVP adv) ;
     nmod_ = PrepNP ;
 
     conjA_ ap = mkUtt ap ; -- : AP -> conj ;

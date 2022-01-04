@@ -56,6 +56,8 @@ concrete UDCatEng of UDCat = BareRGEng - [Deontic,may_Deontic,must_Deontic,shoul
     should_aux = mkAux "should" should_VV ; --Deontic ;
     be_cop,
     be_auxPass = ss "be" ;
+    is_cop,
+    is_auxPass = ss "is" ;
     not_advmod = {adv = lin Adv (ss "not") ; isNot = True} ;
 
     nsubj_,
@@ -82,6 +84,7 @@ concrete UDCatEng of UDCat = BareRGEng - [Deontic,may_Deontic,must_Deontic,shoul
     ccomp_ uds = lin S {s = linUDS uds} ;
     xcompAdv_ adv = adv ;
     xcompA_ ap = lin Adv (mkUtt ap) ;
+    xcompA_ccomp_ ap cc = xcompA_ (mkAP ap cc) ;
     aclUDS_,
     advclUDS_ = \uds -> lin Adv {s = linUDS uds} ;
 

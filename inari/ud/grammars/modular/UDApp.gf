@@ -29,9 +29,8 @@ abstract UDApp = UDCat, JustWordsWordNet ** {
 
 	-- from the text fragments in Legal Spreadsheets PDPA mockup
 
-			root_only : root -> UDS ;
-		--sing ;
-
+	root_only : root -> UDS ;
+	--sing ;
 
 	root_acl : root -> acl -> UDS ;
 	--day of mourning ;
@@ -568,9 +567,37 @@ abstract UDApp = UDCat, JustWordsWordNet ** {
 		root_parataxis : root -> parataxis -> UDS ;
 	--tasty(potato) ;
 
+	    root_xcomp : root -> xcomp -> UDS ;
+	-- [becoming]:root [aware that db occurs]:xcomp
+
+	    root_advmod_xcomp : root -> advmod -> xcomp -> UDS ;
+	-- [not]:advmod [becoming]:root [aware that db occurs]:xcomp
+
 		root_xcomp_ccomp : root -> xcomp -> ccomp -> UDS ;
 	--render it [unlikely] that the notifiable data breach will [result] in significant [harm] to the individual ;
 
 		root_nsubj_aux_obl : root -> nsubj -> aux -> obl -> UDS ;
 	--the notifiable data [breach] will [result] in significant [harm] to the individual ;
+
+
+	fun root_advcl_det_compound_amod_advcl : root -> advcl -> det -> compound -> amod -> advcl -> UDS ;
+	fun root_advcl_nsubjPass_auxPass : root -> advcl -> nsubjPass -> auxPass -> UDS ;
+	fun root_advcl_nsubj_aux_advcl : root -> advcl -> nsubj -> aux -> advcl -> UDS ;
+	fun root_advcl_nsubj_aux_advmod_obj : root -> advcl -> nsubj -> aux -> advmod -> obj -> UDS ;
+	fun root_advcl_nsubj_aux_ccomp : root -> advcl -> nsubj -> aux -> ccomp -> UDS ;
+	fun root_advcl_nsubj_aux_obj_advmod_conj : root -> advcl -> nsubj -> aux -> obj -> advmod -> conj -> UDS ;
+	fun root_advcl_nsubj_aux_obl_obj : root -> advcl -> nsubj -> aux -> obl -> obj -> UDS ;
+	fun root_advcl_nsubj_conj : root -> advcl -> nsubj -> conj -> UDS ;
+	fun root_advcl_nsubj_cop : root -> advcl -> nsubj -> cop -> UDS ;
+	fun root_advcl_nsubj_cop_case_amod_nmod : root -> advcl -> nsubj -> cop -> case_ -> amod -> nmod -> UDS ;
+	fun root_advcl_nsubj_cop_det_amod : root -> advcl -> nsubj -> cop -> det -> amod -> UDS ;
+	fun root_advcl_nsubj_xcomp : root -> advcl -> nsubj -> xcomp -> UDS ;
+	fun root_mark_nsubj_nsubj_xcomp : root -> mark -> nsubj -> nsubj -> xcomp -> UDS ;
+	fun root_nsubj_aux_obj_conj_parataxis : root -> nsubj -> aux -> obj -> conj -> parataxis -> UDS ;
+	fun root_nsubj_cop_advcl_conj : root -> nsubj -> cop -> advcl -> conj -> UDS ;
+	fun root_nsubj_cop_det_aclRelcl : root -> nsubj -> cop -> det -> aclRelcl -> UDS ;
+	fun root_nsubj_cop_det_amod_conj_conj_conj_conj_conj_conj : root -> nsubj -> cop -> det -> amod -> conj -> conj -> conj -> conj -> conj -> conj -> UDS ;
+	fun root_nsubj_cop_obl_parataxis : root -> nsubj -> cop -> obl -> parataxis -> UDS ;
+	fun root_nsubj_obj_advcl : root -> nsubj -> obj -> advcl -> UDS ;
+
 }

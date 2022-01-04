@@ -154,6 +154,12 @@ lin
       let root_obl : Root = rt ** {vp = mkVP rt.vp obl} ;
        in root_nsubj_cop_aclRelcl root_obl sub cop rcl ;
 
+    -- : root -> nsubjPass -> auxPass -> UDS ; -- everyone is notified
+    root_nsubjPass_auxPass rt nsubj aux = {
+      subj = nsubj ;
+      pred = myVPS (ExtendEng.PassVPSlash (root2vpslash rt)) ;
+    } ;
+
     -- : root -> nsubjPass -> aux -> auxPass -> UDS ; -- everyone should be notified
     root_nsubjPass_aux_auxPass notified pdpa should auxpass = {
       subj = pdpa ;

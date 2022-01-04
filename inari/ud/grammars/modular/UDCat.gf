@@ -2,7 +2,7 @@
 
 abstract UDCat = BareRG - [Deontic,may_Deontic,must_Deontic,should_Deontic,shall_Deontic,shant_Deontic] ** {
 	cat
-	    UDS ;
+        UDS ;
         acl ;
         aclRelcl ;
         advcl ;
@@ -119,6 +119,7 @@ abstract UDCat = BareRG - [Deontic,may_Deontic,must_Deontic,should_Deontic,shall
         --
         xcompAdv_ : Adv -> xcomp ;
         xcompA_ : AP -> xcomp ; -- become [aware]:
+        xcompA_ccomp_ : AP -> ccomp -> xcomp ; -- become [aware [that a data breach occurred]]
 
         ccomp_ : UDS -> ccomp ; -- just missing a complementiser, like "that"
 
@@ -140,22 +141,26 @@ abstract UDCat = BareRG - [Deontic,may_Deontic,must_Deontic,should_Deontic,shall
         should_aux : aux ;
 
         be_auxPass : auxPass ;
-        be_cop : cop ;
-
-        it_expl : expl ; -- render [it] unlikely that …
-
-        not_advmod : advmod ;
 
         -------
-
-        nsubj_ : NP -> nsubj ; -- can be NOUN, DET, PRON, but all those can be NPs in GF
-        obj_ : NP -> obj ;
-        iobj_ : NP -> iobj ;
-
-        rootV_ : VP -> root ; -- TODO: figure out good way for this
+    fun
+    -- UD roots can be many GF cats
+        rootV_ : VP -> root ;
         rootA_ : AP -> root ;
         rootN_ : NP -> root ;
         rootAdv_ : Adv -> root ; -- within 30 days
+
+    -- GF NPs can have many UD labels
+        nsubj_ : NP -> nsubj ; -- lexical cat can be NOUN, DET, PRON, …
+        obj_   : NP -> obj ;   -- but all become eventually NPs in GF
+        iobj_  : NP -> iobj ;
+
+    -- Some UD words are syncategorematic in GF
+        be_cop : cop ;
+        is_cop : cop ;
+        it_expl : expl ; -- render [it] unlikely that …
+        not_advmod : advmod ;
+
 
         conjA_ : AP -> conj ;
         conjN_ : NP -> conj ;

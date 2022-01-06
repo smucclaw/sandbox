@@ -42,6 +42,7 @@ library
       Lib
       LinearTemporalLogic
       LspFuzz
+      OneLinerExamples.Defaultsignature
       SimplifySums
       Stlc
   other-modules:
@@ -53,6 +54,7 @@ library
     , bound
     , containers
     , deriving-compat
+    , one-liner
     , prettyprinter
     , process
     , profunctors
@@ -73,6 +75,7 @@ executable haskell-toys-exe
     , containers
     , deriving-compat
     , haskell-toys
+    , one-liner
     , prettyprinter
     , process
     , profunctors
@@ -94,6 +97,7 @@ test-suite haskell-toys-test
     , containers
     , deriving-compat
     , haskell-toys
+    , one-liner
     , prettyprinter
     , process
     , profunctors

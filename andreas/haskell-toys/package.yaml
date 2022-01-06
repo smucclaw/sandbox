@@ -29,6 +29,7 @@ dependencies:
 - profunctors
 - process
 - turtle
+- one-liner
 
 library:
   source-dirs: src

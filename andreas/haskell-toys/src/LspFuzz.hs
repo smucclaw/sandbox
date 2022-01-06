@@ -1,5 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 
+module LspFuzz where
+
 import System.Process hiding (shell)
 import qualified System.Process as P
 import System.IO

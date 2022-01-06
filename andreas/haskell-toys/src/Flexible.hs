@@ -1,4 +1,7 @@
 -- {-#  LANGUAGE FlexibleInstances #-}
+
+module Flexible where
+
 -- class Something a where doSomething :: a -> Integer
 -- instance Something Integer where doSomething x = 1
 -- instance Something Char where doSomething x = 2

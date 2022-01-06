@@ -123,22 +123,22 @@ chooseList n = choose n <$> [0..n]
 -- | Calculate the sum of k^n from k=1 to k=x
 -- sumPow n x == sum [k^n | k <- [1..x]]
 sumPow :: (Num t, FromRational t) => Integer -> t -> t
-sumPow n x = (// fromInteger n') $ x^n' + sum [(-1)^k*fromInteger(choose n' k) * sumPow (n' - k) x | k <- [2..n']] where n' = n + 1
+sumPow n x = (// fromInteger n') $ x^n' + sum [(-1)^k*fromInteger(choose n' k) * sumPow (n' - k) x | k <- [2..n']] where n' = n + 1
 
 prop_sumPow n x = sumPow n x == sum [k^n | k <- [1..x]]
 -- >>> and [prop_sumPow n x | n <- [0..8], x <- [0..8 :: Rational]]
 -- True
 
--- >>> mkPoly () $ sumPow 0
--- >>> mkPoly () $ sum0
--- >>> mkPoly () $ sumPow 1
--- >>> mkPoly () $ sum1
--- >>> mkPoly () $ sumPow 2
--- >>> mkPoly () $ sum2
--- >>> mkPoly () $ sumPow 3
--- >>> mkPoly () $ sum3
--- >>> mkPoly () $ sumPow 4
--- >>> mkPoly () $ sum4
+-- >>> mkPoly () $ sumPow 0
+-- >>> mkPoly () $ sum0
+-- >>> mkPoly () $ sumPow 1
+-- >>> mkPoly () $ sum1
+-- >>> mkPoly () $ sumPow 2
+-- >>> mkPoly () $ sum2
+-- >>> mkPoly () $ sumPow 3
+-- >>> mkPoly () $ sum3
+-- >>> mkPoly () $ sumPow 4
+-- >>> mkPoly () $ sum4
 -- P {unP = [I (0 % 1),I (1 % 1)]}
 -- P {unP = [I (0 % 1),I (1 % 1)]}
 -- P {unP = [I (0 % 1),I (1 % 2),I (1 % 2)]}
@@ -150,7 +150,7 @@ prop_sumPow n x = sumPow n x == sum [k^n | k <- [1..x]]
 -- P {unP = [I (0 % 1),I ((-1) % 30),I (0 % 1),I (1 % 3),I (1 % 2),I (1 % 5)]}
 -- P {unP = [I (0 % 1),I ((-1) % 30),I (0 % 1),I (1 % 3),I (1 % 2),I (1 % 5)]}
 
--- >>> fullyNormalize $ sumPow 4 $ V"n"
+-- >>> fullyNormalize $ sumPow 4 $ V"n"
 --     I ((-1) % 30) :*: V "n"
 -- :+: I (1 % 3)     :*: (V "n" :*: V "n" :*: V "n")
 -- :+: I (1 % 2)     :*: (V "n" :*: V "n" :*: V "n" :*: V "n")
@@ -254,7 +254,7 @@ divModPoly (P ra) (P rb) = (P rd, P $ reverse rm)
     (rd, rm) = divModP (reverse ra) []
 
     -- divModP :: (Eq a, Num a) => [a] -> [a] -> ([a], [a])
-    divModP as ans | length as < lenD = (ans, dropWhile (==0) as)
+    divModP as ans | length as < lenD = (ans, dropWhile (==0) as)
     divModP (0:as) ans = divModP as (0:ans)
     divModP (a:as) ans = divModP rmn (fact:ans)
       where fact = a / dh
@@ -271,7 +271,7 @@ nPlus1 = mkPoly' (+1)
 -- nPlus1 = mkPoly' $ \n -> n * (n + 1) * (2*n + 1) // 30
 
 simplifyPol :: (Polynomial Rational, Polynomial Rational) -> Polynomial Integer
-simplifyPol (P x, P []) = P $ map (\y -> if denominator y == 1 then numerator y else error $ "Not an integer: " ++ show x) x
+simplifyPol (P x, P []) = P $ map (\y -> if denominator y == 1 then numerator y else error $ "Not an integer: " ++ show x) x
 
 --  >>> sumPoly
 --  >>> nPlus1
@@ -279,12 +279,12 @@ simplifyPol (P x, P []) = P $ map (\y -> if denominator y == 1 then numerator y
 -- P {unP = [0 % 1,(-1) % 30,0 % 1,1 % 3,1 % 2,1 % 5]}
 -- P {unP = [0 % 1,1 % 30,1 % 10,1 % 15]}
 -- (P {unP = [(-1) % 1,3 % 1,3 % 1]},P {unP = []})
---  >>> simplifyPol $ divModPoly (sumPolyN 1) (sumPolyN 0 // 2)
---  >>> simplifyPol $ divModPoly (sumPolyN 2) (sumPolyN 1 // 3)
---  >>> simplifyPol $ divModPoly (sumPolyN 3) (sumPolyN 1 * sumPolyN 1)
---  >>> simplifyPol $ divModPoly (sumPolyN 4) (sumPolyN 2 // 5)
---  >>> simplifyPol $ divModPoly (sumPolyN 5) (sumPolyN 3 // 3)
---  >>> simplifyPol $ divModPoly (sumPolyN 6) (sumPolyN 2 // 7)
+--  >>> simplifyPol $ divModPoly (sumPolyN 1) (sumPolyN 0 // 2)
+--  >>> simplifyPol $ divModPoly (sumPolyN 2) (sumPolyN 1 // 3)
+--  >>> simplifyPol $ divModPoly (sumPolyN 3) (sumPolyN 1 * sumPolyN 1)
+--  >>> simplifyPol $ divModPoly (sumPolyN 4) (sumPolyN 2 // 5)
+--  >>> simplifyPol $ divModPoly (sumPolyN 5) (sumPolyN 3 // 3)
+--  >>> simplifyPol $ divModPoly (sumPolyN 6) (sumPolyN 2 // 7)
 -- P {unP = [1,1]}
 -- P {unP = [1,2]}
 -- P {unP = [1]}
@@ -315,7 +315,7 @@ evaluate = fmap polySumToNum . closed
 -- polyRangeFormulas :: Num a => [Range -> a]
 -- polyRangeFormulas :: Integral a => [Range -> a]
 polyRangeFormulas :: (Num a, FromRational a) => [RangeX a -> a]
-polyRangeFormulas = [ \(Range l r) -> sumPow p r - sumPow p (l - 1) | p <- [0..]]
+polyRangeFormulas = [ \(Range l r) -> sumPow p r - sumPow p (l - 1) | p <- [0..]]
 
 -- | The sum of a polynomial over a range
 polyRange :: (Num a, FromRational a) => RangeX a -> Polynomial a -> a
@@ -341,7 +341,7 @@ evalPoly x (P(a : as)) = a + x * evalPoly x (P as)
 
 -- | A generalized polynomial written as a map from a product of varialbes to their coeffiecients
 newtype NormalExpr a
-  = NE {unNE :: Map (MultiSet a) Rational }
+  = NE {unNE :: Map (MultiSet a) Rational }
   deriving Show
 
 type MultiSet a = Map a Int
@@ -353,8 +353,8 @@ multiSetToList :: MultiSet a -> [a]
 multiSetToList = concatMap (\(a,n) -> replicate n a) . M.toList
 
 instance Ord a => Num (NormalExpr a) where
-  NE a + NE b = NE $ M.unionWith (+) a b
-  NE a * NE b = sum . map (uncurry multiplySingle) $ M.toList a
+  NE a + NE b = NE $ M.unionWith (+) a b
+  NE a * NE b = sum . map (uncurry multiplySingle) $ M.toList a
     where multiplySingle varsA coeffA = NE $ M.map (* coeffA) $ M.mapKeysWith (error "this shouldn't happen") (unionMultiSet varsA) b
   abs = error "NormalExpr: abs is not defined"
   signum = error "NormalExpr: signum is not defined"
@@ -381,7 +381,7 @@ fullyNormalize :: Ord a => PolySum a -> PolySum a
 fullyNormalize = reifyNormalExpr . toNormalExpr
 
 ex :: Scope () PolySum String
-ex = abstract1 "x" $ x + 4 * x + x * 3 * x + x * x
+ex = abstract1 "x" $ x + 4 * x + x * 3 * x + x * x
   where x = V"x"
 
 -- >>> ex
@@ -409,7 +409,7 @@ t5'11 =
         10000* sum [10*a+n - a | a <- rToList $ pairRng1 n] * lPairs0 n
       + 10   * lPairs1 n                * sum [10*c+n - c | c <- rToList $ pairRng0 n]
       + 100  * sum [bc | bc <- [0..9]]  * lPairs1 n * lPairs0 n
-    | n <- rToList $ r19 + r09 ]
+    | n <- rToList $ r19 + r09 ]
     where
       r09 = Range 0 9
       r19 = Range 1 9
@@ -423,7 +423,7 @@ t5'12 =
         10000* sumRange (pairRng1 n) "a" (10*a+ fromInteger n - a) * sumRange (pairRng0 n) "c" 1
       + 10   * sumRange (pairRng1 n) "a" 1               * sumRange (pairRng0 n) "c" (10*c+fromInteger n - c )
       + 100  * sumRange r09 "bc" (V "bc")  * lPairs1 n * lPairs0 n
-    | n <- rToList $ r19 + r09 ]
+    | n <- rToList $ r19 + r09 ]
     where
       a = V"a"
       c = V"c"
@@ -439,7 +439,7 @@ t5'13 =
         sumRange (pairRng1 n) "a" (sumRange (pairRng0 n) "c" $ 10000* (10*a+ fromInteger n - a))
       + sumRange (pairRng1 n) "a" (sumRange (pairRng0 n) "c" $ 10   * (10*c+ fromInteger n - c))
       + sumRange r09 "bc" (100  * V "bc")  * lPairs1 n * lPairs0 n
-    | n <- rToList $ r19 + r09 ]
+    | n <- rToList $ r19 + r09 ]
     where
       a = V"a"
       c = V"c"
@@ -454,7 +454,7 @@ t5'14 =
     sum [
         sumRange (pairRng1 n) "a" (sumRange (pairRng0 n) "c" $ 10000* (10*a+ fromInteger n - a) + 10 * (10*c+ fromInteger n - c))
       + sumRange r09 "bc" (100  * V "bc")  * lPairs1 n * lPairs0 n
-    | n <- rToList $ r19 + r09 ]
+    | n <- rToList $ r19 + r09 ]
     where
       a = V"a"
       c = V"c"
@@ -472,7 +472,7 @@ t5'15 =
               d = fromInteger n - c
           in
           10000*a + 1000*b + 100*bc + 10*c + d
-    | n <- rToList $ r19 + r09 ]
+    | n <- rToList $ r19 + r09 ]
     where
       a = V"a"
       c = V"c"
@@ -491,7 +491,7 @@ t5'16 =
               d = fromInteger n - c
           in
           10000*a + 1000*b + 100*bc + 10*c + d
-    | n <- rToList $ r19 + r09 ]
+    | n <- rToList $ r19 + r09 ]
     where
       a = V"a"
       c = V"c"
@@ -516,7 +516,7 @@ t5_a =
               d = fromInteger n - c
           in
           10000*a + 1000*b + 100*bc + 10*c + d
-    | n <- rToList $ r19 + r09 ]
+    | n <- rToList $ r19 + r09 ]
     where
       a = V"a"
       c = V"c"
@@ -544,7 +544,7 @@ t6'1 =
               f = fromInteger n - d
           in
           100000*a + 10000*b + 1000*c + 100*d + 10*e + f
-    | n <- rToList $ r19 + r09 + r09 ]
+    | n <- rToList $ r19 + r09 + r09 ]
     where
       a = V"a"
       d = V"d"

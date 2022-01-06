@@ -24,7 +24,7 @@ deriving newtype instance Show (f (Incr a)) => Show (Scope f a)
 
 data Exp a
   = Var a
-  | Exp a :@ Exp a
+  | Exp a :@ Exp a
   | Lam (Scope Exp a)
   deriving (Eq, Show)
   deriving (Functor, Foldable, Traversable)
@@ -39,7 +39,7 @@ lam name f = Lam $ Scope $ f $ Var (Z name)
 s :: Exp a -> Exp (Incr a)
 s = fmap S
 -- s (Var x) = Var (S x)
--- s (x :@ y) = s x :@ s y
+-- s (x :@ y) = s x :@ s y
 -- s (Lam (Scope f)) = Lam $ s f
 
 ex :: Exp Void
@@ -49,7 +49,7 @@ ex2 :: Exp Void
 ex2 = lam "z" \z -> s ex :@ z
 
 ex3 :: Exp Void
-ex3 = lam "x" $ \x -> s $ lam "y" $ \y -> x :@ y
+ex3 = lam "x" $ \x -> s $ lam "y" $ \y -> x :@ y
 
 -- >>> ex
 -- >>> ex2

@@ -81,7 +81,7 @@ runIO = iterM $ \case
     print x
     cont "hello"
   Set x val cont -> do
-    putStrLn $ "Set " ++ show x ++ " to " ++ show val
+    putStrLn $ "Set " ++ show x ++ " to " ++ show val
     cont
   EndX -> pure ()
 
@@ -90,7 +90,7 @@ runIO = iterM $ \case
 runPure :: FDSL [(String,String)] -> [(String,String)]
 runPure = iter $ \case
   Get x cont -> let
-    y = fromMaybe ("Unknown value: " ++ x) $ lookup x ys
+    y = fromMaybe ("Unknown value: " ++ x) $ lookup x ys
     ys = cont y
     in ys
   Set x val cont -> (x,val):cont

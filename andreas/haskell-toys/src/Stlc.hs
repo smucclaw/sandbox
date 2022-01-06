@@ -27,7 +27,7 @@ module Stlc where
 import Data.Data (Proxy(Proxy))
 import Data.Type.Equality ((:~:) (Refl))
 
-data Typ = T | Typ :-> Typ
+data Typ = T | Typ :-> Typ
 
 infixr 8 :->
 
@@ -35,10 +35,10 @@ infixr 8 :->
 
 data Exp1 (g :: [Typ]) (t :: Typ) a where
     Z1 :: Exp1 (t ': ts) t a
-    -- S1 :: (b ~ Exp1 gs t a) => Exp1 gs t a -> Exp1 (g ': gs) t b
+    -- S1 :: (b ~ Exp1 gs t a) => Exp1 gs t a -> Exp1 (g ': gs) t b
     S1 :: Exp1 gs t a -> Exp1 (g ': gs) t (Exp1 gs t a)
     -- Var :: Exp1 g t a
-    (:@!) :: Exp1 g (t1 :-> t2) a -> Exp1 g t1 a -> Exp1 g t2 a
+    (:@!) :: Exp1 g (t1 :-> t2) a -> Exp1 g t1 a -> Exp1 g t2 a
     Lam1 :: Exp1 (t1 ': g) t2 (Exp1 g t a) -> Exp1 g (t1 :-> t2) a
 
 -- data IsBound
@@ -47,18 +47,18 @@ data Exp2 (bnd :: Maybe Typ) f (t :: Typ) where
     Z2 :: Exp2 (Just t) f t
     -- S2 :: Exp2 b f t -> Exp2 (Just t) (Exp2 b f) t
     S2 :: f t -> Exp2 (Just t1) f t
-    (:@?) :: Exp2 g f (t1 :-> t2) -> Exp2 g f t1 -> Exp2 g f t2
+    (:@?) :: Exp2 g f (t1 :-> t2) -> Exp2 g f t1 -> Exp2 g f t2
     Lam2 :: Exp2 (Just t1) (Exp2 g f) t2 -> Exp2 g f (t1 :-> t2)
 
 infixl 5 :@?
 
-exp2Ex = Lam2 $ Lam2 Z2 :@? Lam2 (S2 Z2)
+exp2Ex = Lam2 $ Lam2 Z2 :@? Lam2 (S2 Z2)
 
 withF :: (forall s. f s -> g s) -> Exp2 b f t -> Exp2 b g t
 withF _ Z2 = Z2
 withF mu (S2 ft) = S2 $ mu ft
 withF mu (a :@? b) = withF mu a :@? withF mu b
-withF mu (Lam2 f) = Lam2 $ withF (withF mu) f
+withF mu (Lam2 f) = Lam2 $ withF (withF mu) f
 
 class TFunctor (t :: (Typ -> *) -> Typ -> *) where
     hoistT :: (forall a. f a -> g a) -> t f b -> t g b
@@ -78,7 +78,7 @@ data Var (t1 :: Typ) f (t :: Typ) where
     S3 :: f t -> Var t1 f t
 instance TFunctor (Var t) where
   hoistT _ Z3 = Z3
-  hoistT mu (S3 x) = S3 $ mu x
+  hoistT mu (S3 x) = S3 $ mu x
 instance TMonad (Var t) where
   returnT = S3
   Z3 >>>= _ = Z3
@@ -88,7 +88,7 @@ newtype Scope (t1 :: Typ) w (f:: Typ -> *) (t2 :: Typ) = Scope { unscope :: w (V
 instance TFunctor w => TFunctor (Scope t1 w) where
   hoistT mu (Scope x) = Scope $ hoistT (hoistT (hoistT mu)) x
 instance TMonad w => TMonad (Scope t1 w) where
-  returnT = Scope . returnT . S3 . returnT
+  returnT = Scope . returnT . S3 . returnT
   Scope e1 >>>= f = Scope $ e1 >>>= \case
      Z3 -> returnT Z3
      (S3 e2) -> e2 >>>= unscope . f
@@ -96,17 +96,17 @@ instance TMonad w => TMonad (Scope t1 w) where
 -- Tweaked version of this:
 -- https://hackage.haskell.org/package/bound-2.0.3/docs/Bound-Class.html#v:-62--62--62--61-
 bound :: TMonad f => Scope t1 f a t2 -> (forall t3. a t3 -> f c t3) -> Scope t1 f c t2
-bound (Scope m) f = Scope $ hoistT (hoistT (>>>= f)) m
+bound (Scope m) f = Scope $ hoistT (hoistT (>>>= f)) m
 data Exp3 f (t :: Typ) where
     Var3 :: f t -> Exp3 f t
-    (:@#) :: Exp3 f (t1 :-> t2) -> Exp3 f t1 -> Exp3 f t2
+    (:@#) :: Exp3 f (t1 :-> t2) -> Exp3 f t1 -> Exp3 f t2
     Lam3 :: Scope t1 Exp3 f t2 -> Exp3 f (t1 :-> t2)
 
 infixl 5 :@#
 instance TFunctor Exp3 where
   hoistT mu (Var3 x) = Var3 (mu x)
   hoistT mu (a :@# b) = hoistT mu a :@# hoistT mu b
-  hoistT mu (Lam3 f) = Lam3 $ hoistT mu f
+  hoistT mu (Lam3 f) = Lam3 $ hoistT mu f
 instance TMonad Exp3 where
   returnT = Var3
   Var3 x    >>>= f = f x
@@ -131,7 +131,7 @@ newtype Var4 s = Var4 s
 data Exp4 (g :: [*]) where
     Z4 :: Var4 s -> Exp4 (s ': g)
     S4 :: Exp4 gs -> Exp4 (g ': gs)
-    (:@&) :: Exp4 g -> Exp4 g -> Exp4 g
+    (:@&) :: Exp4 g -> Exp4 g -> Exp4 g
     Lam4 :: (forall s. Var4 s -> Exp4 (s ': g)) -> Exp4 g
 
 map4 :: (Exp4 g -> Exp4 h) -> Exp4 (s : g) -> Exp4 (s : h)
@@ -156,12 +156,12 @@ whnf4 (f :@& a) = case whnf4 f of
 whnf4 e = e
 
 lam4 :: (forall s. Exp4 (s : g) -> Exp4 (s : g)) -> Exp4 g
-lam4 f = Lam4 $ f . Z4
+lam4 f = Lam4 $ f . Z4
 
 data Exp (g :: [Typ]) (t :: Typ) where
     Z :: Exp (t ': ts) t
     S :: Exp gs t -> Exp (g ': gs) t
-    (:@) :: Exp g (t1 :-> t2) -> Exp g t1 -> Exp g t2
+    (:@) :: Exp g (t1 :-> t2) -> Exp g t1 -> Exp g t2
     Lam :: Exp (t1 ': g) t2 -> Exp g (t1 :-> t2)
 
 infixl 5 :@
@@ -171,15 +171,15 @@ generalize :: Exp '[] t -> Exp g t
 generalize = generalizeIdx
 
 class Concat1 (xs :: [Typ]) (ys :: [Typ]) (zs :: [Typ])
-    | xs ys -> zs, zs xs -> ys where
+    | xs ys -> zs, zs xs -> ys where
   generalizeIdx :: Exp xs t -> Exp zs t
 instance Concat1 '[] ys ys where
-  generalizeIdx (f :@ x) = generalizeIdx f :@ generalizeIdx x
+  generalizeIdx (f :@ x) = generalizeIdx f :@ generalizeIdx x
   generalizeIdx (Lam x) = Lam $ generalizeIdx x
 instance Concat1 xs ys zs => Concat1 (x : xs) ys (x : zs) where
   generalizeIdx Z = Z
   generalizeIdx (S n) = S $ generalizeIdx n
-  generalizeIdx (f :@ x) = generalizeIdx f :@ generalizeIdx x
+  generalizeIdx (f :@ x) = generalizeIdx f :@ generalizeIdx x
   generalizeIdx (Lam x) = Lam $ generalizeIdx x
 
 type family Concat (xs :: [Typ]) (ys :: [Typ]) :: [Typ] where
@@ -239,12 +239,12 @@ instance
 -- consNeqLem (CS CZ) x pf = Refl
 -- consNeqLem (CS cs1@(CS cs)) x Refl = _ $ consNeqLem cs1 x Refl
 
--- | Evaluate a single step
+-- | Evaluate a single step
 eval :: Exp g t -> Maybe (Exp g t)
-eval (S (f :@ x)) = eval $ S f :@ S x
-eval (S (Lam f) :@ x) = eval $ Lam (liftExpUp1 f) :@ x
+eval (S (f :@ x)) = eval $ S f :@ S x
+eval (S (Lam f) :@ x) = eval $ Lam (liftExpUp1 f) :@ x
 -- eval (S (Lam f) :@ x) = Just $ _ f x
-eval (Lam f :@ x) = Just $ subst f x
+eval (Lam f :@ x) = Just $ subst f x
 eval (f :@ x) = (:@ x) <$> eval f
 eval _ = Nothing
 
@@ -269,9 +269,9 @@ liftExpUp1' p i (f :@ x) = liftExpUp1' p i f :@ liftExpUp1' p i x
 liftExpUp1' p@(CS _) i (Lam f) = Lam $ liftExpUp1' (CS p) i f
 -- liftExpUp1' p i n = liftIdxUp p i n
 liftExpUp1' (CS _) _ Z = Z
-liftExpUp1' (CS p) i (S n) = S $ liftExpUp1' p i n
+liftExpUp1' (CS p) i (S n) = S $ liftExpUp1' p i n
 
--- | Substitute the variable with de Bruijn index zero
+-- | Substitute the variable with de Bruijn index zero
 subst :: Exp (t1 ': g) t2 -> Exp g t1 -> Exp g t2
 subst Z x = x
 subst (S n) x = n
@@ -280,18 +280,18 @@ subst (Lam f) x = Lam $ substUnder' (CS CZ) Proxy f x
 
 substUnder :: Exp (t4 : t1 : g) t2 -> Exp g t1 -> Exp (t4 : g) t2
 substUnder Z x = Z
-substUnder (S n) x = S $ subst n x
+substUnder (S n) x = S $ subst n x
 substUnder (a :@ b) x = substUnder a x :@ substUnder b x
 substUnder (Lam f) x = Lam $ substUnder' (CS (CS CZ)) Proxy f x -- _ f x
 
--- | Substitute a variable with non-zero de Bruijn index
+-- | Substitute a variable with non-zero de Bruijn index
 substUnder' :: CtxSing xs -> Proxy (t1 ': i)
     -> Exp (Concat xs (t1 ': i)) t2 -> Exp i t1 -> Exp (Concat xs i) t2
 substUnder' CZ ti f x = subst f x
 substUnder' (CS cxs) ti Z x = Z
-substUnder' (CS cxs) ti (S n) x = S $ substUnder' cxs ti n x
+substUnder' (CS cxs) ti (S n) x = S $ substUnder' cxs ti n x
 substUnder' cs ti (a :@ b) x = substUnder' cs ti a x :@ substUnder' cs ti b x
-substUnder' cs ti (Lam f) x = Lam $ substUnder' (CS cs) ti f x
+substUnder' cs ti (Lam f) x = Lam $ substUnder' (CS cs) ti f x
 
 liftExp :: Contains' i o => Exp i t -> Exp o t
 -- liftExp (f :@ x) = liftExp f :@ liftExp x
@@ -316,7 +316,7 @@ liftExpUp' p i o (f :@ x) = liftExpUp' p i o f :@ liftExpUp' p i o x
 liftExpUp' p@(CS _) i o (Lam f) = Lam $ liftExpUp' (CS p) i o f
 -- liftExpUp' p i o n = liftIdxUp p i o n
 liftExpUp' (CS _) _ _ Z = Z
-liftExpUp' (CS p) i o (S n) = S $ liftExpUp' p i o n
+liftExpUp' (CS p) i o (S n) = S $ liftExpUp' p i o n
 
 
 idxToVar :: Contains' inner outer => Exp inner t -> Exp outer t
@@ -327,11 +327,11 @@ type ExpInCtx g t = forall outer. Contains' g outer =>  Exp outer t
 
 lam' :: (ExpInCtx (t : g) t -> Exp (t : g) t2)
     -> Exp g (t ':-> t2)
-lam' f = lam $ \x -> f $ idxToVar x
+lam' f = lam $ \x -> f $ idxToVar x
 
 lam2 :: (ExpInCtx (t1 : g) t1 -> ExpInCtx (t2 : t1 : g) t2 -> Exp (t2 : t1 : g) t3)
       -> Exp g (t1 ':-> t2 ':-> t3)
-lam2 f = lam' $ \x -> lam' $ f x
+lam2 f = lam' $ \x -> lam' $ f x
 
 -- * Examples
 
@@ -341,7 +341,7 @@ lam2 f = lam' $ \x -> lam' $ f x
 {-# ANN ex6 "HLint: ignore Avoid lambda using `infix`" #-}
 
 ex :: Exp g ((t1 ':-> t2) ':-> (t1 ':-> t2))
-ex = generalize $ lam' \x -> lam' \y -> x :@ y
+ex = generalize $ lam' \x -> lam' \y -> x :@ y
 
 ex2 :: (Exp '[] ((t10 ':-> t20) ':-> (t10 ':-> t20)))
 -- ex2 = lam \z -> ex :@ Var z
@@ -349,13 +349,13 @@ ex2 = lam \z -> ex :@ z
 
 ex3 = lam \x -> lam \y -> S x :@ y
 
-ex4 = generalize $ lam2 \x y -> x :@ lam' \ z -> z :@ y
+ex4 = generalize $ lam2 \x y -> x :@ lam' \ z -> z :@ y
 
 ex5 :: Exp '[] ((a ':-> a ':-> b) ':-> a ':-> b)
 ex5 = lam' \f -> lam' \x -> f :@ x :@ x
 
 ex6 :: Exp g ((((t1 ':-> t4) ':-> t4) ':-> t1 ':-> t5) ':-> t1 ':-> t5)
-ex6 = generalize $ lam' \f -> lam' \x -> f :@ lam' (\y -> y :@ x) :@ x
+ex6 = generalize $ lam' \f -> lam' \x -> f :@ lam' (\y -> y :@ x) :@ x
 
 -- >>> ex
 -- >>> ex2

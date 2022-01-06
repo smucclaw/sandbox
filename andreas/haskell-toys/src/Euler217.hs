@@ -90,7 +90,7 @@ t4s = [1000*a+100*b+10*c+d | a <- [1..9], b <- [0..9], c <- [0..9], d <- [0..9] 
 p4s = [1000*a+100*b+10*b+a | a <- [1..9], b <- [0..9]]
 p4s' = [1000*a+100*b+10*a+b | a <- [1..9], b <- [0..9]]
 
-t4Nonpal = (t4s \\ p4s) \\ p4s'
+t4Nonpal = (t4s \\ p4s) \\ p4s'
 
 t4s1 = [1000*a+100*b+10*c+d | a <- [1..9], b <- [0..9], c <- [0..9], let d = a + b - c , d >= 0, d < 10]
 t4s2 = [1000*a+100*b+10*c+d | a <- [1..9], b <- [0..9], c <- [0..9], let d = a + b - c , a + b >= c, a + b - 9 <= c]
@@ -396,35 +396,35 @@ t5'2 = 10*sum [10000*a+1000*b+10*c+d | a <- [1..9], b <- [0..9], c <- [0..9], d 
      -- 100 * t1 * count pairs * count pairs'
 t5'3 = 10*sum [10000*a+1000*b | n <- [1..18], a <- [1..9], b <- [0..9], n == a + b, c <- [0..9], d <- [0..9] , n == c + d]
      + 10*sum [10*c+d         | n <- [1..18], a <- [1..9], b <- [0..9], n == a + b, c <- [0..9], d <- [0..9] , n == c + d]
-     + sum [100*bc | bc <- [0..9]] * sum [1 | a <- [1..9], b <- [0..9], c <- [0..9], d <- [0..9] , a + b == c + d]
-t5'4 = 10*sum [sum [10000*a+1000*b | a <- [1..9], b <- [0..9], n == a + b, c <- [0..9], d <- [0..9] , n == c + d] | n <- [1..18]]
+     + sum [100*bc | bc <- [0..9]] * sum [1 | a <- [1..9], b <- [0..9], c <- [0..9], d <- [0..9] , a + b == c + d]
+t5'4 = 10*sum [sum [10000*a+1000*b | a <- [1..9], b <- [0..9], n == a + b, c <- [0..9], d <- [0..9] , n == c + d] | n <- [1..18]]
      + 10*sum [sum [10*c+d         | a <- [1..9], b <- [0..9], n == a + b, c <- [0..9], d <- [0..9] , n == c + d] | n <- [1..18]]
-     + sum [100*bc | bc <- [0..9]] * sum [1 | a <- [1..9], b <- [0..9], c <- [0..9], d <- [0..9] , a + b == c + d]
-t5'5 = 10*sum [sum [10000*a+1000*b | a <- [1..9], b <- [0..9], n == a + b] * sum [1      | c <- [0..9], d <- [0..9] , n == c + d] | n <- [1..18]]
+     + sum [100*bc | bc <- [0..9]] * sum [1 | a <- [1..9], b <- [0..9], c <- [0..9], d <- [0..9] , a + b == c + d]
+t5'5 = 10*sum [sum [10000*a+1000*b | a <- [1..9], b <- [0..9], n == a + b] * sum [1      | c <- [0..9], d <- [0..9] , n == c + d] | n <- [1..18]]
      + 10*sum [sum [1              | a <- [1..9], b <- [0..9], n == a + b] * sum [10*c+d |c <- [0..9], d <- [0..9] , n == c + d] | n <- [1..18]]
-     + sum [100*bc | bc <- [0..9]] * sum [1 | a <- [1..9], b <- [0..9], c <- [0..9], d <- [0..9] , a + b == c + d]
-t5'6 = 10000*sum [sum [10*a+b | a <- [1..9], b <- [0..9], n == a + b] * sum [1      | c <- [0..9], d <- [0..9], n == c + d] | n <- [1..18]]
+     + sum [100*bc | bc <- [0..9]] * sum [1 | a <- [1..9], b <- [0..9], c <- [0..9], d <- [0..9] , a + b == c + d]
+t5'6 = 10000*sum [sum [10*a+b | a <- [1..9], b <- [0..9], n == a + b] * sum [1      | c <- [0..9], d <- [0..9], n == c + d] | n <- [1..18]]
      + 10   *sum [sum [1      | a <- [1..9], b <- [0..9], n == a + b] * sum [10*c+d | c <- [0..9], d <- [0..9], n == c + d] | n <- [1..18]]
      + sum [100*bc | bc <- [0..9]]
-       * sum [sum [1 | a <- [1..9], b <- [0..9], n ==  a + b] * sum [1 | c <- [0..9], d <- [0..9], n == c + d] | n <- [1..18]]
-t5'7 = 10000*sum [sum [10*a+b | (a,b) <- pairs1 n] * sum [1      | (c,d) <- pairs0 n] | n <- [1..18]]
+       * sum [sum [1 | a <- [1..9], b <- [0..9], n ==  a + b] * sum [1 | c <- [0..9], d <- [0..9], n == c + d] | n <- [1..18]]
+t5'7 = 10000*sum [sum [10*a+b | (a,b) <- pairs1 n] * sum [1      | (c,d) <- pairs0 n] | n <- [1..18]]
      + 10   *sum [sum [1      | (a,b) <- pairs1 n] * sum [10*c+d | (c,d) <- pairs0 n] | n <- [1..18]]
      + 100  *sum [bc | bc <- [0..9]]
-       * sum [sum [1 | (a,b) <- pairs1 n] * sum [1 | (c,d) <- pairs0 n] | n <- [1..18]]
+       * sum [sum [1 | (a,b) <- pairs1 n] * sum [1 | (c,d) <- pairs0 n] | n <- [1..18]]
     where
       pairs1 n = [(a,b) | a <- [1..9], b <- [0..9], n == a + b]
       pairs0 n = [(c,d) | c <- [0..9], d <- [0..9], n == c + d]
-t5'8 = 10000*sum [sum [10*a+b | (a,b) <- pairs1 n] * length (pairs0 n)                | n <- [1..18]]
+t5'8 = 10000*sum [sum [10*a+b | (a,b) <- pairs1 n] * length (pairs0 n)                | n <- [1..18]]
      + 10   *sum [length (pairs1 n)                * sum [10*c+d | (c,d) <- pairs0 n] | n <- [1..18]]
      + 100  *sum [bc | bc <- [0..9]]
-       * sum [length (pairs1 n) * length (pairs0 n) | n <- [1..18]]
+       * sum [length (pairs1 n) * length (pairs0 n) | n <- [1..18]]
     where
       pairs1 n = [(a,b) | a <- [1..9], b <- [0..9], n == a + b]
       pairs0 n = [(c,d) | c <- [0..9], d <- [0..9], n == c + d]
-t5'9 = 10000*sum [sum [10*a+b | (a,b) <- pairs1 n] * lPairs0 n                | n <- [1..18]]
+t5'9 = 10000*sum [sum [10*a+b | (a,b) <- pairs1 n] * lPairs0 n                | n <- [1..18]]
      + 10   *sum [lPairs1 n                * sum [10*c+d | (c,d) <- pairs0 n] | n <- [1..18]]
      + 100  *sum [bc | bc <- [0..9]]
-       * sum [lPairs1 n * lPairs0 n | n <- [1..18]]
+       * sum [lPairs1 n * lPairs0 n | n <- [1..18]]
     where
       r09 = Range 0 9
       r19 = Range 1 9
@@ -442,10 +442,10 @@ t5'9 = 10000*sum [sum [10*a+b | (a,b) <- pairs1 n] * lPairs0 n                |�
           bRng = r09
           abRng = overlapRange aRng $ fromIntegral n - bRng
       lPairs0 n = rLen $ overlapRange r09 $ fromIntegral n - r09
-t5'10 = 10000*sum [sum [10*a+n - a | a <- rToList $ pairRng1 n] * lPairs0 n                | n <- [1..18]]
+t5'10 = 10000*sum [sum [10*a+n - a | a <- rToList $ pairRng1 n] * lPairs0 n                | n <- [1..18]]
       + 10   *sum [lPairs1 n                * sum [10*c+n - c | c <- rToList $ pairRng0 n] | n <- [1..18]]
       + 100  *sum [bc | bc <- [0..9]]
-        * sum [lPairs1 n * lPairs0 n | n <- [1..18]]
+        * sum [lPairs1 n * lPairs0 n | n <- [1..18]]
     where
       r09 = Range 0 9
       r19 = Range 1 9
@@ -458,7 +458,7 @@ t5'11 =
         10000* sum [10*a+n - a | a <- rToList $ pairRng1 n] * lPairs0 n
       + 10   * lPairs1 n                * sum [10*c+n - c | c <- rToList $ pairRng0 n]
       + 100  * sum [bc | bc <- [0..9]]  * lPairs1 n * lPairs0 n
-    | n <- rToList $ r19 + r09 ]
+    | n <- rToList $ r19 + r09 ]
     where
       r09 = Range 0 9
       r19 = Range 1 9
@@ -471,8 +471,8 @@ t5'11 =
 -- * Nestable polynomials
 -- * Function for sum [10*a+n - a | a <- rToList $ pairRng1 n]
 -- * Call it rangeSum f rng = sum $ [f a | a <- rToList rng]
--- * Call it rangeSum f rng = sum $ map f $ rToList rng
--- * Call it rangeSum f = sum . map f . rToList
+-- * Call it rangeSum f rng = sum $ map f $ rToList rng
+-- * Call it rangeSum f = sum . map f . rToList
 -- * Convert rangeSum (\x -> a*x^2 + b*x + c) rng to
 --   a * rngSquare rng + b * rSum rng + rLen rng
 
@@ -505,7 +505,7 @@ deriving newtype instance Show (f (Incr a)) => Show (Scope f a)
 
 data Exp a
   = Var a
-  | Exp a :@ Exp a
+  | Exp a :@ Exp a
   | Lam (Scope Exp a)
   deriving (Eq, Show)
   deriving (Functor, Foldable, Traversable)
@@ -520,7 +520,7 @@ lam name f = Lam $ Scope $ f $ Var (Z name)
 s :: String -> Exp a -> Exp (Incr a)
 s x = fmap (S x)
 -- s (Var x) = Var (S x)
--- s (x :@ y) = s x :@ s y
+-- s (x :@ y) = s x :@ s y
 -- s (Lam (Scope f)) = Lam $ s f
 
 ex :: Exp Void
@@ -530,7 +530,7 @@ ex2 :: Exp Void
 ex2 = lam "z" \z -> s "z" ex :@ z
 
 ex3 :: Exp Void
-ex3 = lam "x" $ \x -> s "lul" $ lam "y" $ \y -> x :@ y
+ex3 = lam "x" $ \x -> s "lul" $ lam "y" $ \y -> x :@ y
 
 -- >>> ex
 -- >>> ex2

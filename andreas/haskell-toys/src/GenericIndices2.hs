@@ -15,7 +15,7 @@ import GHC.Generics
 import Control.Applicative
 import Data.Kind (Type)
 
-data SimpleIndex = SL SimpleIndex | SR SimpleIndex | SPair SimpleIndex SimpleIndex | SUnit
+data SimpleIndex = SL SimpleIndex | SR SimpleIndex | SPair SimpleIndex SimpleIndex | SUnit
 
 data GIndex (a :: *) where
     L    :: GIndex (a p) -> GIndex ((a :+: b) p)
@@ -29,7 +29,7 @@ data GIndex (a :: *) where
 
 type HolyType = [PartialType]
 
-data PartialType = SumL Type | SumR Type
+data PartialType = SumL Type | SumR Type
 -- data PartialType where
 --     SumL :: Type -> PartialType
 
@@ -52,7 +52,7 @@ type family FillHole (h :: HoledType) (t :: Type1) where
 fillHole :: Pos path var root a -> var a -> root a
 fillHole Here x = x
 fillHole (LS xs) x = L1 $ fillHole xs x
-fillHole (RS xs) x = R1 $ fillHole xs x
+fillHole (RS xs) x = R1 $ fillHole xs x
 fillHole (LP ba xs) x = fillHole xs x :*: ba
 fillHole (RP aa xs) x = aa :*: fillHole xs x
 
@@ -99,8 +99,8 @@ instance (GAsIndex (f p), GAsIndex (g p)) => GAsIndex ((f :+: g) p) where
   gFromIdx (R ib) = R1 (gFromIdx ib)
 
 instance AsIndex c => GAsIndex (K1 i c p) where
-  gToIdx (K1 c) = K $ toIdx c
-  gFromIdx (K x) = K1 $ fromIdx x
+  gToIdx (K1 c) = K $ toIdx c
+  gFromIdx (K x) = K1 $ fromIdx x
 
 instance GAsIndex (f p) => GAsIndex (M1 i c f p) where
   gToIdx (M1 fx) = M $ gToIdx fx

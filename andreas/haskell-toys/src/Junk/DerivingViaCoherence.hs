@@ -21,7 +21,7 @@ newtype HiEarth = HE ()
 instance Hello HiEarth where hello _ = "hi"
 instance World HiEarth where world x = hello x ++ " earth"
 
--- >>> hello $ Both ()
+-- >>> hello $ Both ()
 -- "hello"
 --
 -- >>> world $ Both ()

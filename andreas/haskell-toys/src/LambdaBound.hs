@@ -25,7 +25,7 @@ newtype Var4 s = Var4 s
 data Exp4 (g :: [*]) where
     Z4 :: Var4 s -> Exp4 (s ': g)
     S4 :: Exp4 gs -> Exp4 (g ': gs)
-    (:@&) :: Exp4 g -> Exp4 g -> Exp4 g
+    (:@&) :: Exp4 g -> Exp4 g -> Exp4 g
     Lam4 :: (forall s. Var4 s -> Exp4 (s ': g)) -> Exp4 g
 
 map4 :: (Exp4 g -> Exp4 h) -> Exp4 (s : g) -> Exp4 (s : h)
@@ -50,7 +50,7 @@ whnf4 (f :@& a) = case whnf4 f of
 whnf4 e = e
 
 lam4 :: (forall s. Exp4 (s : g) -> Exp4 (s : g)) -> Exp4 g
-lam4 f = Lam4 $ f . Z4
+lam4 f = Lam4 $ f . Z4
 
 
 infixl 9 :@
@@ -108,7 +108,7 @@ whnf e = e
 -- Hybrid between HOAS and de Bruijn indices
 data Exp2 a where
     Var2 :: a -> Exp2 a
-    (:@#) :: Exp2 a -> Exp2 a -> Exp2 a
+    (:@#) :: Exp2 a -> Exp2 a -> Exp2 a
     Lam2 :: (forall s. s -> Scope s Exp2 a) -> Exp2 a
   deriving (Functor)
 
@@ -151,9 +151,9 @@ instance {-# OVERLAPPING #-} Contains s a => Contains s (Var s1 a) where
 
 
 -- lam2 :: (forall s. (forall x. Contains_ s x => x) -> Scope s Exp2 a) -> Exp2 a
--- lam2 f = Lam2 $ \s -> f (wrap s)
+-- lam2 f = Lam2 $ \s -> f (wrap s)
 lam2 :: (forall s. (forall x. Contains s x => x) -> Exp2 (Var s (Exp2 a))) -> Exp2 a
-lam2 f = Lam2 $ \s -> Scope $ f (wrap s)
+lam2 f = Lam2 $ \s -> Scope $ f (wrap s)
 
 {-# ANN ex1 "HLint: ignore Use id" #-}
 {-# ANN ex2 "HLint: ignore Avoid lambda using `infix`" #-}
@@ -172,4 +172,4 @@ ex2 = lam2 \x -> x :@# lam2 \y -> y :@# x
 
 
 bindSingleVariable :: Monad f => (forall s. f s -> f s) -> Scope () f a
-bindSingleVariable f = Scope . f $ pure (B ())
+bindSingleVariable f = Scope . f $ pure (B ())

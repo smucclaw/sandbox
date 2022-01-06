@@ -35,7 +35,7 @@ test2 = alternate (Proxy @((~) Int)) (pure 4)
 test3 :: [(Int , Int)]
 test3 = alternate (Proxy @((~) Int)) [1, 2]
 
--- >>> take 10 $ test
+-- >>> take 10 $ test
 -- >>> test2 @(Maybe Int) @[]
 -- >>> test3
 -- [(0,Nothing),(0,Just ()),(1,Nothing),(1,Just ())]
@@ -84,14 +84,14 @@ toLeafTree :: Enumerate a => LeafTree a
 toLeafTree = alternatives
 
 toShallowList :: Enumerate a => Int -> [a]
-toShallowList n = toList $ truncateL n toLeafTree
+toShallowList n = toList $ truncateL n toLeafTree
 
--- >>> take 200 $ show $ truncateL 6 $ toLeafTree @([] Int)
--- >>> take 200 $ show $ truncateL' 7 $ toLeafTree @([] Int)
+-- >>> take 200 $ show $ truncateL 6 $ toLeafTree @([] Int)
+-- >>> take 200 $ show $ truncateL' 7 $ toLeafTree @([] Int)
 -- "Node (Leaf []) (Node (Node (Leaf [0]) (Node (Node (Leaf [0,0]) (Node Empty Empty)) (Node (Node Empty Empty) (Node Empty Empty)))) (Node (Node (Node (Leaf [1]) (Node Empty Empty)) (Node (Node Empty Emp"
 -- "Node (Leaf []) (Node (Node (Leaf [0]) (Leaf [0,0])) (Node (Leaf [1]) (Leaf [3])))"
 
--- >>> take 200 $ show $ truncateL' 7 $ toLeafTree @([] Bool)
+-- >>> take 200 $ show $ truncateL' 7 $ toLeafTree @([] Bool)
 -- "Node (Leaf []) (Node (Node (Leaf [False]) (Node (Leaf [False,False]) (Leaf [False,True]))) (Node (Leaf [True]) (Node (Leaf [True,False]) (Leaf [True,True]))))"
 
 newtype State s m a = State {runState :: s -> m (a, s)}
@@ -101,17 +101,17 @@ lift :: Functor m => m a -> State t m a
 lift x = State $ \s -> fmap (,s) x
 
 local :: (s -> s) -> State s m a -> State s m a
-local f (State x) = State $ x . f
+local f (State x) = State $ x . f
 
 instance Monad m => Applicative (State s m) where
   pure a = State $ pure . (a,)
   (<*>) = ap
---   State f <*> State x = State $ \s -> let (f', s') = f s in first f' $ x s'
+--   State f <*> State x = State $ \s -> let (f', s') = f s in first f' $ x s'
 instance Monad m => Monad (State s m) where
-  State x >>= f = State $ \s -> do (x',s') <- x s; runState (f x') s'
+  State x >>= f = State $ \s -> do (x',s') <- x s; runState (f x') s'
 
 instance (Alternative f, Monad f) => Alternative (State s f) where
-  empty = State $ const empty
+  empty = State $ const empty
   State a <|> State b = State \s -> a s <|> b s
 
 instance (Alternative f, Monad f) => MonadPlus (State s f)
@@ -120,7 +120,7 @@ newtype RngMonad g a = RngMonad {runRng :: State g Maybe a}
   deriving (Functor, Applicative, Monad)
 -- instance Applicative (RngMonad g) where
 --   pure = RngMonad . pure
---   RngMonad f <*> RngMonad x = RngMonad $ f <*> x -- (<*>) <$> f <*> x
+--   RngMonad f <*> RngMonad x = RngMonad $ f <*> x -- (<*>) <$> f <*> x
 
 -- instance Monad (RngMonad g) where
 --    RngMonad x >>= f = RngMonad $ x >>= runRng . f
@@ -131,11 +131,11 @@ randomM = RngMonad $ State $ Just . random
 
 instance RandomGen g => Alternative (RngMonad g) where
   empty = RngMonad empty
---   RngMonad (Just a) <|> (RngMonad (Just b)) = RngMonad . Just $ do
+--   RngMonad (Just a) <|> (RngMonad (Just b)) = RngMonad . Just $ do
 --       p <- State random
 --       if p then a
 --           else b
---   RngMonad a <|> RngMonad b = RngMonad $ a <|> b
+--   RngMonad a <|> RngMonad b = RngMonad $ a <|> b
   a <|> b = do
       p <- randomM
       if p then
@@ -188,11 +188,11 @@ newtype SizeOf n a = Size n
 
 instance Num n => Applicative (SizeOf n) where
   pure _ = 1
-  Size a <*> Size b = Size $ a * b
+  Size a <*> Size b = Size $ a * b
 
 instance Num n => Alternative (SizeOf n) where
   empty = Size 0
-  Size a <|> Size b = Size $ a + b
+  Size a <|> Size b = Size $ a + b
 
 sizeOf :: (Enumerate a, Num n) => (SizeOf n) a
 sizeOf = alternatives
@@ -206,7 +206,7 @@ newtype AtDepth f a = AtDepth {withDepth :: Int -> f a}
 instance Alternative f => Applicative (AtDepth f) where
 --   pure x = AtDepth \n -> if n == 0 then pure x else empty
 --   pure x = AtDepth \case 0 -> pure x; _ -> empty
-  pure x = AtDepth $ const $ pure x
+  pure x = AtDepth $ const $ pure x
   AtDepth f <*> AtDepth x = AtDepth \case 0 -> empty; n -> f (n - 1) <*> x (n - 1)
 --   AtDepth f <*> AtDepth x = AtDepth \n -> f n <*> x n
 
@@ -249,7 +249,7 @@ sizeUpTo :: (Alternative m, Monad m, Enumerate a) => Int -> m (a, Int)
 sizeUpTo = runState (withSize alternatives)
 
 sizeExactly :: (MonadPlus f, Enumerate a) => Int -> f a
-sizeExactly n = fmap fst . mfilter ((==0).snd) $ sizeUpTo n
+sizeExactly n = fmap fst . mfilter ((==0).snd) $ sizeUpTo n
 
 subtractOne :: (Alternative m) => State Int m a -> State Int m a
 subtractOne s = State \case 0 -> empty ; n -> runState s (n - 1)
@@ -258,9 +258,9 @@ sizeUpTo' :: (Alternative m, Monad m, Enumerate a) => Int -> m (a, Int)
 sizeUpTo' = runState (withLayers subtractOne)
 
 sizeExactly' :: (MonadPlus f, Enumerate a) => Int -> f a
-sizeExactly' n = fmap fst . mfilter ((==0).snd) $ sizeUpTo' n
+sizeExactly' n = fmap fst . mfilter ((==0).snd) $ sizeUpTo' n
 
--- >>> take 30 $ sizeExactly @[] @Int 5
+-- >>> take 30 $ sizeExactly @[] @Int 5
 -- ProgressCancelledException
 
 -- >>> sizeExactly' @[] @([Maybe ((), ())]) 0
@@ -347,14 +347,14 @@ binaryToInt (x:xs) = fromEnum x + 2* binaryToInt xs
 alternativesInt :: (Alternative f) => Int -> f Int
 alternativesInt n = pure n <|> alternativesInt (2*n) <|> alternativesInt (2*n + 1)
 
--- >>> sort $ toShallowList @Int 7
+-- >>> sort $ toShallowList @Int 7
 -- [0,1,2,3,5,6,7,15]
 
--- >>> take 10 $ binaryToInt . getZipList <$> alternatives
--- >>> take 10 $ binaryToInt <$> alternatives
+-- >>> take 10 $ binaryToInt . getZipList <$> alternatives
+-- >>> take 10 $ binaryToInt <$> alternatives
 -- >>> binaryToInt . reverse <$> toShallowList 8
 -- >>> binaryToInt <$> toShallowList 8
--- >>> sort $ binaryToInt <$> toShallowList 8
+-- >>> sort $ binaryToInt <$> toShallowList 8
 -- [1,2,4,8,16,32,64,128,256,512]
 -- [1,2,4,8,16,32,64,128,256,512]
 -- [1,2,4,8,9,5,10,11,3,6,12,13,7,14,15]

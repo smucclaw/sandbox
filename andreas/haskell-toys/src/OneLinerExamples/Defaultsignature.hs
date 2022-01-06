@@ -13,6 +13,7 @@
   , UndecidableInstances
   , UndecidableSuperClasses
   , FlexibleInstances
+  , GADTs
   #-}
 
 -- depends on the one-liner library

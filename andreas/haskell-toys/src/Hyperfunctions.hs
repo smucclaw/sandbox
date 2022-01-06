@@ -334,17 +334,17 @@ mzip3'1 f xs0 ys0 zs0 = invoke (xz xs0) $ invoke (yz ys0) (zz zs0)
     zz = error "not implemented"
 
 
-mzip3'2 :: forall a b c d. (a -> b -> c -> d) -> [a] -> [b] -> [c] -> [d]
-mzip3'2 f xs0 ys0 zs0 = invoke (xz xs0) $ _ $ invoke (yz ys0) (zz zs0)
-  where
-    xz :: [a] -> (a -> [d]) -&> [d]
-    xz = hypFold id []
+-- mzip3'2 :: forall a b c d. (a -> b -> c -> d) -> [a] -> [b] -> [c] -> [d]
+-- mzip3'2 f xs0 ys0 zs0 = invoke (xz xs0) $ _ $ invoke (yz ys0) (zz zs0)
+--   where
+--     xz :: [a] -> (a -> [d]) -&> [d]
+--     xz = hypFold id []
 
-    yz :: [b] -> (a -> b -> [d]) -&> [d]
-    yz = hypFold _ []
+--     yz :: [b] -> (a -> b -> [d]) -&> [d]
+--     yz = hypFold _ []
 
-    zz :: [c] -> [d] -&> (a -> b -> [d])
-    zz = hypFold (\ l_d c a b -> f a b c : l_d) $ const $ const []
+--     zz :: [c] -> [d] -&> (a -> b -> [d])
+--     zz = hypFold (\ l_d c a b -> f a b c : l_d) $ const $ const []
 
 -- mzip3'3 :: forall a b c d. (a -> b -> c -> d) -> [a] -> [b] -> [c] -> [d]
 -- mzip3'3 f xs0 ys0 zs0 = invoke (foldr xf xz xs0) _ -- - $ foldr yf yz ys0 $ foldr zf zz zs0

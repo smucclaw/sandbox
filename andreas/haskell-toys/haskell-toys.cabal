@@ -54,6 +54,7 @@ library
     , bound
     , containers
     , deriving-compat
+    , mtl
     , one-liner
     , prettyprinter
     , process
@@ -75,6 +76,7 @@ executable haskell-toys-exe
     , containers
     , deriving-compat
     , haskell-toys
+    , mtl
     , one-liner
     , prettyprinter
     , process
@@ -97,6 +99,7 @@ test-suite haskell-toys-test
     , containers
     , deriving-compat
     , haskell-toys
+    , mtl
     , one-liner
     , prettyprinter
     , process

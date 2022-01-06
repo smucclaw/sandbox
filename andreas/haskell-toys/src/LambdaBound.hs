@@ -75,18 +75,21 @@ instance Show (DummyShow a) where
 
 data ShowRec a = ShowRec { shwPrec :: Int -> a -> ShowS}
 
-newtype SmartShow a = SmartShow a
+data SmartShow a = HasShow a => SmartShow a
 
 -- class WithShow
 type HasShow a = (?shwPrc :: Int -> a -> ShowS)
 -- instance HasShow a => Show (SmartShow a) where
 instance Show (SmartShow a) where
-  showsPrec n (SmartShow a) = sp n a
+  showsPrec n (SmartShow a) = ?shwPrc n a
 --   showList (SmartShow a) = sp n a
+
+-- implicitShowPrec :: HasShow a => Int -> a -> ShowS
+-- implicitShowPrec n a = ?shwPrc n a
 
 instance Show1 Exp where
   liftShowsPrec sp sl n e = showsPrec n $ fmap (DummyShow sp sl) e
-  liftShowList sp sl = _
+  -- liftShowList sp sl = _
 
 -- deriving instance Eq a => Eq (Exp a)
 deriving instance Show a => Show (Exp a)

@@ -91,6 +91,8 @@ instance Show (SmartShow a) where
 -- implicitShowPrec :: HasShow a => Int -> a -> ShowS
 -- implicitShowPrec n a = ?shwPrc n a
 
+-- This could be resolved by using the "reflection" package
+
 instance Show1 Exp where
   liftShowsPrec sp sl n e = showsPrec n $ fmap (DummyShow sp sl) e
   -- liftShowList sp sl = _

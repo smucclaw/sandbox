@@ -17,29 +17,28 @@ import GHC.Generics
 import Control.Applicative
 import Data.Kind (Type)
 
-data SimpleIndex = SL SimpleIndex | SR SimpleIndex | SPair SimpleIndex SimpleIndex | SUnit
 
-data GIndex (a :: *) where
-    L    :: GIndex (a p) -> GIndex ((a :+: b) p)
-    R    :: GIndex (b p) -> GIndex ((a :+: b) p)
-    Pair :: GIndex (a p) -> GIndex (b p) -> GIndex ((a :*: b) p)
-    Unit :: GIndex (U1 p)
-    M    :: GIndex (f p) -> GIndex (M1 i c f p)
-    K    :: Index c -> GIndex (K1 i c x)
-    -- Unknown :: GIndex a
-    -- Unknown :: GIndex (K1 i p)
+data GIndex r (a :: *) where
+    L    :: GIndex r (a p) -> GIndex r ((a :+: b) p)
+    R    :: GIndex r (b p) -> GIndex r ((a :+: b) p)
+    Pair :: GIndex r (a p) -> GIndex r (b p) -> GIndex r ((a :*: b) p)
+    Unit :: GIndex r (U1 p)
+    M    :: GIndex r (f p) -> GIndex r (M1 i c f p)
+    K    :: Index r c -> GIndex r (K1 i c x)
+    -- Unknown :: GIndex r a
+    -- Unknown :: GIndex r (K1 i p)
 
 type Type1 = Type -> Type
 
-fillHole :: GPos var root a -> (var -> var) -> root a -> root a
--- fillHole Here x = x
-fillHole (LS xs) x (L1 s) = L1 $ fillHole xs x s
-fillHole (RS xs) x (R1 s) = R1 $ fillHole xs x s
-fillHole (LP xs) x (s :*: ba) = fillHole xs x s :*: ba
-fillHole (RP xs) x (aa :*: s) = aa :*: fillHole xs x s
-fillHole (PMeta xs) x (M1 s) = M1 $ fillHole xs x s
-fillHole PK f (K1 s) = K1 (f s)
-fillHole _ x s = error "FillHole: Not matching constructors"
+gFillHole :: GPos var root a -> (var -> var) -> root a -> root a
+-- gFillHole Here x = x
+gFillHole (LS xs) x (L1 s) = L1 $ gFillHole xs x s
+gFillHole (RS xs) x (R1 s) = R1 $ gFillHole xs x s
+gFillHole (LP xs) x (s :*: ba) = gFillHole xs x s :*: ba
+gFillHole (RP xs) x (aa :*: s) = aa :*: gFillHole xs x s
+gFillHole (PMeta xs) x (M1 s) = M1 $ gFillHole xs x s
+gFillHole PK f (K1 s) = K1 (f s)
+gFillHole _ x s = error "FillHole: Not matching constructors"
 
 data GPos var result p where
     -- Here :: GPos Done var var p
@@ -56,47 +55,54 @@ data GPos var result p where
     -- LP :: GPos root (a p) -> GPos (SumL (b p) : xs) root ((a :+: b) p)
     -- RP :: GPos root (b p) -> GPos (SumR (b p) : xs) root ((a :+: b) p)
 
-data Pos var result where
-    Here' :: Pos var var
-    There' :: Generic inner => GPos inner (Rep result) p -> Pos var inner -> Pos var result
+deriving instance Show (GPos var result p)
 
-fillHole' :: (Generic root, Generic var) => Pos var root -> var -> root -> root
+data Pos' var result where
+    Here' :: Pos' var var
+    There' :: Generic inner => GPos inner (Rep result) p -> Pos' var inner -> Pos' var result
+
+fillHole' :: (Generic root, Generic var) => Pos' var root -> var -> root -> root
 fillHole' Here' x _ = x
-fillHole' (There' p ps) x root = to $ fillHole p (fillHole' ps x) $ from root
+fillHole' (There' p ps) x root = to $ gFillHole p (fillHole' ps x) $ from root
 
--- to $ fillHole ((PMeta $ PMeta $ PMeta PK)) (True) :: (Identity Bool)
--- to $ fillHole ((PMeta $ RS $ PMeta $ PMeta PK)) (True) :: (Maybe Bool)
+-- to $ gFillHole ((PMeta $ PMeta $ PMeta PK)) (True) :: (Identity Bool)
+-- to $ gFillHole ((PMeta $ RS $ PMeta $ PMeta PK)) (True) :: (Maybe Bool)
 
+data Pos var result where
+    Here :: Pos var var
+    There :: AsIndex inner => GPos inner (Rep result) p -> Pos var inner -> Pos var result
 
-data Index a where
-    Unknown :: Index a
-    Constr :: GIndex (Rep a ()) -> Index a
+deriving instance Show (Pos var result)
 
-deriving instance Show (GIndex a)
-deriving instance Show (GIndex (Rep a ())) => Show (Index a)
+data Index r a where
+    Unknown :: Pos a r -> Index r a
+    Constr :: GIndex r (Rep a ()) -> Index r a
+
+deriving instance Show (GIndex r a)
+deriving instance Show (GIndex r (Rep a ())) => Show (Index r a)
 
 -- errorUnkown = error "Encountered an Unknown"
 
 class AsIndex a where
-    toIdx :: a -> Index a
-    fromIdx :: Index a -> a
-    mkUnknown :: [Index a]
+    toIdx :: a -> Index r a
+    fromIdx :: Index r a -> a
+    mkUnknown :: [Index r a]
 
-    default toIdx :: (Generic a, GAsIndex (Rep a ())) => a -> Index a
+    default toIdx :: (Generic a, GAsIndex (Rep a ())) => a -> Index r a
     toIdx = Constr . gToIdx . from
-    default fromIdx :: (Generic a, GAsIndex (Rep a ())) => Index a -> a
-    fromIdx Unknown = error "Encountered an Unknown"
+    default fromIdx :: (Generic a, GAsIndex (Rep a ())) => Index r a -> a
+    fromIdx (Unknown pos) = error "Encountered an Unknown"
     fromIdx (Constr gi) = to . gFromIdx $ gi
-    default mkUnknown :: (Generic a, GAsIndex (Rep a ())) => [Index a]
+    default mkUnknown :: (Generic a, GAsIndex (Rep a ())) => [Index r a]
     mkUnknown = fmap Constr gMkUnknown
 
 instance AsIndex Bool
 instance AsIndex a => AsIndex (Maybe a)
 
 class GAsIndex a where
-    gToIdx :: a -> GIndex a
-    gFromIdx :: GIndex a -> a
-    gMkUnknown :: [GIndex a]
+    gToIdx :: a -> GIndex r a
+    gFromIdx :: GIndex r a -> a
+    gMkUnknown :: [GIndex r a]
 
 instance GAsIndex (U1 p) where
   gToIdx _ = Unit
@@ -118,7 +124,7 @@ instance (GAsIndex (f p), GAsIndex (g p)) => GAsIndex ((f :+: g) p) where
 instance AsIndex c => GAsIndex (K1 i c p) where
   gToIdx (K1 c) = K $ toIdx c
   gFromIdx (K x) = K1 $ fromIdx x
-  gMkUnknown = [K Unknown]
+  gMkUnknown = [K (Unknown _)]
 
 instance GAsIndex (f p) => GAsIndex (M1 i c f p) where
   gToIdx (M1 fx) = M $ gToIdx fx

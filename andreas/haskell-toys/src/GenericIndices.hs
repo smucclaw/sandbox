@@ -15,7 +15,7 @@ import GHC.Generics
 import Control.Applicative
 import Data.Kind (Type)
 
-data SimpleIndex = SL SimpleIndex | SR SimpleIndex | SPair SimpleIndex SimpleIndex | SUnit
+data SimpleIndex = SL SimpleIndex | SR SimpleIndex | SPair SimpleIndex SimpleIndex | SUnit
 
 data GIndex (a :: *) where
     L    :: GIndex (a p) -> GIndex ((a :+: b) p)
@@ -40,14 +40,15 @@ gFollowPath (LP p4) f (Pair gap gbp) = (`Pair` gbp) <$> gFollowPath p4 f gap
 gFollowPath (RP p4) f (Pair gap gbp) = Pair gap <$> gFollowPath p4 f gbp
 gFollowPath Here f (Pair gap gbp) = error "Path stopped too soon"
 gFollowPath _ _ Unit = error "Path lead to Unit"
-gFollowPath p f (M gfp) = M <$> gFollowPath p f gfp
-gFollowPath p f (K ic) = K <$> followPath p f ic
+gFollowPath p f (M gfp) = M <$> gFollowPath p f gfp
+gFollowPath p f (K ic) = K <$> followPath p f ic
 -- gfollowPath
 
 data Pos
     = LP Pos
-    | RP Pos
-    | Here
+    | RP Pos
+    | Here
+  deriving Show
 
 data Index a where
     Unknown :: Pos -> Index a
@@ -62,7 +63,9 @@ class AsIndex a where
     toIdx = Constr . gToIdx . from
     fromIdx :: Index a -> a
     default fromIdx :: (Generic a, GAsIndex (Rep a ())) => Index a -> a
-    fromIdx = _
+    fromIdx (Unknown pos) = error $ "Encountered an Unknown at " ++ show pos
+    fromIdx (Constr gi) = to $ gFromIdx gi
+    fromIdx (Known a) = a
 
 class GAsIndex a where
     gToIdx :: a -> GIndex a
@@ -83,8 +86,8 @@ instance (GAsIndex (f p), GAsIndex (g p)) => GAsIndex ((f :+: g) p) where
   gFromIdx (R ib) = R1 (gFromIdx ib)
 
 instance AsIndex c => GAsIndex (K1 i c p) where
-  gToIdx (K1 c) = K $ toIdx c
-  gFromIdx (K x) = K1 $ fromIdx x
+  gToIdx (K1 c) = K $ toIdx c
+  gFromIdx (K x) = K1 $ fromIdx x
 
 instance GAsIndex (f p) => GAsIndex (M1 i c f p) where
   gToIdx (M1 fx) = M $ gToIdx fx

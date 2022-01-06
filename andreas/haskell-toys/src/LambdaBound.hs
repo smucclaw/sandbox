@@ -69,11 +69,15 @@ instance Monad Exp where
 
 data DummyShow a = DummyShow (Int -> a -> ShowS) ([a] -> ShowS) a
 
+unDummy :: DummyShow a -> a
+unDummy (DummyShow _ _ x) = x
+
 instance Show (DummyShow a) where
   showsPrec n (DummyShow sp sl a) = sp n a
---   showList (DummyShow sp sl a) = sp n a
+  showList as@[] = showString "[]" -- We don't have access to the showList function in an empty list
+  showList as@(DummyShow sp sl a:_) = sl $ fmap unDummy as
 
-data ShowRec a = ShowRec { shwPrec :: Int -> a -> ShowS}
+data ShowRec a = ShowRec { shwPrec :: Int -> a -> ShowS, shwList :: [a] -> ShowS }
 
 data SmartShow a = HasShow a => SmartShow a
 

@@ -11,7 +11,7 @@
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE DefaultSignatures #-}
 {-# LANGUAGE StandaloneDeriving #-}
-module GenericIndices2 where
+module GenericIndices3 where
 
 import GHC.Generics
 import Control.Applicative
@@ -31,22 +31,23 @@ data GIndex (a :: *) where
 
 type Type1 = Type -> Type
 
-fillHole :: GPos var root a -> var -> root a
+fillHole :: GPos var root a -> (var -> var) -> root a -> root a
 -- fillHole Here x = x
-fillHole (LS xs) x = L1 $ fillHole xs x
-fillHole (RS xs) x = R1 $ fillHole xs x
-fillHole (LP ba xs) x = fillHole xs x :*: ba
-fillHole (RP aa xs) x = aa :*: fillHole xs x
-fillHole (PMeta xs) x = M1 $ fillHole xs x
-fillHole PK x = K1 x
+fillHole (LS xs) x (L1 s) = L1 $ fillHole xs x s
+fillHole (RS xs) x (R1 s) = R1 $ fillHole xs x s
+fillHole (LP xs) x (s :*: ba) = fillHole xs x s :*: ba
+fillHole (RP xs) x (aa :*: s) = aa :*: fillHole xs x s
+fillHole (PMeta xs) x (M1 s) = M1 $ fillHole xs x s
+fillHole PK f (K1 s) = K1 (f s)
+fillHole _ x s = error "FillHole: Not matching constructors"
 
 data GPos var result p where
     -- Here :: GPos Done var var p
     -- There :: GPos (x : xs) a b
     LS :: GPos var a p -> GPos var (a :+: b) p
     RS :: GPos var b p -> GPos var (a :+: b) p
-    LP :: b p -> GPos var a p -> GPos var (a :*: b) p
-    RP :: a p -> GPos var b p -> GPos var (a :*: b) p
+    LP :: GPos var a p -> GPos var (a :*: b) p
+    RP :: GPos var b p -> GPos var (a :*: b) p
     PMeta :: GPos var a p -> GPos var (M1 i c a) p
     PK :: GPos c (K1 i c) p -- This is the hole
 
@@ -55,15 +56,13 @@ data GPos var result p where
     -- LP :: GPos root (a p) -> GPos (SumL (b p) : xs) root ((a :+: b) p)
     -- RP :: GPos root (b p) -> GPos (SumR (b p) : xs) root ((a :+: b) p)
 
--- deriving instance (Show (GPos var a p)) => Show (GPos var (M1 i c a) p)
-
 data Pos var result where
     Here' :: Pos var var
     There' :: Generic inner => GPos inner (Rep result) p -> Pos var inner -> Pos var result
 
-fillHole' :: (Generic root, Generic var) => Pos var root -> var -> root
-fillHole' Here' x = x
-fillHole' (There' p ps) x = to $ fillHole p $ fillHole' ps x
+fillHole' :: (Generic root, Generic var) => Pos var root -> var -> root -> root
+fillHole' Here' x _ = x
+fillHole' (There' p ps) x root = to $ fillHole p (fillHole' ps x) $ from root
 
 -- to $ fillHole ((PMeta $ PMeta $ PMeta PK)) (True) :: (Identity Bool)
 -- to $ fillHole ((PMeta $ RS $ PMeta $ PMeta PK)) (True) :: (Maybe Bool)
@@ -78,21 +77,10 @@ deriving instance Show (GIndex (Rep a ())) => Show (Index a)
 
 -- errorUnkown = error "Encountered an Unknown"
 
-data SomePos r = forall a. (AsIndex a, Generic a) => SomePos (Pos a r)
-
-data SomeGPos r p = forall a. (AsIndex a, Generic a) => SomeGPos (GPos a r p)
-
-wrapSomePos :: SomeGPos (Rep r) p -> SomePos r
-wrapSomePos (SomeGPos p) = SomePos (There' p Here')
-
-mapSomeGPos :: (forall a. GPos a r p -> GPos a r' p') -> SomeGPos r p -> SomeGPos r' p'
-mapSomeGPos f (SomeGPos p) = SomeGPos (f p)
-
 class AsIndex a where
     toIdx :: a -> Index a
     fromIdx :: Index a -> a
     mkUnknown :: [Index a]
-    mkHoles :: a -> [SomePos a]
 
     default toIdx :: (Generic a, GAsIndex (Rep a ())) => a -> Index a
     toIdx = Constr . gToIdx . from
@@ -101,42 +89,14 @@ class AsIndex a where
     fromIdx (Constr gi) = to . gFromIdx $ gi
     default mkUnknown :: (Generic a, GAsIndex (Rep a ())) => [Index a]
     mkUnknown = fmap Constr gMkUnknown
-    default mkHoles :: (Generic a, GAsPos (Rep a)) => a -> [SomePos a]
-    mkHoles = fmap wrapSomePos . gMkHoles . from
 
 instance AsIndex Bool
-instance (AsIndex a, Generic a) => AsIndex (Maybe a)
-instance (AsIndex a, Generic a) => AsIndex ([] a)
-
-class GAsIndex (a ()) => GAsPos a where
-  gMkHoles :: a () -> [SomeGPos a ()]
-
-mmap :: (forall a. GPos a r p -> GPos a r' p') -> [SomeGPos r p] -> [SomeGPos r' p']
-mmap f = fmap $ mapSomeGPos f
-
-instance GAsPos U1 where
-  gMkHoles _ = []
-
-instance (GAsPos f , GAsPos g) => GAsPos (f :*: g) where
-  -- gMkHoles (fx :*: gx) = _ (gMkHoles fx)
-  gMkHoles (fx :*: gx) = mmap (LP gx) (gMkHoles fx) <|> mmap (RP fx) (gMkHoles gx)
-
-instance (GAsPos f, GAsPos g) => GAsPos (f :+: g) where
-  gMkHoles (L1 x) = mmap LS (gMkHoles x)
-  gMkHoles (R1 x) = mmap RS (gMkHoles x)
-
-instance (AsIndex c, Generic c) => GAsPos (K1 i c) where
-  gMkHoles (K1 x) = [SomeGPos PK]
-
-instance GAsPos f => GAsPos (M1 i c f) where
-  gMkHoles (M1 x) = mmap PMeta (gMkHoles x)
-
+instance AsIndex a => AsIndex (Maybe a)
 
 class GAsIndex a where
     gToIdx :: a -> GIndex a
     gFromIdx :: GIndex a -> a
     gMkUnknown :: [GIndex a]
-    -- gMkHoles :: (a ~ k p) => a -> [SomeGPos k p]
 
 instance GAsIndex (U1 p) where
   gToIdx _ = Unit

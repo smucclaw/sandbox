@@ -40,34 +40,50 @@ data HoledType
     | SumR' Type1 HoledType
     | ProdL HoledType Type1
     | ProdR Type1 HoledType
-    | Done
+    | KH
+    -- | Done
 
 type family FillHole (h :: HoledType) (t :: Type1) where
     FillHole (SumL' xs b) t = FillHole xs t :+: b
     FillHole (SumR' a xs) t = a :+: FillHole xs t
     FillHole (ProdL xs b) t = FillHole xs t :*: b
     FillHole (ProdR a xs) t = a :+: FillHole xs t
-    FillHole  Done        t = t
+    -- FillHole  Done        t = t
 
-fillHole :: Pos path var root a -> var a -> root a
-fillHole Here x = x
+fillHole :: GPos path var root a -> var -> root a
+-- fillHole Here x = x
 fillHole (LS xs) x = L1 $ fillHole xs x
 fillHole (RS xs) x = R1 $ fillHole xs x
 fillHole (LP ba xs) x = fillHole xs x :*: ba
 fillHole (RP aa xs) x = aa :*: fillHole xs x
+fillHole (PMeta xs) x = M1 $ fillHole xs x
+fillHole PK x = K1 x
 
-data Pos (path :: HoledType) var result p where
-    Here :: Pos Done var var p
-    -- There :: Pos (x : xs) a b
-    LS :: Pos xs var a p -> Pos (SumL' xs b) var (a :+: b) p
-    RS :: Pos xs var b p -> Pos (SumR' b xs) var (a :+: b) p
-    LP :: b p -> Pos xs var a p -> Pos (ProdL xs b) var (a :*: b) p
-    RP :: a p -> Pos xs var b p -> Pos (ProdR b xs) var (a :*: b) p
+data GPos (path :: HoledType) var result p where
+    -- Here :: GPos Done var var p
+    -- There :: GPos (x : xs) a b
+    LS :: GPos xs var a p -> GPos (SumL' xs b) var (a :+: b) p
+    RS :: GPos xs var b p -> GPos (SumR' b xs) var (a :+: b) p
+    LP :: b p -> GPos xs var a p -> GPos (ProdL xs b) var (a :*: b) p
+    RP :: a p -> GPos xs var b p -> GPos (ProdR b xs) var (a :*: b) p
+    PMeta :: GPos xs var a p -> GPos xs var (M1 i c a) p
+    PK :: GPos KH c (K1 i c) p -- This is the hole
 
-    -- Here :: Pos '[] root root
-    -- -- There :: Pos (x : xs) a b
-    -- LP :: Pos xs root (a p) -> Pos (SumL (b p) : xs) root ((a :+: b) p)
-    -- RP :: Pos xs root (b p) -> Pos (SumR (b p) : xs) root ((a :+: b) p)
+    -- Here :: GPos '[] root root
+    -- -- There :: GPos (x : xs) a b
+    -- LP :: GPos xs root (a p) -> GPos (SumL (b p) : xs) root ((a :+: b) p)
+    -- RP :: GPos xs root (b p) -> GPos (SumR (b p) : xs) root ((a :+: b) p)
+
+data Pos (path :: [HoledType]) var result where
+    Here' :: Pos '[] var var
+    There' :: Generic inner => GPos x inner (Rep result) p -> Pos xs var inner -> Pos (x ': xs) var result
+
+fillHole' :: (Generic root, Generic var) => Pos path var root -> var -> root
+fillHole' Here' x = x
+fillHole' (There' p ps) x = to $ fillHole p $ fillHole' ps x
+
+-- to $ fillHole ((PMeta $ PMeta $ PMeta PK)) (True) :: (Identity Bool)
+-- to $ fillHole ((PMeta $ RS $ PMeta $ PMeta PK)) (True) :: (Maybe Bool)
 
 
 data Index a where

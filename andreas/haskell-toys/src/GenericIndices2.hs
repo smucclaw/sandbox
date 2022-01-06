@@ -9,6 +9,8 @@
 -- {-# LANGUAGE KindSignatures #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE DefaultSignatures #-}
+{-# LANGUAGE StandaloneDeriving #-}
 module GenericIndices3 where
 
 import GHC.Generics
@@ -67,36 +69,57 @@ fillHole' (There' p ps) x = to $ fillHole p $ fillHole' ps x
 
 data Index a where
     Unknown :: Index a
-    Constr :: GIndex (Rep a x) -> Index a
+    Constr :: GIndex (Rep a ()) -> Index a
+
+deriving instance Show (GIndex a)
+deriving instance Show (GIndex (Rep a ())) => Show (Index a)
 
 -- errorUnkown = error "Encountered an Unknown"
 
 class AsIndex a where
     toIdx :: a -> Index a
     fromIdx :: Index a -> a
+    mkUnknown :: [Index a]
+
+    default toIdx :: (Generic a, GAsIndex (Rep a ())) => a -> Index a
+    toIdx = Constr . gToIdx . from
+    default fromIdx :: (Generic a, GAsIndex (Rep a ())) => Index a -> a
+    fromIdx Unknown = error "Encountered an Unknown"
+    fromIdx (Constr gi) = to . gFromIdx $ gi
+    default mkUnknown :: (Generic a, GAsIndex (Rep a ())) => [Index a]
+    mkUnknown = fmap Constr gMkUnknown
+
+instance AsIndex Bool
+instance AsIndex a => AsIndex (Maybe a)
 
 class GAsIndex a where
     gToIdx :: a -> GIndex a
     gFromIdx :: GIndex a -> a
+    gMkUnknown :: [GIndex a]
 
 instance GAsIndex (U1 p) where
   gToIdx _ = Unit
   gFromIdx Unit = U1
---   gFromIdx Unknown = errorUnkown
+  gMkUnknown = [Unit]
+
 instance (GAsIndex (f p), GAsIndex (g p)) => GAsIndex ((f :*: g) p) where
   gToIdx (fx :*: gx) = Pair (gToIdx fx) (gToIdx gx)
   gFromIdx (Pair ia ib) = gFromIdx ia :*: gFromIdx ib
---   gFromIdx Unknown = errorUnkown
+  gMkUnknown = Pair <$> gMkUnknown <*> gMkUnknown
+
 instance (GAsIndex (f p), GAsIndex (g p)) => GAsIndex ((f :+: g) p) where
   gToIdx (L1 fx) = L (gToIdx fx)
   gToIdx (R1 gx) = R (gToIdx gx)
   gFromIdx (L ia) = L1 (gFromIdx ia)
   gFromIdx (R ib) = R1 (gFromIdx ib)
+  gMkUnknown = L <$> gMkUnknown <|> R <$> gMkUnknown
 
 instance AsIndex c => GAsIndex (K1 i c p) where
   gToIdx (K1 c) = K $ toIdx c
   gFromIdx (K x) = K1 $ fromIdx x
+  gMkUnknown = [K Unknown]
 
 instance GAsIndex (f p) => GAsIndex (M1 i c f p) where
   gToIdx (M1 fx) = M $ gToIdx fx
   gFromIdx (M gf) = M1 $ gFromIdx gf
+  gMkUnknown = M <$> gMkUnknown

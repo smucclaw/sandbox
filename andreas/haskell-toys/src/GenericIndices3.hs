@@ -103,6 +103,8 @@ class AsIndex a where
     -- mkUnknown :: Pos a r -> [Index r a]
     mkUnknown :: (forall a0. AsIndex a0 => Pos a0 a -> Pos a0 r) -> [Index r a]
 
+    completeIdx :: Index r a -> Index r a
+
     default toIdx :: (Generic a, GAsIndex (Rep a)) => a -> Index r a
     toIdx = Constr . gToIdx . from
     default fromIdx :: (Generic a, GAsIndex (Rep a), Typeable r) => Index r a -> a
@@ -112,6 +114,9 @@ class AsIndex a where
     -- mkUnknown = fmap Constr . gMkUnknown . _
     default mkUnknown :: (Generic a, GAsIndex (Rep a)) => (forall a0. AsIndex a0 => Pos a0 a -> Pos a0 r) -> [Index r a]
     mkUnknown f = Constr <$> gMkUnknown (\x -> f . (:>) x)
+    default completeIdx :: (GAsIndex (Rep a)) => Index r a -> Index r a
+    completeIdx (Unknown x) = completeIdx $ head $ mkUnknown (`appendPos` x)
+    completeIdx (Constr gi) = Constr $ gCompleteIdx gi
 
 mkUnknownHere :: AsIndex r => [Index r r]
 mkUnknownHere = mkUnknown id
@@ -204,6 +209,37 @@ runAll f = runAll' f (Unknown Here)
 
 -}
 
+data Stream a = Empty | Cons a (IO (Stream a))
+data IOTree a = IOTree [IO (IOTree a)] | Leaf a | EmptyTree
+
+invertFunction :: (AsIndex a, Typeable a, Eq b) => (a -> b) -> b -> IO (IOTree (a, Bool))
+invertFunction f y = invertFunction' f y (Unknown Here)
+
+invertFunction' :: (AsIndex a, Typeable a, Eq b) => (a -> b) -> b -> Index' a -> IO (IOTree (a, Bool))
+invertFunction' f y i = do
+  let getValue x = do
+        let ans = f x
+        evaluate (ans == y)
+        return (ans == y)
+  res <- tryOnIndex getValue i
+  case res of
+    Left i' -> do
+      -- putStrLn "..."
+      pure $ IOTree $ fmap (invertFunction' f y) i'
+    Right x -> return $ Leaf (fromIdx $ completeIdx i, x)
+
+printIOTree :: Show a => IOTree a -> IO ()
+printIOTree = printIOTree' id
+printIOTree' :: Show a => ShowS -> IOTree a -> IO ()
+printIOTree' p (Leaf a) = putStrLn $ p $ show a
+printIOTree' p (IOTree xs) = do
+  -- putStrLn $ p "-"
+  putStrLn $ p ""
+  mapM_ (printIOTree' (p . showString "| ") =<<) xs
+  -- putStrLn $ p "-"
+  putStrLn $ p ""
+printIOTree' p EmptyTree = return ()
+
 instance AsIndex Bool
 instance AsIndex a => AsIndex (Maybe a)
 instance AsIndex a => AsIndex [a]
@@ -212,16 +248,19 @@ class GAsIndex a where
     gToIdx :: a p -> GIndex r a
     gFromIdx :: Typeable r => GIndex r a -> a p
     gMkUnknown :: (forall a0 a1. (AsIndex a0, AsIndex a1) => GPos a1 a p -> Pos a0 a1 -> Pos a0 r) -> [GIndex r a]
+    gCompleteIdx ::  GIndex r a -> GIndex r a
 
 instance GAsIndex U1 where
   gToIdx _ = Unit
   gFromIdx Unit = U1
   gMkUnknown _ = [Unit]
+  gCompleteIdx Unit = Unit
 
 instance (GAsIndex f, GAsIndex g) => GAsIndex (f :*: g) where
   gToIdx (fx :*: gx) = Pair (gToIdx fx) (gToIdx gx)
   gFromIdx (Pair ia ib) = gFromIdx ia :*: gFromIdx ib
   gMkUnknown f = Pair <$> gMkUnknown (f . LP) <*> gMkUnknown (f . RP)
+  gCompleteIdx (Pair ia ib) = Pair (gCompleteIdx ia) (gCompleteIdx ib)
 
 instance (GAsIndex f, GAsIndex g) => GAsIndex (f :+: g) where
   gToIdx (L1 fx) = L (gToIdx fx)
@@ -229,14 +268,17 @@ instance (GAsIndex f, GAsIndex g) => GAsIndex (f :+: g) where
   gFromIdx (L ia) = L1 (gFromIdx ia)
   gFromIdx (R ib) = R1 (gFromIdx ib)
   gMkUnknown f = L <$> gMkUnknown (f . LS) <|> R <$> gMkUnknown (f . RS)
+  gCompleteIdx (L ia) = L (gCompleteIdx ia)
+  gCompleteIdx (R ib) = R (gCompleteIdx ib)
 
 instance AsIndex c => GAsIndex (K1 i c) where
   gToIdx (K1 c) = K $ toIdx c
   gFromIdx (K x) = K1 $ fromIdx x
   gMkUnknown f = [K (Unknown (f PK Here))]
-
+  gCompleteIdx (K x) = K (completeIdx x)
 
 instance GAsIndex f => GAsIndex (M1 i c f) where
   gToIdx (M1 fx) = M $ gToIdx fx
   gFromIdx (M gf) = M1 $ gFromIdx gf
   gMkUnknown f = M <$> gMkUnknown (f . PMeta)
+  gCompleteIdx (M gf) = M (gCompleteIdx gf)

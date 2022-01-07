@@ -1,89 +1,69 @@
-(ns financial-advisor
-  (:require [clara.rules :as c :refer [defrule defquery defsession]]))
+(ns clarafa
+  (:require [clara.rules :as c]))
 
-;; (T -> Boolean) decls are modelled as records with single field of type T
-(defrecord SavingsAccount [*]) ;; FinancialStatus
-(defrecord Income [*]) ;; FinancialStatus
-(defrecord Earnings [* **]) ;; Integer, EarningsStatus
-(defrecord Investment [*]) ;; InvestmentStrategy
-(defrecord AmountSaved [*]) ;; Integer
-(defrecord Dependents [*]) ;; Integer
+(defrecord SavingsAccount [arg0 arg1 arg2])
+(defrecord Investment [arg0 arg1 arg2])
+(defrecord Income [arg0 arg1 arg2])
+(defrecord AmountSaved [arg0 arg1 arg2])
+(defrecord Dependents [arg0 arg1 arg2])
 
-;; (T -> Integer) decls are modelled as functions
 (defn minsavings [x]
   (* 5000 x))
 (defn minincome [x]
   (+ 15000 (* 4000 x)))
 
-;; General rules
-;; 1
-(defrule accInad
-  [SavingsAccount (= * :inadequate)]
+(c/defrule r1
+  [SavingsAccount (= arg0 ?j) (= arg1 ?p)
+   (= arg2 "inadequate")]
   =>
-  (c/insert! (->Investment :savings)))
+  (c/insert! (->Investment #:just-r1{:pri0 ?j :arg0 ?p} ?p "savings")))
 
-;; 2
-(defrule accAdIncAd
-  [SavingsAccount (= * :adequate)]
-  [Income (= * :adequate)]
+(c/defrule r2
+  [SavingsAccount (= arg0 ?j0) (= arg1 ?p) (= arg2 "adequate")]
+  [Income (= arg0 ?j1) (= arg1 ?p) (= arg2 "adequate")]
   =>
-  (c/insert! (->Investment :stocks)))
+  (c/insert! (->Investment #:just-r2{:pri0 ?j0 :pri1 ?j1 :arg0 ?p} ?p "stocks")))
 
-;; 3
-(defrule accAdIncInad
-  [SavingsAccount (= * :adequate)]
-  [Income (= * :inadequate)]
+(c/defrule r3
+  [SavingsAccount (= arg0 ?j0) (= arg1 ?p) (= arg2 "adequate")]
+  [Income (= arg0 ?j1) (= arg1 ?p) (= arg2 "inadequate")]
   =>
-  (c/insert! (->Investment :combination)))
+  (c/insert! (->Investment #:just-r3{:pri0 ?j0 :pri1 ?j1 :arg0 ?p} ?p "combination")))
 
-;; 4
-(defrule savingsAd
-  [AmountSaved (= ?x *)]
-  [Dependents (= ?y *)]
+(c/defrule r4
+  [AmountSaved (= arg0 ?j0) (= arg1 ?p) (= arg2 ?x)]
+  [Dependents (= arg0 ?j1) (= arg1 ?p) (= arg2 ?y)]
   [:test (> ?x (minsavings ?y))]
   =>
-  (c/insert! (->SavingsAccount :adequate)))
+  (c/insert! (->SavingsAccount
+              #:just-r4{:pri0 ?j0
+                        :pri1 ?j1
+                        :arg0 ?p
+                        :arg1 ?x
+                        :arg2 ?y}
+              ?p "adequate")))
 
-;; 5
-(defrule savingsInad
-  [AmountSaved (= ?x *)]
-  [Dependents (= ?y *)]
-  [:test (<= ?x (minsavings ?y))]
-  =>
-  (c/insert! (->SavingsAccount :inadequate)))
+(c/defquery result
+  []
+  [?investment <- Investment])
 
-;; 6
-(defrule incomeAd
-  [Earnings (= ?x *) (= ** :steady)]
-  [Dependents (= ?y *)]
-  [:test (> ?x (minincome ?y))]
-  =>
-  (c/insert! (->Income :adequate)))
+(c/defsession sesh 'clarafa)
 
-;; 7
-(defrule incomeInadESteady
-  [Earnings (= ?x *) (= ** :steady)]
-  [Dependents (= ?y *)]
-  [:test (<= ?x (minincome ?y))]
-  =>
-  (c/insert! (->Income :inadequate)))
-
-;; 8
-(defrule incomeInadEUnsteady
-  [Earnings (= ?x *) (= ** :unsteady)]
-  =>
-  (c/insert! (->Income :inadequate)))
-
-;; Queries
-(defquery getResults []
-  [Income (= ?income *)]
-  [Investment (= ?investment *)])
-
-;; Facts concerning a specific case
-(-> (c/mk-session 'financial-advisor)
-            (c/insert (->AmountSaved 22000))
-            (c/insert (->Earnings 25000 :steady))
-            (c/insert (->Dependents 3))
-            (c/fire-rules)
-            (c/query getResults))
-;; => ({:?income :inadequate, :?investment :combination})
+(-> sesh
+    (c/insert (->AmountSaved "amount saved fact" "adam" 5001))
+    (c/insert (->Dependents "deps fact" "adam" 1))
+    (c/insert (->Income "income fact" "adam" "inadequate"))
+    (c/fire-rules)
+    (c/query result))
+;; => ({:?investment
+;;      {:arg0
+;;       #:just-r3{:pri0
+;;                 #:just-r4{:pri0 "amount saved fact",
+;;                           :pri1 "deps fact",
+;;                           :arg0 "adam",
+;;                           :arg1 5001,
+;;                           :arg2 1},
+;;                 :pri1 "income fact",
+;;                 :arg0 "adam"},
+;;       :arg1 "adam",
+;;       :arg2 "combination"}})

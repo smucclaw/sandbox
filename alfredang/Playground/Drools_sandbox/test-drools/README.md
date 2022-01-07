@@ -33,3 +33,14 @@ For reference: see
 - differs from parametric.drl & nonParametric.drl in how classDecls are transformed
 - On hold until we concretely know what L4 classes need to do, and correspondingly look like
 
+
+
+### SETUP
+
+You'll need to install the Eclipse IDE, and the corresponding "Red Hat CodeReady Studio" plugin from the Eclipse marketplace.
+
+
+### Running
+
+- Modify the kmodule.xml file with the approporiate module name to be executed.
+- You'll also need to modify the "query block" within the main java file (see ![here](https://docs.drools.org/7.63.0.Final/drools-docs/html_single/index.html#drl-queries-con_drl-rules))

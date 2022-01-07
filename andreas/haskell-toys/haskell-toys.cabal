@@ -33,6 +33,7 @@ library
       GenericAlternative
       GenericIndices
       GenericIndices2
+      GenericIndices3
       Hyperfunctions
       Junk.DerivingViaCoherence
       Junk.Stackoverflow66941010

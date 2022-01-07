@@ -16,6 +16,8 @@ module GenericIndices3 where
 import GHC.Generics
 import Control.Applicative
 import Data.Kind (Type)
+import Control.Exception
+import Data.Typeable
 
 
 data GIndex r (a :: * -> *) where
@@ -87,16 +89,23 @@ type Index' a = Index a a
 
 -- errorUnkown = error "Encountered an Unknown"
 
+data PartialErr r = forall a. AsIndex a => PartialCon (Pos a r)
+
+deriving instance Show (PartialErr r)
+
+instance Typeable r => Exception (PartialErr r)
+
+
 class AsIndex a where
     toIdx :: a -> Index r a
-    fromIdx :: Index r a -> a
+    fromIdx :: Typeable r => Index r a -> a
     -- mkUnknown :: Pos a r -> [Index r a]
     mkUnknown :: (forall a0. AsIndex a0 => Pos a0 a -> Pos a0 r) -> [Index r a]
 
     default toIdx :: (Generic a, GAsIndex (Rep a)) => a -> Index r a
     toIdx = Constr . gToIdx . from
-    default fromIdx :: (Generic a, GAsIndex (Rep a)) => Index r a -> a
-    fromIdx (Unknown pos) = error $ "Encountered an Unknown at " ++ show pos
+    default fromIdx :: (Generic a, GAsIndex (Rep a), Typeable r) => Index r a -> a
+    fromIdx (Unknown pos) = throw $ PartialCon pos
     fromIdx (Constr gi) = to . gFromIdx $ gi
     -- default mkUnknown :: (Generic a, GAsIndex (Rep a ())) => Pos a r -> [Index r a]
     -- mkUnknown = fmap Constr . gMkUnknown . _
@@ -106,13 +115,44 @@ class AsIndex a where
 mkUnknownHere :: AsIndex r => [Index r r]
 mkUnknownHere = mkUnknown id
 
+-- >> fmap fromIdx (mkUnknownHere :: [Index' [Bool]])
+-- [[],[*** Exception: PartialCon (PMeta (RS (PMeta (LP (PMeta PK)))) :> Here)
+-- >> fmap ((()<$) .  fromIdx)  (mkUnknownHere :: [Index' [Bool]])
+-- [[],[()*** Exception: PartialCon (PMeta (RS (PMeta (RP (PMeta PK)))) :> Here)
+-- >> fmap ((()<$) . take 1 .  fromIdx)  (mkUnknownHere :: [Index' [Bool]])
+-- [[],[()]]
+
+appendPos :: Pos a b -> Pos b c -> Pos a c
+appendPos c Here = c
+appendPos c (a :> b) = a :> appendPos c b
+
+-- expandGPos :: Pos x r -> 
+
+expandPos' :: (AsIndex x, AsIndex r) => Pos x r -> Index' r -> [Index' r]
+expandPos' p = expandPos p p
+
+expandPos :: (AsIndex r, AsIndex x) => Pos x r -> Pos x a -> Index r a -> [Index r a]
+expandPos p0 Here (Unknown _) = mkUnknown (`appendPos` p0)
+expandPos p0 (a :> b) (Constr x) = Constr <$> expandGPos (expandPos p0 b) a x
+expandPos p0 e r = error "expandPos: Incorrect location"
+
+expandGPos :: (Index r inner -> [Index r inner]) -> GPos inner a p -> GIndex r a -> [GIndex r a]
+-- expandGPos f x = _
+expandGPos f (LS xs) (L s) = L <$> expandGPos f xs s
+expandGPos f (RS xs) (R s) = R <$> expandGPos f xs s
+expandGPos f (LP xs) (s `Pair` ba) = (`Pair` ba) <$> expandGPos f xs s 
+expandGPos f (RP xs) (aa `Pair` s) = Pair aa <$> expandGPos f xs s
+expandGPos f (PMeta xs) (M s) = M <$> expandGPos f xs s
+expandGPos f PK (K s) = K <$> f s
+expandGPos f _ s = error "FillHole: Not matching constructors"
+
 instance AsIndex Bool
 instance AsIndex a => AsIndex (Maybe a)
 instance AsIndex a => AsIndex [a]
 
 class GAsIndex a where
     gToIdx :: a p -> GIndex r a
-    gFromIdx :: GIndex r a -> a p
+    gFromIdx :: Typeable r => GIndex r a -> a p
     gMkUnknown :: (forall a0 a1. (AsIndex a0, AsIndex a1) => GPos a1 a p -> Pos a0 a1 -> Pos a0 r) -> [GIndex r a]
 
 instance GAsIndex U1 where

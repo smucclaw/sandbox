@@ -4,58 +4,70 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-declare ESPred
+declare BasicPred end
+
+declare Foo extends BasicPred
+	support : ESPred @position(0)
+	arg0 : Integer @position(1)
+end
+
+declare Bar extends BasicPred
+	support : ESPred @position(0)
+	arg0 : Integer @position(1)
+end
+
+declare FooBar extends BasicPred
+	support : ESPred @position(0)
+	arg0: Integer @position(1)
+end
+
+declare ESPred 
 	name: String @position(0)
 	args: List @position(1)
 	support: List @position(2)
 end
 
-declare ESRule
+declare ESRule 
 	name: String @position(0)
-	bindings: ArrayList @position(1)
-	priors: ArrayList @position(2)
+	bindings: List @position(1)
+	priors: List @position(2)
 end
 
-rule "checking pred names"
+rule "foo > bar"
 	when 
-		$j0: ESPred($n0 := name, name == "Test Pred 1")
-		$j1: ESPred($n1 := name, name == "Test Pred 2")
+		Foo($j0 := support, $x := arg0)
+		Bar($j1 := support, $y := arg0)
+		eval($x > $y)
 	then
-		// ArrayList<Object> ps = new ArrayList<>(new Object[]({$j0, $j1}));
+		ArrayList<Object> bs = new ArrayList<>(Arrays.asList($x,$y));
 		ArrayList<Object> ps = new ArrayList<>(Arrays.asList($j0, $j1));
-		ArrayList<Object> bs = new ArrayList<>(Arrays.asList($n0, $n1));
-		insert(new ESRule("Test Rule 1", bs, ps));
+		ESRule rj = new ESRule("foo > bar", bs, ps);
+		ArrayList<Object> as = new ArrayList<>(Arrays.asList($x + $y));
+		ArrayList<Object> sp = new ArrayList<>(Arrays.asList(rj));
+		ESPred pj = new ESPred("FooBar", as, sp);
+		insert(new FooBar(pj, $x + $y));
 end
-
-rule "checking pred args"
-	when
-		$j0: ESPred($n0 := name, $a0 := args, name == "Test Pred 1")
-		contains($a0, "hello world")
-	then
-		System.out.println("Rule fires");
-end
-
 
 rule "fact1"
 	when
 	then
-		ArrayList<Object> as = new ArrayList<>(Arrays.asList("hello world"));
-		ArrayList<Object> sp = new ArrayList<>(Arrays.asList("fact1"));
-		insert(new ESPred("Test Pred 1", as, sp));
-		// insert(new ESPred("Test Pred 1", (List<Object>)Arrays.asList("hello world"), sp));
+		ESRule rj = new ESRule("fact1", null, null);
+		ArrayList<Object> as = new ArrayList<>(Arrays.asList(10)); // <-- hard coded
+		ArrayList<Object> sp = new ArrayList<>(Arrays.asList(rj));
+		ESPred pj = new ESPred("Foo", as, sp);
+		insert(new Foo(pj, 10));
 end
 
 rule "fact2"
 	when
 	then
-		ArrayList<Object> as = new ArrayList<>(Arrays.asList("goodbye sanity"));
-		ArrayList<Object> sp = new ArrayList<>(Arrays.asList("fact2"));
-		insert(new ESPred("Test Pred 2", as, sp));
+		ESRule rj = new ESRule("fact2", null, null);
+		ArrayList<Object> as = new ArrayList<>(Arrays.asList(2));	// <-- hard coded
+		ArrayList<Object> sp = new ArrayList<>(Arrays.asList(rj));
+		ESPred pj = new ESPred("Bar", as, sp);
+		insert(new Bar(pj, 2));
 end
 
-function contains(ArrayList<Object> $a, Object $o)
-	return $a.contains($o);
-
 query "rule trace"
-	$rule : ESRule()
+	$rule : BasicPred()
 end

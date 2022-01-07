@@ -1,0 +1,48 @@
+package com.sample.marriage
+
+declare Justification end
+
+declare Fact extends Justification end
+
+declare Married
+    // arg0: Justification @position(0)
+    arg1: String @position(0)
+    arg2: String @position(1)
+end
+
+
+rule "janejohnMarried"
+    when
+    then
+        // insert(new Married(new Fact(), "Jane", "John"));
+        insert(new Married("Jane", "John"));
+end
+
+rule "mutualMarried"
+    // no-loop true
+    when
+        Married($p1 := arg1, $p2 := arg2)
+        // Married($j0 := arg0, $p1 := arg1, $p2 := arg2)
+        not(Married(arg1 == $p2, arg2 == $p1))
+    then 
+        System.out.println("mutually married");
+        // insertLogical(new Married(new Justification(), $p2, $p1));
+        // insertLogical(new Married($p2, $p1));
+        insert(new Married($p2, $p1));
+        // insert(new Married(new Justification(), $p2, $p1));
+end
+
+declare JustificationMutualMarried 
+    prior0: Justification @position(0)
+    arg0: String @position(1)
+    arg1: String @position(2)
+end
+
+
+// rule "isWidow"
+//     when
+//         Married($j0 := arg0, $p1 := arg1, $p2 := arg2)
+//         IsDead($j1 := arg0, $p2 := arg1)
+//     then
+//         insertLogical(new IsWidow(new JustificationIsWidow($j0, $j1, $p1, $p2), $p1));
+// end

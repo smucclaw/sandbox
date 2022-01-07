@@ -1,0 +1,47 @@
+Investment(
+ justification=OneTrace(
+  prior=TwoTrace(
+    priorOne=EmptyTrace(factName=dependentsF ), 
+    priorTwo=EmptyTrace(factName=amountSavedF ), 
+    ruleName=savingsInad ),
+  ruleName=accInad ), 
+strategy=savings )
+
+
+
+
+
+The rules fired are:
+Investment(
+  arg0=JustificationAccAdIncAd( 
+    priorOne=JustificationSavingsAd( 
+      priorOne=Fact(  ), 
+      priorTwo=Fact(  ), 
+      argOne=Adam, 
+      argTwo=22000, 
+      argThree=2 ), 
+    priorTwo=JustificationIncomeAd( 
+      priorOne=Fact(  ), 
+      priorTwo=Fact(  ), 
+      argOne=Adam, 
+      argTwo=25000, 
+      argThree=2 ), 
+    argOne=Adam ), 
+  arg1=Adam, 
+  arg2=stocks )
+
+Investment( 
+  arg0=JustificationAccAdIncInad( 
+    priorOne=JustificationSavingsAd( 
+      priorOne=Fact(  ), 
+      priorTwo=Fact(  ), 
+      argOne=Eve, 
+      argTwo=15000, 
+      argThree=2 ), 
+    priorTwo=JustificationIncomeInadEUnsteady( 
+      priorOne=Fact(  ), 
+      argOne=Eve, 
+      argTwo=30000 ), 
+    argOne=Eve ), 
+  arg1=Eve, 
+  arg2=combination )

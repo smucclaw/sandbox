@@ -70,7 +70,9 @@ fillHole' (There' p ps) x root = to $ gFillHole p (fillHole' ps x) $ from root
 
 data Pos var result where
     Here :: Pos var var
-    There :: AsIndex inner => GPos inner (Rep result) p -> Pos var inner -> Pos var result
+    (:>) :: AsIndex inner => GPos inner (Rep result) p -> Pos var inner -> Pos var result
+
+infixr 6 :>
 
 deriving instance Show (Pos var result)
 
@@ -94,18 +96,19 @@ class AsIndex a where
     default toIdx :: (Generic a, GAsIndex (Rep a)) => a -> Index r a
     toIdx = Constr . gToIdx . from
     default fromIdx :: (Generic a, GAsIndex (Rep a)) => Index r a -> a
-    fromIdx (Unknown pos) = error "Encountered an Unknown"
+    fromIdx (Unknown pos) = error $ "Encountered an Unknown at " ++ show pos
     fromIdx (Constr gi) = to . gFromIdx $ gi
     -- default mkUnknown :: (Generic a, GAsIndex (Rep a ())) => Pos a r -> [Index r a]
     -- mkUnknown = fmap Constr . gMkUnknown . _
     default mkUnknown :: (Generic a, GAsIndex (Rep a)) => (forall a0. AsIndex a0 => Pos a0 a -> Pos a0 r) -> [Index r a]
-    mkUnknown f = Constr <$> gMkUnknown (\x -> f . There x)
+    mkUnknown f = Constr <$> gMkUnknown (\x -> f . (:>) x)
 
 mkUnknownHere :: AsIndex r => [Index r r]
 mkUnknownHere = mkUnknown id
 
 instance AsIndex Bool
 instance AsIndex a => AsIndex (Maybe a)
+instance AsIndex a => AsIndex [a]
 
 class GAsIndex a where
     gToIdx :: a p -> GIndex r a

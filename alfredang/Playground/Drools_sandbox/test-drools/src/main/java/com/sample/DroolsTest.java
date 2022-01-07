@@ -40,7 +40,7 @@ public class DroolsTest {
             kSession.fireAllRules();
 
             KieBase kbase = kContainer.getKieBase("rules");
-            FactType traceType = kbase.getFactType("com.sample.multiTypedArgs", "ESRule");
+            FactType traceType = kbase.getFactType("com.sample.multiTypedArgs", "BasicPred");
             Class<?> traceClass = traceType.getFactClass();
 
             QueryResults results = kSession.getQueryResults("rule trace");

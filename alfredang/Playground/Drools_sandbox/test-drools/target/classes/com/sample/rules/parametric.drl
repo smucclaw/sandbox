@@ -31,6 +31,20 @@ declare Earnings
   arg3: String @position(3)
 end
 
+declare Earnings
+  support : ESRule @position(0)
+  arg0: String @position(1)
+  arg1: Integer @position(2)
+  arg2: String @position(3)
+end
+
+declare JustificationEarningsAd 
+  priors: List<ESPred> @position(0)
+  args: List @position(1)
+end
+
+
+
 declare Investment
   arg0: Justification @position(0)
   arg1: String @position(1)

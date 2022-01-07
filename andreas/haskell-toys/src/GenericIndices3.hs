@@ -81,6 +81,8 @@ data Index r a where
 deriving instance Show (GIndex r a)
 deriving instance Show (GIndex r (Rep a)) => Show (Index r a)
 
+type Index' a = Index a a
+
 -- errorUnkown = error "Encountered an Unknown"
 
 class AsIndex a where
@@ -97,7 +99,10 @@ class AsIndex a where
     -- default mkUnknown :: (Generic a, GAsIndex (Rep a ())) => Pos a r -> [Index r a]
     -- mkUnknown = fmap Constr . gMkUnknown . _
     default mkUnknown :: (Generic a, GAsIndex (Rep a)) => (forall a0. AsIndex a0 => Pos a0 a -> Pos a0 r) -> [Index r a]
-    mkUnknown f = Constr <$> gMkUnknown (f . (`There` Here))
+    mkUnknown f = Constr <$> gMkUnknown (\x -> f . There x)
+
+mkUnknownHere :: AsIndex r => [Index r r]
+mkUnknownHere = mkUnknown id
 
 instance AsIndex Bool
 instance AsIndex a => AsIndex (Maybe a)
@@ -105,7 +110,7 @@ instance AsIndex a => AsIndex (Maybe a)
 class GAsIndex a where
     gToIdx :: a p -> GIndex r a
     gFromIdx :: GIndex r a -> a p
-    gMkUnknown :: (forall a0. AsIndex a0 => GPos a0 a p -> Pos a0 r) -> [GIndex r a]
+    gMkUnknown :: (forall a0 a1. (AsIndex a0, AsIndex a1) => GPos a1 a p -> Pos a0 a1 -> Pos a0 r) -> [GIndex r a]
 
 instance GAsIndex U1 where
   gToIdx _ = Unit
@@ -127,7 +132,7 @@ instance (GAsIndex f, GAsIndex g) => GAsIndex (f :+: g) where
 instance AsIndex c => GAsIndex (K1 i c) where
   gToIdx (K1 c) = K $ toIdx c
   gFromIdx (K x) = K1 $ fromIdx x
-  gMkUnknown f = [K (Unknown (f PK))]
+  gMkUnknown f = [K (Unknown (f PK Here))]
 
 
 instance GAsIndex f => GAsIndex (M1 i c f) where

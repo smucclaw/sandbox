@@ -18,8 +18,9 @@ import Control.Applicative
 import Data.Kind (Type)
 import Control.Exception
 import Data.Typeable
+import Data.Bifunctor (first)
 
-
+-- | A representation of a data structure based on its GHC.Generics representation.
 data GIndex r (a :: * -> *) where
     L    :: GIndex r a -> GIndex r (a :+: b)
     R    :: GIndex r b -> GIndex r (a :+: b)
@@ -128,9 +129,13 @@ appendPos c (a :> b) = a :> appendPos c b
 
 -- expandGPos :: Pos x r -> 
 
+expandPos'' :: (AsIndex r) => Index' r -> PartialErr r -> [Index' r]
+expandPos'' i (PartialCon pos) = expandPos' pos i
+
 expandPos' :: (AsIndex x, AsIndex r) => Pos x r -> Index' r -> [Index' r]
 expandPos' p = expandPos p p
 
+-- | Expand the unknown at the given position into more deeper unknowns
 expandPos :: (AsIndex r, AsIndex x) => Pos x r -> Pos x a -> Index r a -> [Index r a]
 expandPos p0 Here (Unknown _) = mkUnknown (`appendPos` p0)
 expandPos p0 (a :> b) (Constr x) = Constr <$> expandGPos (expandPos p0 b) a x
@@ -140,11 +145,64 @@ expandGPos :: (Index r inner -> [Index r inner]) -> GPos inner a p -> GIndex r a
 -- expandGPos f x = _
 expandGPos f (LS xs) (L s) = L <$> expandGPos f xs s
 expandGPos f (RS xs) (R s) = R <$> expandGPos f xs s
-expandGPos f (LP xs) (s `Pair` ba) = (`Pair` ba) <$> expandGPos f xs s 
+expandGPos f (LP xs) (s `Pair` ba) = (`Pair` ba) <$> expandGPos f xs s
 expandGPos f (RP xs) (aa `Pair` s) = Pair aa <$> expandGPos f xs s
 expandGPos f (PMeta xs) (M s) = M <$> expandGPos f xs s
 expandGPos f PK (K s) = K <$> f s
-expandGPos f _ s = error "FillHole: Not matching constructors"
+expandGPos f _ s = error "expandGPos: Non-matching constructors"
+
+-- tryOnIndex :: (AsIndex a, Typeable a) => (a -> IO b) -> Index' a -> IO (Either (PartialErr a) b)
+-- tryOnIndex f i = try $ f $ fromIdx i
+tryOnIndex :: (AsIndex a, Typeable a) => (a -> IO b) -> Index' a -> IO (Either [Index' a] b)
+tryOnIndex f i = fmap (first (expandPos'' i)) . try $ f $ fromIdx i
+
+-- | Run a function on an unknown value and only specify it as much as needed to prevent it from crashing
+runAll :: (AsIndex a, Typeable a) => (a -> IO b) -> IO [b]
+runAll f = runAll' f (Unknown Here)
+  where
+    runAll' :: (AsIndex a, Typeable a) => (a -> IO b) -> Index' a -> IO [b]
+    runAll' f i = do
+        -- print i
+        res <- tryOnIndex f i
+        case res of
+            Left i' -> do
+              putStrLn "..."
+              fmap concat $ runAll' f `mapM` i'
+            Right b -> return [b]
+
+-- [_,Left ps] <- tryOnIndex print `mapM` (mkUnknownHere :: [Index' [Bool]])
+-- map (head.fromIdx) $ (\(PartialCon p0) -> expandPos' p0 (mkUnknownHere !! 1 :: Index' [Bool])) ps
+-- [False,True]
+
+{-
+
+> runAll (print . take 2 :: [Bool] -> IO ())
+...
+[]
+[...
+[False...
+[False]
+[False,...
+[False,False]
+[False,True]
+[True...
+[True]
+[True,...
+[True,False]
+[True,True]
+[(),(),(),(),(),(),()]
+
+> runAll (print . (()<$) . take 3 :: [Bool] -> IO ())
+...
+[]
+[()...
+[()]
+[(),()...
+[(),()]
+[(),(),()]
+[(),(),(),()]
+
+-}
 
 instance AsIndex Bool
 instance AsIndex a => AsIndex (Maybe a)

@@ -240,6 +240,48 @@ printIOTree' p (IOTree xs) = do
   putStrLn $ p ""
 printIOTree' p EmptyTree = return ()
 
+{-
+
+> printIOTree =<< invertFunction (show :: [Maybe Bool] -> String) "[Nothing,Just False]"
+
+| ([],False)
+| 
+| | 
+| | | ([Nothing],False)
+| | | 
+| | | | ([Nothing,Nothing],False)
+| | | | 
+| | | | | 
+| | | | | | ([Nothing,Just False],True)
+| | | | | | ([Nothing,Just False,Nothing],False)
+| | | | | 
+| | | | | ([Nothing,Just True],False)
+| | | | 
+| | | 
+| | 
+| | ([Just False],False)
+|
+
+> printIOTree =<< invertFunction (show :: [Maybe [Bool]] -> String) "[Nothing,Just False]"
+| ([],False)
+| 
+| | 
+| | | ([Nothing],False)
+| | | 
+| | | | ([Nothing,Nothing],False)
+| | | | 
+| | | | | ([Nothing,Just []],False)
+| | | | | ([Nothing,Just [False]],False)
+| | | | 
+| | | 
+| | 
+| | ([Just []],False)
+| 
+
+
+-}
+
+
 instance AsIndex Bool
 instance AsIndex a => AsIndex (Maybe a)
 instance AsIndex a => AsIndex [a]

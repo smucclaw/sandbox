@@ -4,7 +4,7 @@ concrete BareRGEng of BareRG =
     Temp, Pol, NP, Tense,
     S, ExistS, ExistNP,
     AP, VP, PresPartAP,
-    Num, CN, NP, GenModNP, GenNP,
+    Num, CN, NP, GenModNP, GenNP, GenRP,
     N, CompoundN
   ],
 

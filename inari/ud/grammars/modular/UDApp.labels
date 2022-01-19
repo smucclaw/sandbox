@@ -56,7 +56,7 @@
 #fun AdvIP head advmod
 #fun FunRP case nsubj head
 #fun ExistS dep dep head
-
+#fun GenRP nummod head
 
 -- numerals
 #fun pot0 head -- Digit -> Sub10

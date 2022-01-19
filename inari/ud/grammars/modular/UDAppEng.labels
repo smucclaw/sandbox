@@ -127,12 +127,21 @@
 #disable PresPartAP PastPartAP
 
 
--- The construction "whose X" in the RGL is done using FunRP with possess_Prep.
+-- The construction "whose X" in the RGL is done using Extend.GenRP
 
--- (the person) [whose data]:RP (is affected)
+-- GenRP NumSg (UseN dog_N) -- "whose dog"
+-- (the person) [whose dog]:RP (barks)
+-- Version with RGL RP
+#auxfun GenRP_Sg_ dog whose : CN -> RP -> RP = GenRP NumSg dog ; head[Number=Sing] nmod:poss[Poss=Yes]
+#auxfun GenRP_Pl_ dog whose : CN -> RP -> RP = GenRP NumPl dog ; head[Number=Plur] nmod:poss[Poss=Yes]
+
+#disable GenRP
+
+-- This version is used only if the grammar doesn't have a RP with the string "whose"
+-- Of course, labels files are per grammar, and for UDApp there is such an RP, but if someone copies this later for other grammar, and that grammar doesn't have who_RP, then you can use this
 #auxcat RelPron PRON
-#auxfun FunRP_ whose data : RelPron -> CN -> RP = FunRP possess_Prep (MassNP data) IdRP ; nmod:poss[PronType=Int|Poss=Yes] head
-#disable FunRP
+#auxfun GenRP_Sg_auxcat_ dog whose : CN -> RelPron -> RP = GenRP NumSg dog ; head[Number=Sing] nmod:poss[Poss=Yes]
+#auxfun GenRP_Pl_auxcat_ dog whose : CN -> RelPron -> RP = GenRP NumPl dog ; head[Number=Plur] nmod:poss[Poss=Yes]
 
 -- the person [who is affected]:RS
 #auxfun PassRelPres_ affected who is : V -> RP -> auxPass -> RS = UseRCl (TTAnt TPres ASimul) PPos (RelVP who (PassV affected)) ; head[Voice=Pass] nsubj:pass aux:pass[Tense=Pres]
@@ -151,7 +160,7 @@
 
 -- TODO: ideally would choose this, if we saw the preposition "by" attaching to the obl. But that doesn't seem to be possible? Allowing this rule changes "stored in formats" to "stored by formats"
 -- the person [whose data is affected by the breach]:RCl
---#auxfun PassRelClAgent_ affected whose_data is breach : V -> RP -> auxPass -> NP -> RCl = RelVP whose_data (PassVAgent affected breach) ; head[Voice=Pass] nsubj:pass aux:pass obl
+-- #auxfun PassRelClAgent_ affected whose_data is breach : V -> RP -> auxPass -> NP -> RCl = RelVP whose_data (PassVAgent affected breach) ; head[Voice=Pass] nsubj:pass aux:pass obl
 
 -- be notified -- TODO: is this rule used on its own?
 #auxfun PassV_ v : V -> VP = PassV v ; head[Voice=Pass]
@@ -172,7 +181,10 @@
 
 -- ** progressive **
 -- ProgrVP needs to be allowed in different places. This is probably going to be a long list.
-#auxfun RelVPGerund_ processing that is : VP -> RP -> aux -> RS = UseRCl (TTAnt TPres ASimul) PPos (RelVP that (ProgrVP processing)) ; head[Tense=Pres|VerbForm=Part] nsubj[PronType=Rel] aux
+#auxfun RelVPGerund_aux_ processing that is : VP -> RP -> aux -> RS = UseRCl (TTAnt TPres ASimul) PPos (RelVP that (ProgrVP processing)) ; head[Tense=Pres|VerbForm=Part] nsubj aux
+
+#auxfun RelVPGerund_cop_ processing that is : VP -> RP -> aux -> RS = UseRCl (TTAnt TPres ASimul) PPos (RelVP that (ProgrVP processing)) ; head[Tense=Pres|VerbForm=Part] nsubj cop
+
 #disable ProgrVP
 
 

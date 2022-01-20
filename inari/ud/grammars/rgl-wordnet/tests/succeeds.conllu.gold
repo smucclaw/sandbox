@@ -29,3 +29,11 @@ LIN: assesses if it is a notifiable data breach
 root_cop_advmod (rootN_ (DetCN (DetQuant IndefArt NumSg) (AdjCN (PositA public_A) (UseN agency_N)))) be_cop not_advmod
 
 LIN: isn't a public agency
+
+root_only (rootN_ (RelNP (DetCN (DetQuant DefArt NumSg) (UseN person_N)) (UseRCl (TTAnt TPres ASimul) PPos (RelVP (GenRP NumSg (UseN dog_N)) (ProgrVP (UseV sleep_V))))))
+
+LIN: is the person , whose dog is sleeping
+
+root_only (rootN_ (RelNP (DetCN (DetQuant DefArt NumSg) (UseN person_N)) (UseRCl (TTAnt TPres ASimul) PPos (RelVP (GenRP NumPl (UseN dog_N)) (ProgrVP (UseV sleep_V))))))
+
+LIN: is the person , whose dogs are sleeping

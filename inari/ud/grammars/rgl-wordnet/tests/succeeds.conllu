@@ -85,3 +85,17 @@
 3	a	a	DET	DT	Definite=Ind|PronType=Art	5	det	_	FUN=a_Det
 4	public	public	ADJ	JJ	Degree=Pos	5	amod	_	FUN=public_A
 5	agency	agency	NOUN	NN	Number=Sing	0	root	_	FUN=agency_N
+
+1	the	the	DET	Quant	FORM=0	2	det	_	FUN=DefArt
+2	person	person	NOUN	NN	Number=Sing	0	root	_	FUN=person_N
+3	whose	whose	PRON	WP$	Poss=Yes|PronType=Int	4	nmod:poss	_	FUN=PRONWP$
+4	dog	dog	NOUN	NN	Number=Sing	6	nsubj	_	FUN=dog_N
+5	is	be	AUX	VBZ	Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin	6	aux	_	FUN=UseComp
+6	sleeping	sleep	VERB	VBG	Tense=Pres|VerbForm=Part	2	acl:relcl	_	_
+
+1	the	the	DET	Quant	FORM=0	2	det	_	FUN=DefArt
+2	person	person	NOUN	NN	Number=Sing	0	root	_	FUN=person_N
+3	whose	whose	PRON	WP$	Poss=Yes|PronType=Int	4	nmod:poss	_	FUN=PRONWP$
+4	dogs	dog	NOUN	NN	Number=Plur	6	nsubj	_	FUN=dog_N
+5	are	be	AUX	VBZ	Mood=Ind|Number=Plur|Person=3|Tense=Pres|VerbForm=Fin	6	aux	_	FUN=UseComp
+6	sleeping	sleep	VERB	VBG	Tense=Pres|VerbForm=Part	2	acl:relcl	_	_

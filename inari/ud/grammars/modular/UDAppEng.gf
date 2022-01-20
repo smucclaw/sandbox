@@ -213,7 +213,7 @@ lin
 ---------------------------------------------------------------------------
 -- acl, advcl
 
-  -- : root -> acl -> UDS ;	--day of mourning ;
+  -- : root -> acl -> UDS ;	--a message obeying a certain format ;
 	root_acl rt acl = onlyPred (mkVP rt.vp acl) ;
 
   -- : root -> acl -> nmod -> UDS ;

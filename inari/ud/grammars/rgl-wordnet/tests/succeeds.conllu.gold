@@ -29,3 +29,27 @@ LIN: assesses if it is a notifiable data breach
 root_cop_advmod (rootN_ (DetCN (DetQuant IndefArt NumSg) (AdjCN (PositA public_A) (UseN agency_N)))) be_cop not_advmod
 
 LIN: isn't a public agency
+
+root_only (rootN_ (RelNP (DetCN (DetQuant DefArt NumSg) (UseN person_N)) (UseRCl (TTAnt TPres ASimul) PPos (RelVP (GenRP NumSg (UseN dog_N)) (ProgrVP (UseV sleep_V))))))
+
+LIN: is the person , whose dog is sleeping
+
+root_only (rootN_ (RelNP (DetCN (DetQuant DefArt NumSg) (UseN person_N)) (UseRCl (TTAnt TPres ASimul) PPos (RelVP (GenRP NumPl (UseN dog_N)) (ProgrVP (UseV sleep_V))))))
+
+LIN: is the person , whose dogs are sleeping
+
+root_only (rootN_ (DetCN (DetQuant DefArt NumSg) (UseN (StrN "Pdpc"))))
+
+LIN: is the Pdpc
+
+root_acl (rootN_ (DetCN (DetQuant IndefArt NumSg) (UseN message_N))) (aclUDS_ (root_obj (rootV_ (UseV obey_V)) (obj_ (DetCN (DetQuant IndefArt NumSg) (AdjCN (PositA certain_A) (UseN format_N))))))
+
+LIN: is a message obeys a certain format
+
+root_only (rootN_ (DetCN (DetQuant (GenNP (DetCN (DetQuant DefArt NumSg) (UseN individual_N))) NumSg) (UseN account_N)))
+
+LIN: is the individual's account
+
+root_only (rootN_ (DetCN (DetQuant (GenNP (DetCN (DetQuant DefArt NumSg) (UseN individual_N))) NumSg) (UseN (CompoundN account_N identifier_N))))
+
+LIN: is the individual's account identifier

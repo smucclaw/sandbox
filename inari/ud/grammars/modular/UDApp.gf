@@ -35,7 +35,7 @@ abstract UDApp = UDCat, JustWordsWordNet ** {
 	root_acl : root -> acl -> UDS ;
 	--day of mourning ;
 
-		root_acl_nmod : root -> acl -> nmod -> UDS ;
+	root_acl_nmod : root -> acl -> nmod -> UDS ;
 	--policy (called in this item the applicable policy) of which the ;
 
 		root_advcl : root -> advcl -> UDS ;
@@ -203,17 +203,12 @@ abstract UDApp = UDCat, JustWordsWordNet ** {
 		root_mark_nsubj_aux_aux : root -> mark -> nsubj -> aux -> aux -> UDS ;
 	--that a data breach may have occurred
 
-		root_det : root -> det -> UDS ;
-	--the PDPC ;
-
-		root_det_acl : root -> det -> acl -> UDS ;
-	--a message obeying a certain format ;
-
-		root_det_aclRelcl : root -> det -> aclRelcl -> UDS ;
+		root_aclRelcl : root -> aclRelcl -> UDS ;
 	--any manner that is reasonable in the circumstances ;
 
-		root_det_aclRelcl_nmod : root -> det -> aclRelcl -> nmod -> UDS ;
+		root_aclRelcl_nmod : root -> aclRelcl -> nmod -> UDS ;
 	--the Organisation for which you act as a DI ;
+{-
 
 		root_det_advmod : root -> det -> advmod -> UDS ;
 	--any officer generally or specially" ;
@@ -266,7 +261,7 @@ abstract UDApp = UDCat, JustWordsWordNet ** {
 		root_det_nmodPoss_compound : root -> det -> nmodPoss -> compound -> UDS ;
 	--the individual’s account identifier ;
 
-		root_discourse : root -> discourse -> UDS ;
+-}		root_discourse : root -> discourse -> UDS ;
 	--(AdvG §20.4) ;
 
 		root_fixed : root -> fixed -> UDS ;

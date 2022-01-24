@@ -103,7 +103,7 @@ abstract BareRG =
 
     PDPA_N : N ;
     '500_Digit' : Digit ;
-    at_least_Quant,
+    at_least_AdN : AdN ;
     more_than_Quant : Quant ;
 
   }

@@ -1,31 +1,31 @@
-DetCN (DetQuant IndefArt (NumCard (NumNumeral (num (pot2as3 (pot1as2 (pot0as1 (pot0 '500_Digit')))))))) (UseN people_N)
+root_only (rootN_ (DetCN (DetQuant IndefArt (NumCard (StrCard "500"))) (UseN people_N)))
 
-LIN: ['500_Digit'] people
+LIN: is 500 people
 
-DetCN (DetQuant more_than_Quant (NumCard (NumNumeral (num (pot2as3 (pot1as2 (pot0as1 (pot0 '500_Digit')))))))) (UseN people_N)
+root_only (rootN_ (DetCN (DetQuant IndefArt (NumCard (AdNum (AdnCAdv more_CAdv) (StrCard "500")))) (UseN people_N)))
 
-LIN: [more_than_Quant] ['500_Digit'] people
+LIN: is more than 500 people
 
-AdNum at_least_AdN (NumNumeral (num (pot2as3 (pot1as2 (pot0as1 (pot0 '500_Digit'))))))
+root_only (rootN_ (DetNP (DetQuant IndefArt (NumCard (AdNum at_least_AdN (StrCard "500"))))))
 
-LIN: at least ['500_Digit']
+LIN: is at least 500
 
-DetCN (DetQuant IndefArt (NumCard (AdNum at_least_AdN (NumNumeral (num (pot2as3 (pot1as2 (pot0as1 (pot0 '500_Digit'))))))))) (UseN people_N)
+root_only (rootN_ (DetCN (DetQuant IndefArt (NumCard (AdNum at_least_AdN (StrCard "500")))) (UseN people_N)))
 
-LIN: at least ['500_Digit'] people
+LIN: is at least 500 people
 
-DetCN (DetQuant (PossPron i_Pron) NumPl) (UseN cat_N)
+root_only (rootN_ (DetCN (DetQuant (PossPron i_Pron) NumPl) (UseN cat_N)))
 
-LIN: my cats
+LIN: is my cats
 
-DetCN (DetQuant (PossPron i_Pron) (NumCard (NumNumeral (num (pot2as3 (pot1as2 (pot0as1 (pot0 n5)))))))) (UseN cat_N)
+root_only (rootN_ (DetCN (DetQuant (PossPron i_Pron) (NumCard (NumNumeral (num (pot2as3 (pot1as2 (pot0as1 (pot0 n5)))))))) (UseN cat_N)))
 
-LIN: my five cats
+LIN: is my five cats
 
-DetCN (DetQuant (GenNP (UsePN sylvia_PN)) (NumCard (NumNumeral (num (pot2as3 (pot1as2 (pot0as1 (pot0 '500_Digit')))))))) (UseN cat_N)
+root_only (rootN_ (DetCN (DetQuant (GenNP (UsePN sylvia_PN)) (StrNum "500")) (UseN cat_N)))
 
-LIN: Sylvia's ['500_Digit'] cats
+LIN: is Sylvia's 500 cats
 
-DetCN (DetQuant (GenNP (DetCN (DetQuant (PossPron i_Pron) NumSg) (UseN mother_N))) (NumCard (NumNumeral (num (pot2as3 (pot1as2 (pot0as1 (pot0 n5)))))))) (UseN cat_N)
+root_only (rootN_ (DetCN (DetQuant (GenNP (DetCN (DetQuant (PossPron i_Pron) NumSg) (UseN mother_N))) (NumCard (NumNumeral (num (pot2as3 (pot1as2 (pot0as1 (pot0 n5)))))))) (UseN cat_N)))
 
-LIN: my mother's five cats
+LIN: is my mother's five cats

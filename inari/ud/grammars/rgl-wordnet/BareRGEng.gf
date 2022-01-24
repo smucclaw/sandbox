@@ -74,7 +74,7 @@ concrete BareRGEng of BareRG =
     aSg_Det = DetQuant IndefArt NumSg ;
     aPl_Det = DetQuant IndefArt NumPl ;
 
---    at_least_Quant
+    at_least_AdN = ss "at least" ;
 
     everyone_Pron = mkPron "everyone" "everyone" "everyone's" "everyone's" P.singular P3 P.human ;
     who_RP = ExtraEng.who_RP ;

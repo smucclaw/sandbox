@@ -172,7 +172,9 @@ abstract UDCat = BareRG - [Deontic,may_Deontic,must_Deontic,should_Deontic,shall
 --        aclRelcl_ : RS -> aclRelcl ; -- whose personal data is/was/has been affected
 		aclRelclUDS_ : UDS -> aclRelcl ; -- TODO figure out how this works properly, maybe needs some more auxfuns
 		aclRelclRS_ : RS -> aclRelcl ;
-        aclUDS_ : UDS -> acl ;
+        aclUDS_ : UDS -> acl ; -- (the issues) as he sees them -- TODO: how is "as" tagged?
+        aclUDSpastpart_ : UDS -> acl ; -- (an individual) affected by the breach
+        aclUDSgerund_ : UDS -> acl ; -- (a message) obeying a certain format
         advclUDS_ : UDS -> advcl ;
 
         obl_    : Adv -> obl ;

@@ -42,9 +42,9 @@ root_only (rootN_ (DetCN (DetQuant DefArt NumSg) (UseN (StrN "Pdpc"))))
 
 LIN: is the Pdpc
 
-root_acl (rootN_ (DetCN (DetQuant IndefArt NumSg) (UseN message_N))) (aclUDS_ (root_obj (rootV_ (UseV obey_V)) (obj_ (DetCN (DetQuant IndefArt NumSg) (AdjCN (PositA certain_A) (UseN format_N))))))
+root_acl (rootN_ (DetCN (DetQuant IndefArt NumSg) (UseN message_N))) (aclUDSgerund_ (root_obj (rootV_ (UseV obey_V)) (obj_ (DetCN (DetQuant IndefArt NumSg) (AdjCN (PositA certain_A) (UseN format_N))))))
 
-LIN: is a message obeys a certain format
+LIN: is a message that obeys a certain format
 
 root_only (rootN_ (DetCN (DetQuant (GenNP (DetCN (DetQuant DefArt NumSg) (UseN individual_N))) NumSg) (UseN account_N)))
 
@@ -53,3 +53,7 @@ LIN: is the individual's account
 root_only (rootN_ (DetCN (DetQuant (GenNP (DetCN (DetQuant DefArt NumSg) (UseN individual_N))) NumSg) (UseN (CompoundN account_N identifier_N))))
 
 LIN: is the individual's account identifier
+
+root_acl (rootN_ (DetCN (DetQuant IndefArt NumSg) (UseN individual_N))) (aclUDSpastpart_ (root_obl (rootV_ (UseV affect_V)) (obl_ (PrepNP by8agent_Prep (DetCN (DetQuant IndefArt NumSg) (AdjCN (PositA notifiable_A) (UseN (CompoundN data_N breach_N))))))))
+
+LIN: is an individual affected by a notifiable data breach

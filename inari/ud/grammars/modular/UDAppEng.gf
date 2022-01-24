@@ -248,18 +248,22 @@ lin
 
   applyNeg : Root -> NP -> LinUDS = \root,subj -> {
     subj = subj ;
-    pred = MkVPS (mkTemp presentTense simultaneousAnt) negativePol root.vp
-  } ;
+    pred = {fin = MkVPS (mkTemp presentTense simultaneousAnt) negativePol root.vp ;
+            pp =
+              let pp' : AP = BareRGEng.PastPartAP root.vp
+               in pp' ** {s = \\x => "not" ++ pp'.s ! x}
+           } ;
+    } ;
 
 
-  applyAux : LinAux -> VP -> VPS = \will,sleep ->
+  applyAux : LinAux -> VP -> UDSPred = \will,sleep ->
     case will.auxType of {
          RealAux => myVPS (mkVP will.vv sleep) ; -- may, must, –
          Will => myVPS futureTense sleep ;
 			   Have => myVPS anteriorAnt sleep ;
          Be => myVPS sleep } ;
 
-  applyAux2 : (may, have : LinAux) -> VP -> VPS = \may,have,sleep ->
+  applyAux2 : (may, have : LinAux) -> VP -> UDSPred = \may,have,sleep ->
     case <may.auxType, have.auxType> of {
       <Be,x> => applyAux have sleep ;
       <x,Be> => applyAux may  sleep ;
@@ -267,8 +271,10 @@ lin
       <Have,RealAux> => myVPS (ParseExtendComplVV have.vv anteriorAnt positivePol sleep) ;
       <RealAux,Will> => applyAux have (mkVP may.vv sleep) ;
       <Will,RealAux> => applyAux may (mkVP have.vv sleep) ;
-      <Will,Have>|
-      <Have,Will> => MkVPS (mkTemp futureTense anteriorAnt) positivePol sleep ;
+      <Will,Have>|<Have,Will>
+        => let regPP : UDSPred = myVPS sleep
+            in regPP ** {fin = MkVPS (mkTemp futureTense anteriorAnt) positivePol sleep} ;
+
       _ => applyAux have sleep -- TODO: andra combos?
       } ;
 

@@ -187,6 +187,10 @@
 
 #disable ProgrVP
 
+#auxfun aclGerund_   uds : UDS -> acl = aclUDSgerund_   uds ; head[VerbForm=Gerund]
+#auxfun aclPastPart_ uds : UDS -> acl = aclUDSpastpart_ uds ; head[Tense=Past|VerbForm=Part]
+#auxfun aclFinite_   uds : UDS -> acl = aclUDS_         uds ; head[VerbForm=Fin]
+#disable aclUDSGerund_ aclUDS_ aclUDSpastpart_
 
 -- ** ExtAdvNP **
 -- #auxfun … TODO: only allow ExtAdvNP with commas

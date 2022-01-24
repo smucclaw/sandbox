@@ -4,7 +4,7 @@ concrete UDCatEng of UDCat = BareRGEng - [Deontic,may_Deontic,must_Deontic,shoul
   open SyntaxEng, Prelude, (P=ParadigmsEng), (E=ExtraEng), ResEng, ExtendEng in {
 
   lincat
-    UDS = LinUDS ; -- TODO: use VPS instead of VP???
+    UDS = LinUDS ;
 
     root = Root ;
 
@@ -87,6 +87,8 @@ concrete UDCatEng of UDCat = BareRGEng - [Deontic,may_Deontic,must_Deontic,shoul
     xcompA_ccomp_ ap cc = xcompA_ (mkAP ap cc) ;
     aclUDS_,
     advclUDS_ = \uds -> lin Adv {s = linUDS uds} ;
+    aclUDSpastpart_ uds = lin Adv {s = linUDS' PastPart uds} ;
+    aclUDSgerund_ uds = lin Adv {s = "that" ++ linUDS uds} ; -- TODO: do we need actual gerund here? this is just to avoid "message obeys a certain format" when original is "… obeying …"
 
     expl_ = id Pron ;
     det_ = id Det ;
@@ -97,24 +99,33 @@ concrete UDCatEng of UDCat = BareRGEng - [Deontic,may_Deontic,must_Deontic,shoul
     -- passives
     nsubjPass_ = id NP ;
 
-  oper
-    emptyNP : NP = it_NP ** {s = \\_ => ""} ;
+  param
+    AclType = Finite | PastPart ;
 
-    LinUDS : Type = {subj : NP ; pred : VPS} ;
+  oper
+    UDSPred : Type = {fin : VPS ; pp : AP} ; -- because UDS can become an acl, either finite, gerund or past participle
+
+    LinUDS : Type = {subj : NP ; pred : UDSPred} ;
 
     mkUDS : NP -> VP -> LinUDS = \np,vp -> {
        subj = np ; pred = myVPS vp } ;
 
-    linUDS : LinUDS -> Str = \uds -> (PredVPS uds.subj uds.pred).s ;
-    emptyNP : NP = it_NP ** {s = \\_ => ""} ;
+    linUDS : LinUDS -> Str = linUDS' Finite ;
+    linUDS' : AclType -> LinUDS -> Str = \at,uds -> case at of {
+      Finite => (PredVPS uds.subj uds.pred.fin).s ;
+      PastPart => (cc2 (mkUtt uds.subj) (mkUtt uds.pred.pp)).s } ;
 
     myVPS = overload {
-      myVPS : VP -> VPS = \vp ->
-        MkVPS (mkTemp presentTense simultaneousAnt) positivePol vp ;
-      myVPS : Tense -> VP -> VPS = \tns,vp ->
-        MkVPS (mkTemp tns simultaneousAnt) positivePol vp ;
-      myVPS : Ant -> VP -> VPS = \ant,vp ->
-        MkVPS (mkTemp presentTense ant) positivePol vp
+      myVPS : VP -> UDSPred = \vp -> {
+        fin = MkVPS (mkTemp presentTense simultaneousAnt) positivePol vp ;
+        pp = BareRGEng.PastPartAP vp
+        } ;
+      myVPS : Tense -> VP -> UDSPred = \tns,vp -> {
+        fin = MkVPS (mkTemp tns simultaneousAnt) positivePol vp ;
+        pp = BareRGEng.PastPartAP vp } ;
+      myVPS : Ant -> VP -> UDSPred = \ant,vp -> {
+        fin = MkVPS (mkTemp presentTense ant) positivePol vp ;
+        pp = BareRGEng.PastPartAP vp }
     } ;
     --Aux : Type = {v : V ; isCop : Bool} ;
 --   Root : Type = {vp : VP ; comp : Comp ; c2 : Str} ;
@@ -135,6 +146,8 @@ concrete UDCatEng of UDCat = BareRGEng - [Deontic,may_Deontic,must_Deontic,shoul
        adv = ss "dummy" ;
        c2 = []
     } ;
+
+    emptyNP : NP = it_NP ** {s = \\_ => ""} ;
 
     should_VV : VV = lin VV {
       s = table {

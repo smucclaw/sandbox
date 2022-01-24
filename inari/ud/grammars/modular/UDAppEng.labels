@@ -96,6 +96,7 @@
 -- ** at least **
 #auxcat At ADV
 #auxfun AtLeast_ at least : At -> AdA -> AdN = at_least_AdN ; case head[Degree=Sup] -- will likely match other things — need to match with words!
+#auxfun AtLeastAdv_ at least : Adv -> AdA -> AdN = at_least_AdN ; case head[Degree=Sup] -- if At is recognised as at_Adv. still as overaccepting as the above version
 
 -- ** 5 people **
 #auxfun NumCN_ num cn : Card -> CN -> NP = DetCN (DetQuant IndefArt (NumCard num)) cn ; nummod head

@@ -1,2 +1,0 @@
-HOLDS,X,divides,Y
-WHEN,"mod(Y,X) == 0",,

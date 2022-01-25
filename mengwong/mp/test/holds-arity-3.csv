@@ -1,3 +1,0 @@
-HOLDS,inrange,X,Y,Z
-WHEN,,X,<,Z
-AND,,Y,>,Z

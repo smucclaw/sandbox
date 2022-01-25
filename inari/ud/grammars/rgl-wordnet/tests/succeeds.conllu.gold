@@ -30,17 +30,17 @@ root_cop_advmod (rootN_ (DetCN (DetQuant IndefArt NumSg) (AdjCN (PositA public_A
 
 LIN: isn't a public agency
 
-root_only (rootN_ (RelNP (DetCN (DetQuant DefArt NumSg) (UseN person_N)) (UseRCl (TTAnt TPres ASimul) PPos (RelVP (GenRP NumSg (UseN dog_N)) (ProgrVP (UseV sleep_V))))))
+root_aclRelcl (rootN_ (DetCN (DetQuant DefArt NumSg) (UseN person_N))) (aclRelclRS_ (UseRCl (TTAnt TPres ASimul) PPos (RelVP (GenRP NumSg (UseN dog_N)) (ProgrVP (UseV sleep_V)))))
 
 LIN: is the person , whose dog is sleeping
 
-root_only (rootN_ (RelNP (DetCN (DetQuant DefArt NumSg) (UseN person_N)) (UseRCl (TTAnt TPres ASimul) PPos (RelVP (GenRP NumPl (UseN dog_N)) (ProgrVP (UseV sleep_V))))))
+root_aclRelcl (rootN_ (DetCN (DetQuant DefArt NumSg) (UseN person_N))) (aclRelclRS_ (UseRCl (TTAnt TPres ASimul) PPos (RelVP (GenRP NumPl (UseN dog_N)) (ProgrVP (UseV sleep_V)))))
 
 LIN: is the person , whose dogs are sleeping
 
-root_only (rootN_ (DetCN (DetQuant DefArt NumSg) (UseN (StrN "Pdpc"))))
+root_only (rootN_ (DetCN (DetQuant DefArt NumSg) (UseN (StrN "PDPC"))))
 
-LIN: is the Pdpc
+LIN: is the PDPC
 
 root_acl (rootN_ (DetCN (DetQuant IndefArt NumSg) (UseN message_N))) (aclUDSgerund_ (root_obj (rootV_ (UseV obey_V)) (obj_ (DetCN (DetQuant IndefArt NumSg) (AdjCN (PositA certain_A) (UseN format_N))))))
 
@@ -57,3 +57,7 @@ LIN: is the individual's account identifier
 root_acl (rootN_ (DetCN (DetQuant IndefArt NumSg) (UseN individual_N))) (aclUDSpastpart_ (root_obl (rootV_ (UseV affect_V)) (obl_ (PrepNP by8agent_Prep (DetCN (DetQuant IndefArt NumSg) (AdjCN (PositA notifiable_A) (UseN (CompoundN data_N breach_N))))))))
 
 LIN: is an individual affected by a notifiable data breach
+
+root_aclRelcl (rootN_ (DetCN anySg_Det (UseN manner_N))) (aclRelclUDS_ (root_nsubj_cop_obl (rootA_ (PositA reasonable_A)) (nsubj_ (DetNP (DetQuant that_Quant NumSg))) be_cop (obl_ (PrepNP in_Prep (DetCN (DetQuant DefArt NumSg) (UseN circumstance_N))))))
+
+LIN: is any manner , that is reasonable in the circumstance

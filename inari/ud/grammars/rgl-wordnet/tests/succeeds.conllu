@@ -129,3 +129,12 @@
 6	notifiable	notifiable	ADJ	JJ	Degree=Pos	8	amod	_	FUN=notifiable_A
 7	data	data	NOUN	NN	Number=Sing	8	compound	_	FUN=data_N
 8	breach	breach	NOUN	NN	Number=Sing	3	obl	_	FUN=breach_N
+
+1	any	any	DET	DT	_	2	det	_	_
+2	manner	manner	NOUN	NN	Number=Sing	0	root	_	_
+3	that	that	PRON	WDT	PronType=Rel	5	nsubj	_	_
+4	is	be	AUX	VBZ	Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin	5	cop	_	_
+5	reasonable	reasonable	ADJ	JJ	Degree=Pos	2	acl:relcl	_	_
+6	in	in	ADP	IN	_	8	case	_	_
+7	the	the	DET	Quant	FORM=0	8	det	_	_
+8	circumstances	circumstance	NOUN	NNS	Number=Plur	5	obl	_	_

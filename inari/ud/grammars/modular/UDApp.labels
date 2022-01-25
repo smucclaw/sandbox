@@ -324,11 +324,9 @@
 #fun root_cop_advmod head cop advmod
 #fun root_csubj head csubj
 #fun root_csubj_aux_aux head csubj aux aux
-#fun root_det head det
-#fun root_det_acl head det acl
-#fun root_det_aclRelcl head det acl:relcl
-#fun root_det_aclRelcl_nmod head det acl:relcl nmod
-#fun root_det_advmod head det advmod
+#fun root_acl head acl
+#fun root_aclRelcl head acl:relcl
+#fun root_aclRelcl_nmod head acl:relcl nmod
 #fun root_det_amod head det amod
 #fun root_det_amod_aclRelcl head det amod acl:relcl
 #fun root_det_amod_aclRelcl_nmod head det amod acl:relcl nmod

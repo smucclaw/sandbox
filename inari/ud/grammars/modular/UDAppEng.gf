@@ -222,6 +222,9 @@ lin
   -- : root -> advcl -> UDS ; --assess if it is a breach ;
 	root_advcl rt adv = root_acl rt adv ;
 
+  -- : root -> aclRelcl -> UDS ; --any manner that is reasonable ;
+	root_aclRelcl rt rs = root_only (addRcl rt rs) ;
+
 ---------------------------------------------------------------------------
 -- Cases where GF and UD structures map less neatly to each other
 -- Needed to add special funs that are not the top-level/application layer

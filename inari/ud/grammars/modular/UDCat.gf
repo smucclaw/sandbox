@@ -77,7 +77,6 @@ abstract UDCat = BareRG - [Deontic,may_Deontic,must_Deontic,should_Deontic,shall
         advmodLmod_ : X -> advmodLmod ;
         appos_ : X -> appos ;
         aux_ : X -> aux ;
-        case__ : X -> case_ ;
         ccPreconj_ : X -> ccPreconj ;
         clf_ : X -> clf ;
         compound_ : X -> compound ;
@@ -142,6 +141,8 @@ abstract UDCat = BareRG - [Deontic,may_Deontic,must_Deontic,should_Deontic,shall
 
         be_auxPass : auxPass ;
 
+        -- genS_case : case_ ; -- 's is treated as a separate token in UD
+
         -------
     fun
     -- UD roots can be many GF cats
@@ -149,6 +150,8 @@ abstract UDCat = BareRG - [Deontic,may_Deontic,must_Deontic,should_Deontic,shall
         rootA_ : AP -> root ;
         rootN_ : NP -> root ;
         rootAdv_ : Adv -> root ; -- within 30 days
+        rootDet_ : Det -> root ; -- some
+        rootQuant_ : Quant -> root ; -- the customer's
 
     -- GF NPs can have many UD labels
         nsubj_ : NP -> nsubj ; -- lexical cat can be NOUN, DET, PRON, …

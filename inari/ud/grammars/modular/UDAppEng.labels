@@ -253,3 +253,20 @@
 
 #auxfun NPCompleteList_ catHorse capybara and_dog : PrefixNP -> NPComma -> Pair_Conj_NP -> NP = UsePair_ (NPCompleteList_helper_ catHorse capybara) and_dog ; head conj conj
 #auxfun NPCompleteList_helper_ catHorse capybara and dog : PrefixNP -> NPComma -> Conj -> NP -> NP = ConjNP and (catHorse (BaseNP capybara dog)) ; head dummy dummy dummy
+
+-- ** Adv **
+#auxfun CommaAdv_ Adv comma : Adv -> Comma -> AdvComma = Adv ; head punct
+
+#auxfun AndAdvPair_ and dog : Conj -> Adv -> Pair_Conj_Adv = MkPair_ and dog ; cc head
+
+#auxfun Adv2_ cat andDog : Adv -> Pair_Conj_Adv -> Adv = UsePair_ (Adv2_helper_ cat) andDog ; head conj
+#auxfun Adv2_helper_ cat and dog :  Adv -> Conj -> Adv -> Adv = ConjAdv and (BaseAdv cat dog) ; head dummy nonexistent
+
+-- type PrefixAdv = ListAdv -> ListAdv
+
+#auxfun AdvListHead_ cat : Adv -> PrefixAdv = ConsAdv cat ; head
+
+#auxfun AdvAddComma_ cat horse : PrefixAdv -> AdvComma -> PrefixAdv = Compose_ cat (ConsAdv horse) ; head conj
+
+#auxfun AdvCompleteList_ catHorse capybara and_dog : PrefixAdv -> AdvComma -> Pair_Conj_Adv -> Adv = UsePair_ (AdvCompleteList_helper_ catHorse capybara) and_dog ; head conj conj
+#auxfun AdvCompleteList_helper_ catHorse capybara and dog : PrefixAdv -> AdvComma -> Conj -> Adv -> Adv = ConjAdv and (catHorse (BaseAdv capybara dog)) ; head dummy dummy dummy

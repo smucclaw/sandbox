@@ -61,3 +61,27 @@ LIN: is an individual affected by a notifiable data breach
 root_aclRelcl (rootN_ (DetCN anySg_Det (UseN manner_N))) (aclRelclUDS_ (root_nsubj_cop_obl (rootA_ (PositA reasonable_A)) (nsubj_ (DetNP (DetQuant that_Quant NumSg))) be_cop (obl_ (PrepNP in_Prep (DetCN (DetQuant DefArt NumSg) (UseN circumstance_N))))))
 
 LIN: is any manner , that is reasonable in the circumstance
+
+root_aclRelcl (rootN_ (DetCN anySg_Det (AdjCN (PositA personal_A) (UseN data_N)))) (aclRelclUDS_ (root_nsubj_cop_advmod (rootA_ (PositA available_A)) (nsubj_ (DetNP (DetQuant that_Quant NumSg))) be_cop (advmod_ (PositAdvAdj public_A))))
+
+LIN: is any personal data , that is available publicly
+
+root_advmod (rootN_ (DetCN anySg_Det (UseN officer_N))) (advmod_ (ConjAdv or_Conj (BaseAdv (PositAdvAdj general_A) (PositAdvAdj special_A))))
+
+LIN: is any officer generally or specially
+
+root_only (rootQuant_ (GenNP (DetCN (DetQuant DefArt NumSg) (UseN individual_N))))
+
+LIN: is the individual's
+
+root_nmod (rootN_ (DetCN (DetQuant DefArt NumSg) (AdjCN (PastPartAP (UseV prescribe_V)) (UseN number_N)))) (nmod_ of_Prep (DetCN aPl_Det (AdjCN (PastPartAP (UseV affect_V)) (UseN individual_N))))
+
+LIN: is the prescribed number of affected individuals
+
+root_nmod (rootN_ (ConjNP and_Conj (BaseNP (DetCN (DetQuant DefArt NumSg) (UseN donation_N)) (MassNP (UseN removal_N))))) (nmod_ of_Prep (DetCN anySg_Det (UseN data_N)))
+
+LIN: is the donation and removal of any data
+
+root_nmod (rootN_ (DetCN (DetQuant DefArt NumSg) (UseN set_N))) (nmod_ of_Prep (DetCN aPl_Det (AdjCN (PastPartAP (AdvVP (UseV affect_V) (PrepNP by8agent_Prep (ThePN (StrPN "NDB"))))) (UseN individual_N))))
+
+LIN: is the set of individuals affected by the NDB

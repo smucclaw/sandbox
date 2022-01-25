@@ -15,6 +15,8 @@ abstract UDApp = UDCat, JustWordsWordNet - [some_Quant, some_Det, any_Det] ** {
 	StrCard : String -> Card ;
 	StrNum : String -> Num ;
 
+
+	ThePN : PN -> NP ; -- for e.g. abbreviations/defined terms that are erroneously parsed as PNs; "the NDB"
 	-- from the first test corpus, full sentences
 
 	root_cop_advmod          : root -> cop -> advmod -> UDS ; -- is not a breach

@@ -1,7 +1,7 @@
 --# -path=./../rgl-wordnet
 
 concrete UDCatEng of UDCat = BareRGEng - [Deontic,may_Deontic,must_Deontic,should_Deontic,shall_Deontic,shant_Deontic] **
-  open SyntaxEng, Prelude, (P=ParadigmsEng), (E=ExtraEng), ResEng, ExtendEng in {
+  open SyntaxEng, Prelude, (P=ParadigmsEng), (E=ExtraEng), ResEng, ExtendEng, (N=NounEng) in {
 
   lincat
     UDS = LinUDS ;
@@ -76,6 +76,8 @@ concrete UDCatEng of UDCat = BareRGEng - [Deontic,may_Deontic,must_Deontic,shoul
     rootA_ ap = mkRoot ap ;
     rootN_ np = mkRoot np ;
     rootAdv_ adv = mkRoot (mkVP adv) ;
+    rootDet_ det = mkRoot (N.DetNP det) ;
+    rootQuant_ det = mkRoot (N.DetNP (N.DetQuant det N.NumSg)) ;
     nmod_ = PrepNP ;
 
     conjA_ ap = mkUtt ap ; -- : AP -> conj ;

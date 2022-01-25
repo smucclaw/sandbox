@@ -15,6 +15,7 @@ lin
 	StrCard str = symb (mkSymb str.s) ;
 	StrNum str = N.NumPl ** {s,sp = \\_,_ => str.s} ;
 
+  ThePN pn = N.PredetNP (lin Predet {s= "the"}) (N.UsePN pn) ;
 -- The concrete syntax is sketchy on purpose.
 -- One could say that it doesn't even have to bother to linearise properly,
 -- but we do it for the sake of ud2gf: checking linearisations against the original.
@@ -75,7 +76,10 @@ lin
 
     -- : root -> obl -> UDS ;
   	-- subject to X ;
-		root_obl subject to_X = onlyPred (mkVP subject.vp to_X) ;
+    root_nmod,
+		root_obl = \subject, to_X -> onlyPred (mkVP subject.vp to_X) ;
+
+    root_advmod rt adv = root_obl rt adv.adv ;
 
     -- : root -> advmod -> advmod -> obl -> UDS ;
     -- [publicly] available [solely] because of any data [breach]. ;
@@ -224,6 +228,9 @@ lin
 
   -- : root -> aclRelcl -> UDS ; --any manner that is reasonable ;
 	root_aclRelcl rt rs = root_only (addRcl rt rs) ;
+
+  -- : root -> aclRelcl -> nmod -> UDS ; -- org for which you act as a DI ;
+	root_aclRelcl_nmod rt rs nmod = root_nmod (addRcl rt rs) nmod ;
 
 ---------------------------------------------------------------------------
 -- Cases where GF and UD structures map less neatly to each other

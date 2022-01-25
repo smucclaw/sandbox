@@ -105,5 +105,6 @@ abstract BareRG =
     '500_Digit' : Digit ;
     at_least_AdN : AdN ;
     more_than_Quant : Quant ;
-
+    anySg_Det, anyPl_Det : Det ;
+    someSg_Det, somePl_Det : Det ;
   }

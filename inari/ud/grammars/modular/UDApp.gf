@@ -1,6 +1,6 @@
 --# -path=./../rgl-wordnet
 
-abstract UDApp = UDCat, JustWordsWordNet ** {
+abstract UDApp = UDCat, JustWordsWordNet - [some_Quant, some_Det, any_Det] ** {
 
 	flags
 		startcat = UDS ;

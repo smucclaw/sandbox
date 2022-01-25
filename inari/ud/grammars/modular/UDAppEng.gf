@@ -1,7 +1,7 @@
 --# -path=./../rgl-wordnet
 
 concrete UDAppEng of UDApp =
-  UDCatEng, JustWordsWordNetEng **
+  UDCatEng, JustWordsWordNetEng - [some_Quant, some_Det, any_Det] **
   open Prelude, SyntaxEng, IrregEng, ExtendEng, SymbolicEng,
     (PE=ParseExtendEng), -- from WordNet
     (N=NounEng), (P=ParadigmsEng) in {

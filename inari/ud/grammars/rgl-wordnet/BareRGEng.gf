@@ -74,7 +74,12 @@ concrete BareRGEng of BareRG =
     aSg_Det = DetQuant IndefArt NumSg ;
     aPl_Det = DetQuant IndefArt NumPl ;
 
+    someSg_Det = mkDeterminerSpec P.singular "some" (variants {"someone"; "somebody"}) "something" False ;
+    somePl_Det = mkDeterminerSpec P.plural "some" (variants {"someone"; "somebody"}) "something" False ;
+
     at_least_AdN = ss "at least" ;
+    anySg_Det = mkDeterminerSpec P.singular "any" (variants {"anyone"; "anybody"}) "anything" False ;
+    anyPl_Det = mkDeterminerSpec P.plural "any" (variants {"anyone"; "anybody"}) "anything" False ;
 
     everyone_Pron = mkPron "everyone" "everyone" "everyone's" "everyone's" P.singular P3 P.human ;
     who_RP = ExtraEng.who_RP ;

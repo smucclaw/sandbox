@@ -136,15 +136,67 @@ CN ::= "organisation" ;
 
 Title ::= "Duty" "to" "conduct" "assessment" "of" "data" "breach" ;
 Ref ::= "26C" ;
-CN ::= "data" "breach" "that" "occurs" "on" "or" "after" "1" "February" "2021" ;
-S ::= "an" "organisation" "has" "reason" "to" "believe" "that" "a" "data" "breach" "affecting" "personal" "data" "in" "its" "possession" "or" "under" "its" "control" "has" "occurred" ;
-S ::= "the" "organisation" "must" "conduct" "," "in" "a" "reasonable" "and" "expeditious" "manner" "," "an" "assessment" "of" "whether" "the" "data" "breach" "is" "a" "notifiable" "data" "breach" ;
-CN ::= "data" "intermediary" "(other" "than" "a" "data" "intermediary" "mentioned" "in" "section" "26E)" ;
-VP ::= "has" "reason" "to" "believe" "that" "a" "data" "breach" "has" "occurred" "in" "relation" "to" "personal" "data" "that" "the" "data" "intermediary" "is" "processing" "on" "behalf" "of" "and" "for" "the" "purposes" "of" "another" "organisation" ;
-S ::= "the" "data" "intermediary" "must" "," "without" "undue" "delay" "," "notify" "that" "other" "organisation" "of" "the" "occurrence" "of" "the" "data" "breach" ;
+
+
+--- CN ::= "data" "breach" "that" "occurs" "on" "or" "after" "1" "February" "2021" ;
+VP ::= "occurs" "on" "or" "after" Date ;
+Date ::= "1" "February" "2021" ;
+
+
+--- S ::= "an" "organisation" "has" "reason" "to" "believe" "that" "a" "data" "breach" "affecting" "personal" "data" "in" "its" "possession" "or" "under" "its" "control" "has" "occurred" ;
+S ::= NP VP ;
+VP ::= "has" "reason" "to" "believe" "that" S ;
+VP ::= "has" "occurred" ;
+CN ::= CN "affecting" NP ;
+CN ::= CN ConjPP ;
+ConjPP ::= PP Conj PP ;
+PP ::= "in" "its" "possession" ;
+PP ::= "under" "its" "control" ;
+
+
+--- S ::= "the" "organisation" "must" "conduct" "," "in" "a" "reasonable" "and" "expeditious" "manner" "," "an" "assessment" "of" "whether" "the" "data" "breach" "is" "a" "notifiable" "data" "breach" ;
+VP ::= "must" VP ;
+VP ::= V2 "," PP "," NP ;
+V2 ::= "conduct" ;
+PP ::= "in" "a" "reasonable" "and" "expeditious" "manner" ;
+CN ::= "assessment" "of" "whether" S ;
+S  := NP "is" "a" CN ;
+
+
+--- CN ::= "data" "intermediary" "(other" "than" "a" "data" "intermediary" "mentioned" "in" "section" "26E)" ;
+CN ::= CN "(" "other" "than" NP ")" ;
+CN ::= "data" "intermediary" ;
+CN ::= CN "mentioned" "in" "section" Ref ;
+
+
+--- VP ::= "has" "reason" "to" "believe" "that" "a" "data" "breach" "has" "occurred" "in" "relation" "to" "personal" "data" "that" "the" "data" "intermediary" "is" "processing" "on" "behalf" "of" "and" "for" "the" "purposes" "of" "another" "organisation" ;
+VP ::= "has" "occurred" "in" "relation" "to" NP ;
+RS ::= "that" NP VP ;
+VP ::= "is" "processing" PP ;
+PP ::= "on" "behalf" "of" "and" "for" "the" "purposes" "of" NP ;
+NP ::= "another" CN ;
+
+
 Conj ::= "and" ;
-S ::= "that" "other" "organisation" "must" "," "upon" "notification" "by" "the" "data" "intermediary" "," "conduct" "an" "assessment" "of" "whether" "the" "data" "breach" "is" "a" "notifiable" "data" "breach" ;
+
+
+--- S ::= "the" "data" "intermediary" "must" "," "without" "undue" "delay" "," "notify" "that" "other" "organisation" "of" "the" "occurrence" "of" "the" "data" "breach" ;
+VP ::= "must" "," PP  "," VP ;
+PP ::= "without" "undue" "delay" ;
+VP ::= "notify" NP "of" NP ;
+NP ::= "that" "other" CN ;
+CN ::= "occurrence" "of" NP ;
+
+
+--- S ::= "that" "other" "organisation" "must" "," "upon" "notification" "by" "the" "data" "intermediary" "," "conduct" "an" "assessment" "of" "whether" "the" "data" "breach" "is" "a" "notifiable" "data" "breach" ;
+PP ::= "upon" "notification" "by" NP ;
+VP ::= "conduct" NP ;
+
+
+--- S ::= "The" "organisation" "must" "carry" "out" "the" "assessment" "mentioned" "in" "subsection" "(2)" "or" "(3)(b)" "in" "accordance" "with" "any" "prescribed" "requirements" ;
 S ::= "The" "organisation" "must" "carry" "out" "the" "assessment" "mentioned" "in" "subsection" "(2)" "or" "(3)(b)" "in" "accordance" "with" "any" "prescribed" "requirements" ;
+
+
 Title ::= "Duty" "to" "notify" "occurrence" "of" "notifiable" "data" "breach" ;
 Ref ::= "26D" ;
 CN ::= "organisation" ;

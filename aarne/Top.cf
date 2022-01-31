@@ -194,7 +194,7 @@ VP ::= "conduct" NP ;
 
 
 --- S ::= "The" "organisation" "must" "carry" "out" "the" "assessment" "mentioned" "in" "subsection" "(2)" "or" "(3)(b)" "in" "accordance" "with" "any" "prescribed" "requirements" ;
-S ::= "The" "organisation" "must" "carry" "out" "the" "assessment" "mentioned" "in" "subsection" "(2)" "or" "(3)(b)" "in" "accordance" "with" "any" "prescribed" "requirements" ;
+S ::= "the" "organisation" "must" "carry" "out" "the" "assessment" "mentioned" "in" "subsection" "(2)" "or" "(3)(b)" "in" "accordance" "with" "any" "prescribed" "requirements" ;
 
 
 Title ::= "Duty" "to" "notify" "occurrence" "of" "notifiable" "data" "breach" ;

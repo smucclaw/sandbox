@@ -32,6 +32,7 @@ Line ::= Ref "." "Where" "an" CN "—" ;
 Line ::= Item VP "," ;
 Line ::= S "." ;
 -- 66 lines 33 rules
+
 Title ::= "PART" "6A" ;
 Title ::= "NOTIFICATION" "OF" "DATA" "BREACHES" ;
 Title ::= "Interpretation" "of" "this" "Part" ;
@@ -43,30 +44,96 @@ CN ::= "individual" "to" "whom" "any" "personal" "data" "affected" "by" "a" "dat
 QCN ::= "“data" "breach”" ;
 NP ::= "personal" "data" ;
 Item ::= "(a)" ;
-NP ::= "the" "unauthorised" "access" "," "collection" "," "use" "," "disclosure" "," "copying" "," "modification" "or" "disposal" "of" "personal" "data" ;
+
+--- NP ::= "the" "unauthorised" "access" "," "collection" "," "use" "," "disclosure" "," "copying" "," "modification" "or" "disposal" "of" "personal" "data" ;
+NP ::= "the" "unauthorised" ConjN2 "of" NP ;
+ConjN2 ::= N2 Conj N2 ;
+ConjN2 ::= N2 "," ConjN2 ;
+N2 ::= "access" ;
+N2 ::= "collection" ;
+N2 ::= "use" ;
+N2 ::= "disclosure" ;
+N2 ::= "copying" ;
+N2 ::= "modification" ;
+N2 ::= "disposal" ;
+NP ::= CN ;
+CN ::= "personal" "data" ;
+
+
 Conj ::= "or" ;
 Item ::= "(b)" ;
-NP ::= "the" "loss" "of" "any" "storage" "medium" "or" "device" "on" "which" "personal" "data" "is" "stored" "in" "circumstances" "where" "the" "unauthorised" "access" "," "collection" "," "use" "," "disclosure" "," "copying" "," "modification" "or" "disposal" "of" "the" "personal" "data" "is" "likely" "to" "occur" ;
+
+
+--- NP ::= "the" "loss" "of" "any" "storage" "medium" "or" "device" "on" "which" "personal" "data" "is" "stored" "in" "circumstances" "where" "the" "unauthorised" "access" "," "collection" "," "use" "," "disclosure" "," "copying" "," "modification" "or" "disposal" "of" "the" "personal" "data" "is" "likely" "to" "occur" ;
+NP ::= "the" "loss" "of" "any" ConjCN RS ;
+ConjCN ::= CN Conj CN ;
+CN  ::= "storage" "medium" ;
+CN  ::= "device" ;
+RS ::= "on" "which" S ;
+S  ::= "personal" "data" "is" "stored" "in" "circumstances" RS ;
+RS ::= "where" S  ;
+S  ::= NP "is" "likely" "to" "occur" ;
+NP ::= "the" CN ;
+
+
 Ref ::= "[40/2020]" ;
 Title ::= "Notifiable" "data" "breaches" ;
 Ref ::= "26B" ;
 Item ::= "(1)" ;
 CN ::= "data" "breach" ;
-CN ::= "notifiable" "data" "breach" ;
-NP ::= "the" "data" "breach" ;
-VP ::= "results" "in" "," "or" "is" "likely" "to" "result" "in" "," "significant" "harm" "to" "an" "affected" "individual" ;
-VP ::= "is" "," "or" "is" "likely" "to" "be" "," "of" "a" "significant" "scale" ;
+CN ::= A CN ;
+A ::= "notifiable" ;
+
+
+---VP ::= "results" "in" "," "or" "is" "likely" "to" "result" "in" "," "significant" "harm" "to" "an" "affected" "individual" ;
+VP ::= ConjVP2 NP ;
+ConjVP2 ::= VP2 "," Conj VP2 "," ;
+VP2 ::= "results" "in" ;
+VP2 ::= "is" "likely" "to" "result" "in" ;
+NP ::= "significant" "harm" "to" NP ;
+NP ::= "an" CN ;
+NP ::= "a" CN ;
+A  ::= "affected" ;
+CN ::= "individual" ;
+
+
+---VP ::= "is" "," "or" "is" "likely" "to" "be" "," "of" "a" "significant" "scale" ;
+VP ::= ConjCop Comp ;
+ConjCop ::= Cop "," Conj Cop "," ;
+Cop ::= "is" ;
+Cop ::= "is" "likely" "to" "be" ;
+Comp ::= "of" "a" "significant" "scale" ;
+
+
 Item ::= "(2)" ;
 Ref ::= "(1)(a)" ;
-VP ::= "result" "in" "significant" "harm" "to" "an" "individual" ;
-S ::= "the" "data" "breach" "is" "in" "relation" "to" "any" "prescribed" "personal" "data" "or" "class" "of" "personal" "data" "relating" "to" "the" "individual" ;
+VP ::= "result" "in" "significant" "harm" "to" NP ;
+
+
+--- S ::= "the" "data" "breach" "is" "in" "relation" "to" "any" "prescribed" "personal" "data" "or" "class" "of" "personal" "data" "relating" "to" "the" "individual" ;
+S ::= NP "is" "in" "relation" "to" NP ;
+NP ::= "any" CN ;
+CN ::= ConjCN "relating" "to" NP ; --- resolving ambiguity by brute force
+CN ::= "prescribed" "personal" "data" ;
+CN ::= "class" "of" "personal" "data" ; 
+
+
 Item ::= "(3)" ;
 Ref ::= "(1)(b)" ;
 VP ::= "be" "of" "a" "significant" "scale" ;
 S ::= "the" "data" "breach" "affects" "not" "fewer" "than" "the" "prescribed" "number" "of" "affected" "individuals" ";" ;
 Item ::= "(4)" ;
 ConjItem ::= "(1)" "," "(2)" "and" "(3)" ;
-CN ::= "data" "breach" "that" "relates" "to" "the" "unauthorised" "access" "," "collection" "," "use" "," "disclosure" "," "copying" "or" "modification" "of" "personal" "data" "only" "within" "an" "organisation" ;
+
+
+---CN ::= "data" "breach" "that" "relates" "to" "the" "unauthorised" "access" "," "collection" "," "use" "," "disclosure" "," "copying" "or" "modification" "of" "personal" "data" "only" "within" "an" "organisation" ;
+CN ::= CN RS ;
+RS ::= "that" VP ;
+VP ::= "relates" "to" NP ;
+NP ::= "the" "unauthorised" ConjN2 "of" NP "only" "within" NP ;
+CN ::= "organisation" ;
+
+
 Title ::= "Duty" "to" "conduct" "assessment" "of" "data" "breach" ;
 Ref ::= "26C" ;
 CN ::= "data" "breach" "that" "occurs" "on" "or" "after" "1" "February" "2021" ;

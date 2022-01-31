@@ -5,7 +5,7 @@ Based on Act 6A of PDPA.
 Files:
 
 - Analyse.hs  -- Haskell file for generating the grammar
-- Top.cf      -- the generated grammar, just in case
+- Top.cf      -- the generated grammar, with manual modifications at the end
 - act-6A.html -- the original document
 - act-6A.txt  -- the original as plain text
 - annotated-6A.txt -- the origina annotated with categories and keywords
@@ -14,8 +14,12 @@ Files:
 
 Processing:
 
-- generate the grammar: `runghc Analyse.hs >Top.cf`
-- parse in GF: `rf -file="tokenized-6A.txt" -lines | p -cat=Line`
+- generate the grammar: `runghc Analyse.hs >GenTop.cf` (no longer needed)
+- parse in GF:
+```
+> i Top.cf
+> rf -file="tokenized-6A.txt" -lines | p -cat=Line
+```
 
 
 

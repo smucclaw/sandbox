@@ -5,30 +5,30 @@ Line ::= QCN "," "in" "relation" "to" NP "," "means" "—" ;
 Line ::= Item NP ";" Conj ;
 Line ::= Item NP "." ;
 Line ::= Ref ;
-Line ::= Ref "." "—" Item "A" CN "is" "a" CN "if" NP "—" ;
+Line ::= Ref "." "—" Item "a" CN "is" "a" CN "if" NP "—" ;
 Line ::= Item VP ";" Conj ;
 Line ::= Item VP "." ;
-Line ::= Item "Without" "limiting" "subsection" Ref "," "a" CN "is" "deemed" "to" VP "—" ;
+Line ::= Item "without" "limiting" "subsection" Ref "," "a" CN "is" "deemed" "to" VP "—" ;
 Line ::= Item "if" S ";" Conj ;
 Line ::= Item "other" "prescribed" "circumstances" "." ;
 Line ::= Item "if" S Conj ;
 Line ::= Item "in" "other" "prescribed" "circumstances" "." ;
-Line ::= Item "Despite" "subsections" ConjItem "," "a" CN "is" "deemed" "not" "to" "be" "a" CN "." ;
-Line ::= Ref "." "—" Item "This" "section" "applies" "to" "a" CN "." ;
-Line ::= Item "Subject" "to" "subsection" Item "," "where" S "," S "." ;
-Line ::= Item "Where" "a" CN VP "—" ;
+Line ::= Item "despite" "subsections" ConjItem "," "a" CN "is" "deemed" "not" "to" "be" "a" CN "." ;
+Line ::= Ref "." "—" Item "this" "section" "applies" "to" "a" CN "." ;
+Line ::= Item "subject" "to" "subsection" Item "," "where" S "," S "." ;
+Line ::= Item "where" "a" CN VP "—" ;
 Line ::= Item S ";" Conj ;
 Line ::= Item S "." ;
 Line ::= Ref "." "—" Item "Where" "an" CN VP "." ;
-Line ::= Item "Subject" "to" "subsections" ConjItem "," Time "," S "." ;
+Line ::= Item "subject" "to" "subsections" ConjItem "," Time "," S "." ;
 Line ::= Item S "if" NP "—" ;
 Line ::= Item Time "," VP ";" Conj ;
 Line ::= Item "an" CN "must" "not" VP "in" "accordance" "with" "subsection" Item "if" "—" ;
-Line ::= Item "An" CN "is" "not" "," Adv "," "to" "be" "regarded" "as" VPing "of" "—" ;
+Line ::= Item "an" CN "is" "not" "," Adv "," "to" "be" "regarded" "as" VPing "of" "—" ;
 Line ::= Item "any" CN ";" Conj ;
 Line ::= Item "any" CN "." ;
-Line ::= Item "Subsections" ConjItem VP "." ;
-Line ::= Ref "." "Where" "an" CN "—" ;
+Line ::= Item "subsections" ConjItem VP "." ;
+Line ::= Ref "." "where" "an" CN "—" ;
 Line ::= Item VP "," ;
 Line ::= S "." ;
 -- 66 lines 33 rules
@@ -37,13 +37,18 @@ Title ::= "PART" "6A" ;
 Title ::= "NOTIFICATION" "OF" "DATA" "BREACHES" ;
 Title ::= "Interpretation" "of" "this" "Part" ;
 Ref ::= "26A" ;
-Loc ::= "In" "this" "Part" ;
+Loc ::= "in" "this" "Part" ;
 S ::= "the" "context" "otherwise" "requires" ;
 QCN ::= "“affected" "individual”" ;
-CN ::= "individual" "to" "whom" "any" "personal" "data" "affected" "by" "a" "data" "breach" "relates" ;
+
+
+---CN ::= "individual" "to" "whom" "any" "personal" "data" "affected" "by" "a" "data" "breach" "relates" ;
 QCN ::= "“data" "breach”" ;
-NP ::= "personal" "data" ;
 Item ::= "(a)" ;
+RS ::= "to" "whom" NP VP ;
+AP ::= "affected" "by" NP ;
+VP ::= "relates" ;
+
 
 --- NP ::= "the" "unauthorised" "access" "," "collection" "," "use" "," "disclosure" "," "copying" "," "modification" "or" "disposal" "of" "personal" "data" ;
 NP ::= "the" "unauthorised" ConjN2 "of" NP ;
@@ -123,7 +128,8 @@ Ref ::= "(1)(b)" ;
 VP ::= "be" "of" "a" "significant" "scale" ;
 S ::= "the" "data" "breach" "affects" "not" "fewer" "than" "the" "prescribed" "number" "of" "affected" "individuals" ";" ;
 Item ::= "(4)" ;
-ConjItem ::= "(1)" "," "(2)" "and" "(3)" ;
+ConjItem ::= Item Conj Item ;
+ConjItem ::= Item "," ConjItem ;
 
 
 ---CN ::= "data" "breach" "that" "relates" "to" "the" "unauthorised" "access" "," "collection" "," "use" "," "disclosure" "," "copying" "or" "modification" "of" "personal" "data" "only" "within" "an" "organisation" ;
@@ -193,22 +199,52 @@ PP ::= "upon" "notification" "by" NP ;
 VP ::= "conduct" NP ;
 
 
---- S ::= "The" "organisation" "must" "carry" "out" "the" "assessment" "mentioned" "in" "subsection" "(2)" "or" "(3)(b)" "in" "accordance" "with" "any" "prescribed" "requirements" ;
-S ::= "the" "organisation" "must" "carry" "out" "the" "assessment" "mentioned" "in" "subsection" "(2)" "or" "(3)(b)" "in" "accordance" "with" "any" "prescribed" "requirements" ;
+--- S ::= "the" "organisation" "must" "carry" "out" "the" "assessment" "mentioned" "in" "subsection" "(2)" "or" "(3)(b)" "in" "accordance" "with" "any" "prescribed" "requirements" ;
+VP ::= "carry" "out" NP ;
+CN ::= "assessment" ;
+CN ::= CN AP ;
+AP ::= "mentioned" "in" "subsection" ConjItem ;
+VP ::= VP PP ;
+PP ::= "in" "accordance" "with" NP ;
+CN ::= "prescribed" "requirements" ;
+Item ::= "(3)(b)" ;
 
 
 Title ::= "Duty" "to" "notify" "occurrence" "of" "notifiable" "data" "breach" ;
 Ref ::= "26D" ;
-CN ::= "organisation" ;
-VP ::= "assesses" "," "in" "accordance" "with" "section" "26C" "," "that" "a" "data" "breach" "is" "a" "notifiable" "data" "breach" "," "the" "organisation" "must" "notify" "the" "Commission" "as" "soon" "as" "is" "practicable" "," "but" "in" "any" "case" "no" "later" "than" "3" "calendar" "days" "after" "the" "day" "the" "organisation" "makes" "that" "assessment" ;
-ConjItem ::= "(5)" "," "(6)" "and" "(7)" ;
-Time ::= "on" "or" "after" "notifying" "the" "Commission" "under" "subsection" "(1)" ;
-S ::= "the" "organisation" "must" "also" "notify" "each" "affected" "individual" "affected" "by" "a" "notifiable" "data" "breach" "mentioned" "in" "section" "26B(1)(a)" "in" "any" "manner" "that" "is" "reasonable" "in" "the" "circumstances" ;
+
+
+--- VP ::= "assesses" "," "in" "accordance" "with" "section" "26C" "," "that" "a" "data" "breach" "is" "a" "notifiable" "data" "breach" "," "the" "organisation" "must" "notify" "the" "Commission" "as" "soon" "as" "is" "practicable" "," "but" "in" "any" "case" "no" "later" "than" "3" "calendar" "days" "after" "the" "day" "the" "organisation" "makes" "that" "assessment" ;
+VP ::= "assesses" "," PP "," "that" S ;
+PP ::= "in" "accordance" "with" "section" Ref ;
+Line ::= Ref "." "—" Item "where" S "," S "." ;
+VP ::= "notify" NP ;
+NP ::= "the" "Commission" ;
+PP ::= "as" "soon" "as" "is" "practicable" ;
+PP ::= PP "," "but" "in" "any" "case" PP ;
+PP ::= "no" "later" "than" Num "calendar" "days" "after" "the" "day" S ;
+VP ::= "makes" NP ;
+NP ::= "that" CN ;
+Num ::= "3" ;
+
+
+--- Time ::= "on" "or" "after" "notifying" "the" "Commission" "under" "subsection" "(1)" ;
+Time ::= "on" "or" "after" "notifying" "the" "Commission" "under" "subsection" Item ;
+
+
+--- S ::= "the" "organisation" "must" "also" "notify" "each" "affected" "individual" "affected" "by" "a" "notifiable" "data" "breach" "mentioned" "in" "section" "26B(1)(a)" "in" "any" "manner" "that" "is" "reasonable" "in" "the" "circumstances" ;
+VP ::= "must" "also" VP ;
+VP ::= "notify" NP ;
+NP ::= "each" CN ; 
+AP ::= "mentioned" "in" "section" Ref ;
+Ref ::= "26B(1)(a)" ;
+PP ::= "in" "any" "manner" "that" "is" "reasonable" "in" "the" "circumstances" ;
+
+
 S ::= "The" "notification" "under" "subsection" "(1)" "or" "(2)" "must" "contain" "," "to" "the" "best" "of" "the" "knowledge" "and" "belief" "of" "the" "organisation" "at" "the" "time" "it" "notifies" "the" "Commission" "or" "affected" "individual" "(" "as" "the" "case" "may" "be" ")" "," "all" "the" "information" "that" "is" "prescribed" "for" "this" "purpose" ;
 S ::= "The" "notification" "under" "subsection" "(1)" "must" "be" "made" "in" "the" "form" "and" "submitted" "in" "the" "manner" "required" "by" "the" "Commission" ;
 Item ::= "(5)" ;
 S ::= "Subsection" "(2)" "does" "not" "apply" "to" "an" "organisation" "in" "relation" "to" "an" "affected" "individual" ;
-NP ::= "the" "organisation" ;
 Time ::= "on" "or" "after" "assessing" "that" "the" "data" "breach" "is" "a" "notifiable" "data" "breach" ;
 VP ::= "takes" "any" "action" "," "in" "accordance" "with" "any" "prescribed" "requirements" "," "that" "renders" "it" "unlikely" "that" "the" "notifiable" "data" "breach" "will" "result" "in" "significant" "harm" "to" "the" "affected" "individual" ;
 VP ::= "had" "implemented" "," "prior" "to" "the" "occurrence" "of" "the" "notifiable" "data" "breach" "," "any" "technological" "measure" "that" "renders" "it" "unlikely" "that" "the" "notifiable" "data" "breach" "will" "result" "in" "significant" "harm" "to" "the" "affected" "individual" ;

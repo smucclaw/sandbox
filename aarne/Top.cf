@@ -241,17 +241,75 @@ Ref ::= "26B(1)(a)" ;
 PP ::= "in" "any" "manner" "that" "is" "reasonable" "in" "the" "circumstances" ;
 
 
-S ::= "The" "notification" "under" "subsection" "(1)" "or" "(2)" "must" "contain" "," "to" "the" "best" "of" "the" "knowledge" "and" "belief" "of" "the" "organisation" "at" "the" "time" "it" "notifies" "the" "Commission" "or" "affected" "individual" "(" "as" "the" "case" "may" "be" ")" "," "all" "the" "information" "that" "is" "prescribed" "for" "this" "purpose" ;
-S ::= "The" "notification" "under" "subsection" "(1)" "must" "be" "made" "in" "the" "form" "and" "submitted" "in" "the" "manner" "required" "by" "the" "Commission" ;
+--- S ::= "the" "notification" "under" "subsection" "(1)" "or" "(2)" "must" "contain" "," "to" "the" "best" "of" "the" "knowledge" "and" "belief" "of" "the" "organisation" "at" "the" "time" "it" "notifies" "the" "Commission" "or" "affected" "individual" "(" "as" "the" "case" "may" "be" ")" "," "all" "the" "information" "that" "is" "prescribed" "for" "this" "purpose" ;
+CN ::= "notification" ;
+AP ::= "under" "subsection" ConjItem ;
+V2 ::= "contain" ;
+PP ::= "to" "the" "best" "of" "the" "knowledge" "and" "belief" "of" NP "at" "the" "time" NP "notifies" ConjNP "(" "as" "the" "case" "may" "be" ")" ;
+NP ::= "it" ;
+ConjNP ::= NP Conj NP ;
+NP ::= "all" "the" CN RS ;
+CN ::= "information" ;
+VP ::= "is" "prescribed" "for" NP ;
+NP ::= "this" CN ;
+CN ::= "purpose" ;
+
+
+--- S ::= "the" "notification" "under" "subsection" "(1)" "must" "be" "made" "in" "the" "form" "and" "submitted" "in" "the" "manner" "required" "by" NP ;
+AP ::= "under" "subsection" Item ;
+VP ::= "be" ConjPPart ;
+ConjPPart ::= PPart Conj PPart ;
+PPart ::= "made" "in" "the" "form" ;
+PPart ::= "submitted" "in" "the" "manner" "required" "by" "the" "Commission" ;
+
+
 Item ::= "(5)" ;
-S ::= "Subsection" "(2)" "does" "not" "apply" "to" "an" "organisation" "in" "relation" "to" "an" "affected" "individual" ;
-Time ::= "on" "or" "after" "assessing" "that" "the" "data" "breach" "is" "a" "notifiable" "data" "breach" ;
-VP ::= "takes" "any" "action" "," "in" "accordance" "with" "any" "prescribed" "requirements" "," "that" "renders" "it" "unlikely" "that" "the" "notifiable" "data" "breach" "will" "result" "in" "significant" "harm" "to" "the" "affected" "individual" ;
-VP ::= "had" "implemented" "," "prior" "to" "the" "occurrence" "of" "the" "notifiable" "data" "breach" "," "any" "technological" "measure" "that" "renders" "it" "unlikely" "that" "the" "notifiable" "data" "breach" "will" "result" "in" "significant" "harm" "to" "the" "affected" "individual" ;
+
+
+--- S ::= "subsection" "(2)" "does" "not" "apply" "to" "an" "organisation" "in" "relation" "to" "an" "affected" "individual" ;
+NP ::= "subsection" Item ;
+VP ::= "does" "not" "apply" "to" NP ;
+AP ::= "in" "relation" "to" NP ;
+
+
+--- Time ::= "on" "or" "after" "assessing" "that" "the" "data" "breach" "is" "a" "notifiable" "data" "breach" ;
+Time ::= "on" "or" "after" "assessing" "that" S ;
+
+
+--- VP ::= "takes" "any" "action" "," "in" "accordance" "with" "any" "prescribed" "requirements" "," "that" "renders" "it" "unlikely" "that" "the" "notifiable" "data" "breach" "will" "result" "in" "significant" "harm" "to" "the" "affected" "individual" ;
+VP ::= "takes" NP "," PP "," RS ;
+CN ::= "action" ;
+VP ::= "renders" "it" "unlikely" "that" S ;
+VP ::= "will" "result" "in" "significant" "harm" "to" NP ;
+PP ::= "in" "accordance" "with" NP ;
+A ::= "prescribed" ;
+CN ::= "requirements" ;
+
+
 Item ::= "(6)" ;
-VP ::= "notify" "any" "affected" "individual" ;
-S ::= "a" "prescribed" "law" "enforcement" "agency" "so" "instructs" ;
-S ::= "the" "Commission" "so" "directs" ;
+
+
+---VP ::= "had" "implemented" "," "prior" "to" "the" "occurrence" "of" "the" "notifiable" "data" "breach" "," "any" "technological" "measure" "that" "renders" "it" "unlikely" "that" "the" "notifiable" "data" "breach" "will" "result" "in" "significant" "harm" "to" "the" "affected" "individual" ;
+VP ::= "had" "implemented" "," PP "," NP ;
+PP ::= "prior" "to" "the" "occurrence" "of" NP ;
+A ::= "technological" ;
+CN ::= "measure" ;
+
+
+--- VP ::= "notify" "any" "affected" "individual" ;
+VP ::= "notify" NP ;
+
+
+--- S ::= "a" "prescribed" "law" "enforcement" "agency" "so" "instructs" ;
+CN ::= "law" "enforcement" "agency" ;
+VP ::= "so" V ;
+V ::= "instructs" ;
+
+
+--- S ::= "the" "Commission" "so" "directs" ;
+V ::= "directs" ;
+
+
 Item ::= "(7)" ;
 S ::= "The" "Commission" "may" "," "on" "the" "written" "application" "of" "an" "organisation" "," "waive" "the" "requirement" "to" "notify" "an" "affected" "individual" "under" "subsection" "(2)" "subject" "to" "any" "conditions" "that" "the" "Commission" "thinks" "fit" ;
 Item ::= "(8)" ;

@@ -24,7 +24,7 @@ Line ::= Item "subject" "to" "subsections" ConjItem "," Time "," S "." ;
 Line ::= Item S "if" NP "—" ;
 Line ::= Item Time "," VP ";" Conj ;
 Line ::= Item "an" CN "must" "not" VP "in" "accordance" "with" "subsection" Item "if" "—" ;
-Line ::= Item "an" CN "is" "not" "," Adv "," "to" "be" "regarded" "as" VPing "of" "—" ;
+Line ::= Item "an" CN "is" "not" "," PP "," "to" "be" "regarded" "as" NP "of" "—" ;
 Line ::= Item "any" CN ";" Conj ;
 Line ::= Item "any" CN "." ;
 Line ::= Item "subsections" ConjItem VP "." ;
@@ -166,7 +166,7 @@ VP ::= V2 "," PP "," NP ;
 V2 ::= "conduct" ;
 PP ::= "in" "a" "reasonable" "and" "expeditious" "manner" ;
 CN ::= "assessment" "of" "whether" S ;
-S  := NP "is" "a" CN ;
+VP := "is" "a" CN ;
 
 
 --- CN ::= "data" "intermediary" "(other" "than" "a" "data" "intermediary" "mentioned" "in" "section" "26E)" ;
@@ -219,7 +219,7 @@ VP ::= "assesses" "," PP "," "that" S ;
 PP ::= "in" "accordance" "with" "section" Ref ;
 Line ::= Ref "." "—" Item "where" S "," S "." ;
 VP ::= "notify" NP ;
-NP ::= "the" "Commission" ;
+CN ::= "Commission" ;
 PP ::= "as" "soon" "as" "is" "practicable" ;
 PP ::= PP "," "but" "in" "any" "case" PP ;
 PP ::= "no" "later" "than" Num "calendar" "days" "after" "the" "day" S ;
@@ -311,18 +311,85 @@ V ::= "directs" ;
 
 
 Item ::= "(7)" ;
-S ::= "The" "Commission" "may" "," "on" "the" "written" "application" "of" "an" "organisation" "," "waive" "the" "requirement" "to" "notify" "an" "affected" "individual" "under" "subsection" "(2)" "subject" "to" "any" "conditions" "that" "the" "Commission" "thinks" "fit" ;
+
+
+--- S ::= "The" "Commission" "may" "," "on" "the" "written" "application" "of" "an" "organisation" "," "waive" "the" "requirement" "to" "notify" "an" "affected" "individual" "under" "subsection" "(2)" "subject" "to" "any" "conditions" "that" "the" "Commission" "thinks" "fit" ;
 Item ::= "(8)" ;
-Adv ::= "by" "reason" "only" "of" "notifying" "the" "Commission" "under" "subsection" "(1)" "or" "an" "affected" "individual" "under" "subsection" "(2)" ;
-VPing ::= "being" "in" "breach" ;
-CN ::= "duty" "or" "obligation" "under" "any" "written" "law" "or" "rule" "of" "law" "," "or" "any" "contract" "," "as" "to" "secrecy" "or" "other" "restriction" "on" "the" "disclosure" "of" "information" ;
-CN ::= "rule" "of" "professional" "conduct" "applicable" "to" "the" "organisation" ;
+VP ::= "may" "," PP "," VP ;
+PP ::= "on" "the" "written" "application" "of" NP ;
+VP ::= "waive" NP ;
+CN ::= "requirement" "to" VP ;
+PP ::= "subject" "to" "any" "conditions" "that" "the" "Commission" "thinks" "fit" ;
+
+
+--- PP ::= "by" "reason" "only" "of" "notifying" "the" "Commission" "under" "subsection" "(1)" "or" "an" "affected" "individual" "under" "subsection" "(2)" ;
+PP ::= "by" "reason" "only" "of" NP ;
+NP ::= "notifying" ConjNP ;
+
+
+NP ::= "being" "in" "breach" ;
+
+
+--- CN ::= "duty" "or" "obligation" "under" "any" "written" "law" "or" "rule" "of" "law" "," "or" "any" "contract" "," "as" "to" "secrecy" "or" "other" "restriction" "on" "the" "disclosure" "of" "information" ;
+CN ::= "duty" ;
+CN ::= "obligation" ;
+AP ::= "under" NP ;
+A  ::= "written" ;
+CN ::= "law" ;
+CN ::= "rule" "of" "law" ;
+CN ::= "contract" ;
+CN ::= "secrecy" ;
+CN ::= "restriction" "on" NP ;
+NP ::= NP "," Conj NP "," PP ;
+PP ::= "as" "to" ConjNP ;
+A  ::= "other" ;
+NP ::= "any" ConjCN ;
+CN ::= N2 "of" NP ;
+
+
+--- CN ::= "rule" "of" "professional" "conduct" "applicable" "to" "the" "organisation" ;
+CN ::= "rule" "of" NP ;
+CN ::= "professional" "conduct" ;
+AP ::= "applicable" "to" NP ;
+
+
 Item ::= "(9)" ;
-ConjItem ::= "(1)" "and" "(2)" ;
-VP ::= "apply" "concurrently" "with" "any" "obligation" "of" "the" "organisation" "under" "any" "other" "written" "law" "to" "notify" "any" "other" "person" "(" "including" "any" "public" "agency" ")" "of" "the" "occurrence" "of" "a" "data" "breach" "," "or" "to" "provide" "any" "information" "relating" "to" "a" "data" "breach" ;
-Title ::= "Obligations" "of" "data" "intermediary" "of" "public" "agency" ;
+
+
+--- VP ::= "apply" "concurrently" "with" "any" "obligation" "of" "the" "organisation" "under" "any" "other" "written" "law" "to" "notify" "any" "other" "person" "(" "including" "any" "public" "agency" ")" "of" "the" "occurrence" "of" "a" "data" "breach" "," "or" "to" "provide" "any" "information" "relating" "to" "a" "data" "breach" ;
+VP ::= "apply" "concurrently" "with" NP ;
+CN ::= "obligation" "of" NP "to" VP ;
+CN ::= "person" ;
+NP ::= NP "(" "including" NP ")" ;
+CN ::= "public" "agency" ;
+CN ::= "occurrence" "of" NP ;
+VP ::= VP "," Conj "to" VP ;
+VP ::= "provide" NP ;
+PP ::= "relating" "to" NP ;
+Line ::= "subsections" ConjItem VP "." ;
+
+
+Title ::= "obligations" "of" "data" "intermediary" "of" "public" "agency" ;
 Ref ::= "26E" ;
-VP ::= "is" "a" "data" "intermediary" "processing" "personal" "data" "on" "behalf" "of" "and" "for" "the" "purposes" "of" "a" "public" "agency" ;
-VP ::= "has" "reason" "to" "believe" "that" "a" "data" "breach" "has" "occurred" "in" "relation" "to" "that" "personal" "data" ;
-S ::= "the" "organisation" "must" "," "without" "undue" "delay" "," "notify" "the" "public" "agency" "of" "the" "occurrence" "of" "the" "data" "breach" ;
--- 80 lexical rules
+
+
+--- VP ::= "is" "a" "data" "intermediary" "processing" "personal" "data" "on" "behalf" "of" "and" "for" "the" "purposes" "of" "a" "public" "agency" ;
+CN ::= "data" "intermediary" ;
+AP ::= "processing" NP ;
+AP ::= "on" "behalf" "of" "and" "for" "the" "purposes" "of" NP ;
+CN ::= "public" "agency" ;
+
+
+--- VP ::= "has" "reason" "to" "believe" "that" "a" "data" "breach" "has" "occurred" "in" "relation" "to" "that" "personal" "data" ;
+VP ::= "has" "reason" "to" VP ;
+VP ::= "believe" "that" S ;
+VP ::= "has" "occurred" ;
+PP ::= "in" "relation" "to" NP ;
+
+
+--- S ::= "the" "organisation" "must" "," "without" "undue" "delay" "," "notify" "the" "public" "agency" "of" "the" "occurrence" "of" "the" "data" "breach" ;
+VP ::= "must" "," PP "," VP ;
+PP ::= "without" "undue" "delay" ;
+
+
+--- -- 80 lexical rules

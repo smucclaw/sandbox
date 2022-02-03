@@ -1,0 +1,131 @@
+*Title PART 6A
+
+*Title NOTIFICATION OF DATA BREACHES
+
+*Title Interpretation of this Part
+
+*Ref 26A #.  *Loc In this Part #, #unless *S the context otherwise requires #—
+
+*QCN “affected individual” #means #any *CN individual to whom any personal data affected by a data breach relates #;
+
+*QCN “data breach” #, #in #relation #to *NP personal data #, #means #—
+
+*Item (a) *NP the unauthorised access , collection , use , disclosure , copying , modification [ or ] disposal [ of ] personal data #; *Conj or
+
+*Item (b) *NP the loss of any storage medium or device on which personal data is stored in circumstances where the unauthorised access , collection , use , disclosure , copying , modification [ or ] disposal of the personal data is likely to occur #.
+
+*Ref [40/2020]
+
+*Title Notifiable data breaches
+
+*Ref 26B #. #— *Item (1)  #A *CN data breach #is #a *CN notifiable data breach #if *NP the data breach #—
+
+*Item (a) *VP results in , [ or ] is likely to result in , significant harm to an affected individual #; *Conj or
+
+*Item (b) *VP is , [ or ] is likely to be , of a significant scale #.
+
+*Ref [40/2020]
+
+*Item (2) #Without #limiting #subsection *Ref (1)(a) #, #a *CN data breach #is #deemed #to *VP result in significant harm to an individual #—
+
+*Item (a) #if *S the data breach is in relation to any prescribed personal data or class of personal data relating to the individual #; *Conj or
+
+*Item (b) #other #prescribed #circumstances #.
+
+*Ref [40/2020]
+
+*Item (3) #Without #limiting #subsection *Ref (1)(b) #, #a *CN data breach #is #deemed #to *VP be of a significant scale #—
+
+*Item (a) #if *S the data breach affects not fewer than the prescribed number of affected individuals ; *Conj or
+
+*Item (b) #in #other #prescribed #circumstances #.
+
+*Ref [40/2020]
+
+*Item (4) #Despite #subsections *ConjItem (1) , (2) and (3) #, #a *CN data breach that relates to the unauthorised access , collection , use , disclosure , copying or modification of personal data only within an organisation #is #deemed #not #to #be #a *CN notifiable data breach #.
+
+*Ref [40/2020]
+
+*Title Duty to conduct assessment of data breach
+
+*Ref 26C #. #— *Item (1) #This #section #applies #to #a *CN data breach that occurs on or after 1 February 2021 #.
+
+*Ref [40/2020]
+
+*Item (2) #Subject #to #subsection *Item (3) #, #where *S an organisation has reason to believe that a data breach affecting personal data in its possession [ or ] under its control has occurred #, *S the organisation [ must ] conduct , in a reasonable and expeditious manner , an assessment of whether the data breach is a notifiable data breach #.
+
+*Ref [40/2020]
+
+*Item (3)  #Where #a *CN data intermediary (other than a data intermediary mentioned in section 26E) *VP has reason to believe that a data breach has occurred in relation to personal data that the data intermediary is processing on behalf of and for the purposes of [ another ] organisation #—
+
+*Item (a) *S [ the ] data intermediary must , without undue delay , notify [ that other ] organisation of the occurrence of the data breach #; *Conj and
+
+*Item (b) *S [ that other ] organisation must , upon notification by the data intermediary , conduct an assessment of whether the data breach is a notifiable data breach #.
+
+*Ref [40/2020]
+
+*Item (4)  *S [ The ] organisation must carry out the assessment mentioned in subsection (2) or (3)(b) in accordance with any prescribed requirements #.
+
+*Ref [40/2020]
+
+*Title Duty to notify occurrence of notifiable data breach
+
+*Ref 26D #. #— *Item (1)  #Where #an *CN organisation *VP assesses , [ in accordance with ] section 26C , that a data breach is a notifiable data breach , the organisation must notify the Commission as soon as is practicable , but in any case no later than 3 calendar days [ after the ] day the organisation makes that assessment #.
+
+*Ref [40/2020]
+
+*Item (2)  #Subject #to #subsections *ConjItem (5) , (6) and (7) #, *Time [ on or after ] notifying the Commission under subsection (1) #, *S the organisation must also notify each affected individual affected by a notifiable data breach mentioned in section 26B(1)(a) in any manner that is reasonable in the circumstances #.
+
+*Ref [40/2020]
+
+*Item (3)  *S [ The ] notification [ under subsection ] (1) or (2) [ must ] contain , to the best of the knowledge and belief of the organisation at the time it notifies the Commission or affected individual ( as the case may be ) , all the information that is prescribed for this purpose #.
+
+*Ref [40/2020]
+
+*Item (4)  *S [ The ] notification [ under ] subsection (1) [ must ] be made in the form and submitted in the manner required by the Commission #.
+
+*Ref [40/2020]
+
+*Item (5) *S Subsection (2) [ does not apply to ] an organisation in relation to an affected individual #if *NP the organisation #—
+
+*Item (a) *Time [ on or after ] assessing that the data breach is a notifiable data breach #, *VP takes any action , in accordance with any prescribed requirements , that renders it unlikely that the notifiable data breach will result in significant harm to the affected individual #; *Conj or
+
+*Item (b) *VP had implemented , [ prior to the occurrence of ] the notifiable data breach , any technological measure that renders it unlikely that the notifiable data breach will result in significant harm to the affected individual #.
+
+*Ref [40/2020]
+
+*Item (6) #an *CN organisation #must #not *VP notify any affected individual #in #accordance #with #subsection *Item (2) #if #—
+
+*Item (a) *S a prescribed law enforcement agency so instructs #; *Conj or
+
+*Item (b) *S the Commission so directs #.
+
+*Ref [40/2020]
+
+*Item (7)  *S The Commission [ may ] , on the written application of an organisation , waive the requirement to notify an affected individual under subsection (2) subject to any conditions that the Commission thinks fit #.
+
+*Ref [40/2020]
+
+*Item (8)  #An *CN organisation #is #not #, *Adv by reason only of notifying the Commission under subsection (1) or an affected individual under subsection (2) #, #to #be #regarded #as *VPing being in breach #of #—
+
+*Item (a) #any *CN duty [ or ] obligation under any written law or rule of law , [ or ] any contract , as to secrecy [ or ] other restriction on the disclosure of information #; *Conj or
+
+*Item (b) #any *CN rule of professional conduct applicable to [ the ] organisation #.
+
+*Ref [40/2020]
+
+*Item (9) #Subsections *ConjItem (1) and (2) *VP [ apply concurrently ] with any obligation of the organisation under any other written law to notify any other person ( including any public agency ) of the occurrence of a data breach , or to provide any information relating to a data breach #.
+
+*Ref [40/2020]
+
+*Title Obligations of data intermediary of public agency
+
+*Ref 26E #.  #Where #an *CN organisation #—
+
+*Item (a) *VP is a data intermediary processing personal data on behalf of and for the purposes of a public agency #; *Conj and
+
+*Item (b) *VP has reason to believe that [ a ] data breach has occurred in relation to that personal data #,
+
+*S [ the ] organisation must , without undue delay , notify the public agency of the occurrence of [ the ] data breach #.
+
+*Ref [40/2020]

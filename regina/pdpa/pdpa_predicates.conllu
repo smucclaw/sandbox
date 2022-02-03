@@ -1,0 +1,403 @@
+#   The PDPA covers personal data stored in electronic and non-electronic formats
+1	The	the	DET	DEF	Definite=Def|PronType=Art	2	det	_	_
+2	PDPA	Pdpa	NOUN	SG-NOM	Number=Sing	3	nsubj	_	_
+3	covers	cover	VERB	PL-NOM	Number=Plur	0	root	_	_
+4	personal	personal	ADJ	POS	Degree=Pos	5	amod	_	_
+5	data	data	NOUN	PL-NOM	Number=Sing	3	obj	_	_
+6	stored	store	VERB	PASS	Tense=Past|VerbForm=Part|Voice=Pass	5	acl	_	_
+7	in	in	ADP	_	_	11	case	_	_
+8	electronic	electronic	ADJ	POS	Degree=Pos	11	amod	_	_
+9	and	and	CCONJ	_	_	10	cc	_	_
+10	non-electronic	non-electronic	ADJ	POS	Degree=Pos	8	conj	_	_
+11	formats	formats	NOUN	PL-NOM	Number=Plur	6	obl	_	SpaceAfter=No
+
+#   The affected individual is the person whose personal data is affected by the data breach
+1	The	the	DET	DEF	Definite=Def|PronType=Art	3	det	_	_
+2	affected	affect	ADJ	POS	Degree=Pos|VerbForm=Part	3	amod	_	_
+3	individual	individual	NOUN	SG-NOM	Number=Sing	6	nsubj	_	_
+4	is	be	AUX	PRES	Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin	6	cop	_	_
+5	the	the	DET	DEF	Definite=Def|PronType=Art	6	det	_	_
+6	person	person	NOUN	SG-NOM	Number=Sing	0	root	_	_
+7	whose	who	PRON	WH-REL-GEN	Poss=Yes|PronType=Int	9	nmod:poss	_	_
+8	personal	personal	ADJ	POS	Degree=Pos	9	amod	_	_
+9	data	data	NOUN	PL-NOM	Number=Sing	11	nsubj:pass	_	_
+10	is	be	AUX	PRES-AUX	Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin	11	aux:pass	_	_
+11	affected	affect	VERB	PASS	Tense=Past|VerbForm=Part|Voice=Pass	6	acl:relcl	_	_
+12	by	by	ADP	_	_	15	case	_	_
+13	the	the	DET	DEF	Definite=Def|PronType=Art	15	det	_	_
+14	data	data	NOUN	PL-NOM	Number=Sing	15	compound	_	_
+15	breach	breach	NOUN	SG-NOM	Number=Sing	11	obl	_	SpacesAfter=\n
+
+#	Data breach is the unauthorised access, collection, use, disclosure, copying, modification or disposal of personal data
+1	Data	data	NOUN	PL-NOM	Number=Sing	2	compound	_	_
+2	breach	breach	NOUN	SG-NOM	Number=Sing	6	nsubj	_	_
+3	is	be	AUX	PRES	Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin	6	cop	_	_
+4	the	the	DET	DEF	Definite=Def|PronType=Art	6	det	_	_
+5	unauthorised	unauthorised	ADJ	POS	Degree=Pos	6	amod	_	_
+6	access	access	NOUN	SG-NOM	Number=Sing	0	root	_	SpaceAfter=No
+7	,	,	PUNCT	Comma	_	6	punct	_	_
+8	collection	collection	NOUN	SG-NOM	Number=Sing	6	conj	_	SpaceAfter=No
+9	,	,	PUNCT	Comma	_	8	punct	_	_
+10	use	use	NOUN	SG-NOM	Number=Sing	6	conj	_	SpaceAfter=No
+11	,	,	PUNCT	Comma	_	10	punct	_	_
+12	disclosure	disclosure	NOUN	SG-NOM	Number=Sing	6	conj	_	SpaceAfter=No
+13	,	,	PUNCT	Comma	_	14	punct	_	_
+14	copying	copy	VERB	ING	Tense=Pres|VerbForm=Part	6	conj	_	SpaceAfter=No
+15	,	,	PUNCT	Comma	_	14	punct	_	_
+16	modification	modification	NOUN	SG-NOM	Number=Sing	6	conj	_	_
+17	or	or	CCONJ	_	_	18	cc	_	_
+18	disposal	disposal	NOUN	SG-NOM	Number=Sing	6	conj	_	_
+19	of	of	ADP	_	_	21	case	_	_
+20	personal	personal	ADJ	POS	Degree=Pos	21	amod	_	_
+21	data	data	NOUN	PL-NOM	Number=Sing	18	nmod	_	SpacesAfter=\n
+
+#   Data breach is the loss of any storage medium or device on which personal data is stored in circumstances where the unauthorised access, collection, use, disclosure, copying, modification or disposal of the personal data is likely to occur
+1	Data	data	NOUN	PL-NOM	Number=Sing	2	compound	_	_
+2	breach	breach	NOUN	SG-NOM	Number=Sing	5	nsubj	_	_
+3	is	be	AUX	PRES	Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin	5	cop	_	_
+4	the	the	DET	DEF	Definite=Def|PronType=Art	5	det	_	_
+5	loss	loss	NOUN	SG-NOM	Number=Sing	0	root	_	_
+6	of	of	ADP	_	_	9	case	_	_
+7	any	any	DET	IND	_	9	det	_	_
+8	storage	storage	NOUN	SG-NOM	Number=Sing	9	compound	_	_
+9	medium	medium	NOUN	SG-NOM	Number=Sing	5	nmod	_	_
+10	or	or	CCONJ	_	_	11	cc	_	_
+11	device	device	NOUN	SG-NOM	Number=Sing	9	conj	_	_
+12	on	on	ADP	_	_	13	case	_	_
+13	which	which	PRON	WH-REL	PronType=Int	17	obl	_	_
+14	personal	personal	ADJ	POS	Degree=Pos	15	amod	_	_
+15	data	data	NOUN	PL-NOM	Number=Sing	17	nsubj:pass	_	_
+16	is	be	AUX	PRES-AUX	Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin	17	aux:pass	_	_
+17	stored	store	VERB	PASS	Tense=Past|VerbForm=Part|Voice=Pass	11	acl:relcl	_	_
+18	in	in	ADP	_	_	19	case	_	_
+19	circumstances	circumstance	NOUN	PL-NOM	Number=Plur	17	obl	_	_
+20	where	where	ADV	WH-REL	PronType=Int	41	advmod	_	_
+21	the	the	DET	DEF	Definite=Def|PronType=Art	23	det	_	_
+22	unauthorised	unauthorised	ADJ	POS	Degree=Pos	23	amod	_	_
+23	access	access	NOUN	SG-NOM	Number=Sing	41	nsubj	_	SpaceAfter=No
+24	,	,	PUNCT	Comma	_	23	punct	_	_
+25	collection	collection	NOUN	SG-NOM	Number=Sing	23	conj	_	SpaceAfter=No
+26	,	,	PUNCT	Comma	_	25	punct	_	_
+27	use	use	NOUN	SG-NOM	Number=Sing	23	conj	_	SpaceAfter=No
+28	,	,	PUNCT	Comma	_	27	punct	_	_
+29	disclosure	disclosure	NOUN	SG-NOM	Number=Sing	23	conj	_	SpaceAfter=No
+30	,	,	PUNCT	Comma	_	31	punct	_	_
+31	copying	copy	VERB	ING	Tense=Pres|VerbForm=Part	23	conj	_	SpaceAfter=No
+32	,	,	PUNCT	Comma	_	31	punct	_	_
+33	modification	modification	NOUN	SG-NOM	Number=Sing	23	conj	_	_
+34	or	or	CCONJ	_	_	35	cc	_	_
+35	disposal	disposal	NOUN	SG-NOM	Number=Sing	23	conj	_	_
+36	of	of	ADP	_	_	39	case	_	_
+37	the	the	DET	DEF	Definite=Def|PronType=Art	39	det	_	_
+38	personal	personal	ADJ	POS	Degree=Pos	39	amod	_	_
+39	data	data	NOUN	PL-NOM	Number=Sing	35	nmod	_	_
+40	is	be	AUX	PRES	Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin	41	cop	_	_
+41	likely	like	ADJ	POS	Degree=Pos	19	acl:relcl	_	_
+42	to	to	PART	_	_	43	mark	_	_
+43	occur	occur	VERB	INF	VerbForm=Inf	41	acl	_	SpacesAfter=\n
+
+#   Data breach includes the loss of any storage medium or device with personal data
+1	Data	data	NOUN	PL-NOM	Number=Sing	2	compound	_	_
+2	breach	breach	NOUN	SG-NOM	Number=Sing	3	nsubj	_	_
+3	includes	include	VERB	PRES	Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin	0	root	_	_
+4	the	the	DET	DEF	Definite=Def|PronType=Art	5	det	_	_
+5	loss	loss	NOUN	SG-NOM	Number=Sing	3	obj	_	_
+6	of	of	ADP	_	_	9	case	_	_
+7	any	any	DET	IND	_	9	det	_	_
+8	storage	storage	NOUN	SG-NOM	Number=Sing	9	compound	_	_
+9	medium	medium	NOUN	SG-NOM	Number=Sing	5	nmod	_	_
+10	or	or	CCONJ	_	_	11	cc	_	_
+11	device	device	NOUN	SG-NOM	Number=Sing	9	conj	_	_
+12	with	with	ADP	_	_	14	case	_	_
+13	personal	personal	ADJ	POS	Degree=Pos	14	amod	_	_
+14	data	data	NOUN	PL-NOM	Number=Sing	11	nmod	_	SpacesAfter=\n
+
+#   A data breach is notifiable if it results in, or is likely to result in, significant harm to an affected individual
+1	A	a	DET	IND-SG	Definite=Ind|PronType=Art	3	det	_	_
+2	data	data	NOUN	PL-NOM	Number=Sing	3	compound	_	_
+3	breach	breach	NOUN	SG-NOM	Number=Sing	5	nsubj	_	_
+4	is	be	AUX	PRES	Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin	5	cop	_	_
+5	notifiable	notifiable	ADJ	POS	Degree=Pos	0	root	_	_
+6	if	if	SCONJ	_	_	8	mark	_	_
+7	it	it	PRON	PERS-SG	_	8	nsubj	_	_
+8	results	result	VERB	PRES	Case=Nom	5	advcl	_	_
+9	in	in	ADV	_	_	8	advmod	_	SpaceAfter=No
+10	,	,	PUNCT	Comma	_	5	punct	_	_
+11	or	or	CCONJ	_	_	13	cc	_	_
+12	is	be	AUX	PRES	Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin	13	cop	_	_
+13	likely	like	ADJ	POS	Degree=Pos	5	conj	_	_
+14	to	to	ADP	_	_	15	case	_	_
+15	result	result	NOUN	SG-NOM	Number=Sing	13	nmod	_	_
+16	in	in	ADP	_	_	15	case	_	SpaceAfter=No
+17	,	,	PUNCT	Comma	_	16	punct	_	_
+18	significant	significant	ADJ	POS	Degree=Pos	19	amod	_	_
+19	harm	harm	NOUN	SG-NOM	Number=Sing	15	nmod	_	_
+20	to	to	ADP	_	_	23	case	_	_
+21	an	an	DET	IND-SG	Definite=Ind|PronType=Art	23	det	_	_
+22	affected	affect	ADJ	PASS	Degree=Pos	23	amod	_	_
+23	individual	individual	NOUN	SG-NOM	Number=Sing	19	nsubj	_	SpacesAfter=\n
+
+#   if it harms the affected individual, the data breach is notifiable
+1	if	if	SCONJ	_	_	3	mark	_	_
+2	it	it	PRON	PERS-SG	_	3	nsubj	_	_
+3	harms	harm	VERB	PRES	Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin	12	advcl	_	_
+4	the	the	DET	DEF	Definite=Def|PronType=Art	6	det	_	_
+5	affected	affect	ADJ	PASS	Degree=Pos	6	amod	_	_
+6	individual	individual	NOUN	SG-NOM	Number=Sing	3	obj	_	SpaceAfter=No
+7	,	,	PUNCT	Comma	_	3	punct	_	_
+8	the	the	DET	DEF	Definite=Def|PronType=Art	10	det	_	_
+9	data	data	NOUN	PL-NOM	Number=Sing	10	compound	_	_
+10	breach	breach	NOUN	SG-NOM	Number=Sing	12	nsubj	_	_
+11	is	be	AUX	PRES	Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin	12	cop	_	_
+12	notifiable	notifiable	ADJ	POS	Degree=Pos	0	root	_	SpacesAfter=\n
+
+#   if it is significant, the data breach is notifiable
+1	if	if	SCONJ	_	_	4	mark	_	_
+2	it	it	PRON	PERS-SG	_	4	nsubj	_	_
+3	is	be	AUX	PRES	Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin	4	cop	_	_
+4	significant	significant	ADJ	POS	Degree=Pos	10	advcl	_	SpaceAfter=No
+5	,	,	PUNCT	Comma	_	4	punct	_	_
+6	the	the	DET	DEF	Definite=Def|PronType=Art	8	det	_	_
+7	data	data	NOUN	PL-NOM	Number=Sing	8	compound	_	_
+8	breach	breach	NOUN	SG-NOM	Number=Sing	10	nsubj	_	_
+9	is	be	AUX	PRES	Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin	10	cop	_	_
+10	notifiable	notifiable	ADJ	POS	Degree=Pos	0	root	_	SpacesAfter=\n
+
+#   once it is likely to be of significant scale, the data breach is notifiable
+1	once	once	SCONJ	_	_	4	mark	_	_
+2	it	it	PRON	PERS-SG	_	4	nsubj	_	_
+3	is	be	AUX	PRES	Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin	4	cop	_	_
+4	likely	like	ADJ	POS	Degree=Pos	15	advcl	_	_
+5	to	to	PART	_	_	6	aux	_	_
+6	be	be	VERB	INF	VerbForm=Inf	4	advmod	_	_
+7	of	of	ADP	_	_	9	case	_	_
+8	significant	significant	ADJ	POS	Degree=Pos	9	amod	_	_
+9	scale	scale	NOUN	SG-NOM	Number=Sing	6	obl	_	SpaceAfter=No
+10	,	,	PUNCT	Comma	_	4	punct	_	_
+11	the	the	DET	DEF	Definite=Def|PronType=Art	13	det	_	_
+12	data	data	NOUN	PL-NOM	Number=Sing	13	compound	_	_
+13	breach	breach	NOUN	SG-NOM	Number=Sing	15	nsubj	_	_
+14	is	be	AUX	PRES	Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin	15	cop	_	_
+15	notifiable	notifiable	ADJ	POS	Degree=Pos	0	root	_	SpacesAfter=\n
+
+#   any significant data breach, in scale or harm to the individual, is notifiable
+1	any	any	DET	IND	_	4	det	_	_
+2	significant	significant	ADJ	POS	Degree=Pos	3	amod	_	_
+3	data	data	NOUN	PL-NOM	Number=Sing	4	compound	_	_
+4	breach	breach	NOUN	SG-NOM	Number=Sing	15	nsubj	_	SpaceAfter=No
+5	,	,	PUNCT	Comma	_	7	punct	_	_
+6	in	in	ADP	_	_	7	case	_	_
+7	scale	scale	NOUN	SG-NOM	Number=Sing	4	nmod	_	_
+8	or	or	CCONJ	_	_	9	cc	_	_
+9	harm	harm	VERB	IMP	VerbForm=Inf	4	conj	_	_
+10	to	to	ADP	_	_	12	case	_	_
+11	the	the	DET	DEF	Definite=Def|PronType=Art	12	det	_	_
+12	individual	individual	NOUN	SG-NOM	Number=Sing	9	obl	_	SpaceAfter=No
+13	,	,	PUNCT	Comma	_	4	punct	_	_
+14	is	be	AUX	PRES	Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin	15	cop	_	_
+15	notifiable	notifiable	ADJ	POS	Degree=Pos	0	root	_	SpacesAfter=\n
+
+#   significant harm refers to data breach of any prescribed personal data or class of personal data of the individual
+1	significant	significant	ADJ	POS	Degree=Pos	2	amod	_	SpacesBefore=\t
+2	harm	harm	NOUN	SG-NOM	Number=Sing	3	nsubj	_	_
+3	refers	refer	VERB	PRES	Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin	0	root	_	_
+4	to	to	ADP	_	_	6	case	_	_
+5	data	data	NOUN	PL-NOM	Number=Sing	6	compound	_	_
+6	breach	breach	NOUN	SG-NOM	Number=Sing	3	obl	_	_
+7	of	of	ADP	_	_	11	case	_	_
+8	any	any	DET	IND	_	11	det	_	_
+9	prescribed	prescribe	NOUN	SG-NOM	Number=Sing	11	compound	_	_
+10	personal	personal	ADJ	POS	Degree=Pos	11	amod	_	_
+11	data	data	NOUN	PL-NOM	Number=Sing	6	nmod	_	_
+12	or	or	CCONJ	_	_	13	cc	_	_
+13	class	class	NOUN	SG-NOM	Number=Sing	11	conj	_	_
+14	of	of	ADP	_	_	16	case	_	_
+15	personal	personal	ADJ	POS	Degree=Pos	16	amod	_	_
+16	data	data	NOUN	PL-NOM	Number=Sing	13	nmod	_	_
+17	of	of	ADP	_	_	19	case	_	_
+18	the	the	DET	DEF	Definite=Def|PronType=Art	19	det	_	_
+19	individuale	individuale	NOUN	SG-NOM	Number=Sing	16	nmod	_	SpacesAfter=\n
+
+#   data breach of prescribed personal data is deemed to result in significant harm
+1	data	data	NOUN	PL-NOM	Number=Sing	2	compound	_	_
+2	breach	breach	NOUN	SG-NOM	Number=Sing	6	nmod	_	_
+3	of	of	ADP	_	_	4	case	_	_
+4	prescribed	prescribe	NOUN	_	Number=Sing	6	compound	_	_
+5	personal	personal	ADJ	POS	Degree=Pos	6	amod	_	_
+6	data	data	NOUN	PL-NOM	Number=Sing	8	nsubj:pass	_	_
+7	is	be	AUX	PRES-AUX	Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin	8	aux:pass	_	_
+8	deemed	deem	VERB	PASS	Tense=Past|VerbForm=Part|Voice=Pass	0	root	_	_
+9	to	to	PART	_	_	10	mark	_	_
+10	result	result	VERB	INF	VerbForm=Inf	8	obl	_	_
+11	in	in	ADP	_	_	13	case	_	_
+12	significant	significant	ADJ	POS	Degree=Pos	13	amod	_	_
+13	harm	harm	NOUN	SG-NOM	Number=Sing	10	obl	_	SpacesAfter=\n
+
+#   data breach of class of prescribed personal data of the individual is deemed to result in significant harm
+1	data	data	NOUN	PL-NOM	Number=Sing	2	compound	_	_
+2	breach	breach	NOUN	SG-NOM	Number=Sing	13	nsubj:pass	_	_
+3	of	of	ADP	_	_	4	case	_	_
+4	class	class	NOUN	SG-NOM	Number=Sing	2	nmod	_	_
+5	of	of	ADP	_	_	8	case	_	_
+6	prescribed	prescribe	NOUN	_	Number=Sing	8	amod	_	_
+7	personal	personal	ADJ	POS	Degree=Pos	8	amod	_	_
+8	data	data	NOUN	PL-NOM	Number=Sing	4	nmod	_	_
+9	of	of	ADP	_	_	11	case	_	_
+10	the	the	DET	DEF	Definite=Def|PronType=Art	11	det	_	_
+11	individual	individual	NOUN	SG-NOM	Number=Sing	8	nmod	_	_
+12	is	be	AUX	PRES-AUX	Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin	13	aux:pass	_	_
+13	deemed	deem	VERB	PASS	Tense=Past|VerbForm=Part|Voice=Pass	0	root	_	_
+14	to	to	PART	_	_	15	mark	_	_
+15	result	result	VERB	INF	VerbForm=Inf	13	xcomp	_	_
+16	in	in	ADP	_	_	18	case	_	_
+17	significant	significant	ADJ	POS	Degree=Pos	18	amod	_	_
+18	harm	harm	NOUN	SG-NOM	Number=Sing	15	obl	_	SpacesAfter=\n
+
+#   a data breach is deemed to result in significant harm to an individual in certain prescribed circumstances
+1	a	a	DET	IND-SG	Definite=Ind|PronType=Art	3	det	_	_
+2	data	data	NOUN	PL-NOM	Number=Sing	3	compound	_	_
+3	breach	breach	NOUN	SG-NOM	Number=Sing	5	nsubj:pass	_	_
+4	is	be	AUX	PRES-AUX	Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin	5	aux:pass	_	_
+5	deemed	deem	VERB	PASS	Tense=Past|VerbForm=Part|Voice=Pass	0	root	_	_
+6	to	to	PART	_	_	7	mark	_	_
+7	result	result	VERB	INF	VerbForm=Inf	5	xcomp	_	_
+8	in	in	ADP	_	_	10	case	_	_
+9	significant	significant	ADJ	POS	Degree=Pos	10	amod	_	_
+10	harm	harm	NOUN	SG-NOM	Number=Sing	7	obl	_	_
+11	to	to	ADP	_	_	13	case	_	_
+12	an	an	DET	IND-SG	Definite=Ind|PronType=Art	13	det	_	_
+13	individual	individual	NOUN	SG-NOM	Number=Sing	7	obl	_	_
+14	in	in	ADP	_	_	16	case	_	_
+15	certain	certain	ADJ	POS	Degree=Pos	16	amod	_	_
+16	prescribed	prescribe	NOUN	SG-NOM	Number=Sing	17	compound	_	_
+17	circumstances	circumstance	NOUN	PL-NOM	Number=Plur	13	acl	_	SpacesAfter=\n
+
+#   if the data breach affects at least 500 people, it is significant
+1	if	if	SCONJ	_	_	5	mark	_	_
+2	the	the	DET	DEF	Definite=Def|PronType=Art	4	det	_	_
+3	data	data	NOUN	PL-NOM	Number=Sing	4	compound	_	_
+4	breach	breach	NOUN	SG-NOM	Number=Sing	5	nsubj	_	_
+5	affects	affect	VERB	PRES	Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin	13	advcl	_	_
+6	at	at	ADP	_	_	9	case	_	_
+7	least	little	ADV	_	_	6	fixed	_	_
+8	500	500	NUM	CARD-PL	NumType=Card	9	nummod	_	_
+9	people	people	NOUN	PL-NOM	Number=Plur	5	obl	_	SpaceAfter=No
+10	,	,	PUNCT	Comma	_	5	punct	_	_
+11	it	it	PRON	PERS-SG	_	13	nsubj	_	_
+12	is	be	AUX	PRES	Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin	13	cop	_	_
+13	significant	significant	ADJ	POS	Degree=Pos	0	root	_	SpacesAfter=\n
+
+#   if the data breach affects at least 500 people, it is of significant scale for notification
+1	if	if	SCONJ	_	_	5	mark	_	_
+2	the	the	DET	DEF	Definite=Def|PronType=Art	4	det	_	_
+3	data	data	NOUN	PL-NOM	Number=Sing	4	compound	_	_
+4	breach	breach	NOUN	SG-NOM	Number=Sing	5	nsubj	_	_
+5	affects	affect	VERB	PRES	Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin	12	advcl	_	_
+6	at	at	ADP	_	_	9	case	_	_
+7	least	little	ADV	_	_	6	fixed	_	_
+8	500	500	NUM	CARD-PL	NumType=Card	9	nummod	_	_
+9	people	people	NOUN	PL-NOM	Number=Plur	5	obl	_	SpaceAfter=No
+10	,	,	PUNCT	Comma	_	5	punct	_	_
+11	it	it	PRON	PERS-SG	_	12	cop	_	_
+12	is	be	VERB	PRES	Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin	0	root	_	_
+13	of	of	ADP	_	_	15	case	_	_
+14	significant	significant	ADJ	POS	Degree=Pos	15	amod	_	_
+15	scale	scale	NOUN	SG-NOM	Number=Sing	12	obl	_	_
+16	for	for	ADP	_	_	17	case	_	_
+17	notification	notification	NOUN	SG-NOM	Number=Sing	15	nmod	_	SpacesAfter=\n
+
+#   if the data breach affects at least 500 people, it is a notifiable breach
+1	if	if	SCONJ	_	_	5	mark	_	SpacesBefore=\t
+2	the	the	DET	DEF	Definite=Def|PronType=Art	4	det	_	_
+3	data	data	NOUN	PL-NOM	Number=Sing	4	compound	_	_
+4	breach	breach	NOUN	SG-NOM	Number=Sing	5	nsubj	_	_
+5	affects	affect	VERB	PRES	Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin	15	advcl	_	_
+6	at	at	ADP	_	_	9	case	_	_
+7	least	little	ADV	_	_	6	fixed	_	_
+8	500	500	NUM	CARD-PL	NumType=Card	9	nummod	_	_
+9	people	people	NOUN	PL-NOM	Number=Plur	5	obl	_	SpaceAfter=No
+10	,	,	PUNCT	Comma	_	5	punct	_	_
+11	it	it	PRON	PERS-SG	_	15	nsubj	_	_
+12	is	be	AUX	PRES	Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin	15	cop	_	_
+13	a	a	DET	IND-SG	Definite=Ind|PronType=Art	15	det	_	_
+14	notifiable	notifiable	ADJ	POS	Degree=Pos	15	amod	_	_
+15	breach	breach	NOUN	SG-NOM	Number=Sing	0	root	_	SpacesAfter=\n
+
+#   a data breach affecting more than 500 people is a notifiable data breach
+1	a	a	DET	IND-SG	Definite=Ind|PronType=Art	3	det	_	_
+2	data	data	NOUN	PL-NOM	Number=Sing	3	compound	_	_
+3	breach	breach	NOUN	SG-NOM	Number=Sing	13	nsubj	_	_
+4	affecting	affect	VERB	ING	Tense=Pres|VerbForm=Part	3	acl	_	_
+5	more	much	ADV	CMP	_	4	advcl	_	_
+6	than	than	ADP	_	_	8	case	_	_
+7	500	500	NUM	CARD-PL	NumType=Card	8	nummod	_	_
+8	people	people	NOUN	PL-NOM	Number=Plur	5	nmod	_	_
+9	is	be	AUX	PRES	Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin	13	cop	_	_
+10	a	a	DET	IND-SG	Definite=Ind|PronType=Art	13	det	_	_
+11	notifiable	notifiable	ADJ	POS	Degree=Pos	12	amod	_	_
+12	data	data	NOUN	PL-NOM	Number=Sing	13	compound	_	_
+13	breach	breach	NOUN	SG-NOM	Number=Sing	0	root	_	SpacesAfter=\n
+
+#   a data breach is a notifiable breach if it falls outside the organisation
+1	a	a	DET	IND-SG	Definite=Ind|PronType=Art	3	det	_	_
+2	data	data	NOUN	PL-NOM	Number=Sing	3	compound	_	_
+3	breach	breach	NOUN	SG-NOM	Number=Sing	7	nsubj	_	_
+4	is	be	AUX	PRES	Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin	7	cop	_	_
+5	a	a	DET	IND-SG	Definite=Ind|PronType=Art	7	det	_	_
+6	notifiable	notifiable	ADJ	POS	Degree=Pos	7	amod	_	_
+7	breach	breach	NOUN	SG-NOM	Number=Sing	0	root	_	_
+8	if	if	SCONJ	_	_	10	mark	_	_
+9	it	it	PRON	PERS-SG	_	10	nsubj	_	_
+10	falls	fall	VERB	PRES	Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin	7	advcl	_	_
+11	outside	outside	ADP	_	_	13	case	_	_
+12	the	the	DET	DEF	Definite=Def|PronType=Art	13	det	_	_
+13	organisation	organisation	NOUN	SG-NOM	Number=Sing	10	advcl	_	SpacesAfter=\n
+
+#   a data breach within an organisation is not deemed to be a notifiable data breach
+1	a	a	DET	IND-SG	Definite=Ind|PronType=Art	3	det	_	_
+2	data	data	NOUN	PL-NOM	Number=Sing	3	compound	_	_
+3	breach	breach	NOUN	SG-NOM	Number=Sing	9	nsubj	_	_
+4	within	within	ADP	_	_	6	case	_	_
+5	an	an	DET	IND-SG	Definite=Ind|PronType=Art	6	det	_	_
+6	organisation	organisation	NOUN	SG-NOM	Number=Sing	3	acl	_	_
+7	is	be	AUX	PRES	Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin	9	cop	_	_
+8	not	not	PART	NEG	_	9	advmod	_	_
+9	deemed	deem	VERB	AD	Tense=Past|VerbForm=Part	0	root	_	_
+10	to	to	PART	_	_	15	mark	_	_
+11	be	be	AUX	INF	VerbForm=Inf	15	cop	_	_
+12	a	a	DET	IND-SG	Definite=Ind|PronType=Art	15	det	_	_
+13	notifiable	notifiable	ADJ	POS	Degree=Pos	14	amod	_	_
+14	data	data	NOUN	PL-NOM	Number=Sing	15	compound	_	_
+15	breach	breach	NOUN	SG-NOM	Number=Sing	9	xcomp	_	SpacesAfter=\n
+
+#   a data breach within an organisation is deemed to be not a notifiable data breach
+1	a	a	DET	IND-SG	Definite=Ind|PronType=Art	3	det	_	_
+2	data	data	NOUN	PL-NOM	Number=Sing	3	compound	_	_
+3	breach	breach	NOUN	SG-NOM	Number=Sing	8	nsubj:pass	_	_
+4	within	within	ADP	_	_	6	case	_	_
+5	an	an	DET	IND-SG	Definite=Ind|PronType=Art	6	det	_	_
+6	organisation	organisation	NOUN	SG-NOM	Number=Sing	3	nmod	_	_
+7	is	be	AUX	PRES	Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin	8	aux:pass	_	_
+8	deemed	deem	VERB	PERF	Tense=Past|VerbForm=Part|Voice=Pass	0	root	_	_
+9	to	to	PART	_	_	10	fixed	_	_
+10	be	be	AUX	INF	VerbForm=Inf	15	cop	_	_
+11	not	not	PART	NEG	_	15	advmod	_	_
+12	a	a	DET	IND-SG	Definite=Ind|PronType=Art	15	det	_	_
+13	notifiable	notifiable	ADJ	POS	Degree=Pos	14	amod	_	_
+14	data	data	NOUN	PL-NOM	Number=Sing	15	compound	_	_
+15	breach	breach	NOUN	SG-NOM	Number=Sing	8	obl	_	SpacesAfter=\n
+
+#   if the data breach is within an organisation, no notice is required
+1	if	if	SCONJ	_	_	5	mark	_	_
+2	the	the	DET	DEF	Definite=Def|PronType=Art	4	det	_	_
+3	data	data	NOUN	PL-NOM	Number=Sing	4	compound	_	_
+4	breach	breach	NOUN	SG-NOM	Number=Sing	5	nsubj	_	_
+5	is	be	VERB	PRES	Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin	6	aux:pass	_	_
+6	within	within	ADP	_	_	8	case	_	_
+7	an	an	DET	IND-SG	Definite=Ind|PronType=Art	8	det	_	_
+8	organisation	organisation	NOUN	SG-NOM	Number=Sing	5	obl	_	SpaceAfter=No not sure of this
+9	,	,	PUNCT	Comma	_	5	punct	_	_
+10	no	no	DET	NEG	_	11	det	_	_
+11	notice	notice	NOUN	SG-NOM	Number=Sing	13	nsubj:pass	_	_
+12	is	be	AUX	PRES-AUX	Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin	13	aux:pass	_	_
+13	required	require	VERB	PASS	Tense=Past|VerbForm=Part|Voice=Pass	0	root	_	SpacesAfter=\n

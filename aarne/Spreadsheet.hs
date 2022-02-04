@@ -64,6 +64,7 @@ andBox bs = infixLeftsideBox "AND" bs
 orBox bs = infixLeftsideBox "OR" bs
 notBox b = leftsideBox "NOT" [b]
 ifBox bs cs = doubleLeftsideBox "IF" bs "THEN" cs
+ofBox bs cs = doubleLeftsideBox "THE" bs "OF" cs
 atomBox s = headerBox s
 
 forallBox bs cs = doubleLeftsideBox "FOR ALL" bs "HOLDS" cs

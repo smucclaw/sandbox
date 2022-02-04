@@ -46,15 +46,20 @@ formula2box formula = case formula of
 -- the interpretation takes a list of lines
 
 data Env = Env {
-  lin :: Expr -> String
+  lin :: Expr -> String -- for the rendering of unanalysed parts
   }
+
+-- to collect lines that belong together - under a common heading
+paragraphs :: [GLine] -> [[GLine]]
+paragraphs = reverse . collect [] [] where
+  collect ps ts ls = case ls of
+    t@(GLine_Ref _) : ll | not (null ts) -> collect (reverse ts : ps) [t] ll
+    t : ll -> collect ps (t:ts) ll
+    _ -> reverse ts : ps
   
 iLines :: Env -> [GLine] -> Formula
 iLines env ls = case ls of
-  _ -> Sequence (map (iLine env) ls) ----
-
-paragraphs :: [GLine] -> [[GLine]]
-paragraphs ts = map return ts ----
+  _ -> Modal (lin env (gf (head ls))) $ Sequence (map (iLine env) (tail ls)) ----
 
 iA :: Env -> GA -> Formula
 iA env a = Atomic (lin env (gf a))

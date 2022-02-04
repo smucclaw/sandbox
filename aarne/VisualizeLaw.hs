@@ -15,12 +15,15 @@ Just lineCat = readType "Line"
 
 main = do
   pgf <- readPGF law_pgf
-  s <- getContents
-  let ps = parse pgf eng lineCat s
-  case ps of
-    [] -> putStrLn "no parse"
-    tree:_ -> do
-      let env = Env {lin = linearize pgf eng}
-      let formula = iLine env (fg tree)
+  ss <- getContents >>= return . lines
+  ts <- flip mapM ss $ \s -> do
+    let ps = parse pgf eng lineCat s
+    case ps of
+      [] -> putStrLn ("NO PARSE: " ++ s) >> return []
+      tree:_ -> return [tree]   
+  let env = Env {lin = linearize pgf eng}
+  let paras = paragraphs (map fg (concat ts))
+  flip mapM_ paras $ \para -> do
+      let formula = iLines env para
       let box = formula2box formula
       putStrLn $ S.renderBox box

@@ -67,6 +67,7 @@ ifBox bs cs = doubleLeftsideBox "IF" bs "THEN" cs
 ofBox bs cs = doubleLeftsideBox "THE" bs "OF" cs
 modBox a cs = doubleLeftsideBox "" [a] "WHICH IS" cs
 atomBox s = headerBox s
+seqBox bs = box{cells = [("",b) | b <- bs]}
 
 forallBox bs cs = doubleLeftsideBox "FOR ALL" bs "HOLDS" cs
 forsomeBox bs cs = doubleLeftsideBox "FOR SOME" bs "HOLDS" cs

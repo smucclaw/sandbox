@@ -111,14 +111,21 @@ fun ConjN2_N2__ConjN2 : N2 -> ConjN2 -> ConjN2 ;
 fun ConjN2_N2_Conj_N2 : N2 -> Conj -> N2 -> ConjN2 ;
 
 fun ConjNP_NP_Conj_NP : NP -> Conj -> NP -> ConjNP ;
+
 fun ConjPP_PP_Conj_PP : PP -> Conj -> PP -> ConjPP ;
+
 fun ConjPPart_PPart_Conj_PPart : PPart -> Conj -> PPart -> ConjPPart ;
+
 fun ConjVP2_VP2__Conj_VP2_ : VP2 -> Conj -> VP2 -> ConjVP2 ;
+
 fun Conj_and : Conj ;
 fun Conj_or : Conj ;
+
 fun Cop_is : Cop ;
 fun Cop_is_likely_to_be : Cop ;
+
 fun Date_1_February_2021 : Date ;
+
 fun Item_1 : Item ;
 fun Item_2 : Item ;
 fun Item_3 : Item ;
@@ -131,6 +138,7 @@ fun Item_8 : Item ;
 fun Item_9 : Item ;
 fun Item_a : Item ;
 fun Item_b : Item ;
+
 fun Line_Item_NP_ : Item -> NP -> Line ;
 fun Line_Item_NP__Conj : Item -> NP -> Conj -> Line ;
 fun Line_Item_S_ : Item -> S -> Line ;
@@ -163,6 +171,7 @@ fun Line_Ref___Item_this_section_applies_to_a_CN_ : Ref -> Item -> CN -> Line ;
 fun Line_Ref___Item_where_S__S_ : Ref -> Item -> S -> S -> Line ;
 fun Line_S_ : S -> Line ;
 fun Line_Title : Title -> Line ;
+
 fun N2_access : N2 ;
 fun N2_collection : N2 ;
 fun N2_copying : N2 ;
@@ -170,6 +179,7 @@ fun N2_disclosure : N2 ;
 fun N2_disposal : N2 ;
 fun N2_modification : N2 ;
 fun N2_use : N2 ;
+
 fun NP_CN : CN -> NP ;
 fun NP_NP__including_NP_ : NP -> NP -> NP ;
 fun NP_NP__Conj_NP__PP : NP -> Conj -> NP -> PP -> NP ;
@@ -195,7 +205,9 @@ fun NP_the_CN : CN -> NP ;
 fun NP_the_loss_of_any_ConjCN_RS : ConjCN -> RS -> NP ;
 fun NP_the_unauthorised_ConjN2_of_NP : ConjN2 -> NP -> NP ;
 fun NP_this_CN : CN -> NP ;
+
 fun Num_3 : Num ;
+
 fun PP_PP__but_in_any_case_PP : PP -> PP -> PP ;
 fun PP_as_soon_as_is_practicable : PP ;
 fun PP_as_to_ConjNP : ConjNP -> PP ;
@@ -223,15 +235,19 @@ fun PP_under_its_control : PP ;
 fun PP_upon_notification_by_NP : NP -> PP ;
 fun PP_without_limiting_NP : NP -> PP ;
 fun PP_without_undue_delay : PP ;
+
 fun PPart_made_in_the_form : PPart ;
 fun PPart_submitted_in_the_manner_required_by_the_Commission : PPart ;
+
 fun QCN_affected_individual : QCN ;
 fun QCN_data_breach : QCN ;
+
 fun RS_on_which_S : S -> RS ;
 fun RS_that_NP_VP : NP -> VP -> RS ;
 fun RS_that_VP : VP -> RS ;
 fun RS_to_whom_NP_VP : NP -> VP -> RS ;
 fun RS_where_S : S -> RS ;
+
 fun Ref_1a : Ref ;
 fun Ref_1b : Ref ;
 fun Ref_26A : Ref ;
@@ -241,15 +257,19 @@ fun Ref_26C : Ref ;
 fun Ref_26D : Ref ;
 fun Ref_26E : Ref ;
 fun Ref_402020 : Ref ;
+
 fun S_NP_VP : NP -> VP -> S ;
 fun S_NP_is_in_relation_to_NP : NP -> NP -> S ;
 fun S_NP_is_likely_to_occur : NP -> S ;
 fun S_personal_data_is_stored_in_circumstances_RS : RS -> S ;
 fun S_the_context_otherwise_requires : S ;
+
 fun SeqPP_PP : PP -> SeqPP ;
 fun SeqPP_PP_SeqPP : PP -> SeqPP -> SeqPP ;
+
 fun Time_on_or_after_assessing_that_S : S -> Time ;
 fun Time_on_or_after_notifying_the_Commission_under_subsection_Item : Item -> Time ;
+
 fun Title_Duty_to_conduct_assessment_of_data_breach : Title ;
 fun Title_Duty_to_notify_occurrence_of_notifiable_data_breach : Title ;
 fun Title_Interpretation_of_this_Part : Title ;
@@ -257,10 +277,13 @@ fun Title_NOTIFICATION_OF_DATA_BREACHES : Title ;
 fun Title_Notifiable_data_breaches : Title ;
 fun Title_PART_6A : Title ;
 fun Title_obligations_of_data_intermediary_of_public_agency : Title ;
+
 fun V2_conduct : V2 ;
 fun V2_contain : V2 ;
+
 fun VP2_is_likely_to_result_in : VP2 ;
 fun VP2_results_in : VP2 ;
+
 fun VP_ConjCop_Comp : ConjCop -> Comp -> VP ;
 fun VP_ConjVP2_NP : ConjVP2 -> NP -> VP ;
 fun VP_V2__SeqPP__NP : V2 -> SeqPP -> NP -> VP ;
@@ -298,6 +321,7 @@ fun VP_so_V : V -> VP ;
 fun VP_takes_NP__PP__RS : NP -> PP -> RS -> VP ;
 fun VP_waive_NP : NP -> VP ;
 fun VP_will_result_in_NP : NP -> VP ;
+
 fun V_directs : V ;
 fun V_instructs : V ;
 

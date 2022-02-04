@@ -1,6 +1,7 @@
 concrete LawEng of Law = {
 
 lincat A = Str ;
+lincat A2 = Str ;
 lincat AP = Str ;
 lincat CN = Str ;
 lincat Comp = Str ;
@@ -34,22 +35,27 @@ lincat V2 = Str ;
 lincat VP = Str ;
 lincat VP2 = Str ;
 
-lin AP_affected_by_NP np = "affected" ++ "by" ++ np ;
-lin AP_affecting_NP np = "affecting" ++ np ;
-lin AP_applicable_to_NP np = "applicable" ++ "to" ++ np ;
-lin AP_in_relation_to_NP np = "in" ++ "relation" ++ "to" ++ np ;
-lin AP_mentioned_in_NP np = "mentioned" ++ "in" ++ np ;
-lin AP_on_behalf_of_and_for_the_purposes_of_NP np = "on" ++ "behalf" ++ "of" ++ "and" ++ "for" ++ "the" ++ "purposes" ++ "of" ++ np ;
-lin AP_processing_NP np = "processing" ++ np ;
-lin AP_under_NP np = "under" ++ np ;
 lin A_affected = "affected" ;
 lin A_notifiable = "notifiable" ;
 lin A_other = "other" ;
 lin A_prescribed = "prescribed" ;
 lin A_technological = "technological" ;
 lin A_written = "written" ;
+
+lin A2_affected_by = "affected" ++ "by" ;
+lin A2_affecting = "affecting" ;
+lin A2_applicable_to = "applicable" ++ "to" ;
+lin A2_in_relation_to = "in" ++ "relation" ++ "to" ;
+lin A2_mentioned_in = "mentioned" ++ "in" ;
+lin A2_on_behalf_of_and_for_the_purposes_of = "on" ++ "behalf" ++ "of" ++ "and" ++ "for" ++ "the" ++ "purposes" ++ "of" ;
+lin A2_other_than = "other" ++ "than" ;
+lin A2_processing = "processing" ;
+lin A2_under = "under" ;
+
+lin AP_A2_NP a2 np = a2 ++ np ;
+
 lin CN_A_CN a cn = a ++ cn ;
-lin CN_CN__other_than_NP_ cn np = cn ++ "(" ++ "other" ++ "than" ++ np ++ ")" ;
+lin CN_CN__AP_ cn ap = cn ++ "(" ++ ap ++ ")" ;
 lin CN_CN_AP cn ap = cn ++ ap ;
 lin CN_CN_ConjPP cn conjpp = cn ++ conjpp ;
 lin CN_CN_RS cn rs = cn ++ rs ;

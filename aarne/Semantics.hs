@@ -6,6 +6,8 @@ module Semantics where
 import Law
 import Spreadsheet
 
+import PGF (Expr)
+
 -- the logic
 
 type Modality = String
@@ -17,7 +19,8 @@ data Formula =
   | Conjunction [Formula]
   | Disjunction [Formula]
   | Implication Formula Formula
-  | Application Formula Formula  ---- the f of x
+  | Application Formula Formula  -- the f of x
+  | Modified Formula [Formula]   -- A which is B ... and C
   | Negation Formula
    deriving Show
 
@@ -32,6 +35,7 @@ formula2box formula = case formula of
   Disjunction fs -> orBox (map formula2box fs)
   Implication f g -> ifBox [formula2box f] [formula2box g]
   Application f x -> ofBox [formula2box f] [formula2box x]
+  Modified f xs -> modBox (formula2box f) (map formula2box xs)
   Negation f -> notBox (formula2box f)
 
 
@@ -40,21 +44,47 @@ formula2box formula = case formula of
 -- the interpretation takes a list of lines
 
 data Env = Env {
-  lin :: forall c. Tree c -> String
+  lin :: Expr -> String
   }
   
 ----iLines :: [GLine] -> Formula
 ----iLines ls = case ls of
 
+iA :: Env -> GA -> Formula
+iA env a = Atomic (lin env (gf a))
+
+iA2 :: Env -> GA2 -> Formula
+iA2 env a2 = Atomic (lin env (gf a2))
+
+iAP :: Env -> GAP -> Formula
+iAP env ap = case ap of
+  GAP_A2_NP a2 np -> Application (iA2 env a2) (iNP env np)
+
+iCN :: Env -> GCN -> Formula
+iCN env cn = case cn of
+  GCN_A_CN a n -> let (ms, bn) = mods cn in Modified bn ms
+  GCN_CN_AP n ap -> let (ms, bn) = mods cn in Modified bn ms
+  _ -> Atomic (lin env (gf cn))
+ where
+   mods cn = case cn of
+     GCN_A_CN a n -> let (ms, bn) = mods n in (iA env a : ms, bn)
+     GCN_CN_AP n ap -> let (ms, bn) = mods n in (iAP env ap : ms, bn)
+
+iComp :: Env -> GComp -> Formula
+iComp env comp = Atomic (lin env (gf comp))
+
 iLine :: Env -> GLine -> Formula
 iLine env line = case line of
-  GLine_Item_NP__Conj item np conj -> Modal (iItem env item) (iNP env np) ---- conj
+  GLine_Item_NP__Conj item np conj -> iConj env conj [Modal (iItem env item) (iNP env np)]
+  _ -> Atomic (lin env (gf line))
+
 
 iNP :: Env -> GNP -> Formula
 iNP env np = case np of
   GNP_the_unauthorised_ConjN2_of_NP conjn2 np ->
     Application (Modal "unauthorized" (iConjN2 env conjn2)) (iNP env np)
   GNP_CN cn -> iCN env cn
+  _ -> Atomic (lin env (gf np))
 
 iConjN2 :: Env -> GConjN2 -> Formula
 iConjN2 env conjn2 = conj fs where
@@ -68,14 +98,12 @@ iConj env conj = case conj of
   GConj_and -> Conjunction
   GConj_or -> Disjunction
 
+
 iN2 :: Env -> GN2 -> Formula
-iN2 env n2 = Atomic (lin env n2)
-  
-iCN :: Env -> GCN -> Formula
-iCN env cn = Atomic (lin env cn) ----
+iN2 env n2 = Atomic (lin env (gf n2))
   
 iItem :: Env -> GItem -> Modality
-iItem env item = lin env item
+iItem env item = lin env (gf item)
   
   
 {-

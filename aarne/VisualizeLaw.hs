@@ -20,7 +20,7 @@ main = do
   case ps of
     [] -> putStrLn "no parse"
     tree:_ -> do
-      let env = Env {lin = linearize pgf eng . gf}
+      let env = Env {lin = linearize pgf eng}
       let formula = iLine env (fg tree)
       let box = formula2box formula
       putStrLn $ S.renderBox box

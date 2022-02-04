@@ -3,6 +3,7 @@ abstract Law = {
 flags startcat = Line ;
 
 cat A ;
+cat A2 ;
 cat AP ;
 cat CN ;
 cat Comp ;
@@ -36,22 +37,27 @@ cat V2 ;
 cat VP ;
 cat VP2 ;
 
-fun AP_affected_by_NP : NP -> AP ;
-fun AP_affecting_NP : NP -> AP ;
-fun AP_applicable_to_NP : NP -> AP ;
-fun AP_in_relation_to_NP : NP -> AP ;
-fun AP_mentioned_in_NP : NP -> AP ;
-fun AP_on_behalf_of_and_for_the_purposes_of_NP : NP -> AP ;
-fun AP_processing_NP : NP -> AP ;
-fun AP_under_NP : NP -> AP ;
 fun A_affected : A ;
 fun A_notifiable : A ;
 fun A_other : A ;
 fun A_prescribed : A ;
 fun A_technological : A ;
 fun A_written : A ;
+
+fun A2_affected_by :  A2 ;
+fun A2_affecting :  A2 ;
+fun A2_applicable_to :  A2 ;
+fun A2_in_relation_to :  A2 ;
+fun A2_mentioned_in :  A2 ;
+fun A2_on_behalf_of_and_for_the_purposes_of :  A2 ;
+fun A2_other_than : A2 ;
+fun A2_processing :  A2 ;
+fun A2_under :  A2 ;
+
+fun AP_A2_NP : A2 -> NP -> AP ;
+
 fun CN_A_CN : A -> CN -> CN ;
-fun CN_CN__other_than_NP_ : CN -> NP -> CN ;
+fun CN_CN__AP_ : CN -> AP -> CN ;
 fun CN_CN_AP : CN -> AP -> CN ;
 fun CN_CN_ConjPP : CN -> ConjPP -> CN ;
 fun CN_CN_RS : CN -> RS -> CN ;
@@ -91,13 +97,19 @@ fun CN_rule_of_NP : NP -> CN ;
 fun CN_secrecy : CN ;
 fun CN_significant_harm_to_NP : NP -> CN ;
 fun CN_storage_medium : CN ;
+
 fun Comp_of_a_significant_scale : Comp ;
+
 fun ConjCN_CN_Conj_CN : CN -> Conj -> CN -> ConjCN ;
+
 fun ConjCop_Cop__Conj_Cop_ : Cop -> Conj -> Cop -> ConjCop ;
+
 fun ConjItem_Item__ConjItem : Item -> ConjItem -> ConjItem ;
 fun ConjItem_Item_Conj_Item : Item -> Conj -> Item -> ConjItem ;
+
 fun ConjN2_N2__ConjN2 : N2 -> ConjN2 -> ConjN2 ;
 fun ConjN2_N2_Conj_N2 : N2 -> Conj -> N2 -> ConjN2 ;
+
 fun ConjNP_NP_Conj_NP : NP -> Conj -> NP -> ConjNP ;
 fun ConjPP_PP_Conj_PP : PP -> Conj -> PP -> ConjPP ;
 fun ConjPPart_PPart_Conj_PPart : PPart -> Conj -> PPart -> ConjPPart ;

@@ -139,42 +139,45 @@ fun Item_8 : Item ;
 fun Item_9 : Item ;
 fun Item_a : Item ;
 fun Item_b : Item ;
+fun Item_1a : Item ;
+fun Item_1b : Item ;
+fun Item_26A : Item ;
+fun Item_26B : Item ;
+fun Item_26B1a : Item ;
+fun Item_26C : Item ;
+fun Item_26D : Item ;
+fun Item_26E : Item ;
+
 
 fun LabLine_Item_Line : Item -> Line -> LabLine ;
+fun LabLine_Item__Line : Item -> Line -> LabLine ;
 fun LabLine_Line : Line -> LabLine ;
 fun LabLine_Ref : Ref -> LabLine ;
-fun LabLine_Ref_Line : Ref -> Line -> LabLine ;
-fun LabLine_Ref__Item_Line : Ref -> Item -> Line -> LabLine ;
+fun LabLine_Item__Item_Line : Item -> Item -> Line -> LabLine ;
 fun LabLine_Title : Title -> LabLine ;
 
 fun Line_NP_ : NP -> Line ;
-fun Line_NP__Conj : NP -> Conj -> Line ;
+fun Line_NP__Conj : NP -> Conj -> Line ; -- + in block
 fun Line_S_ : S -> Line ;
-fun Line_S_cont : S -> Line ;
-fun Line_S__Conj : S -> Conj -> Line ;
-fun Line_S_if_ : S -> Line ;
-fun Line_S_if_NP_ : S -> NP -> Line ;
-fun Line_VP__Conj : VP -> Conj -> Line ;
-fun Line_VP_c : VP -> Line ;
+fun Line_S_cont : S -> Line ;  -- ++
+fun Line_S__Conj : S -> Conj -> Line ;  -- +
+fun Line_S_if_ : S -> Line ; -- ++
+fun Line_S_if_NP_ : S -> NP -> Line ;  -- ++ starts block
+fun Line_VP__Conj : VP -> Conj -> Line ; -- +
+fun Line_VP_c : VP -> Line ;  -- +
 fun Line_VP_p : VP -> Line ;
-fun Line_VP__Conj : VP -> Conj -> Line ;
-fun Line_an_CN_is_not__PP__to_be_regarded_as_NP_of_ : CN -> PP -> NP -> Line ;
-fun Line_if_S__Conj : S -> Conj -> Line ;
-fun Line_if_S_Conj : S -> Conj -> Line ;
+fun Line_an_CN_is_not__PP__to_be_regarded_as_NP_of_ : CN -> PP -> NP -> Line ; -- ++
+fun Line_if_S__Conj : S -> Conj -> Line ; -- +
+fun Line_if_S_Conj : S -> Conj -> Line ; -- +
 fun Line_in_other_prescribed_circumstances_ : Line ;
 fun Line_other_prescribed_circumstances_ : Line ;
-fun Line_where_S_ : S -> Line ;
+fun Line_where_S_ : S -> Line ; -- ++
 fun Line_where_S__S_ : S -> S -> Line ;
-
-fun Line_PP__Line : PP -> Line -> Line ;
-fun Line_where_S__S_ : S -> S -> Line ;
-
+fun Line_PP__Line : PP -> Line -> Line ; -- * recurs to line
 fun Line_QCN__PP__means_ : QCN -> PP -> Line ;
 fun Line_QCN_means_NP_ : QCN -> NP -> Line ;
-fun Line_PP__unless_S_ : PP -> S -> Line ;
-fun Line_where_an_CN_ : CN -> Line ;
-fun Line_S_ : S -> Line ;
-
+fun Line_PP__unless_S_ : PP -> S -> Line ; -- ++
+fun Line_where_an_CN_ : CN -> Line ; -- ++
 
 fun N2_access : N2 ;
 fun N2_collection : N2 ;
@@ -253,14 +256,6 @@ fun RS_that_VP : VP -> RS ;
 fun RS_to_whom_NP_VP : NP -> VP -> RS ;
 fun RS_where_S : S -> RS ;
 
-fun Ref_1a : Ref ;
-fun Ref_1b : Ref ;
-fun Ref_26A : Ref ;
-fun Ref_26B : Ref ;
-fun Ref_26B1a : Ref ;
-fun Ref_26C : Ref ;
-fun Ref_26D : Ref ;
-fun Ref_26E : Ref ;
 fun Ref_402020 : Ref ;
 
 fun S_NP_VP : NP -> VP -> S ;

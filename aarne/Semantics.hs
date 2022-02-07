@@ -20,7 +20,8 @@ data Formula =
   | Disjunction [Formula]
   | Implication Formula Formula
   | Application Formula Formula  -- the f of x
-  | Modified Formula [Formula]   -- A which is B ... and C
+  | Predication Formula Formula
+  | Modified Formula Formula   -- A which is B
   | Negation Formula
   | Sequence [Formula] --- just a sequence one on top of another
   | Means Formula Formula -- definition
@@ -37,7 +38,8 @@ formula2box formula = case formula of
   Disjunction fs -> orBox (map formula2box fs)
   Implication f g -> ifBox [formula2box f] [formula2box g]
   Application f x -> ofBox [formula2box f] [formula2box x]
-  Modified f xs -> modBox (formula2box f) (map formula2box xs)
+  Predication x f -> doubleLeftsideBox "WHO" [formula2box x] "WHAT" [formula2box f]
+  Modified f x -> modBox (formula2box f) [formula2box x]
   Negation f -> notBox (formula2box f)
   Sequence fs -> seqBox (map formula2box fs) ----
   Means f g -> meansBox (formula2box f) (formula2box g)
@@ -60,23 +62,24 @@ paragraphs = reverse . collect [] [] where
     _ -> reverse ts : ps
   
 
-iLines :: Env -> [GLabLine] -> Formula
-iLines env ls = case ls of
-  t@(GLabLine_Ref r) : ts -> Modal (iRef env r) (iLines env ts)
+iLabLines :: Env -> [GLabLine] -> Formula
+iLabLines env ls = case ls of
+  t@(GLabLine_Ref r) : ts -> Modal (iRef env r) (iLabLines env ts)
 ----  GLine_QCN__in_relation_to_NP__means_ qcn np : ts ->
 ----      Modal (iNP env np) (Means (iQCN env qcn) ()) 
   _ -> Sequence (map (iLabLine env) ls)
 
--- for lines that don't expect continuation
 iLabLine :: Env -> GLabLine -> Formula
 iLabLine env line = case line of
   GLabLine_Item_Line item li -> Modal (iItem env item) (iLine env li)
+  GLabLine_Line li -> iLine env li
   GLabLine_Ref r -> Atomic (iRef env r)
   GLabLine_Title t -> iTitle env t
   _ -> Atomic (lin env (gf line))
 
 iLine :: Env -> GLine -> Formula
 iLine env line = case line of
+  GLine_NP_ np -> iNP env np
   GLine_NP__Conj np conj -> iConj env conj [iNP env np]
   GLine_S_ s -> iS env s
   GLine_S_ s -> iS env s
@@ -99,8 +102,8 @@ iAP env ap = case ap of
 
 iCN :: Env -> GCN -> Formula
 iCN env cn = case cn of
-  GCN_A_CN a n -> let (ms, bn) = mods cn in Modified bn ms
-  GCN_CN_AP n ap -> let (ms, bn) = mods cn in Modified bn ms
+  GCN_A_CN a n -> let (ms, bn) = mods cn in Modified bn (Conjunction ms)
+  GCN_CN_AP n ap -> let (ms, bn) = mods cn in Modified bn (Conjunction ms)
   _ -> Atomic (lin env (gf cn))
  where
    mods cn = case cn of
@@ -167,6 +170,10 @@ iNP :: Env -> GNP -> Formula
 iNP env np = case np of
   GNP_the_unauthorised_ConjN2_of_NP conjn2 np ->
     Application (Modal "unauthorized" (iConjN2 env conjn2)) (iNP env np)
+    
+  GNP_the_loss_of_any_ConjCN_RS conjcn rs ->
+    Modal "the loss of any" (Modified (iConjCN env conjcn) (iRS env rs))
+  
   GNP_CN cn -> iCN env cn
   _ -> Atomic (lin env (gf np)) ----
 
@@ -183,13 +190,21 @@ iQCN :: Env -> GQCN -> Formula
 iQCN env n2 = Atomic (lin env (gf n2))
 
 iRS :: Env -> GRS -> Formula
-iRS env n2 = Atomic (lin env (gf n2)) ----
+iRS env rs = case rs of
+  GRS_on_which_S s -> Modal "ON WHICH" (iS env s)
+  GRS_where_S s -> Modal "WHERE" (iS env s)
+  _ -> Atomic (lin env (gf rs)) ----
 
 iRef :: Env -> GRef -> Modality
 iRef env n2 = lin env (gf n2)
 
 iS :: Env -> GS -> Formula
-iS env n2 = Atomic (lin env (gf n2)) ----
+iS env s = case s of
+  GS_personal_data_is_stored_in_circumstances_RS rs ->
+    Modified (Atomic "personal data is stored in circumstances") (iRS env rs)
+  GS_NP_is_likely_to_occur np ->
+    Predication (iNP env np) (Atomic "is likely to occur")
+  _ -> Atomic (lin env (gf s)) ----
 
 iSeqPP :: Env -> GSeqPP -> Formula
 iSeqPP env n2 = Atomic (lin env (gf n2)) ----

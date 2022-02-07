@@ -24,6 +24,6 @@ main = do
   let env = Env {lin = linearize pgf eng}
   let paras = paragraphs (map fg (concat ts))
   flip mapM_ paras $ \para -> do
-      let formula = iLines env para
+      let formula = iLabLines env para
       let box = formula2box formula
       putStrLn $ S.renderBox box

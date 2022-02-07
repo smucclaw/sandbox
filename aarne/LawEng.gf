@@ -112,6 +112,7 @@ lin Conj_or = "or" ;
 lin Cop_is = "is" ;
 lin Cop_is_likely_to_be = "is" ++ "likely" ++ "to" ++ "be" ;
 lin Date_1_February_2021 = "1" ++ "February" ++ "2021" ;
+
 lin Item_1 = "(1)" ;
 lin Item_2 = "(2)" ;
 lin Item_3 = "(3)" ;
@@ -124,12 +125,20 @@ lin Item_8 = "(8)" ;
 lin Item_9 = "(9)" ;
 lin Item_a = "(a)" ;
 lin Item_b = "(b)" ;
+lin Item_1a = "(1)(a)" ;
+lin Item_1b = "(1)(b)" ;
+lin Item_26A = "26A" ;
+lin Item_26B = "26B" ;
+lin Item_26B1a = "26B(1)(a)" ;
+lin Item_26C = "26C" ;
+lin Item_26D = "26D" ;
+lin Item_26E = "26E" ;
 
 lin LabLine_Item_Line item line = item ++ line ;
+lin LabLine_Item__Line item line = item ++ "." ++ line ;
 lin LabLine_Line line = line ;
 lin LabLine_Ref ref = ref ;
-lin LabLine_Ref__Item_Line ref item line = ref ++ "." ++ "—" ++ item ++ line ;
-lin LabLine_Ref_Line ref line = ref ++ "." ++ line ;
+lin LabLine_Item__Item_Line ref item line = ref ++ "." ++ "—" ++ item ++ line ;
 lin LabLine_Title title = title ;
 
 lin Line_NP_ np = np ++ "." ;
@@ -149,15 +158,11 @@ lin Line_in_other_prescribed_circumstances_ = "in" ++ "other" ++ "prescribed" ++
 lin Line_other_prescribed_circumstances_ = "other" ++ "prescribed" ++ "circumstances" ++ "." ;
 lin Line_where_S_ s = "where" ++ s ++ "—" ;
 lin Line_where_S__S_ s s2 = "where" ++ s ++ "," ++ s2 ++ "." ;
-
 lin Line_PP__Line pp line = pp ++ "," ++ line ;
-lin Line_where_S__S_ s s2 = "where" ++ s ++ "," ++ s2 ++ "." ;
-
 lin Line_QCN__PP__means_ qcn pp = qcn ++ "," ++ pp ++ "," ++ "means" ++ "—" ;
 lin Line_QCN_means_NP_ qcn np = qcn ++ "means" ++ np ++ ";" ;
 lin Line_PP__unless_S_ loc s = loc ++ "," ++ "unless" ++ s ++ "—" ;
 lin Line_where_an_CN_ cn = "where" ++ "an" ++ cn ++ "—" ;
-lin Line_S_ s = s ++ "." ;
 
 lin N2_access = "access" ;
 lin N2_collection = "collection" ;
@@ -233,14 +238,7 @@ lin RS_that_NP_VP np vp = "that" ++ np ++ vp ;
 lin RS_that_VP vp = "that" ++ vp ;
 lin RS_to_whom_NP_VP np vp = "to" ++ "whom" ++ np ++ vp ;
 lin RS_where_S s = "where" ++ s ;
-lin Ref_1a = "(1)(a)" ;
-lin Ref_1b = "(1)(b)" ;
-lin Ref_26A = "26A" ;
-lin Ref_26B = "26B" ;
-lin Ref_26B1a = "26B(1)(a)" ;
-lin Ref_26C = "26C" ;
-lin Ref_26D = "26D" ;
-lin Ref_26E = "26E" ;
+
 lin Ref_402020 = "[40/2020]" ;
 
 lin S_NP_VP np vp = np ++ vp ;

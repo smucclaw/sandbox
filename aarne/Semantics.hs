@@ -23,6 +23,7 @@ data Formula =
   | Modified Formula [Formula]   -- A which is B ... and C
   | Negation Formula
   | Sequence [Formula] --- just a sequence one on top of another
+  | Means Formula Formula -- definition
    deriving Show
 
 
@@ -39,6 +40,7 @@ formula2box formula = case formula of
   Modified f xs -> modBox (formula2box f) (map formula2box xs)
   Negation f -> notBox (formula2box f)
   Sequence fs -> seqBox (map formula2box fs) ----
+  Means f g -> meansBox (formula2box f) (formula2box g)
 
 
 -- interpretation of Law in the logic
@@ -50,16 +52,40 @@ data Env = Env {
   }
 
 -- to collect lines that belong together - under a common heading
-paragraphs :: [GLine] -> [[GLine]]
+paragraphs :: [GLabLine] -> [[GLabLine]]
 paragraphs = reverse . collect [] [] where
   collect ps ts ls = case ls of
-    t@(GLine_Ref _) : ll | not (null ts) -> collect (reverse ts : ps) [t] ll
+    t@(GLabLine_Ref _) : ll | not (null ts) -> collect (reverse ts : ps) [t] ll
     t : ll -> collect ps (t:ts) ll
     _ -> reverse ts : ps
   
-iLines :: Env -> [GLine] -> Formula
+
+iLines :: Env -> [GLabLine] -> Formula
 iLines env ls = case ls of
-  _ -> Modal (lin env (gf (head ls))) $ Sequence (map (iLine env) (tail ls)) ----
+  t@(GLabLine_Ref r) : ts -> Modal (iRef env r) (iLines env ts)
+----  GLine_QCN__in_relation_to_NP__means_ qcn np : ts ->
+----      Modal (iNP env np) (Means (iQCN env qcn) ()) 
+  _ -> Sequence (map (iLabLine env) ls)
+
+-- for lines that don't expect continuation
+iLabLine :: Env -> GLabLine -> Formula
+iLabLine env line = case line of
+  GLabLine_Item_Line item li -> Modal (iItem env item) (iLine env li)
+  GLabLine_Ref r -> Atomic (iRef env r)
+  GLabLine_Title t -> iTitle env t
+  _ -> Atomic (lin env (gf line))
+
+iLine :: Env -> GLine -> Formula
+iLine env line = case line of
+  GLine_NP__Conj np conj -> iConj env conj [iNP env np]
+  GLine_S_ s -> iS env s
+  GLine_S_ s -> iS env s
+  GLine_S__Conj s conj -> iConj env conj [iS env s]
+
+----  GLine_QCN__PP__means_ qcn pp ->  Means (Modal (lin env (gf pp)) (iQCN env qcn)) (iNP env np)
+  GLine_QCN_means_NP_ qcn np -> Means (iQCN env qcn) (iNP env np) 
+  _ -> Atomic (lin env (gf line))
+
 
 iA :: Env -> GA -> Formula
 iA env a = Atomic (lin env (gf a))
@@ -132,18 +158,7 @@ iDate env item = Atomic (lin env (gf item))
 iItem :: Env -> GItem -> Modality
 iItem env item = lin env (gf item)
 
-iLine :: Env -> GLine -> Formula
-iLine env line = case line of
-  GLine_Item_NP_ item np -> Modal (iItem env item) (iNP env np)
-  GLine_Item_NP__Conj item np conj -> iConj env conj [Modal (iItem env item) (iNP env np)]
-  GLine_Item_S_ item s -> Modal (iItem env item) (iS env s)
-  GLine_Item_S__Conj item s conj -> iConj env conj [Modal (iItem env item) (iS env s)]
-  
-  GLine_Ref r -> iRef env r
-  GLine_S_ s -> iS env s
-  GLine_Title t -> iTitle env t
-  _ -> Atomic (lin env (gf line))
-
+-- iLine on top level before all other categories
 
 iN2 :: Env -> GN2 -> Formula
 iN2 env n2 = Atomic (lin env (gf n2))
@@ -170,8 +185,8 @@ iQCN env n2 = Atomic (lin env (gf n2))
 iRS :: Env -> GRS -> Formula
 iRS env n2 = Atomic (lin env (gf n2)) ----
 
-iRef :: Env -> GRef -> Formula
-iRef env n2 = Atomic (lin env (gf n2))
+iRef :: Env -> GRef -> Modality
+iRef env n2 = lin env (gf n2)
 
 iS :: Env -> GS -> Formula
 iS env n2 = Atomic (lin env (gf n2)) ----

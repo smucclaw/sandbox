@@ -10,7 +10,7 @@ eng = mkCId "LawEng"
 --law_pgf = "TopAbs.pgf"
 --eng = mkCId "Top"
 
-Just lineCat = readType "Line"
+Just lineCat = readType "LabLine"
 
 analyse pgf s =
   let ps = parse pgf eng lineCat s

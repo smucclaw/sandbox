@@ -11,7 +11,7 @@ import PGF
 
 law_pgf = "Law.pgf"
 eng = mkCId "LawEng"
-Just lineCat = readType "Line"
+Just lineCat = readType "LabLine"
 
 main = do
   pgf <- readPGF law_pgf

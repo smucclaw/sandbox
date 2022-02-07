@@ -1,6 +1,6 @@
 abstract Law = {
 
-flags startcat = Line ;
+flags startcat = LabLine ;
 
 cat A ;
 cat A2 ;
@@ -19,6 +19,7 @@ cat ConjVP2 ;
 cat Cop ;
 cat Date ;
 cat Item ;
+cat LabLine ;
 cat Line ;
 cat N2 ;
 cat NP ;
@@ -139,38 +140,41 @@ fun Item_9 : Item ;
 fun Item_a : Item ;
 fun Item_b : Item ;
 
-fun Line_Item_NP_ : Item -> NP -> Line ;
-fun Line_Item_NP__Conj : Item -> NP -> Conj -> Line ;
-fun Line_Item_S_ : Item -> S -> Line ;
-fun Line_Item_S__Conj : Item -> S -> Conj -> Line ;
-fun Line_Item_S_if_NP_ : Item -> S -> NP -> Line ;
-fun Line_Item_Time__VP__Conj : Item -> Time -> VP -> Conj -> Line ;
-fun Line_Item_VP_c : Item -> VP -> Line ;
-fun Line_Item_VP_p : Item -> VP -> Line ;
-fun Line_Item_VP__Conj : Item -> VP -> Conj -> Line ;
-fun Line_Item_an_CN_is_not__PP__to_be_regarded_as_NP_of_ : Item -> CN -> PP -> NP -> Line ;
-fun Line_Item_an_CN_must_not_VP_if_ : Item -> CN -> VP -> Line ;
-fun Line_Item_any_CN_ : Item -> CN -> Line ;
-fun Line_Item_any_CN__Conj : Item -> CN -> Conj -> Line ;
-fun Line_Item_PP__a_CN_is_deemed_not_to_be_a_CN_ : Item -> PP -> CN -> CN -> Line ;
-fun Line_Item_if_S__Conj : Item -> S -> Conj -> Line ;
-fun Line_Item_if_S_Conj : Item -> S -> Conj -> Line ;
-fun Line_Item_in_other_prescribed_circumstances_ : Item -> Line ;
-fun Line_Item_other_prescribed_circumstances_ : Item -> Line ;
-fun Line_Item_PP__where_S__S_ : Item -> PP -> S -> S -> Line ;
-fun Line_Item_PP__Time__S_ : Item -> PP -> Time -> S -> Line ;
-fun Line_Item_where_a_CN_VP_ : Item -> CN -> VP -> Line ;
-fun Line_Item_PP__a_CN_is_deemed_to_VP_ : Item -> PP -> CN -> VP -> Line ;
-fun Line_QCN__in_relation_to_NP__means_ : QCN -> NP -> Line ;
-fun Line_QCN_means_any_CN_ : QCN -> CN -> Line ;
-fun Line_Ref : Ref -> Line ;
-fun Line_Ref__PP__unless_S_ : Ref -> PP -> S -> Line ;
-fun Line_Ref__where_an_CN_ : Ref -> CN -> Line ;
-fun Line_Ref___Item_a_CN_is_a_CN_if_NP_ : Ref -> Item -> CN -> CN -> NP -> Line ;
-fun Line_Ref___Item_this_section_applies_to_a_CN_ : Ref -> Item -> CN -> Line ;
-fun Line_Ref___Item_where_S__S_ : Ref -> Item -> S -> S -> Line ;
+fun LabLine_Item_Line : Item -> Line -> LabLine ;
+fun LabLine_Line : Line -> LabLine ;
+fun LabLine_Ref : Ref -> LabLine ;
+fun LabLine_Ref_Line : Ref -> Line -> LabLine ;
+fun LabLine_Ref__Item_Line : Ref -> Item -> Line -> LabLine ;
+fun LabLine_Title : Title -> LabLine ;
+
+fun Line_NP_ : NP -> Line ;
+fun Line_NP__Conj : NP -> Conj -> Line ;
 fun Line_S_ : S -> Line ;
-fun Line_Title : Title -> Line ;
+fun Line_S_cont : S -> Line ;
+fun Line_S__Conj : S -> Conj -> Line ;
+fun Line_S_if_ : S -> Line ;
+fun Line_S_if_NP_ : S -> NP -> Line ;
+fun Line_VP__Conj : VP -> Conj -> Line ;
+fun Line_VP_c : VP -> Line ;
+fun Line_VP_p : VP -> Line ;
+fun Line_VP__Conj : VP -> Conj -> Line ;
+fun Line_an_CN_is_not__PP__to_be_regarded_as_NP_of_ : CN -> PP -> NP -> Line ;
+fun Line_if_S__Conj : S -> Conj -> Line ;
+fun Line_if_S_Conj : S -> Conj -> Line ;
+fun Line_in_other_prescribed_circumstances_ : Line ;
+fun Line_other_prescribed_circumstances_ : Line ;
+fun Line_where_S_ : S -> Line ;
+fun Line_where_S__S_ : S -> S -> Line ;
+
+fun Line_PP__Line : PP -> Line -> Line ;
+fun Line_where_S__S_ : S -> S -> Line ;
+
+fun Line_QCN__PP__means_ : QCN -> PP -> Line ;
+fun Line_QCN_means_NP_ : QCN -> NP -> Line ;
+fun Line_PP__unless_S_ : PP -> S -> Line ;
+fun Line_where_an_CN_ : CN -> Line ;
+fun Line_S_ : S -> Line ;
+
 
 fun N2_access : N2 ;
 fun N2_collection : N2 ;
@@ -205,10 +209,12 @@ fun NP_the_CN : CN -> NP ;
 fun NP_the_loss_of_any_ConjCN_RS : ConjCN -> RS -> NP ;
 fun NP_the_unauthorised_ConjN2_of_NP : ConjN2 -> NP -> NP ;
 fun NP_this_CN : CN -> NP ;
+fun NP_this_section : NP ;
 
 fun Num_3 : Num ;
 
 fun PP_PP__but_in_any_case_PP : PP -> PP -> PP ;
+fun PP_Time : Time -> PP ;
 fun PP_as_soon_as_is_practicable : PP ;
 fun PP_as_to_ConjNP : ConjNP -> PP ;
 fun PP_by_reason_only_of_NP : NP -> PP ;
@@ -239,8 +245,7 @@ fun PP_without_undue_delay : PP ;
 fun PPart_made_in_the_form : PPart ;
 fun PPart_submitted_in_the_manner_required_by_the_Commission : PPart ;
 
-fun QCN_affected_individual : QCN ;
-fun QCN_data_breach : QCN ;
+fun QCN__CN_ : CN -> QCN ;
 
 fun RS_on_which_S : S -> RS ;
 fun RS_that_NP_VP : NP -> VP -> RS ;
@@ -290,9 +295,11 @@ fun VP_V2__SeqPP__NP : V2 -> SeqPP -> NP -> VP ;
 fun VP_VP__Conj_to_VP : VP -> Conj -> VP -> VP ;
 fun VP_VP_PP : VP -> PP -> VP ;
 fun VP_affects_NP : NP -> VP ;
+fun VP_applies_to_NP : NP -> VP ;
 fun VP_apply_concurrently_with_NP : NP -> VP ;
 fun VP_assesses__PP__that_S : PP -> S -> VP ;
 fun VP_be_ConjPPart : ConjPPart -> VP ;
+fun VP_be_a_CN : CN -> VP ;
 fun VP_be_of_a_significant_scale : VP ;
 fun VP_believe_that_S : S -> VP ;
 fun VP_carry_out_NP : NP -> VP ;
@@ -302,6 +309,8 @@ fun VP_had_implemented__PP__NP : PP -> NP -> VP ;
 fun VP_has_occurred : VP ;
 fun VP_has_reason_to_VP : VP -> VP ;
 fun VP_is_a_CN : CN -> VP ;
+fun VP_is_deemed_not_to_VP : VP -> VP ;
+fun VP_is_deemed_to_VP : VP -> VP ;
 fun VP_is_prescribed_for_NP : NP -> VP ;
 fun VP_is_processing_PP : PP -> VP ;
 fun VP_makes_NP : NP -> VP ;
@@ -309,6 +318,7 @@ fun VP_may__SeqPP__VP : SeqPP -> VP -> VP ;
 fun VP_must__SeqPP__VP : SeqPP -> VP -> VP ;
 fun VP_must_VP : VP -> VP ;
 fun VP_must_also_VP : VP -> VP ;
+fun VP_must_not_VP : VP -> VP ;
 fun VP_notify_NP : NP -> VP ;
 fun VP_notify_NP_of_NP : NP -> NP -> VP ;
 fun VP_occurs_on_or_after_Date : Date -> VP ;

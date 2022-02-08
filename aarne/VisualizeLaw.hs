@@ -20,11 +20,12 @@ main = do
     let ps = parse pgf eng lineCat s
     case ps of
       [] -> putStrLn ("## NO PARSE: " ++ s) >> return []
-      tree:_ -> putStrLn ("## " ++ showExpr [] tree) >> return [tree]
+      tree:_ -> return [tree]
 
   let env = Env {lin = linearize pgf eng}
   let paras = paragraphs (map fg (concat ts))
   flip mapM_ paras $ \para -> do
+      putStrLn $ unlines ["## " ++ showExpr [] (gf line) | line <- para]
       let formula = iLabLines env para
       let box = formula2box formula
       putStrLn $ S.renderBox box

@@ -8,6 +8,8 @@ import Spreadsheet
 
 import PGF (Expr)
 
+import Data.Char (toUpper)
+
 -- the logic
 
 type Modality = String
@@ -45,7 +47,7 @@ formula2box formula = case formula of
   Predication x f -> nodoubleLeftsideBox "SUBJECT" [formula2box x] "PREDICATE" [formula2box f]
   Action f x -> nodoubleLeftsideBox "ACTING" [formula2box f] "ON" [formula2box x]
   Modification a p -> nodoubleLeftsideBox "ENTITY" [formula2box a] "WITH PROPERTIES" [formula2box p]
-  Relation f x -> nodoubleLeftsideBox "HAVING RELATION" [formula2box x] "TO" [formula2box f]
+  Relation f x -> nodoubleLeftsideBox "HAVING RELATION" [formula2box f] "TO" [formula2box x]
   Qualification s f -> leftsideBox s [formula2box f]
   Sequence fs -> seqBox (map formula2box fs) ----
   Means f g -> meansBox (formula2box f) (formula2box g)
@@ -90,26 +92,45 @@ lineStartsBlock line = case line of
   GLine_S_if_NP_ _ _ -> True
   GLine_an_CN_is_not__PP__to_be_regarded_as_NP_of_ _ _ _ -> True
   GLine_where_S_ _ -> True
+  GLine_QCN__PP__means_ _ _ -> True
   GLine_PP__unless_S_ _ _ -> True
   GLine_where_an_CN_ _ -> True
   _ -> False
 
 lineIsInBlock :: GLine -> Bool
-lineIsInBlock line = case line of
-  GLine_NP__Conj _ _ -> True
-  GLine_S__Conj _ _ -> True
-  GLine_VP__Conj _ _ -> True
-  GLine_VP_c _ -> True
-  GLine_if_S__Conj _ _ -> True
-  GLine_if_S_Conj _ _ -> True
-  _ -> False
+lineIsInBlock line = conjOfLine line /= Nothing
+
+conjOfLine :: GLine -> Maybe GConj
+conjOfLine line = case line of
+  GLine_NP__Conj _ conj -> Just conj
+  GLine_S__Conj _ conj -> Just conj
+  GLine_VP__Conj _ conj -> Just conj
+----  GLine_VP_c 
+  GLine_if_S__Conj _ conj -> Just conj
+  GLine_if_S_Conj _ conj -> Just conj
+  _ -> Nothing
+
+labOfLabLine :: Env -> GLabLine -> Formula -> Formula
+labOfLabLine env lline f = case lline of
+  GLabLine_Item_Line item _ -> Modal (iItem env item) f
+  GLabLine_Item__Line item _ -> Modal (iItem env item) f
+  GLabLine_Item__Item_Line item item2 _ -> Modal (iItem env item ++ "." ++ iItem env item2) f
+  _ -> f
+
+conjOfLabLines :: Env -> [GLabLine] -> [Formula] -> Formula
+conjOfLabLines env llines fs =
+  case [c | ll <- llines, Just l <- [lineOfLabLine ll], Just c <- [conjOfLine l]] of
+    conj:_ -> iConj env conj fs  ---- if many different conjs?
+    _ -> Sequence fs
+     
 
 iLabLines :: Env -> [GLabLine] -> Formula
 iLabLines env ls = case ls of
-  t@(GLabLine_Ref r) : ts -> Modal (iRef env r) (iLabLines env ts)
-----  GLine_QCN__in_relation_to_NP__means_ qcn np : ts ->
-----      Modal (iNP env np) (Means (iQCN env qcn) ()) 
-  _ -> Sequence (map (iLabLine env) ls)
+  t : ts -> case lineOfLabLine t of  ---- labOfLabLine env t $ 
+    Just (GLine_QCN__PP__means_ qcn pp) ->
+       Means (Modification (iQCN env qcn) (iPP env pp))
+         (conjOfLabLines env ts (map (iLabLine env) ts))
+    _ -> Sequence (map (iLabLine env) ls)
 
 iLabLine :: Env -> GLabLine -> Formula
 iLabLine env line = case line of
@@ -122,12 +143,11 @@ iLabLine env line = case line of
 iLine :: Env -> GLine -> Formula
 iLine env line = case line of
   GLine_NP_ np -> iNP env np
-  GLine_NP__Conj np conj -> iConj env conj [iNP env np]
+  GLine_NP__Conj np conj -> iConj env conj [iNP env np] ----
   GLine_S_ s -> iS env s
   GLine_S_ s -> iS env s
   GLine_S__Conj s conj -> iConj env conj [iS env s]
 
-----  GLine_QCN__PP__means_ qcn pp ->  Means (Modal (lin env (gf pp)) (iQCN env qcn)) (iNP env np)
   GLine_QCN_means_NP_ qcn np -> Means (iQCN env qcn) (iNP env np) 
   _ -> Atomic (lin env (gf line))
 
@@ -225,11 +245,11 @@ iNum env n2 = Atomic (lin env (gf n2))
 
 iPP :: Env -> GPP -> Formula
 iPP env pp = case pp of
-  GPP_PP2_NP pp2 np -> Relation (iPP2 env pp2) (iNP env np)
+  GPP_PP2_NP pp2 np -> Qualification (iPP2 env pp2) (iNP env np)
   __ -> Atomic (lin env (gf pp))
 
-iPP2 :: Env -> GPP2 -> Formula
-iPP2 env n2 = Atomic (lin env (gf n2)) ----
+iPP2 :: Env -> GPP2 -> Modality
+iPP2 env n2 = map toUpper (lin env (gf n2))
 
 iPPart :: Env -> GPPart -> Formula
 iPPart env n2 = Atomic (lin env (gf n2))

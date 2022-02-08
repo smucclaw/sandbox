@@ -19,10 +19,12 @@ data Formula =
   | Conjunction [Formula]
   | Disjunction [Formula]
   | Implication Formula Formula
+  | Negation Formula
   | Application Formula Formula  -- the f of x
   | Predication Formula Formula
-  | Modified Formula Formula   -- A which is B
-  | Negation Formula
+  | Action Formula Formula
+  | Modification Formula Formula   -- A which is B
+  | Relation Formula Formula
   | Sequence [Formula] --- just a sequence one on top of another
   | Means Formula Formula -- definition
    deriving Show
@@ -37,10 +39,12 @@ formula2box formula = case formula of
   Conjunction fs -> andBox (map formula2box fs)
   Disjunction fs -> orBox (map formula2box fs)
   Implication f g -> ifBox [formula2box f] [formula2box g]
-  Application f x -> ofBox [formula2box f] [formula2box x]
-  Predication x f -> doubleLeftsideBox "WHO" [formula2box x] "WHAT" [formula2box f]
-  Modified f x -> modBox (formula2box f) [formula2box x]
   Negation f -> notBox (formula2box f)
+  Application f x -> ofBox [formula2box f] [formula2box x]
+  Predication x f -> doubleLeftsideBox "AGENT" [formula2box x] "ACTION" [formula2box f]
+  Action f x -> doubleLeftsideBox "ACTING" [formula2box x] "ON" [formula2box f]
+  Modification f x -> modBox (formula2box f) [formula2box x]
+  Relation f x -> doubleLeftsideBox "HAVING RELATION" [formula2box x] "TO" [formula2box f]
   Sequence fs -> seqBox (map formula2box fs) ----
   Means f g -> meansBox (formula2box f) (formula2box g)
 
@@ -102,8 +106,8 @@ iAP env ap = case ap of
 
 iCN :: Env -> GCN -> Formula
 iCN env cn = case cn of
-  GCN_A_CN a n -> let (ms, bn) = mods cn in Modified bn (Conjunction ms)
-  GCN_CN_AP n ap -> let (ms, bn) = mods cn in Modified bn (Conjunction ms)
+  GCN_A_CN a n -> let (ms, bn) = mods cn in Modification bn (Conjunction ms)
+  GCN_CN_AP n ap -> let (ms, bn) = mods cn in Modification bn (Conjunction ms)
   _ -> Atomic (lin env (gf cn))
  where
    mods cn = case cn of
@@ -172,7 +176,7 @@ iNP env np = case np of
     Application (Modal "unauthorized" (iConjN2 env conjn2)) (iNP env np)
     
   GNP_the_loss_of_any_ConjCN_RS conjcn rs ->
-    Modal "the loss of any" (Modified (iConjCN env conjcn) (iRS env rs))
+    Modal "the loss of any" (Modification (iConjCN env conjcn) (iRS env rs))
   
   GNP_CN cn -> iCN env cn
   _ -> Atomic (lin env (gf np)) ----
@@ -181,7 +185,12 @@ iNum :: Env -> GNum -> Formula
 iNum env n2 = Atomic (lin env (gf n2))
 
 iPP :: Env -> GPP -> Formula
-iPP env n2 = Atomic (lin env (gf n2)) ----
+iPP env pp = case pp of
+  GPP_PP2_NP pp2 np -> Relation (iPP2 env pp2) (iNP env np)
+  __ -> Atomic (lin env (gf pp))
+
+iPP2 :: Env -> GPP2 -> Formula
+iPP2 env n2 = Atomic (lin env (gf n2)) ----
 
 iPPart :: Env -> GPPart -> Formula
 iPPart env n2 = Atomic (lin env (gf n2))
@@ -200,10 +209,10 @@ iRef env n2 = lin env (gf n2)
 
 iS :: Env -> GS -> Formula
 iS env s = case s of
+  GS_NP_VP np vp ->
+    Predication (iNP env np) (iVP env vp)
   GS_personal_data_is_stored_in_circumstances_RS rs ->
-    Modified (Atomic "personal data is stored in circumstances") (iRS env rs)
-  GS_NP_is_likely_to_occur np ->
-    Predication (iNP env np) (Atomic "is likely to occur")
+    Modification (Atomic "personal data is stored in circumstances") (iRS env rs)
   _ -> Atomic (lin env (gf s)) ----
 
 iSeqPP :: Env -> GSeqPP -> Formula
@@ -212,32 +221,11 @@ iSeqPP env n2 = Atomic (lin env (gf n2)) ----
 iTitle :: Env -> GTitle -> Formula
 iTitle env n2 = Atomic (lin env (gf n2))
 
-iV2 :: Env -> GV2 -> Formula
-iV2 env n2 = Atomic (lin env (gf n2))
+iVP :: Env -> GVP -> Formula
+iVP env vp = case vp of
+  GVP_VP2_NP vp2 np -> Action (iVP2 env vp2) (iNP env np)
+  _ -> Atomic (lin env (gf vp)) ----
 
 iVP2 :: Env -> GVP2 -> Formula
 iVP2 env n2 = Atomic (lin env (gf n2)) 
 
-iVP :: Env -> GVP -> Formula
-iVP env n2 = Atomic (lin env (gf n2)) ----
-
-iV :: Env -> GV -> Formula
-iV env n2 = Atomic (lin env (gf n2))
-
-{-
-
-OK: 26A .  in this Part , unless the context otherwise requires —
-Line_Ref__PP__unless_S_ Ref_26A PP_in_this_Part S_the_context_otherwise_requires
-
-OK: “affected individual” means any individual to whom any personal data affected by a data breach relates ;
-Line_QCN_means_any_CN_ QCN_affected_individual (CN_CN_RS CN_individual (RS_to_whom_NP_VP (NP_any_CN (CN_CN_AP CN_personal_data (AP_affected_by_NP (NP_a_CN CN_data_breach)))) VP_relates))
-
-OK: “data breach” , in relation to personal data , means —
-Line_QCN__in_relation_to_NP__means_ QCN_data_breach (NP_CN CN_personal_data)
-
-OK: (a)	the unauthorised access , collection , use , disclosure , copying , modification or disposal of personal data ; or
-Line_Item_NP__Conj Item_a (NP_the_unauthorised_ConjN2_of_NP (ConjN2_N2__ConjN2 N2_access (ConjN2_N2__ConjN2 N2_collection (ConjN2_N2__ConjN2 N2_use (ConjN2_N2__ConjN2 N2_disclosure (ConjN2_N2__ConjN2 N2_copying (ConjN2_N2_Conj_N2 N2_modification Conj_or N2_disposal)))))) (NP_CN CN_personal_data)) Conj_or
-
-OK: (b)	the loss of any storage medium or device on which personal data is stored in circumstances where the unauthorised access , collection , use , disclosure , copying , modification or disposal of the personal data is likely to occur .
-Line_Item_NP_ Item_b (NP_the_loss_of_any_ConjCN_RS (ConjCN_CN_Conj_CN CN_storage_medium Conj_or CN_device) (RS_on_which_S (S_personal_data_is_stored_in_circumstances_RS (RS_where_S (S_NP_is_likely_to_occur (NP_the_unauthorised_ConjN2_of_NP (ConjN2_N2__ConjN2 N2_access (ConjN2_N2__ConjN2 N2_collection (ConjN2_N2__ConjN2 N2_use (ConjN2_N2__ConjN2 N2_disclosure (ConjN2_N2__ConjN2 N2_copying (ConjN2_N2_Conj_N2 N2_modification Conj_or N2_disposal)))))) (NP_the_CN CN_personal_data)))))))
--}

@@ -26,6 +26,7 @@ Processing:
 - build pgf and gadt: `make`
 - parse text: `runghc LawParser.hs <tokenized-6A.txt`
 - tsv generation test: `cat tokenized-6A.txt | head -8 | runghc VisualizeLaw.hs`
+  (this shows the ASTs in comments before each block, prefixed with `##`)
 
 Older processing:
 

@@ -28,6 +28,7 @@ data Formula =
   | Modification Formula Formula   -- A which is B
   | Relation Formula Formula
   | Qualification String Formula ---
+  | Quantification String Formula ---
   | Sequence [Formula] --- just a sequence one on top of another
   | Means Formula Formula -- definition
    deriving Show
@@ -49,6 +50,7 @@ formula2box formula = case formula of
   Modification a p -> nodoubleLeftsideBox "ENTITY" [formula2box a] "WITH PROPERTIES" [formula2box p]
   Relation f x -> nodoubleLeftsideBox "HAVING RELATION" [formula2box f] "TO" [formula2box x]
   Qualification s f -> leftsideBox s [formula2box f]
+  Quantification s f -> leftsideBox s [formula2box f]
   Sequence fs -> seqBox (map formula2box fs) ----
   Means f g -> meansBox (formula2box f) (formula2box g)
 
@@ -72,10 +74,14 @@ paragraphs = reverse . collect [] where
         _ -> let (llines1, llines2) = getPara llines
              in collect ((lline:llines1) : ps) llines2
     _ -> ps
-  getPara ls = span inBlock ls
-  inBlock lline = case lineOfLabLine lline of
-    Just line -> not (lineStartsBlock line)
-    _ -> False
+  getPara = inBlock []
+  inBlock block llines = case llines of
+    lline:llines2 -> case lineOfLabLine lline of
+      Just line | lineIsInBlock line -> inBlock (block ++ [lline]) llines2
+      Just line | lineStartsBlock line -> (block, llines) ---- no blocks in block
+      Just line -> inBlock (block ++ [lline]) llines2
+      _ -> (block, llines)
+    _ -> (block, [])
 
 lineOfLabLine :: GLabLine -> Maybe GLine
 lineOfLabLine lline = case lline of
@@ -130,6 +136,10 @@ iLabLines env ls = case ls of
     Just (GLine_QCN__PP__means_ qcn pp) ->
        Means (Modification (iQCN env qcn) (iPP env pp))
          (conjOfLabLines env ts (map (iLabLine env) ts))
+    Just (GLine_S_if_NP_ s np) ->
+       Means (iS env s)
+         (Qualification "THAT"
+           (Predication (iNP env np) (conjOfLabLines env ts (map (iLabLine env) ts))))
     _ -> Sequence (map (iLabLine env) ls)
 
 iLabLine :: Env -> GLabLine -> Formula
@@ -147,8 +157,9 @@ iLine env line = case line of
   GLine_S_ s -> iS env s
   GLine_S_ s -> iS env s
   GLine_S__Conj s conj -> iConj env conj [iS env s]
-
-  GLine_QCN_means_NP_ qcn np -> Means (iQCN env qcn) (iNP env np) 
+  GLine_PP__Line pp line2 -> Modal (lin env (gf pp)) (iLine env line2)
+  GLine_QCN_means_NP_ qcn np -> Means (iQCN env qcn) (iNP env np)
+  GLine_where_S__S_ s s2 -> Implication (iS env s) (iS env s2)
   _ -> Atomic (lin env (gf line))
 
 
@@ -160,18 +171,19 @@ iA2 env a2 = Atomic (lin env (gf a2))
 
 iAP :: Env -> GAP -> Formula
 iAP env ap = case ap of
-  GAP_A2_NP a2 np -> Application (iA2 env a2) (iNP env np)
+  GAP_A2_NP a2 np -> Sequence [iA2 env a2, iNP env np] ---
 
 iCN :: Env -> GCN -> Formula
 iCN env cn = case cn of
   GCN_A_CN a n -> let (ms, bn) = mods cn in Modification bn (Conjunction ms)
   GCN_CN_AP n ap -> let (ms, bn) = mods cn in Modification bn (Conjunction ms)
-  GCN_CN_RS cn rs -> Sequence [iCN env cn, iRS env rs]
+  GCN_CN_RS cn rs -> Sequence [iCN env cn, iRS env rs] ---
   _ -> Atomic (lin env (gf cn))
  where
    mods cn = case cn of
      GCN_A_CN a n -> let (ms, bn) = mods n in (iA env a : ms, bn)
      GCN_CN_AP n ap -> let (ms, bn) = mods n in (iAP env ap : ms, bn)
+     _ -> ([], iCN env cn)
 
 iComp :: Env -> GComp -> Formula
 iComp env comp = Atomic (lin env (gf comp))
@@ -238,6 +250,15 @@ iNP env np = case np of
     Application (Atomic "loss") (Modal "ANY" (Sequence [(iConjCN env conjcn), (iRS env rs)]))
   
   GNP_CN cn -> iCN env cn
+
+  GNP_a_CN cn -> Quantification "A" (iCN env cn)
+  GNP_an_CN cn -> Quantification "AN" (iCN env cn)
+  GNP_any_CN cn -> Quantification "ANY" (iCN env cn)
+  GNP_each_CN cn -> Quantification "EACH" (iCN env cn)
+  GNP_that_CN cn -> Quantification "THAT" (iCN env cn)
+  GNP_this_CN cn -> Quantification "THIS" (iCN env cn)
+
+  
   _ -> Atomic (lin env (gf np)) ----
 
 iNum :: Env -> GNum -> Formula
@@ -261,6 +282,7 @@ iRS :: Env -> GRS -> Formula
 iRS env rs = case rs of
   GRS_on_which_S s -> Qualification "ON WHICH" (iS env s)
   GRS_where_S s -> Qualification "WHERE" (iS env s)
+  GRS_that_VP vp -> Qualification "THAT" (iVP env vp)
   _ -> Atomic (lin env (gf rs)) ----
 
 iRef :: Env -> GRef -> Modality
@@ -280,7 +302,9 @@ iTitle env n2 = Atomic (lin env (gf n2))
 
 iVP :: Env -> GVP -> Formula
 iVP env vp = case vp of
+  GVP_VP_PP vp pp -> Modification (iVP env vp) (iPP env pp)
   GVP_VP2_NP vp2 np -> Action (iVP2 env vp2) (iNP env np)
+  GVP_ConjVP2_NP vp2 np -> Action (iConjVP2 env vp2) (iNP env np)
   _ -> Atomic (lin env (gf vp)) ----
 
 iVP2 :: Env -> GVP2 -> Formula

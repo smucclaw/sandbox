@@ -68,6 +68,7 @@ fun CN_N2_of_NP : N2 -> NP -> CN ;
 fun CN_action : CN ;
 fun CN_assessment : CN ;
 fun CN_assessment_of_whether_S : S -> CN ;
+fun CN_circumstances : CN ;
 fun CN_class_of_personal_data : CN ;
 fun CN_contract : CN ;
 fun CN_data_breach : CN ;
@@ -149,9 +150,9 @@ fun Item_26E : Item ;
 
 fun LabLine_Item_Line : Item -> Line -> LabLine ;
 fun LabLine_Item__Line : Item -> Line -> LabLine ;
+fun LabLine_Item__Item_Line : Item -> Item -> Line -> LabLine ;
 fun LabLine_Line : Line -> LabLine ;
 fun LabLine_Ref : Ref -> LabLine ;
-fun LabLine_Item__Item_Line : Item -> Item -> Line -> LabLine ;
 fun LabLine_Title : Title -> LabLine ;
 
 fun Line_NP_ : NP -> Line ;
@@ -258,7 +259,7 @@ fun RS_where_S : S -> RS ;
 fun Ref_402020 : Ref ;
 
 fun S_NP_VP : NP -> VP -> S ;
-fun S_personal_data_is_stored_in_circumstances_RS : RS -> S ;
+---fun S_personal_data_is_stored_in_circumstances_RS : RS -> S ;
 fun S_the_context_otherwise_requires : S ;
 
 fun SeqPP_PP : PP -> SeqPP ;
@@ -321,6 +322,7 @@ fun VP2_conduct : VP2 ;
 fun VP2_does_not_apply_to : VP2 ;
 fun VP2_is_in_relation_to : VP2 ;
 fun VP2_is_prescribed_for : VP2 ;
+fun VP2_is_stored_in : VP2 ;
 fun VP2_makes : VP2 ;
 fun VP2_notify : VP2 ;
 fun VP2_provide : VP2 ;

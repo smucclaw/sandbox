@@ -66,6 +66,7 @@ lin CN_N2_of_NP n2 np = n2 ++ "of" ++ np ;
 lin CN_action = "action" ;
 lin CN_assessment = "assessment" ;
 lin CN_assessment_of_whether_S s = "assessment" ++ "of" ++ "whether" ++ s ;
+lin CN_circumstances = "circumstances" ;
 lin CN_class_of_personal_data = "class" ++ "of" ++ "personal" ++ "data" ;
 lin CN_contract = "contract" ;
 lin CN_data_breach = "data" ++ "breach" ;
@@ -135,9 +136,9 @@ lin Item_26E = "26E" ;
 
 lin LabLine_Item_Line item line = item ++ line ;
 lin LabLine_Item__Line item line = item ++ "." ++ line ;
+lin LabLine_Item__Item_Line ref item line = ref ++ "." ++ "—" ++ item ++ line ;
 lin LabLine_Line line = line ;
 lin LabLine_Ref ref = ref ;
-lin LabLine_Item__Item_Line ref item line = ref ++ "." ++ "—" ++ item ++ line ;
 lin LabLine_Title title = title ;
 
 lin Line_NP_ np = np ++ "." ;
@@ -243,7 +244,7 @@ lin RS_where_S s = "where" ++ s ;
 lin Ref_402020 = "[40/2020]" ;
 
 lin S_NP_VP np vp = np ++ vp ;
-lin S_personal_data_is_stored_in_circumstances_RS rs = "personal" ++ "data" ++ "is" ++ "stored" ++ "in" ++ "circumstances" ++ rs ;
+---lin S_personal_data_is_stored_in_circumstances_RS rs = "personal" ++ "data" ++ "is" ++ "stored" ++ "in" ++ "circumstances" ++ rs ;
 lin S_the_context_otherwise_requires = "the" ++ "context" ++ "otherwise" ++ "requires" ;
 
 lin SeqPP_PP pp = pp ;
@@ -307,6 +308,7 @@ lin VP2_conduct = "conduct" ;
 lin VP2_does_not_apply_to = "does" ++ "not" ++ "apply" ++ "to" ;
 lin VP2_is_in_relation_to = "is" ++ "in" ++ "relation" ++ "to" ;
 lin VP2_is_prescribed_for = "is" ++ "prescribed" ++ "for" ;
+lin VP2_is_stored_in = "is" ++ "stored" ++ "in" ;
 lin VP2_makes = "makes" ;
 lin VP2_notify = "notify" ;
 lin VP2_provide = "provide" ;

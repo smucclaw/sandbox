@@ -19,8 +19,9 @@ main = do
   ts <- flip mapM ss $ \s -> do
     let ps = parse pgf eng lineCat s
     case ps of
-      [] -> putStrLn ("NO PARSE: " ++ s) >> return []
-      tree:_ -> return [tree]   
+      [] -> putStrLn ("## NO PARSE: " ++ s) >> return []
+      tree:_ -> putStrLn ("## " ++ showExpr [] tree) >> return [tree]
+
   let env = Env {lin = linearize pgf eng}
   let paras = paragraphs (map fg (concat ts))
   flip mapM_ paras $ \para -> do

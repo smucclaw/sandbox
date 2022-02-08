@@ -25,6 +25,7 @@ data Formula =
   | Action Formula Formula
   | Modification Formula Formula   -- A which is B
   | Relation Formula Formula
+  | Qualification String Formula ---
   | Sequence [Formula] --- just a sequence one on top of another
   | Means Formula Formula -- definition
    deriving Show
@@ -41,10 +42,11 @@ formula2box formula = case formula of
   Implication f g -> ifBox [formula2box f] [formula2box g]
   Negation f -> notBox (formula2box f)
   Application f x -> ofBox [formula2box f] [formula2box x]
-  Predication x f -> doubleLeftsideBox "AGENT" [formula2box x] "ACTION" [formula2box f]
-  Action f x -> doubleLeftsideBox "ACTING" [formula2box x] "ON" [formula2box f]
-  Modification f x -> modBox (formula2box f) [formula2box x]
-  Relation f x -> doubleLeftsideBox "HAVING RELATION" [formula2box x] "TO" [formula2box f]
+  Predication x f -> nodoubleLeftsideBox "SUBJECT" [formula2box x] "PREDICATE" [formula2box f]
+  Action f x -> nodoubleLeftsideBox "ACTING" [formula2box f] "ON" [formula2box x]
+  Modification a p -> nodoubleLeftsideBox "ENTITY" [formula2box a] "WITH PROPERTIES" [formula2box p]
+  Relation f x -> nodoubleLeftsideBox "HAVING RELATION" [formula2box x] "TO" [formula2box f]
+  Qualification s f -> leftsideBox s [formula2box f]
   Sequence fs -> seqBox (map formula2box fs) ----
   Means f g -> meansBox (formula2box f) (formula2box g)
 
@@ -59,12 +61,48 @@ data Env = Env {
 
 -- to collect lines that belong together - under a common heading
 paragraphs :: [GLabLine] -> [[GLabLine]]
-paragraphs = reverse . collect [] [] where
-  collect ps ts ls = case ls of
-    t@(GLabLine_Ref _) : ll | not (null ts) -> collect (reverse ts : ps) [t] ll
-    t : ll -> collect ps (t:ts) ll
-    _ -> reverse ts : ps
-  
+paragraphs = reverse . collect [] where
+  collect ps ls = case ls of
+    lline:llines -> case lineOfLabLine lline of
+      Nothing -> collect ([lline] : ps) llines
+      Just line -> case lineStartsBlock line of
+        False -> collect ([lline] : ps) llines
+        _ -> let (llines1, llines2) = getPara llines
+             in collect ((lline:llines1) : ps) llines2
+    _ -> ps
+  getPara ls = span inBlock ls
+  inBlock lline = case lineOfLabLine lline of
+    Just line -> not (lineStartsBlock line)
+    _ -> False
+
+lineOfLabLine :: GLabLine -> Maybe GLine
+lineOfLabLine lline = case lline of
+  GLabLine_Item_Line _ line -> Just line
+  GLabLine_Item__Line _ line -> Just line
+  GLabLine_Item__Item_Line _ _ line -> Just line
+  GLabLine_Line line -> Just line
+  _ -> Nothing
+
+lineStartsBlock :: GLine -> Bool
+lineStartsBlock line = case line of
+  GLine_S_cont _ -> True
+  GLine_S_if_ _ -> True
+  GLine_S_if_NP_ _ _ -> True
+  GLine_an_CN_is_not__PP__to_be_regarded_as_NP_of_ _ _ _ -> True
+  GLine_where_S_ _ -> True
+  GLine_PP__unless_S_ _ _ -> True
+  GLine_where_an_CN_ _ -> True
+  _ -> False
+
+lineIsInBlock :: GLine -> Bool
+lineIsInBlock line = case line of
+  GLine_NP__Conj _ _ -> True
+  GLine_S__Conj _ _ -> True
+  GLine_VP__Conj _ _ -> True
+  GLine_VP_c _ -> True
+  GLine_if_S__Conj _ _ -> True
+  GLine_if_S_Conj _ _ -> True
+  _ -> False
 
 iLabLines :: Env -> [GLabLine] -> Formula
 iLabLines env ls = case ls of
@@ -108,6 +146,7 @@ iCN :: Env -> GCN -> Formula
 iCN env cn = case cn of
   GCN_A_CN a n -> let (ms, bn) = mods cn in Modification bn (Conjunction ms)
   GCN_CN_AP n ap -> let (ms, bn) = mods cn in Modification bn (Conjunction ms)
+  GCN_CN_RS cn rs -> Sequence [iCN env cn, iRS env rs]
   _ -> Atomic (lin env (gf cn))
  where
    mods cn = case cn of
@@ -176,7 +215,7 @@ iNP env np = case np of
     Application (Modal "unauthorized" (iConjN2 env conjn2)) (iNP env np)
     
   GNP_the_loss_of_any_ConjCN_RS conjcn rs ->
-    Modal "the loss of any" (Modification (iConjCN env conjcn) (iRS env rs))
+    Application (Atomic "loss") (Modal "ANY" (Sequence [(iConjCN env conjcn), (iRS env rs)]))
   
   GNP_CN cn -> iCN env cn
   _ -> Atomic (lin env (gf np)) ----
@@ -200,8 +239,8 @@ iQCN env n2 = Atomic (lin env (gf n2))
 
 iRS :: Env -> GRS -> Formula
 iRS env rs = case rs of
-  GRS_on_which_S s -> Modal "ON WHICH" (iS env s)
-  GRS_where_S s -> Modal "WHERE" (iS env s)
+  GRS_on_which_S s -> Qualification "ON WHICH" (iS env s)
+  GRS_where_S s -> Qualification "WHERE" (iS env s)
   _ -> Atomic (lin env (gf rs)) ----
 
 iRef :: Env -> GRef -> Modality
@@ -211,8 +250,6 @@ iS :: Env -> GS -> Formula
 iS env s = case s of
   GS_NP_VP np vp ->
     Predication (iNP env np) (iVP env vp)
-  GS_personal_data_is_stored_in_circumstances_RS rs ->
-    Modification (Atomic "personal data is stored in circumstances") (iRS env rs)
   _ -> Atomic (lin env (gf s)) ----
 
 iSeqPP :: Env -> GSeqPP -> Formula

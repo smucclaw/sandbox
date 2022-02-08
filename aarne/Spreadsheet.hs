@@ -23,6 +23,9 @@ doubleLeftsideBox ls1 bs1 ls2 bs2 = box {
           [(ls2, head bs2)] ++ [("", b) | b <- tail bs2]
   }
 
+--- to ignore headers
+nodoubleLeftsideBox ls1 bs1 ls2 bs2 = seqBox (bs1 ++ bs2)
+
 mkBox h l boxes = (leftsideBox l boxes){header = h}
 
 addHeader h box =

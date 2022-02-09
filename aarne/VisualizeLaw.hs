@@ -27,5 +27,6 @@ main = do
   flip mapM_ paras $ \para -> do
       putStrLn $ unlines ["## " ++ showExpr [] (gf line) | line <- para]
       let formula = iLabLines env para
+      putStrLn $ "#+ " ++ show formula
       let box = formula2box formula
       putStrLn $ S.renderBox box

@@ -153,10 +153,16 @@ iLabLines env ls = case ls of
        Conditional
            (iS env s)
            (Predication (iNP env np) (conjOfLabLines env ts (map (iLabLine env) ts)))
+    Just (GLine_S_if_ s) ->
+       Conditional
+           (iS env s)
+           (conjOfLabLines env ts (map (iLabLine env) ts))
     Just (GLine_where_S_ s) ->
        Implication
            (iS env s)
            (conjOfLabLines env ts (map (iLabLine env) ts))
+    Just line@(GLine_an_CN_is_not__PP__to_be_regarded_as_NP_of_ _ _ _) -> ---- analyse further!
+       Sequence [iLine env line, conjOfLabLines env ts (map (iLabLine env) ts)]
     _ -> case ts of
       t2 : _  | maybe False lineIsConditional (lineOfLabLine t2) ->
         Conditional
@@ -166,6 +172,7 @@ iLabLines env ls = case ls of
 
 iLabLine :: Env -> GLabLine -> Formula
 iLabLine env line = case line of
+  GLabLine_Item__Item_Line item item2 li -> Modal (iItem env item ++ "." ++ "—" ++ iItem env item2) (iLine env li)
   GLabLine_Item_Line item li -> Modal (iItem env item) (iLine env li)
   GLabLine_Line li -> iLine env li
   GLabLine_Ref r -> Atomic (iRef env r)
@@ -179,6 +186,7 @@ iLine env line = case line of
   GLine_S_ s -> iS env s
   GLine_S_cont s -> iS env s
   GLine_S__Conj s conj -> iConj env conj [iS env s]
+  GLine_where_S__S_ s1 s2 -> Implication (iS env s1) (iS env s2)
   GLine_PP__Line pp line2 -> Modal (lin env (gf pp)) (iLine env line2)
   GLine_QCN_means_NP_ qcn np -> Means (iQCN env qcn) (iNP env np)
   GLine_where_S__S_ s s2 -> Implication (iS env s) (iS env s2)
@@ -328,8 +336,9 @@ iVP :: Env -> GVP -> Formula
 iVP env vp = case vp of
   GVP_VP_PP vp pp -> Modification (iVP env vp) (iPP env pp)
   GVP_VP2_NP vp2 np -> Action (iVP2 env vp2) (iNP env np)
+  GVP_VP2__SeqPP__NP vp2 seqpp np -> Modification (Action (iVP2 env vp2) (iNP env np)) (iSeqPP env seqpp)
   GVP_ConjVP2_NP vp2 np -> Action (iConjVP2 env vp2) (iNP env np)
-  GVP_may__SeqPP__VP seqpp vp2 -> Qualification "MUST" (Modification (iVP env vp2) (iSeqPP env seqpp))
+  GVP_may__SeqPP__VP seqpp vp2 -> Qualification "MAY" (Modification (iVP env vp2) (iSeqPP env seqpp))
   GVP_must__SeqPP__VP seqpp vp2 -> Qualification "MUST" (Modification (iVP env vp2) (iSeqPP env seqpp))
   ---- these could be treated with a separate VVP category 
   GVP_must_VP vp2 -> Qualification "MUST" (iVP env vp2)
@@ -343,3 +352,7 @@ iVP env vp = case vp of
 
 iVP2 :: Env -> GVP2 -> Formula
 iVP2 env n2 = Atomic (lin env (gf n2))
+
+----
+-- TODO:
+-- line 39: wrong structure

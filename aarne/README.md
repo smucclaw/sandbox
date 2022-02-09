@@ -25,15 +25,20 @@ Processing:
 - build pgf: `gf --make LawEng.gf`
 - build pgf and gadt: `make`
 - parse text: `runghc LawParser.hs <tokenized-6A.txt`
-- tsv generation test: `cat tokenized-6A.txt | head -8 | runghc VisualizeLaw.hs`
-  (this shows the ASTs in comments before each block, prefixed with `##`)
+- tsv generation test: `cat tokenized-6A.txt | runghc VisualizeLaw.hs`
+- by changing the definition of `ifDebug` in `VisualizeLaw.hs` (by a
+  simple comment/comment), the run also produces debugging
+  information, as well as a `lawtrees.dot`, which shows abstract
+  syntax trees graphically
+- in that case, `dot -Tpng -O lawtrees.dot >lawtrees.png` creates
+  graphical trees for each line
 
 Older processing:
 
-- generate the grammar: `runghc Analyse.hs >GenTop.cf` (no longer needed)
+- generate a BNF grammar: `runghc Analyse.hs >GenTop.cf` (no longer needed)
 - parse in GF:
 ```
-> i Top.cf
+> i GenTop.cf
 > rf -file="tokenized-6A.txt" -lines | p -cat=Line
 ```
 

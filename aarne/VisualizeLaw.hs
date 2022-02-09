@@ -25,6 +25,8 @@ main = do
       [] -> putStrLn ("## NO PARSE: " ++ s) >> return []
       tree:_ -> return [tree]
 
+  ifDebug $ writeFile "lawtrees.dot" $ unlines [graphvizAbstractTree pgf (True, False) t | t <- concat ts]
+
   let env = Env {lin = linearize pgf eng}
   let paras = paragraphs (map fg (concat ts))
   flip mapM_ paras $ \para -> do

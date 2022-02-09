@@ -9,6 +9,9 @@ import qualified Spreadsheet as S
 
 import PGF
 
+ifDebug io = return ()
+-- ifDebug io = io
+
 law_pgf = "Law.pgf"
 eng = mkCId "LawEng"
 Just lineCat = readType "LabLine"
@@ -25,9 +28,9 @@ main = do
   let env = Env {lin = linearize pgf eng}
   let paras = paragraphs (map fg (concat ts))
   flip mapM_ paras $ \para -> do
-      putStrLn $ unlines ["#- " ++ lin env (gf line) | line <- para]
-      putStrLn $ unlines ["## " ++ showExpr [] (gf line) | line <- para]
+      ifDebug $ putStrLn $ unlines ["#- " ++ lin env (gf line) | line <- para]
+      ifDebug $ putStrLn $ unlines ["## " ++ showExpr [] (gf line) | line <- para]
       let formula = iLabLines env para
-      putStrLn $ "#+ " ++ show formula
+      ifDebug $ putStrLn $ "#+ " ++ show formula
       let box = formula2box formula
       putStrLn $ S.renderBox box

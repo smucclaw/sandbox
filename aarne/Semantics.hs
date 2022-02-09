@@ -15,6 +15,7 @@ import Data.Maybe (isJust)
 
 type Modality = String
 type Atom = String
+type Role = String
 
 data Formula =
     Modal Modality Formula
@@ -26,6 +27,7 @@ data Formula =
   | Negation Formula
   | Application Formula Formula  -- the f of x
   | Predication Formula Formula
+  | Assignment Role Formula Formula -- oblication/duty/right of NP to VP
   | Action Formula Formula
   | Modification Formula Formula   -- A which is B
   | Relation Formula Formula
@@ -49,6 +51,7 @@ formula2box formula = case formula of
   Negation f -> notBox (formula2box f)
   Application f x -> ofBox [formula2box f] [formula2box x]
   Predication x f -> nodoubleLeftsideBox "SUBJECT" [formula2box x] "PREDICATE" [formula2box f]
+  Assignment r x f -> seqBox [atomBox r, leftsideBox "OF" [formula2box x], leftsideBox "TO" [formula2box f]]
   Action f x -> nodoubleLeftsideBox "ACTING" [formula2box f] "ON" [formula2box x]
   Modification a p -> nodoubleLeftsideBox "ENTITY" [formula2box a] "WITH PROPERTIES" [formula2box p]
   Relation f x -> nodoubleLeftsideBox "HAVING RELATION" [formula2box f] "TO" [formula2box x]
@@ -163,6 +166,17 @@ iLabLines env ls = case ls of
            (conjOfLabLines env ts (map (iLabLine env) ts))
     Just line@(GLine_an_CN_is_not__PP__to_be_regarded_as_NP_of_ _ _ _) -> ---- analyse further!
        Sequence [iLine env line, conjOfLabLines env ts (map (iLabLine env) ts)]
+
+    Just (GLine_where_an_CN_ cn) ->
+       let (ts1, ts2) = splitAt (length ts - 1) ts ---- TODO generally: split after conj+1
+       in 
+       Implication
+         (Predication
+           (Quantification "AN" (iCN env cn))
+           (conjOfLabLines env ts (map (iLabLine env) ts1)))
+         (iLabLines env ts2)
+
+
     _ -> case ts of
       t2 : _  | maybe False lineIsConditional (lineOfLabLine t2) ->
         Conditional
@@ -201,19 +215,33 @@ iA2 env a2 = Atomic (lin env (gf a2))
 
 iAP :: Env -> GAP -> Formula
 iAP env ap = case ap of
-  GAP_A2_NP a2 np -> Sequence [iA2 env a2, iNP env np] ---
+  GAP_A2_NP a2 np -> 
+    let
+      ws = words (lin env (gf a2)) ---- should use discontinuous const
+      (adj, prep) = splitAt (length ws - 1) ws
+    in Relation (Atomic (unwords adj)) (Qualification (map toUpper (concat prep)) (iNP env np))
 
 iCN :: Env -> GCN -> Formula
 iCN env cn = case cn of
-  GCN_A_CN a n -> let (ms, bn) = mods cn in Modification bn (Conjunction ms)
-  GCN_CN_AP n ap -> let (ms, bn) = mods cn in Modification bn (Conjunction ms)
-  GCN_CN_RS cn rs -> Sequence [iCN env cn, iRS env rs] ---
+  GCN_A_CN a n -> let (ms, bn) = mods cn in modif bn ms
+  GCN_CN_AP n ap -> let (ms, bn) = mods cn in modif bn ms
+  GCN_CN_RS n rs -> let (ms, bn) = mods cn in modif bn ms
+
+  GCN_obligation_of_NP_to_VP np vp -> Assignment "OBLIGATION" (iNP env np) (iVP env vp)
+  
   _ -> Atomic (lin env (gf cn))
  where
    mods cn = case cn of
      GCN_A_CN a n -> let (ms, bn) = mods n in (iA env a : ms, bn)
      GCN_CN_AP n ap -> let (ms, bn) = mods n in (iAP env ap : ms, bn)
+     GCN_CN_RS n rs -> let (ms, bn) = mods n in (iRS env rs : ms, bn)
      _ -> ([], iCN env cn)
+   modif bn ms =
+     if length ms > 1
+     then Modification bn (Qualification "WITH PROPERTIES" (Conjunction ms))
+     else Modification bn (Qualification "WITH PROPERTY" (Sequence ms))
+
+
 
 iComp :: Env -> GComp -> Formula
 iComp env comp = Atomic (lin env (gf comp))
@@ -288,7 +316,10 @@ iNP env np = case np of
   GNP_that_CN cn -> Quantification "THAT" (iCN env cn)
   GNP_this_CN cn -> Quantification "THIS" (iCN env cn)
 
-
+  GNP_NP__Conj_NP__PP np conj np2 pp ->
+    Modification (iConj env conj (map (iNP env) [np, np2])) (iPP env pp)
+  GNP_any_ConjCN conjcn -> Quantification "ANY" (iConjCN env conjcn)
+  
   _ -> Atomic (lin env (gf np)) ----
 
 iNum :: Env -> GNum -> Formula
@@ -338,6 +369,8 @@ iVP env vp = case vp of
   GVP_VP2_NP vp2 np -> Action (iVP2 env vp2) (iNP env np)
   GVP_VP2__SeqPP__NP vp2 seqpp np -> Modification (Action (iVP2 env vp2) (iNP env np)) (iSeqPP env seqpp)
   GVP_ConjVP2_NP vp2 np -> Action (iConjVP2 env vp2) (iNP env np)
+  GVP_VP__Conj_to_VP vp1 conj vp2 -> iConj env conj (map (iVP env) [vp1, vp2])
+
   GVP_may__SeqPP__VP seqpp vp2 -> Qualification "MAY" (Modification (iVP env vp2) (iSeqPP env seqpp))
   GVP_must__SeqPP__VP seqpp vp2 -> Qualification "MUST" (Modification (iVP env vp2) (iSeqPP env seqpp))
   ---- these could be treated with a separate VVP category 

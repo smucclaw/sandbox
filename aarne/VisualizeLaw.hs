@@ -6,7 +6,7 @@ module Main where
 import Law
 import Semantics
 import qualified Spreadsheet as S
-
+import Control.Monad (forM, forM_)
 import PGF
 
 ifDebug io = return ()
@@ -19,7 +19,7 @@ Just lineCat = readType "LabLine"
 main = do
   pgf <- readPGF law_pgf
   ss <- getContents >>= return . lines
-  ts <- flip mapM ss $ \s -> do
+  ts <- forM ss $ \s -> do
     let ps = parse pgf eng lineCat s
     case ps of
       [] -> putStrLn ("## NO PARSE: " ++ s) >> return []
@@ -29,7 +29,7 @@ main = do
 
   let env = Env {lin = linearize pgf eng}
   let paras = paragraphs (map fg (concat ts))
-  flip mapM_ paras $ \para -> do
+  forM_ paras $ \para -> do
       ifDebug $ putStrLn $ unlines ["#- " ++ lin env (gf line) | line <- para]
       ifDebug $ putStrLn $ unlines ["## " ++ showExpr [] (gf line) | line <- para]
       let formula = iLabLines env para

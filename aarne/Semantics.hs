@@ -22,6 +22,7 @@ data Formula =
   | Conjunction [Formula]
   | Disjunction [Formula]
   | Implication Formula Formula
+  | Conditional Formula Formula -- reverse implication (notice anaphora!)
   | Negation Formula
   | Application Formula Formula  -- the f of x
   | Predication Formula Formula
@@ -44,6 +45,7 @@ formula2box formula = case formula of
   Conjunction fs -> andBox (map formula2box fs)
   Disjunction fs -> orBox (map formula2box fs)
   Implication f g -> ifBox [formula2box f] [formula2box g]
+  Conditional a b -> doubleLeftsideBox "CONDITIONALLY" [formula2box a] "PROVIDED" [formula2box b]
   Negation f -> notBox (formula2box f)
   Application f x -> ofBox [formula2box f] [formula2box x]
   Predication x f -> nodoubleLeftsideBox "SUBJECT" [formula2box x] "PREDICATE" [formula2box f]
@@ -102,6 +104,15 @@ lineStartsBlock line = case line of
   GLine_QCN__PP__means_ _ _ -> True
   GLine_PP__unless_S_ _ _ -> True
   GLine_where_an_CN_ _ -> True
+  GLine_PP__Line _ line2 -> lineStartsBlock line2
+  _ -> False
+
+lineIsConditional :: GLine -> Bool
+lineIsConditional line = case line of
+  GLine_if_S__Conj _ _ -> True
+  GLine_if_S_Conj _ _ -> True
+  GLine_PP__Line _ line2 -> lineIsConditional line2
+
   _ -> False
 
 lineIsInBlock :: GLine -> Bool
@@ -115,6 +126,7 @@ conjOfLine line = case line of
 ----  GLine_VP_c
   GLine_if_S__Conj _ conj -> Just conj
   GLine_if_S_Conj _ conj -> Just conj
+  GLine_PP__Line _ line2 -> conjOfLine line2
   _ -> Nothing
 
 labOfLabLine :: Env -> GLabLine -> Formula -> Formula
@@ -138,10 +150,19 @@ iLabLines env ls = case ls of
        Means (Modification (iQCN env qcn) (iPP env pp))
          (conjOfLabLines env ts (map (iLabLine env) ts))
     Just (GLine_S_if_NP_ s np) ->
-       Means (iS env s)
-         (Qualification "THAT"
-           (Predication (iNP env np) (conjOfLabLines env ts (map (iLabLine env) ts))))
-    _ -> Sequence (map (iLabLine env) ls)
+       Conditional
+           (iS env s)
+           (Predication (iNP env np) (conjOfLabLines env ts (map (iLabLine env) ts)))
+    Just (GLine_where_S_ s) ->
+       Implication
+           (iS env s)
+           (conjOfLabLines env ts (map (iLabLine env) ts))
+    _ -> case ts of
+      t2 : _  | maybe False lineIsConditional (lineOfLabLine t2) ->
+        Conditional
+          (iLabLine env t)
+          (conjOfLabLines env ts (map (iLabLine env) ts))
+      _ -> Sequence (map (iLabLine env) ls)
 
 iLabLine :: Env -> GLabLine -> Formula
 iLabLine env line = case line of
@@ -156,7 +177,7 @@ iLine env line = case line of
   GLine_NP_ np -> iNP env np
   GLine_NP__Conj np conj -> iConj env conj [iNP env np] ----
   GLine_S_ s -> iS env s
-  GLine_S_ s -> iS env s
+  GLine_S_cont s -> iS env s
   GLine_S__Conj s conj -> iConj env conj [iS env s]
   GLine_PP__Line pp line2 -> Modal (lin env (gf pp)) (iLine env line2)
   GLine_QCN_means_NP_ qcn np -> Means (iQCN env qcn) (iNP env np)
@@ -284,6 +305,8 @@ iRS env rs = case rs of
   GRS_on_which_S s -> Qualification "ON WHICH" (iS env s)
   GRS_where_S s -> Qualification "WHERE" (iS env s)
   GRS_that_VP vp -> Qualification "THAT" (iVP env vp)
+  GRS_that_NP_VP np vp -> Qualification "THAT" (Predication (iNP env np) (iVP env vp))
+  GRS_to_whom_NP_VP np vp -> Qualification "TO WHOM" (Predication (iNP env np) (iVP env vp))
   _ -> Atomic (lin env (gf rs)) ----
 
 iRef :: Env -> GRef -> Modality
@@ -306,6 +329,16 @@ iVP env vp = case vp of
   GVP_VP_PP vp pp -> Modification (iVP env vp) (iPP env pp)
   GVP_VP2_NP vp2 np -> Action (iVP2 env vp2) (iNP env np)
   GVP_ConjVP2_NP vp2 np -> Action (iConjVP2 env vp2) (iNP env np)
+  GVP_may__SeqPP__VP seqpp vp2 -> Qualification "MUST" (Modification (iVP env vp2) (iSeqPP env seqpp))
+  GVP_must__SeqPP__VP seqpp vp2 -> Qualification "MUST" (Modification (iVP env vp2) (iSeqPP env seqpp))
+  ---- these could be treated with a separate VVP category 
+  GVP_must_VP vp2 -> Qualification "MUST" (iVP env vp2)
+  GVP_must_also_VP vp2 -> Qualification "MUST ALSO" (iVP env vp2)
+  GVP_must_not_VP vp2 -> Qualification "MUST NOT" (iVP env vp2)
+  GVP_has_reason_to_VP vp2 -> Qualification "HAS REASON TO" (iVP env vp2)
+  GVP_is_deemed_to_VP vp2 -> Qualification "IS DEEMED TO" (iVP env vp2)
+  GVP_is_deemed_not_to_VP vp2 -> Qualification "IS DEEMED NOT TO" (iVP env vp2)
+
   _ -> Atomic (lin env (gf vp)) ----
 
 iVP2 :: Env -> GVP2 -> Formula

@@ -22,10 +22,9 @@ author:             Aarne Ranta
 extra-source-files:
     README.md
 
-build-depends:    base
-                , gf
-                , mtl
-
+library
+  build-depends:
+      mtl
 
 executable Analyse
     main-is:          Analyse.hs

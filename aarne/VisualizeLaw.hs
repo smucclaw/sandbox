@@ -1,7 +1,7 @@
 {-# OPTIONS_GHC -fglasgow-exts #-}
 {-# LANGUAGE GADTs #-}
 
-module VisualizeLaw where
+module Main where
 
 import Law
 import Semantics

@@ -9,6 +9,7 @@ import Spreadsheet
 import PGF (Expr)
 
 import Data.Char (toUpper)
+import Data.Maybe (isJust)
 
 -- the logic
 
@@ -104,14 +105,14 @@ lineStartsBlock line = case line of
   _ -> False
 
 lineIsInBlock :: GLine -> Bool
-lineIsInBlock line = conjOfLine line /= Nothing
+lineIsInBlock line = isJust $ conjOfLine line
 
 conjOfLine :: GLine -> Maybe GConj
 conjOfLine line = case line of
   GLine_NP__Conj _ conj -> Just conj
   GLine_S__Conj _ conj -> Just conj
   GLine_VP__Conj _ conj -> Just conj
-----  GLine_VP_c 
+----  GLine_VP_c
   GLine_if_S__Conj _ conj -> Just conj
   GLine_if_S_Conj _ conj -> Just conj
   _ -> Nothing
@@ -128,11 +129,11 @@ conjOfLabLines env llines fs =
   case [c | ll <- llines, Just l <- [lineOfLabLine ll], Just c <- [conjOfLine l]] of
     conj:_ -> iConj env conj fs  ---- if many different conjs?
     _ -> Sequence fs
-     
+
 
 iLabLines :: Env -> [GLabLine] -> Formula
 iLabLines env ls = case ls of
-  t : ts -> case lineOfLabLine t of  ---- labOfLabLine env t $ 
+  t : ts -> case lineOfLabLine t of  ---- labOfLabLine env t $
     Just (GLine_QCN__PP__means_ qcn pp) ->
        Means (Modification (iQCN env qcn) (iPP env pp))
          (conjOfLabLines env ts (map (iLabLine env) ts))
@@ -203,7 +204,7 @@ iConjN2 :: Env -> GConjN2 -> Formula
 iConjN2 env conjn2 = conj fs where
   (conj, fs) = iconj conjn2
   iconj conjn2 = case conjn2 of
-    GConjN2_N2__ConjN2 n2 conj2 -> let (conj, fs) = iconj conj2 in (conj, (iN2 env n2):fs)  
+    GConjN2_N2__ConjN2 n2 conj2 -> let (conj, fs) = iconj conj2 in (conj, (iN2 env n2):fs)
     GConjN2_N2_Conj_N2 n1 conj n2 -> (iConj env conj, [iN2 env n1, iN2 env n2])
 
 iConjNP :: Env -> GConjNP -> Formula
@@ -245,10 +246,10 @@ iNP :: Env -> GNP -> Formula
 iNP env np = case np of
   GNP_the_unauthorised_ConjN2_of_NP conjn2 np ->
     Application (Modal "unauthorized" (iConjN2 env conjn2)) (iNP env np)
-    
+
   GNP_the_loss_of_any_ConjCN_RS conjcn rs ->
     Application (Atomic "loss") (Modal "ANY" (Sequence [(iConjCN env conjcn), (iRS env rs)]))
-  
+
   GNP_CN cn -> iCN env cn
 
   GNP_a_CN cn -> Quantification "A" (iCN env cn)
@@ -258,7 +259,7 @@ iNP env np = case np of
   GNP_that_CN cn -> Quantification "THAT" (iCN env cn)
   GNP_this_CN cn -> Quantification "THIS" (iCN env cn)
 
-  
+
   _ -> Atomic (lin env (gf np)) ----
 
 iNum :: Env -> GNum -> Formula
@@ -308,5 +309,4 @@ iVP env vp = case vp of
   _ -> Atomic (lin env (gf vp)) ----
 
 iVP2 :: Env -> GVP2 -> Formula
-iVP2 env n2 = Atomic (lin env (gf n2)) 
-
+iVP2 env n2 = Atomic (lin env (gf n2))

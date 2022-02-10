@@ -54,7 +54,7 @@ If you don't have a global GHC, you can also run this with stack. In that case, 
 #### Processing:
 - build pgf—**identical to previous instruction**: `gf --make LawEng.gf`
 - parse text: `stack run LawParser <tokenized-6A.txt`
-- tsv generation test: `cat tokenized-6A.txt | head -8 | stack run VisualizeLaw`
+- tsv generation test: `cat tokenized-6A.txt | head -8 | stack runghc VisualizeLaw`
 
 #### Older processing:
 - generate the grammar: `stack run Analyses > GenTop.cf` (no longer needed)

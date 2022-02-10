@@ -122,7 +122,7 @@ fex2 = Univ (Family "N" []) (\x -> Exist (Family "N" []) (\y -> Conj [Pred "Gt" 
 
 -- from assembly logic to real logic
 
-data PropCat = PProp Prop | PSet Set | PInd Ind | PFun (Ind -> PropCat)
+data PropCat = PProp Prop | PSet Set | PInd Ind
 
 formula2prop :: Formula -> Either String PropCat
 formula2prop formula = case formula of
@@ -133,6 +133,7 @@ formula2prop formula = case formula of
     CProp -> return $ PProp $ Pred a []
     CSet -> return $ PSet $ Family a []
     CInd -> return $ PInd $ App a []
+    CPred -> return $ PProp $ Pred a []
     _ -> Left $ "no Prop, Set, or Ind from " ++ show formula
   Conjunction c fs -> case c of
     CProp -> do
@@ -154,16 +155,24 @@ formula2prop formula = case formula of
   Negation f -> do
     pf <- f2prop f
     return $ PProp $ Neg pf
+
+---  Application c f x ->
+
+
+  Predication q f -> do
+    pq <- f2quant q
+    pf <- f2pred f
+    return $ PProp $ pq pf
 {-
-  Application _ f x -> 
-  Predication x f -> 
   Assignment r x f -> 
   Action f x -> 
   Modification _ a p -> 
   Relation f x -> 
   Qualification _ s f -> 
   Modalization s f -> 
-  Quantification s f -> 
+-}
+
+{-
   Sequence _ fs -> 
   Means _ f g ->
 -}
@@ -185,4 +194,33 @@ formula2prop formula = case formula of
        PInd p -> return p
        _ -> Left $ "no Ind from " ++ show f
 
+   f2quant :: Formula -> Either String ((Ind -> Prop) -> Prop) 
+   f2quant formula = case formula of
+     Quantification s f -> do
+       pf <- f2set f
+       case s of
+         "ANY"  -> return $ \pred -> Exist pf (\x -> pred x)
+         "EACH" -> return $ \pred -> Univ  pf (\x -> pred x)
+     _ -> do
+       px <- f2ind formula
+       return $ \pred -> pred px
+
+   f2pred :: Formula -> Either String (Ind -> Prop) 
+   f2pred formula = case formula of
+     Atomic CPred f -> return $ \x -> Pred f [x]
+     Conjunction cat_ fs -> do
+       pfs <- mapM f2pred fs
+       return $ \x -> Conj [f x | f <- pfs]
+     Disjunction cat_ fs -> do
+       pfs <- mapM f2pred fs
+       return $ \x -> Disj [f x | f <- pfs]
+
+formula1 = Predication (Quantification "EACH" (Atomic CSet "N")) (Atomic CPred "Even")
+formula2 =
+  Predication (Quantification "EACH" (Atomic CSet "N"))
+    (Disjunction CPred [(Atomic CPred "Even"), (Atomic CPred "Odd")])
+
+testTrans formula = do
+  let Right (PProp p) = formula2prop formula
+  putStrLn $ prProp p
 

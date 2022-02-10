@@ -4,64 +4,14 @@
 module Semantics where
 
 import Law
-import Spreadsheet
+import Logics
 
 import PGF (Expr)
 
 import Data.Char (toUpper)
 import Data.Maybe (isJust)
 
--- the logic
-
-type Modality = String
-type Atom = String
-type Role = String
-
-data Formula =
-    Modal Modality Formula
-  | Atomic Atom
-  | Conjunction [Formula]
-  | Disjunction [Formula]
-  | Implication Formula Formula
-  | Conditional Formula Formula -- reverse implication (notice anaphora!)
-  | Negation Formula
-  | Application Formula Formula  -- the f of x
-  | Predication Formula Formula
-  | Assignment Role Formula Formula -- oblication/duty/right of NP to VP
-  | Action Formula Formula
-  | Modification Formula Formula   -- A which is B
-  | Relation Formula Formula
-  | Qualification String Formula ---
-  | Quantification String Formula ---
-  | Sequence [Formula] --- just a sequence one on top of another
-  | Means Formula Formula -- definition
-   deriving Show
-
-
--- from logic to spreadsheet (two-dimensional "box")
-
-formula2box :: Formula -> Box
-formula2box formula = case formula of
-  Modal m f -> addHeader m (formula2box f)
-  Atomic a  -> atomBox a
-  Conjunction fs -> andBox (map formula2box fs)
-  Disjunction fs -> orBox (map formula2box fs)
-  Implication f g -> ifBox [formula2box f] [formula2box g]
-  Conditional a b -> doubleLeftsideBox "CONDITIONALLY" [formula2box a] "PROVIDED" [formula2box b]
-  Negation f -> notBox (formula2box f)
-  Application f x -> ofBox [formula2box f] [formula2box x]
-  Predication x f -> nodoubleLeftsideBox "SUBJECT" [formula2box x] "PREDICATE" [formula2box f]
-  Assignment r x f -> seqBox [atomBox r, leftsideBox "OF" [formula2box x], leftsideBox "TO" [formula2box f]]
-  Action f x -> nodoubleLeftsideBox "ACTING" [formula2box f] "ON" [formula2box x]
-  Modification a p -> nodoubleLeftsideBox "ENTITY" [formula2box a] "WITH PROPERTIES" [formula2box p]
-  Relation f x -> nodoubleLeftsideBox "HAVING RELATION" [formula2box f] "TO" [formula2box x]
-  Qualification s f -> leftsideBox s [formula2box f]
-  Quantification s f -> leftsideBox s [formula2box f]
-  Sequence fs -> seqBox (map formula2box fs) ----
-  Means f g -> meansBox (formula2box f) (formula2box g)
-
-
--- interpretation of Law in the logic
+-- interpretation of Law in the assembly logic
 -- assuming a linearization from Tree to atoms or modalities
 -- the interpretation takes a list of lines
 
@@ -142,15 +92,15 @@ labOfLabLine env lline f = case lline of
 conjOfLabLines :: Env -> [GLabLine] -> [Formula] -> Formula
 conjOfLabLines env llines fs =
   case [c | ll <- llines, Just l <- [lineOfLabLine ll], Just c <- [conjOfLine l]] of
-    conj:_ -> iConj env conj fs  ---- if many different conjs?
-    _ -> Sequence fs
+    conj:_ -> iConj env conj CProp fs  ---- if many different conjs?
+    _ -> Sequence CProp fs
 
 
 iLabLines :: Env -> [GLabLine] -> Formula
 iLabLines env ls = case ls of
   t : ts -> case lineOfLabLine t of  ---- labOfLabLine env t $
     Just (GLine_QCN__PP__means_ qcn pp) ->
-       Means (Modification (iQCN env qcn) (iPP env pp))
+       Means CSet (Modification CSet (iQCN env qcn) (iPP env pp))
          (conjOfLabLines env ts (map (iLabLine env) ts))
     Just (GLine_S_if_NP_ s np) ->
        Conditional
@@ -165,7 +115,7 @@ iLabLines env ls = case ls of
            (iS env s)
            (conjOfLabLines env ts (map (iLabLine env) ts))
     Just line@(GLine_an_CN_is_not__PP__to_be_regarded_as_NP_of_ _ _ _) -> ---- analyse further!
-       Sequence [iLine env line, conjOfLabLines env ts (map (iLabLine env) ts)]
+       Sequence CProp [iLine env line, conjOfLabLines env ts (map (iLabLine env) ts)]
 
     Just (GLine_where_an_CN_ cn) ->
        let (ts1, ts2) = splitAt (length ts - 1) ts ---- TODO generally: split after conj+1
@@ -182,36 +132,36 @@ iLabLines env ls = case ls of
         Conditional
           (iLabLine env t)
           (conjOfLabLines env ts (map (iLabLine env) ts))
-      _ -> Sequence (map (iLabLine env) ls)
+      _ -> Sequence CProp (map (iLabLine env) ls)
 
 iLabLine :: Env -> GLabLine -> Formula
 iLabLine env line = case line of
   GLabLine_Item__Item_Line item item2 li -> Modal (iItem env item ++ "." ++ "—" ++ iItem env item2) (iLine env li)
   GLabLine_Item_Line item li -> Modal (iItem env item) (iLine env li)
   GLabLine_Line li -> iLine env li
-  GLabLine_Ref r -> Atomic (iRef env r)
+  GLabLine_Ref r -> Atomic CNone (iRef env r)
   GLabLine_Title t -> iTitle env t
-  _ -> Atomic (lin env (gf line))
+  _ -> Atomic CProp (lin env (gf line)) ---- cat
 
 iLine :: Env -> GLine -> Formula
 iLine env line = case line of
   GLine_NP_ np -> iNP env np
-  GLine_NP__Conj np conj -> iConj env conj [iNP env np] ----
+  GLine_NP__Conj np conj -> iConj env conj CProp [iNP env np] ----
   GLine_S_ s -> iS env s
   GLine_S_cont s -> iS env s
-  GLine_S__Conj s conj -> iConj env conj [iS env s]
+  GLine_S__Conj s conj -> iS env s
   GLine_where_S__S_ s1 s2 -> Implication (iS env s1) (iS env s2)
   GLine_PP__Line pp line2 -> Modal (lin env (gf pp)) (iLine env line2)
-  GLine_QCN_means_NP_ qcn np -> Means (iQCN env qcn) (iNP env np)
+  GLine_QCN_means_NP_ qcn np -> Means CSet (iQCN env qcn) (iNP env np)
   GLine_where_S__S_ s s2 -> Implication (iS env s) (iS env s2)
-  _ -> Atomic (lin env (gf line))
+  _ -> Atomic CProp (lin env (gf line)) ---- cat
 
 
 iA :: Env -> GA -> Formula
-iA env a = Atomic (lin env (gf a))
+iA env a = Atomic CPred (lin env (gf a))
 
 iA2 :: Env -> GA2 -> Formula
-iA2 env a2 = Atomic (lin env (gf a2))
+iA2 env a2 = Atomic CPred (lin env (gf a2))
 
 iAP :: Env -> GAP -> Formula
 iAP env ap = case ap of
@@ -219,7 +169,7 @@ iAP env ap = case ap of
     let
       ws = words (lin env (gf a2)) ---- should use discontinuous const
       (adj, prep) = splitAt (length ws - 1) ws
-    in Relation (Atomic (unwords adj)) (Qualification (map toUpper (concat prep)) (iNP env np))
+    in Relation (Atomic CPred (unwords adj)) (Qualification CNone (map toUpper (concat prep)) (iNP env np))
 
 iCN :: Env -> GCN -> Formula
 iCN env cn = case cn of
@@ -229,7 +179,7 @@ iCN env cn = case cn of
 
   GCN_obligation_of_NP_to_VP np vp -> Assignment "OBLIGATION" (iNP env np) (iVP env vp)
   
-  _ -> Atomic (lin env (gf cn))
+  _ -> Atomic CSet (lin env (gf cn))
  where
    mods cn = case cn of
      GCN_A_CN a n -> let (ms, bn) = mods n in (iA env a : ms, bn)
@@ -238,27 +188,27 @@ iCN env cn = case cn of
      _ -> ([], iCN env cn)
    modif bn ms =
      if length ms > 1
-     then Modification bn (Qualification "WITH PROPERTIES" (Conjunction ms))
-     else Modification bn (Qualification "WITH PROPERTY" (Sequence ms))
+     then Modification CSet bn (Qualification CPred "WITH PROPERTIES" (Conjunction CPred ms))
+     else Modification CSet bn (Qualification CPred "WITH PROPERTY" (Sequence CPred ms))
 
 
 
 iComp :: Env -> GComp -> Formula
-iComp env comp = Atomic (lin env (gf comp))
+iComp env comp = Atomic CPred (lin env (gf comp))
 
 iConjCN :: Env -> GConjCN -> Formula
 iConjCN env cc = case cc of
-  GConjCN_CN_Conj_CN cn1 conj cn2 -> iConj env conj (map (iCN env) [cn1, cn2])
+  GConjCN_CN_Conj_CN cn1 conj cn2 -> iConj env conj CSet (map (iCN env) [cn1, cn2])
 
 iConjCop :: Env -> GConjCop -> Formula
 iConjCop env cc = case cc of
-  GConjCop_Cop__Conj_Cop_ cn1 conj cn2 -> iConj env conj (map (iCop env) [cn1, cn2])
+  GConjCop_Cop__Conj_Cop_ cn1 conj cn2 -> iConj env conj CCop (map (iCop env) [cn1, cn2])
 
 iConjItem :: Env -> GConjItem -> Modality
 iConjItem env conjn2 = lin env (gf conjn2)
 
 iConjN2 :: Env -> GConjN2 -> Formula
-iConjN2 env conjn2 = conj fs where
+iConjN2 env conjn2 = conj CSet fs where
   (conj, fs) = iconj conjn2
   iconj conjn2 = case conjn2 of
     GConjN2_N2__ConjN2 n2 conj2 -> let (conj, fs) = iconj conj2 in (conj, (iN2 env n2):fs)
@@ -266,30 +216,30 @@ iConjN2 env conjn2 = conj fs where
 
 iConjNP :: Env -> GConjNP -> Formula
 iConjNP env cc = case cc of
-  GConjNP_NP_Conj_NP cn1 conj cn2 -> iConj env conj (map (iNP env) [cn1, cn2])
+  GConjNP_NP_Conj_NP cn1 conj cn2 -> iConj env conj CQuant (map (iNP env) [cn1, cn2])
 
 iConjPP :: Env -> GConjPP -> Formula
 iConjPP env cc = case cc of
-  GConjPP_PP_Conj_PP cn1 conj cn2 -> iConj env conj (map (iPP env) [cn1, cn2])
+  GConjPP_PP_Conj_PP cn1 conj cn2 -> iConj env conj CPred (map (iPP env) [cn1, cn2])
 
 iConjPPart :: Env -> GConjPPart -> Formula
 iConjPPart env cc = case cc of
-  GConjPPart_PPart_Conj_PPart cn1 conj cn2 -> iConj env conj (map (iPPart env) [cn1, cn2])
+  GConjPPart_PPart_Conj_PPart cn1 conj cn2 -> iConj env conj CPred (map (iPPart env) [cn1, cn2])
 
 iConjVP2 :: Env -> GConjVP2 -> Formula
 iConjVP2 env cc = case cc of
-  GConjVP2_VP2__Conj_VP2_ cn1 conj cn2 -> iConj env conj (map (iVP2 env) [cn1, cn2])
+  GConjVP2_VP2__Conj_VP2_ cn1 conj cn2 -> iConj env conj CPred (map (iVP2 env) [cn1, cn2])
 
-iConj :: Env -> GConj -> ([Formula] -> Formula)
+iConj :: Env -> GConj -> (Cat -> [Formula] -> Formula)
 iConj env conj = case conj of
   GConj_and -> Conjunction
   GConj_or -> Disjunction
 
 iCop :: Env -> GCop -> Formula
-iCop env item = Atomic (lin env (gf item))
+iCop env item = Atomic CCop (lin env (gf item))
 
 iDate :: Env -> GDate -> Formula
-iDate env item = Atomic (lin env (gf item))
+iDate env item = Atomic CInd (lin env (gf item))
 
 iItem :: Env -> GItem -> Modality
 iItem env item = lin env (gf item)
@@ -297,15 +247,15 @@ iItem env item = lin env (gf item)
 -- iLine on top level before all other categories
 
 iN2 :: Env -> GN2 -> Formula
-iN2 env n2 = Atomic (lin env (gf n2))
+iN2 env n2 = Atomic CFam (lin env (gf n2))
 
 iNP :: Env -> GNP -> Formula
 iNP env np = case np of
   GNP_the_unauthorised_ConjN2_of_NP conjn2 np ->
-    Application (Modal "unauthorized" (iConjN2 env conjn2)) (iNP env np)
+    Application CQuant (Modification CFam (Atomic CPred "unauthorized") (iConjN2 env conjn2)) (iNP env np)
 
   GNP_the_loss_of_any_ConjCN_RS conjcn rs ->
-    Application (Atomic "loss") (Modal "ANY" (Sequence [(iConjCN env conjcn), (iRS env rs)]))
+    Application CQuant (Atomic CFun "loss") (Quantification "ANY" (Modification CSet (iConjCN env conjcn) (iRS env rs)))
 
   GNP_CN cn -> iCN env cn
 
@@ -317,36 +267,36 @@ iNP env np = case np of
   GNP_this_CN cn -> Quantification "THIS" (iCN env cn)
 
   GNP_NP__Conj_NP__PP np conj np2 pp ->
-    Modification (iConj env conj (map (iNP env) [np, np2])) (iPP env pp)
+    Modification CQuant (iConj env conj CQuant (map (iNP env) [np, np2])) (iPP env pp)
   GNP_any_ConjCN conjcn -> Quantification "ANY" (iConjCN env conjcn)
   
-  _ -> Atomic (lin env (gf np)) ----
+  _ -> Atomic CInd (lin env (gf np)) ----
 
 iNum :: Env -> GNum -> Formula
-iNum env n2 = Atomic (lin env (gf n2))
+iNum env n2 = Atomic CInd (lin env (gf n2))
 
 iPP :: Env -> GPP -> Formula
 iPP env pp = case pp of
-  GPP_PP2_NP pp2 np -> Qualification (iPP2 env pp2) (iNP env np)
-  __ -> Atomic (lin env (gf pp))
+  GPP_PP2_NP pp2 np -> Qualification CPred (iPP2 env pp2) (iNP env np)
+  __ -> Atomic CPred (lin env (gf pp))
 
 iPP2 :: Env -> GPP2 -> Modality
 iPP2 env n2 = map toUpper (lin env (gf n2))
 
 iPPart :: Env -> GPPart -> Formula
-iPPart env n2 = Atomic (lin env (gf n2))
+iPPart env n2 = Atomic CPred (lin env (gf n2))
 
 iQCN :: Env -> GQCN -> Formula
-iQCN env n2 = Atomic (lin env (gf n2))
+iQCN env n2 = Atomic CSet (lin env (gf n2))
 
 iRS :: Env -> GRS -> Formula
 iRS env rs = case rs of
-  GRS_on_which_S s -> Qualification "ON WHICH" (iS env s)
-  GRS_where_S s -> Qualification "WHERE" (iS env s)
-  GRS_that_VP vp -> Qualification "THAT" (iVP env vp)
-  GRS_that_NP_VP np vp -> Qualification "THAT" (Predication (iNP env np) (iVP env vp))
-  GRS_to_whom_NP_VP np vp -> Qualification "TO WHOM" (Predication (iNP env np) (iVP env vp))
-  _ -> Atomic (lin env (gf rs)) ----
+  GRS_on_which_S s -> Qualification CPred "ON WHICH" (iS env s)
+  GRS_where_S s -> Qualification CPred "WHERE" (iS env s)
+  GRS_that_VP vp -> Qualification CPred "THAT" (iVP env vp)
+  GRS_that_NP_VP np vp -> Qualification CPred "THAT" (Predication (iNP env np) (iVP env vp))
+  GRS_to_whom_NP_VP np vp -> Qualification CPred "TO WHOM" (Predication (iNP env np) (iVP env vp))
+  _ -> Atomic CPred (lin env (gf rs)) ----
 
 iRef :: Env -> GRef -> Modality
 iRef env n2 = lin env (gf n2)
@@ -355,36 +305,36 @@ iS :: Env -> GS -> Formula
 iS env s = case s of
   GS_NP_VP np vp ->
     Predication (iNP env np) (iVP env vp)
-  _ -> Atomic (lin env (gf s)) ----
+  _ -> Atomic CProp (lin env (gf s)) ----
 
 iSeqPP :: Env -> GSeqPP -> Formula
-iSeqPP env n2 = Atomic (lin env (gf n2)) ----
+iSeqPP env n2 = Atomic CPred (lin env (gf n2)) ----
 
 iTitle :: Env -> GTitle -> Formula
-iTitle env n2 = Atomic (lin env (gf n2))
+iTitle env n2 = Atomic CNone (lin env (gf n2))
 
 iVP :: Env -> GVP -> Formula
 iVP env vp = case vp of
-  GVP_VP_PP vp pp -> Modification (iVP env vp) (iPP env pp)
+  GVP_VP_PP vp pp -> Modification CPred (iVP env vp) (iPP env pp)
   GVP_VP2_NP vp2 np -> Action (iVP2 env vp2) (iNP env np)
-  GVP_VP2__SeqPP__NP vp2 seqpp np -> Modification (Action (iVP2 env vp2) (iNP env np)) (iSeqPP env seqpp)
+  GVP_VP2__SeqPP__NP vp2 seqpp np -> Modification CPred (Action (iVP2 env vp2) (iNP env np)) (iSeqPP env seqpp)
   GVP_ConjVP2_NP vp2 np -> Action (iConjVP2 env vp2) (iNP env np)
-  GVP_VP__Conj_to_VP vp1 conj vp2 -> iConj env conj (map (iVP env) [vp1, vp2])
+  GVP_VP__Conj_to_VP vp1 conj vp2 -> iConj env conj CPred (map (iVP env) [vp1, vp2])
 
-  GVP_may__SeqPP__VP seqpp vp2 -> Qualification "MAY" (Modification (iVP env vp2) (iSeqPP env seqpp))
-  GVP_must__SeqPP__VP seqpp vp2 -> Qualification "MUST" (Modification (iVP env vp2) (iSeqPP env seqpp))
+  GVP_may__SeqPP__VP seqpp vp2 -> Modalization "MAY" (Modification CPred (iVP env vp2) (iSeqPP env seqpp))
+  GVP_must__SeqPP__VP seqpp vp2 -> Modalization "MUST" (Modification CPred (iVP env vp2) (iSeqPP env seqpp)) ---- modality?
   ---- these could be treated with a separate VVP category 
-  GVP_must_VP vp2 -> Qualification "MUST" (iVP env vp2)
-  GVP_must_also_VP vp2 -> Qualification "MUST ALSO" (iVP env vp2)
-  GVP_must_not_VP vp2 -> Qualification "MUST NOT" (iVP env vp2)
-  GVP_has_reason_to_VP vp2 -> Qualification "HAS REASON TO" (iVP env vp2)
-  GVP_is_deemed_to_VP vp2 -> Qualification "IS DEEMED TO" (iVP env vp2)
-  GVP_is_deemed_not_to_VP vp2 -> Qualification "IS DEEMED NOT TO" (iVP env vp2)
+  GVP_must_VP vp2 -> Modalization "MUST" (iVP env vp2)
+  GVP_must_also_VP vp2 -> Modalization "MUST ALSO" (iVP env vp2)
+  GVP_must_not_VP vp2 -> Modalization "MUST NOT" (iVP env vp2)
+  GVP_has_reason_to_VP vp2 -> Modalization "HAS REASON TO" (iVP env vp2)
+  GVP_is_deemed_to_VP vp2 -> Modalization "IS DEEMED TO" (iVP env vp2)
+  GVP_is_deemed_not_to_VP vp2 -> Modalization "IS DEEMED NOT TO" (iVP env vp2)
 
-  _ -> Atomic (lin env (gf vp)) ----
+  _ -> Atomic CPred (lin env (gf vp)) ----
 
 iVP2 :: Env -> GVP2 -> Formula
-iVP2 env n2 = Atomic (lin env (gf n2))
+iVP2 env n2 = Atomic CPred (lin env (gf n2))
 
 ----
 -- TODO:

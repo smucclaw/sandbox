@@ -269,7 +269,7 @@ lin RS_that_VP vp = mkRS (mkRCl X.that_RP vp) ;
 lin Ref_402020 = "[40/2020]" ;
 
 lin S_NP_VP np vp = mkCl np vp ;
-lin S_the_context_otherwise_requires = mkCl (mkNP the_Det (mkN "context")) (mkVP (mkAdV "otherwise") (mkVP (mkV "requires"))) ;
+lin S_the_context_otherwise_requires = mkCl (mkNP the_Det (mkN "context")) (mkVP (mkAdV "otherwise") (mkVP (mkV "require"))) ;
 
 lin SeqPP_PP pp = pp ;
 lin SeqPP_PP_SeqPP pp seqpp = lin Adv {s = pp.s ++ seqpp.s} ;
@@ -339,5 +339,18 @@ lin VP2_provide = mkV2 "provide" ;
 lin VP2_relates_to = mkV2 (mkV "relate") to_Prep ;
 lin VP2_waive = mkV2 "waive" ;
 ----lin VP2_will_result_in = "will result in" ;
+
+------------------------------
+-- for other uses than parsing
+------------------------------
+
+lincat Utt = S.Utt ;
+lincat QS = S.QCl ;
+
+lin Utt_S s = mkUtt (mkS s) ;
+lin Utt_QS s = mkUtt (mkQS s) ;
+lin QS_S s = mkQCl s ;
+
+lin Utt_demo_S s = mkUtt (mkQS (mkQCl s)) | mkUtt (mkS s) ;
 
 }

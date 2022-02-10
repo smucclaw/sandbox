@@ -329,5 +329,17 @@ fun VP2_relates_to : VP2 ;
 fun VP2_waive : VP2 ;
 fun VP2_will_result_in : VP2 ;
 
+------------------------------
+-- for other uses than parsing
+------------------------------
+
+cat Utt ;
+cat QS ;
+
+fun Utt_S : S -> Utt ;
+fun Utt_QS : QS -> Utt ;
+fun QS_S : S -> QS ;
+fun Utt_demo_S : S -> Utt ;
+
 
 }

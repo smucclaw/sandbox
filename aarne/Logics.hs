@@ -1,6 +1,7 @@
 module Logics where
 
 import Spreadsheet
+import Data.List
 
 -- real logic - a many-sorted modal logic
 
@@ -8,23 +9,22 @@ data Prop =
     Conj [Prop]
   | Disj [Prop]
   | Impl Prop Prop
+  | Equi Prop Prop
   | Neg Prop
-  | Univ Var Set Prop
-  | Exist Var Set Prop
+  | Univ Set (Ind -> Prop)
+  | Exist Set (Ind -> Prop)
   | Mod Oper Prop
   | Pred Fun [Ind]
-   deriving Show
 
 data Set =
     Union [Set]
   | Intersection [Set]
   | Family Fun [Set]
-    deriving Show
+  | Comprehension Set (Ind -> Prop)
 
 data Ind =
     App Fun [Ind]
   | Bound Var
-    deriving Show
     
 type Var = String
 type Oper = String
@@ -87,11 +87,42 @@ formula2box formula = case formula of
   Sequence _ fs -> seqBox (map formula2box fs) ----
   Means _ f g -> meansBox (formula2box f) (formula2box g)
 
+-- from real logic to printed formulas
+prProp :: Prop -> String
+prProp = prp 0 0 where
+  prp prec i p = case p of
+    Conj ps -> parenth 2 prec $ unwords $ intersperse "&" $ map (prp 3 i) ps
+    Disj ps -> parenth 2 prec $ unwords $ intersperse "∨" $ map (prp 3 i) ps
+    Impl p q -> parenth 1 prec $ prp 2 i p ++ " ⊃ " ++ prp 1 i q
+    Equi p q -> parenth 1 prec $ prp 2 i p ++ " ≡ " ++ prp 2 i q
+    Neg prop -> parenth 3 prec $ "~ " ++ prp 3 i prop
+    Univ set pred -> parenth 0 6 ("∀" ++ var i ++ " : " ++ prs 0 (i+1) set) ++ prp 3 (i+1) (pred (Bound (var i)))
+    Exist set pred -> parenth 0 6 ("∃" ++ var i ++ " : " ++ prs 0 (i+1) set) ++ prp 3 (i+1) (pred (Bound (var i)))
+    Mod oper prop -> parenth prec 3 $ oper ++ " " ++ prp 3 i prop
+    Pred fun inds -> fun ++ ifparenth (concat (intersperse "," (map pri inds)))
+
+  pri a = case a of
+    App fun inds -> fun ++ ifparenth (concat (intersperse "," (map pri inds)))
+    Bound x -> x
+
+  prs prec i s = case s of
+--    Union [Set]
+--  | Intersection [Set]
+   Family fun sets -> fun ++ ifparenth (concat (intersperse "," (map (prs 0 i) sets)))
+--  | Comprehension Set (Ind -> Prop)
+
+  parenth giv exp s = if giv < exp then "(" ++ s ++ ")" else s
+  ifparenth s = if null s then "" else parenth 0 6 s
+
+  var i = (["x", "y", "z"] ++ ["x" ++ show i | i <- [4..]]) !! i
+
+--- to test
+fex1 = Univ (Family "N" []) (\x -> Conj [Pred "Even" [x], Pred "Odd" [x]])
+fex2 = Univ (Family "N" []) (\x -> Exist (Family "N" []) (\y -> Conj [Pred "Gt" [x, y], Pred "Prime" [y]]))
 
 -- from assembly logic to real logic
 
-data PropCat = PProp Prop | PSet Set | PInd Ind
-  deriving Show
+data PropCat = PProp Prop | PSet Set | PInd Ind | PFun (Ind -> PropCat)
 
 formula2prop :: Formula -> Either String PropCat
 formula2prop formula = case formula of
@@ -111,11 +142,19 @@ formula2prop formula = case formula of
       pfs <- mapM f2set fs
       return $ PSet $ Intersection pfs
     _ -> Left $ "expected Prop or Set, found"  ++ show formula
+
+--  Disjunction _ fs ->
+
+
+  Implication f g -> do
+    pf <- f2prop f
+    pg <- f2prop g
+    return $ PProp $ Impl pf pg
+  Conditional a b -> formula2prop (Implication b a)
+  Negation f -> do
+    pf <- f2prop f
+    return $ PProp $ Neg pf
 {-
-  Disjunction _ fs -> 
-  Implication f g -> 
-  Conditional a b -> 
-  Negation f -> 
   Application _ f x -> 
   Predication x f -> 
   Assignment r x f -> 

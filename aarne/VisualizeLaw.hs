@@ -14,7 +14,7 @@ ifDebug io = return ()
 -- ifDebug io = io
 
 law_pgf = "Law.pgf"
-eng = mkCId "LawEng"
+eng = mkCId "LawRawEng"
 Just lineCat = readType "LabLine"
 
 main = do

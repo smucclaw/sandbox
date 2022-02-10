@@ -6,7 +6,7 @@ import Data.List
 
 
 law_pgf = "Law.pgf"
-eng = mkCId "LawEng"
+eng = mkCId "LawRawEng"
 --law_pgf = "TopAbs.pgf"
 --eng = mkCId "Top"
 

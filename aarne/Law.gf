@@ -259,7 +259,6 @@ fun RS_where_S : S -> RS ;
 fun Ref_402020 : Ref ;
 
 fun S_NP_VP : NP -> VP -> S ;
----fun S_personal_data_is_stored_in_circumstances_RS : RS -> S ;
 fun S_the_context_otherwise_requires : S ;
 
 fun SeqPP_PP : PP -> SeqPP ;

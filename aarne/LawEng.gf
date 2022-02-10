@@ -7,7 +7,9 @@ concrete LawEng of Law =
     MarkupEng,
     (G=GrammarEng),
     (E=ExtendEng),
-    (Mk=MakeStructuralEng)
+    (X=ExtraEng), --- that_RP
+    (Mk=MakeStructuralEng),
+    (I=IrregEng)
   in {
 
 lincat A = S.A ;
@@ -38,12 +40,12 @@ lincat PPart = Str ;
 lincat QCN = S.CN ;
 lincat RS = S.RS ;
 lincat Ref = Str ;
-lincat S = S.S ;
+lincat S = S.Cl ;
 lincat SeqPP = S.Adv ;
 lincat Time = Str ;
 lincat Title = Str ;
 lincat VP = E.VP ;
-lincat VP2 = E.VPS2 ;
+lincat VP2 = V2 ;
 
 oper parenth = overload {
     parenth : S.AP -> S.AP = \ap -> MarkupAP (mkMark "(" ")") ap ;
@@ -52,7 +54,7 @@ oper str = overload {
     str : S.Adv -> Str = \x -> (mkUtt x).s ;
     str : S.Conj -> Str = \conj -> conj.s2 ;
     str : S.NP -> Str = \x -> (mkUtt x).s ;
-    str : S.S -> Str = \x -> (mkUtt x).s ;
+    str : S.Cl -> Str = \x -> (mkUtt (mkS x)).s ;
     str : S.VP -> Str = \x -> (mkUtt x).s ; ----
     } ;
 
@@ -221,9 +223,9 @@ lin NP_this_CN cn = mkNP this_Det cn ;
 lin NP_this_section = mkNP this_Det (mkN "section") ;
 
 lin Num_3 = "3" ;
-{-
-lin PP_PP__but_in_any_case_PP pp pp2 = pp ++ ", but in any case" ++ pp2 ;
-lin PP_PP2_NP pp2 np = pp2 ++ np ;
+
+---lin PP_PP__but_in_any_case_PP pp pp2 = pp ++ ", but in any case" ++ pp2 ;
+lin PP_PP2_NP pp2 np = S.mkAdv pp2 np ; {-
 lin PP_Time time = time ;
 lin PP_as_soon_as_is_practicable = "as soon as is practicable" ;
 lin PP_as_to_ConjNP conjnp = "as to" ++ conjnp ;
@@ -240,39 +242,39 @@ lin PP_under_its_control = "under its control" ;
 lin PP_without_undue_delay = "without undue delay" ;
 lin PPart_made_in_the_form = "made in the form" ;
 lin PPart_submitted_in_the_manner_required_by_the_Commission = "submitted in the manner required by the Commission" ;
+-}
 
-lin PP2_by_reason_only_of = "by reason only of" ;
-lin PP2_despite = "despite" ;
-lin PP2_in_accordance_with = "in accordance with" ;
-lin PP2_in_relation_to = "in relation to" ;
-lin PP2_on_behalf_of_and_for_the_purposes_of = "on behalf of and for the purposes of" ;
-lin PP2_on_the_written_application_of = "on the written application of" ;
-lin PP2_only_within = "only within" ;
-lin PP2_prior_to_the_occurrence_of = "prior to the occurrence of" ;
-lin PP2_relating_to = "relating to" ;
-lin PP2_subject_to = "subject to" ;
-lin PP2_to_the_best_of_the_knowledge_and_belief_of = "to the best of the knowledge and belief of" ;
-lin PP2_upon_notification_by = "upon notification by" ;
-lin PP2_without_limiting = "without limiting" ;
+lin PP2_by_reason_only_of = mkPrep "by reason only of" ;
+lin PP2_despite = mkPrep "despite" ;
+lin PP2_in_accordance_with = mkPrep "in accordance with" ;
+lin PP2_in_relation_to = mkPrep "in relation to" ;
+lin PP2_on_behalf_of_and_for_the_purposes_of = mkPrep "on behalf of and for the purposes of" ;
+lin PP2_on_the_written_application_of = mkPrep "on the written application of" ;
+lin PP2_only_within = mkPrep "only within" ;
+lin PP2_prior_to_the_occurrence_of = mkPrep "prior to the occurrence of" ;
+lin PP2_relating_to = mkPrep "relating to" ;
+lin PP2_subject_to = mkPrep "subject to" ;
+lin PP2_to_the_best_of_the_knowledge_and_belief_of = mkPrep "to the best of the knowledge and belief of" ;
+lin PP2_upon_notification_by = mkPrep "upon notification by" ;
+lin PP2_without_limiting = mkPrep "without limiting" ;
 
-lin QCN__CN_ cn = "“" ++ cn ++ "”" ;
+lin QCN__CN_ cn = MarkupCN (mkMark "“" "”") cn ;
 
-lin RS_on_which_S s = "on which" ++ s ;
-lin RS_that_NP_VP np vp = "that" ++ np ++ vp ;
-lin RS_that_VP vp = "that" ++ vp ;
-lin RS_to_whom_NP_VP np vp = "to whom" ++ np ++ vp ;
-lin RS_where_S s = "where" ++ s ;
+lin RS_on_which_S s = mkRS (mkRCl which_RP (mkClSlash s on_Prep)) ;
+lin RS_that_NP_VP np vp = mkRS (mkRCl X.that_RP (mkClSlash (mkCl np vp) noPrep)) ; ---
+lin RS_that_VP vp = mkRS (mkRCl X.that_RP vp) ;
+----lin RS_to_whom_NP_VP np vp = "to whom" ++ np ++ vp ;
+----lin RS_where_S s = "where" ++ s ;
 
 lin Ref_402020 = "[40/2020]" ;
 
-lin S_NP_VP np vp = np ++ vp ;
----lin S_personal_data_is_stored_in_circumstances_RS rs = "personal data is stored in circumstances" ++ rs ;
-lin S_the_context_otherwise_requires = "the context otherwise requires" ;
+lin S_NP_VP np vp = mkCl np vp ;
+lin S_the_context_otherwise_requires = mkCl (mkNP the_Det (mkN "context")) (mkVP (mkAdV "otherwise") (mkVP (mkV "requires"))) ;
 
 lin SeqPP_PP pp = pp ;
-lin SeqPP_PP_SeqPP pp seqpp = pp ++ seqpp ;
+lin SeqPP_PP_SeqPP pp seqpp = lin Adv {s = pp.s ++ seqpp.s} ;
 
-lin Time_on_or_after_assessing_that_S s = "on or after assessing that" ++ s ;
+lin Time_on_or_after_assessing_that_S s = "on or after assessing that" ++ str s ;
 lin Time_on_or_after_notifying_the_Commission_under_subsection_Item item = "on or after notifying the Commission under subsection" ++ item ;
 
 lin Title_Duty_to_conduct_assessment_of_data_breach = "Duty to conduct assessment of data breach" ;
@@ -283,59 +285,59 @@ lin Title_Notifiable_data_breaches = "Notifiable data breaches" ;
 lin Title_PART_6A = "PART 6A" ;
 lin Title_obligations_of_data_intermediary_of_public_agency = "obligations of data intermediary of public agency" ;
 
-lin VP_ConjCop_Comp conjcop comp = conjcop ++ comp ;
-lin VP_ConjVP2_NP conjvp2 np = conjvp2 ++ np ;
-lin VP_VP2_NP vp2 np = vp2 ++ np ;
-lin VP_VP2__SeqPP__NP v2 seqpp np = v2 ++ "," ++ seqpp ++ "," ++ np ;
-lin VP_VP__Conj_to_VP vp conj vp2 = vp ++ "," ++ conj ++ "to" ++ vp2 ;
-lin VP_VP_PP vp pp = vp ++ pp ;
-lin VP_assesses__PP__that_S pp s = "assesses ," ++ pp ++ ", that" ++ s ;
-lin VP_be_ConjPPart conjppart = "be" ++ conjppart ;
-lin VP_be_a_CN cn = "be a" ++ cn ;
-lin VP_be_of_a_significant_scale = "be of a significant scale" ;
-lin VP_believe_that_S s = "believe that" ++ s ;
-lin VP_had_implemented__PP__NP pp np = "had implemented ," ++ pp ++ "," ++ np ;
-lin VP_has_occurred = "has occurred" ;
-lin VP_has_reason_to_VP vp = "has reason to" ++ vp ;
-lin VP_is_a_CN cn = "is a" ++ cn ;
-lin VP_is_deemed_not_to_VP vp = "is deemed not to" ++ vp ;
-lin VP_is_deemed_to_VP vp = "is deemed to" ++ vp ;
-lin VP_is_likely_to_occur = "is likely to occur" ;
-lin VP_is_processing_PP pp = "is processing" ++ pp ;
-lin VP_may__SeqPP__VP seqpp vp = "may ," ++ seqpp ++ "," ++ vp ;
-lin VP_must__SeqPP__VP seqpp vp = "must ," ++ seqpp ++ "," ++ vp ;
-lin VP_must_VP vp = "must" ++ vp ;
-lin VP_must_also_VP vp = "must also" ++ vp ;
-lin VP_must_not_VP vp = "must not" ++ vp ;
-lin VP_notify_NP_of_NP np np2 = "notify" ++ np ++ "of" ++ np2 ;
-lin VP_occurs_on_or_after_Date date = "occurs on or after" ++ date ;
-lin VP_relates = "relates" ;
-lin VP_renders_it_unlikely_that_S s = "renders it unlikely that" ++ s ;
-lin VP_so_VP v = "so" ++ v ;
-lin VP_takes_NP__PP__RS np pp rs = "takes" ++ np ++ "," ++ pp ++ "," ++ rs ;
-lin VP_directs = "directs" ;
-lin VP_instructs = "instructs" ;
+----lin VP_ConjCop_Comp conjcop comp = conjcop ++ comp ;
+----lin VP_ConjVP2_NP conjvp2 np = E.ComplVPS2 conjvp2 np ;
+lin VP_VP2_NP vp2 np = mkVP vp2 np ;
+----lin VP_VP2__SeqPP__NP v2 seqpp np = v2 ++ "," ++ seqpp ++ "," ++ np ;
+----lin VP_VP__Conj_to_VP vp conj vp2 = vp ++ "," ++ conj ++ "to" ++ vp2 ;
+lin VP_VP_PP vp pp = mkVP vp pp ;
+----lin VP_assesses__PP__that_S pp s = "assesses ," ++ pp ++ ", that" ++ s ;
+lin VP_be_ConjPPart conjppart = mkVP (lin Adv {s = conjppart}) ; ----
+lin VP_be_a_CN cn = mkVP cn ;
+lin VP_be_of_a_significant_scale = mkVP (S.mkAdv possess_Prep (mkNP a_Det (mkCN (mkA "significant") (mkN "scale")))) ;
+lin VP_believe_that_S s = mkVP (mkVS (mkV "believe")) (mkS s) ;
+----lin VP_had_implemented__PP__NP pp np = "had implemented ," ++ pp ++ "," ++ np ;
+----lin VP_has_occurred = "has occurred" ;
+----lin VP_has_reason_to_VP vp = "has reason to" ++ vp ;
+lin VP_is_a_CN cn = mkVP cn ; ---- redundant
+----lin VP_is_deemed_not_to_VP vp = "is deemed not to" ++ vp ;
+----lin VP_is_deemed_to_VP vp = "is deemed to" ++ vp ;
+----lin VP_is_likely_to_occur = "is likely to occur" ;
+----lin VP_is_processing_PP pp = "is processing" ++ pp ;
+----lin VP_may__SeqPP__VP seqpp vp = "may ," ++ seqpp ++ "," ++ vp ;
+----lin VP_must__SeqPP__VP seqpp vp = "must ," ++ seqpp ++ "," ++ vp ;
+lin VP_must_VP vp = mkVP must_VV vp ;
+lin VP_must_also_VP vp = mkVP must_VV (mkVP (mkAdV "also") vp) ;
+----lin VP_must_not_VP vp = "must not" ++ vp ;
+lin VP_notify_NP_of_NP np np2 = mkVP (mkVP (mkV2 (mkV "notify")) np) (S.mkAdv possess_Prep np2) ;
+----lin VP_occurs_on_or_after_Date date = "occurs on or after" ++ date ;
+lin VP_relates = mkVP (mkV "relate") ;
+----lin VP_renders_it_unlikely_that_S s = "renders it unlikely that" ++ s ;
+lin VP_so_VP vp = mkVP (mkAdV "so") vp ;
+----lin VP_takes_NP__PP__RS np pp rs = "takes" ++ np ++ "," ++ pp ++ "," ++ rs ;
+lin VP_directs = mkVP (mkV "direct") ;
+lin VP_instructs = mkVP (mkV "instruct") ;
 
-lin VP2_conduct = "conduct" ;
-lin VP2_contain = "contain" ;
-lin VP2_is_likely_to_result_in = "is likely to result in" ;
-lin VP2_result_in = "result in" ;
-lin VP2_results_in = "results in" ;
+lin VP2_conduct = mkV2 "conduct" ;
+lin VP2_contain = mkV2 "contain" ;
+----lin VP2_is_likely_to_result_in = "is likely to result in" ;
+lin VP2_result_in = mkV2 (mkV "result") in_Prep ;
+lin VP2_results_in = mkV2 (mkV "result") in_Prep ; ---- redundant
 
-lin VP2_affects = "affects" ;
-lin VP2_applies_to = "applies to" ;
-lin VP2_apply_concurrently_with = "apply concurrently with" ;
-lin VP2_carry_out = "carry out" ;
-lin VP2_conduct = "conduct" ;
-lin VP2_does_not_apply_to = "does not apply to" ;
-lin VP2_is_in_relation_to = "is in relation to" ;
-lin VP2_is_prescribed_for = "is prescribed for" ;
-lin VP2_is_stored_in = "is stored in" ;
-lin VP2_makes = "makes" ;
-lin VP2_notify = "notify" ;
-lin VP2_provide = "provide" ;
-lin VP2_relates_to = "relates to" ;
-lin VP2_waive = "waive" ;
-lin VP2_will_result_in = "will result in" ;
--}
+lin VP2_affects = mkV2 "affects" ;
+lin VP2_applies_to = mkV2 (mkV "apply") to_Prep ;
+----lin VP2_apply_concurrently_with = "apply concurrently with" ;
+lin VP2_carry_out = mkV2 (partV (mkV "carry") "out") ;
+lin VP2_conduct = mkV2 "conduct" ;
+----lin VP2_does_not_apply_to = "does not apply to" ;
+----lin VP2_is_in_relation_to = "is in relation to" ;
+----lin VP2_is_prescribed_for = "is prescribed for" ;
+----lin VP2_is_stored_in = "is stored in" ;
+lin VP2_makes = mkV2 I.make_V ;
+lin VP2_notify = mkV2 "notify" ;
+lin VP2_provide = mkV2 "provide" ;
+lin VP2_relates_to = mkV2 (mkV "relate") to_Prep ;
+lin VP2_waive = mkV2 "waive" ;
+----lin VP2_will_result_in = "will result in" ;
+
 }

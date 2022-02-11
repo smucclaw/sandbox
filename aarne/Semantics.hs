@@ -139,7 +139,7 @@ iLabLine env line = case line of
   GLabLine_Item__Item_Line item item2 li -> Modal (iItem env item ++ "." ++ "—" ++ iItem env item2) (iLine env li)
   GLabLine_Item_Line item li -> Modal (iItem env item) (iLine env li)
   GLabLine_Line li -> iLine env li
-  GLabLine_Ref r -> Atomic CNone (iRef env r)
+  GLabLine_Ref r -> Atomic CProp (iRef env r)
   GLabLine_Title t -> iTitle env t
   _ -> Atomic CProp (lin env (gf line)) ---- cat
 
@@ -252,10 +252,10 @@ iN2 env n2 = Atomic CFam (lin env (gf n2))
 iNP :: Env -> GNP -> Formula
 iNP env np = case np of
   GNP_the_unauthorised_ConjN2_of_NP conjn2 np ->
-    Application CQuant (Modification CFam (Atomic CPred "unauthorized") (iConjN2 env conjn2)) (iNP env np)
+    Application CPred (Modification CSet (Atomic CPred "unauthorized") (iConjN2 env conjn2)) (iNP env np)
 
   GNP_the_loss_of_any_ConjCN_RS conjcn rs ->
-    Application CQuant (Atomic CFun "loss") (Quantification "ANY" (Modification CSet (iConjCN env conjcn) (iRS env rs)))
+    Application CPred (Atomic CFun "loss") (Quantification "ANY" (Modification CSet (iConjCN env conjcn) (iRS env rs)))
 
   GNP_CN cn -> iCN env cn
 
@@ -311,7 +311,7 @@ iSeqPP :: Env -> GSeqPP -> Formula
 iSeqPP env n2 = Atomic CPred (lin env (gf n2)) ----
 
 iTitle :: Env -> GTitle -> Formula
-iTitle env n2 = Atomic CNone (lin env (gf n2))
+iTitle env n2 = Atomic CProp (lin env (gf n2)) --- to be used as abbreviation for a section
 
 iVP :: Env -> GVP -> Formula
 iVP env vp = case vp of

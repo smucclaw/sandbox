@@ -11,7 +11,7 @@ import Control.Monad (forM, forM_)
 import PGF
 
 ifDebug io = return ()
--- ifDebug io = io
+--ifDebug io = io
 
 law_pgf = "Law.pgf"
 eng = mkCId "LawRawEng"
@@ -37,3 +37,8 @@ main = do
       ifDebug $ putStrLn $ "#+ " ++ show formula
       let box = formula2box formula
       putStrLn $ S.renderBox box
+      let fprop = formula2prop formula
+      ifDebug $ case fprop of
+          Right pc -> putStrLn $ "#/ REAL LOGIC: " ++ prPropCat pc
+          Left s -> putStrLn $ "#/ LOGIC ERROR: " ++ s
+ 

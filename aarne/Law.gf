@@ -220,7 +220,6 @@ fun PP_Time : Time -> PP ;
 fun PP_as_soon_as_is_practicable : PP ;
 fun PP_as_to_ConjNP : ConjNP -> PP ;
 fun PP_in_a_reasonable_and_expeditious_manner : PP ;
-fun PP_in_accordance_with_section_Ref : Ref -> PP ;
 fun PP_in_any_manner_that_is_reasonable_in_the_circumstances : PP ;
 fun PP_in_its_possession : PP ;
 fun PP_in_this_Part : PP ;

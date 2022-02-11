@@ -2,6 +2,7 @@ concrete LawEng of Law =
   open
     (S=SyntaxEng),
     SyntaxEng,
+    (P=ParadigmsEng),
     ParadigmsEng,
     SymbolicEng,
     MarkupEng,
@@ -33,7 +34,7 @@ lincat LabLine = Str ;
 lincat Line = Str ;
 lincat N2 = S.N2 ;
 lincat NP = S.NP ;
-lincat Num = Str ;
+lincat Num = S.Card ;
 lincat PP = S.Adv ;
 lincat PP2 = S.Prep ;
 lincat PPart = Str ;
@@ -45,10 +46,10 @@ lincat SeqPP = S.Adv ;
 lincat Time = Str ;
 lincat Title = Str ;
 lincat VP = E.VP ;
-lincat VP2 = V2 ;
+lincat VP2 = VPSlash ;
 
 oper parenth = overload {
-    parenth : S.AP -> S.AP = \ap -> MarkupAP (mkMark "(" ")") ap ;
+    parenth : S.AP -> S.AP = \ap -> MarkupAP (myMark "(" ")") ap ;
     } ;
 oper str = overload {
     str : S.Adv -> Str = \x -> (mkUtt x).s ;
@@ -56,6 +57,11 @@ oper str = overload {
     str : S.NP -> Str = \x -> (mkUtt x).s ;
     str : S.Cl -> Str = \x -> (mkUtt (mkS x)).s ;
     str : S.VP -> Str = \x -> (mkUtt x).s ; ----
+    } ;
+
+myMark : Str -> Str -> Mark = \b,e -> lin Mark {begin = b ; end = e} ;
+oper enclose = overload {
+    enclose : (b,e : Str) -> NP -> NP = \b,e,np -> MarkupNP (myMark b e) np ;
     } ;
 
 
@@ -89,7 +95,7 @@ lin CN_ConjCN_relating_to_NP conjcn np = mkCN conjcn (S.mkAdv (mkPrep "relating 
 lin CN_N2_of_NP n2 np = mkCN n2 np ;
 lin CN_action = mkCN (mkN "action") ;
 lin CN_assessment = mkCN (mkN "assessment") ;
-----lin CN_assessment_of_whether_S s = "assessment" ++ "of" ++ "whether" ++ s ;
+lin CN_assessment_of_whether_S s = mkCN (mkN "assessment") (S.mkAdv (lin Subj {s = "of whether"}) (mkS s)) ;  --- really: CN of QS
 lin CN_circumstances = mkCN (mkN "circumstance") ; ----
 lin CN_class_of_personal_data = mkCN (mkN "class") (S.mkAdv possess_Prep (mkNP (mkCN (mkA "personal") (mkN "data")))) ;
 lin CN_contract = mkCN (mkN "contract") ;
@@ -106,15 +112,15 @@ lin CN_measure = mkCN (mkN "measure") ;
 lin CN_notification = mkCN (mkN "notification") ;
 lin CN_number_of_CN cn = mkCN (mkN "number") (S.mkAdv possess_Prep (mkNP aPl_Det cn)) ;
 lin CN_obligation = mkCN (mkN "obligation") ;
-----lin CN_obligation_of_NP_to_VP np vp = "obligation of" ++ np ++ "to" ++ vp ;
+lin CN_obligation_of_NP_to_VP np vp = mkCN (mkCN (mkN2 (mkN "obligation")) np) vp ;
 lin CN_organisation = mkCN (mkN "organisation") ;
 lin CN_person = mkCN (mkN "person") ;
 lin CN_personal_data = mkCN (mkA "personal") (mkN "data") ;
 lin CN_professional_conduct = mkCN (mkA "professional") (mkN "conduct") ;
 lin CN_public_agency = mkCN (mkA "public") (mkN "agency") ;
 lin CN_purpose = mkCN (mkN "purpose") ;
-----lin CN_requirement_to_VP vp = "requirement to" ++ vp ;
-lin CN_requirements = mkCN (mkN "requirements") ; ----
+lin CN_requirement_to_VP vp = mkCN (mkCN (mkN "requirement")) vp ;
+lin CN_requirements = mkCN (mkN "requirement") ; ---- change fun name
 lin CN_restriction_on_NP np = mkCN (mkN "restriction") (S.mkAdv on_Prep np) ;
 lin CN_secrecy = mkCN (mkN "secrecy") ;
 lin CN_significant_harm_to_NP np = mkCN (mkCN (mkA "significant") (mkN "harm")) (S.mkAdv to_Prep np) ;
@@ -125,8 +131,8 @@ lin ConjCN_CN_Conj_CN cn conj cn2 = G.ConjCN conj (G.BaseCN cn cn2) ;
 lin ConjCop_Cop__Conj_Cop_ cop1 conj cop2 = cop1 ++ "," ++ str conj ++ cop2 ++ "," ;
 lin ConjItem_Item__ConjItem item conjitem = item ++ "," ++ conjitem ;
 lin ConjItem_Item_Conj_Item item conj item2 = item ++ str conj ++ item2 ;
-----lin ConjN2_N2__ConjN2 n2 conjn2 = n2 ++ "," ++ conjn2 ;
-----lin ConjN2_N2_Conj_N2 n2 conj n22 = n2 ++ str conj ++ n22 ;
+lin ConjN2_N2__ConjN2 n2 conjn2 = G.ConjCN (mkConj ",") (G.BaseCN (mkCN n2) conjn2) ; --- a hack, should use proper ListCN
+lin ConjN2_N2_Conj_N2 n2 conj n22 = G.ConjCN conj (G.BaseCN (mkCN n2) (mkCN n22)) ;
 lin ConjNP_NP_Conj_NP np conj np2 = mkNP conj np np2 ;
 lin ConjPP_PP_Conj_PP pp conj pp2 = S.mkAdv conj pp pp2 ;
 lin ConjPPart_PPart_Conj_PPart ppart conj ppart2 = ppart ++ str conj ++ ppart2 ;
@@ -199,7 +205,7 @@ lin N2_rule = mkN2 (mkN "rule") ;
 lin N2_use = mkN2 (mkN "use") ;
 
 lin NP_CN cn = mkNP cn ; ---- both Sg and Pl
-----lin NP_NP__Conj_NP__PP np conj np2 pp = np ++ "," ++ conj ++ np2 ++ "," ++ pp ;
+lin NP_NP__Conj_NP__PP np conj np2 pp = mkNP (mkNP conj np (enclose "," "," np2)) pp ;
 lin NP_a_CN cn = mkNP a_Det cn ;
 lin NP_all_the_CN_RS cn rs = mkNP all_Predet (mkNP thePl_Det (mkCN cn rs)) ;
 lin NP_an_CN cn = mkNP a_Det cn ; ---- remove
@@ -210,39 +216,38 @@ lin NP_being_in_breach = mkNP (mkPN "being in breach") ; ---
 lin NP_each_CN cn = mkNP (Mk.mkDet "each") cn ;
 lin NP_it = it_NP ;
 lin NP_not_fewer_than_NP np = mkNP (lin Predet {s = "not fewer than"}) np ;
-----lin NP_notifying_ConjNP conjnp = "notifying" ++ conjnp ;
+lin NP_notifying_ConjNP conjnp = mkNP (mkCN (mkN "notifying") (S.mkAdv noPrep conjnp)) ; --- hack, should be gerund construction
 lin NP_section_Item item = mkNP (mkCN (mkN "section") <symb (mkSymb item) : NP>) ; 
 lin NP_subsection_Item item = mkNP (mkCN (mkN "subsection") <symb (mkSymb item) : NP>) ; 
 lin NP_subsection_ConjItem items = mkNP (mkCN (mkN "subsection") <symb (mkSymb items) : NP>) ; 
 lin NP_subsections_ConjItem items = mkNP (mkCN (mkN "subsections") <symb (mkSymb items) : NP>) ; 
 lin NP_that_CN cn = mkNP that_Det cn ;
 lin NP_the_CN cn = mkNP the_Det cn ; ---- both Sg and Pl ?
-----lin NP_the_loss_of_any_ConjCN_RS conjcn rs = "the loss of any" ++ conjcn ++ rs ;
-----lin NP_the_unauthorised_ConjN2_of_NP conjn2 np = "the unauthorised" ++ conjn2 ++ "of" ++ np ;
+lin NP_the_loss_of_any_ConjCN_RS conjcn rs = mkNP the_Det (mkCN (mkN2 (mkN "loss")) (mkNP (Mk.mkDet "any") (mkCN conjcn rs))) ;
+lin NP_the_unauthorised_ConjN2_of_NP conjn2 np = mkNP (mkCN (mkCN (mkA "unauthorised") conjn2) (S.mkAdv possess_Prep np)) ;
 lin NP_this_CN cn = mkNP this_Det cn ;
 lin NP_this_section = mkNP this_Det (mkN "section") ;
 
-lin Num_3 = "3" ;
+lin Num_3 = mkCard "3" ;
 
----lin PP_PP__but_in_any_case_PP pp pp2 = pp ++ ", but in any case" ++ pp2 ;
-lin PP_PP2_NP pp2 np = S.mkAdv pp2 np ; {-
-lin PP_Time time = time ;
-lin PP_as_soon_as_is_practicable = "as soon as is practicable" ;
-lin PP_as_to_ConjNP conjnp = "as to" ++ conjnp ;
-lin PP_in_a_reasonable_and_expeditious_manner = "in a reasonable and expeditious manner" ;
-lin PP_in_accordance_with_section_Ref ref = "in accordance with section" ++ ref ;
-lin PP_in_any_manner_that_is_reasonable_in_the_circumstances = "in any manner that is reasonable in the circumstances" ;
-lin PP_in_its_possession = "in its possession" ;
-lin PP_in_this_Part = "in this Part" ;
-lin PP_no_later_than_Num_calendar_days_after_the_day_S num s = "no later than" ++ num ++ "calendar days after the day" ++ s ;
-lin PP_subject_to_any_conditions_that_the_Commission_thinks_fit = "subject to any conditions that the Commission thinks fit" ;
-lin PP_at_the_time_NP_notifies_ConjNP np conjnp = "at the time" ++ np ++ "notifies" ++ conjnp ;
-lin PP__as_the_case_may_be_ = "( as the case may be )";
-lin PP_under_its_control = "under its control" ;
-lin PP_without_undue_delay = "without undue delay" ;
+lin PP_PP__but_in_any_case_PP pp pp2 = lin Adv {s = pp.s ++ ", but in any case" ++ pp2.s} ;
+lin PP_PP2_NP pp2 np = S.mkAdv pp2 np ; 
+lin PP_Time time = P.mkAdv time ;
+lin PP_as_soon_as_is_practicable = P.mkAdv "as soon as is practicable" ;
+lin PP_as_to_ConjNP conjnp = S.mkAdv (mkPrep "as to") conjnp ;
+lin PP_in_a_reasonable_and_expeditious_manner = P.mkAdv ("in a reasonable and expeditious manner") ;
+lin PP_in_any_manner_that_is_reasonable_in_the_circumstances = P.mkAdv"in any manner that is reasonable in the circumstances" ;
+lin PP_in_its_possession = P.mkAdv "in its possession" ;
+lin PP_in_this_Part = P.mkAdv "in this Part" ;
+lin PP_no_later_than_Num_calendar_days_after_the_day_S num s = S.mkAdv (mkPrep "no later than") (mkNP (mkNP num (mkN "calendar day")) (S.mkAdv (lin Subj {s = "after the day"}) (mkS s))) ;
+lin PP_subject_to_any_conditions_that_the_Commission_thinks_fit = P.mkAdv "subject to any conditions that the Commission thinks fit" ;
+lin PP_at_the_time_NP_notifies_ConjNP np conjnp = S.mkAdv (lin Subj {s = "at the time"}) (mkS (mkCl np (mkV2 "notify") conjnp)) ;
+lin PP__as_the_case_may_be_ = P.mkAdv "( as the case may be )";
+lin PP_under_its_control = P.mkAdv "under its control" ;
+lin PP_without_undue_delay = P.mkAdv "without undue delay" ;
+
 lin PPart_made_in_the_form = "made in the form" ;
 lin PPart_submitted_in_the_manner_required_by_the_Commission = "submitted in the manner required by the Commission" ;
--}
 
 lin PP2_by_reason_only_of = mkPrep "by reason only of" ;
 lin PP2_despite = mkPrep "despite" ;
@@ -258,13 +263,13 @@ lin PP2_to_the_best_of_the_knowledge_and_belief_of = mkPrep "to the best of the 
 lin PP2_upon_notification_by = mkPrep "upon notification by" ;
 lin PP2_without_limiting = mkPrep "without limiting" ;
 
-lin QCN__CN_ cn = MarkupCN (mkMark "“" "”") cn ;
+lin QCN__CN_ cn = MarkupCN (myMark "“" "”") cn ;
 
 lin RS_on_which_S s = mkRS (mkRCl which_RP (mkClSlash s on_Prep)) ;
 lin RS_that_NP_VP np vp = mkRS (mkRCl X.that_RP (mkClSlash (mkCl np vp) noPrep)) ; ---
 lin RS_that_VP vp = mkRS (mkRCl X.that_RP vp) ;
-----lin RS_to_whom_NP_VP np vp = "to whom" ++ np ++ vp ;
-----lin RS_where_S s = "where" ++ s ;
+lin RS_to_whom_NP_VP np vp = lin RS {s = \\_ => "to whom" ++ (mkS (mkCl np vp)).s ; c = nominative} ; --- hack, because the form "whom" is not accessible in the RGL
+lin RS_where_S s = lin RS {s = \\_ => "where" ++ (mkS s).s ; c = nominative} ; --- might be OK as RS, although "where" is not an RP
 
 lin Ref_402020 = "[40/2020]" ;
 
@@ -318,27 +323,27 @@ lin VP_so_VP vp = mkVP (mkAdV "so") vp ;
 lin VP_directs = mkVP (mkV "direct") ;
 lin VP_instructs = mkVP (mkV "instruct") ;
 
-lin VP2_conduct = mkV2 "conduct" ;
-lin VP2_contain = mkV2 "contain" ;
-----lin VP2_is_likely_to_result_in = "is likely to result in" ;
-lin VP2_result_in = mkV2 (mkV "result") in_Prep ;
-lin VP2_results_in = mkV2 (mkV "result") in_Prep ; ---- redundant
+lin VP2_conduct = mkVPSlash (mkV2 "conduct") ;
+lin VP2_contain = mkVPSlash (mkV2 "contain") ;
+lin VP2_is_likely_to_result_in = G.VPSlashPrep (mkVP (mkAP (mkAP (mkA "likely")) (mkSC (mkVP (mkV "result"))))) in_Prep ; 
+lin VP2_result_in = mkVPSlash (mkV2 (mkV "result") in_Prep) ;
+lin VP2_results_in = mkVPSlash (mkV2 (mkV "result") in_Prep) ; ---- redundant
 
-lin VP2_affects = mkV2 "affects" ;
-lin VP2_applies_to = mkV2 (mkV "apply") to_Prep ;
-----lin VP2_apply_concurrently_with = "apply concurrently with" ;
-lin VP2_carry_out = mkV2 (partV (mkV "carry") "out") ;
-lin VP2_conduct = mkV2 "conduct" ;
-----lin VP2_does_not_apply_to = "does not apply to" ;
-----lin VP2_is_in_relation_to = "is in relation to" ;
-----lin VP2_is_prescribed_for = "is prescribed for" ;
-----lin VP2_is_stored_in = "is stored in" ;
-lin VP2_makes = mkV2 I.make_V ;
-lin VP2_notify = mkV2 "notify" ;
-lin VP2_provide = mkV2 "provide" ;
-lin VP2_relates_to = mkV2 (mkV "relate") to_Prep ;
-lin VP2_waive = mkV2 "waive" ;
-----lin VP2_will_result_in = "will result in" ;
+lin VP2_affects = mkVPSlash (mkV2 "affects") ;
+lin VP2_applies_to = mkVPSlash (mkV2 (mkV "apply") to_Prep) ;
+lin VP2_apply_concurrently_with = mkVPSlash (mkV2 (mkV "apply") (mkPrep "concurrently with")) ;
+lin VP2_carry_out = mkVPSlash (mkV2 (partV (mkV "carry") "out")) ;
+lin VP2_conduct = mkVPSlash (mkV2 "conduct") ;
+----lin VP2_does_not_apply_to = "does not apply to" ; ---- redundant
+lin VP2_is_in_relation_to = G.VPSlashPrep (mkVP (P.mkAdv "in relation")) to_Prep ; --- not in API
+lin VP2_is_prescribed_for = G.VPSlashPrep (mkVP (mkA "prescribed")) for_Prep ; --- not in API
+lin VP2_is_stored_in = G.VPSlashPrep (mkVP (mkA "stored")) in_Prep ; --- not in API
+lin VP2_makes = mkVPSlash (mkV2 I.make_V) ;
+lin VP2_notify = mkVPSlash (mkV2 "notify") ;
+lin VP2_provide = mkVPSlash (mkV2 "provide") ;
+lin VP2_relates_to = mkVPSlash (mkV2 (mkV "relate") to_Prep) ;
+lin VP2_waive = mkVPSlash (mkV2 "waive") ;
+----lin VP2_will_result_in = "will result in" ; ---- redundant
 
 ------------------------------
 -- for other uses than parsing

@@ -20,14 +20,14 @@ lincat CN = S.CN ;
 lincat Comp = S.Comp ;
 lincat Conj = S.Conj ;
 lincat ConjCN = S.CN ;
-lincat ConjCop = Str ;
+lincat ConjCop = Str ; --- G.VPS ; 
 lincat ConjItem = Str ;
 lincat ConjN2 = S.CN ;
 lincat ConjNP = S.NP ;
 lincat ConjPP = S.Adv ;
 lincat ConjPPart = Str ;
 lincat ConjVP2 = E.VPS2 ;
-lincat Cop = Str ;
+lincat Cop = Str ; --- G.VP ; -- UseCopula
 lincat Date = Str ;
 lincat Item = Str ;
 lincat LabLine = Str ;
@@ -61,9 +61,13 @@ oper str = overload {
 
 myMark : Str -> Str -> Mark = \b,e -> lin Mark {begin = b ; end = e} ;
 oper enclose = overload {
-    enclose : (b,e : Str) -> NP -> NP = \b,e,np -> MarkupNP (myMark b e) np ;
+    enclose : (b,e : Str) -> S.Adv -> S.Adv = \b,e,np -> MarkupAdv (myMark b e) np ;
+    enclose : (b,e : Str) -> S.NP -> S.NP = \b,e,np -> MarkupNP (myMark b e) np ;
     } ;
 
+--- to work around an overload resolution failure
+oper prefixCommaAdvVP : S.Adv -> S.VP-> S.VP = \adv, vp ->
+  mkVP (lin AdV (MarkupAdv (myMark "," ",") adv)) vp ;
 
 lin A_affected = mkA "affected" ;
 lin A_notifiable = mkA "notifiable" ;
@@ -139,8 +143,8 @@ lin ConjPPart_PPart_Conj_PPart ppart conj ppart2 = ppart ++ str conj ++ ppart2 ;
 ----lin ConjVP2_VP2__Conj_VP2_ vp21 conj vp22 = vp21 ++ "," ++ conj ++ vp22 ++ "," ;
 lin Conj_and = and_Conj ;
 lin Conj_or = or_Conj ;
-lin Cop_is = "is" ;
-lin Cop_is_likely_to_be = "is likely to be" ;
+lin Cop_is = "is" ; --- G.UseCopula ;
+lin Cop_is_likely_to_be = "is likely to be" ; --- mkVP (mkAP (mkAP (mkA "likely")) (mkSC G.UseCopula)) ;
 lin Date_1_February_2021 = "1 February 2021" ;
 
 lin Item_1 = "(1)" ;
@@ -291,35 +295,35 @@ lin Title_PART_6A = "PART 6A" ;
 lin Title_obligations_of_data_intermediary_of_public_agency = "obligations of data intermediary of public agency" ;
 
 ----lin VP_ConjCop_Comp conjcop comp = conjcop ++ comp ;
-----lin VP_ConjVP2_NP conjvp2 np = E.ComplVPS2 conjvp2 np ;
+---lin VP_ConjVP2_NP conjvp2 np = E.ComplVPS2 conjvp2 np ; --- does not give VP but VPS
 lin VP_VP2_NP vp2 np = mkVP vp2 np ;
-----lin VP_VP2__SeqPP__NP v2 seqpp np = v2 ++ "," ++ seqpp ++ "," ++ np ;
-----lin VP_VP__Conj_to_VP vp conj vp2 = vp ++ "," ++ conj ++ "to" ++ vp2 ;
+lin VP_VP2__SeqPP__NP v2 seqpp np = mkVP (G.AdvVPSlash v2 (enclose "," "," seqpp)) np ;
+----lin VP_VP__Conj_to_VP vp conj vp2 = vp ++ "," ++ conj ++ "to" ++ vp2 ; --- VPI
 lin VP_VP_PP vp pp = mkVP vp pp ;
-----lin VP_assesses__PP__that_S pp s = "assesses ," ++ pp ++ ", that" ++ s ;
+lin VP_assesses__PP__that_S pp s = mkVP (mkVP (mkVP (mkV "assess")) (enclose "," "," pp)) (S.mkAdv that_Subj (mkS s)) ;
 lin VP_be_ConjPPart conjppart = mkVP (lin Adv {s = conjppart}) ; ----
 lin VP_be_a_CN cn = mkVP cn ;
 lin VP_be_of_a_significant_scale = mkVP (S.mkAdv possess_Prep (mkNP a_Det (mkCN (mkA "significant") (mkN "scale")))) ;
 lin VP_believe_that_S s = mkVP (mkVS (mkV "believe")) (mkS s) ;
 ----lin VP_had_implemented__PP__NP pp np = "had implemented ," ++ pp ++ "," ++ np ;
-----lin VP_has_occurred = "has occurred" ;
-----lin VP_has_reason_to_VP vp = "has reason to" ++ vp ;
-lin VP_is_a_CN cn = mkVP cn ; ---- redundant
-----lin VP_is_deemed_not_to_VP vp = "is deemed not to" ++ vp ;
-----lin VP_is_deemed_to_VP vp = "is deemed to" ++ vp ;
-----lin VP_is_likely_to_occur = "is likely to occur" ;
-----lin VP_is_processing_PP pp = "is processing" ++ pp ;
-----lin VP_may__SeqPP__VP seqpp vp = "may ," ++ seqpp ++ "," ++ vp ;
-----lin VP_must__SeqPP__VP seqpp vp = "must ," ++ seqpp ++ "," ++ vp ;
+lin VP_has_occurred = mkVP (mkV "occur") ; ---- perfect tense to do
+lin VP_has_reason_to_VP vp = mkVP have_V2 (mkNP (mkCN (mkN "reason") vp)) ;
+--lin VP_is_a_CN cn = mkVP cn ; ---- already redundant
+----lin VP_is_deemed_not_to_VP vp = "is deemed not to" ++ vp ; ---- to be made redundant
+lin VP_is_deemed_to_VP vp = mkVP (mkAP (mkAP (mkA "deemed")) (mkSC vp)) ;
+lin VP_is_likely_to_occur = mkVP (mkAP (mkAP (mkA "likely")) (mkSC (mkVP (mkV "occur")))) ;
+lin VP_is_processing_PP pp = progressiveVP (mkVP (mkVP (mkV "process")) pp) ; ---- generalize progressive
+lin VP_may__SeqPP__VP seqpp vp = mkVP X.may_VV (prefixCommaAdvVP seqpp vp) ;
+lin VP_must__SeqPP__VP seqpp vp = mkVP must_VV (prefixCommaAdvVP seqpp vp) ;
 lin VP_must_VP vp = mkVP must_VV vp ;
 lin VP_must_also_VP vp = mkVP must_VV (mkVP (mkAdV "also") vp) ;
-----lin VP_must_not_VP vp = "must not" ++ vp ;
+----lin VP_must_not_VP vp = "must not" ++ vp ; ---- will be redundant
 lin VP_notify_NP_of_NP np np2 = mkVP (mkVP (mkV2 (mkV "notify")) np) (S.mkAdv possess_Prep np2) ;
-----lin VP_occurs_on_or_after_Date date = "occurs on or after" ++ date ;
+lin VP_occurs_on_or_after_Date date = mkVP (mkVP (mkV "occur")) (S.mkAdv (mkPrep "on or after") <symb date : NP>) ;
 lin VP_relates = mkVP (mkV "relate") ;
-----lin VP_renders_it_unlikely_that_S s = "renders it unlikely that" ++ s ;
+lin VP_renders_it_unlikely_that_S s = mkVP (mkV2A (mkV "render")) it_NP (mkAP (mkAP (mkA "unlikely")) (mkSC (mkS s))) ;
 lin VP_so_VP vp = mkVP (mkAdV "so") vp ;
-----lin VP_takes_NP__PP__RS np pp rs = "takes" ++ np ++ "," ++ pp ++ "," ++ rs ;
+lin VP_takes_NP__PP__RS np pp rs = mkVP (mkV2 I.take_V) (mkNP (mkNP np (enclose "," "" pp)) rs) ; --- a second "," would result in two subsequent commas
 lin VP_directs = mkVP (mkV "direct") ;
 lin VP_instructs = mkVP (mkV "instruct") ;
 
@@ -327,14 +331,14 @@ lin VP2_conduct = mkVPSlash (mkV2 "conduct") ;
 lin VP2_contain = mkVPSlash (mkV2 "contain") ;
 lin VP2_is_likely_to_result_in = G.VPSlashPrep (mkVP (mkAP (mkAP (mkA "likely")) (mkSC (mkVP (mkV "result"))))) in_Prep ; 
 lin VP2_result_in = mkVPSlash (mkV2 (mkV "result") in_Prep) ;
-lin VP2_results_in = mkVPSlash (mkV2 (mkV "result") in_Prep) ; ---- redundant
+--lin VP2_results_in = mkVPSlash (mkV2 (mkV "result") in_Prep) ; ---- redundant
 
 lin VP2_affects = mkVPSlash (mkV2 "affects") ;
 lin VP2_applies_to = mkVPSlash (mkV2 (mkV "apply") to_Prep) ;
 lin VP2_apply_concurrently_with = mkVPSlash (mkV2 (mkV "apply") (mkPrep "concurrently with")) ;
 lin VP2_carry_out = mkVPSlash (mkV2 (partV (mkV "carry") "out")) ;
 lin VP2_conduct = mkVPSlash (mkV2 "conduct") ;
-----lin VP2_does_not_apply_to = "does not apply to" ; ---- redundant
+----lin VP2_does_not_apply_to = "does not apply to" ; ---- to be made redundant
 lin VP2_is_in_relation_to = G.VPSlashPrep (mkVP (P.mkAdv "in relation")) to_Prep ; --- not in API
 lin VP2_is_prescribed_for = G.VPSlashPrep (mkVP (mkA "prescribed")) for_Prep ; --- not in API
 lin VP2_is_stored_in = G.VPSlashPrep (mkVP (mkA "stored")) in_Prep ; --- not in API
@@ -343,7 +347,7 @@ lin VP2_notify = mkVPSlash (mkV2 "notify") ;
 lin VP2_provide = mkVPSlash (mkV2 "provide") ;
 lin VP2_relates_to = mkVPSlash (mkV2 (mkV "relate") to_Prep) ;
 lin VP2_waive = mkVPSlash (mkV2 "waive") ;
-----lin VP2_will_result_in = "will result in" ; ---- redundant
+----lin VP2_will_result_in = "will result in" ; ---- to be made redundant
 
 ------------------------------
 -- for other uses than parsing

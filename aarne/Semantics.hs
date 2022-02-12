@@ -161,7 +161,7 @@ iA :: Env -> GA -> Formula
 iA env a = Atomic CPred (lin env (gf a))
 
 iA2 :: Env -> GA2 -> Formula
-iA2 env a2 = Atomic CPred (lin env (gf a2))
+iA2 env a2 = Atomic CPred2 (lin env (gf a2))
 
 iAP :: Env -> GAP -> Formula
 iAP env ap = case ap of
@@ -169,7 +169,7 @@ iAP env ap = case ap of
     let
       ws = words (lin env (gf a2)) ---- should use discontinuous const
       (adj, prep) = splitAt (length ws - 1) ws
-    in Relation (Atomic CPred (unwords adj)) (Qualification CNone (map toUpper (concat prep)) (iNP env np))
+    in Action (Atomic CPred (unwords adj)) (Qualification CNone (map toUpper (concat prep)) (iNP env np))
 
 iCN :: Env -> GCN -> Formula
 iCN env cn = case cn of
@@ -188,7 +188,7 @@ iCN env cn = case cn of
      _ -> ([], iCN env cn)
    modif bn ms =
      if length ms > 1
-     then Modification CSet bn (Qualification CPred "WITH PROPERTIES" (Conjunction CPred ms))
+     then Modification CSet bn (Qualification CPred "WITH PROPERTIES" (Conjunction CPred AND ms))
      else Modification CSet bn (Qualification CPred "WITH PROPERTY" (Sequence CPred ms))
 
 
@@ -231,9 +231,9 @@ iConjVP2 env cc = case cc of
   GConjVP2_VP2__Conj_VP2_ cn1 conj cn2 -> iConj env conj CPred (map (iVP2 env) [cn1, cn2])
 
 iConj :: Env -> GConj -> (Cat -> [Formula] -> Formula)
-iConj env conj = case conj of
-  GConj_and -> Conjunction
-  GConj_or -> Disjunction
+iConj env conj cat = case conj of
+  GConj_and -> Conjunction cat AND
+  GConj_or -> Conjunction cat OR
 
 iCop :: Env -> GCop -> Formula
 iCop env item = Atomic CCop (lin env (gf item))
@@ -277,11 +277,11 @@ iNum env n2 = Atomic CInd (lin env (gf n2))
 
 iPP :: Env -> GPP -> Formula
 iPP env pp = case pp of
-  GPP_PP2_NP pp2 np -> Qualification CPred (iPP2 env pp2) (iNP env np)
+  GPP_PP2_NP pp2 np -> Action (iPP2 env pp2) (iNP env np)
   __ -> Atomic CPred (lin env (gf pp))
 
-iPP2 :: Env -> GPP2 -> Modality
-iPP2 env n2 = map toUpper (lin env (gf n2))
+iPP2 :: Env -> GPP2 -> Formula
+iPP2 env n2 = Atomic CPred2 (map toUpper (lin env (gf n2)))
 
 iPPart :: Env -> GPPart -> Formula
 iPPart env n2 = Atomic CPred (lin env (gf n2))
@@ -326,7 +326,7 @@ iVP env vp = case vp of
   ---- these could be treated with a separate VVP category 
   GVP_must_VP vp2 -> Modalization "MUST" (iVP env vp2)
   GVP_must_also_VP vp2 -> Modalization "MUST ALSO" (iVP env vp2)
-  GVP_must_not_VP vp2 -> Modalization "MUST NOT" (iVP env vp2)
+  GVP_must_not_VP vp2 -> Negation CPred (Modalization "MUST" (iVP env vp2))
   GVP_has_reason_to_VP vp2 -> Modalization "HAS REASON TO" (iVP env vp2)
   GVP_is_deemed_to_VP vp2 -> Modalization "IS DEEMED TO" (iVP env vp2)
   GVP_is_deemed_not_to_VP vp2 -> Modalization "IS DEEMED NOT TO" (iVP env vp2)
@@ -334,7 +334,7 @@ iVP env vp = case vp of
   _ -> Atomic CPred (lin env (gf vp)) ----
 
 iVP2 :: Env -> GVP2 -> Formula
-iVP2 env n2 = Atomic CPred (lin env (gf n2))
+iVP2 env n2 = Atomic CPred2 (lin env (gf n2))
 
 ----
 -- TODO:

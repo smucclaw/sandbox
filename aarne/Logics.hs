@@ -34,6 +34,34 @@ type Var = String
 type Oper = String
 type Fun = String
 
+-- eliminating sorts by conversion to predicates
+
+unsortProp :: Prop -> Prop
+unsortProp prop = case prop of
+  Univ Universal pred -> Univ Universal $ \x -> unsortProp (pred x) 
+  Exist Universal pred -> Exist Universal $ \x -> unsortProp (pred x) 
+  Univ set pred -> Univ Universal $ \x -> Impl (uSet x set) (unsortProp (pred x)) 
+  Exist set pred -> Exist Universal $ \x -> Conj [uSet x set, unsortProp (pred x)] 
+  Conj props -> Conj (map unsortProp props)
+  Disj props -> Disj (map unsortProp props)
+  Impl p q -> Impl (unsortProp p) (unsortProp q)
+  Equi p q -> Equi (unsortProp p) (unsortProp q)
+ ---- Equals s t -> Equi (uSet s) (uSet t)
+  Neg p -> Neg (unsortProp p)
+  _ -> prop -- nothing to convert, assuming that iota has been eliminated
+ where
+   uSet x set = case set of
+     Union sets -> Disj (map (uSet x) (filter notUniversal sets))
+     Intersection sets -> Conj (map (uSet x) (filter notUniversal sets))
+     Family fun inds -> Pred fun (x:inds) -- add first argument to predicate
+     Comprehension Universal pred -> pred x
+     Comprehension set pred -> Conj [uSet x set, pred x]
+---     Universal -> Universal -- not converted
+   notUniversal set = case set of
+     Universal -> False
+     _ -> True
+
+
 
 -- the Assembly Logic - between abstract syntax and real logic
 
@@ -41,30 +69,35 @@ type Modality = String
 type Atom = String
 type Role = String
 
+data ConjWord = AND | OR deriving Show
+
 -- to record the logical category in assembly logic, when derived from syntax
 data Cat =
-  CProp | CSet | CInd | CPred | CFun | CFam | CCop | CQuant | CNone -- none: to be ignored
+  CProp | CSet | CInd | CPred | CPred2 | CFun | CFam | CCop | CQuant | CNone -- none: to be ignored
   deriving Show
 
 data Formula =
-    Modal Modality Formula
-  | Atomic Cat Atom
-  | Conjunction Cat [Formula]
-  | Disjunction Cat [Formula]
+    Atomic Cat Atom
+  | Conjunction Cat ConjWord [Formula]
   | Implication Formula Formula
   | Conditional Formula Formula -- reverse implication (notice anaphora!)
-  | Negation Formula
+  | Negation Cat Formula
+  
   | Application Cat Formula Formula  -- the f of x
-  | Predication Formula Formula
-  | Assignment Role Formula Formula -- oblication/duty/right of NP to VP
-  | Action Formula Formula
   | Modification Cat Formula Formula   -- A which is B
-  | Relation Formula Formula
   | Qualification Cat String Formula ---
-  | Modalization Modality Formula -- of a predicate
-  | Quantification String Formula ---
-  | Sequence Cat [Formula] --- just a sequence one on top of another
   | Means Cat Formula Formula -- definition
+  
+  | Predication Formula Formula
+  | Action Formula Formula
+
+  | Assignment Role Formula Formula -- oblication/duty/right of NP to VP
+
+  | Modalization Modality Formula -- of a predicate
+  | Modal Modality Formula
+  | Quantification String Formula ---
+  
+  | Sequence Cat [Formula] --- just a sequence one on top of another
    deriving Show
 
 
@@ -72,24 +105,29 @@ data Formula =
 
 formula2box :: Formula -> Box
 formula2box formula = case formula of
-  Modal m f -> addHeader m (formula2box f)
   Atomic _ a  -> atomBox a
-  Conjunction _ fs -> andBox (map formula2box fs)
-  Disjunction _ fs -> orBox (map formula2box fs)
+  Conjunction _ cw fs -> infixLeftsideBox (show cw) (map formula2box fs)
   Implication f g -> ifBox [formula2box f] [formula2box g]
   Conditional a b -> doubleLeftsideBox "CONDITIONALLY" [formula2box a] "PROVIDED" [formula2box b]
-  Negation f -> notBox (formula2box f)
+  Negation _ f -> notBox (formula2box f)
+  
   Application _ f x -> ofBox [formula2box f] [formula2box x]
-  Predication x f -> nodoubleLeftsideBox "SUBJECT" [formula2box x] "PREDICATE" [formula2box f]
-  Assignment r x f -> seqBox [atomBox r, leftsideBox "OF" [formula2box x], leftsideBox "TO" [formula2box f]]
-  Action f x -> nodoubleLeftsideBox "ACTING" [formula2box f] "ON" [formula2box x]
-  Modification _ a p -> nodoubleLeftsideBox "ENTITY" [formula2box a] "WITH PROPERTIES" [formula2box p]
-  Relation f x -> nodoubleLeftsideBox "HAVING RELATION" [formula2box f] "TO" [formula2box x]
+  Modification _ a p -> seqBox [formula2box a, formula2box p]
   Qualification _ s f -> leftsideBox s [formula2box f]
+  
+  Means _ f g -> doubleLeftsideBox "THE TERM" [formula2box f] "MEANS" [formula2box g]
+  
+  Predication x f -> seqBox[formula2box x, formula2box f]
+  Action f x -> seqBox [formula2box f, formula2box x]
+    
+  Assignment r x f -> seqBox [atomBox r, leftsideBox "OF" [formula2box x], leftsideBox "TO" [formula2box f]]
+
+  Modal m f -> addHeader m (formula2box f)
   Modalization s f -> leftsideBox s [formula2box f]
   Quantification s f -> leftsideBox s [formula2box f]
+  
   Sequence _ fs -> seqBox (map formula2box fs) ----
-  Means _ f g -> meansBox (formula2box f) (formula2box g)
+
 
 -- from real logic to printed formulas
 prProp :: Prop -> String
@@ -128,9 +166,32 @@ prFun fun = concat $ intersperse "_" $ words fun ---
 
 var i = (["x", "y", "z"] ++ ["x" ++ show i | i <- [4..]]) !! i
 
+-- printing to tptp syntax, applying unsort first
+tptpProp :: Prop -> String
+tptpProp = prp 0 0 . unsortProp
+ where
+  prp prec i prop = case prop of
+    Conj ps -> parenth 2 prec $ unwords $ intersperse "&" $ map (prp 3 i) ps
+    Disj ps -> parenth 2 prec $ unwords $ intersperse "|" $ map (prp 3 i) ps
+    Impl p q -> parenth 1 prec $ prp 2 i p ++ " => " ++ prp 1 i q
+    Equi p q -> parenth 1 prec $ prp 2 i p ++ " <=> " ++ prp 2 i q
+    Neg prop -> parenth 3 prec $ "~ " ++ prp 3 i prop
+    Univ _ pred -> "![" ++ var i ++ "]:" ++ prp 3 (i+1) (pred (Bound (var i)))
+    Exist _ pred -> "?[" ++ var i ++ "]:" ++ prp 3 (i+1) (pred (Bound (var i)))
+ ---- Mod oper prop -> parenth prec 3 $ oper ++ " " ++ prp 3 i prop
+    Pred fun inds -> prFun fun ++ ifparenth (concat (intersperse "," (map (prInd i) inds)))
+    Equal p q -> parenth 1 prec $ prInd i p ++ " = " ++ prInd i q
+
+
 --- to test
-fex1 = Univ (Family "N" []) (\x -> Conj [Pred "Even" [x], Pred "Odd" [x]])
-fex2 = Univ (Family "N" []) (\x -> Exist (Family "N" []) (\y -> Conj [Pred "Gt" [x, y], Pred "Prime" [y]]))
+fex1 = Univ (Family "N" []) (\x -> Disj [Pred "Even" [x], Pred "Odd" [x]])
+fex2 = Univ (Family "N" []) (\x -> Exist (Family "N" []) (\u -> Conj [Pred "Gt" [u, x], Pred "Prime" [u]]))
+
+testProp p = do
+  putStrLn $ prProp p
+  putStrLn $ prProp $ unsortProp p
+  putStrLn $ tptpProp p
+  
 
 -- from assembly logic to real logic. The result can be any of the three:
 
@@ -147,31 +208,21 @@ formula2prop formula = case formula of
     CInd -> return $ PInd $ App a []
     CPred -> return $ PProp $ Pred a []
     _ -> Left $ "no Prop, Set, or Ind from " ++ show formula
-  Conjunction c fs -> case c of
+  Conjunction c cw fs -> case c of
     CProp -> do
       pfs <- mapM f2prop fs
-      return $ PProp $ Conj pfs
+      return $ PProp $ (fst (iConjWord cw)) pfs
     CSet -> do
       pfs <- mapM f2set fs
-      return $ PSet $ Intersection pfs
+      return $ PSet $ (snd (iConjWord cw)) pfs
     _ -> Left $ "expected Prop or Set, found"  ++ show formula
-
-  Disjunction c fs -> case c of
-    CProp -> do
-      pfs <- mapM f2prop fs
-      return $ PProp $ Disj pfs
-    CSet -> do
-      pfs <- mapM f2set fs
-      return $ PSet $ Union pfs
-    _ -> Left $ "expected Prop or Set, found"  ++ show formula
-
 
   Implication f g -> do
     pf <- f2prop f
     pg <- f2prop g
     return $ PProp $ Impl pf pg
   Conditional a b -> formula2prop (Implication b a)
-  Negation f -> do
+  Negation CProp f -> do
     pf <- f2prop f
     return $ PProp $ Neg pf
 
@@ -199,13 +250,12 @@ formula2prop formula = case formula of
       pp <- f2pred p
       return $ PSet $ Comprehension sa pp
   
-----  Relation f x -> 
 ----  Qualification _ s f -> 
 ----  Modalization s f -> 
 
 
 
-  Sequence c fs -> formula2prop $ Conjunction c fs ----
+  Sequence c fs -> formula2prop $ Conjunction c AND fs ----
   Means c a b -> do
     pa <- formula2prop a
     pb <- formula2prop b
@@ -248,12 +298,9 @@ formula2prop formula = case formula of
    f2pred :: Formula -> Either String (Ind -> Prop) 
    f2pred formula = case formula of
      Atomic CPred f -> return $ \x -> Pred f [x]
-     Conjunction cat_ fs -> do
+     Conjunction cat_ cw fs -> do
        pfs <- mapM f2pred fs
-       return $ \x -> Conj [f x | f <- pfs]
-     Disjunction cat_ fs -> do
-       pfs <- mapM f2pred fs
-       return $ \x -> Disj [f x | f <- pfs]
+       return $ \x -> fst (iConjWord cw) [f x | f <- pfs]
      Qualification CPred s a -> do
        fa <- formula2prop a
        case fa of
@@ -263,6 +310,10 @@ formula2prop formula = case formula of
        
      _ -> Left $ "no predicate from: " ++ show formula
 
+   iConjWord cw = case cw of
+     AND -> (Conj, Intersection)
+     OR -> (Disj, Union)
+
 prPropCat pc = case pc of
   PProp prop -> prProp prop
   PSet set -> prSet 0 0 set
@@ -271,9 +322,10 @@ prPropCat pc = case pc of
 formula1 = Predication (Quantification "EACH" (Atomic CSet "N")) (Atomic CPred "Even")
 formula2 =
   Predication (Quantification "EACH" (Atomic CSet "N"))
-    (Disjunction CPred [(Atomic CPred "Even"), (Atomic CPred "Odd")])
+    (Conjunction CPred OR [(Atomic CPred "Even"), (Atomic CPred "Odd")])
 
 testTrans formula = do
   let Right (PProp p) = formula2prop formula
   putStrLn $ prProp p
+  putStrLn $ tptpProp p
 

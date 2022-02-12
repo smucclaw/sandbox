@@ -108,7 +108,7 @@ lin CN_data_intermediary = mkCN (mkN "data intermediary") ;
 lin CN_device = mkCN (mkN "device") ;
 lin CN_duty = mkCN (mkN "duty") ;
 lin CN_individual = mkCN (mkN "individual") ;
-lin CN_individuals = mkCN (mkN "individual") ; ---- 
+--lin CN_individuals = mkCN (mkN "individual") ; ---- redundant
 lin CN_information = mkCN (mkN "information") ;
 lin CN_law = mkCN (mkN "law") ;
 lin CN_law_enforcement_agency = mkCN (mkN "law enforcement agency") ;
@@ -131,6 +131,7 @@ lin CN_significant_harm_to_NP np = mkCN (mkCN (mkA "significant") (mkN "harm")) 
 lin CN_storage_medium = mkCN (mkN "storage medium" "storage media") ;
 
 lin Comp_of_a_significant_scale = mkComp (S.mkAdv possess_Prep (mkNP a_Det (mkCN (mkA "significant") (mkN "scale")))) ;
+
 lin ConjCN_CN_Conj_CN cn conj cn2 = G.ConjCN conj (G.BaseCN cn cn2) ;
 lin ConjCop_Cop__Conj_Cop_ cop1 conj cop2 = cop1 ++ "," ++ str conj ++ cop2 ++ "," ;
 lin ConjItem_Item__ConjItem item conjitem = item ++ "," ++ conjitem ;
@@ -208,7 +209,7 @@ lin N2_occurrence = mkN2 (mkN "occurrence") ;
 lin N2_rule = mkN2 (mkN "rule") ;
 lin N2_use = mkN2 (mkN "use") ;
 
-lin NP_CN cn = mkNP cn ; ---- both Sg and Pl
+lin NP_CN cn = mkNP cn ; ---- TODO: both Sg and Pl
 lin NP_NP__Conj_NP__PP np conj np2 pp = mkNP (mkNP conj np (enclose "," "," np2)) pp ;
 lin NP_a_CN cn = mkNP a_Det cn ;
 lin NP_all_the_CN_RS cn rs = mkNP all_Predet (mkNP thePl_Det (mkCN cn rs)) ;
@@ -234,7 +235,7 @@ lin NP_this_section = mkNP this_Det (mkN "section") ;
 
 lin Num_3 = mkCard "3" ;
 
-lin PP_PP__but_in_any_case_PP pp pp2 = lin Adv {s = pp.s ++ ", but in any case" ++ pp2.s} ;
+lin PP_PP__but_in_any_case_PP pp pp2 = lin Adv {s = pp.s ++ ", but in any case" ++ pp2.s} ; ---
 lin PP_PP2_NP pp2 np = S.mkAdv pp2 np ; 
 lin PP_Time time = P.mkAdv time ;
 lin PP_as_soon_as_is_practicable = P.mkAdv "as soon as is practicable" ;
@@ -333,7 +334,7 @@ lin VP2_is_likely_to_result_in = G.VPSlashPrep (mkVP (mkAP (mkAP (mkA "likely"))
 lin VP2_result_in = mkVPSlash (mkV2 (mkV "result") in_Prep) ;
 --lin VP2_results_in = mkVPSlash (mkV2 (mkV "result") in_Prep) ; ---- redundant
 
-lin VP2_affects = mkVPSlash (mkV2 "affects") ;
+lin VP2_affects = mkVPSlash (mkV2 "affect") ;
 lin VP2_applies_to = mkVPSlash (mkV2 (mkV "apply") to_Prep) ;
 lin VP2_apply_concurrently_with = mkVPSlash (mkV2 (mkV "apply") (mkPrep "concurrently with")) ;
 lin VP2_carry_out = mkVPSlash (mkV2 (partV (mkV "carry") "out")) ;

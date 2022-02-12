@@ -61,6 +61,16 @@ unsortProp prop = case prop of
      Universal -> False
      _ -> True
 
+--- needed in family applied to a quantifier, should be solved in a different way
+set2prop :: Set -> Prop
+set2prop set = case set of
+     Union sets -> Disj (map set2prop sets)
+     Intersection sets -> Conj (map set2prop sets)
+     Family fun inds -> Pred fun inds
+----     Comprehension Universal pred -> pred x
+     Comprehension set pred -> Exist set pred -- !!
+---     Universal -> Universal -- not converted
+  
 
 
 -- the Assembly Logic - between abstract syntax and real logic
@@ -77,27 +87,27 @@ data Cat =
   deriving Show
 
 data Formula =
-    Atomic Cat Atom
-  | Conjunction Cat ConjWord [Formula]
-  | Implication Formula Formula
-  | Conditional Formula Formula -- reverse implication (notice anaphora!)
-  | Negation Cat Formula
+    Atomic Cat Atom                     -- CProp CPred CPred2 CCop CInd CFam CFun CSet
+  | Conjunction Cat ConjWord [Formula]  -- CProp CSet CCop CQuant CPred CPred2 CFam
+  | Implication Formula Formula         -- CProp
+  | Conditional Formula Formula         -- reverse implication (notice anaphora!) -- CProp
+  | Negation Cat Formula                -- CPred
   
-  | Application Cat Formula Formula  -- the f of x
-  | Modification Cat Formula Formula   -- A which is B
-  | Qualification Cat String Formula ---
-  | Means Cat Formula Formula -- definition
+  | Application Cat Formula Formula  -- the f of x    -- CFam CSet
+  | Modification Cat Formula Formula -- A which is B  -- CSet CQuant CPred CFam
+  | Qualification Cat String Formula -- CNone (can be ignored) CPred (works like abstraction)
+  | Means Cat Formula Formula        -- definition    -- CSet
   
-  | Predication Formula Formula
-  | Action Formula Formula
+  | Predication Formula Formula      -- CProp
+  | Action Formula Formula           -- CPred
 
-  | Assignment Role Formula Formula -- oblication/duty/right of NP to VP
+  | Assignment Role Formula Formula -- oblication/duty/right of NP to VP -- CProp ?
 
-  | Modalization Modality Formula -- of a predicate
-  | Modal Modality Formula
-  | Quantification String Formula ---
+  | Modalization Modality Formula   -- must/may/...  -- CPred
+  | Modal Modality Formula          -- used after labels, to be ignored ? -- CProp ?
+  | Quantification String Formula   -- CQuant 
   
-  | Sequence Cat [Formula] --- just a sequence one on top of another
+  | Sequence Cat [Formula] --- just a sequence one on top of another -- CProp CPred 
    deriving Show
 
 
@@ -226,13 +236,11 @@ formula2prop formula = case formula of
     pf <- f2prop f
     return $ PProp $ Neg pf
 
-  Application c f x -> case c of
-    CPred -> do
-      sf <- f2pred f
-      px <- formula2prop x
-      case px of
-        PSet sx -> return $ PSet $ Comprehension sx (\x -> sf x)
-        _ -> Left $ "expacted Set, found: " ++ prPropCat px
+  Application c f q -> case c of
+    CSet -> do
+      pf <- f2fam f
+      pq <- f2quant q
+      return $ PProp $ pq $ \x -> set2prop (pf x) ----
     _ -> Left $ "unsupported Application: " ++ show formula
   
 
@@ -249,8 +257,9 @@ formula2prop formula = case formula of
       sa <- f2set a
       pp <- f2pred p
       return $ PSet $ Comprehension sa pp
+    _ -> Left $ "set expected for Modification, found: " ++ show formula
   
-----  Qualification _ s f -> 
+  Qualification CNone _ f -> formula2prop f 
 ----  Modalization s f -> 
 
 
@@ -291,6 +300,10 @@ formula2prop formula = case formula of
        case s of
          _ | elem s ["A", "AN", "ANY"]  -> return $ \pred -> Exist pf (\x -> pred x)
          "EACH" -> return $ \pred -> Univ  pf (\x -> pred x)
+     Modification CQuant np rs -> do
+       quant <- f2quant np
+       pred  <- f2pred rs
+       return $ \p -> quant (\x -> Conj [p x, pred x])
      _ -> do
        px <- f2ind formula
        return $ \pred -> pred px
@@ -302,13 +315,40 @@ formula2prop formula = case formula of
        pfs <- mapM f2pred fs
        return $ \x -> fst (iConjWord cw) [f x | f <- pfs]
      Qualification CPred s a -> do
-       fa <- formula2prop a
-       case fa of
-         PSet sa -> return $ \x -> Exist sa (\y -> Pred s [x, y])
-         PInd ia -> return $ \x -> Pred s [x, ia]
-         _ -> Left $ "expected Set or Ind in Qualification, found " ++ prPropCat fa
-       
+       fa <- f2prop a
+       return $ \x -> fa ---- there should be an argument place for x
+     Qualification CNone _ a -> f2pred a
+     Modification CPred f rs -> do
+         pf <- f2pred f
+         prs <- f2pred rs
+         return $ \x -> Conj [pf x, prs x]
+     Action f q -> do
+         pf <- f2pred2 f
+         pq <- f2quant q
+         return $ \x -> pq (\y -> pf x y)
+
      _ -> Left $ "no predicate from: " ++ show formula
+
+   f2pred2 :: Formula -> Either String (Ind -> Ind -> Prop) 
+   f2pred2 formula = case formula of
+     Atomic CPred2 f -> return $ \x y -> Pred f [x, y]
+     Conjunction cat_ cw fs -> do
+       pfs <- mapM f2pred2 fs
+       return $ \x y -> fst (iConjWord cw) [pf x y | pf <- pfs]
+     _ -> Left $ "no 2-place predicate from: " ++ show formula
+
+   f2fam :: Formula -> Either String (Ind -> Set)
+   f2fam formula = case formula of
+     Atomic CFam a -> return $ \x -> Family a [x]
+     Conjunction CFam cw fs -> do
+       pfs <- mapM f2fam fs
+       return $ \x -> snd (iConjWord cw) [pf x | pf <- pfs]
+     Modification CFam mo fam -> do
+       pmo <- f2pred mo
+       pfam <- f2fam fam
+       return $ \x -> Comprehension (pfam x) (\y -> pmo y)
+     _ -> Left $ "no family from: " ++ show formula
+
 
    iConjWord cw = case cw of
      AND -> (Conj, Intersection)

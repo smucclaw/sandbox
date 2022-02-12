@@ -153,7 +153,6 @@ iLine env line = case line of
   GLine_where_S__S_ s1 s2 -> Implication (iS env s1) (iS env s2)
   GLine_PP__Line pp line2 -> Modal (lin env (gf pp)) (iLine env line2)
   GLine_QCN_means_NP_ qcn np -> Means CSet (iQCN env qcn) (iNP env np)
-  GLine_where_S__S_ s s2 -> Implication (iS env s) (iS env s2)
   _ -> Atomic CProp (lin env (gf line)) ---- cat
 
 
@@ -188,8 +187,8 @@ iCN env cn = case cn of
      _ -> ([], iCN env cn)
    modif bn ms =
      if length ms > 1
-     then Modification CSet bn (Qualification CPred "WITH PROPERTIES" (Conjunction CPred AND ms))
-     else Modification CSet bn (Qualification CPred "WITH PROPERTY" (Sequence CPred ms))
+     then Modification CSet bn (Qualification CNone "WITH PROPERTIES" (Conjunction CPred AND ms))
+     else Modification CSet bn (Qualification CNone "WITH PROPERTY" (Sequence CPred ms))
 
 
 
@@ -208,7 +207,7 @@ iConjItem :: Env -> GConjItem -> Modality
 iConjItem env conjn2 = lin env (gf conjn2)
 
 iConjN2 :: Env -> GConjN2 -> Formula
-iConjN2 env conjn2 = conj CSet fs where
+iConjN2 env conjn2 = conj CFam fs where
   (conj, fs) = iconj conjn2
   iconj conjn2 = case conjn2 of
     GConjN2_N2__ConjN2 n2 conj2 -> let (conj, fs) = iconj conj2 in (conj, (iN2 env n2):fs)
@@ -228,7 +227,7 @@ iConjPPart env cc = case cc of
 
 iConjVP2 :: Env -> GConjVP2 -> Formula
 iConjVP2 env cc = case cc of
-  GConjVP2_VP2__Conj_VP2_ cn1 conj cn2 -> iConj env conj CPred (map (iVP2 env) [cn1, cn2])
+  GConjVP2_VP2__Conj_VP2_ cn1 conj cn2 -> iConj env conj CPred2 (map (iVP2 env) [cn1, cn2])
 
 iConj :: Env -> GConj -> (Cat -> [Formula] -> Formula)
 iConj env conj cat = case conj of
@@ -252,10 +251,10 @@ iN2 env n2 = Atomic CFam (lin env (gf n2))
 iNP :: Env -> GNP -> Formula
 iNP env np = case np of
   GNP_the_unauthorised_ConjN2_of_NP conjn2 np ->
-    Application CPred (Modification CSet (Atomic CPred "unauthorized") (iConjN2 env conjn2)) (iNP env np)
+    Application CSet (Modification CFam (Atomic CPred "unauthorized") (iConjN2 env conjn2)) (iNP env np)
 
   GNP_the_loss_of_any_ConjCN_RS conjcn rs ->
-    Application CPred (Atomic CFun "loss") (Quantification "ANY" (Modification CSet (iConjCN env conjcn) (iRS env rs)))
+    Application CSet (Atomic CFun "loss") (Quantification "ANY" (Modification CSet (iConjCN env conjcn) (iRS env rs)))
 
   GNP_CN cn -> iCN env cn
 
@@ -296,7 +295,7 @@ iRS env rs = case rs of
   GRS_that_VP vp -> Qualification CPred "THAT" (iVP env vp)
   GRS_that_NP_VP np vp -> Qualification CPred "THAT" (Predication (iNP env np) (iVP env vp))
   GRS_to_whom_NP_VP np vp -> Qualification CPred "TO WHOM" (Predication (iNP env np) (iVP env vp))
-  _ -> Atomic CPred (lin env (gf rs)) ----
+
 
 iRef :: Env -> GRef -> Modality
 iRef env n2 = lin env (gf n2)

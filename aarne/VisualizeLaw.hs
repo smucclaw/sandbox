@@ -40,6 +40,10 @@ main = do
       putStrLn $ S.renderBox box
       let fprop = formula2prop formula
       ifDebug $ case fprop of
-          Right pc -> putStrLn $ "#/ REAL LOGIC: " ++ prPropCat pc
+          Right pc -> do
+            putStrLn $ "#/ REAL LOGIC: " ++ prPropCat pc
+            case pc of
+              PProp p -> putStrLn $ "#/ TPTP LOGIC: " ++ tptpProp p
+              _ -> return ()
           Left s -> putStrLn $ "#/ LOGIC ERROR: " ++ s
  

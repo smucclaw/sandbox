@@ -34,6 +34,10 @@ type Var = String
 type Oper = String
 type Fun = String
 
+-- used in modalities: Must f means Neg (f x) -> BREACH x
+breachPred :: Ind -> Prop
+breachPred x = Pred "BREACH" [x]
+
 -- eliminating sorts by conversion to predicates
 
 unsortProp :: Prop -> Prop
@@ -48,6 +52,8 @@ unsortProp prop = case prop of
   Equi p q -> Equi (unsortProp p) (unsortProp q)
  ---- Equals s t -> Equi (uSet s) (uSet t)
   Neg p -> Neg (unsortProp p)
+  Mod op p -> Impl (Pred op []) (unsortProp p)
+    --- this modality means implication: "(a) says that p"
   _ -> prop -- nothing to convert, assuming that iota has been eliminated
  where
    uSet x set = case set of
@@ -188,7 +194,6 @@ tptpProp = prp 0 0 . unsortProp
     Neg prop -> parenth 3 prec $ "~ " ++ prp 3 i prop
     Univ _ pred -> "![" ++ var i ++ "]:" ++ prp 3 (i+1) (pred (Bound (var i)))
     Exist _ pred -> "?[" ++ var i ++ "]:" ++ prp 3 (i+1) (pred (Bound (var i)))
- ---- Mod oper prop -> parenth prec 3 $ oper ++ " " ++ prp 3 i prop
     Pred fun inds -> prFun fun ++ ifparenth (concat (intersperse "," (map (prInd i) inds)))
     Equal p q -> parenth 1 prec $ prInd i p ++ " = " ++ prInd i q
 
@@ -262,7 +267,9 @@ formula2prop formula = case formula of
   Qualification CNone _ f -> formula2prop f 
 ----  Modalization s f -> 
 
-
+  Quantification q f | elem q ["A", "AN", "ANY"] -> do
+    sf <- f2set f
+    return $ PSet sf
 
   Sequence c fs -> formula2prop $ Conjunction c AND fs ----
   Means c a b -> do
@@ -283,10 +290,13 @@ formula2prop formula = case formula of
        PProp p -> return p
        _ -> Left $ "no Prop from " ++ show f
    f2set f =  do
-     pf <- formula2prop f
-     case pf of
-       PSet p -> return p
-       _ -> Left $ "no Set from " ++ show f
+     case formula2prop f of
+       Right pf -> case pf of
+         PSet p -> return p
+         _ -> Left $ "no Set from " ++ show f
+       _ -> case f of
+         Quantification q set | elem q ["A", "AN", "ANY"] -> f2set f
+         _ -> Left $ "no Set from " ++ show f
    f2ind f =  do
      pf <- formula2prop f
      case pf of
@@ -314,6 +324,9 @@ formula2prop formula = case formula of
      Conjunction cat_ cw fs -> do
        pfs <- mapM f2pred fs
        return $ \x -> fst (iConjWord cw) [f x | f <- pfs]
+     Negation CPred f -> do
+       pf <- f2pred f
+       return $ \x -> Neg (pf x)
      Qualification CPred s a -> do
        fa <- f2prop a
        return $ \x -> fa ---- there should be an argument place for x
@@ -326,6 +339,15 @@ formula2prop formula = case formula of
          pf <- f2pred2 f
          pq <- f2quant q
          return $ \x -> pq (\y -> pf x y)
+         
+     Modalization m f -> do
+         pf <- f2pred f
+         case m of
+             -- "deontic" modalities as implications of breach
+             "MAY"  -> return $ \x -> Neg (Impl (pf x) (breachPred x))
+             "MUST" -> return $ \x -> Impl (Neg (pf x)) (breachPred x)
+             _ -> return pf ---- covers HAS REASON TO, IS DEEMED TO
+     Sequence CPred fs -> f2pred $ Conjunction CPred AND fs
 
      _ -> Left $ "no predicate from: " ++ show formula
 

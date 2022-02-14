@@ -328,7 +328,7 @@ iVP env vp = case vp of
   GVP_must_not_VP vp2 -> Negation CPred (Modalization "MUST" (iVP env vp2))
   GVP_has_reason_to_VP vp2 -> Modalization "HAS REASON TO" (iVP env vp2)
   GVP_is_deemed_to_VP vp2 -> Modalization "IS DEEMED TO" (iVP env vp2)
-  GVP_is_deemed_not_to_VP vp2 -> Modalization "IS DEEMED NOT TO" (iVP env vp2)
+  GVP_is_deemed_not_to_VP vp2 -> Modalization "IS DEEMED TO" (Negation CPred (iVP env vp2))
 
   _ -> Atomic CPred (lin env (gf vp)) ----
 

@@ -1,17 +1,18 @@
-module LawParser where
+module Main where
 
 import qualified Spreadsheet
 import PGF
 import Data.List
+
 
 law_pgf = "Law.pgf"
 eng = mkCId "LawEng"
 --law_pgf = "TopAbs.pgf"
 --eng = mkCId "Top"
 
-Just lineCat = readType "Line"
+Just lineCat = readType "LabLine"
 
-analyse pgf s = 
+analyse pgf s =
   let ps = parse pgf eng lineCat s
       msg = case ps of
         [t] -> ["OK: " ++ s, showExpr [] t]
@@ -36,5 +37,3 @@ main = do
   pgf <- readPGF law_pgf
   ss <- getContents >>= return . lines
   mapM_ (putStrLn . unlines . analyse pgf) ss
-
-

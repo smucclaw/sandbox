@@ -28,7 +28,7 @@ line2lexRules = anOne . words
 quote w = "\"" ++ w ++ "\""
 unquote w = if head w == '"' then init (tail w) else w
 
-mainz = do
+main = do
   ls <- readFile src_file >>= return . filter (not . null) . lines
   let rs = nub $ map line2rule ls
   mapM putStrLn $ rs
@@ -75,7 +75,7 @@ mkCatRules cat = unlines [
 
 cf_file = "Top.cf"
 
-main = do
+main2 = do
   ls <- readFile cf_file >>= return . filter isRule . lines
   let pss = map (getParts . words) ls
   mapM_ (putStrLn . mkRules) pss

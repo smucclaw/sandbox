@@ -23,6 +23,9 @@ doubleLeftsideBox ls1 bs1 ls2 bs2 = box {
           [(ls2, head bs2)] ++ [("", b) | b <- tail bs2]
   }
 
+--- to ignore headers
+nodoubleLeftsideBox ls1 bs1 ls2 bs2 = seqBox (bs1 ++ bs2)
+
 mkBox h l boxes = (leftsideBox l boxes){header = h}
 
 addHeader h box =
@@ -64,7 +67,11 @@ andBox bs = infixLeftsideBox "AND" bs
 orBox bs = infixLeftsideBox "OR" bs
 notBox b = leftsideBox "NOT" [b]
 ifBox bs cs = doubleLeftsideBox "IF" bs "THEN" cs
+ofBox bs cs = doubleLeftsideBox "THE" bs "OF" cs
+meansBox b c = doubleLeftsideBox "THE TERM" [b] "MEANS" [c]
+modBox a cs = doubleLeftsideBox "" [a] "CONDITION" cs
 atomBox s = headerBox s
+seqBox bs = box{cells = [("",b) | b <- bs]}
 
 forallBox bs cs = doubleLeftsideBox "FOR ALL" bs "HOLDS" cs
 forsomeBox bs cs = doubleLeftsideBox "FOR SOME" bs "HOLDS" cs

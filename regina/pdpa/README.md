@@ -48,3 +48,18 @@
 4. In /Users/regina/Code/gf-udpipe/src, run command `echo "an organisation must report the notifiable data breach to the Commission as soon as possible" | udpipe --tokenize --tag --parse english-lines-ud-2.5-191206.udpipe`
 5. Copy the conllu output in terminal and put into annotatorix https://maryszmary.github.io/ud-annotatrix/standalone/annotator.html
 6. Check against dependencies in https://universaldependencies.org/u/dep/
+
+
+# Fixing gf-rgl and testing the chinese rgl
+1. get to /Users/regina/installations/gf-rgl/src/chinese
+2. do `gf ../english/LangEng.gf LangChi.gf`
+3. find the tree and linearisations for a phrase with `p -cat=Cl "the cat walks" | l -treebank` . Change the `cat=Cl` to `cat=S` , `cat=QS` , `cat=NP` accordingly to different phrases. This produces:
+   ```
+   Lang: PredVP (DetCN (DetQuant DefArt NumSg) (UseN cat_N)) (UseV walk_V)
+   LangChi: 猫 走
+   LangEng: the cat walks
+   ```
+4. Do the necessary tweaks in the different chinese modules -- QuestionChi, ResChi, StructuralChi, Don't add to LexiconChi unless disagree. Consider ExtendChi, ResChi instead.
+5. Write tests in test files in /Users/regina/installations/gf-rgl/src/chinese/unittest
+6. Retrack back to /Users/regina/installations/gf-rgl
+7. Run the command `python unittest/unittest.py src/chinese/unittest/future.gftest`to test the linearisation in future.gftest

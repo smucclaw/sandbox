@@ -38,3 +38,13 @@
 # UD to abstract and skeleton concrete GF.
 1. Extract predicates with `python pdpa_read_predicates.py pdpa_predicates.csv > input`
 2. See steps for processing into conllu , more processing to generate GF files in [spacyconlltree](https://github.com/1Regina/spacyconlltree)
+
+# UD to conllu format with model.
+1. get modelfrom https://ufal.mff.cuni.cz/udpipe/1/users-manual#model_training and put in /Users/regina/Code/gf-udpipe/src/english-lines-ud-2.5-191206.udpipe p
+2. Background info:
+   1. working with conllu file https://universaldependencies.org/format.html
+   2. udpipe https://github.com/ufal/udpipe
+3. Check predicates in https://github.com/smucclaw/sandbox/blob/default/regina/pdpa/pdpa_predicates.csv
+4. In /Users/regina/Code/gf-udpipe/src, run command `echo "an organisation must report the notifiable data breach to the Commission as soon as possible" | udpipe --tokenize --tag --parse english-lines-ud-2.5-191206.udpipe`
+5. Copy the conllu output in terminal and put into annotatorix https://maryszmary.github.io/ud-annotatrix/standalone/annotator.html
+6. Check against dependencies in https://universaldependencies.org/u/dep/

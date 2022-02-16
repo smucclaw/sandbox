@@ -89,19 +89,20 @@ labOfLabLine env lline f = case lline of
   GLabLine_Item__Item_Line item item2 _ -> Modal (iItem env item ++ "." ++ iItem env item2) f
   _ -> f
 
-conjOfLabLines :: Env -> [GLabLine] -> [Formula] -> Formula
-conjOfLabLines env llines fs =
+conjOfLabLinesCat :: Env -> [GLabLine] -> Cat -> [Formula] -> Formula
+conjOfLabLinesCat env llines cat fs =
   case [c | ll <- llines, Just l <- [lineOfLabLine ll], Just c <- [conjOfLine l]] of
-    conj:_ -> iConj env conj CProp fs  ---- if many different conjs?
+    conj:_ -> iConj env conj cat fs  ---- if many different conjs?
     _ -> Sequence CProp fs
 
+conjOfLabLines env ls = conjOfLabLinesCat env ls CProp -- default
 
 iLabLines :: Env -> [GLabLine] -> Formula
 iLabLines env ls = case ls of
   t : ts -> case lineOfLabLine t of  ---- labOfLabLine env t $
     Just (GLine_QCN__PP__means_ qcn pp) ->
        Means CSet (Modification CSet (iQCN env qcn) (iPP env pp))
-         (conjOfLabLines env ts (map (iLabLine env) ts))
+         (conjOfLabLinesCat env ts CSet (map (iLabLine env) ts))
     Just (GLine_S_if_NP_ s np) ->
        Conditional
            (iS env s)
@@ -146,7 +147,7 @@ iLabLine env line = case line of
 iLine :: Env -> GLine -> Formula
 iLine env line = case line of
   GLine_NP_ np -> iNP env np
-  GLine_NP__Conj np conj -> iConj env conj CProp [iNP env np] ----
+  GLine_NP__Conj np conj -> iNP env np --- iConj env conj CProp [iNP env np] ----
   GLine_S_ s -> iS env s
   GLine_S_cont s -> iS env s
   GLine_S__Conj s conj -> iS env s
@@ -168,7 +169,7 @@ iAP env ap = case ap of
     let
       ws = words (lin env (gf a2)) ---- should use discontinuous const
       (adj, prep) = splitAt (length ws - 1) ws
-    in Action (Atomic CPred (unwords adj)) (Qualification CNone (map toUpper (concat prep)) (iNP env np))
+    in Action (Atomic CPred2 (unwords adj)) (Qualification CNone (map toUpper (concat prep)) (iNP env np))
 
 iCN :: Env -> GCN -> Formula
 iCN env cn = case cn of
@@ -254,7 +255,7 @@ iNP env np = case np of
     Application CSet (Modification CFam (Atomic CPred "unauthorized") (iConjN2 env conjn2)) (iNP env np)
 
   GNP_the_loss_of_any_ConjCN_RS conjcn rs ->
-    Application CSet (Atomic CFun "loss") (Quantification "ANY" (Modification CSet (iConjCN env conjcn) (iRS env rs)))
+    Application CSet (Atomic CFam "loss") (Quantification "ANY" (Modification CSet (iConjCN env conjcn) (iRS env rs)))
 
   GNP_CN cn -> iCN env cn
 
@@ -264,6 +265,7 @@ iNP env np = case np of
   GNP_each_CN cn -> Quantification "EACH" (iCN env cn)
   GNP_that_CN cn -> Quantification "THAT" (iCN env cn)
   GNP_this_CN cn -> Quantification "THIS" (iCN env cn)
+  GNP_the_CN cn -> Quantification "THE" (iCN env cn)
 
   GNP_NP__Conj_NP__PP np conj np2 pp ->
     Modification CQuant (iConj env conj CQuant (map (iNP env) [np, np2])) (iPP env pp)

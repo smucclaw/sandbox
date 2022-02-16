@@ -50,7 +50,7 @@ unsortProp prop = case prop of
   Disj props -> Disj (map unsortProp props)
   Impl p q -> Impl (unsortProp p) (unsortProp q)
   Equi p q -> Equi (unsortProp p) (unsortProp q)
- ---- Equals s t -> Equi (uSet s) (uSet t)
+  Equals s t -> Univ Universal $ \x -> Equi (uSet x s) (uSet x t)
   Neg p -> Neg (unsortProp p)
   Mod op p -> Impl (Pred op []) (unsortProp p)
     --- this modality means implication: "(a) says that p"
@@ -61,7 +61,7 @@ unsortProp prop = case prop of
      Intersection sets -> Conj (map (uSet x) (filter notUniversal sets))
      Family fun inds -> Pred fun (x:inds) -- add first argument to predicate
      Comprehension Universal pred -> pred x
-     Comprehension set pred -> Conj [uSet x set, pred x]
+     Comprehension set pred -> Exist Universal $ \x -> Conj [uSet x set, unsortProp (pred x)]
 ---     Universal -> Universal -- not converted
    notUniversal set = case set of
      Universal -> False
@@ -196,6 +196,7 @@ tptpProp = prp 0 0 . unsortProp
     Exist _ pred -> "?[" ++ var i ++ "]:" ++ prp 3 (i+1) (pred (Bound (var i)))
     Pred fun inds -> prFun fun ++ ifparenth (concat (intersperse "," (map (prInd i) inds)))
     Equal p q -> parenth 1 prec $ prInd i p ++ " = " ++ prInd i q
+    _ -> error $ "NOT TPTP " ++ prProp prop
 
 
 --- to test
@@ -215,8 +216,10 @@ data PropCat = PProp Prop | PSet Set | PInd Ind
 formula2prop :: Formula -> Either String PropCat
 formula2prop formula = case formula of
   Modal m f -> do
-    p <- f2prop f
-    return $ PProp $ Mod m p
+    pf <- formula2prop f
+    case pf of
+      PProp p -> return $ PProp $ Mod m p
+      _ -> return pf --- ignoring modality, which is just a label
   Atomic c a  -> case c of
     CProp -> return $ PProp $ Pred a []
     CSet -> return $ PSet $ Family a []
@@ -271,6 +274,7 @@ formula2prop formula = case formula of
     sf <- f2set f
     return $ PSet sf
 
+  Sequence c_ [f] -> formula2prop f ---- check c wrt f?
   Sequence c fs -> formula2prop $ Conjunction c AND fs ----
   Means c a b -> do
     pa <- formula2prop a
@@ -296,7 +300,7 @@ formula2prop formula = case formula of
          _ -> Left $ "no Set from " ++ show f
        _ -> case f of
          Quantification q set | elem q ["A", "AN", "ANY"] -> f2set f
-         _ -> Left $ "no Set from " ++ show f
+         _ -> Left $ "still no Set from " ++ show f
    f2ind f =  do
      pf <- formula2prop f
      case pf of
@@ -309,14 +313,19 @@ formula2prop formula = case formula of
        pf <- f2set f
        case s of
          _ | elem s ["A", "AN", "ANY"]  -> return $ \pred -> Exist pf (\x -> pred x)
+         _ | elem s ["THAT", "THIS", "THE"]  -> return $ \pred -> pred (Iota pf)
          "EACH" -> return $ \pred -> Univ  pf (\x -> pred x)
      Modification CQuant np rs -> do
        quant <- f2quant np
        pred  <- f2pred rs
        return $ \p -> quant (\x -> Conj [p x, pred x])
+     Qualification CNone _ f -> f2quant f
      _ -> do
-       px <- f2ind formula
-       return $ \pred -> pred px
+       pf <- formula2prop formula
+       case pf of
+         PInd px -> return $ \pred -> pred px
+         PSet ps -> return $ \pred -> Exist ps pred
+         PProp pp -> return $ \pred -> Exist Universal $ \x -> Conj [pp, pred x] --- ??
 
    f2pred :: Formula -> Either String (Ind -> Prop) 
    f2pred formula = case formula of
@@ -331,6 +340,8 @@ formula2prop formula = case formula of
        fa <- f2prop a
        return $ \x -> fa ---- there should be an argument place for x
      Qualification CNone _ a -> f2pred a
+
+     
      Modification CPred f rs -> do
          pf <- f2pred f
          prs <- f2pred rs
@@ -387,7 +398,12 @@ formula2 =
     (Conjunction CPred OR [(Atomic CPred "Even"), (Atomic CPred "Odd")])
 
 testTrans formula = do
-  let Right (PProp p) = formula2prop formula
-  putStrLn $ prProp p
-  putStrLn $ tptpProp p
+  let ff = formula2prop formula
+  case ff of
+    Right (PProp p) -> do
+      putStrLn $ prProp p
+      putStrLn $ tptpProp p
+    Right pp -> putStrLn $ prPropCat pp
+    Left s -> putStrLn s
+    
 

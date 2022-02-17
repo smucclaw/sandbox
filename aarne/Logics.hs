@@ -89,7 +89,7 @@ data ConjWord = AND | OR deriving Show
 
 -- to record the logical category in assembly logic, when derived from syntax
 data Cat =
-  CProp | CSet | CInd | CPred | CPred2 | CFun | CFam | CCop | CQuant | CNone -- none: to be ignored
+  CProp | CSet | CInd | CPred | CPred2 | CFun | CFam | CQuant | CNone -- none: to be ignored
   deriving Show
 
 data Formula =
@@ -247,11 +247,14 @@ formula2prop formula = case formula of
   Application c f q -> case c of
     CSet -> do
       pf <- f2fam f
-      pq <- f2quant q
-      return $ PProp $ pq $ \x -> set2prop (pf x) ----
+      let epp = formula2prop q
+      case epp of
+        Right (PSet s) -> return $ PSet $ Comprehension s $ \x -> set2prop (pf x)
+        _ -> do
+          pq <- f2quant q
+          return $ PProp $ pq $ \x -> set2prop (pf x) ----
     _ -> Left $ "unsupported Application: " ++ show formula
   
-
 
   Predication q f -> do
     pq <- f2quant q
@@ -359,6 +362,8 @@ formula2prop formula = case formula of
              "MUST" -> return $ \x -> Impl (Neg (pf x)) (breachPred x)
              _ -> return pf ---- covers HAS REASON TO, IS DEEMED TO
      Sequence CPred fs -> f2pred $ Conjunction CPred AND fs
+
+     Modal m_ f -> f2pred f -- modality is just a label
 
      _ -> Left $ "no predicate from: " ++ show formula
 

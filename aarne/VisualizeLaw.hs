@@ -10,9 +10,9 @@ import qualified Spreadsheet as S
 import Control.Monad (forM, forM_)
 import PGF
 
+--ifDebug io = return ()
 --
-ifDebug io = return ()
---ifDebug io = io
+ifDebug io = io
 
 law_pgf = "Law.pgf"
 eng = mkCId "LawRawEng"

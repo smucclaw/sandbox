@@ -2,6 +2,7 @@ module Logics where
 
 import Spreadsheet
 import Data.List
+import Data.Char (toUpper)
 
 -- real logic - a many-sorted modal logic
 
@@ -192,12 +193,18 @@ tptpProp = prp 0 0 . unsortProp
     Impl p q -> parenth 1 prec $ prp 2 i p ++ " => " ++ prp 1 i q
     Equi p q -> parenth 1 prec $ prp 2 i p ++ " <=> " ++ prp 2 i q
     Neg prop -> parenth 3 prec $ "~ " ++ prp 3 i prop
-    Univ _ pred -> "![" ++ var i ++ "]:" ++ prp 3 (i+1) (pred (Bound (var i)))
-    Exist _ pred -> "?[" ++ var i ++ "]:" ++ prp 3 (i+1) (pred (Bound (var i)))
-    Pred fun inds -> prFun fun ++ ifparenth (concat (intersperse "," (map (prInd i) inds)))
-    Equal p q -> parenth 1 prec $ prInd i p ++ " = " ++ prInd i q
+    Univ _ pred -> "![" ++ tvar i ++ "]:" ++ prp 3 (i+1) (pred (Bound (var i)))
+    Exist _ pred -> "?[" ++ tvar i ++ "]:" ++ prp 3 (i+1) (pred (Bound (var i)))
+    Pred fun inds -> prFun fun ++ ifparenth (concat (intersperse "," (map (tptpInd i) inds)))
+    Equal p q -> parenth 1 prec $ tptpInd i p ++ " = " ++ tptpInd i q
     _ -> error $ "NOT TPTP " ++ prProp prop
 
+  tptpInd i a = case a of
+    App fun inds -> prFun fun ++ ifparenth (concat (intersperse "," (map (tptpInd i) inds)))
+    Bound x -> map toUpper x
+    Iota set -> "ι" ++ parenth 0 6 (prSet 0 i set) ---- TODO: eliminate by anaphora resolution
+
+  tvar x = map toUpper $ var x
 
 --- to test
 fex1 = Univ (Family "N" []) (\x -> Disj [Pred "Even" [x], Pred "Odd" [x]])

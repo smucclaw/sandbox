@@ -2,6 +2,13 @@
 
 Based on Act 6A of PDPA.
 
+Different modes of usage: see
+```
+  runghc VisualizeLaw.hs help
+```
+
+[Slides (under construction)](https://docs.google.com/presentation/d/140civdlLcharzOFLd5Z0Z1IwmgUVWUYceFX4aCHh2aY/edit?usp=sharing)
+
 Files:
 
 - Analyse.hs  -- Haskell file for generating the grammar
@@ -16,7 +23,9 @@ Files:
 - Makefile     -- generating PGF and GADT
 - Semantics.hs -- conversion of AST to a logic and logic to spreadsheets
 - Spreadsheet.hs -- a simple recursive spreadsheet data structure
-- VisualizeLaw.hs -- script for parsing and conversion to spreasheet (as TSV)
+- VisualizeLaw.hs -- script for parsing and conversion to spreasheet
+(as TSV)
+- color_spreadsheet.py -- script for generating a spreadsheet with colors
 - act-6A.html -- the original document
 - act-6A.txt  -- the original as plain text
 - annotated-6A.txt -- the origina annotated with categories and keywords

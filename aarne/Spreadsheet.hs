@@ -38,17 +38,20 @@ addHeader h box =
 
 cellsBox :: Box -> [[String]]
 cellsBox box =
-  (if null h then id else ([h]:)) $
+  (if null h then id else ([headlabel box ++ h]:)) $
     if null bs then [] else
       if all null (map fst bs)
         then [     c | (_,  b) <- bs, let cb = cellsBox b, c <- cb]
         else [mark i c | (ls, b) <- bs, let cb = cellsBox b, (i, c) <- zip [0..] cb,
-                         let mark i c = if i==0 then ls:c else "":c
+                         let mark i c = if i==0 then (leftlabel ++ ls):c else "":c
                         ]
   where
     h = header box
     ls = leftside box
     bs = cells box
+
+    leftlabel = "#L "
+    headlabel box = if null (cells box) then "" else "#H "
 
 boxSize :: Box -> (Int, Int)
 boxSize box = (maximum (map length cs), length cs) 
@@ -57,9 +60,14 @@ boxSize box = (maximum (map length cs), length cs)
 
 separator = "\t"
 
-renderBox :: Box -> String
-renderBox = unlines . map (concat . intersperse separator) . cellsBox
+renderBox :: Bool -> Box -> String
+renderBox addColors = unlines . map (concat . intersperse separator . map color) . cellsBox
+  where
+    color = if addColors then id else removeColor
+    removeColor s = if elem (take 3 s) ["#L ", "#H "] then drop 3 s else s 
 
+
+--addHeader "Paragraph 1." $ ifBox [andBox (map atomBox ["A", "B", "C"])] [orBox (map atomBox ["F", "G", "H"])]
 
 -- logical structures
 
@@ -95,7 +103,7 @@ ex5 = addHeader "universal rule:" $ forallBox [addHeader "domain" (atomBox "N")]
 
 test ex = do
   putStrLn $ show $ boxSize ex
-  putStrLn $ renderBox ex
+  putStrLn $ renderBox False ex
 
 main = do
   test ex1

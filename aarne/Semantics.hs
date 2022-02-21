@@ -316,7 +316,7 @@ iSeqPP :: Env -> GSeqPP -> Formula
 iSeqPP env n2 = Atomic CPred (lin env (gf n2)) ----
 
 iTitle :: Env -> GTitle -> Formula
-iTitle env n2 = Atomic CProp (lin env (gf n2)) --- to be used as abbreviation for a section
+iTitle env n2 = Title (lin env (gf n2)) --- to be used as abbreviation for a section
 
 iVP :: Env -> GVP -> Formula
 iVP env vp = case vp of

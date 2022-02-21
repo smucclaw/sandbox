@@ -114,7 +114,8 @@ data Formula =
   | Modal Modality Formula          -- used after labels, to be ignored ? -- CProp ?
   | Quantification String Formula   -- CQuant 
   
-  | Sequence Cat [Formula] --- just a sequence one on top of another -- CProp CPred 
+  | Sequence Cat [Formula] --- just a sequence one on top of another -- CProp CPred
+  | Title Atom
    deriving Show
 
 
@@ -145,6 +146,7 @@ formula2box formula = case formula of
   
   Sequence _ fs -> seqBox (map formula2box fs) ----
 
+  Title s -> headerBox ("#H " ++s) --- to colour as a title
 
 -- from real logic to printed formulas
 prProp :: Prop -> String
@@ -295,6 +297,7 @@ formula2prop formula = case formula of
       (PInd aa, PInd ab) -> return $ PProp $ Equal aa ab
       _ -> Left $ "common type expected in: " ++ show formula
 
+  Title s  -> return $ PProp $ Pred s []
 
   _ -> Left $ "not yet: " ++ show formula
  where

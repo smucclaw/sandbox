@@ -9,63 +9,76 @@ import Logics
 import qualified Spreadsheet as S
 import Control.Monad (forM, forM_)
 import PGF
+import System.Environment (getArgs)
 
---ifDebug io = return ()
 --
-ifDebug io = io
+ifDebug io = return ()
+--ifDebug io = io
+
+--
+doXLSX = True
+--doXLSX = False
+
 
 law_pgf = "Law.pgf"
 eng = mkCId "LawRawEng"
 Just lineCat = readType "LabLine"
 
+usage = unlines [
+  "usage: VisualizeLaw opt*",
+  "reads standard input",
+  "Options, to show any of the formats (combinations are allowed):",
+  "  help     this message",
+  "  trees    syntax trees in GF notation",
+  "  dot      syntax trees in graphviz .dot",
+  "  lin      linearizations",
+  "  assembly assembly logic",
+  "  logic    many-sorted predicate logic",
+  "  tptp     logic in TPTP format",
+  "  tsv      spreadsheet as TSV file",
+  "  excel    spreadsheet with colour tags for .xlsx",
+  "The default is just tsv.",
+  "With excel option, pipe into 'python3 color_spreadsheet.py'"
+  ]
+
 main = do
-  pgf <- readPGF law_pgf
-  ss <- getContents >>= return . lines
-  ts <- forM ss $ \s -> do
-    let ps = parse pgf eng lineCat s
-    case ps of
-      [] -> putStrLn ("## NO PARSE: " ++ s) >> return []
-      tree:_ -> return [tree]
+  xx <- getArgs
+  let ifOpts os act = if any (flip elem xx) os then act else return ()
+  let ifOpt o = ifOpts [o]
+  if elem "help" xx
+    then do
+      putStrLn usage
+      return ()
+    else do
+      pgf <- readPGF law_pgf
+      ss <- getContents >>= return . lines
+      ts <- forM ss $ \s -> do
+        let ps = parse pgf eng lineCat s
+        case ps of
+          [] -> putStrLn ("## NO PARSE: " ++ s) >> return []
+          tree:_ -> return [tree]
 
-  ifDebug $ writeFile "lawtrees.dot" $ unlines [graphvizAbstractTree pgf (True, False) t | t <- concat ts]
+      ifOpt "dot" $ do
+        writeFile "lawtrees.dot" $ unlines [graphvizAbstractTree pgf (True, False) t | t <- concat ts]
+        putStrLn "wrote lawtrees.dot"
 
-  let env = Env {lin = linearize pgf eng}
-  let paras = paragraphs (map fg (concat ts))
-  forM_ paras $ \para -> do
-      ifDebug $ putStrLn $ unlines ["#- " ++ lin env (gf line) | line <- para]
-      ifDebug $ putStrLn $ unlines ["## " ++ showExpr [] (gf line) | line <- para]
-      let formula = iLabLines env para
-      ifDebug $ putStrLn $ "#+ " ++ show formula
-      let box = formula2box formula
-      putStrLn $ S.renderBox box
-      let fprop = formula2prop formula
-      ifDebug $ case fprop of
+      let env = Env {lin = linearize pgf eng}
+      let paras = paragraphs (map fg (concat ts))
+      forM_ paras $ \para -> do
+        ifOpt "lin" $ putStrLn $ unlines ["#- " ++ lin env (gf line) | line <- para]
+        ifOpt "trees" $ putStrLn $ unlines ["## " ++ showExpr [] (gf line) | line <- para]
+        let formula = iLabLines env para
+        ifOpt "assembly" $ putStrLn $ "#+ " ++ show formula
+        let box = formula2box formula
+        if null xx || elem "tsv" xx || elem "excel" xx
+          then putStrLn $ S.renderBox (elem "excel" xx) box
+          else return ()
+        let fprop = formula2prop formula
+        case fprop of
           Right pc -> do
-            putStrLn $ "#/ REAL LOGIC: " ++ prPropCat pc
-            case pc of
+            ifOpt "logic" $ putStrLn $ "#/ REAL LOGIC: " ++ prPropCat pc
+            ifOpt "tptp" $ case pc of
               PProp p -> putStrLn $ "#/ TPTP LOGIC: " ++ tptpProp p
               _ -> return ()
-          Left s -> putStrLn $ "#/ LOGIC ERROR: " ++ s
- 
+          Left s -> ifOpts ["logic", "tptp"] $ putStrLn $ "#/ LOGIC ERROR: " ++ s
 
-{- TODO: data structure for parse results
-
-data ParseResult = ParseResult {
-  lineNumbers :: [Int],
-  block :: [String],  -- text on each line
-  trees :: [Expr],    -- tree per line
-  formula :: Formula,
-  logic :: Either String PProp,
-  tptp :: Maybe String
-  }
-
-getParseResults :: PGF -> Language -> Type -> [String] -> [ParseResult]
-getParseResults pgf lang typ ss = [
-  ParseResult {
-    } 
-  ]
- where
-   parses = map (parse pgf lang typ) ss
-   combinations = sequence parses
-   blockss = [paragraphs (map fg comb) | comb <- combinations]
--}

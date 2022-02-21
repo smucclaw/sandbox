@@ -154,6 +154,8 @@ iLine env line = case line of
   GLine_where_S__S_ s1 s2 -> Implication (iS env s1) (iS env s2)
   GLine_PP__Line pp line2 -> Modal (lin env (gf pp)) (iLine env line2)
   GLine_QCN_means_NP_ qcn np -> Means CSet (iQCN env qcn) (iNP env np)
+  GLine_VP__Conj vp c_ -> iVP env vp
+  GLine_VP_p vp -> iVP env vp
   _ -> Atomic CProp (lin env (gf line)) ---- cat
 
 
@@ -176,6 +178,7 @@ iCN env cn = case cn of
   GCN_A_CN a n -> let (ms, bn) = mods cn in modif bn ms
   GCN_CN_AP n ap -> let (ms, bn) = mods cn in modif bn ms
   GCN_CN_RS n rs -> let (ms, bn) = mods cn in modif bn ms
+  GCN_CN_ConjPP n pps -> let (ms, bn) = mods cn in modif bn ms
 
   GCN_obligation_of_NP_to_VP np vp -> Assignment "OBLIGATION" (iNP env np) (iVP env vp)
   
@@ -185,6 +188,7 @@ iCN env cn = case cn of
      GCN_A_CN a n -> let (ms, bn) = mods n in (iA env a : ms, bn)
      GCN_CN_AP n ap -> let (ms, bn) = mods n in (iAP env ap : ms, bn)
      GCN_CN_RS n rs -> let (ms, bn) = mods n in (iRS env rs : ms, bn)
+     GCN_CN_ConjPP n pps -> let (ms, bn) = mods n in (iConjPP env pps : ms, bn)
      _ -> ([], iCN env cn)
    modif bn ms =
      if length ms > 1
@@ -194,7 +198,7 @@ iCN env cn = case cn of
 
 
 iComp :: Env -> GComp -> Formula
-iComp env comp = Atomic CPred (lin env (gf comp))
+iComp env comp = Atomic CSet (lin env (gf comp))
 
 iConjCN :: Env -> GConjCN -> Formula
 iConjCN env cc = case cc of
@@ -202,7 +206,7 @@ iConjCN env cc = case cc of
 
 iConjCop :: Env -> GConjCop -> Formula
 iConjCop env cc = case cc of
-  GConjCop_Cop__Conj_Cop_ cn1 conj cn2 -> iConj env conj CCop (map (iCop env) [cn1, cn2])
+  GConjCop_Cop__Conj_Cop_ cn1 conj cn2 -> iConj env conj CPred2 (map (iCop env) [cn1, cn2])
 
 iConjItem :: Env -> GConjItem -> Modality
 iConjItem env conjn2 = lin env (gf conjn2)
@@ -236,7 +240,7 @@ iConj env conj cat = case conj of
   GConj_or -> Conjunction cat OR
 
 iCop :: Env -> GCop -> Formula
-iCop env item = Atomic CCop (lin env (gf item))
+iCop env item = Atomic CPred2 (lin env (gf item))
 
 iDate :: Env -> GDate -> Formula
 iDate env item = Atomic CInd (lin env (gf item))
@@ -321,7 +325,8 @@ iVP env vp = case vp of
   GVP_VP2__SeqPP__NP vp2 seqpp np -> Modification CPred (Action (iVP2 env vp2) (iNP env np)) (iSeqPP env seqpp)
   GVP_ConjVP2_NP vp2 np -> Action (iConjVP2 env vp2) (iNP env np)
   GVP_VP__Conj_to_VP vp1 conj vp2 -> iConj env conj CPred (map (iVP env) [vp1, vp2])
-
+  GVP_ConjCop_Comp conjcop comp -> Action (iConjCop env conjcop) (iComp env comp)
+  
   GVP_may__SeqPP__VP seqpp vp2 -> Modalization "MAY" (Modification CPred (iVP env vp2) (iSeqPP env seqpp))
   GVP_must__SeqPP__VP seqpp vp2 -> Modalization "MUST" (Modification CPred (iVP env vp2) (iSeqPP env seqpp)) ---- modality?
   ---- these could be treated with a separate VVP category 
@@ -331,6 +336,7 @@ iVP env vp = case vp of
   GVP_has_reason_to_VP vp2 -> Modalization "HAS REASON TO" (iVP env vp2)
   GVP_is_deemed_to_VP vp2 -> Modalization "IS DEEMED TO" (iVP env vp2)
   GVP_is_deemed_not_to_VP vp2 -> Modalization "IS DEEMED TO" (Negation CPred (iVP env vp2))
+  GVP_believe_that_S s -> Action (Atomic CPred2 "believe") (Qualification CNone "THAT" (iS env s))
 
   _ -> Atomic CPred (lin env (gf vp)) ----
 

@@ -216,16 +216,21 @@ resolveAnaphora :: Prop -> Prop
 resolveAnaphora = resprop []
   where
     resprop context prop = case prop of
-      Impl (Exist a f) b -> Univ a (\x -> Impl (resprop context (f x)) (resprop ((a, x):context) b))
-      Impl b (Exist a f) -> Univ a (\x -> Impl (resprop ((a, x):context) b) (resprop context (f x)))
-      Univ a f -> Univ a (\x -> resprop context (f x)) ---- TODO: resolve in a, if comprehension
-      Exist a f -> Exist a (\x -> resprop context (f x))
+      Impl (Exist a f) b ->
+        let ra = resset context a in Univ ra (\x -> Impl (resprop context (f x)) (resprop ((ra, x):context) b))
+      Impl b (Exist a f) ->
+        let ra = resset context a in Univ ra (\x -> Impl (resprop ((ra, x):context) b) (resprop context (f x)))
+      Univ a f ->
+        let ra = resset context a in Univ ra (\x -> resprop ((ra, x):context) (f x))
+      Exist a f ->
+        let ra = resset context a in Exist ra (\x -> resprop ((ra, x):context) (f x))
       Conj ps -> Conj (map (resprop context) ps)
       Disj ps -> Disj (map (resprop context) ps)
       Impl p q -> Impl (resprop context p) (resprop context q)
       Pred fun xs -> Pred fun (map (resind context) xs)
       Mod m p -> Mod m (resprop context p)
       Neg p -> Neg (resprop context p)
+      Equals a b -> Equals (resset context a) (resset context b)
       _ -> prop
     resind context ind = case ind of
       Iota set -> case set of
@@ -234,6 +239,15 @@ resolveAnaphora = resprop []
         _ -> ind ---- TODO: other sets than atomic
       App fun xs -> App fun [resind context x | x <- xs]
       _ -> ind
+    resset context set = case set of
+      Comprehension a f ->
+        let ra = resset context a in Comprehension ra (\x -> resprop ((ra, x):context) (f x))
+      Union ps -> Union (map (resset context) ps)
+      Intersection ps -> Intersection (map (resset context) ps)
+      Family f xs -> Family f (map (resind context) xs)
+      _ -> set
+
+
 
     use ind context = case context of
       (_, x):_ -> x ---- TODO: ambiguous referent

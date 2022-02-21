@@ -6,6 +6,7 @@ module Main where
 import Law
 import Semantics
 import Logics
+import Interpretation
 import qualified Spreadsheet as S
 import Control.Monad (forM, forM_)
 import PGF

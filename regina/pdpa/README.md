@@ -48,7 +48,15 @@
 4. In /Users/regina/Code/gf-udpipe/src, run command `echo "an organisation must report the notifiable data breach to the Commission as soon as possible" | udpipe --tokenize --tag --parse english-lines-ud-2.5-191206.udpipe`
 5. Copy the conllu output in terminal and put into annotatorix https://maryszmary.github.io/ud-annotatrix/standalone/annotator.html
 6. Check against dependencies in https://universaldependencies.org/u/dep/
-
+7. Note the following:
+   1. **nmod**
+      1. school by the road
+   2. **acl**
+      1. school offering education
+      2. school famous for its success
+   3. **amod**
+      1. old school
+      2. very old school
 
 # Fixing gf-rgl and testing the chinese rgl
 1. get to /Users/regina/installations/gf-rgl/src/chinese

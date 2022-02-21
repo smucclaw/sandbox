@@ -71,3 +71,19 @@
 5. Write tests in test files in /Users/regina/installations/gf-rgl/src/chinese/unittest
 6. Retrack back to /Users/regina/installations/gf-rgl
 7. Run the command `python unittest/unittest.py src/chinese/unittest/future.gftest`to test the linearisation in future.gftest
+8. To do comparison:
+   1. go to /Users/regina/installations/gf-rgl/src/chinese
+   2. `gf -make LangChi.gf` to get the Lang.pgf
+   3. move this current Lang.pgf to a created folder you want to hold the old pgf e.g in gftestiing folder `mv Lang.pgf gftesting`
+   4. do the changes you want in the modules e.g NounChi.gf / GrammarChi.gf or whatever.
+   5. then refresh the Lang.pgf with `gf -make LangChi.gf`
+   6. compile the comparison of the 2 pgf files with `gftest -g Lang -o gftesting/Lang.pgf -l "Chi"` See more commands of gftest [here] (https://github.com/GrammaticalFramework/gftest#:~:text=an%20executable%20gftest.-,common%20use%20cases,-Run%20gftest%20--help) . This will produce 4 files
+      1. LangChi-ccat-diff.org
+      2. LangChi-lin-diff.org (most useful)
+      3. LangChi-new-funs.org
+      4. LangChi-new-funs.org
+   7. Open LangChi-lin-diff.org for detailed example and LangChi-ccat-diff.org for cat summary changes.
+   8. `gftest -g Lang -f "ComplVV" -l "Chi"`
+      1. -g to test the file path (Lang)
+      2. -f of function "ComplVV"
+      3. -l of language "Chi"

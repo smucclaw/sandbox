@@ -155,6 +155,7 @@ formula2prop formula = case formula of
              "MAY"  -> return $ \x -> Neg (Impl (pf x) (breachPred x))
              "MUST" -> return $ \x -> Impl (Neg (pf x)) (breachPred x)
              _ -> return pf ---- covers HAS REASON TO, IS DEEMED TO
+     Sequence _ [f] -> f2pred f
      Sequence CPred fs -> f2pred $ Conjunction CPred AND fs
 
      Modal m_ f -> f2pred f -- modality is just a label

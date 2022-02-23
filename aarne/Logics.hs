@@ -62,7 +62,7 @@ unsortProp prop = case prop of
      Intersection sets -> Conj (map (uSet x) (filter notUniversal sets))
      Family fun inds -> Pred fun (x:inds) -- add first argument to predicate
      Comprehension Universal pred -> pred x
-     Comprehension set pred -> Exist Universal $ \x -> Conj [uSet x set, unsortProp (pred x)]
+     Comprehension set pred -> Conj [uSet x set, unsortProp (pred x)]
 ---     Universal -> Universal -- not converted
    notUniversal set = case set of
      Universal -> False
@@ -216,14 +216,18 @@ resolveAnaphora :: Prop -> Prop
 resolveAnaphora = resprop []
   where
     resprop context prop = case prop of
-      Impl (Exist a f) b ->
-        let ra = resset context a in Univ ra (\x -> Impl (resprop context (f x)) (resprop ((ra, x):context) b))
       Impl b (Exist a f) ->
-        let ra = resset context a in Univ ra (\x -> Impl (resprop ((ra, x):context) b) (resprop context (f x)))
+        let ra = resset context a
+        in Univ ra (\x -> Impl (resprop ((ra, x):context) b) (resprop context (f x)))
+      Impl (Exist a f) b ->
+        let ra = resset context a
+        in Univ ra (\x -> Impl (resprop context (f x)) (resprop ((ra, x):context) b))
       Univ a f ->
-        let ra = resset context a in Univ ra (\x -> resprop ((ra, x):context) (f x))
+        let ra = resset context a
+        in Univ ra (\x -> resprop ((ra, x):context) (f x))
       Exist a f ->
-        let ra = resset context a in Exist ra (\x -> resprop ((ra, x):context) (f x))
+        let ra = resset context a
+        in Exist ra (\x -> resprop ((ra, x):context) (f x))
       Conj ps -> Conj (map (resprop context) ps)
       Disj ps -> Disj (map (resprop context) ps)
       Impl p q -> Impl (resprop context p) (resprop context q)

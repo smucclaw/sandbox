@@ -94,7 +94,6 @@ lin CN_CN__AP_ cn ap = mkCN (parenth ap) cn ;
 lin CN_CN_AP cn ap = mkCN ap cn ;
 lin CN_CN_ConjPP cn conjpp = mkCN cn conjpp ;
 lin CN_CN_RS cn rs = mkCN cn rs ;
-lin CN_Commission = mkCN (mkN "Commission") ;
 lin CN_ConjCN_relating_to_NP conjcn np = mkCN conjcn (S.mkAdv (mkPrep "relating to") np) ;
 lin CN_N2_of_NP n2 np = mkCN n2 np ;
 lin CN_action = mkCN (mkN "action") ;
@@ -228,6 +227,7 @@ lin NP_subsection_ConjItem items = mkNP (mkCN (mkN "subsection") <symb (mkSymb i
 lin NP_subsections_ConjItem items = mkNP (mkCN (mkN "subsections") <symb (mkSymb items) : NP>) ; 
 lin NP_that_CN cn = mkNP that_Det cn ;
 lin NP_the_CN cn = mkNP the_Det cn ; ---- both Sg and Pl ?
+lin NP_the_Commission = mkNP the_Det (mkN "Commission") ;
 lin NP_the_loss_of_any_ConjCN_RS conjcn rs = mkNP the_Det (mkCN (mkN2 (mkN "loss")) (mkNP (Mk.mkDet "any") (mkCN conjcn rs))) ;
 lin NP_the_unauthorised_ConjN2_of_NP conjn2 np = mkNP (mkCN (mkCN (mkA "unauthorised") conjn2) (S.mkAdv possess_Prep np)) ;
 lin NP_this_CN cn = mkNP this_Det cn ;
@@ -351,8 +351,15 @@ lin VP2_waive = mkVPSlash (mkV2 "waive") ;
 ----lin VP2_will_result_in = "will result in" ; ---- to be made redundant
 
 ------------------------------
--- for other uses than parsing
+-- for other uses than parsing the original text
 ------------------------------
+
+lin Line_if_S__S a b = str (S.mkAdv if_Subj (mkS a)) ++ "," ++ str b ;
+lin VP_be_AP ap = mkVP ap ;
+lin VP_be_A a = mkVP a ;
+lin NP_every_CN cn = mkNP every_Det cn ;
+lin NP_the_CN_s cn = mkNP thePl_Det cn ;
+lin NP_CN_s cn = mkNP aPl_Det cn ;
 
 lincat Utt = S.Utt ;
 lincat QS = S.QCl ;

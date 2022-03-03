@@ -152,6 +152,7 @@ iLine env line = case line of
   GLine_S_cont s -> iS env s
   GLine_S__Conj s conj -> iS env s
   GLine_where_S__S_ s1 s2 -> Implication (iS env s1) (iS env s2)
+  GLine_if_S__S s1 s2 -> Implication (iS env s1) (iS env s2)
   GLine_PP__Line pp line2 -> Modal (lin env (gf pp)) (iLine env line2)
   GLine_QCN_means_NP_ qcn np -> Means CSet (iQCN env qcn) (iNP env np)
   GLine_VP__Conj vp c_ -> iVP env vp
@@ -267,9 +268,11 @@ iNP env np = case np of
   GNP_an_CN cn -> Quantification "AN" (iCN env cn)
   GNP_any_CN cn -> Quantification "ANY" (iCN env cn)
   GNP_each_CN cn -> Quantification "EACH" (iCN env cn)
+  GNP_every_CN cn -> Quantification "EVERY" (iCN env cn)
   GNP_that_CN cn -> Quantification "THAT" (iCN env cn)
   GNP_this_CN cn -> Quantification "THIS" (iCN env cn)
   GNP_the_CN cn -> Quantification "THE" (iCN env cn)
+  GNP_the_CN_s cn -> Quantification "THE" (iCN env cn)
 
   GNP_NP__Conj_NP__PP np conj np2 pp ->
     Modification CQuant (iConj env conj CQuant (map (iNP env) [np, np2])) (iPP env pp)
@@ -337,6 +340,10 @@ iVP env vp = case vp of
   GVP_is_deemed_to_VP vp2 -> Modalization "IS DEEMED TO" (iVP env vp2)
   GVP_is_deemed_not_to_VP vp2 -> Modalization "IS DEEMED TO" (Negation CPred (iVP env vp2))
   GVP_believe_that_S s -> Action (Atomic CPred2 "believe") (Qualification CNone "THAT" (iS env s))
+  GVP_is_a_CN cn -> Qualification CPred "IS A" (iCN env cn)
+  GVP_be_a_CN cn -> Qualification CPred "IS A" (iCN env cn)
+  GVP_be_A a -> Qualification CPred "IS" (iA env a)
+  GVP_be_AP ap -> Qualification CPred "IS" (iAP env ap)
 
   _ -> Atomic CPred (lin env (gf vp)) ----
 

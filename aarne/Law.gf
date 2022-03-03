@@ -62,7 +62,6 @@ fun CN_CN__AP_ : CN -> AP -> CN ;
 fun CN_CN_AP : CN -> AP -> CN ;
 fun CN_CN_ConjPP : CN -> ConjPP -> CN ;
 fun CN_CN_RS : CN -> RS -> CN ;
-fun CN_Commission : CN ;
 fun CN_ConjCN_relating_to_NP : ConjCN -> NP -> CN ;
 fun CN_N2_of_NP : N2 -> NP -> CN ;
 fun CN_action : CN ;
@@ -70,6 +69,7 @@ fun CN_assessment : CN ;
 fun CN_assessment_of_whether_S : S -> CN ;
 fun CN_circumstances : CN ;
 fun CN_class_of_personal_data : CN ;
+fun CN_Commission : CN ; ---- to be removed
 fun CN_contract : CN ;
 fun CN_data_breach : CN ;
 fun CN_data_intermediary : CN ;
@@ -207,6 +207,7 @@ fun NP_subsection_ConjItem : ConjItem -> NP ;
 fun NP_subsections_ConjItem : ConjItem -> NP ;
 fun NP_that_CN : CN -> NP ;
 fun NP_the_CN : CN -> NP ;
+fun NP_the_Commission : NP ;
 fun NP_the_loss_of_any_ConjCN_RS : ConjCN -> RS -> NP ;
 fun NP_the_unauthorised_ConjN2_of_NP : ConjN2 -> NP -> NP ;
 fun NP_this_CN : CN -> NP ;
@@ -329,8 +330,15 @@ fun VP2_waive : VP2 ;
 fun VP2_will_result_in : VP2 ;
 
 ------------------------------
--- for other uses than parsing
+-- for other uses than parsing the text; only in the RGL version
 ------------------------------
+
+fun Line_if_S__S : S -> S -> Line ;
+fun VP_be_AP : AP -> VP ;
+fun VP_be_A : A -> VP ; --- should be redundant
+fun NP_every_CN : CN -> NP ;
+fun NP_the_CN_s : CN -> NP ;
+fun NP_CN_s : CN -> NP ;
 
 cat Utt ;
 cat QS ;

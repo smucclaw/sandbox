@@ -89,6 +89,7 @@ formula2prop formula = case formula of
      pf <- formula2prop f
      case pf of
        PProp p -> return p
+       PSet p -> return $ set2prop p
        _ -> Left $ "no Prop from " ++ show f
    f2set f =  do
      case formula2prop f of
@@ -109,9 +110,9 @@ formula2prop formula = case formula of
      Quantification s f -> do
        pf <- f2set f
        case s of
-         _ | elem s ["A", "AN", "ANY"]  -> return $ \pred -> Exist pf (\x -> pred x)
+         _ | elem s ["A", "AN", "ANY", "SOME"]  -> return $ \pred -> Exist pf (\x -> pred x)
          _ | elem s ["THAT", "THIS", "THE"]  -> return $ \pred -> pred (Iota pf)
-         "EACH" -> return $ \pred -> Univ  pf (\x -> pred x)
+         _ | elem s ["EACH", "EVERY"] -> return $ \pred -> Univ  pf (\x -> pred x)
      Modification CQuant np rs -> do
        quant <- f2quant np
        pred  <- f2pred rs
@@ -127,6 +128,7 @@ formula2prop formula = case formula of
    f2pred :: Formula -> Either String (Ind -> Prop) 
    f2pred formula = case formula of
      Atomic CPred f -> return $ \x -> Pred f [x]
+     Atomic CSet f -> return $ \x -> Pred f [x]
      Conjunction cat_ cw fs -> do
        pfs <- mapM f2pred fs
        return $ \x -> fst (iConjWord cw) [f x | f <- pfs]
@@ -134,8 +136,7 @@ formula2prop formula = case formula of
        pf <- f2pred f
        return $ \x -> Neg (pf x)
      Qualification CPred s a -> do
-       fa <- f2prop a
-       return $ \x -> fa ---- there should be an argument place for x
+       f2pred a
      Qualification CNone _ a -> f2pred a
 
      

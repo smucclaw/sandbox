@@ -22,7 +22,6 @@ doXLSX = True
 
 
 law_pgf = "Law.pgf"
-eng = mkCId "LawRawEng"
 Just lineCat = readType "LabLine"
 
 usage = unlines [
@@ -30,6 +29,7 @@ usage = unlines [
   "reads standard input",
   "Options, to show any of the formats (combinations are allowed):",
   "  help     this message",
+  "  rgl      use Eng for parsing, instead of RawEng",
   "  trees    syntax trees in GF notation",
   "  dot      syntax trees in graphviz .dot",
   "  lin      linearizations",
@@ -37,9 +37,9 @@ usage = unlines [
   "  logic    many-sorted predicate logic",
   "  tptp     logic in TPTP format",
   "  tsv      spreadsheet as TSV file",
-  "  excel    spreadsheet with colour tags for .xlsx",
+  "  color    spreadsheet with colour tags for .xlsx",
   "The default is just tsv.",
-  "With excel option, pipe into 'python3 color_spreadsheet.py'"
+  "With color option, pipe into 'python3 color_spreadsheet.py'"
   ]
 
 main = do
@@ -52,6 +52,7 @@ main = do
       return ()
     else do
       pgf <- readPGF law_pgf
+      let eng = if elem "rgl" xx then mkCId "LawEng" else mkCId "LawRawEng"
       ss <- getContents >>= return . lines
       ts <- forM ss $ \s -> do
         let ps = parse pgf eng lineCat s
@@ -71,8 +72,8 @@ main = do
         let formula = iLabLines env para
         ifOpt "assembly" $ putStrLn $ "#+ " ++ show formula
         let box = formula2box formula
-        if null xx || elem "tsv" xx || elem "excel" xx
-          then putStrLn $ S.renderBox (elem "excel" xx) box
+        if null xx || elem "tsv" xx || elem "color" xx
+          then putStrLn $ S.renderBox (elem "color" xx) box
           else return ()
         let fprop = formula2prop formula
         case fprop of

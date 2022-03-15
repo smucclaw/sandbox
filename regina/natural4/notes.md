@@ -1,7 +1,7 @@
 Steps
 1. Create a test in TestNLG.hs under nlgTests :: Spec and add the test case e.g testNLGComplexBSR
-   1. <p align="center">
-     <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/1a_newcase.png" width="550" height="400" title="create test in TestNLG.hs">
+     <p align="center">
+     <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/1a_newcase.png" width="400" height="550" title="create test in TestNLG.hs">
      </p>
 
 2. Create the testNLGComplexBSR beloww

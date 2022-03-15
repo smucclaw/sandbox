@@ -1,5 +1,9 @@
 Steps
 1. Create a test in TestNLG.hs under nlgTests :: Spec and add the test case e.g testNLGComplexBSR
+   1. <p align="center">
+     <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/1a_newcase.png" width="350" title="create test in TestNLG.hs">
+     </p>
+
 2. Create the testNLGComplexBSR beloww
 3. in the natural4 folder, do `stack test`
 4. With the output from the sentences,
@@ -12,7 +16,7 @@ Steps
 6. Scroll back up the `stack test` output where the failure is and copy the UD `root_aclRecl (rootN_ (DetCN...)).........`
 7. Paste into a new line in NLG.hs's npFromUDS case and use rgl or otherwise helper function `udRelcl2rglRS` to take care of this one more case. NB: RS for relative sentence.
 8. run `stack test` and see that `the assessment that sucks` is fixed that but `the occurence on the beach` is still limited only to `the occurence`
-9. When checking tree in rgl, go to `/Users/regina/installations/gf-rgl/src/abstract` and do e.g `ag "> Det"`
+9.  When checking tree in rgl, go to `/Users/regina/installations/gf-rgl/src/abstract` and do e.g `ag "> Det"`
 
 ## For "the occurrence at the Beach"
 1. For stack test output copy `root_nmod (rootN_ (DetCN (DetQuant DefArt NumSg) (UseN occurrence_N))) (nmod_ at_Prep (DetCN (DetQuant DefArt NumSg) (UseN beach_N)))` to pretty print

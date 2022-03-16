@@ -16,7 +16,7 @@ Steps
    1. determine to use which RGLTree to use before heading to UDExt. Helpful to use `pbpaste | pretty-simple` the tree that fails
    2. look at how did the test fail under the output "Failures" section. e.g for "the occurence on the beach", it failed to parse "on the beach"
     <p align="center">
-    <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/2b_failures.png" width="500" height="270" title="check failures for clues">
+    <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/2b_failures.png" width="500" height="240" title="check failures for clues">
     </p>
    3. go to TestNLG.hs and find the corresponding testBSR that supports the `bsr2gf` in NLG.hs to see how it is built whether it is a treeAP, treeNP, treeAdv which takes care of the differennt scenario. Looking inside bsr2gf to figure out which function to poke
     <p align="center">
@@ -32,18 +32,18 @@ Steps
    1. the resulting tree is so long and complicated,  and
    2. there are several constructors for `aclRelcl`, and matching all of them inline inside `npFromUDS` would just be unwieldy.
     <p align="center">
-     <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/5a_add_helper_function.png" width="500" height="440" title="Adding helper function-1 n 2">
+     <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/5a_add_helper_function.png" width="500" height="400" title="Adding helper function-1 n 2">
       <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/6a_bareRGLnAbstract.png" width="500" height="480" title="Check for module in BareRG.gf and gf-rgl abstract with 'ag'">
     </p>
 7. Scroll back up the `stack test` output where the failure is and copy the UD `root_aclRecl (rootN_ (DetCN...)).........`
 8. Paste into a new line in NLG.hs's npFromUDS case and use rgl or otherwise helper function `udRelcl2rglRS` to take care of/neatify this one more case. NB: RS for relative sentence.
     <p align="center">
-    <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/6b_tidy_case.png" width="500" height="380" title="Apply the new helper function">
+    <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/6b_tidy_case.png" width="500" height="320" title="Apply the new helper function">
     </p>
 9.  run `stack test` and see that `the assessment that sucks` is fixed that but `the occurence on the beach` is still limited only to `the occurence`
      <p align="center">
     <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/7_stack_test.png" width="500" height="280" title="Find the underlying function to check for supporting case">
-    <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/8a_review.png" width="500" height="170" title="Review to see if fix is compplete">
+    <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/8a_review.png" width="500" height="140" title="Review to see if fix is compplete">
     </p>
 10. When checking tree in rgl, go to `/Users/regina/installations/gf-rgl/src/abstract` and do e.g `ag "> Det"`
 
@@ -80,7 +80,7 @@ Steps
 1. Run stack test again and take the failure output from "but got: ConjNP or_Conj (BaseNP (AdvNP (DetCN (DetQuant DefArt NumSg) (UseN occurrence_N)) (PrepNP at_Prep (DetCN (DetQuant DefArt NumSg) (UseN beach_N)))) (RelNP (DetCN (DetQuant this_Quant NumSg) (UseN assessment_N)) (UseRCl (TTAnt TPres ASimul) PPos (RelVP IdRP (UseV suck_V)))))" to GF shell and run to see if the result is the same as "the occurence at the beach"
 2. new shell do `gf grammars/UDApp.pgf`. In this GF shell, linearize the tree "l ConjNP or_Conj (BaseNP (AdvNP (DetCN (DetQuant DefArt NumSg) (UseN occurrence_N)) (PrepNP at_Prep (DetCN (DetQuant DefArt NumSg) (UseN beach_N)))) (RelNP (DetCN (DetQuant this_Quant NumSg) (UseN assessment_N)) (UseRCl (TTAnt TPres ASimul) PPos (RelVP IdRP (UseV suck_V)))))". If correct, it will return "the occurrence at the beach"
     <p align="center">
-    <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/8b_linearize.png" width="500" height="250" title="test in gf shell">
+    <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/8b_linearize.png" width="500" height="200" title="test in gf shell">
     </p>
 3.  If it does, go back to the test originally in nlgTests :: Spec in TestNLG.hs and replace "TODO" with the tree ie.
     ```

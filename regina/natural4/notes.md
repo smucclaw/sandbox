@@ -11,12 +11,12 @@ Steps
 3. in the natural4 folder, do `stack test`
 4. With the output from the sentences,
     <p align="center">
-    <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/2a_checkUDAppTrees.png" width="500" height="270" title="stack output">
+    <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/2a_checkUDAppTrees.png" width="500" height="220" title="stack output">
     </p>
    1. determine to use which RGLTree to use before heading to UDExt. Helpful to use `pbpaste | pretty-simple` the tree that fails
    2. look at how did the test fail under the output "Failures" section. e.g for "the occurence on the beach", it failed to parse "on the beach"
     <p align="center">
-    <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/2b_failures.png" width="500" height="200" title="check failures for clues">
+    <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/2b_failures.png" width="500" height="180" title="check failures for clues">
     </p>
    3. go to TestNLG.hs and find the corresponding testBSR that supports the `bsr2gf` in NLG.hs to see how it is built whether it is a treeAP, treeNP, treeAdv which takes care of the differennt scenario. Looking inside bsr2gf to figure out which function to poke
     <p align="center">
@@ -32,13 +32,13 @@ Steps
    1. the resulting tree is so long and complicated,  and
    2. there are several constructors for `aclRelcl`, and matching all of them inline inside `npFromUDS` would just be unwieldy.
     <p align="center">
-     <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/5a_add_helper_function.png" width="500" height="380" title="Adding helper function-1 n 2">
+     <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/5a_add_helper_function.png" width="500" height="300" title="Adding helper function-1 n 2">
       <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/6a_bareRGLnAbstract.png" width="500" height="480" title="Check for module in BareRG.gf and gf-rgl abstract with 'ag'">
     </p>
 7. Scroll back up the `stack test` output where the failure is and copy the UD `root_aclRecl (rootN_ (DetCN...)).........`
 8. Paste into a new line in NLG.hs's npFromUDS case and use rgl or otherwise helper function `udRelcl2rglRS` to take care of/neatify this one more case. NB: RS for relative sentence.
     <p align="center">
-    <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/6b_tidy_case.png" width="500" height="280" title="Apply the new helper function">
+    <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/6b_tidy_case.png" width="500" height="230" title="Apply the new helper function">
     </p>
 9.  run `stack test` and see that `the assessment that sucks` is fixed that but `the occurence on the beach` is still limited only to `the occurence`
      <p align="center">

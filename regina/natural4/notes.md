@@ -38,7 +38,7 @@ Steps
 7. Scroll back up the `stack test` output where the failure is and copy the UD `root_aclRecl (rootN_ (DetCN...)).........`
 8. Paste into a new line in NLG.hs's npFromUDS case and use rgl or otherwise helper function `udRelcl2rglRS` to take care of/neatify this one more case. NB: RS for relative sentence.
     <p align="center">
-    <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/6b_tidy_case.png" width="700" title="Apply the new helper function">
+    <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/6b_tidy_case.png" width="900" title="Apply the new helper function">
     </p>
 9.  run `stack test` and see that `the assessment that sucks` is fixed that but `the occurence on the beach` is still limited only to `the occurence`
      <p align="center">

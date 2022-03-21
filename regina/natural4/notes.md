@@ -18,7 +18,7 @@ Steps
     <p align="center">
     <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/2b_failures.png" width="900" title="check failures for clues">
     </p>
-   3. go to TestNLG.hs and find the corresponding testBSR that supports the `bsr2gf` in NLG.hs to see how it is built whether it is a treeAP, treeNP, treeAdv which takes care of the differennt scenario. Looking inside bsr2gf to figure out which function to poke
+   3. go to NLG.hs and find the corresponding testBSR that supports the `bsr2gf` in NLG.hs to see how it is built whether it is a treeAP, treeNP, treeAdv which takes care of the differennt scenario. Looking inside bsr2gf to figure out which function to poke
     <p align="center">
     <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/3a_find_required_function.png" width="900" title="find the function in bsr2gf">
     </p>

@@ -1,0 +1,101 @@
+http://flora.sourceforge.net/ -- Flora website with extensive documentation 
+
+//Type check query : Checks if there are instances of object attributes that have the wrong type.
+//Reports all such violations if any otherwise the empty set is returned
+
+//?- Type[check(?[?Meth=>?],?Result)]@\typecheck.
+
+
+//Example of strict sub-class inheritance with in-built (Haskell like) type '\string'.
+//student is a sub-class of person therefore running this query will return X = \string
+
+student::person.
+person[|name=>\string|].
+//?- student[|name=>?X|].
+
+
+
+//Example of non-monotonic (->) inheritance. Running query without any additional info returns
+// X = English but adding the new fact that John's native language is French doesn't cause a type-error in Type check query.
+// If the single arrow in |nativeLanguage -> English| was changed to |nativeLanguage => English|, then this is strict inheritance
+// adding the fact that John's native language is French would cause a type-error.
+
+British[|nativeLanguage -> English|].
+John:British.
+//?- John[nativeLanguage -> ?X].
+John[nativeLanguage -> French].
+
+
+//Example of strict inheritance. Since Monday is not defined to be a member of the class Weekend, we get a typecheck error on the object Orchard.
+//This is an example of a more 'sensetive' kind of type checking than what is naively possible in Haskell
+
+Singapore[|Freeparking=>Weekend|].
+Orchard:Singapore.
+Orchard[Freeparking->Monday].
+Saturday:Weekend.
+Sunday:Weekend.
+
+
+
+//Examples of set queries
+
+Mammal[|age=>\integer|].
+Mammal[|salary=>\integer|].
+
+bob:Mammal.
+bob[age->65].
+bob[salary->2000].
+
+//Conjunctive query --- This returns the empty set
+//?- ?Z = setof{?Mammal|?Mammal[age->?X][salary->?Y], ?X < 60,?Y < 3000 }.
+
+//Disjunctive query --- This returns the set [bob]
+?- ?K = setof{?Mammal|?Mammal[age->?X], ?X < 60;?Mammal[salary->?Y],?Y < 3000 }.
+
+
+
+//Basic example of extracting information from ontologies
+
+
+
+
+paper[|authors => person, title => string|].
+journal_p :: paper[|in_vol => volume|].
+conf_p :: paper[|at_conf => conf_proc|].
+journal_vol[|of => journal, volume => integer, number => integer, year => integer|].
+journal[|name => string, publisher => string, editors => person|].
+conf_proc[|of_conf => conf_series, year => integer, editors => person|].
+conf_series[|name => string|].
+publisher[|name => string|].
+person[|name => string, affil(integer) => institution|].
+institution[|name => string, address => string|].
+
+o_j1 : journal_p[title -> 'Records, Relations, Sets, Entities, and Things',
+authors -> {o_mes}, in_vol -> o_i11].
+o_di: conf_p[ title -> 'DIAM II and Levels of Abstraction',
+authors -> {o_mes, o_eba}, at_conf -> o_v76].
+o_i11 : journal_vol[of -> o_is, number -> 1, volume -> 1, year -> 1975].
+o_is : journal[name -> 'Information Systems', editors -> {o_mj}].
+o_v76 : conf_proc[of -> vldb, year -> 1976, editors -> {o_pcl, o_ejn}].
+o_vldb : conf_series[name -> 'Very Large Databases'].
+o_mes : person[name -> 'Michael E. Senko'].
+o_mj : person[name -> 'Matthias Jarke', affil(1976) -> o_rwt].
+o_rwt: institution[name -> 'RWTH_Aachen'].
+o_eba : person[name -> 'E.B.Allen'].
+
+//Ontology queries
+
+//?- ?P[title -> ?T, authors -> ?[name -> 'E.B.Allen']].
+//?- ?P[editors -> ?[name -> ?E],(name -> 'Information Systems')].
+//?- ?P[((authors->?[name -> 'E.B.Allen']);name -> 'Information Systems')].
+
+// The results of these queries are as follows: The first query returns all pairs (P,T) such that
+// P is an object that has an attribute 'title' whose value is T and has an author whose name is 'E.B.Allen'
+
+
+// The second query returns all pairs (P,E) such that P is an object that has an attribute 'editors' which in turn has an attribute
+// 'name' whose value is E and furthermore P itself must have the attribute 'name' whose value is 'Information Systems'
+
+
+// The third query returns all objects P that either are authored by a person with name 'E.B.Allen' OR, have the attribute 'name' whose value
+// is 'Information Systems'

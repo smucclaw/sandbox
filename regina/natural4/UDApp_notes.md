@@ -81,7 +81,7 @@ After you're done, do `./updateHS.sh.`
     3. Recall that subtree that can't be incorporated final tree are marked with *. Here the subtree 'missing' is missing
 
         <p align="center">
-        <img src="" title="Subtree that can't be incorporated into the final tree">
+        <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/UDApp_screenshots/5.1_example_mssing_subtree.png" title="Subtree that can't be incorporated into the final tree">
         </p>
 3. In linearisation for words that are adverbial in nature e.g nmod, advmod, obl, advcl. their linearisation should have 2 steps and use a let xxx in yyy structure
    root_nsubjPass_auxPass_advmod rt subj aux adv =

@@ -10,7 +10,15 @@
     <p align="center">
     <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/UDApp_screenshots/1_get_UD_parses_for_strings.png">
     </p>
-   2.
+   2. In parallel, you should run these conllu files with ud2gf, so that you can see when do you hit that sweet spot of minimal example, but still not covered by the GF grammar yet. So this whole step 1 is back and forth between udpipe at spacyconllu directory (whichever way you decide to use it) and ud2gf in natural4/grammars.
+   3. In the output of ud2gf, the asterisk * means that the subtree wasn't incorporated to the final tree. So your output could look like this, very disconnected—none of the subtrees b-e are connected to anything.
+        ```
+                [1] a
+                    * [2] b
+                    * [3] c
+                    * [4] d
+                    * [5] e
+        ```
 
 2. In linearisation for words that are adverbial in nature e.g nmod, advmod, obl, advcl. their linearisation should have 2 steps and use a let xxx in yyy structure
    root_nsubjPass_auxPass_advmod rt subj aux adv =

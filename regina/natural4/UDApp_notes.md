@@ -37,7 +37,7 @@ So we need to run stuff manually. The first step is to parse your sentence with 
 1. Most common reason: the top-level fun (in this case) `root_nsubj_ccomp` doesn't have a linearisation
     </br> To know if a linearisation is missing, you can check in the concrete syntax whether there is a lin or not.
     </br> Regarding **"appropriate GF grammar"**, where to find things:
-    </br> * **UDCat(Eng)**: coercion funs, e.g. `obl_ : Adv -> obl` ; some of these funs may have more arguments, but as a rule, *their return types are UD labels, not UDS (our custom type, the startcat of UDApp, entrypoint of NLG.hs). The coercion funs may take UDS as arguments.*
+    * **UDCat(Eng)**: coercion funs, e.g. `obl_ : Adv -> obl` ; some of these funs may have more arguments, but as a rule, *their return types are UD labels, not UDS (our custom type, the startcat of UDApp, entrypoint of NLG.hs). The coercion funs may take UDS as arguments.*
        </br> - Examples of more complex "coercion funs" in UDCat:
 
         xcompAdv_ : Adv -> xcomp ;
@@ -48,8 +48,8 @@ So we need to run stuff manually. The first step is to parse your sentence with 
 
         ccomp_ : UDS -> ccomp ; -- just missing a complementiser, like "that"
 
-    </br>* **UDApp(Eng)**: Sentence pattern funs, e.g. `root_nsubj : root -> nsubj -> UDS` . All these funs that return UDS come from a corpus—there was some sentence in the corpus that followed that pattern, e.g. "breach occurs", "the cat sleeps". (There may be other funs in UDApp, but we should move them into different modules.)
-    </br>* **UDExt(Eng)**: Only used for NLG, not parsing
+    * **UDApp(Eng)**: Sentence pattern funs, e.g. `root_nsubj : root -> nsubj -> UDS` . All these funs that return UDS come from a corpus—there was some sentence in the corpus that followed that pattern, e.g. "breach occurs", "the cat sleeps". (There may be other funs in UDApp, but we should move them into different modules.)
+    * **UDExt(Eng)**: Only used for NLG, not parsing
     <p float="left">
     <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/UDApp_screenshots/3a_troubleshoot.png" title="Troubleshooting: No linearisation">
     <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/UDApp_screenshots/3b_troubleshoot.png" title="Troubleshooting: Search for lin ">
@@ -83,6 +83,15 @@ After you're done, do `./updateHS.sh.`
         <p align="center">
         <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/UDApp_screenshots/5.1_example_mssing_subtree.png" title="Subtree that can't be incorporated into the final tree">
         </p>
+    4. So we can fix this by adding a new top-level sentence pattern fun in three places:
+
+     * fun `root_mark_nsubj_xcomp : root -> mark -> nsubj -> xcomp -> UDS ;`  in UDApp.gf,
+     * linearisation in UDAppEng.gf, and
+     * labels in UDApp.labels
+        <p align="center">
+        <img src="" title="Subtree that can't be incorporated into the final tree">
+        </p>
+
 3. In linearisation for words that are adverbial in nature e.g nmod, advmod, obl, advcl. their linearisation should have 2 steps and use a let xxx in yyy structure
    root_nsubjPass_auxPass_advmod rt subj aux adv =
    -- step 1: attach the adverbial to root

@@ -89,10 +89,16 @@ After you're done, do `./updateHS.sh.`
      * linearisation in UDAppEng.gf, and
      * labels in UDApp.labels
         <p align="center">
-        <img src="" title="Subtree that can't be incorporated into the final tree">
+        <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/UDApp_screenshots/5.2_example_3filesFix.png" title="Files adjustments for linearization">
         </p>
 
-3. In linearisation for words that are adverbial in nature e.g nmod, advmod, obl, advcl. their linearisation should have 2 steps and use a let xxx in yyy structure
+        So this was the scenario where the missing word is an immediate child of the root, and solution is to add a new top-level sentence pattern fun into UDApp.gf (+ UDAppEng + UDApp.labels). Copy the `root_mark_nsubj.....` and do `pbpaste | pretty-simple`
+        <p align="center">
+        <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/UDApp_screenshots/5.3_example_fix_proof.png" title="Linearisation fix result">
+        </p>
+
+### 3A. AUX FUNS
+In linearisation for words that are adverbial in nature e.g nmod, advmod, obl, advcl. their linearisation should have 2 steps and use a let xxx in yyy structure
    root_nsubjPass_auxPass_advmod rt subj aux adv =
    -- step 1: attach the adverbial to root
    -- step 2; find fun without the advmod/conj/ part

@@ -97,6 +97,8 @@ After you're done, do `./updateHS.sh.`
         <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/UDApp_screenshots/5.3_example_fix_proof.png" title="Linearisation fix result">
         </p>
 
+### 3.1 My personal favourite way to hunt for funs that are missing linearisations:
+1. 
 ### 3A. AUX FUNS
 In linearisation for words that are adverbial in nature e.g nmod, advmod, obl, advcl. their linearisation should have 2 steps and use a let xxx in yyy structure
    root_nsubjPass_auxPass_advmod rt subj aux adv =

@@ -97,8 +97,24 @@ After you're done, do `./updateHS.sh.`
         <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/UDApp_screenshots/5.3_example_fix_proof.png" title="Linearisation fix result">
         </p>
 
-### 3.1 My personal favourite way to hunt for funs that are missing linearisations:
-1. 
+### 3.1 My personal favourite way to hunt for funs that are missing linearisations (tested with nmod cluster):
+1. Use gf to find the missing linearsations via `gf UDApppEng.gf`.
+        <p align="center">
+        <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/UPApp_screenshots_personalFav/1%20gf%20missing%20linearization.png" title="Find in gf">
+        </p>
+2. Find the targets to fix from UDApp.gf, copying their example, labelling the words to their tags.
+        <p align="center">
+        <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/UPApp_screenshots_personalFav/2.%20Search%20the%20missing%20funs%20in%20UPApp.gf.png" title="Find the funs">
+        </p>
+3. For each ud labels for the funs, find the lincat. Impt because the labels correspond to some GF labels and is necessary since we want to use the RGL api.
+        <p align="center">
+        <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/UPApp_screenshots_personalFav/3.%20Find%20lincat%20of%20the%20UD%20labels.png" title="Match the lincat">
+        </p>
+4. Leverage on existing patterns funs in UPAppEng.gf to avoid starting from scratch. [Something mentioned earlier](https://github.com/smucclaw/sandbox/blob/default/regina/natural4/UDApp_notes.md#:~:text=many%20of%20the%20sentence%20pattern%20funs%20are%20very%20similar%2C%20so%20check%20in%20the%20concrete%20syntax%20if%20a%20similar%20fun%20already%20has%20a%20lin%2C%20you%20can%20probably%20reuse%20it.). Note the use of `rs` for `acl:rcl` in `root_nmod_aclRelcl`
+        <p align="center">
+        <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/UPApp_screenshots_personalFav/4.%20Linearisation%20Funs%20.png" title="Add the linearisation funs">
+        </p>
+    Here in these examples, I leverage on `root_acl` , `root_aclRelcl` and `root_nmod`.
 ### 3A. AUX FUNS
 In linearisation for words that are adverbial in nature e.g nmod, advmod, obl, advcl. their linearisation should have 2 steps and use a let xxx in yyy structure
    root_nsubjPass_auxPass_advmod rt subj aux adv =

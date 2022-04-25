@@ -3,12 +3,18 @@ Steps
      <p align="center">
      <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/1a_newcase.png" width="900" title="create test in TestNLG.hs">
      </p>
+     With the removal of unsafePerformIO, create new case in this format
+     <p align="center">
+     <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/1a_safe.png" width="900" title="create test in TestNLG.hs">
+     </p>
 
 2. Create the testNLGComplexBSR below --  ie the BoolStructR that contains the NPs that bsr2gf is going to parse
     <p align="center">
     <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/1b_newcase.png" width="900" title="create the BoolStructR">
     </p>
-3. in the natural4 folder, do `stack test`
+3. in the natural4 folder, do `stack test`.  But with unsafePerformIO being replace, do these
+    * `export MP_NLG=True`
+    * `stack test`
 4. With the output from the sentences,
     <p align="center">
     <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/2a_checkUDAppTrees.png" width="900" title="stack output">

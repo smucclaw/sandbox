@@ -158,3 +158,22 @@ In linearisation for words that are adverbial in nature e.g nmod, advmod, obl, a
     </p>
 4. After you're done, do `./updateHS.sh` in natural4 directory
 5. Can repeat step 2 to see the breaking point is healed and confirm with `stack test` in natural4 directory
+
+### 3B Other Supplementary Funs like articles when changing from predicates to questions
+1. Use stack run on the csv with checklist tag to see the AST. Compare the existing definite article one with `the` article (Is the observance mandatory?") which is correct to get inspiration on how to rectify the indefinite article `a` for "day of silence" when it is converted into a question.
+    <p align="center">
+    <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/Articles_screenshots/3.%20check%20which%20getQSFromTrees%20(see%20type%20signature).png" title="Use the AST to see which RGL tree to use">
+    </p>
+2. FYI. With "groundToChecklist" in VueJSON.hs, the parsed tokens and AST are put through all the intermediate functions as it tries to decide how the predicates were formed so as to twist it to become a question
+    <p align="center">
+    <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/Articles_screenshots/2final.combine%20all%20intermediate%20funs.png" title="Check the parsing via groupByRGLtype via the intermediate functions">
+    </p>
+
+3. Knowing where to insert: Knowing that the `getQSFromTrees` is the function that converts trees into questions and the indefinite article is to be inserted only when converting into a question, add the *makeSubjectIndefinite* into it, observing that the "a" article is applied on a np instead of a vp (as in the definite article "the" scenario). Observe the arguments as the function is built.
+   <p align="center">
+    <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/Articles_screenshots/2final.combine%20all%20intermediate%20funs.png" title="Know where to insert">
+    </p>
+4. Check the result
+    <p align="center">
+    <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/Articles_screenshots/4.%20stack%20test%20to%20see%20rectified%20fix.png" title="Stack test">
+    </p>

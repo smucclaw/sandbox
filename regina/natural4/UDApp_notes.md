@@ -154,7 +154,7 @@ In linearisation for words that are adverbial in nature e.g nmod, advmod, obl, a
    Using pbpaste | pretty-simple could be helpful
 3. Add the aux fun into UDAppEng.labels
     <p align="center">
-    <img src="https://github.com/smucclaw/sandbox/blob/f0d64926b8dad47b53acc4d87a575340b514278c/regina/natural4/AuxFuns_screenshots/3.%20Define%20the%20aux%20fun.png" title="Define the aux fun">
+    <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/AuxFuns_screenshots/3.%20Define%20the%20aux%20fun%20RECOVER.png" title="Define the aux fun">
     </p>
 4. After you're done, do `./updateHS.sh` in natural4 directory
 5. Can repeat step 2 to see the breaking point is healed and confirm with `stack test` in natural4 directory

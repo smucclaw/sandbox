@@ -116,9 +116,42 @@ After you're done, do `./updateHS.sh.`
         </p>
     Here in these examples, I leverage on `root_acl` , `root_aclRelcl` and `root_nmod`.
 ### 3A. AUX FUNS
-In linearisation for words that are adverbial in nature e.g nmod, advmod, obl, advcl. their linearisation should have 2 steps and use a let xxx in yyy structure
-   root_nsubjPass_auxPass_advmod rt subj aux adv =
-   -- step 1: attach the adverbial to root
-   -- step 2; find fun without the advmod/conj/ part
-    let root_adv : Root = rt ** {vp = mkVP rt.vp adv};
-    in root_nsubjPass_auxPass root_adv subj aux;
+In linearisation for words that are adverbial in nature e.g nmod, advmod, obl, advcl. their linearisation should have 2 steps and use a `let xxx in yyy ` structure.
+</br>**Tip**: auxfuns are needed if the problem lies in the ud2gf step, but if ud2gf returns a correct tree, then the problem is somewhere in NLG.hs, and auxfuns are not needed
+
+    e.g [the updates]:nsubjPass [are]: auxPass [reviewed]:root [regularly]: advmod
+
+    root_nsubjPass_auxPass_advmod rt subj aux adv =
+    -- step 1: attach the adverbial to root
+    -- step 2; find fun without the advmod/conj/ part
+        let root_adv : Root = rt ** {vp = mkVP rt.vp adv};
+        in root_nsubjPass_auxPass root_adv subj aux;
+
+(??? can i remove this bcos I dont understand this part below well at all to document it)
+  --   root_nsubjPass_auxPass_advmod rt subj aux advm = case advm.isNot of {
+  --     False =>****
+  --       let root_advm : Root = advRoot rt advm.adv ; -- new root: attached the advmod into the old root
+  --        in root_nsubjPass_auxPass root_advm subj aux;
+
+  --     True => -- advmod is the negation, so the adv field is just a dummy --- the real info is in that it's NEG
+  --             -- so we need to apply applyNeg at some point.
+  --             -- incidentally, this pattern also contains an auxiliary, which means that we need also applyAux
+  --             -- conclusion: this is not a simple case, Inari will refactor applyNeg and applyAux to allow them
+  --             -- to be used in the same UDS.
+  --       let root_neg : Root = applyNeg rt ;
+  --        in root_nsubjPass_auxPass root_neg subj aux
+
+  --   };
+
+1. Fixing Parentheses aux fun on: Discovered while parsing "The policy (called the applicable policy) of the company"
+    <p align="center">
+    <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/AuxFuns_screenshots/1.%20Get%20input%20into%20conllu%20format.png" title="Get into conllu format">
+    </p>
+2. Find the breaking point using ud2gf
+    <p align="center">
+    <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/AuxFuns_screenshots/2.%20fix%20the%20area%20to%20fix.png" title="Find breaking point">
+    </p>
+3. Add the aux fun into UDAppEng.labels
+    <p align="center">
+    <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/AuxFuns_screenshots/2.%20fix%20the%20area%20to%20fix.png" title="Define the aux fun">
+    </p>

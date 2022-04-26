@@ -151,7 +151,7 @@ In linearisation for words that are adverbial in nature e.g nmod, advmod, obl, a
     <p align="center">
     <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/AuxFuns_screenshots/2.%20fix%20the%20area%20to%20fix.png" title="Find breaking point">
     </p>
-2b. Using pbpaste | pretty-simple could be helpful
+   Using pbpaste | pretty-simple could be helpful
 3. Add the aux fun into UDAppEng.labels
     <p align="center">
     <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/AuxFuns_screenshots/3.%20Define%20the%20aux%20fun.png" title="Define the aux fun">

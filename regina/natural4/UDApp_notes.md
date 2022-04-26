@@ -162,7 +162,7 @@ In linearisation for words that are adverbial in nature e.g nmod, advmod, obl, a
 ### 3B Other Supplementary Funs like articles when changing from predicates to questions
 1. Use stack run on the csv with checklist tag to see the AST. Compare the existing definite article one with `the` article (Is the observance mandatory?") which is correct to get inspiration on how to rectify the indefinite article `a` for "day of silence" when it is converted into a question.
     <p align="center">
-    <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/Articles_screenshots/3.%20check%20which%20getQSFromTrees%20(see%20type%20signature).png" title="Use the AST to see which RGL tree to use">
+    <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/Articles_screenshots/1.%20check%20which%20getQSFromTrees%20.png" title="Use the AST to see which RGL tree to use">
     </p>
 2. FYI. With "groundToChecklist" in VueJSON.hs, the parsed tokens and AST are put through all the intermediate functions as it tries to decide how the predicates were formed so as to twist it to become a question
     <p align="center">

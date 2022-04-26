@@ -171,7 +171,7 @@ In linearisation for words that are adverbial in nature e.g nmod, advmod, obl, a
 
 3. Knowing where to insert: Knowing that the `getQSFromTrees` is the function that converts trees into questions and the indefinite article is to be inserted only when converting into a question, add the *makeSubjectIndefinite* into it, observing that the "a" article is applied on a np instead of a vp (as in the definite article "the" scenario). Observe the arguments as the function is built.
    <p align="center">
-    <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/Articles_screenshots/2final.combine%20all%20intermediate%20funs.png" title="Know where to insert">
+    <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/Articles_screenshots/3.%20Insert%20at%20the%20right%20place.png" title="Know where to insert">
     </p>
 4. Check the result
     <p align="center">

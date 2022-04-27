@@ -127,7 +127,25 @@ In linearisation for words that are adverbial in nature e.g nmod, advmod, obl, a
         let root_adv : Root = rt ** {vp = mkVP rt.vp adv};
         in root_nsubjPass_auxPass root_adv subj aux;
 
-(??? can i remove this bcos I dont understand this part below well at all to document it)
+1. Fixing Parentheses aux fun on: Discovered while parsing "The policy (called the applicable policy) of the company"
+    <p align="center">
+    <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/AuxFuns_screenshots/1.%20Get%20input%20into%20conllu%20format.png" title="Get into conllu format">
+    </p>
+2. Find the breaking point using ud2gf
+    <p align="center">
+    <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/AuxFuns_screenshots/2.%20fix%20the%20area%20to%20fix.png" title="Find breaking point">
+    </p>
+   Using pbpaste | pretty-simple could be helpful
+3. Add the aux fun into UDAppEng.labels
+    <p align="center">
+    <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/AuxFuns_screenshots/3.%20Define%20the%20aux%20fun.png" title="Define the aux fun">
+    </p>
+4. After you're done, do `./updateHS.sh` in natural4 directory to compile the changes made in the grammar (including UDAppEng.gf) into the UDApp.pgf
+5. Go into GF to test with `gf UDAppEng.gf` and linearize if you choose not to do  `./updateHS.sh` earlier. But otherwise, you could use the latest compiled pgf by `gf UDApp.pgf` and linearize the AST to see if the output is fixed.
+6. Can repeat step 2 to see the breaking point is healed and confirm with `stack test` in natural4 directory
+
+
+(??? advmod auxfun KIV)
   --   root_nsubjPass_auxPass_advmod rt subj aux advm = case advm.isNot of {
   --     False =>****
   --       let root_advm : Root = advRoot rt advm.adv ; -- new root: attached the advmod into the old root
@@ -142,23 +160,6 @@ In linearisation for words that are adverbial in nature e.g nmod, advmod, obl, a
   --        in root_nsubjPass_auxPass root_neg subj aux
 
   --   };
-
-1. Fixing Parentheses aux fun on: Discovered while parsing "The policy (called the applicable policy) of the company"
-    <p align="center">
-    <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/AuxFuns_screenshots/1.%20Get%20input%20into%20conllu%20format.png" title="Get into conllu format">
-    </p>
-2. Find the breaking point using ud2gf
-    <p align="center">
-    <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/AuxFuns_screenshots/2.%20fix%20the%20area%20to%20fix.png" title="Find breaking point">
-    </p>
-   Using pbpaste | pretty-simple could be helpful
-3. Add the aux fun into UDAppEng.labels
-    <p align="center">
-    <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/AuxFuns_screenshots/3.%20Define%20the%20aux%20fun.png" title="Define the aux fun">
-    </p>
-4. After you're done, do `./updateHS.sh` in natural4 directory
-5. Can repeat step 2 to see the breaking point is healed and confirm with `stack test` in natural4 directory
-
 ### 3B Other Supplementary Funs like articles when changing from predicates to questions
 1. Use stack run on the csv with checklist tag to see the AST. Compare the existing definite article one with `the` article (Is the observance mandatory?") which is correct to get inspiration on how to rectify the indefinite article `a` for "day of silence" when it is converted into a question.
     <p align="center">

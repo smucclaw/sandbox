@@ -144,22 +144,6 @@ In linearisation for words that are adverbial in nature e.g nmod, advmod, obl, a
 5. Go into GF to test with `gf UDAppEng.gf` and linearize if you choose not to do  `./updateHS.sh` earlier. But otherwise, you could use the latest compiled pgf by `gf UDApp.pgf` and linearize the AST to see if the output is fixed.
 6. Can repeat step 2 to see the breaking point is healed and confirm with `stack test` in natural4 directory
 
-
-(??? advmod auxfun KIV)
-  --   root_nsubjPass_auxPass_advmod rt subj aux advm = case advm.isNot of {
-  --     False =>****
-  --       let root_advm : Root = advRoot rt advm.adv ; -- new root: attached the advmod into the old root
-  --        in root_nsubjPass_auxPass root_advm subj aux;
-
-  --     True => -- advmod is the negation, so the adv field is just a dummy --- the real info is in that it's NEG
-  --             -- so we need to apply applyNeg at some point.
-  --             -- incidentally, this pattern also contains an auxiliary, which means that we need also applyAux
-  --             -- conclusion: this is not a simple case, Inari will refactor applyNeg and applyAux to allow them
-  --             -- to be used in the same UDS.
-  --       let root_neg : Root = applyNeg rt ;
-  --        in root_nsubjPass_auxPass root_neg subj aux
-
-  --   };
 ### 3B Other Supplementary Funs like articles when changing from predicates to questions
 1. Use stack run on the csv with checklist tag to see the AST. Compare the existing definite article one with `the` article (Is the observance mandatory?") which is correct to get inspiration on how to rectify the indefinite article `a` for "day of silence" when it is converted into a question.
     <p align="center">
@@ -178,3 +162,45 @@ In linearisation for words that are adverbial in nature e.g nmod, advmod, obl, a
     <p align="center">
     <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/Articles_screenshots/4.%20stack%20test%20to%20see%20rectified%20fix.png" title="Stack test">
     </p>
+
+### 4. Misc remarks
+
+#### Auxiliary as grammatical term: unrelated to `#auxfun`
+
+##### Examples of auxiliaries
+
+* I *have* seen the ship
+* I *will* see the ship
+* I *must* see the ship
+
+All of these have the UD relation `aux`, and they have a lexical function in UDApp like `have_aux`, `will_aux`, `must_aux`. Auxiliary verbs are a closed class, so we just add an entry to every one of them in UDCat.gf.
+
+("Closed class" means that there is a set amount of members in the class, we are not going to invent new auxiliaries in English. Contrast with open class, like nouns: new nouns appear all the time.)
+
+##### Auxiliary vs. copula
+
+* the ship is big — *is* is a copula, UD relation `cop`
+* I see the ship —> passive transformation "the ship *is* seen" — *is* is the passive auxiliary, UD relation `aux:pass` (and corresponding GF category `auxPass`).
+
+<!-- ```haskell
+root_nsubjPass_auxPass_advmod rt subj aux advm = case advm.isNot of {
+  False =>****
+    let root_advm : Root = advRoot rt advm.adv ; -- new root: attached the advmod into the old root
+     in root_nsubjPass_auxPass root_advm subj aux;
+
+  True => -- advmod is the negation, so the adv field is just a dummy --- the real info is in that it's NEG
+          -- so we need to apply applyNeg at some point.
+          -- incidentally, this pattern also contains an auxiliary, which means that we need also applyAux
+          -- conclusion: this is not a simple case, Inari will refactor applyNeg and applyAux to allow them
+          -- to be used in the same UDS.
+    let root_neg : Root = applyNeg rt ;
+     in root_nsubjPass_auxPass root_neg subj aux
+};
+``` -->
+
+### Negation
+
+In UD, negation is contained in the word `not` which is in the category `advmod`.
+
+![Screenshot of root_nsubj_advmod](Misc_screenshots/1_advmod_negation.png "Using advmod: sometimes negation, sometimes an actual adverbial")
+

@@ -13,7 +13,7 @@ Steps
     <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/1b_newcase.png" width="900" title="create the BoolStructR">
     </p>
 3. in the natural4 folder, do `stack test`.  But with unsafePerformIO being replace, do these
-    * `export MP_NLG=True`
+    * `export MP_NLG=True` to output the verbose details.
     * `stack test`
 4. With the output from the sentences,
     <p align="center">

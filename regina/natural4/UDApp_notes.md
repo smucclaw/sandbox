@@ -154,7 +154,7 @@ In linearisation for words that are adverbial in nature e.g nmod, advmod, obl, a
    * Step 1: create a result of this fake type NmodMisparsedAsAcl, give it a value that is actually a nmod
    * Step 2: connect the nmod with the fake type NmodMisparsedAsAcl to a CN.
     <p align="center">
-    <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/Articles_screenshots/4.%20Intermitten%20type.png" title="The 2 steps with intermittent aux fun">
+    <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/AuxFuns_screenshots/4.%20Intermitten%20type.png" title="The 2 steps with intermittent aux fun">
     </p>
 
 ### 3B Other Supplementary Funs like articles when changing from predicates to questions

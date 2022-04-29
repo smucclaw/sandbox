@@ -140,8 +140,8 @@ In linearisation for words that are adverbial in nature e.g nmod, advmod, obl, a
     <p align="center">
     <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/AuxFuns_screenshots/3.%20Define%20the%20aux%20fun.png" title="Define the aux fun">
     </p>
-4. After you're done, do `./updateHS.sh` in natural4 directory to compile the changes made in the grammar (including UDAppEng.gf) into the UDApp.pgf
-5. Go into GF to test with `gf UDAppEng.gf` and linearize if you choose not to do  `./updateHS.sh` earlier. But otherwise, you could use the latest compiled pgf by `gf UDApp.pgf` and linearize the AST to see if the output is fixed.
+4. After you're done, do `./updateHS.sh` in natural4/grammars directory to compile the changes made in the grammar (including UDAppEng.gf) into the UDApp.pgf
+5. In natural4/grammars, go into GF to test with `gf UDAppEng.gf` and linearize if you choose not to do  `./updateHS.sh` earlier. But otherwise, you could use the latest compiled pgf by `gf UDApp.pgf` and linearize the AST to see if the output is fixed.
 6. Can repeat step 2 to see the breaking point is healed and confirm with `stack test` in natural4 directory
 
 ### Aux Funs Case 2 - Creating Intermediate Aux Funs/ Helper Aux Funs

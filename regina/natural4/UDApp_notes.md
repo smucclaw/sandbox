@@ -40,13 +40,13 @@ So we need to run stuff manually. The first step is to parse your sentence with 
     * **UDCat(Eng)**: coercion funs, e.g. `obl_ : Adv -> obl` ; some of these funs may have more arguments, but as a rule, *their return types are UD labels, not UDS (our custom type, the startcat of UDApp, entrypoint of NLG.hs). The coercion funs may take UDS as arguments.*
        </br> - Examples of more complex "coercion funs" in UDCat:
 
-        xcompAdv_ : Adv -> xcomp ;
-        xcompN_ : NP -> xcomp ; -- considered [a building]
-        xcompToBeN_ : mark -> cop -> NP -> xcomp ; -- considered [to be a building]
-        xcompA_ : AP -> xcomp ; -- become [aware]:
-        xcompA_ccomp_ : AP -> ccomp -> xcomp ; -- become [aware [that a data breach occurred]]
+            xcompAdv_ : Adv -> xcomp ;
+            xcompN_ : NP -> xcomp ; -- considered [a building]
+            xcompToBeN_ : mark -> cop -> NP -> xcomp ; -- considered [to be a building]
+            xcompA_ : AP -> xcomp ; -- become [aware]:
+            xcompA_ccomp_ : AP -> ccomp -> xcomp ; -- become [aware [that a data breach occurred]]
 
-        ccomp_ : UDS -> ccomp ; -- just missing a complementiser, like "that"
+            ccomp_ : UDS -> ccomp ; -- just missing a complementiser, like "that"
 
     * **UDApp(Eng)**: Sentence pattern funs, e.g. `root_nsubj : root -> nsubj -> UDS` . All these funs that return UDS come from a corpus—there was some sentence in the corpus that followed that pattern, e.g. "breach occurs", "the cat sleeps". (There may be other funs in UDApp, but we should move them into different modules.)
     * **UDExt(Eng)**: Only used for NLG, not parsing
@@ -126,7 +126,7 @@ In linearisation for words that are adverbial in nature e.g nmod, advmod, obl, a
     -- step 2; find fun without the advmod/conj/ part
         let root_adv : Root = rt ** {vp = mkVP rt.vp adv};
         in root_nsubjPass_auxPass root_adv subj aux;
-
+### Aux Funs Case 1 - Parentheses
 1. Fixing Parentheses aux fun on: Discovered while parsing "The policy (called the applicable policy) of the company"
     <p align="center">
     <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/AuxFuns_screenshots/1.%20Get%20input%20into%20conllu%20format.png" title="Get into conllu format">
@@ -143,6 +143,19 @@ In linearisation for words that are adverbial in nature e.g nmod, advmod, obl, a
 4. After you're done, do `./updateHS.sh` in natural4 directory to compile the changes made in the grammar (including UDAppEng.gf) into the UDApp.pgf
 5. Go into GF to test with `gf UDAppEng.gf` and linearize if you choose not to do  `./updateHS.sh` earlier. But otherwise, you could use the latest compiled pgf by `gf UDApp.pgf` and linearize the AST to see if the output is fixed.
 6. Can repeat step 2 to see the breaking point is healed and confirm with `stack test` in natural4 directory
+
+### Aux Funs Case 2 - Creating Intermediate Aux Funs/ Helper Aux Funs
+1. (Day of Mourning). Recovering a "root case nmod" misparsed as "root mark acl", e.g day of mourning:
+2. "mourning" is analysed as verb, even though it should be noun (Gerund), and "of" is analysed as conjunction, should be adposition.
+3.  We do it in two steps:
+ * Create a fake type for the result of "of mourning"
+ * Connect "day" to that result of that fake type
+4. The 2 steps
+   * Step 1: create a result of this fake type NmodMisparsedAsAcl, give it a value that is actually a nmod
+   * Step 2: connect the nmod with the fake type NmodMisparsedAsAcl to a CN.
+    <p align="center">
+    <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/Articles_screenshots/4.%20Intermitten%20type.png" title="The 2 steps with intermittent aux fun">
+    </p>
 
 ### 3B Other Supplementary Funs like articles when changing from predicates to questions
 1. Use stack run on the csv with checklist tag to see the AST. Compare the existing definite article one with `the` article (Is the observance mandatory?") which is correct to get inspiration on how to rectify the indefinite article `a` for "day of silence" when it is converted into a question.

@@ -115,9 +115,8 @@ After you're done, do `./updateHS.sh.`
         <img src="https://github.com/smucclaw/sandbox/blob/default/regina/natural4/UPApp_screenshots_personalFav/4.%20Linearisation%20Funs%20.png" title="Add the linearisation funs">
         </p>
     Here in these examples, I leverage on `root_acl` , `root_aclRelcl` and `root_nmod`.
-### 3A. AUX FUNS
+
 In linearisation for words that are adverbial in nature e.g nmod, advmod, obl, advcl. their linearisation should have 2 steps and use a `let xxx in yyy ` structure.
-</br>**Tip**: auxfuns are needed if the problem lies in the ud2gf step, but if ud2gf returns a correct tree, then the problem is somewhere in NLG.hs, and auxfuns are not needed
 
     e.g [the updates]:nsubjPass [are]: auxPass [reviewed]:root [regularly]: advmod
 
@@ -126,6 +125,19 @@ In linearisation for words that are adverbial in nature e.g nmod, advmod, obl, a
     -- step 2; find fun without the advmod/conj/ part
         let root_adv : Root = rt ** {vp = mkVP rt.vp adv};
         in root_nsubjPass_auxPass root_adv subj aux;
+
+### 3A. AUX FUNS
+
+UD and GF have quite different structure, and sometimes the conversion from UD to GF needs extra help in the labels file (UDAppEng.labels). These are called `auxfuns`, and are written as such:
+
+```haskell
+#auxfun FunctionName_ arg1 arg2 : ArgType1 -> ArgType2 -> ReturnType = SomeActualFun arg1 (AnotherFun arg2) ; label1 label2
+```
+
+TODO: explain this more in detail with actual examples
+
+**Tip**: auxfuns are needed if the problem lies in the ud2gf step, but if ud2gf returns a correct tree, then the problem is somewhere in NLG.hs, and auxfuns are not needed
+
 ### Aux Funs Case 1 - Parentheses
 1. Fixing Parentheses aux fun on: Discovered while parsing "The policy (called the applicable policy) of the company"
     <p align="center">
@@ -216,4 +228,3 @@ root_nsubjPass_auxPass_advmod rt subj aux advm = case advm.isNot of {
 In UD, negation is contained in the word `not` which is in the category `advmod`.
 
 ![Screenshot of root_nsubj_advmod](Misc_screenshots/1_advmod_negation.png "Using advmod: sometimes negation, sometimes an actual adverbial")
-

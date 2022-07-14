@@ -1,0 +1,217 @@
+\documentclass{beamer}
+
+
+\input{settings}
+\input{defs}
+
+\title{Reasoning with and about Rules and Processes}
+
+\author{Avishkar Mahajan and Martin Strecker}
+\date{2022-07-14}
+
+
+%======================================================================
+
+\begin{document}
+
+
+%======================================================================
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+
+
+%======================================================================
+\section{Reasoning with and about Rules}
+
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{What's the difference?}
+
+  \blue{Reasoning \emph{with} rules:}
+  \begin{itemize}
+  \item Given:
+    \begin{itemize}
+    \item A set of rules  (\emph{e.g.: insurance contract})
+    \item A specific scenario (\emph{e.g.: dammage / accident})
+    \end{itemize}
+  \item Sought:
+    \begin{itemize}
+    \item A judgement (\emph{who pays / how much?})
+    \item Possibly with a justification (\emph{why?})
+    \end{itemize}
+  \end{itemize}
+
+  \vspace{4mm}
+  \blue{Reasoning \emph{about} rules:}
+  \begin{itemize}
+  \item Given:
+    \begin{itemize}
+    \item A set of rules  (\emph{e.g.: insurance contract})
+    \item A notion of rule consistency
+    \end{itemize}
+  \item Sought:
+    \begin{itemize}
+    \item \emph{Either} an inconsistent scenario 
+    \item \emph{or} a proof of consistency
+    \end{itemize}
+  \end{itemize}
+
+
+\end{frame}
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Example: AXA insurance case study - \emph{Rules}}
+
+  \dots{} about the coverage provided for the vehicle breakdown
+
+  \blue{What is covered}
+  \begin{itemize}
+  \item If the vehicle breaks down more than one mile from your home, we will
+    arrange and pay for a breakdown vehicle to come to the vehicle (for up to
+    one hour) to try to get it working again.
+    
+  \item If the vehicle cannot be made safe to drive at the place you have
+    broken down, we will arrange for the vehicle, the driver and passengers to
+    be recovered to a repairer or a destination of your choice within 20 miles
+    of where you have broken down.
+  \end{itemize}
+  
+  \blue{What is not covered}
+  \begin{itemize}
+  \item A breakdown at or within one mile from your home.  
+  \item Travel outside the UK.  
+  \end{itemize}
+
+
+\end{frame}
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Example: AXA insurance case study}
+
+  \blue{Reasoning \emph{with} rules}
+  
+Is a cover provided for a mechanical breakdown in Swansea (that is 10 miles
+away from home)?
+
+\begin{lstlisting}
+fact premiumPaid
+fact currentSit mechanicalBrkd
+fact situationInLocation mechanicalBrkd swansea
+fact distance home swansea 10
+
+assert <scen1_assert2> {SMT: valid} 
+coverProvided mechanicalBrkd payBreakdownVehicle
+\end{lstlisting}
+\emph{Answer: Yes}
+
+\end{frame}
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Example: AXA insurance case study}
+
+  \blue{Reasoning \emph{about} rules}
+  
+  \begin{itemize}
+  \item Is the rule set inconsistent?
+  \item More precisely: Is there a situation such that the insurance has to
+    pay and can refute payment?
+  \end{itemize}
+  
+  \begin{lstlisting}
+    for mySit: Situation, myCov: CoverageType
+    assert <contradictoryCover> {SMT: consistent}
+    coverProvided mySit myCov && myCov /= noCoverProvided &&
+    coverProvided mySit noCoverProvided
+  \end{lstlisting}
+\vspace{-5mm}
+  \emph{Answer:} Scenario:
+  \begin{lstlisting}
+    currentSit mechanicalBrkd
+    coverProvided mechanicalBrkd noCoverProvided
+    coverProvided mechanicalBrkd payBreakdownVehicle
+    isBreakdownSituation mechanicalBrkd
+    isIn home uk
+    isIn dundalk abroad
+    distance home dundalk d =  (15 <= d) && (d < 19)
+  \end{lstlisting}
+  
+\end{frame}
+
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Evaluation}
+
+  \blue{What's the interest?}
+  \begin{itemize}
+  \item Sanitize your rules before running them in production mode
+  \item Similar to software verification before deployment
+  \end{itemize}
+
+  \vspace{4mm}
+  \blue{Where are the difficulties?}
+  \begin{itemize}
+  \item \emph{Input:} Rules and \emph{lots} of everyday knowledge
+    \begin{itemize}
+    \item Geography
+    \item Components of a car
+    \item No breakdown in two different locations at the same time
+    \end{itemize}
+  \item \emph{Input:} Notion of consistency
+  \item \emph{Output:} Comprehensible display of scenarios
+  \end{itemize}
+
+\end{frame}
+
+
+
+%======================================================================
+\section{Reasoning with and about Processes}
+
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Rules and Automata}
+
+  An antagonistic view? \emph{No!}
+
+\blue{Rules} for modelling time-independent situations
+
+\blue{Automata} for modelling time-dependent processes
+\begin{itemize}
+\item prevalent in today's Business Process Management tools
+\item but what about compliance?
+\end{itemize}
+
+\begin{columns}
+  \column{.5\textwidth}
+  \begin{center}
+  BPM languages:
+
+    \includegraphics[scale=0.2]{Figures/business_process.png}
+    
+    \tiny{(from  SAP BPM pages)}
+  \end{center}
+  \column{.5\textwidth}
+  \begin{center}
+    Uppaal \red{(live demo!)}
+  
+    \includegraphics[scale=0.35]{Figures/uppaal_swimlane.png}
+  \end{center}
+\end{columns}
+
+\end{frame}
+
+
+
+%-------------------------------------------------------------
+
+\end{document}
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% coding: utf-8
+%%% End: 

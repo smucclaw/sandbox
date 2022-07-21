@@ -1,0 +1,61 @@
+* People Assignments
+** Available People
+
+- Jo Hsi
+- Joe
+- Avishkar
+- Ruslan
+- Maryam
+- Max Loo
+- Meng
+- Martin
+
+** Specialization Domains
+
+- sta = statics :: constitutive rules, AnyAll, and/or tree
+- dyn = dynamic :: regulative / prescriptive rules, moving parts, state diagrams, petri net, DFA
+- ont = ontology :: class relationships, type system, database schema.
+- ter = terms :: variable/value-level details like "this is a contract between Mark and Oliver"; also traces of event logs
+- def = defeasibility :: meta rules, rules that override over rules. Scopes?
+- nlg = natural language generation :: serialization to natural language
+
+** People and Projects
+
+| Person   | Domains         | Project              | Desc                                                                                                        |
+|----------+-----------------+----------------------+-------------------------------------------------------------------------------------------------------------|
+| Meng     | sta             | Vue web app (old)    | make the and/or tree interactive so users can do deductive reasoning to reach an answer; v8k runs the app   |
+| Max      | sta             | Vue web app (new)    | support multiple heads in a single page; switch to the latest SVG diagramming instead of the d3.            |
+| Meng     | ter             | JSON                 | output the symbol table to JSON.                                                                            |
+| Meng     | ont             | TypeScript           | output the class declarations to TS class declarations                                                      |
+|          | ter             | Scenario Testing     | make the GIVEN / EXPECT rules actually evaluate as part of a "natural4-exe --test"                          |
+|----------+-----------------+----------------------+-------------------------------------------------------------------------------------------------------------|
+| Avishkar | all             | CoreL4               | transpiler to Baby L4 that retains all the expressiveness                                                   |
+| Avishkar | sta             | Prolog               | improve L4 Prolog Transpiler or go via BabyL4; output all BoolStruct elements.                              |
+| Avishkar | sta             | Epilog               | output to Epilog syntax, through to creation of an epilog web app similar to our vue app                    |
+|          | sta + dyn       | Logical English      | output to Logical English syntax, through to creation of a web app in SWISH similar to our vue app          |
+|          |                 |                      | https://www.youtube.com/watch?v=9I3xshz4T0E                                                                 |
+|          |                 |                      | book: Commonsense Reasoning                                                                                 |
+|----------+-----------------+----------------------+-------------------------------------------------------------------------------------------------------------|
+| Ruslan   | sta             | statics SVG viz      | visualize all BoolStruct statics. Get SMALL Mode working. Support mouseover tooltips to next size up        |
+| Jo Hsi   | sta             | DMN decision diagram | output all BoolStruct elements as DMN tables or FEEL expressions. Connect them up using DRD.                |
+|          | sta + ont       | Catala               | output DECIDE rules and BoolStruct elements to Catala.                                                      |
+| Joe      |                 | Deon's CSL           | learn about CSL and steal ideas from them, no need to output to their language just yet.                    |
+|          | sta + ont       | DocAssemble          | create a full DocAssemble web app similar to our vue app                                                    |
+|          | sta + ont       | CheckFirst           | create a full CheckFirst web app similar to our vue app                                                     |
+|          |                 |                      | feels like basically a DMN front-end invented by people who didn't know about DMN                           |
+|----------+-----------------+----------------------+-------------------------------------------------------------------------------------------------------------|
+|          | sta + ont + def | Blawx                | create a full Blawx app similar to our vue app                                                              |
+| Ruslan   |                 | Morphir              | investigate Morphir and export the "business logic" components of an L4 program to it                       |
+|----------+-----------------+----------------------+-------------------------------------------------------------------------------------------------------------|
+| Maryam   | nlg + all       | Word doc             | via intermediate output e.g. Markdown, then converted using Pandoc                                          |
+| Maryam   | nlg + ter       | PDF                  | via intermediate output e.g. Markdown, then converted using Pandoc; embed the L4 symbol table using l4meta. |
+|          | ter + all       | PDF                  | In future, embed all the L4 source in the PDF using l4meta. Discuss with Meng about doing the SAFE.         |
+|          | nlg + all       | Akoma Ntoso          | Direct to XML using hxt?                                                                                    |
+|----------+-----------------+----------------------+-------------------------------------------------------------------------------------------------------------|
+| Joe      | dyn             | Petri Net viz        | currently under renovation                                                                                  |
+| Joe      | dyn             | Tapaal               | output our Petri nets to Tapaal format, so we can run an engine "headlessly" for verification               |
+| Max      | dyn             | BPMN workflow        | BPMN is basically a timed Petri Net invented by people who didn't know about timed Petri Nets               |
+
+Another project -- formalization of the SAFE, and using that as a demonstration use case: creation of a SAFE Word doc, creation of PDF, embedding of JSON and L4 rules into the PDF.
+
+Thorne on LLD: https://www.youtube.com/watch?v=0YeesAW7-Rc

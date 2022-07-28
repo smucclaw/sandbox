@@ -1,0 +1,1206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+
+HXT - HaskellWiki
+document.documentElement.className = document.documentElement.className.replace( /(^|\s)client-nojs(\s|$)/, "$1client-js$2" );
+(window.RLQ=window.RLQ||[]).push(function(){mw.config.set({"wgCanonicalNamespace":"","wgCanonicalSpecialPageName":false,"wgNamespaceNumber":0,"wgPageName":"HXT","wgTitle":"HXT","wgCurRevisionId":60699,"wgRevisionId":60699,"wgArticleId":1979,"wgIsArticle":true,"wgIsRedirect":false,"wgAction":"view","wgUserName":null,"wgUserGroups":["*"],"wgCategories":["Web","XML","Tools","Tutorials","Libraries"],"wgBreakFrames":false,"wgPageContentLanguage":"en","wgPageContentModel":"wikitext","wgSeparatorTransformTable":["",""],"wgDigitTransformTable":["",""],"wgDefaultDateFormat":"dmy","wgMonthNames":["","January","February","March","April","May","June","July","August","September","October","November","December"],"wgMonthNamesShort":["","Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],"wgRelevantPageName":"HXT","wgRelevantArticleId":1979,"wgRequestId":"b588b56ef151406aac41f635","wgIsProbablyEditable":false,"wgRelevantPageIsProbablyEditable":false,"wgRestrictionEdit":[],"wgRestrictionMove":[],"wgWikiEditorEnabledModules":[],"wgCollapsibleVectorEnabledModules":{"collapsiblenav":true,"experiments":true}});mw.loader.state({"site.styles":"ready","noscript":"ready","user.styles":"ready","user":"ready","site":"ready","user.options":"ready","user.tokens":"loading","ext.pygments":"ready","mediawiki.legacy.shared":"ready","mediawiki.legacy.commonPrint":"ready","mediawiki.sectionAnchor":"ready","mediawiki.skinning.interface":"ready","skins.hawiki.styles":"ready"});mw.loader.implement("user.tokens@03tqtch",function($,jQuery,require,module){/*@nomin*/mw.user.tokens.set({"editToken":"+\\","patrolToken":"+\\","watchToken":"+\\","csrfToken":"+\\"});
+});mw.loader.load(["mediawiki.page.startup","mediawiki.user","mediawiki.hidpi","mediawiki.page.ready","mediawiki.toc","mediawiki.searchSuggest","skins.hawiki.js"]);});
+
+
+
+
+
+
+
+
+
+
+
+
+		
+		
+		
+			
+
+						
+
+			HXT
+									
+									From HaskellWiki
+								
+												
+					Jump to:					#mw-head, 					#p-search
+				
+				
+
+A Gentle Introduction to the Haskell XML Toolbox
+The http://www.fh-wedel.de/~si/HXmlToolbox/index.html is a collection of tools for processing XML with Haskell. The core component of the Haskell XML Toolbox is a domain specific language consisting of a set of combinators for processing XML trees in a simple and elegant way. The combinator library is based on the concept of arrows. The main component is a validating and namespace-aware XML Parser that supports the XML 1.0 Standard almost completely. Extensions are a validator for RelaxNG and an XPath evaluator.
+
+Contents
+
+#A_Gentle_Introduction_to_the_Haskell_XML_Toolbox
+#Background
+#Resources
+
+#Home_Page_and_Repository
+#Packages
+
+#HXT-related_packages
+#More_general_packages
+
+
+#Installation
+#Upgrade_from_HXT_versions_.3C_9.0
+
+
+#The_basic_concepts
+
+#The_basic_data_structures
+#The_concept_of_filters
+#Filter_combinators
+#Tree_traversal_filter
+#Arrows
+
+
+#Getting_started:_Hello_world_examples
+
+#copyXML
+#Pattern_for_a_main_program
+#Tracing
+
+
+#Selection_examples
+
+#Selecting_text_from_an_HTML_document
+#Selecting_text_and_ALT_attribute_values
+#Selecting_text_and_ALT_attribute_values_.282.29
+
+
+#Document_construction_examples
+
+#The_Hello_World_document
+#A_page_about_all_images_within_a_HTML_page
+#A_page_about_all_images_within_a_HTML_page:_1._Refinement
+#A_page_about_all_images_within_a_HTML_page:_2._Refinement
+
+
+#Transformation_examples
+
+#Decorating_external_references_of_an_HTML_document
+#Transform_external_references_into_absolute_references
+#Transform_external_references_into_absolute_references:_Refinement
+
+
+#More_complex_examples
+
+#Serialization_and_deserialisation_to.2Ffrom_XML
+#Practical_examples_of_HXT
+#The_Complete_Guide_To_Working_With_HTML
+
+
+
+
+
+Background
+The Haskell XML Toolbox is based on the ideas of http://www.cs.york.ac.uk/fp/HaXml/ and http://www.flightlab.com/~joe/hxml/, but introduces a more general approach for processing XML with Haskell. HXT uses a generic data model for representing XML documents, including the DTD subset, entity references, CData parts and processing instructions. This data model makes it possible to use tree transformation functions as a uniform design of XML processing steps from parsing, DTD processing, entity processing, validation, namespace propagation, content processing and output.
+HXT has grown over the years. Components for XPath, XSLT, validation
+with RelaxNG, picklers for conversion from/to native Haskell data,
+lazy parsing with tagsoup, input via curl and native Haskell HTTP
+and others have been added. This has led to a rather large package
+with a lot of dependencies.
+To make the toolbox more modular and to reduce the dependencies on
+other packages, hxt has been split
+into various smaller packages since version 9.0.0.
+
+Resources
+Home Page and Repository
+http://www.fh-wedel.de/~si/HXmlToolbox/index.html
+The project home for HXT
+http://github.com/UweSchmidt/hxt
+The git source repository on github for all HXT packages
+Packages
+All packages are available on Hackage.
+
+HXT-related packages
+http://hackage.haskell.org/package/hxt
+The package http://hackage.haskell.org/package/hxt forms the core of the toolbox. It contains a validating XML parser and a HTML parser, which tries to read any text as HTML, a DSL for processing, transforming and generating XML/HTML, and so called pickler for conversion from/to XML and native Haskell data.
+http://hackage.haskell.org/package/HandsomeSoup
+HandsomeSoup adds CSS selectors to HXT.
+https://hackage.haskell.org/package/hxt-css
+Another CSS selector engine for HXT.
+http://hackage.haskell.org/package/hxt-http
+Native HTTP support is contained in http://hackage.haskell.org/package/hxt-http and depends on package http://hackage.haskell.org/package/HTTP.
+http://hackage.haskell.org/package/hxt-curl
+HTTP support via libCurl and package http://hackage.haskell.org/package/curl is in http://hackage.haskell.org/package/hxt-curl.
+http://hackage.haskell.org/package/hxt-tagsoup
+The lazy tagsoup parser can be found in package http://hackage.haskell.org/package/hxt-tagsoup, only this package depends on Neil Mitchell's http://hackage.haskell.org/package/tagsoup.
+http://hackage.haskell.org/package/hxt-xpath
+
+http://hackage.haskell.org/package/hxt-xslt
+
+http://hackage.haskell.org/package/hxt-relaxng
+The XPath-, XSLT- and RelaxNG-extensions are separated into http://hackage.haskell.org/package/hxt-xpath, http://hackage.haskell.org/package/hxt-xslt and http://hackage.haskell.org/package/hxt-relaxng.
+More general packages
+There are some basic functionalities, which are not only of interest for HXT, but can be useful for other none XML/HTML related projects. These have been separated too.
+
+http://hackage.haskell.org/package/hxt-charproperties
+defines XML- and Unicode character class properties.
+http://hackage.haskell.org/package/hxt-unicode
+contains decoding function from various encoding schemes to Unicode. The difference of these functions compared to most of those available on hackage are, that these functions are lazy even in the case of encoding errors (thanks to Henning Thielemann).
+http://hackage.haskell.org/package/hxt-regex-xmlschema
+contains a lightweight and efficient regex-library. There is full Unicode support, the standard syntax defined in the XML-Schema doc is supported, and there are extensions available for intersection, difference, exclusive OR. The package is self contained, no other regex library is required. The Wiki page /Regular_expressions_for_XML_Schema describes the theory behind this regex library and the extensions and gives some usage examples.
+http://hackage.haskell.org/package/hxt-cache
+A cache for storing parsed XML/HTML pages in binary from. This is used in the Holumbus searchengine framework and the Hayoo! API search for speeding up the repeated indexing of pages.
+Installation
+When installing hxt with cabal, one does not have to deal with all the
+basic packages. Just a cabal install hxt does the work for the core toolbox. When HTTP access is required, install at least one of
+the packages hxt-curl or hxt-http. All other packages can be installed
+on demand any time later.
+
+Upgrade from HXT versions &lt; 9.0
+HXT-9 is not downwards compatible. The splitting into smaller
+packages required some internal reorganisation and changes of some type
+declarations. To use the main features of the core package, import
+Text.XML.HXT.Core instead of Text.XML.HXT.Arrow.
+The second major change was the kind of configuration and option handling.
+This was done previously by lists of key-value-pairs implemented as strings.
+The growing number of options and the untyped option values have led to
+unreliable code. With HXT-9, options are represented in a more type-safe manner by functions instead of strings, so option handling has to be modified when switching to the new version. For examples, see #copyXML and
+#Pattern_for_a_main_program below.
+
+The basic concepts
+The basic data structures
+Processing of XML is a task of processing tree structures. This is can be done in Haskell in a very elegant way by defining an appropriate tree data type, a Haskell DOM (document object model) structure. The tree structure in HXT is a rose tree with a special XNode data type for storing the XML node information.
+The generally useful tree structure (NTree) is separated from the node type (XNode). This allows for reusing the tree structure and the tree traversal and manipulation functions in other applications.
+
+data NTree a  = NTree a [NTree a]     -- rose tree
+
+data XNode    = XText String          -- plain text node
+              | ...
+              | XTag QName XmlTrees   -- element name and list of attributes
+              | XAttr QName           -- attribute name
+              | ...
+
+type QName    = ...                   -- qualified name
+
+type XmlTree  = NTree XNode
+
+type XmlTrees = [XmlTree]
+
+The concept of filters
+Selecting, transforming and generating trees often requires routines which compute not only a single result tree, but a possibly empty list of (sub-)trees. This leads to the idea of XML filters like in HaXml. Filters are functions which take an XML tree as input and compute a list of result trees:
+
+type XmlFilter = XmlTree -> [XmlTree]
+
+More generally, we can define a filter as:
+
+type Filter a b = a -> [b]
+
+We will do this abstraction later when introducing arrows. Many of the functions in the following motivating examples can be generalized this way. But for getting the idea, the XmlFilter is sufficient.
+The filter functions are used so frequently that the idea of defining a domain specific language with filters as the basic processing units comes up. In such a DSL the basic filters are predicates, selectors, constructors and transformers, all working on the HXT DOM tree structure. For a DSL it becomes necessary to define an appropriate set of combinators for building more complex functions from simpler ones. Of course filter composition, like (.), becomes one of the most frequently used combinators. There are more complex filters for traversal of a whole tree and selection or transformation of several nodes. We will see a  few first examples in the following part.
+To build filters from pure functions, we need a way to lift them to filters. For predicates this is done by mapping False to the empty list and True to a singleton list containing the input tree:
+p   :: XmlTree -> Bool          -- pure function
+p t =  ...
+
+pf  :: XmlTree -> [XmlTree]     -- or XmlFilter
+pf t | p t       = [t]
+     | otherwise = []
+
+The combinator for this kind of lifting is called isA, and it works on any type. It is defined as:
+isA  :: (a -> Bool) -> (a -> [a])
+isA p x | p x       = [x]
+        | otherwise = []
+
+As an example, a predicate for filtering text nodes looks like this:
+
+isXText :: XmlTree -> Bool
+isXText (NTree (XText _) _) = True
+isXText _                   = False
+
+isXTextF :: XmlFilter           -- XmlTree -> [XmlTree]
+isXTextF = isA isXText
+
+Transformers, i.e. functions that map a tree into another tree, are lifted in a trivial way via singleton lists:
+
+f    :: XmlTree -> XmlTree
+f t  =  exp(t)
+
+ff   :: XmlTree -> [XmlTree]
+ff t = [exp(t)]
+
+This basic function is called arr, it comes from the Control.Arrow module of the base package of GHC. Partial functions, i.e functions that can't always compute a result, are usually lifted to totally defined filters where illegal arguments are mapped to the empty list:
+f :: XmlTree -> XmlTree
+f t  | p t       = expr(t)
+     | otherwise = error "f not defined"
+
+ff :: XmlFilter
+ff t | p t       = [expr(t)]
+     | otherwise = []
+
+When processing trees, there's often the case that no result, exactly one result, or more than one result is possible. These functions, returning a set of results, are often a bit imprecisely called non-deterministic functions. Such functions, e.g. selecting all children of a node or all grandchildren, are exactly our filters. In this context, lists instead of sets of values are the appropriate result type, because the ordering in XML is important and duplicates are possible. Examples for working with non-deterministic functions are selecting the children and the grandchildren of an XmlTree, which can be implemented as follows:
+
+getChildren :: XmlFilter
+getChildren (NTree n cs)  = cs
+
+getGrandChildren :: XmlFilter
+getGrandChildren (NTree n cs) = concat [ getChildren c | c &lt;- cs ]
+
+Working with filters is rather similar to working with binary relations, which is rather natural and comfortable, database people know this very well.
+
+Filter combinators
+Composition of filters, like function composition, is the most important combinator. We will use the infix operator (>>>) for filter composition and reverse the arguments, so we can read composition sequences from left to right, like pipes in Unix. Composition is defined as follows:
+(>>>) :: XmlFilter -> XmlFilter -> XmlFilter
+(f >>> g) t =  concat [g t' | t' &lt;- f t]
+
+This definition corresponds 1:1 to the composition of binary relations. With the help of the (>>>) operator, the definition of getGrandChildren becomes rather simple:
+getGrandChildren :: XmlFilter
+getGrandChildren = getChildren >>> getChildren
+
+Selecting all text nodes of the children of an element can also be formulated very easily with the help of (>>>):
+getTextChildren :: XmlFilter
+getTextChildren = getChildren >>> isXText
+
+When used to combine predicate filters, the (>>>) serves as a logical "and" operator or, from the relational view, as an intersection operator: isA p1 >>> isA p2 selects all values for which p1 and p2 both hold. The dual operator to (>>>) is (&lt;+>), the logical "or" for filters:
+(&lt;+>) :: XmlFilter -> XmlFilter -> XmlFilter
+(f &lt;+> g) t =  f t ++ g t -- not literally ++, rather the set union operator
+  -- so without duplicates
+
+Combining elementary filters with (>>>) and (&lt;+>) leads to more complex functionality. For example, selecting all text nodes within two levels of depth (in left to right order) can be formulated with:
+getTextChildren2 :: XmlFilter
+getTextChildren2 = getChildren >>> ( isXText &lt;+> ( getChildren >>> isXText ) )
+
+
+Exercise: Are these filters equivalent? If not, what is the difference?
+
+getChildren >>> ( isXText &lt;+> ( getChildren >>> isXText ) )
+
+( getChildren >>> isXText ) &lt;+> ( getChildren >>> getChildren >>> isXText )
+
+
+Of course we need choice combinators, too. The first idea is an if-then-else filter, built from three simpler filters. But often it's easier and more elegant to work with simpler binary combinators for choice. So we will introduce the simpler ones first. One of these choice combinators is called orElse and is defined as follows:
+orElse :: XmlFilter -> XmlFilter -> XmlFilter
+orElse f g t | null res1 = g t
+             | otherwise = res1
+  where res1 = f t
+
+If f computes a non-empty list as result, f succeeds and this list is the result. Otherwise g is applied to the input, and this yields the overall result.
+There are two other simple choice combinators usually written in infix notation, g `guards` f and f `when` g, which are useful when transforming and manipulating trees:
+guards :: XmlFilter -> XmlFilter -> XmlFilter
+guards g f t | null (g t) = []
+             | otherwise  = f t
+
+when :: XmlFilter -> XmlFilter -> XmlFilter
+when f g t | null (g t) = [t]
+           | otherwise  = f t
+
+Tree traversal filter
+A very basic operation on tree structures is the traversal of all nodes and the selection and/or transformation of nodes. These traversal filters serve as control structures for processing whole trees. They correspond to the map and fold combinators for lists.
+The simplest traversal filter does a top down search of all nodes with a special feature. This filter, called deep, is defined as follows:
+
+deep	:: XmlFilter -> XmlFilter
+deep f  = f `orElse` (getChildren >>> deep f)
+
+When a predicate filter is applied to deep, a top down search is done and all subtrees satisfying the predicate are collected. The descent into the tree stops when a subtree is found, because of the use of orElse.
+Example: Selecting all plain text nodes of a document can be formulated with:
+
+deep isXText
+
+Example: Selecting all "top level" tables in a HTML documents looks like
+this:
+
+deep (isElem >>> hasName "table")
+
+A variant of deep, called multi, performs a complete search, where the tree traversal does not stop when a node is found.
+
+multi	:: XmlFilter -> XmlFilter
+multi f  = f &lt;+> (getChildren >>> multi f)
+
+Example: Selecting all tables in a HTML document, even nested ones, multi has to be used instead of deep:
+multi (isElem >>> hasName "table")
+
+Arrows
+We've already seen that the filters a -> [b] are a very powerful and sometimes a more elegant way to process XML than pure functions, which is the good news. The bad news is that filters are not general enough. We e.g. want to do some I/O while staying at the filter level, so for the IO monad we need something like:
+type XmlIOFilter = XmlTree -> IO [XmlTree]
+
+Sometimes it's appropriate to thread some state through the computation like in state monads, which leads to a type like:
+
+type XmlStateFilter state = state -> XmlTree -> (state, [XmlTree])
+
+Real-world applications might need both extensions at the same time: Of course I/O is necessary but usually there are also some global options and variables for controlling the computations. In HXT for instance there are variables for controlling trace output, options for setting the default encoding scheme for input data and a base URI for accessing documents, which are addressed in a content or in a DTD part by relative URIs. So we need something like:
+
+type XmlIOStateFilter state = state -> XmlTree -> IO (state, [XmlTree])
+
+We want to work with all four filter variants, and in the future perhaps with even more general filters, but of course not with four sets of filter names, e.g. deep, deepST, deepIO, deepIOST. This is the point where newtypes and classes come in. Classes are needed for overloading names and newtypes are needed to declare instances. Furthermore, the restriction of XmlTree as the argument and result type is not necessary and hinders reuse in many cases.
+A filter as discussed above has all features of an arrow. Arrows are introduced for generalizing the concept of functions and function combination to more general kinds of computation.
+A basic set of combinators for arrows is defined in the classes in the Control.Arrow module, containing the above mentioned (>>>), (&lt;+>) and arr.
+In HXT, the additional classes for filters working with lists as the result type are defined in Control.Arrow.ArrowList. The choice operators are in Control.Arrow.ArrowIf, tree filters (like getChildren, deep, or multi) in Control.Arrow.ArrowTree, and the elementary XML-specific filters in Text.XML.HXT.XmlArrow.
+In HXT, there are four types instantiated with these classes for pure list arrows, list arrows with a state, list arrows with IO and list arrows with a state and IO.
+
+newtype LA      a b = LA    { runLA    :: (     a ->        [b])  }
+newtype SLA   s a b = SLA   { runSLA   :: (s -> a ->    (s, [b])) }
+newtype IOLA    a b = IOLA  { runIOLA  :: (     a -> IO     [b])  }
+newtype IOSLA s a b = IOSLA { runIOSLA :: (s -> a -> IO (s, [b])) }
+
+The first and last one are those used most frequently in the toolbox, and of course there are lifting functions for converting general arrows into more specific arrows. Don't worry about all these conceptual details. Let's have a look at some Hello world examples.
+
+Getting started: Hello world examples
+copyXML
+The first complete example is a program for copying an XML document:
+
+module Main where
+
+import System.Environment
+import Text.XML.HXT.Core
+import Text.XML.HXT.Curl
+
+main :: IO ()
+main = do
+  [src, dst] &lt;- getArgs
+  runX $
+    readDocument [withValidate no
+                 ,withCurl []
+                 ] src
+    >>>
+    writeDocument [withIndent yes
+                  ,withOutputEncoding isoLatin1
+                  ] dst
+  return ()
+
+The interesting part of this example is the call of runX, which executes an arrow. This arrow is one of the more powerful list arrows with IO and an HXT system state. The arrow itself is a composition of readDocument and writeDocument.
+readDocument is an arrow for reading, DTD processing and validation of documents. Its behaviour can be controlled by a list of system options. Here we turn off the validation step. The src, a file name or an URI, is read and parsed and a document tree is built. The input option withCurl [] enables reading via HTTP. For using this option, the extra package hxt-curl must be installed, and withCurl must be imported by import Text.XML.HXT.Curl. If only file access is necessary, this option and the import can be dropped. In that case the program does not depend on the libcurl binding.
+The tree is then piped into the output arrow, which is once again controlled by a set of system options. The withIndent option controls the output formatting (here indentation is switched on) and the withOutputEncoding option switches the output to the ISO-Latin1 encoding. writeDocument converts the tree into a string and writes it to dst. The available options for reading and writing can be found in the module Text.XML.HXT.Arrow.XmlState.SystemConfig.
+We've omitted the boring stuff of option parsing and error handling. Compilation and a test run looks like this:
+
+hobel > ghc --make -o copyXml CopyXML.hs
+hobel > cat hello.xml
+&lt;hello>&lt;haskell>world&lt;/haskell>&lt;/hello>
+hobel > copyXml hello.xml -
+&lt;?xml version="1.0" encoding="ISO-8859-1"?>
+&lt;hello>
+  &lt;haskell>world&lt;/haskell>
+&lt;/hello>
+hobel >
+
+The mini XML document in file hello.xml is read, and a document tree is built. Then this tree is converted into a string and written to standard output (filename: -). It is decorated with an XML declaration containing the version and the output encoding.
+
+For processing HTML documents there is a HTML parser which tries to parse and interpret almost anything as HTML. This can be selected by using:
+readDocument [withParseHTML yes, ...]
+
+Pattern for a main program
+A more realistic pattern for a simple Unix filter like program has
+the following structure:
+
+module Main
+where
+
+import Text.XML.HXT.Core
+import Text.XML.HXT....   -- further HXT packages
+
+import System.IO
+import System.Environment
+import System.Console.GetOpt
+import System.Exit
+
+main :: IO ()
+main
+    = do
+      argv &lt;- getArgs
+      (al, src, dst) &lt;- cmdlineOpts argv
+      [rc]  &lt;- runX (application al src dst)
+      if rc >= c_err
+	 then exitWith (ExitFailure (0-1))
+	 else exitWith ExitSuccess
+
+-- | the dummy for the boring stuff of option evaluation,
+-- usually done with 'System.Console.GetOpt'
+
+cmdlineOpts 	:: [String] -> IO (SysConfigList, String, String)
+cmdlineOpts argv
+    = return ([withValidate no], argv!!0, argv!!1)
+
+-- | the main arrow
+
+application	:: SysConfigList -> String -> String -> IOSArrow b Int
+application cfg src dst
+    = configSysVars cfg                                           -- (0)
+      >>>
+      readDocument [] src
+      >>>
+      processChildren (processDocumentRootElement `when` isElem)  -- (1)
+      >>>
+      writeDocument [] dst                                        -- (3)
+      >>>
+      getErrStatus
+
+
+-- | the dummy for the real processing: the identity filter
+
+processDocumentRootElement	:: IOSArrow XmlTree XmlTree
+processDocumentRootElement
+    = this         -- substitute this by the real application
+
+This program has the same functionality as our first example,
+but it separates the arrow from the boring option evaluation and
+return code computation.
+In line (0) the system is configured with the list of options.
+These options are then used as defaults for all read and write operation.
+The options can be overwritten for single read/write calls
+by putting config options into the parameter list of the
+read/write function calls.
+The interesing line is (1).
+readDocument generates a tree structure with a so called extra
+root node. This root node is a node above the XML document root
+element. The node above the XML document root element is neccessary
+because of possible other elements on the same tree level as the XML
+root, for instance comments, processing instructions or whitespace.
+Furthermore the artificial root node serves for storing meta
+information about the document in the attribute list, like the
+document name, the encoding scheme, the HTTP transfer headers and
+other information.
+To process the real XML root element, we have to take the children of
+the root node, select the XML root element and process this, but
+remain all other children unchanged. This is done with
+processChildren and the when choice
+operator. processChildren applies a filter elementwise to
+all children of a node. All results form processing the list of children from
+the result node.
+The structure of internal document tree can be made visible
+e.g. by adding the option withShowTree yes to the
+writeDocument arrow in (3).
+This will emit the tree in a readable
+text representation instead of the real document.
+In the next section we will give examples for the
+processDocumentRootElement arrow.
+
+Tracing
+There are tracing facilities to observe the actions performed
+and to show intermediate results
+
+application	:: SysConfigList -> String -> String -> IOSArrow b Int
+application cfg src dst
+    = configSysVars (withTrace 1 : cfg)                           -- (0)
+      >>>
+      traceMsg 1 "start reading document"                         -- (1)
+      >>>
+      readDocument [] src
+      >>>
+      traceMsg 1 "document read, start processing"                -- (2)
+      >>>
+      processChildren (processDocumentRootElement `when` isElem)
+      >>>
+      traceMsg 1 "document processed"                             -- (3)
+      >>>
+      writeDocument [] dst
+      >>>
+      getErrStatus
+
+In (0) the system trace level is set to 1, in default level 0
+all trace messages are suppressed. The three trace messages (1)-(3)
+will be issued, but also readDocument and writeDocument will
+log their activities.
+How a whole document and the internal tree structure can be traced,
+is shown in the following example
+
+      ...
+      >>>
+      processChildren (processDocumentRootElement `when` isElem)
+      >>>
+      withTraceLevel 4 (traceDoc "resulting document")      -- (1)
+      >>>
+      ...
+
+In (1) the trace level is locally set to the highest level 4.
+traceDoc will then issue the trace message, the document formatted
+as XML, and the internal DOM tree of the document.
+
+Selection examples
+Selecting text from an HTML document
+Selecting all the plain text of an XML/HTML document
+can be formulated with
+
+selectAllText	:: ArrowXml a => a XmlTree XmlTree
+selectAllText
+    = deep isText
+
+deep traverses the whole tree, stops the traversal when
+a node is a text node (isText) and returns all the text nodes.
+There are two other traversal operators deepest and multi,
+In this case, where the selected nodes are all leaves, these would give the same result.
+
+Selecting text and ALT attribute values
+Let's take a bit more complex task: We want to select all text, but also the values of the alt attributes
+of image tags.
+
+selectAllTextAndAltValues	:: ArrowXml a => a XmlTree XmlTree
+selectAllTextAndAltValues
+    = deep
+      ( isText                       -- (1)
+	&lt;+>
+	( isElem >>> hasName "img"   -- (2)
+	  >>>
+	  getAttrValue "alt"         -- (3)
+	  >>>
+	  mkText                     -- (4)
+	)
+      )
+
+The whole tree is searched for text nodes (1) and for image elements (2), from the image elements
+the alt attribute values are selected as plain text (3), this text is transformed into a text node (4).
+
+Selecting text and ALT attribute values (2)
+Let's refine the above filter one step further. The text from the alt attributes shall be marked in the output
+by surrounding double square brackets. Empty alt values shall be ignored.
+
+selectAllTextAndRealAltValues	:: ArrowXml a => a XmlTree XmlTree
+selectAllTextAndRealAltValues
+    = deep
+      ( isText
+	&lt;+>
+	( isElem >>> hasName "img"
+	  >>>
+	  getAttrValue "alt"
+	  >>>
+	  isA significant            -- (1)
+	  >>>
+	  arr addBrackets            -- (2)
+	  >>>
+	  mkText
+	)
+      )
+    where
+    significant :: String -> Bool
+    significant = not . all (`elem` " \n\r\t")
+
+    addBrackets :: String -> String
+    addBrackets s
+	=  " [[ " ++ s ++ " ]] "
+
+This example shows two combinators for building arrows from pure functions.
+The first one isA removes all empty or whitespace values from alt attributes (1),
+the other arr lifts the editing function to the arrow level (2).
+
+Document construction examples
+The Hello World document
+The first document, of course, is a Hello World document:
+
+helloWorld	:: ArrowXml a => a XmlTree XmlTree
+helloWorld
+    = mkelem "html" []              -- (1)
+      [ mkelem "head" []
+	[ mkelem "title" []
+	  [ txt "Hello World" ]     -- (2)
+	]
+      , mkelem "body"
+	[ sattr "class" "haskell" ] -- (3)
+	[ mkelem "h1" []
+	  [ txt "Hello World" ]     -- (4)
+	]
+      ]
+
+The main arrows for document construction are mkelem
+and it's variants (selem, aelem, eelem) for element creation, attr and sattr for attributes and mktext
+and txt for text nodes. mkelem takes three arguments, the element name (or tag name), a list of arrows for the construction of attributes, not empty in (3), and a list of arrows for the contents. Text content is generated in (2) and (4).
+To write this document to a file use the following arrow
+
+root [] [helloWorld]                         -- (1)
+>>>
+writeDocument [withIndent yes] "hello.xml"   -- (2)
+
+When this arrow is executed, the helloWorld
+document is wrapped into a so called root node (1). This complete
+document is written to "hello.xml" (2).
+writeDocument and its variants always expect
+a whole document tree with such a root node. Before writing, the document is
+indented (withIndent yes)) by inserting extra whitespace
+text nodes, and an XML declaration with version and encoding is added. If the indent option is not given, the whole document would appears on a single line:
+
+&lt;?xml version="1.0" encoding="UTF-8"?>
+&lt;html>
+  &lt;head>
+    &lt;title>Hello World&lt;/title>
+  &lt;/head>
+  &lt;body class="haskell">
+    &lt;h1>Hello World&lt;/h1>
+  &lt;/body>
+&lt;/html>
+
+The code can be shortened a bit by using some of the
+convenient functions:
+
+helloWorld2	:: ArrowXml a => a XmlTree XmlTree
+helloWorld2
+    = selem "html"
+      [ selem "head"
+	[ selem "title"
+	  [ txt "Hello World" ]
+	]
+      , mkelem "body"
+	[ sattr "class" "haskell" ]
+	[ selem "h1"
+	  [ txt "Hello World" ]
+	]
+      ]
+
+In the above two examples the arrow input is totally ignored, because
+of the use of the constant arrow txt "...".
+
+A page about all images within a HTML page
+A bit more interesting task is the construction of a page
+containing a table of all images within a page inclusive image URLs, geometry and ALT attributes.
+The program for this has a frame similar to the helloWorld program,
+but the rows of the table must be filled in from the input document.
+In the first step we will generate a table with a single column containing
+the URL of the image.
+
+imageTable	:: ArrowXml a => a XmlTree XmlTree
+imageTable
+    = selem "html"
+      [ selem "head"
+	[ selem "title"
+	  [ txt "Images in Page" ]
+	]
+      , selem "body"
+	[ selem "h1"
+	  [ txt "Images in Page" ]
+	, selem "table"
+	  [ collectImages           -- (1)
+	    >>>
+	    genTableRows            -- (2)
+	  ]
+	]
+      ]
+    where
+    collectImages                   -- (1)
+	= deep ( isElem
+                 >>>
+                 hasName "img"
+               )
+    genTableRows                    -- (2)
+	= selem "tr"
+	  [ selem "td"
+	    [ getAttrValue "src" >>> mkText ]
+	  ]
+
+With (1) the image elements are collected, and with (2)
+the HTML code for an image element is built.
+Applied to http://www.haskell.org/ we get the following result
+(at the time writing this page):
+
+&lt;html>
+  &lt;head>
+    &lt;title>Images in Page&lt;/title>
+  &lt;/head>
+  &lt;body>
+    &lt;h1>Images in Page&lt;/h1>
+    &lt;table>
+      &lt;tr>
+        &lt;td>/haskellwiki_logo.png&lt;/td>
+      &lt;/tr>
+      &lt;tr>
+        &lt;td>/sitewiki/images/1/10/Haskelllogo-small.jpg&lt;/td>
+      &lt;/tr>
+      &lt;tr>
+        &lt;td>/haskellwiki_logo_small.png&lt;/td>
+      &lt;/tr>
+    &lt;/table>
+  &lt;/body>
+&lt;/html>
+
+When generating HTML, often there are constant parts within the page,
+in the example e.g. the page header. It's possible to write these
+parts as a string containing plain HTML and then read this with
+a simple XML contents parser called xread.
+The example above could then be rewritten as
+
+imageTable
+    = selem "html"
+      [ pageHeader
+      , ...
+      ]
+    where
+    pageHeader
+	= constA "&lt;head>&lt;title>Images in Page&lt;/title>&lt;/head>"
+	  >>>
+	  xread
+    ...
+
+xread is a very primitive arrow. It does not run in the
+IO monad, so it can be used in any context, but therefore the error handling
+is very limited. xread parses an XML element content.
+
+A page about all images within a HTML page: 1. Refinement
+The next refinement step is the extension of the table such that
+it contains four columns, one for the image itself, one for the URL,
+the geometry and the ALT text. The extended getTableRows
+has the following form:
+
+    genTableRows
+	= selem "tr"
+	  [ selem "td"			-- (1)
+	    [ this                      -- (1.1)
+	    ]
+	  , selem "td"                  -- (2)
+	    [ getAttrValue "src"
+	      >>>
+	      mkText
+	      >>>
+	      mkelem "a"                -- (2.1)
+	      [ attr "href" this ]
+	      [ this ]
+	    ]
+	  , selem "td"                  -- (3)
+	    [ ( getAttrValue "width"
+		&amp;&amp;&amp;                     -- (3.1)
+		getAttrValue "height"
+	      )
+	      >>>
+	      arr2 geometry             -- (3.2)
+	      >>>
+	      mkText
+	    ]
+	  , selem "td"                  -- (4)
+	    [ getAttrValue "alt"
+	      >>>
+	      mkText
+	    ]
+	  ]
+        where
+	geometry :: String -> String -> String
+	geometry "" ""
+	    = ""
+	geometry w h
+	    = w ++ "x" ++ h
+
+In (1) the identity arrow this is used for
+inserting the whole image element (this value) into the first column.
+(2) is the column from the previous example but the URL has been made active
+by embedding the URL in an A-element (2.1). In (3) there are two
+new combinators, (&amp;&amp;&amp;) (3.1) is an arrow for applying two
+arrows to the same input and combine the results into a pair. arr2
+works like arr but it lifts a binary function into an arrow
+accepting a pair of values. arr2 f is a shortcut for
+arr (uncurry f). So width and height are combined into an X11 like
+geometry spec. (4) adds the ALT-text.
+
+A page about all images within a HTML page: 2. Refinement
+The generated HTML page is not yet very useful, because it usually
+contains relative HREFs to the images, so the links do not work.
+We have to transform the SRC attribute values into absolute URLs.
+This can be done with the following code:
+
+imageTable2	:: IOStateArrow s XmlTree XmlTree
+imageTable2
+    = ...
+      ...
+	, selem "table"
+	  [ collectImages
+	    >>>
+	    mkAbsImageRef                          -- (1)
+	    >>>
+	    genTableRows
+	  ]
+       ...
+
+mkAbsImageRef :: IOStateArrow s XmlTree XmlTree    -- (1)
+mkAbsImageRef
+    = processAttrl ( mkAbsRef                      -- (2)
+                     `when`
+                     hasName "src"                 -- (3)
+                   )
+      where
+      mkAbsRef                                     -- (4)
+	  = replaceChildren
+	    ( xshow getChildren                    -- (5)
+	      >>>
+	      ( mkAbsURI `orElse` this )           -- (6)
+	      >>>
+	      mkText                               -- (7)
+	    )
+
+The imageTable2 is extended by an arrow mkAbsImageRef
+(1). This arrow uses the global system state of HXT, in which the base URL
+of a document is stored. For editing the SRC attribute value, the attribute list
+of the image elements is processed with processAttrl.
+With the `when` hasName "src" only SRC attributes are manipulated (3). The real work is done in (4): The URL is selected with getChildren, a text node, and converted into a string (xshow), the URL is transformed into an absolute URL
+with mkAbsURI (6). This arrow may fail, e.g. in case of illegal
+URLs. In this case the URL remains unchanged (`orElse` this).
+The resulting String value is converted into a text node forming the new
+attribute value node (7).
+Because of the use of the global HXT state in mkAbsURI
+mkAbsRef and imageTable2 need to have the more specialized signature IOStateArrow s XmlTree XmlTree.
+
+Transformation examples
+Decorating external references of an HTML document
+In the following examples, we want to decorate the external references
+in an HTML page by a small icon, like it's done in many wikis.
+For this task the document tree has to be traversed, all parts
+except the intersting A-Elements remain unchanged. At the end of the list of children of an A-Element we add an image element.
+Here is the first version:
+
+addRefIcon	:: ArrowXml a => a XmlTree XmlTree
+addRefIcon
+    = processTopDown                       -- (1)
+      ( addImg                             -- (2)
+	`when`
+	isExternalRef                      -- (3)
+      )
+    where
+    isExternalRef                          -- (4)
+	= isElem
+	  >>>
+	  hasName "a"
+          >>>
+	  hasAttr "href"
+	  >>>
+	  getAttrValue "href"
+	  >>>
+	  isA isExtRef
+	where
+	isExtRef                           -- (4.1)
+	    = isPrefixOf "http:"           -- or something more precise
+
+    addImg
+	= replaceChildren                  -- (5)
+	  ( getChildren                    -- (6)
+	    &lt;+>
+	    imgElement                     -- (7)
+	  )
+
+    imgElement
+	= mkelem "img"                     -- (8)
+	  [ sattr "src" "/icons/ref.png"   -- (9)
+	  , sattr "alt" "external ref"
+	  ] []                             -- (10)
+
+The traversal is done with processTopDown (1).
+This arrow applies an arrow to all nodes of the whole document tree.
+The transformation arrow applies the addImg (2) to
+all A-elements (3),(4). This arrow uses a bit simplified test (4.1)
+for external URLs.
+addImg manipulates all children (5) of the A-elements by
+selecting the current children (6) and adding an image element (7).
+The image element is constructed with mkelem (8). This takes
+an element name, a list of arrows for computing the attributes and a
+list of arrows for computing the contents. The content of the image element is
+empty (10). The attributes are constructed with sattr (9).
+sattr ignores the arrow input and builds an attribute form
+the name value pair of arguments.
+
+Transform external references into absolute references
+In the following example we will develop a program for editing a HTML page such that all references to external documents (images, hypertext refs, style refs, ...) become absolute references. We will see some new, but very useful combinators in the solution. 
+The task seems to be rather trivial. In a tree traversal all references are edited with respect to the document base. But in HTML there is a BASE element, allowed in the content of HEAD with a HREF attribute, which defines the document base. Again this href can be a relative URL. 
+We start the development with the editing arrow. This gets the real document base as argument. 
+
+mkAbsHRefs	:: ArrowXml a => String -> a XmlTree XmlTree
+mkAbsHRefs base
+    = processTopDown editHRef                   -- (1)
+    where
+    editHRef
+	= processAttrl                          -- (3)
+            ( changeAttrValue (absHRef base)    -- (5)
+	      `when`
+	      hasName "href"                    -- (4)
+	     )
+	  `when`
+	  ( isElem >>> hasName "a" )            -- (2)
+	where
+
+	absHRef	:: String -> String -> String   -- (5)
+	absHRef base url
+	    = fromMaybe url . expandURIString url $ base
+
+The tree is traversed (1) and for every A element the attribute list is processed (2). All HREF attribute values (4) are manipulated by changeAttrValue called with a string function (5). expandURIString is a pure function defined in HXT for computing an absolute URI. 
+In this first step we only edit A-HREF attribute values. We will refine this
+later.
+The second step is the complete computation of the base URL.
+
+computeBaseRef	:: IOStateArrow s XmlTree String
+computeBaseRef
+    = ( ( ( isElem >>> hasName "html"      -- (0)
+            >>>
+            getChildren                    -- (1)
+	    >>>
+	    isElem >>> hasName "head"      -- (2)
+	    >>>
+	    getChildren                    -- (3)
+	    >>>
+	    isElem >>> hasName "base"      -- (4)
+	    >>>
+	    getAttrValue "href"            -- (5)
+	  )
+	  &amp;&amp;&amp;
+	  getBaseURI                       -- (6)
+	)
+	>>> expandURI                      -- (7)
+      )
+      `orElse` getBaseURI                  -- (8)
+
+Input to this arrow is the HTML element, (0) to (5) is the arrow for selecting
+the BASE elements HREF value, parallel to this the system base URL is read
+with getBaseURI (6) like in examples above. The resulting 
+pair of strings is piped into expandURI (7), the arrow version of
+expandURIString. This arrow ((1) to (7)) fails in the absence
+of a BASE element. in this case we take the plain document base (8).
+The selection of the BASE elements is not yet very handy. We will define
+a more general and elegant function later, allowing an element path as selection argument.
+In the third step, we will combine the to arrows. For this we will use a new combinator ($&lt;). The need for this new combinator is the following: We need the arrow input (the document) two times, once for computing the document base, and second for editing the whole document, and we want to compute the extra string parameter for editing of course with the above defined arrow. 
+The combined arrow, our main arrow, looks like this:
+
+toAbsRefs	:: IOStateArrow s XmlTree XmlTree
+toAbsRefs
+    = mkAbsHRefs $&lt; computeBaseRef        -- (1)
+
+In (1) first the arrow input is piped into computeBaseRef,
+this result is used in mkAbsHRefs as extra string parameter
+when processing the document. Internally the ($&lt;) combinator
+is defined by the basic combinators (&amp;&amp;&amp;), (>>>) and app, but in a bit more complex computations,
+this pattern occurs rather frequently, so ($&lt;) becomes very useful.
+Programming with arrows is one style of point free programming. Point free programming often becomes unhandy when values are used more than once. One solution is the special arrow syntax supported by ghc and others, similar to the do notation for monads. But for many simple cases the ($&lt;) combinator and its variants ($&lt;&lt;), ($&lt;&lt;&lt;), ($&lt;&lt;&lt;&lt;), ($&lt;$) is sufficient. 
+To complete the development of the example, a last step is necessary: the removal of the redundant BASE element. 
+
+toAbsRefs	:: IOStateArrow s XmlTree XmlTree
+toAbsRefs
+    = ( mkAbsHRefs $&lt; computeBaseRef )
+      >>>
+      removeBaseElement
+      
+removeBaseElement	:: ArrowXml a => a XmlTree XmlTree
+removeBaseElement
+    = processChildren
+        ( processChildren
+            ( none                            -- (1)
+              `when`
+              ( isElem >>> hasName "base" )
+            )
+          `when`
+          ( isElem >>> hasName "head" )
+        )
+
+In this function the children of the HEAD element are searched for a BASE element. This is removed by aplying the null arrow none to the input, returning always the empty list. none `when` ... is the pattern for deleting nodes from a tree. 
+The computeBaseRef function defined above contains an arrow pattern for selecting the right sub-tree that is rather common in HXT applications 
+
+isElem >>> hasName n1
+>>>
+getChildren
+>>>
+isElem >>> hasName n2
+...
+>>>
+getChildren
+>>>
+isElem >>> hasName nm
+
+For this pattern we will define a convenient function creating the arrow for selection:
+
+getDescendents :: ArrowXml a => [String] -> a XmlTree XmlTree
+getDescendents
+    = foldl1 (\ x y -> x >>> getChildren >>> y)   -- (1)
+      .
+      map (\ n -> isElem >>> hasName n)           -- (2)
+
+The name list is mapped to the element checking arrow (2), the resulting list of arrows is folded with getChildren into a single arrow. computeBaseRef can then be simplified and becomes more readable: 
+
+computeBaseRef	:: IOStateArrow s XmlTree String
+computeBaseRef
+    = ( ( ( getDescendents ["html","head","base"]  -- (1)
+	    >>>
+	    getAttrValue "href"                    -- (2)
+	  )
+      ...
+      ...
+
+An even more general and flexible technique can be found with the XPath expressions available for selection of document parts defined in the module Text.XML.HXT.Arrow.XmlNodeSet.
+With XPath computeBaseRef can be simplified to:
+
+computeBaseRef
+    = ( ( ( getXPathTrees "/html/head/base"        -- (1)
+            >>>
+	    getAttrValue "href"                    -- (2)
+	  )
+      ...
+
+Even the attribute selection can be expressed by XPath, so (1) and (2) can be combined into
+
+computeBaseRef
+    = ( ( xshow (getXPathTrees "/html/head/base@href")
+      ...
+
+The extra xshow is here required to convert the XPath result, an XmlTree, into a string.
+XPath defines a full language for selecting parts of an XML document. Sometimes it is simpler to make selections of this type, but the XPath evaluation in general is more expensive in time and space than a simple combination of arrowsas we've seen it in getDescendends.
+
+Transform external references into absolute references: Refinement
+In the above example only A-HREF URLs are edited. Now we extend this
+to other element-attribute combinations.
+
+mkAbsRefs	:: ArrowXml a => String -> a XmlTree XmlTree
+mkAbsRefs base
+    = processTopDown ( editRef "a" "href"                 -- (2)
+		       >>>
+		       editRef "img" "src"                -- (3)
+		       >>>
+		       editRef "link" "href"              -- (4)
+		       >>>
+		       editRef "script" "src"             -- (5)
+		     )
+    where
+    editRef en an                                         -- (1)
+	= processAttrl ( changeAttrValue (absHRef base)
+			 `when`
+			 hasName an
+		       )
+	  `when`
+	  ( isElem >>> hasName en )
+	where
+	absHRef	:: String -> String -> String
+	absHRef base url
+	    = fromMaybe url . expandURIString url $ base
+
+editRef is parameterized by the element and attribute names.
+The arrow applied to every element is extended to a sequence of
+editRef's ((2)-(5)). Notice that the document is still traversed only once.
+To process all possible HTML elements,
+this sequence should be extended by further element-attribute pairs.
+This can further be simplified into
+
+mkAbsRefs	:: ArrowXml a => String -> a XmlTree XmlTree
+mkAbsRefs base
+    = processTopDown editRefs
+    where
+    editRefs
+	= foldl (>>>) this
+	  .
+	  map (\ (en, an) -> editRef en an)
+	  $
+	  [ ("a", "href")
+	  , ("img", "src")
+	  , ("link", "href")
+	  , ("script", "src")	    -- and more
+	  ]
+    editRef
+      = ...
+
+The foldl (>>>) this is defined in HXT as seqA,
+so the above code can be simplified to
+
+mkAbsRefs	:: ArrowXml a => String -> a XmlTree XmlTree
+mkAbsRefs base
+    = processTopDown editRefs
+    where
+    editRefs
+	= seqA . map (uncurry editRef)
+	  $
+	  ...
+
+More complex examples
+Serialization and deserialisation to/from XML
+Examples can be found in /HXT/Conversion_of_Haskell_data_from/to_XML
+
+Practical examples of HXT
+More complex and complete examples of HXT in action
+can be found in /HXT/Practical
+
+The Complete Guide To Working With HTML
+Tutorial and Walkthrough: http://adit.io/posts/2012-04-14-working_with_HTML_in_haskell.html
+
+
+
+
+
+					
+						Retrieved from "https://wiki.haskell.org/index.php?title=HXT&amp;oldid=60699"					
+				/Special:Categories: /Category:Web/Category:XML/Category:Tools/Category:Tutorials/Category:Libraries				
+							
+		
+		
+			Navigation menu
+
+			
+									
+						Personal tools
+						
+							/index.php?title=Special:UserLogin&amp;returnto=HXT						
+					
+									
+										
+						Namespaces
+						
+															/HXT
+															/Talk:HXT
+													
+					
+										
+												
+							Variants#
+						
+
+						
+							
+															
+						
+					
+									
+				
+										
+						Views
+						
+															/HXT
+															/index.php?title=HXT&amp;action=edit
+															/index.php?title=HXT&amp;action=history
+													
+					
+										
+						More#
+
+						
+							
+															
+						
+					
+										
+						
+							Search
+						
+
+						
+							
+														
+						
+					
+									
+			
+			
+				/Haskell
+						
+			Navigation
+
+			
+									
+						/Haskell/HaskellWiki:Community/Special:RecentChanges/Special:Random					
+							
+		
+			
+			Tools
+
+			
+									
+						/Special:WhatLinksHere/HXT/Special:RecentChangesLinked/HXT/Special:SpecialPages/index.php?title=HXT&amp;printable=yes/index.php?title=HXT&amp;oldid=60699/index.php?title=HXT&amp;action=info/index.php?title=Special:CiteThisPage&amp;page=HXT&amp;id=60699					
+							
+		
+				
+		
+		
+							
+											 This page was last edited on 27 April 2016, at 00:20.
+											Recent content is available under /HaskellWiki:Copyrights.
+									
+							
+											/HaskellWiki:Privacy_policy
+											/HaskellWiki:About
+											/HaskellWiki:General_disclaimer
+									
+									
+		
+		(window.RLQ=window.RLQ||[]).push(function(){mw.config.set({"wgPageParseReport":{"limitreport":{"cputime":"0.103","walltime":"0.465","ppvisitednodes":{"value":1127,"limit":1000000},"ppgeneratednodes":{"value":0,"limit":1000000},"postexpandincludesize":{"value":0,"limit":2097152},"templateargumentsize":{"value":0,"limit":2097152},"expansiondepth":{"value":2,"limit":40},"expensivefunctioncount":{"value":0,"limit":100},"unstrip-depth":{"value":0,"limit":20},"unstrip-size":{"value":86569,"limit":5000000},"timingprofile":[]},"cachereport":{"timestamp":"20220728051517","ttl":86400,"transientcontent":false}}});});(window.RLQ=window.RLQ||[]).push(function(){mw.config.set({"wgBackendResponseTime":80});});
+	
+

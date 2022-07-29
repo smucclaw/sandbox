@@ -32,6 +32,9 @@ library
       src
   build-depends:
       base >=4.7 && <5
+    , fgl
+    , mtl
+    , pretty-simple
   default-language: Haskell2010
 
 executable pnml-exe
@@ -43,7 +46,10 @@ executable pnml-exe
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
+    , fgl
+    , mtl
     , pnml
+    , pretty-simple
   default-language: Haskell2010
 
 test-suite pnml-test
@@ -56,5 +62,8 @@ test-suite pnml-test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
+    , fgl
+    , mtl
     , pnml
+    , pretty-simple
   default-language: Haskell2010

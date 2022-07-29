@@ -1,15 +1,14 @@
-{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE StandaloneDeriving #-}
-{-# LANGUAGE TypeFamilyDependencies #-}
+{-# LANGUAGE TypeFamilies #-}
 
 module Data.PetriNet where
 import Control.Applicative as App
 import Data.Kind (Constraint, Type)
 import GHC.Generics (Generic)
--- import GHC.TypeLits (ErrorMessage (Text), TypeError)
+import GHC.TypeLits (ErrorMessage (Text), TypeError)
 
 import Data.Hashable (Hashable)
 import Data.Tuple.All (sequenceT)
@@ -34,14 +33,14 @@ import Flow ((|>))
   Practically, this tells GHC that RHS of the equalities can be inverted,
   which helps to avoid some unintuitive type errors.
 -}
-data NodeType  = PlaceType | TransitionType
+data NodeType = PlaceType | TransitionType
   deriving (Eq, Generic, Ord, Read, Show)
-
+  
 instance Hashable NodeType
 
-type family FlipNodeType srcType = destType | destType -> srcType where
-  FlipNodeType PlaceType = TransitionType
-  FlipNodeType TransitionType = PlaceType
+-- type family FlipNodeType srcType = destType | destType -> srcType where
+--   FlipNodeType PlaceType = TransitionType
+--   FlipNodeType TransitionType = PlaceType
 
 -- NodeType is used by the Node type to elevate and store information about the
 -- data constructor at the type level.
@@ -51,9 +50,16 @@ type family FlipNodeType srcType = destType | destType -> srcType where
 -- More specifically, this allows us to ban, at the type-level, arcs formed by
 -- the pairs (Place _, Place _) and (Transition _, Transition _).
 
-data Node (nodeType :: NodeType) nodeName where
-  Place :: a -> Node PlaceType a
-  Transition :: a -> Node TransitionType a
+data PlaceT
+data TransT
+
+type family FlipT t where
+  FlipT PlaceT = TransT
+  FlipT TransT = PlaceT
+
+data Node tag nodeName where
+  Place :: a -> Node PlaceT a
+  Transition :: a -> Node TransT a
 
 deriving instance Eq a => Eq (Node nodeType a)
 deriving instance Ord a => Ord (Node nodeType a)
@@ -67,14 +73,14 @@ data LabelledNode nodeType a b = LabelledNode
 
 data Arc srcType a c = Arc
   { arcSrc :: Node srcType a,
-    arcDest :: Node (FlipNodeType srcType) a,
+    arcDest :: Node (FlipT srcType) a,
     arcLabel :: c
   }
   deriving (Eq, Ord, Show)
 
 data InOutArcs srcType a b c = LabelledArcs
-  { incomingArcs :: [InOutArc (FlipNodeType srcType) a b c],
-    outgoingArcs :: [InOutArc (FlipNodeType srcType) a b c]
+  { incomingArcs :: [InOutArc (FlipT srcType) a b c],
+    outgoingArcs :: [InOutArc (FlipT srcType) a b c]
   }
   deriving (Eq, Ord, Show)
 
@@ -119,7 +125,7 @@ class PetriNet pn a b c where
     petriNet |> nodes |> snd |> map node |> (transition `elem`)
 
   -- Get all the nodes in a Petri net.
-  nodes :: pn a b c -> ([LabelledNode PlaceType a b], [LabelledNode TransitionType a b])
+  nodes :: pn a b c -> ([LabelledNode PlaceT a b], [LabelledNode TransT a b])
 
   -- Given a Petri net and a node, find the label corresponding to that node.
   lookupLabel :: pn a b c -> Node nodeType a -> Maybe b
@@ -150,11 +156,11 @@ class PetriNet pn a b c where
       outArcs' = aux outArcs
 
   -- Get the incoming arcs for a node in a Petri net.
-  inArcs :: Node nodeType a -> pn a b c -> Maybe [InOutArc (FlipNodeType nodeType) a b c]
+  inArcs :: Node nodeType a -> pn a b c -> Maybe [InOutArc (FlipT nodeType) a b c]
   inArcs node petriNet = petriNet |> arcs node |> fmap incomingArcs
 
   -- Get the outgoing arcs for a node in a Petri net.
-  outArcs :: Node nodeType a -> pn a b c -> Maybe [InOutArc (FlipNodeType nodeType) a b c]
+  outArcs :: Node nodeType a -> pn a b c -> Maybe [InOutArc (FlipT nodeType) a b c]
   outArcs node petriNet = petriNet |> arcs node |> fmap outgoingArcs
 
   -- Add a new arc to a Petri net.
@@ -164,7 +170,7 @@ class PetriNet pn a b c where
   delArc :: Arc srcType a c -> pn a b c -> pn a b c
 
 type Marking pn a b c tokenType =
-  Node PlaceType a -> pn a b c -> Maybe [tokenType]
+  Node PlaceT a -> pn a b c -> Maybe [tokenType]
 
 -- emptyMarking :: Marking pn a b c tokenType
 -- emptyMarking (Place _) _ = Just []

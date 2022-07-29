@@ -1,4 +1,3 @@
-{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE GADTs #-}
@@ -81,12 +80,12 @@ node2graphNode (PTNet.Place nodeName) =
 node2graphNode (PTNet.Transition nodeName) =
   GraphNode { nodeType = PTNet.TransitionType, nodeName }
 
-graphNode2place :: App.Alternative m => GraphNode a -> m (PTNet.Node PTNet.PlaceType a)
+graphNode2place :: App.Alternative m => GraphNode a -> m (PTNet.Node PTNet.PlaceT a)
 graphNode2place GraphNode { nodeType = PTNet.PlaceType, nodeName } =
   nodeName |> PTNet.Place |> pure
 graphNode2place _ = App.empty
 
-graphNode2transition :: App.Alternative m => GraphNode a -> m (PTNet.Node PTNet.TransitionType a)
+graphNode2transition :: App.Alternative m => GraphNode a -> m (PTNet.Node PTNet.TransT a)
 graphNode2transition GraphNode { nodeType = PTNet.TransitionType, nodeName } =
   nodeName |> PTNet.Transition |> pure
 graphNode2transition _ = App.empty
@@ -226,8 +225,8 @@ testPetriNet =
   |> PTNet.addArc (PTNet.Arc (PTNet.Place "P1") (PTNet.Transition "T2") 2)
   |> PTNet.addArc (PTNet.Arc (PTNet.Transition "T2") (PTNet.Place "P1") 3)
   |> PTNet.addArcs []
-  -- |> PTNet.addArc (PTNet.Arc (PTNet.Place "P1", PTNet.Place "P1", 4))
-  -- |> PTNet.addArc (PTNet.Arc (PTNet.Transition "T1", PTNet.Transition "T2", 4))
+  -- |> PTNet.addArc (PTNet.Arc (PTNet.Place "P1") (PTNet.Place "P1") 4)
+  -- |> PTNet.addArc (PTNet.Arc (PTNet.Transition "T1") ( PTNet.Transition "T2") 4)
 
 -- testArcs :: Maybe [(Node TransitionType String String, Int)]
 testArcs = PTNet.arcs (PTNet.Place "P1") testPetriNet

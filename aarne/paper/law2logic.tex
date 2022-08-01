@@ -1,6 +1,7 @@
 \documentclass{IOS-Book-Article}
 \usepackage[utf8]{inputenc}
 \usepackage{graphicx}
+\usepackage{framed}
 
 \def\hb{\hbox to 11.5 cm{}}
 
@@ -99,8 +100,9 @@ The second part is a conversion to a new intermediate representation between syn
 We call this representation \textbf{assembly logic}, in analogy to assembly languages in compilers, if we think of spreadsheets and logics as "machine languages", whose long distance to the source language is bridged by the assembly language.
 
 Figure~\ref{pipeline} shows the complete pipeline, and Figure~\ref{pipeline-ex} shows an example of a text at different stages through the pipeline.
+
 \begin{figure}
-\includegraphics[width=0.8\textwidth]{pipeline.png}
+ \includegraphics[width=0.8\textwidth]{pipeline.png}
 \caption{The pipeline.}
 \label{pipeline}
 \end{figure}
@@ -112,11 +114,11 @@ Figure~\ref{pipeline} shows the complete pipeline, and Figure~\ref{pipeline-ex} 
 \small
 \begin{verbatim}
 ![X]:(data_breach(X) & ?[Y]:(personal_data(Y) & IN_RELATION_TO(X,Y)) <=> 
-(personal_data(X) & ?[Y]:((access(Y,X) | collection(Y,X) | use(Y,X) | disclosure(Y,X) | 
-copying(Y,X) | modification(Y,X) | disposal(Y,X)) & unauthorized(Y))) | 
-(((storage_medium(X) | device(X)) & (personal_data(X) & 
-?[Y]:((circumstances(Y) & (((unauthorized(Y) & (access(Y) | collection(Y) | use(Y) | 
-disclosure(Y) | copying(Y) | modification(Y) | disposal(Y))) & 
+(personal_data(X) & ?[Y]:((access(Y,X) | collection(Y,X) | use(Y,X) | 
+disclosure(Y,X) | copying(Y,X) | modification(Y,X) | disposal(Y,X)) & 
+unauthorized(Y))) | (((storage_medium(X) | device(X)) & (personal_data(X) & 
+?[Y]:((circumstances(Y) & (((unauthorized(Y) & (access(Y) | collection(Y) | 
+use(Y) | disclosure(Y) | copying(Y) | modification(Y) | disposal(Y))) & 
 is_likely_to_occur(Y))) & is_stored_in(X,Y)))) & loss(X))))
 \end{verbatim}
 \normalsize
@@ -127,7 +129,7 @@ TODO (AR): the TPTP formula is not quite correct - I will have to fix the semant
 \end{figure}
 
 
-\section{Building and using the grammar}
+\section{Building the grammar}
 
 Parsing the text is performed by the Grammatical Framework (GF) software.
 The parser is driven by a grammar, which specifies a relation between strings and abstract syntax trees.
@@ -147,6 +149,7 @@ Figure~\ref{grammar-gen} shows an example of a line of a text, the annotations a
 
 
 \begin{figure}
+ \begin{framed}
 \bequ
 \textbf{A line in the text:}
 \bequ
@@ -154,9 +157,10 @@ Figure~\ref{grammar-gen} shows an example of a line of a text, the annotations a
 \enqu
 \textbf{The line annotated with marks for terminals} (\verb6#6) \textbf{and nonterminals} (\verb6*6):
 \bequ
-  \begin{verbatim}
-*Item (2) #without #limiting #subsection *Ref (1)(a) #, #a *CN data breach 
-#is #deemed #to *VP result in significant harm to an individual #—
+\begin{verbatim}
+*Item (2) #without #limiting #subsection *Ref (1)(a) #, 
+#a *CN data breach #is #deemed #to 
+*VP result in significant harm to an individual #—
 \end{verbatim}
 \enqu
 \textbf{Grammar rules derived by the script:}
@@ -167,7 +171,8 @@ Line ::= Item "without" "limiting" "subsection" Ref ","
 Item ::= "(2)" ;
 Ref  ::= "(1)(a)" ;
 CN   ::= "data" "breach" ;
-VP   ::= "result" "in" "significant" "harm" "to" "an" "individual" ;
+VP   ::= "result" "in" "significant" 
+         "harm" "to" "an" "individual" ;
 \end{verbatim}
 \enqu
 \textbf{The last of the grammar rules manually edited by step-wise refinements:}
@@ -188,7 +193,8 @@ fun NP_an_CN : CN -> NP ;
 fun CN_individual : CN ;
 \end{verbatim}
 \enqu  
-\enqu  
+\enqu
+\end{framed}
 \caption{The grammar extraction process.}
 \label{grammar-gen}
 \end{figure}
@@ -209,6 +215,7 @@ This structure supports compositional conversion from a tree-like representation
 Figure~\ref{assembly} shows this type, together with the other concepts related to spreadsheets.
 
 \begin{figure}
+  \begin{framed}
   \bequ
   \textbf{The recursive Haskell datatype for spreadsheets:}
  \bequ
@@ -224,14 +231,14 @@ data Box = Box {
  \bequ
 \begin{verbatim}
 data Cat = 
-  CProp | CSet | CInd | CPred | CPred2 | CFun | CFam | CQuant | CNone 
+  CProp | CSet | CInd | -- ...
 
 data Formula =
     Atomic Cat Atom                     
   | Conjunction Cat ConjWord [Formula]  
   | Implication Formula Formula         
-  | Conditional Formula Formula      -- reverse implication
-  | Quantification String Formula    -- quantifier + domain
+  | Conditional Formula Formula     -- reverse implication
+  | Quantification String Formula   -- quantifier + domain
 \end{verbatim}
  \enqu
 
@@ -242,7 +249,7 @@ iNP :: Env -> GNP -> Formula
 iNP env np = case np of
   GNP_any_CN cn -> Quantification "ANY" (iCN env cn)
   GNP_each_CN cn -> Quantification "EACH" (iCN env cn)
-  GNP_that_CN cn -> Quantification "THAT" (iCN env cn)
+  -- ...
   _ -> Atomic CInd (lin env (gf np))
 \end{verbatim}
  \enqu
@@ -253,24 +260,104 @@ iNP env np = case np of
 formula2box :: Formula -> Box
 formula2box formula = case formula of
   Atomic _ a  -> atomBox a
-  Conjunction _ cw fs -> infixLeftsideBox (show cw) (map formula2box fs)
   Implication f g -> ifBox [formula2box f] [formula2box g]
   Quantification s f -> leftsideBox s [formula2box f]
 \end{verbatim}
  \enqu
- 
  \enqu
+   \end{framed}
  \caption{Data structures and conversions related to spreadsheet and the assembly logic.
  }
 \label{assembly}
 \end{figure}
 
+Notice that the ultimate unit of semantic interpretation is a paragraph consisting of several lines.
+This is the case, for instance with the example in Figure~\ref{pipeline-ex}.
+In the current implementation, the parser reads the document line by line, and a separate process is used for segmenting groups of lines into paragraphs.
+The reason for this set-up is purely practical: semantic units can be arbitrarily long sequences of lines, and the parser may get slow in such cases.
+
+
 
 
 \section{Interpretation in predicate logic}
 
+The pipeline in Figure~\ref{pipeline} branches from Assembly Logic to two directions: to spreadsheets, as described in the previous section, and to predicate logic, to be discussed here.
+The predicate logic step itself is divided to two phases:
+\begin{enumerate}
+\item Assembly logic is mapped into a many-sorted logic with Russell iota terms.
+\item The many-sorted logic is mapped into ordinary predicate logic and rendered in the TPTP notation.
+\end{enumerate}
+The many-sorted logic is chosen because of its better support of compositional translation.
+Thus quanfication expressed by noun phrases (such as \textit{any storage medium}) are compositionally interpreted as quantifiers with sorts, instead of dividing them into unsorted quantiers and sort predicates.
+The sorts are eliminated as a part of the conversion from many-sorted to ordinary logic.
+
+Even more crucially, anaphoric expressions (such as \textit{that organization}) are interpreted as definite descriptions formalized as iota terms.
+These iota terms are eliminated in a pass that looks for non-iota terms in their context of use.
+Figure~\ref{anaphora} shows an examples of this, showing thestructure of ``donkey sentences'' well-known in linguistic literature (\textit{if a man owns a donkey he beats it}).
+Such a sentence has an existential quantifier in the antecedent, and a pronoun or definite desctiption referring to it in the succedent.
+To express this reference in ordinary predicate logic, the existential quantifier is changed into a universal with a wide scope of the implication.
+
+ \begin{figure}
+  \begin{framed}
+  \bequ
+  \textbf{A toy example of a ``donkey sentence'':}
+  \bequ
+ \textit{if a notification is a data breach , the notification is affected}
+ \enqu
+
+ \textbf{Compositional interpretation in many-sorted logic with iota terms:}
+ \[
+(\exists x : \eop{notification})\eop{data\_breach}(x) \, \supset \, \eop{affected}(\iota(\eop{notification}))
+\]
+
+ \textbf{Conversions to ordinary predicate logic in TPTP notation:}
+ \bequ
+\begin{verbatim}
+![X]:(notification(X) => data_breach(X) => affected(X))
+\end{verbatim}
+ \enqu
+ \enqu
+   \end{framed}
+ \caption{Iota terms are eliminated via anaphora resolution.
+ }
+\label{anaphora}
+\end{figure}
+
+Donkey sentences are ubiquitous in law text, as in many other types of text.
+To our surprise, also ``inverted donkey sentences'' occurred in our sample text --- ones in which the existential appears in the succedent and is referred to in the antecedent.
+What makes this sound natural is that the whole implication appears in reverse: \textit{a man beats a donkey if he owns it}.
+Figure~\ref{donkey}
+
+
+
+\begin{figure}
+ \includegraphics[width=0.96\textwidth]{anaphora.png}
+\caption{An inverted donkey sentence from the actual law text.}
+\label{donkey}
+\end{figure}
 
 \section{Results, evaluation, and future work}
+
+Table~\ref{stats} shows some figures about the corpus used in this case study.
+
+TODO: At the time of writing, the final translation to logic fails for two logical units.
+
+
+\begin{table}
+  \begin{tabular}{|l|r|}
+\hline
+lines & 66 \\
+characters & 6154 \\
+tokens & 1072 \\
+unique tokens & 229 \\
+tokens per line on average & 16 \\
+tokens on the longest line & 56 \\
+logical units & 46 \\
+\hline
+  \end{tabular}
+  \caption{Statistics about Personal Data Protection Act (PDPA), Part 6A}
+  \label{stats}
+\end{table}
 
 
 \section{Conclusion}

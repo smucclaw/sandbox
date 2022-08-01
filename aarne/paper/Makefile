@@ -1,5 +1,7 @@
 all:
 	pdflatex law2logic.tex
+	bibtex law2logic
+	pdflatex law2logic.tex
 	pdflatex law2logic.tex
 
 txt:

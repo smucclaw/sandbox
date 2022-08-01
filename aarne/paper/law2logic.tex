@@ -131,14 +131,14 @@ TODO (AR): the TPTP formula is not quite correct - I will have to fix the semant
 
 \section{Building the grammar}
 
-Parsing the text is performed by the Grammatical Framework (GF) software.
+Parsing the text is performed by the Grammatical Framework (GF) software \cite{ranta-2011}.
 The parser is driven by a grammar, which specifies a relation between strings and abstract syntax trees.
 In typical GF applications, abstract syntax trees are processed further, usually in translations to other languages but also in logical semantics. 
 
 GF grammars are usually written by hand, to guarantee a precise correspondance to desired abstract syntax trees.
 The process is helped by GF's module system and extensive libraries, which reduce the need of manual work to the minimum.
-This is particularly useful in the most typical application of GF, Controlled Natural Language (CNL).
-In such applications, the language can be made to follow grammar rules defined in the GF Resource Grammar Library (RGL).
+This is particularly useful in the most typical application of GF, Controlled Natural Language (CNL) \cite{fuchs-al-2008,angelov-ranta-2009}.
+In such applications, the language can be made to follow grammar rules defined in the GF Resource Grammar Library (RGL, \cite{ranta-2009}).
 
 However, the RGL does not cover all the constructs in Singaporean law text, which means that some grammar writing needs to be done from scratch.
 In particular, the text contains indented lists, paragraph numbers, and references, which significant for the logical structure and which we wanted to capture by the parser.
@@ -293,7 +293,7 @@ The sorts are eliminated as a part of the conversion from many-sorted to ordinar
 
 Even more crucially, anaphoric expressions (such as \textit{that organization}) are interpreted as definite descriptions formalized as iota terms.
 These iota terms are eliminated in a pass that looks for non-iota terms in their context of use.
-Figure~\ref{anaphora} shows an examples of this, showing thestructure of ``donkey sentences'' well-known in linguistic literature (\textit{if a man owns a donkey he beats it}).
+Figure~\ref{anaphora} shows an examples of this, showing thestructure of ``donkey sentences'' well-known in linguistic literature (\textit{if a man owns a donkey he beats it}) \cite{geach-1962,kamp-1981}
 Such a sentence has an existential quantifier in the antecedent, and a pronoun or definite desctiption referring to it in the succedent.
 To express this reference in ordinary predicate logic, the existential quantifier is changed into a universal with a wide scope of the implication.
 
@@ -340,7 +340,7 @@ Figure~\ref{donkey}
 
 Table~\ref{stats} shows some figures about the corpus used in this case study.
 
-TODO: At the time of writing, the final translation to logic fails for two logical units.
+TODO (AR): At the time of writing, the final translation to logic fails for two logical units, and the logic rules require better verification.
 
 
 \begin{table}
@@ -359,18 +359,21 @@ logical units & 46 \\
   \label{stats}
 \end{table}
 
+The most important tasks for future work are to link this pipeline with the previous work at CCLAW, which have much more precision and detail: the spreadsheets and the grammar of smaller units.
+
+As regards spreadsheets, and in fact the interpretation in logic, the current experiment is simple-minded in the sense that it only looks at the document at hand.
+The real spreasheets also take into account other documents that affect the interpretation, and show this information in the spreadsheets.
+
+As for the grammar, the bulk of the work will be in the detailed structure of noun phrases and predicates that appear in single cells.
+It also remains to see how much of the line and paragraph structures is already included in the grammar based on the sample, but the variation there can be expected to be numerically smaller.
+
+
 
 \section{Conclusion}
 
+\bibliographystyle{plain}
+\bibliography{gf-bib}
 
-\begin{thebibliography}{99}
-
-
-\bibitem{r1}
-Petitti DB, Crooks VC, Buckwalter JG, Chiu V. Blood pressure levels before dementia.
-Arch Neurol. 2005 Jan;62(1):112-6, doi: ....
-
-\end{thebibliography}
 
 
 \end{document}

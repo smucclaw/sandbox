@@ -98,15 +98,108 @@ The first part of this is a grammar that parses texts to abstract syntax trees.
 The second part is a conversion to a new intermediate representation between syntax trees, spreadsheets, and logic.
 We call this representation \textbf{assembly logic}, in analogy to assembly languages in compilers, if we think of spreadsheets and logics as "machine languages", whose long distance to the source language is bridged by the assembly language.
 
-Figure~\ref{pipeline} shows the complete pipeline.
+Figure~\ref{pipeline} shows the complete pipeline, and Figure~\ref{pipeline-ex} shows an example of a text at different stages through the pipeline.
 \begin{figure}
 \includegraphics[width=0.8\textwidth]{pipeline.png}
 \caption{The pipeline.}
 \label{pipeline}
 \end{figure}
 
+\begin{figure}
+\includegraphics[width=0.8\textwidth]{text.png}
+\includegraphics[width=0.4\textwidth]{tree.eps}
+\includegraphics[width=0.6\textwidth]{assembly.png}
+\small
+\begin{verbatim}
+![X]:(data_breach(X) & ?[Y]:(personal_data(Y) & IN_RELATION_TO(X,Y)) <=> 
+(personal_data(X) & ?[Y]:((access(Y,X) | collection(Y,X) | use(Y,X) | disclosure(Y,X) | 
+copying(Y,X) | modification(Y,X) | disposal(Y,X)) & unauthorized(Y))) | 
+(((storage_medium(X) | device(X)) & (personal_data(X) & 
+?[Y]:((circumstances(Y) & (((unauthorized(Y) & (access(Y) | collection(Y) | use(Y) | 
+disclosure(Y) | copying(Y) | modification(Y) | disposal(Y))) & 
+is_likely_to_occur(Y))) & is_stored_in(X,Y)))) & loss(X))))
+\end{verbatim}
+\normalsize
+\caption{An example through the pipeline: text, abstract syntax tree (of the second line), spreadsheet, and formula in TPTP notation.
+TODO (AR): the TPTP formula is not quite correct - I will have to fix the semantics.
+}
+\label{pipeline-ex}
+\end{figure}
+
 
 \section{Building and using the grammar}
+
+Parsing the text is performed by the Grammatical Framework (GF) software.
+The parser is driven by a grammar, which specifies a relation between strings and abstract syntax trees.
+In typical GF applications, abstract syntax trees are processed further, usually in translations to other languages but also in logical semantics. 
+
+GF grammars are usually written by hand, to guarantee a precise correspondance to desired abstract syntax trees.
+The process is helped by GF's module system and extensive libraries, which reduce the need of manual work to the minimum.
+This is particularly useful in the most typical application of GF, Controlled Natural Language (CNL).
+In such applications, the language can be made to follow grammar rules defined in the GF Resource Grammar Library (RGL).
+
+However, the RGL does not cover all the constructs in Singaporean law text, which means that some grammar writing needs to be done from scratch.
+In particular, the text contains indented lists, paragraph numbers, and references, which significant for the logical structure and which we wanted to capture by the parser.
+In order to make sure to capture everything, we started grammar writing in a data-driven, top-down way, starting from entire lines of text and going forward by stepwise refinements of the grammar rules.
+
+The most efficient way to produce the grammar turned out to be a semi-automatic method consisting of manual annotations from which a script generated GF rules.
+Figure~\ref{grammar-gen} shows an example of a line of a text, the annotations added to it, and the resulting grammar rules.
+
+
+\begin{figure}
+\bequ
+\textbf{A line in the text:}
+\bequ
+\textit{Item (2) without limiting subsection Ref (1)(a), a CN data breach is deemed to VP result in significant harm to an individual —}
+\enqu
+\textbf{The line annotated with marks for terminals} (\verb6#6) \textbf{and nonterminals} (\verb6*6):
+\bequ
+  \begin{verbatim}
+*Item (2) #without #limiting #subsection *Ref (1)(a) #, #a *CN data breach 
+#is #deemed #to *VP result in significant harm to an individual #—
+\end{verbatim}
+\enqu
+\textbf{Grammar rules derived by the script:}
+\bequ
+\begin{verbatim}
+Line ::= Item "without" "limiting" "subsection" Ref "," 
+         "a" CN "is" "deemed" "to" VP "-" ;
+Item ::= "(2)" ;
+Ref  ::= "(1)(a)" ;
+CN   ::= "data" "breach" ;
+VP   ::= "result" "in" "significant" "harm" "to" "an" "individual" ;
+\end{verbatim}
+\enqu
+\textbf{The last of the grammar rules manually edited by step-wise refinements:}
+\bequ
+\begin{verbatim}
+VP2 ::= "result" "in" NP ;
+NP  ::= "significant" "harm" "to" NP ;
+NP  ::= "an" CN ;
+CN  ::= "individual" ;
+\end{verbatim}
+\enqu  
+\textbf{Abstract syntax functions in the resulting GF grammar:}
+\bequ
+\begin{verbatim}
+fun VP2_result_in : VP2 ;
+fun CN_significant_harm_to_NP : NP -> CN ;
+fun NP_an_CN : CN -> NP ;
+fun CN_individual : CN ;
+\end{verbatim}
+\enqu  
+\enqu  
+\caption{The grammar extraction process.}
+\label{grammar-gen}
+\end{figure}
+
+The grammar produced by the script is a BNF (context-free) grammar, in a notation that can be used in GF as it is.
+Internally, GF adds to each rule abstract syntax functions, whose names are derived from items in the rule itself.
+Full GF is more expressive and more abstract than BNF.
+In the example of Figure~\ref{grammar-gen}, the full power can be used to merge together the function \verb6CN_individual6 with another derived function \verb6CN_individuals6, to a single function that covers both the singular and the plural form of the noun.
+Similarly, the rules \verb6NP_an_CN6 can be merged with \verb6NP_a_CN6.
+An advantage, in addition to getting fewer rules, is that the choice of the sinular and the plural, or \textit{a} vs.\ \textit{an}, can then be made precisely depending on the context.
+
 
 
 \section{Assembly logic and spreadsheets}

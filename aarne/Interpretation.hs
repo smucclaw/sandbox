@@ -83,6 +83,11 @@ formula2prop formula = case formula of
 
   Title s  -> return $ PProp $ Pred s []
 
+  Assignment role q f -> do
+    pq <- f2quant q
+    pf <- f2pred f
+    return $ PProp $ Mod role (pq pf)
+
   _ -> Left $ "not yet: " ++ show formula
  where
    f2prop f =  do
@@ -96,9 +101,10 @@ formula2prop formula = case formula of
        Right pf -> case pf of
          PSet p -> return p
          _ -> Left $ "no Set from " ++ show f
-       _ -> case f of
+       Left s -> case f of
          Quantification q set | elem q ["A", "AN", "ANY"] -> f2set f
-         _ -> Left $ "still no Set from " ++ show f
+         Modal _ g -> f2set g
+         _ -> Left $ s ++ " THEREFORE " ++ "still no Set from " ++ show f
    f2ind f =  do
      pf <- formula2prop f
      case pf of
@@ -128,7 +134,9 @@ formula2prop formula = case formula of
    f2pred :: Formula -> Either String (Ind -> Prop) 
    f2pred formula = case formula of
      Atomic CPred f -> return $ \x -> Pred f [x]
+     Atomic CProp f -> return $ \x -> Pred f [x]
      Atomic CSet f -> return $ \x -> Pred f [x]
+     Atomic CFam f -> return $ \x -> Pred f [x]
      Conjunction cat_ cw fs -> do
        pfs <- mapM f2pred fs
        return $ \x -> fst (iConjWord cw) [f x | f <- pfs]
@@ -139,8 +147,20 @@ formula2prop formula = case formula of
        f2pred a
      Qualification CNone _ a -> f2pred a
 
+     Predication a f -> do
+       pa <- f2pred a
+       pf <- f2pred f
+       return $ \x -> Conj [pa x, pf x]
+     Application _ a f -> do
+       pa <- f2pred a
+       pf <- f2pred f
+       return $ \x -> Conj [pa x, pf x]
+     Quantification _ _ -> do
+       pq <- f2quant formula
+       return $ \x -> pq (\y -> Equal x y)
+
      
-     Modification CPred f rs -> do
+     Modification _ f rs -> do
          pf <- f2pred f
          prs <- f2pred rs
          return $ \x -> Conj [pf x, prs x]

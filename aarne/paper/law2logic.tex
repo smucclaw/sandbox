@@ -204,6 +204,68 @@ An advantage, in addition to getting fewer rules, is that the choice of the sinu
 
 \section{Assembly logic and spreadsheets}
 
+We implemented spreadsheets with a recursive datatype \verb6Box6, where a box consists of a header and cells, where each cell is a box with a title.
+This structure supports compositional conversion from a tree-like representation, but also rendering as tab-separated files, which can be read into spreadsheet editors.
+Figure~\ref{assembly} shows this type, together with the other concepts related to spreadsheets.
+
+\begin{figure}
+  \bequ
+  \textbf{The recursive Haskell datatype for spreadsheets:}
+ \bequ
+\begin{verbatim}
+data Box = Box {
+   header :: String,
+   cells :: [(String, Box)]
+  }
+\end{verbatim}
+ \enqu
+
+ \textbf{Some assembly logic constructors:}
+ \bequ
+\begin{verbatim}
+data Cat = 
+  CProp | CSet | CInd | CPred | CPred2 | CFun | CFam | CQuant | CNone 
+
+data Formula =
+    Atomic Cat Atom                     
+  | Conjunction Cat ConjWord [Formula]  
+  | Implication Formula Formula         
+  | Conditional Formula Formula      -- reverse implication
+  | Quantification String Formula    -- quantifier + domain
+\end{verbatim}
+ \enqu
+
+ \textbf{Semantics of abstract syntax trees in the assembly logic:}
+ \bequ
+\begin{verbatim}
+iNP :: Env -> GNP -> Formula
+iNP env np = case np of
+  GNP_any_CN cn -> Quantification "ANY" (iCN env cn)
+  GNP_each_CN cn -> Quantification "EACH" (iCN env cn)
+  GNP_that_CN cn -> Quantification "THAT" (iCN env cn)
+  _ -> Atomic CInd (lin env (gf np))
+\end{verbatim}
+ \enqu
+
+ \textbf{Conversions from assembly logic to spreadsheets:}
+ \bequ
+\begin{verbatim}
+formula2box :: Formula -> Box
+formula2box formula = case formula of
+  Atomic _ a  -> atomBox a
+  Conjunction _ cw fs -> infixLeftsideBox (show cw) (map formula2box fs)
+  Implication f g -> ifBox [formula2box f] [formula2box g]
+  Quantification s f -> leftsideBox s [formula2box f]
+\end{verbatim}
+ \enqu
+ 
+ \enqu
+ \caption{Data structures and conversions related to spreadsheet and the assembly logic.
+ }
+\label{assembly}
+\end{figure}
+
+
 
 \section{Interpretation in predicate logic}
 

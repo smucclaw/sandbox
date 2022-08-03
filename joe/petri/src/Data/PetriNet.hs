@@ -1,8 +1,8 @@
-{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE StandaloneDeriving #-}
-{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE StandaloneKindSignatures #-}
+{-# LANGUAGE TypeFamilyDependencies #-}
 
 module Data.PetriNet where
 import Control.Applicative as App
@@ -15,51 +15,58 @@ import Data.Tuple.All (sequenceT)
 import Flow ((|>))
 
 {-
-  NodeType is a type living in the Type universe.  
-  Using DataKinds, we promote it to its own type universe called NodeType.
-  This universe is disjoint from Type.
-  The constructors PlaceType and TransitionType are then promoted to types
-  living in this universe.
+Node is a family of types doubly indexed by 2 types:
+- nodeType:
+  This type indicates the type (as in a place or a transition) of the node.
+  In practice, this is either:
+  - PlaceType, which indicates that the node is a place
+  - TransType, which indicates that the node is a transition
+- nodeName:
+  This is the type of the names that will be associated with each node.
+  This could be String, but we only require that it be hashable.
 
-  Note that this type is isomorphic to Bool and the type family FlipNodeType
-  functions like a type-level negation operator.
-  Alternatively, one may view the (->) type constructor as a non-dependent
-  analogue of the Pi type so that FlipNodeType as a family of types indexed by
-  the input srcType living in the NodeType universe.
+Notice that the data constructors of Node inject into different type universes,
+ie the output of Place is indexed by PlaceType, while that of Trans(ition)
+is indexed by TransType.
+This elevates information about the node to the type-level, so that we know,
+at the type-level, if the node is a place or transition.
 
-  TypeFamilyDependencies is used here to indicate that this indexed family
-  is injective in the sense that for each output type destType, there is only
-  one index srcType corresponding to it.
-  Practically, this tells GHC that RHS of the equalities can be inverted,
-  which helps to avoid some unintuitive type errors.
+Now, FlipPT can be viewed as a type-level function which behaves as a boolean
+toggle between PlaceType and TransType, leaving all other types untouched.
+
+Note that we could also do this by using DataKinds and saying
+data NodeType = PlaceType | TransType
+so that NodeType would be promoted to its own standalone type universe, which
+is disjoint from * = Type, with PlaceType and TransType living in there.
+Then, FlipPT could have the type FlipPT :: NodeType -> NodeType, in which case
+we see that NodeType is essentially a type-level boolean type, with FlipPT
+acting as boolean negation.
+
+This is used in the Arc record to force the arcDest to be a transition when
+arcSrc is a place, and vice versa.
+Practically, this means that the typechecker will prevent us from creating
+arcs like (Place, Place) and (Trans, Trans).
 -}
-data NodeType = PlaceType | TransitionType
-  deriving (Eq, Generic, Ord, Read, Show)
-  
-instance Hashable NodeType
+data PlaceType :: Type
+data TransType :: Type
 
--- type family FlipNodeType srcType = destType | destType -> srcType where
---   FlipNodeType PlaceType = TransitionType
---   FlipNodeType TransitionType = PlaceType
+data Node nodeType nodeName where
+  Place :: nodeName -> Node PlaceType nodeName
+  Trans :: nodeName -> Node TransType nodeName
 
--- NodeType is used by the Node type to elevate and store information about the
--- data constructor at the type level.
--- Notice how the output type is indexed by NodeType so that PlaceType and
--- TransitionType function as type-level tags telling us if Node was constructed
--- via Place or Transition.
--- More specifically, this allows us to ban, at the type-level, arcs formed by
--- the pairs (Place _, Place _) and (Transition _, Transition _).
-
-data PlaceT
-data TransT
-
-type family FlipT t where
-  FlipT PlaceT = TransT
-  FlipT TransT = PlaceT
-
-data Node tag nodeName where
-  Place :: a -> Node PlaceT a
-  Transition :: a -> Node TransT a
+{-
+Here we use TypeFamilyDependencies to force GHC to recognize this as an
+injective type family.
+In other words, GHC will now happily rewrite LHS -> RHS when dealing with
+type equality constraints.
+This may help to avoid some weird and unintuitive type errors, though
+I (Joe) have yet to come across any without.
+-}
+type FlipPT :: Type -> Type
+type family FlipPT srcType = destType | destType -> srcType where
+  FlipPT PlaceType = TransType
+  FlipPT TransType = PlaceType
+  FlipPT a = a
 
 deriving instance Eq a => Eq (Node nodeType a)
 deriving instance Ord a => Ord (Node nodeType a)
@@ -71,43 +78,37 @@ data LabelledNode nodeType a b = LabelledNode
   }
   deriving (Eq, Ord, Show)
 
-data Arc srcType a c = Arc
+data Arc srcType a = Arc
   { arcSrc :: Node srcType a,
-    arcDest :: Node (FlipT srcType) a,
+    arcDest :: Node (FlipPT srcType) a
+  }
+  deriving (Eq, Ord, Show)
+  
+data LabelledArc srcType a c = LabelledArc
+  { arc :: Arc srcType a,
     arcLabel :: c
   }
   deriving (Eq, Ord, Show)
 
-data InOutArcs srcType a b c = LabelledArcs
-  { incomingArcs :: [InOutArc (FlipT srcType) a b c],
-    outgoingArcs :: [InOutArc (FlipT srcType) a b c]
+data InOutArcs srcType a b c = InOutArcs
+  { incomingArcs :: [InOutArc (FlipPT srcType) a b c],
+    outgoingArcs :: [InOutArc (FlipPT srcType) a b c]
   }
   deriving (Eq, Ord, Show)
 
-data InOutArc srcType a b c = LabelledArc
+data InOutArc srcType a b c = InOutArc
   { otherNode :: LabelledNode srcType a b,
     inOutArcLabel :: c
   }
   deriving (Eq, Ord, Show)
 
-{-
-  Family of constraints indexed by 2 type universes a and b, followed by the
-  srcType and destType, which live in the universes (a -> Node a a) and
-  (b -> Node b b) respectively.
--}
--- type ValidArc :: NodeType -> NodeType -> Constraint
--- type family ValidArc srcType destType where
---   ValidArc PlaceType TransitionType = ()
---   ValidArc TransitionType PlaceType = ()
---   ValidArc _ _ =
---     TypeError (Text "Excuse me, you can only add arcs between places and transitions!")
-
 type InOutArcsType nodeType destType pn a b c =
   Node nodeType a ->
   pn a b c ->
-  [Arc nodeType a c]
+  [LabelledArc nodeType a c]
 
--- PetriNet class that defines some of the basic operations on a Petri net.
+-- PetriNet class that defines some of the basic operations on a Petri net,
+-- viewed as a directed, bipartite graph.
 --
 -- a is the type of names for nodes 
 -- b is the type of labels for nodes.
@@ -121,11 +122,11 @@ class PetriNet pn a b c where
   place@(Place _) `nodeElem` petriNet =
     petriNet |> nodes |> fst |> map node |> (place `elem`)
 
-  transition@(Transition _) `nodeElem` petriNet =
+  transition@(Trans _) `nodeElem` petriNet =
     petriNet |> nodes |> snd |> map node |> (transition `elem`)
 
   -- Get all the nodes in a Petri net.
-  nodes :: pn a b c -> ([LabelledNode PlaceT a b], [LabelledNode TransT a b])
+  nodes :: pn a b c -> ([LabelledNode PlaceType a b], [LabelledNode TransType a b])
 
   -- Given a Petri net and a node, find the label corresponding to that node.
   lookupLabel :: pn a b c -> Node nodeType a -> Maybe b
@@ -138,7 +139,7 @@ class PetriNet pn a b c where
       (places, transitions) = nodes petriNet
 
   -- Add a node to a Petri net.
-  addNode :: Node nodeType a -> b -> pn a b c -> pn a b c
+  addNode :: LabelledNode nodeType a b -> pn a b c -> pn a b c
 
   -- Delete a node from a Petri net.
   delNode :: Node nodeType a -> pn a b c -> pn a b c
@@ -149,28 +150,28 @@ class PetriNet pn a b c where
     pn a b c ->
     Maybe (InOutArcs nodeType a b c)
   arcs node petriNet =
-    (inArcs', outArcs') |> sequenceT |> fmap (uncurry LabelledArcs)
+    (inArcs', outArcs') |> sequenceT |> fmap (uncurry InOutArcs)
     where
       aux inOrOutArcs = petriNet |> inOrOutArcs node
       inArcs' = aux inArcs
       outArcs' = aux outArcs
 
   -- Get the incoming arcs for a node in a Petri net.
-  inArcs :: Node nodeType a -> pn a b c -> Maybe [InOutArc (FlipT nodeType) a b c]
+  inArcs :: Node nodeType a -> pn a b c -> Maybe [InOutArc (FlipPT nodeType) a b c]
   inArcs node petriNet = petriNet |> arcs node |> fmap incomingArcs
 
   -- Get the outgoing arcs for a node in a Petri net.
-  outArcs :: Node nodeType a -> pn a b c -> Maybe [InOutArc (FlipT nodeType) a b c]
+  outArcs :: Node nodeType a -> pn a b c -> Maybe [InOutArc (FlipPT nodeType) a b c]
   outArcs node petriNet = petriNet |> arcs node |> fmap outgoingArcs
 
   -- Add a new arc to a Petri net.
-  addArc :: Arc srcType a c -> pn a b c -> pn a b c
+  addArc :: LabelledArc srcType a c -> pn a b c -> pn a b c
   
   -- Delete an arc from a Petri net.
-  delArc :: Arc srcType a c -> pn a b c -> pn a b c
+  delArc :: Arc srcType a -> pn a b c -> pn a b c
 
 type Marking pn a b c tokenType =
-  Node PlaceT a -> pn a b c -> Maybe [tokenType]
+  Node PlaceType a -> pn a b c -> Maybe [tokenType]
 
 -- emptyMarking :: Marking pn a b c tokenType
 -- emptyMarking (Place _) _ = Just []
@@ -183,7 +184,7 @@ class PetriNet pn a b c => MarkedPetriNet pn a b c tokenType where
 
 addArcs ::
   (Foldable t, PetriNet pn a b c) =>
-  t (Arc srcType a c) ->
+  t (LabelledArc srcType a c) ->
   pn a b c ->
   pn a b c
 addArcs arcs petriNet = foldl (flip addArc) petriNet arcs

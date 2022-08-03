@@ -44,7 +44,7 @@ deriving instance
 deriving instance
   (Show a, Show b, Show c) => Show (PetriNet a b c)
 
-type NodeMap nodeName nodeLabel = 
+type NodeMap nodeName nodeLabel =
   HashMap.HashMap nodeName (NodeMapVal nodeLabel)
 
 data NodeMapVal nodeLabel = NodeMapVal
@@ -74,6 +74,14 @@ lookupFglNodeLabel PetriNet { transitions } (FglTransLabel nodeName) =
 node2fglNodeLabel :: PTNet.Node nodeType a -> FglNodeLabel a
 node2fglNodeLabel (PTNet.Place nodeName) = FglPlaceLabel nodeName
 node2fglNodeLabel (PTNet.Trans nodeName) = FglTransLabel nodeName
+
+node2fglNode ::
+  (Eq a, Hashable a) =>
+  PetriNet a nodeLabel c ->
+  PTNet.Node nodeType a ->
+  Maybe Fgl.Node
+node2fglNode petriNet node =
+  node |> node2fglNodeLabel |> lookupFglNodeLabel petriNet |> fmap fglNode
 
 fglNodeLabel2place :: App.Alternative m => FglNodeLabel a -> m (PTNet.Node PTNet.PlaceType a)
 fglNodeLabel2place (FglPlaceLabel nodeName) = PTNet.Place nodeName |> pure
@@ -128,7 +136,7 @@ inOutArcs fglNodeLabel2node inOrOut node petriNet@PetriNet {..} =
 instance (Eq a, Hashable a) => PTNet.PetriNet PetriNet a b c where
   empty =
     PetriNet
-    { places = HashMap.empty, transitions = HashMap.empty, graph = Fgl.empty }
+    {places = HashMap.empty, transitions = HashMap.empty, graph = Fgl.empty}
 
   nodes petriNet@PetriNet { .. } =
     (places, transitions)
@@ -153,7 +161,7 @@ instance (Eq a, Hashable a) => PTNet.PetriNet PetriNet a b c where
 
   numNodes PetriNet { graph } = Fgl.noNodes graph
 
-  lookupLabel petriNet node = 
+  lookupLabel petriNet node =
     node |> node2fglNodeLabel |> lookupFglNodeLabel petriNet |> fmap nodeLabel
 
   inArcs place@(PTNet.Place _) = inOutArcs fglNodeLabel2transition In place
@@ -163,16 +171,16 @@ instance (Eq a, Hashable a) => PTNet.PetriNet PetriNet a b c where
   outArcs transition@(PTNet.Trans _) = inOutArcs fglNodeLabel2place Out transition
 
   addNode PTNet.LabelledNode { .. } petriNet@PetriNet { .. } =
-    PetriNet { graph = graph', places = places', transitions = transitions' }
+    PetriNet {graph = graph', places = places', transitions = transitions'}
     where
       fglNodeLabel = node2fglNodeLabel node
 
       fglNode
-        | Just NodeMapVal { .. } <- lookupFglNodeLabel petriNet fglNodeLabel = fglNode
+        | Just NodeMapVal {..} <- lookupFglNodeLabel petriNet fglNodeLabel = fglNode
         | otherwise = graph |> Fgl.newNodes 1 |> head
 
       insertLabelledNode nodeName nodeMap =
-        HashMap.insert nodeName NodeMapVal { .. } nodeMap
+        HashMap.insert nodeName NodeMapVal {..} nodeMap
 
       (places', transitions') = case fglNodeLabel of
         FglPlaceLabel nodeName  ->
@@ -180,35 +188,37 @@ instance (Eq a, Hashable a) => PTNet.PetriNet PetriNet a b c where
         FglTransLabel nodeName ->
           (places, insertLabelledNode nodeName transitions)
 
-      graph' = Fgl.insNode (fglNode, fglNodeLabel) graph 
+      graph' = Fgl.insNode (fglNode, fglNodeLabel) graph
 
-  -- delNode node petriNet@PetriNetI { .. } =
-  --   if not (eitherNode `Bimap.member` nodeMap)
-  --   o
-  --     then petriNet
-  --     else PetriNetI { graph = graph', nodeMap = nodeMap' }
-  --     where
-  --       eitherNode = node2eitherNode node
+  delNode node petriNet@PetriNet {..} =
+    PetriNet {graph = graph', places = places', transitions = transitions'}
+    where
+      graph' = 
+        node |> node2fglNode petriNet |> maybe graph (`Fgl.delNode` graph)
 
-  -- delNode node PetriNetI { .. } =
-  --   PetriNetI { graph = graph', nodeMap = nodeMap }
-  --   where
-  --     graph' = delMapNode nodeMap node' graph
-  --     node' = node2eitherNode node
+      (places', transitions') = case node of
+        PTNet.Place nodeName ->
+          (HashMap.delete nodeName places, transitions)
+        PTNet.Trans nodeName ->
+          (places, HashMap.delete nodeName transitions)
 
-  addArc PTNet.LabelledArc { arc = PTNet.Arc { .. }, .. } petriNet@PetriNet { .. } =
-      (node2fglNode arcSrc, node2fglNode arcDest)
-      |> sequenceT |> fmap labelEdge |> maybe petriNet updatePetriNet
-      where
-        node2fglNode :: PTNet.Node nodeType a -> Maybe Fgl.Node
-        node2fglNode node =
-          node |> node2fglNodeLabel |> lookupFglNodeLabel petriNet |> fmap fglNode
+  addArc PTNet.LabelledArc {arc = PTNet.Arc {..}, ..} petriNet@PetriNet {..}  =
+    (node2fglNode petriNet arcSrc, node2fglNode petriNet arcDest)
+    |> sequenceT |> fmap labelEdge |> maybe petriNet updatePetriNet
+    where
+      labelEdge (src, dest) = (src, dest, arcLabel)
 
-        labelEdge (src, dest) = (src, dest, arcLabel)
+      updatePetriNet labelledEdge =
+        petriNet {graph = Fgl.insEdge labelledEdge graph}
 
-        updatePetriNet labelledEdge =
-          petriNet { graph = Fgl.insEdge labelledEdge graph }
- 
+  delArc PTNet.Arc {..} petriNet@PetriNet {graph} =
+    (node2fglNode petriNet arcSrc, node2fglNode petriNet arcDest)
+    |> sequenceT
+    |> maybe petriNet updatePetriNet
+    where
+      updatePetriNet edge@(_arcSrc, _arcDest) =
+        petriNet {graph = Fgl.delEdge edge graph}
+
 testPetriNet :: PetriNet String Double Int
 testPetriNet =
   PTNet.empty
@@ -218,6 +228,8 @@ testPetriNet =
   |> PTNet.addArc (PTNet.LabelledArc (PTNet.Arc (PTNet.Place "P1") (PTNet.Trans "T1")) 1)
   |> PTNet.addArc (PTNet.LabelledArc (PTNet.Arc (PTNet.Trans "T2") (PTNet.Place "P1")) 3)
   |> PTNet.addArcs []
+  -- |> PTNet.delNode (PTNet.Place "P1")
+  |> PTNet.delArc (PTNet.Arc (PTNet.Place "P1") (PTNet.Trans "T1"))
   -- |> PTNet.addArc (PTNet.LabelledArc (PTNet.Arc (PTNet.Place "P1") (PTNet.Place "P1")) 1)
   -- |> PTNet.addArc (PTNet.LabelledArc (PTNet.Arc (PTNet.Trans "T1") (PTNet.Trans "T2")) 1)
 

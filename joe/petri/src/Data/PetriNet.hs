@@ -1,12 +1,15 @@
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE StandaloneKindSignatures #-}
 {-# LANGUAGE TypeFamilyDependencies #-}
+{-# LANGUAGE UndecidableInstances #-}
 
 module Data.PetriNet where
 import Control.Applicative as App
-import Data.Kind (Constraint, Type)
+import Data.Kind (Type)
 import GHC.Generics (Generic)
 import GHC.TypeLits (ErrorMessage (Text), TypeError)
 
@@ -48,11 +51,19 @@ Practically, this means that the typechecker will prevent us from creating
 arcs like (Place, Place) and (Trans, Trans).
 -}
 data PlaceType :: Type
-data TransType :: Type
+  deriving Generic
 
-data Node nodeType nodeName where
+data TransType :: Type
+  deriving Generic
+
+data Node :: Type -> Type -> Type where
   Place :: nodeName -> Node PlaceType nodeName
   Trans :: nodeName -> Node TransType nodeName
+
+deriving instance Eq a => Eq (Node nodeType a)
+deriving instance Ord a => Ord (Node nodeType a)
+deriving instance Show a => Show (Node nodeType a)
+-- deriving instance Generic (Node nodeType a)
 
 {-
 Here we use TypeFamilyDependencies to force GHC to recognize this as an
@@ -68,39 +79,55 @@ type family FlipPT srcType = destType | destType -> srcType where
   FlipPT TransType = PlaceType
   FlipPT a = a
 
-deriving instance Eq a => Eq (Node nodeType a)
-deriving instance Ord a => Ord (Node nodeType a)
-deriving instance Show a => Show (Node nodeType a)
-
 data LabelledNode nodeType a b = LabelledNode
   { node :: Node nodeType a,
     nodeLabel :: b
   }
-  deriving (Eq, Ord, Show)
+  deriving (Eq, Generic, Ord, Show)
+
+instance
+  (Hashable (Node nodeType a), Hashable b) =>
+  Hashable (LabelledNode nodeType a b)
 
 data Arc srcType a = Arc
   { arcSrc :: Node srcType a,
     arcDest :: Node (FlipPT srcType) a
   }
-  deriving (Eq, Ord, Show)
+  deriving (Eq, Generic, Ord, Show)
+
+instance
+  (Hashable (Node srcType a), Hashable (Node (FlipPT srcType) a)) =>
+  Hashable (Arc srcType a)
   
 data LabelledArc srcType a c = LabelledArc
   { arc :: Arc srcType a,
     arcLabel :: c
   }
-  deriving (Eq, Ord, Show)
+  deriving (Eq, Generic, Ord, Show)
 
-data InOutArcs srcType a b c = InOutArcs
-  { incomingArcs :: [InOutArc (FlipPT srcType) a b c],
-    outgoingArcs :: [InOutArc (FlipPT srcType) a b c]
-  }
-  deriving (Eq, Ord, Show)
+instance
+  (Hashable (Arc srcType a), Hashable c) =>
+  Hashable (LabelledArc srcType a c)
 
 data InOutArc srcType a b c = InOutArc
   { otherNode :: LabelledNode srcType a b,
     inOutArcLabel :: c
   }
-  deriving (Eq, Ord, Show)
+  deriving (Eq, Generic, Ord, Show)
+
+instance
+  (Hashable (LabelledNode srcType a b), Hashable c) =>
+  Hashable (InOutArc srcType a b c)
+
+data InOutArcs srcType a b c = InOutArcs
+  { incomingArcs :: [InOutArc (FlipPT srcType) a b c],
+    outgoingArcs :: [InOutArc (FlipPT srcType) a b c]
+  }
+  deriving (Eq, Generic, Ord, Show)
+
+instance
+  Hashable (InOutArc (FlipPT srcType) a b c) =>
+  Hashable (InOutArcs srcType a b c)
 
 type InOutArcsType nodeType destType pn a b c =
   Node nodeType a ->

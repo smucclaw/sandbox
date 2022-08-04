@@ -1,4 +1,5 @@
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE ImportQualifiedPost #-}
@@ -7,6 +8,7 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE UndecidableInstances #-}
 
 module Data.PetriNet.Internal where
 
@@ -39,10 +41,20 @@ data PetriNet nodeName nodeLabel arcLabel = PetriNet
     graph :: Gr (FglNodeLabel nodeName) arcLabel
   }
 
+deriving instance (Eq a, Eq b, Ord c) => Eq (PetriNet a b c)
+
+deriving instance Generic (PetriNet a b c)
+
 deriving instance
-  (Eq a, Eq b, Eq c, Ord c) => Eq (PetriNet a b c)
-deriving instance
-  (Show a, Show b, Show c) => Show (PetriNet a b c)
+  (Ord a, Ord b, Ord c, Ord (Gr (FglNodeLabel a) c)) =>
+  Ord (PetriNet a b c)
+
+deriving instance (Show a, Show b, Show c) => Show (PetriNet a b c)
+
+
+instance
+  (Hashable a, Hashable b, Hashable c, Hashable (Gr (FglNodeLabel a) c)) =>
+  Hashable (PetriNet a b c)
 
 type NodeMap nodeName nodeLabel =
   HashMap.HashMap nodeName (NodeMapVal nodeLabel)
@@ -93,6 +105,8 @@ fglNodeLabel2transition _ = App.empty
 
 data InOrOut = In | Out
   deriving (Eq, Generic, Ord, Read, Show)
+
+instance Hashable InOrOut
 
 -- Helper function to grab the incoming and outgoing ars for a node in a
 -- Petri net.

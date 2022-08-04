@@ -51,7 +51,6 @@ deriving instance
 
 deriving instance (Show a, Show b, Show c) => Show (PetriNet a b c)
 
-
 instance
   (Hashable a, Hashable b, Hashable c, Hashable (Gr (FglNodeLabel a) c)) =>
   Hashable (PetriNet a b c)
@@ -140,12 +139,12 @@ inOutArcs fglNodeLabel2node inOrOut node petriNet@PetriNet {..} =
     -- format, which has type [InOutArc (FlipNodeType nodeType) a c]
     fglArcs2labelledArcs arcs =
       flip mapMaybe arcs $ \(inOutArcLabel, otherNode) -> do
-        let (maybeContext, _) = otherNode `Fgl.match` graph
+        let (maybeContext, _) = Fgl.match otherNode graph
         (_, _, fglNodeLabel, _) <- maybeContext
         NodeMapVal {nodeLabel} <- lookupFglNodeLabel petriNet fglNodeLabel
         otherNode <- fglNodeLabel2node fglNodeLabel
         let otherNode' = PTNet.LabelledNode {node = otherNode, nodeLabel}
-        pure (PTNet.InOutArc {PTNet.otherNode = otherNode' , inOutArcLabel})
+        pure (PTNet.InOutArc {PTNet.otherNode = otherNode', inOutArcLabel})
 
 instance (Eq a, Hashable a) => PTNet.PetriNet PetriNet a b c where
   empty =

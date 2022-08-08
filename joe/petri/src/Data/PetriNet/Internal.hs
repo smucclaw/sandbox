@@ -247,7 +247,7 @@ testPetriNet =
   |> PTNet.addArc (PTNet.LabelledArc (PTNet.Arc (PTNet.Trans "T2") (PTNet.Place "P1")) 3)
   |> PTNet.addArcs []
   -- |> PTNet.delNode (PTNet.Place "P1")
-  |> PTNet.delArc (PTNet.Arc (PTNet.Place "P1") (PTNet.Trans "T1"))
+  -- |> PTNet.delArc (PTNet.Arc (PTNet.Place "P1") (PTNet.Trans "T1"))
   -- |> PTNet.addArc (PTNet.LabelledArc (PTNet.Arc (PTNet.Place "P1") (PTNet.Place "P1")) 1)
   -- |> PTNet.addArc (PTNet.LabelledArc (PTNet.Arc (PTNet.Trans "T1") (PTNet.Trans "T2")) 1)
 

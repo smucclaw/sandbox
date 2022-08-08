@@ -1,21 +1,28 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE GADTs #-}
+{-# LANGUAGE ImportQualifiedPost #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE StandaloneKindSignatures #-}
 {-# LANGUAGE TypeFamilyDependencies #-}
 {-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 
 module Data.PetriNet where
-import Control.Applicative as App
+import Control.Applicative qualified as App
+import Data.Bifunctor (bimap)
+import Control.Monad (join)
 import Data.Kind (Type)
+import Data.Monoid (Endo(..))
 import GHC.Generics (Generic)
 import GHC.TypeLits (ErrorMessage (Text), TypeError)
 
 import Data.Hashable (Hashable)
 import Data.Tuple.All (sequenceT)
-import Flow ((|>))
+import Flow ((|>), (.>))
 
 {-
 Node is a family of types doubly indexed by 2 types:
@@ -215,3 +222,70 @@ addArcs ::
   pn a b c ->
   pn a b c
 addArcs arcs petriNet = foldl (flip addArc) petriNet arcs
+
+
+-- Work-in-progress function that converts a Petri net into the textual .net
+-- format accepted by the Tina tool for Petri nets.
+-- https://projects.laas.fr/tina/
+toTina ::
+  forall pn a b c.
+  (Show a, Show b, PetriNet pn a b c) =>
+  pn a b c ->
+  String
+toTina petriNet =
+  petriNet
+  -- Grab all nodes and apply place2tina (resp trans2tina) to all the
+  -- places (resp transitions).
+  -- This converts all the places/trans into strings in Tina's .net format.
+  -- Technially these strings are represented by continuations via the
+  -- Yoneda embedding (aka CPS transformation) from the free monoid of strings
+  -- into its corresponding endomorphism monoid.
+  -- But we can happily identify them with each other since the Yoneda Lemma
+  -- guarantees that this embedding is full and faithful.
+  |> nodes |> bimap (foldMap place2tina) (foldMap trans2tina)
+  -- Finally, we combine the continuations and run it with the empty string to
+  -- get the result.
+  |> uncurry (<>) |> runCont
+  -- This is essentially the same trick as employed by difference lists and
+  -- ShowS and showsPrec, to re-associate a left fold of the form
+  -- (((as ++ bs) ++ cs) ++ ds) into (as ++ (bs ++ (cs ++ ds))), which is more
+  -- efficient to compute when dealing with singly linked lists.
+  -- Fun exercise: Implement foldr in terms of foldl using the Yoneda embedding.
+  where
+    -- toCont(inuation) is the Yoneda embedding.
+    -- More concretely, given an element x of a monoid m, it maps x to (<> x),
+    -- its corresponding continuation, ie action, in the monoid of 
+    -- endomorphisms over m.
+    toCont :: Monoid m => m -> Endo m
+    toCont = (<>) .> Endo
+
+    -- runCont(inuation) is the inverse mapping from the endomorphism monoid 
+    -- back to the original monoid.
+    -- More concretely, it runs with the continuation with the identity element
+    -- mempty of the original monoid and returns the result.
+    runCont :: Monoid m => Endo m -> m
+    runCont = flip appEndo mempty
+
+    -- Convert a single place to a string in Tina's .net format.
+    place2tina :: LabelledNode PlaceType a b -> Endo String
+    place2tina LabelledNode {node = Place nodeName, nodeLabel} =
+      foldMap toCont ["pl ", show nodeName, " : ", show nodeLabel, "\n"]
+
+    -- Convert a single transition to a string in Tina's .net format.
+    trans2tina :: LabelledNode TransType a b -> Endo String
+    trans2tina LabelledNode {node = node@(Trans _), nodeLabel} =
+      petriNet |> arcs node |> maybe mempty inOutArcs2cont
+
+    inOutArcs2cont :: InOutArcs TransType a b c -> Endo String
+    inOutArcs2cont InOutArcs {..} =
+      mconcat
+        [ toCont "tr ",
+          foldMap getPlaceName incomingArcs,
+          toCont "-> ",
+          foldMap getPlaceName outgoingArcs,
+          toCont "\n"
+        ]
+
+    getPlaceName :: Show a => InOutArc PlaceType a b c -> Endo String
+    getPlaceName InOutArc {otherNode = LabelledNode {node = Place nodeName}} =
+      foldMap toCont [show nodeName, " "]

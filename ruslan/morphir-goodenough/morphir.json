@@ -1,0 +1,7 @@
+{
+    "name": "Morphir.Loan.App",
+    "sourceDirectory": "src",
+    "exposedModules": [
+        "Loan"
+    ]
+}

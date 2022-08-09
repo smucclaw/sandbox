@@ -4,12 +4,12 @@
 {-# LANGUAGE ImportQualifiedPost #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE NamedFieldPuns #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE StandaloneKindSignatures #-}
 {-# LANGUAGE TypeFamilyDependencies #-}
 {-# LANGUAGE UndecidableInstances #-}
-{-# LANGUAGE RecordWildCards #-}
-{-# LANGUAGE ScopedTypeVariables #-}
 
 module Data.PetriNet where
 import Control.Applicative qualified as App
@@ -156,8 +156,8 @@ class PetriNet pn a b c where
   place@(Place _) `nodeElem` petriNet =
     petriNet |> nodes |> fst |> map node |> (place `elem`)
 
-  transition@(Trans _) `nodeElem` petriNet =
-    petriNet |> nodes |> snd |> map node |> (transition `elem`)
+  trans@(Trans _) `nodeElem` petriNet =
+    petriNet |> nodes |> snd |> map node |> (trans `elem`)
 
   -- Get all the nodes in a Petri net.
   nodes :: pn a b c -> ([LabelledNode PlaceType a b], [LabelledNode TransType a b])
@@ -237,34 +237,40 @@ toTina petriNet =
   -- Grab all nodes and apply place2tina (resp trans2tina) to all the
   -- places (resp transitions).
   -- This converts all the places/trans into strings in Tina's .net format.
-  -- Technially these strings are represented by continuations via the
-  -- Yoneda embedding (aka CPS transformation) from the free monoid of strings
-  -- into its corresponding endomorphism monoid.
-  -- But we can happily identify them with each other since the Yoneda Lemma
-  -- guarantees that this embedding is full and faithful.
   |> nodes |> bimap (foldMap place2tina) (foldMap trans2tina)
-  -- Finally, we combine the continuations and run it with the empty string to
-  -- get the result.
+  -- Finally, we combine all the strings.
   |> uncurry (<>) |> runCont
-  -- This is essentially the same trick as employed by difference lists and
-  -- ShowS and showsPrec, to re-associate a left fold of the form
-  -- (((as ++ bs) ++ cs) ++ ds) into (as ++ (bs ++ (cs ++ ds))), which is more
-  -- efficient to compute when dealing with singly linked lists.
-  -- Fun exercise: Implement foldr in terms of foldl using the Yoneda embedding.
   where
-    -- toCont(inuation) is the Yoneda embedding.
-    -- More concretely, given an element x of a monoid m, it maps x to (<> x),
-    -- its corresponding continuation, ie action, in the monoid of 
-    -- endomorphisms over m.
+    -- Technially, strings are represented as continuations via
+    -- toCont(inuation), which is the Yoneda embedding from a monoid into the
+    -- corresponding endomorphism monoid.
+    -- More concretely, it maps an element x of a monoid m to (x <>), its
+    -- corresponding continuation, ie action, in the monoid of endormophisms
+    -- over m.
+    --
+    -- runCont(inuation) is then the inverse mapping from the endomorphism
+    -- monoid back to the original monoid.
+    -- It takes a continuation as input and runs it with the identity element
+    -- mempty of the original monoid and returns the result.
+    --
+    -- Note that the Yoneda Lemma says that these embeddings are inverses so
+    -- that we can happily identify an element of a monoid with its corresponding
+    -- continuation.
+    --
+    -- This is essentially the same trick as employed by difference lists and
+    -- ShowS and showsPrec, to re-associate a left fold of the form
+    -- (((as ++ bs) ++ cs) ++ ds) into (as ++ (bs ++ (cs ++ ds))), which is more
+    -- efficient to compute when dealing with singly linked lists.
     toCont :: Monoid m => m -> Endo m
     toCont = (<>) .> Endo
 
-    -- runCont(inuation) is the inverse mapping from the endomorphism monoid 
-    -- back to the original monoid.
-    -- More concretely, it runs with the continuation with the identity element
-    -- mempty of the original monoid and returns the result.
     runCont :: Monoid m => Endo m -> m
     runCont = flip appEndo mempty
+
+    -- Specialized version of the CPS transformation that takes the
+    -- contrapositive: forall a b c. (a -> b) -> (b -> c) -> (a -> c)
+    -- toCps :: Monoid m => (m -> m) -> Endo m -> Endo m
+    -- toCps f endo = Endo f <> endo
 
     -- Convert a single place to a string in Tina's .net format.
     place2tina :: LabelledNode PlaceType a b -> Endo String
@@ -286,6 +292,6 @@ toTina petriNet =
           toCont "\n"
         ]
 
-    getPlaceName :: Show a => InOutArc PlaceType a b c -> Endo String
+    getPlaceName :: InOutArc PlaceType a b c -> Endo String
     getPlaceName InOutArc {otherNode = LabelledNode {node = Place nodeName}} =
       foldMap toCont [show nodeName, " "]

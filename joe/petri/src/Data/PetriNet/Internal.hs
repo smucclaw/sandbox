@@ -92,7 +92,7 @@ node2fglNode ::
   PTNet.Node nodeType a ->
   Maybe Fgl.Node
 node2fglNode petriNet node =
-  node |> node2fglNodeLabel |> lookupFglNodeLabel petriNet |> fmap fglNode
+  node |> node2fglNodeLabel |> lookupFglNodeLabel petriNet |$> fglNode
 
 fglNodeLabel2place :: App.Alternative m => FglNodeLabel a -> m (PTNet.Node PTNet.PlaceType a)
 fglNodeLabel2place (FglPlaceLabel nodeName) = PTNet.Place nodeName |> pure
@@ -122,12 +122,12 @@ inOutArcs fglNodeLabel2node inOrOut node petriNet@PetriNet {..} =
     node2maybeContext node =
       -- First convert the node to an FGL node label and use that
       -- to lookup the fglNode in the graph.
-      node |> node2fglNodeLabel |> lookupFglNodeLabel petriNet |> fmap fglNode
+      node |> node2fglNodeLabel |> lookupFglNodeLabel petriNet |$> fglNode
       -- Once we have the fglNode, we use it to decompose the graph and
       -- grab the context, which is wrapped in a Maybe.
       -- This is to account for the fact that the fglNode may not actually exist
       -- in the graph.
-      |> fmap (`Fgl.match` graph) |> fmap fst |> join
+      |$> (`Fgl.match` graph) |> (>>= fst)
 
     -- Given a context, grab the arcs that are incoming or outgoing to node.
     -- These arcs are in FGL format, with type
@@ -142,7 +142,7 @@ inOutArcs fglNodeLabel2node inOrOut node petriNet@PetriNet {..} =
     fglArc2LabelledArc inOutArcLabel otherNode =
       otherNode
       -- Grab the fgl context corresponding to that node in graph.
-      |> (`Fgl.match` graph) |> \(maybeContext, _) -> maybeContext
+      |> (`Fgl.match` graph) |> fst
       -- Extract the fgl node label from the context.
       |$> (\(_ , _, fglNodeLabel, _) -> fglNodeLabel)
       -- Turn the fgl label into a node and lookup its label in petriNet.
@@ -176,15 +176,16 @@ instance (Eq a, Hashable a) => PTNet.PetriNet PetriNet a b c where
 
       nodeName2labelledNode :: (a -> PTNet.Node nodeType a) -> a -> Maybe (PTNet.LabelledNode nodeType a b)
       nodeName2labelledNode placeOrTransition nodeName =
-        Just nodeName
-        |$> placeOrTransition
-        >>>= (Just, PTNet.lookupLabel petriNet)
+        nodeName
+        |> placeOrTransition
+        |>> (Just, PTNet.lookupLabel petriNet)
+        |> sequenceT 
         |$> uncurry PTNet.LabelledNode
 
   numNodes PetriNet {graph} = Fgl.noNodes graph
 
   lookupLabel petriNet node =
-    node |> node2fglNodeLabel |> lookupFglNodeLabel petriNet |> fmap nodeLabel
+    node |> node2fglNodeLabel |> lookupFglNodeLabel petriNet |$> nodeLabel
 
   inArcs place@(PTNet.Place _) = inOutArcs fglNodeLabel2transition In place
   inArcs transition@(PTNet.Trans _) = inOutArcs fglNodeLabel2place In transition
@@ -231,8 +232,11 @@ instance (Eq a, Hashable a) => PTNet.PetriNet PetriNet a b c where
           (places, HashMap.delete nodeName transitions)
 
   addArc PTNet.LabelledArc {arc = PTNet.Arc {..}, ..} petriNet@PetriNet {graph}  =
-    (node2fglNode petriNet arcSrc, node2fglNode petriNet arcDest)
-    |> sequenceT |$> labelEdge |> maybe petriNet updatePetriNet
+    (arcSrc, arcDest)
+    |> bimap (node2fglNode petriNet) (node2fglNode petriNet)
+    |> sequenceT
+    |$> labelEdge
+    |> maybe petriNet updatePetriNet
     where
       labelEdge (src, dest) = (src, dest, arcLabel)
 
@@ -240,8 +244,10 @@ instance (Eq a, Hashable a) => PTNet.PetriNet PetriNet a b c where
         petriNet {graph = Fgl.insEdge labelledEdge graph}
 
   delArc PTNet.Arc {..} petriNet@PetriNet {graph} =
-    (node2fglNode petriNet arcSrc, node2fglNode petriNet arcDest)
-    |> sequenceT |> maybe petriNet updatePetriNet
+    (arcSrc, arcDest)
+    |> bimap (node2fglNode petriNet) (node2fglNode petriNet)
+    |> sequenceT
+    |> maybe petriNet updatePetriNet
     where
       updatePetriNet edge =
         petriNet {graph = Fgl.delEdge edge graph}
@@ -261,4 +267,5 @@ testPetriNet =
   -- |> PTNet.addArc (PTNet.LabelledArc (PTNet.Arc (PTNet.Trans "T1") (PTNet.Trans "T2")) 1)
 
 -- testArcs :: Maybe [(Node TransitionType String String, Int)]
+testArcs :: Maybe (PTNet.InOutArcs PTNet.PlaceType [Char] Double Int)
 testArcs = PTNet.arcs (PTNet.Place "P1") testPetriNet

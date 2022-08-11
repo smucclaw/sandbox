@@ -24,6 +24,8 @@ import Data.Hashable (Hashable)
 import Data.Tuple.All (sequenceT)
 import Flow ((|>), (.>))
 
+import Data.PetriNet.Utils
+
 {-
 Node is a family of types doubly indexed by 2 types:
 - nodeType:
@@ -182,19 +184,18 @@ class PetriNet pn a b c where
     pn a b c ->
     Maybe (InOutArcs nodeType a b c)
   arcs node petriNet =
-    node |> App.liftA2 (,) inArcs' outArcs' |> sequenceT |> fmap (uncurry InOutArcs)
+    node |> pure >>>= inOutArcs' |$> uncurry InOutArcs
     where
+      inOutArcs' = (inArcs, outArcs) |> join bimap aux
       aux inOrOutArcs = flip inOrOutArcs petriNet
-      inArcs' = aux inArcs
-      outArcs' = aux outArcs
 
   -- Get the incoming arcs for a node in a Petri net.
   inArcs :: Node nodeType a -> pn a b c -> Maybe [InOutArc (FlipPT nodeType) a b c]
-  inArcs node petriNet = petriNet |> arcs node |> fmap incomingArcs
+  inArcs node petriNet = petriNet |> arcs node |$> incomingArcs
 
   -- Get the outgoing arcs for a node in a Petri net.
   outArcs :: Node nodeType a -> pn a b c -> Maybe [InOutArc (FlipPT nodeType) a b c]
-  outArcs node petriNet = petriNet |> arcs node |> fmap outgoingArcs
+  outArcs node petriNet = petriNet |> arcs node |$> outgoingArcs
 
   -- Add a new arc to a Petri net.
   addArc :: LabelledArc srcType a c -> pn a b c -> pn a b c
@@ -220,7 +221,6 @@ addArcs ::
   pn a b c ->
   pn a b c
 addArcs arcs petriNet = foldl (flip addArc) petriNet arcs
-
 
 -- Work-in-progress function that converts a Petri net into the textual .net
 -- format accepted by the Tina tool for Petri nets.

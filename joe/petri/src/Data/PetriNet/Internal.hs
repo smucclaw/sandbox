@@ -14,7 +14,7 @@ module Data.PetriNet.Internal where
 
 import Control.Applicative qualified as App
 import Control.Monad (join)
-import Data.Bifunctor (bimap)
+import Data.Bifunctor (bimap, Bifunctor (first, second))
 import GHC.Generics (Generic)
 import Data.Maybe (mapMaybe, fromMaybe)
 
@@ -26,10 +26,10 @@ import Data.HashMap.Strict qualified as HashMap
 
 import Data.Tuple.All (sequenceT)
 
-import Flow ((.>), (|>))
+import Flow ((|>))
 
 import Data.PetriNet qualified as PTNet
--- import Data.PetriNet (LabelledNode)
+import Data.PetriNet.Utils
 
 -- Concretely, Petri nets are implemented using hashmaps and an fgl graph.
 -- places/transitions are hash maps mapping node names to a record containing
@@ -137,19 +137,27 @@ inOutArcs fglNodeLabel2node inOrOut node petriNet@PetriNet {..} =
 
     -- The final step is to convert the arcs from fgl format into our desired
     -- format, which has type [InOutArc (FlipNodeType nodeType) a c]
-    fglArcs2labelledArcs arcs =
-      flip mapMaybe arcs $ \(inOutArcLabel, otherNode) -> do
-        let (maybeContext, _) = Fgl.match otherNode graph
-        (_, _, fglNodeLabel, _) <- maybeContext
-        NodeMapVal {nodeLabel} <- lookupFglNodeLabel petriNet fglNodeLabel
-        otherNode <- fglNodeLabel2node fglNodeLabel
-        let otherNode' = PTNet.LabelledNode {node = otherNode, nodeLabel}
-        pure (PTNet.InOutArc {PTNet.otherNode = otherNode', inOutArcLabel})
+    fglArcs2labelledArcs arcs = mapMaybe (uncurry fglArc2LabelledArc) arcs
+
+    fglArc2LabelledArc inOutArcLabel otherNode =
+      otherNode
+      -- Grab the fgl context corresponding to that node in graph.
+      |> (`Fgl.match` graph) |> \(maybeContext, _) -> maybeContext
+      -- Extract the fgl node label from the context.
+      |$> (\(_ , _, fglNodeLabel, _) -> fglNodeLabel)
+      -- Turn the fgl label into a node and lookup its label in petriNet.
+      >>>= (fglNodeLabel2node, lookupFglNodeLabel petriNet)
+      |$> second nodeLabel
+      |$> uncurry PTNet.LabelledNode
+      |$> \otherNode -> PTNet.InOutArc {..}
 
 instance (Eq a, Hashable a) => PTNet.PetriNet PetriNet a b c where
   empty =
     PetriNet
-    {places = HashMap.empty, transitions = HashMap.empty, graph = Fgl.empty}
+      { places = HashMap.empty,
+        transitions = HashMap.empty,
+        graph = Fgl.empty
+      }
 
   nodes petriNet@PetriNet {..} =
     (places, transitions)
@@ -167,10 +175,11 @@ instance (Eq a, Hashable a) => PTNet.PetriNet PetriNet a b c where
         mapMaybe (nodeName2labelledNode placeOrTransition) nodeNames
 
       nodeName2labelledNode :: (a -> PTNet.Node nodeType a) -> a -> Maybe (PTNet.LabelledNode nodeType a b)
-      nodeName2labelledNode placeOrTransition nodeName = do
-        let node' = placeOrTransition nodeName
-        nodeLabel <- PTNet.lookupLabel petriNet node'
-        pure PTNet.LabelledNode {node = node', nodeLabel}
+      nodeName2labelledNode placeOrTransition nodeName =
+        Just nodeName
+        |$> placeOrTransition
+        >>>= (Just, PTNet.lookupLabel petriNet)
+        |$> uncurry PTNet.LabelledNode
 
   numNodes PetriNet {graph} = Fgl.noNodes graph
 
@@ -210,7 +219,7 @@ instance (Eq a, Hashable a) => PTNet.PetriNet PetriNet a b c where
     where
       updatePetriNet fglNode =
         PetriNet
-        { graph = Fgl.delNode fglNode graph, 
+        { graph = Fgl.delNode fglNode graph,
           places = places',
           transitions = transitions'
         }
@@ -223,7 +232,7 @@ instance (Eq a, Hashable a) => PTNet.PetriNet PetriNet a b c where
 
   addArc PTNet.LabelledArc {arc = PTNet.Arc {..}, ..} petriNet@PetriNet {graph}  =
     (node2fglNode petriNet arcSrc, node2fglNode petriNet arcDest)
-    |> sequenceT |> fmap labelEdge |> maybe petriNet updatePetriNet
+    |> sequenceT |$> labelEdge |> maybe petriNet updatePetriNet
     where
       labelEdge (src, dest) = (src, dest, arcLabel)
 

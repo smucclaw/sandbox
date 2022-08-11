@@ -168,9 +168,7 @@ class PetriNet pn a b c where
   -- Count the number of nodes in a Petri net.
   numNodes :: pn a b c -> Int
   numNodes petriNet =
-    length places + length transitions
-    where
-      (places, transitions) = nodes petriNet
+    petriNet |> nodes |> bimap length length |> uncurry (+)
 
   -- Add a node to a Petri net.
   addNode :: LabelledNode nodeType a b -> pn a b c -> pn a b c
@@ -184,9 +182,9 @@ class PetriNet pn a b c where
     pn a b c ->
     Maybe (InOutArcs nodeType a b c)
   arcs node petriNet =
-    (inArcs', outArcs') |> sequenceT |> fmap (uncurry InOutArcs)
+    node |> App.liftA2 (,) inArcs' outArcs' |> sequenceT |> fmap (uncurry InOutArcs)
     where
-      aux inOrOutArcs = petriNet |> inOrOutArcs node
+      aux inOrOutArcs = flip inOrOutArcs petriNet
       inArcs' = aux inArcs
       outArcs' = aux outArcs
 

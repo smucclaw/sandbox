@@ -40,12 +40,12 @@ Those property assertions are represented as subcontracts, as they are not simpl
        § FundsRequest
    PARTY Borrower
      MAY NOTIFY Lender
-                  with == reqAmount :: Money
+                  with = reqAmount :: Money
 
        § PrincipalLoan
    PARTY Lender
     MUST send funds
-                    to == Borrower
+                    to = Borrower
              principal := reqAmount
            outstanding := principal * 1.075
 
@@ -53,16 +53,16 @@ Those property assertions are represented as subcontracts, as they are not simpl
    PARTY Borrower
    AFTER 1 year
     MUST repay first half
-                    to == Lender
-                amount == principal * 0.550
+                    to = Lender
+                amount = principal * 0.550
            outstanding := outstanding * 0.525
 
        § SecondHalf
    PARTY Borrower
    AFTER 1 year
     MUST repay second half
-                    to == Lender
-                amount == outstanding
+                    to = Lender
+                amount = outstanding
            outstanding := 0
 
        § TrackAuxiliary

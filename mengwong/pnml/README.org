@@ -76,7 +76,7 @@ Those property assertions are represented as subcontracts, as they are not simpl
                      MUST cure default
                       AND notify Lender
                           that = default is cured
-                     LEST   INTERRUPT TrackMain -- note scope hiearchy
+                     LEST   INTERRUPT TrackMain -- note scope hierarchy
                                  AND PARTY Borrower
                                       MUST accelerate repayment
                                                to = Lender

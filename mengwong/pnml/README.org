@@ -44,7 +44,7 @@ Those property assertions are represented as subcontracts, as they are not simpl
 
        § PrincipalLoan
    PARTY Lender
-    MUST send funds             AKA Principal Loan
+    MUST send funds
                     to == Borrower
              principal := reqAmount
            outstanding := principal * 1.075

@@ -31,23 +31,37 @@ Those property assertions are represented as subcontracts, as they are not simpl
      AND TrackAuxiliary
 
        § TrackMain
+  DEFINE TrackMain
+   MEANS FundsRequest
+    THEN PrincipalLoan
+    THEN FirstHalf
+    THEN SecondHalf
+
+       § FundsRequest
    PARTY Borrower
-     MAY NOTIFY Lender AKA FundsRequest
-   HENCE  PARTY Lender
-           MUST send funds             AKA Principal Loan
-                  principal :: Money
-                         to == Borrower
-                    outstanding := principal * 1.075
-          HENCE    PARTY Borrower
-                   AFTER 1 year
-                    MUST repay first half to Lender
-                         amount == principal * 0.550
-                         outstanding := outstanding * 0.525
-                    HENCE   PARTY Borrower
-                            AFTER 1 year
-                             MUST repay second half to Lender
-                                  amount == outstanding
-                                  outstanding := 0
+     MAY NOTIFY Lender
+         reqAmount :: Money
+
+       § PrincipalLoan
+   PARTY Lender
+    MUST send funds             AKA Principal Loan
+                    to == Borrower
+             principal := reqAmount
+           outstanding := principal * 1.075
+
+       § FirstHalf
+   PARTY Borrower
+   AFTER 1 year
+    MUST repay first half to Lender
+                amount == principal * 0.550
+           outstanding := outstanding * 0.525
+
+       § SecondHalf
+   PARTY Borrower
+   AFTER 1 year
+    MUST repay second half to Lender
+              amount == outstanding
+         outstanding := 0
 
        § TrackAuxiliary
    PARTY Borrower

@@ -75,12 +75,12 @@ Those property assertions are represented as subcontracts, as they are not simpl
            HENCE    PARTY Borrower
                      MUST cure default
                       AND notify Lender
-                          that   default is cured
+                          that = default is cured
                      LEST   Interrupt TrackMain
                                  AND PARTY Borrower
                                       MUST accelerate repayment
-                                               to == Lender
-                                           amount == outstanding
+                                               to = Lender
+                                           amount = outstanding
 #+end_example
 
 What happens when multiple defaults occur? The source contract says "In the event of multiple events of default, the ﬁrst to occur shall take precedence for the purposes of specifying outcomes under this agreement."

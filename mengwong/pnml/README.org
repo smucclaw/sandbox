@@ -37,7 +37,7 @@ Those property assertions are represented as subcontracts, as they are not simpl
            MUST send funds             AKA Principal Loan
                   principal :: Money
                          to == Borrower
-	            outstanding := principal * 1.075
+                    outstanding := principal * 1.075
           HENCE    PARTY Borrower
                    AFTER 1 year
                     MUST repay first half to Lender

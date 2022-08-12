@@ -25,6 +25,43 @@ On the auxiliary track, the borrower has to remain compliant with a number of pr
 
 Those property assertions are represented as subcontracts, as they are not simple events but involve reparation pathways.
 
+
+#+begin_example
+  -------------------------------------
+  | TrackMain                         |
+  |                                   |
+  |   --------------------------      |
+  |   | FundsRequest           |      |
+  |   --------------------------      |
+  |     |                             |
+  |     v                             |
+  |   --------------------------      |
+  |   | PrincipalLoan          |      |
+  |   --------------------------      |
+  |     |                             |
+  |     v                             |
+  |   --------------------------      |
+  |   | FirstHalf              |      |
+  |   --------------------------      |
+  |     |                             |
+  |     v                             |
+  |   --------------------------      |
+  |   | SecondHalf             |      |
+  |   --------------------------      |
+  |     |                             |
+  |     v                             |
+  |    fulfilled                      |
+  |                                   |
+  |------------------------------------ 
+                | interrupt -- this is a hierarchical state machine arrow between boxes
+                v 
+           ------------------------
+           | AcceleratedRepayment |
+           ------------------------
+#+end_example
+
+and here's what the L4 could look like
+
 #+begin_example
   DEFINE F&G
    MEANS TrackMain
@@ -73,10 +110,11 @@ Those property assertions are represented as subcontracts, as they are not simpl
              MAY notify Borrower
                      of = msgBody :: eventDetails
            HENCE    PARTY Borrower
+                   WITHIN 2 days
                      MUST cure default
                       AND notify Lender
                           that = default is cured
-                     LEST   INTERRUPT TrackMain -- note scope hierarchy
+                     LEST  INTERRUPT TrackMain -- note scope hierarchy
                                  AND PARTY Borrower
                                       MUST accelerate repayment
                                                to = Lender
@@ -84,6 +122,8 @@ Those property assertions are represented as subcontracts, as they are not simpl
 #+end_example
 
 What happens when multiple defaults occur? The source contract says "In the event of multiple events of default, the ﬁrst to occur shall take precedence for the purposes of specifying outcomes under this agreement."
+
+** 
 
 ** PDPA DBNO
 

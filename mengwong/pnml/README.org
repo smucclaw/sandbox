@@ -1,0 +1,78 @@
+#+TITLE: throwaway experiments in petri net, process algebra, other workflow modeling
+
+* Formalisms Considered
+
+- Petri Nets
+- BPMN
+- Hierarchical State Machines (Harel State Charts)
+- Concurrency
+- Parallelism
+- Continuations
+- Process Algebras
+  - CSP
+  - CCP
+  - pi-calculi
+
+* Application Usages
+
+** Flood & Goodenough
+
+https://link.springer.com/epdf/10.1007/s10506-021-09300-9?sharing_token=M0oIt9b1RkTRd7yIGOhmRPe4RwlQNchNByi7wbcMAY47UEgYKTsS2y3NlCtlyjIQHDJKh4e6n-UgpQaxlMnNJsFMhDWtYOYhQkbOjngvwNEEMJPQBtf7qIAWYSNhod_xsaNwV_M_iCkxacdm-fOI3OAcRHGUt-KLIrxr0-B84xk%3D
+
+On the main track, the loan is repaid in two halves.
+
+On the auxiliary track, the borrower has to remain compliant with a number of property assertions. If the borrower fails to do so, the full balance of the loan is immediately due.
+
+Those property assertions are represented as subcontracts, as they are not simple events but involve reparation pathways.
+
+#+begin_example
+  DEFINE F&G
+   MEANS TrackMain
+     AND TrackAuxiliary
+
+       § TrackMain
+   PARTY Borrower
+     MAY NOTIFY Lender AKA FundsRequest
+   HENCE  PARTY Lender
+           MUST send funds             AKA Principal Loan
+                  principal :: Money
+                         to == Borrower
+	            outstanding := principal * 1.075
+          HENCE    PARTY Borrower
+                   AFTER 1 year
+                    MUST repay first half to Lender
+                         amount == principal * 0.550
+                         outstanding := outstanding * 0.525
+                    HENCE   PARTY Borrower
+                            AFTER 1 year
+                             MUST repay second half to Lender
+                                  amount == outstanding
+                                  outstanding := 0
+
+       § TrackAuxiliary
+   PARTY Borrower
+    MUST avoid default
+   UNTIL Termination
+    LEST   PARTY Lender
+             MAY notify Borrower
+                     of msgBody :: eventDetails
+           HENCE    PARTY Borrower
+                     MUST cure default
+                      AND notify Lender
+                          that   default is cured
+                     LEST   Interrupt TrackMain
+                                 AND PARTY Borrower
+                                      MUST accelerate repayment
+                                               to == Lender
+                                           amount == outstanding
+#+end_example
+
+What happens when multiple defaults occur? The source contract says "In the event of multiple events of default, the ﬁrst to occur shall take precedence for the purposes of specifying outcomes under this agreement."
+
+** PDPA DBNO
+
+** The SAFE
+
+
+
+

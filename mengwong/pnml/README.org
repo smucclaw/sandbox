@@ -71,12 +71,12 @@ Those property assertions are represented as subcontracts, as they are not simpl
    UNTIL Termination
     LEST   PARTY Lender
              MAY notify Borrower
-                     of msgBody :: eventDetails
+                     of = msgBody :: eventDetails
            HENCE    PARTY Borrower
                      MUST cure default
                       AND notify Lender
                           that = default is cured
-                     LEST   Interrupt TrackMain
+                     LEST   INTERRUPT TrackMain -- note scope hiearchy
                                  AND PARTY Borrower
                                       MUST accelerate repayment
                                                to = Lender

@@ -63,67 +63,83 @@ Those property assertions are represented as subcontracts, as they are not simpl
 and here's what the L4 could look like
 
 #+begin_example
+
   DEFINE F&G
-   MEANS TrackMain
-     AND TrackAuxiliary
+   MEANS Borrower Requests Principal
+    THEN Lender Sends Principal
+    THEN GUARD MainTrack
+           AND SideTrack
+          LEST Accelerate Repayment
 
-       § TrackMain
-  DEFINE TrackMain
-   MEANS FundsRequest
-    THEN PrincipalLoan
-    THEN FirstHalf
-    THEN SecondHalf
+       § MainTrack
+  DEFINE MainTrack
+   MEANS Debt 1
+    THEN Debt 2
 
-       § FundsRequest
+       § Borrower Requests Principal
    PARTY Borrower
      MAY NOTIFY Lender
-                  with = reqAmount :: Money
+                  with :  reqAmount :: Money
 
-       § PrincipalLoan
+       § Lender Sends Principal
    PARTY Lender
     MUST send funds
-                    to = Borrower
+                    to :  Borrower
              principal := reqAmount
            outstanding := principal * 1.075
 
-       § FirstHalf
+       § Debt 1
    PARTY Borrower
    AFTER 1 year
     MUST repay first half
-                    to = Lender
-                amount = principal * 0.550
+                    to :  Lender
+                amount :  principal * 0.550
            outstanding := outstanding * 0.525
 
-       § SecondHalf
+       § Debt 2
    PARTY Borrower
    AFTER 1 year
     MUST repay second half
-                    to = Lender
-                amount = outstanding
+                    to :  Lender
+                amount :  outstanding
            outstanding := 0
 
-       § TrackAuxiliary
+       § SideTrack
+   PARTY Lender
+     MAY NOTIFY Borrower
+                    of : defaultEvent :: eventDetails
+   HENCE    PARTY Borrower
+           WITHIN 2 days
+             MUST notify Lender
+                  that : defaultEvent is cured
+
+      // upon reaching BREACH state in the GUARDed section
+       § Accelerate Repayment
    PARTY Borrower
-    MUST avoid default
-   UNTIL Termination
-    LEST   PARTY Lender
-             MAY notify Borrower
-                     of = msgBody :: eventDetails
-           HENCE    PARTY Borrower
-                   WITHIN 2 days
-                     MUST cure default
-                      AND notify Lender
-                          that = default is cured
-                     LEST  INTERRUPT TrackMain -- note scope hierarchy
-                                 AND PARTY Borrower
-                                      MUST accelerate repayment
-                                               to = Lender
-                                           amount = outstanding
+    MUST pay
+                    to : Lender
+                amount : outstanding
+  WITHIN 1 day
+
 #+end_example
 
 What happens when multiple defaults occur? The source contract says "In the event of multiple events of default, the ﬁrst to occur shall take precedence for the purposes of specifying outcomes under this agreement."
 
-** 
+** The GUARD keyword
+
+Allows thread termination by another thread by draining the guard.
+
+The guard is automatically filled when a GUARD scope is entered, and automatically drained by any thread that leaves the GUARD scope.
+
+In the contract above, failure to repay Debt 1 or Debt 2 (on the main track), or failure to cure a default (on the side track) leads to BREACH; which then leads to the "Accelerate Repayment" clause.
+
+** Modeling as a Petri Net
+
+\begin{equation}
+e^{\pi i} + 1 = 0
+\end{equation}
+
+Modeling Termination
 
 ** PDPA DBNO
 

@@ -1,0 +1,56 @@
+% Introduce a new type called Party with 2 constructors, one for the borrower and one for the lender.
+sort Party;
+cons borrower, lender : Party;
+
+% pay is a family of actions indexed by 2 parties and a real, with
+% pay(p1, p2, amt) meaning that p1 pays p2 an amount of amt.
+% Note that # denotes cartesian product.
+act pay : Party # Party # Real;
+
+% Function that maps the number of remaining payments to the amount due in that payment.
+map paymentAmt : Nat -> Real;
+var m : Nat;
+eqn m == 2 -> paymentAmt(m) = 550;
+    m == 1 -> paymentAmt(m) = 525;
+
+% Process where the borrower pays money to the lender.
+% paymentNumber indicates which payment it is, ie payment 1 or 2.
+proc payPayment(paymentNumber : Nat) =
+	pay(borrower, lender, paymentAmt(paymentNumber));
+
+% Atomic action denoting acceleration of payments in the event that the borrower defaults.
+% This is indexed by a Real indicating the remaining amount the borrower needs to pay to the lender.
+act acceleratePayments : Real;
+
+% Function that maps the number of remaining payments to the oustanding amount.
+map outstandingAmt : Nat -> Real;
+var n : Nat;
+eqn n == 2 -> outstandingAmt(n) = 1075;
+	n == 1 -> outstandingAmt(n) = 525;
+
+% Recursive process that handles the payment thread, while taking into account the possibility of
+% the borrower ending up in default.
+% This is essentially a while loop, written in functional style via tail recursion with an input parameter
+% and a guard, ie the (remainingPayments > 0) -> ... part. 
+% The idea is that while there are outstanding payments remaining, the borrower either pays it or
+% defaults on the payment.
+% In the former case, he continues to make the remaining payments.
+% In the latter case, all payments become due immediately and all subsequent payments are cancelled.
+% More precisely, the following process is a while loop, written in functional style via tail
+% recursion with an input parameter and a guard, ie the (remainingPayments > 0) -> ... part.
+% It does the following:
+% while (remaining payments > 0) do
+%	Here in the body of the loop, either of 2 things can happen:
+% 		1. The borrower pays the current payment via payPayment(remainingPayments)
+%          In this case, we decrement the number of remaining payments and continue.
+%       2. The borrower defaults and so the acceleratePayments action happens with an amount of
+%          outstandingAmt(remainingPayments).
+%          Once this happens, we set the number of remaining payments to 0 and continue.
+%          Note that this has the effect of breaking the loop.
+proc payPayments(remainingPayments : Nat) =
+	(remainingPayments > 0) -> (
+		payPayment(remainingPayments) . payPayments(Int2Nat(remainingPayments - 1))
+		+ acceleratePayments(outstandingAmt(remainingPayments)) . payPayments(0)
+	);
+
+init payPayments(2);

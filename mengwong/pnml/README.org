@@ -103,7 +103,6 @@ and here's what the L4 could look like
                     to :  Lender
                 amount :  outstanding
            outstanding := 0
-   HENCE FULFILLED
 
        § SideTrack
    PARTY Lender

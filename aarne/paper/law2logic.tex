@@ -129,11 +129,39 @@ TODO (AR): the TPTP formula is not quite correct - I will have to fix the semant
 \end{figure}
 
 
+\section{Justifications for why GF and not the initial CFG}
+
+(TODO: merge this section into appropriate section later)
+
+\subsection{Comparison to Context-Free Grammars}
+
+The first step from the annotation is to generate a context-free grammar (CFG, \cite{chomsky-1956}). On the first look, the use of GF seems to need justification, given that
+\begin{enumerate}
+\item[a)] the initially produced CFG perfectly describes the original document; and
+\item[b)] CFGs are widely used in all branches of computer science, whereas GF is comes with a steeper learning curve.
+\end{enumerate}
+
+So why the extra step of going to a more expressive\footnote{GF is equivalent to Parallel Multiple Context-Free Grammars \cite{seki-al-1991}}, but less known formalism?
+
+\paragraph{Abstract representations are not created equal}
+While the initial CFG faithfully captures the original text, we must consider the larger context of this grammar.
+The initial grammar produces the strings `to \emph{carry} out the deal`, `Acme \emph{carries} out the deal`), but their grammatical correctness is rather an accident.
+The CFG doesn't know what verb conjugation and agreement are---it only knows strings, and in order to output these examples correctly, it needs to have a separate rule for how to handle \texttt{carry} and \texttt{carries}. If we translate this CFG naively into logical predicates, we will get a different predicate for each inflection form. This means that the further applications, such as automated theorem provers, will lose all connection between `Acme \emph{carries} out the deal` and `Acme doesn't \emph{carry} out the deal`.
+
+In contrast, the GF grammar has a higher level of abstraction, and it knows all about the English phrasal verb \emph{carry out}: how the verb is conjugated, and how the particle \emph{out} behaves with different objects (\emph{carry out the deal} vs. \emph{carry it out}). This representation gives us two immediate benefits over the CFG:
+\begin{enumerate}
+\item The grammar is more general, and can be used to parse unseen text with much smaller additions compared to the CFG; and
+\item No redundancy needed in grammar rules: logical predicates can be produced from the same grammar that is used for parsing.
+\end{enumerate}
+
+For these reasons, we consider it worthwile to convert the initial CFG into a full GF grammar, even with the manual effort it takes.
+
+
 \section{Building the grammar}
 
 Parsing the text is performed by the Grammatical Framework (GF) software \cite{ranta-2011}.
 The parser is driven by a grammar, which specifies a relation between strings and abstract syntax trees.
-In typical GF applications, abstract syntax trees are processed further, usually in translations to other languages but also in logical semantics. 
+In typical GF applications, abstract syntax trees are processed further, usually in translations to other languages but also in logical semantics.
 
 GF grammars are usually written by hand, to guarantee a precise correspondance to desired abstract syntax trees.
 The process is helped by GF's module system and extensive libraries, which reduce the need of manual work to the minimum.

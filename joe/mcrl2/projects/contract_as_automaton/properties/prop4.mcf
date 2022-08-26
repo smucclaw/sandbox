@@ -1,0 +1,8 @@
+forall m : Pos.
+forall payment_type : PaymentType.
+val(initial_outstanding_amt < m && m <= 20000) =>
+[
+	true* .
+	pay(payment_type, borrower, lender, m)
+]
+false

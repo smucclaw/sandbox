@@ -1,0 +1,9 @@
+<root>
+ <spec>contract_as_automaton_spec.mcrl2</spec>
+ <properties>
+  <property>prop1</property>
+  <property>prop2</property>
+  <property>prop3</property>
+  <property>prop4</property>
+ </properties>
+</root>

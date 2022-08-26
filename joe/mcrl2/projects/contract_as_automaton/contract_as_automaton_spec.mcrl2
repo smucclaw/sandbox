@@ -1,0 +1,88 @@
+% Contract parameters
+map
+	% This indicates how many payments there are in total.
+	num_payments : Pos;
+
+	% This tells us how much the borrower has to pay in each payment.
+	payment_amt : Pos -> Pos;
+
+	% The principal amount the lender sends the borrower.
+	principal_amt : Pos;
+
+	% This is the initial amount that the borrower owes the lender.
+	initial_outstanding_amt : Pos;
+
+var n : Pos;
+
+eqn
+	num_payments = 2;
+
+	principal_amt = 1000;
+
+	initial_outstanding_amt = 1075;
+
+	(n == 1) -> payment_amt(n) = 550;
+	(n == 2) -> payment_amt(n) = 525;
+	(n >= 3) -> payment_amt(n) = 1;
+
+sort
+	PaymentType = struct normal | accelerated;
+	Party = struct borrower | lender;
+	State = struct state(
+				current_payment : Pos,
+				outstanding_amt : Nat
+			);
+
+act
+	pay : PaymentType # Party # Party # Pos;
+	accelerated_payment : Pos;
+
+	request_principal,
+	borrower_default, lender_default, cure_default,
+	breached, fulfilled,
+	notify_borrower_of_default;
+
+proc
+	Fulfilled = fulfilled . delta;
+	Breached = breached . delta;
+
+	LoanAgreement =
+		Fulfilled
+		+
+		request_principal . (
+			lender_default . Breached
+			+
+			pay(normal, lender, borrower, principal_amt) . MainPaymentTrack(state(1, initial_outstanding_amt))
+			% (MainPaymentTrack(1) || SideTrack(1))
+		);
+
+	MainPaymentTrack(state' : State) =
+		(current_payment(state') > num_payments) ->
+			Fulfilled
+		<>
+			(PayPayment(state') + SideTrack(state')) .
+			MainPaymentTrack(
+				state(
+					current_payment(state') + 1,
+					Int2Nat(outstanding_amt(state') - payment_amt(current_payment(state')))
+				)
+			);
+
+	SideTrack(state' : State) =
+		borrower_default . (
+			Fulfilled
+			+
+			notify_borrower_of_default . (
+				cure_default . MainPaymentTrack(state')
+		  		+
+		  		AcceleratePayments(state')
+			)
+		);
+
+	PayPayment(state' : State) =
+		pay(normal, borrower, lender, payment_amt(current_payment(state')));
+
+	AcceleratePayments(state' : State) =
+		pay(accelerated, borrower, lender, Nat2Pos(outstanding_amt(state'))) . Fulfilled + Breached;
+
+init LoanAgreement;

@@ -1,0 +1,7 @@
+<root>
+ <spec>towers_of_hanoi_spec.mcrl2</spec>
+ <properties>
+  <property>solvable</property>
+  <property>sorted</property>
+ </properties>
+</root>

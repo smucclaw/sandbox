@@ -1,0 +1,83 @@
+map numDiscs : Pos;
+eqn numDiscs = 5;
+
+sort Stack = struct stack(size : Nat, list : List(Nat));
+
+map
+	is_empty : Stack -> Bool;
+	empty : Stack;
+	push : Nat # Stack -> Stack;
+	pop : Stack -> Stack;
+	peek : Stack -> Nat;
+
+	bimap_stack : (Nat -> Nat) # (List(Nat) -> List(Nat)) # Stack -> Stack;
+	nats_up_to : Nat -> List(Nat);
+
+	pairwise : (Nat # Nat -> Bool) # Stack -> Bool;
+	sorted : Stack -> Bool;
+
+var
+	n : Nat, s : Stack,
+	pairwise_fn : Nat # Nat -> Bool;
+	map_size : Nat -> Nat,
+	map_list : List(Nat) -> List(Nat);
+
+eqn
+	is_empty(s) = s == empty;
+
+	empty = stack(0, []);
+
+	push(n, s) = bimap_stack(lambda m : Nat. m + Int2Nat(1), lambda l : List(Nat). n |> l, s);
+
+	pop(s) = bimap_stack(lambda m : Nat. Int2Nat(max(0, m - 1)), lambda l : List(Nat). tail(l), s);
+
+	(!is_empty(s)) -> peek(s) = head(list(s));
+
+	bimap_stack(map_size, map_list, s) =
+		stack(map_size(size(s)), map_list(list(s)));
+
+	(n == 0) -> nats_up_to(n) = [];
+	(n > 0) -> nats_up_to(n) = nats_up_to(Int2Nat(n - 1)) <| Int2Nat(n - 1);
+
+	(size(s) <= 1) ->
+		pairwise(pairwise_fn, s) = true;
+	(size(s) > 1) ->
+		pairwise(pairwise_fn, s) = pairwise_fn(peek(s), peek(pop(s))) && sorted(pop(pop(s)));
+
+	sorted(s) = pairwise(lambda x, y : Nat. x < y, s);
+
+act
+	receive, send, move : Nat # Nat # Nat;
+	unsorted, finished;
+
+proc
+	PegProcess(id : Nat, s : Stack) =
+		(!sorted(s)) ->
+			unsorted
+		<>
+			(id == 4 && size(s) == numDiscs) ->
+				finished
+			<>
+				sum disc, otherId : Nat. (
+					(is_empty(s) || disc < peek(s)) ->
+						receive(disc, otherId, id) . PegProcess(s = push(disc, s))
+					+
+					(!is_empty(s) && disc == peek(s)) ->
+						send(disc, id, otherId) . PegProcess(s = pop(s))
+				);
+
+	StartPegProcess(id : Nat) =
+		(id == 0) ->
+			PegProcess(0, stack(numDiscs, nats_up_to(numDiscs)))
+		<>
+			PegProcess(id, empty);
+
+init
+	allow({move, finished, unsorted},
+	comm({receive|send -> move},
+		StartPegProcess(0)
+		|| StartPegProcess(1)
+		|| StartPegProcess(2)
+		|| StartPegProcess(3)
+		|| StartPegProcess(4)
+	));

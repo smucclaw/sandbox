@@ -1,0 +1,39 @@
+act
+	pay_payment : Pos;
+	request_principal, principal_received,
+	lender_default,
+	main_track_done, side_track_done,
+	success, fail;
+	
+	default_payment, cure_default : Pos;
+	default_reprs_warranties, default_covenants, default_bankruptcy,
+	notify_borrower_of_default, accelerate_payments;
+
+map
+	num_payments : Pos;
+eqn
+	num_payments = 2;
+
+proc
+	Contract =
+		success
+		+
+		request_principal . (
+			lender_default
+			+
+			principal_received . (PayPayments(1) || SideTrack)
+		);
+
+	PayPayments(n : Pos) =
+		pay_payment(n) . (n < num_payments) -> PayPayments(n + 1)
+		+
+		default_payment(n) . (cure_default(n) . PayPayments(n) + NotifyAndAcceleratePayments);
+
+	SideTrack =
+		(default_reprs_warranties || default_covenants || default_bankruptcy) .
+		NotifyAndAcceleratePayments;
+
+	NotifyAndAcceleratePayments =
+		notify_borrower_of_default . accelerate_payments;
+
+init Contract;

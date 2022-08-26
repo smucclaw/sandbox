@@ -1,0 +1,398 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2022-08-26 Fri 17:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>a syntax for NaturalL4 that expresses ASP</title>
+<meta name="author" content="Wong Meng Weng" />
+<meta name="generator" content="Org Mode" />
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        displayAlign: "center",
+        displayIndent: "0em",
+
+        "HTML-CSS": { scale: 100,
+                        linebreaks: { automatic: "false" },
+                        webFont: "TeX"
+                       },
+        SVG: {scale: 100,
+              linebreaks: { automatic: "false" },
+              font: "TeX"},
+        NativeMML: {scale: 100},
+        TeX: { equationNumbers: {autoNumber: "AMS"},
+               MultLineWidth: "85%",
+               TagSide: "right",
+               TagIndent: ".8em"
+             }
+});
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS_HTML"></script>
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">a syntax for NaturalL4 that expresses ASP</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#orgce533ef">1. How do we represent Horn clauses in Natural L4</a>
+<ul>
+<li><a href="#orgc54ecbf">1.1. the various forms of terms and predicates</a>
+<ul>
+<li><a href="#orge0e0d54">1.1.1. constraints</a></li>
+</ul>
+</li>
+<li><a href="#org6084683">1.2. How do we represent arbitrary first-order Horn clauses in Natural4?</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<p>
+prioritizing front-end considerations
+</p>
+
+<p>
+We propose:
+</p>
+<ul class="org-ul">
+<li>an ASP-friendly syntax for Natural4 that compiles to</li>
+<li>an ASP fragment of Baby L4</li>
+<li>that can go to ASP proper</li>
+</ul>
+
+<div id="outline-container-orgce533ef" class="outline-2">
+<h2 id="orgce533ef"><span class="section-number-2">1.</span> How do we represent Horn clauses in Natural L4</h2>
+<div class="outline-text-2" id="text-1">
+</div>
+<div id="outline-container-orgc54ecbf" class="outline-3">
+<h3 id="orgc54ecbf"><span class="section-number-3">1.1.</span> the various forms of terms and predicates</h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+fact1().
+</p>
+
+<p>
+should always be written as
+</p>
+
+<p>
+fact2.
+</p>
+
+
+
+
+
+<p>
+functor(term1, Variable2).
+</p>
+
+<p>
+choiceFunctor(term1; term2; term3).
+</p>
+
+<p>
+n {choice1; choice2} m.
+</p>
+
+<p>
+not
+</p>
+</div>
+
+<div id="outline-container-orge0e0d54" class="outline-4">
+<h4 id="orge0e0d54"><span class="section-number-4">1.1.1.</span> constraints</h4>
+<div class="outline-text-4" id="text-1-1-1">
+<p>
+:- exp1, exp2.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org6084683" class="outline-3">
+<h3 id="org6084683"><span class="section-number-3">1.2.</span> How do we represent arbitrary first-order Horn clauses in Natural4?</h3>
+<div class="outline-text-3" id="text-1-2">
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">prolog / asp</th>
+<th scope="col" class="org-left">Natural4</th>
+<th scope="col" class="org-left">Alloy 6</th>
+<th scope="col" class="org-left">GF???</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">fact1.</td>
+<td class="org-left">DECIDE fact1 IS true ALWAYS</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td class="org-left">functor1(term1).</td>
+<td class="org-left">DECIDE functor1 OF term1 IS true ALWAYS</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td class="org-left">functor1(term1) :- functor2(term2).</td>
+<td class="org-left">DECIDE term1 IS functor1 WHEN term2 IS functor2</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td class="org-left">functor1(Var1) :- functor2(Var1).</td>
+<td class="org-left">EVERY Var1 IS functor1 WHEN Var1 IS functor2</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td class="org-left">functor1(Var1,Var2) :- functor2(Var1,Var2).</td>
+<td class="org-left">EVERY Var1 IS functor1 OF Var2 WHEN Var1 IS functor2 OF Var2</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">ancestor(X,Y) :- parent(X,Y).</td>
+<td class="org-left">EVERY X IS ancestor OF Y WHEN X IS parent OF Y.</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">ancestor(X,Z) :- ancestor(X,Y), ancestor(Y,Z).</td>
+<td class="org-left">EVERY X is ancestor of Z WHEN X IS ancestor of Y</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">AND Y IS ancestor of Z.</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">functor1(X,Y,Z) :- functor2(Z,Y,X).</td>
+<td class="org-left">GIVEN X Y Z</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">functor1 WHEN functor2 OF Z Y X</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">functor1(X,Y)   :- functor2(Y, X).</td>
+<td class="org-left">GIVEN X Y</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">functor1 WHEN functor2 OF Y X</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">functor1 WHEN functor2 IS Y X</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">Y IS functor2 OF X</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">functor1(X,Y) :- functor2(Y,X).</td>
+<td class="org-left">EVERY X IS functor1 OF Y WHEN Y IS functor2 OF X</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td class="org-left">q(X) :- p(X,Y).</td>
+<td class="org-left">\(\forall X \exists Y p(X,Y) \implies q(X)\)</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td class="org-left">f1(X,Y) :- f2(X,Y), f3(X,Y).</td>
+<td class="org-left">EVERY X IS f1 OF Y WHEN X IS f2 OF Y AND X IS F3 OF Y</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td class="org-left">f1(X,Y) :- f2(X,Y), f3(X,Y).</td>
+<td class="org-left">EVERY X IS f1 OF Y WHEN X IS f2 OF Y  OR X IS F3 OF Y</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">\(\forall X \forall Y, f2(X,Y) \land f3(X,Y) \implies f1(X,Y)\)</td>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+</tbody>
+</table>
+
+
+
+<p>
+by default we assume a relation is asymmetric:
+</p>
+
+<p>
+X is parent OF Y
+</p>
+
+<p>
+but with the VICEVERSA keyword we add symmetry when translating to the backend:
+</p>
+
+<p>
+X is spouse OF Y WHEN married(X,Y)       VICEVERSA
+</p>
+
+<p>
+spouse(X,Y) :- 
+spouse(Y,X) :- spouse(X,Y).
+</p>
+
+
+
+<p>
+extending to n&gt;2, perhaps the VICEVERSA keyword defines that the predicate holds for any permutation, and operationally we would sort the predicates to reduce them to a "hashed" signature.
+</p>
+
+
+<p>
+do we care about transitivity? associativity, distributivity, commutativity not relevant.
+</p>
+
+
+
+
+
+
+<p>
+X is married TO Y    VICEVERSA
+</p>
+
+<p>
+X is inLove WITH Y   // much drama
+</p>
+
+<p>
+X IS F {OF, TO, WITH, FOR, OVER} Y &#x2013;&gt; F(X,Y).
+</p>
+
+<p>
+\(y=f(x)\) would be phrased as F(Y,X) and read as "Y IS F OF X"
+</p>
+
+<p>
+Does that mean that we always use it with X as input and Y as output?
+</p>
+
+<p>
+Or do we allow a sort of constraint solving / unification engine to use X as output and Y as input?
+</p>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="author">Author: Wong Meng Weng</p>
+<p class="date">Created: 2022-08-26 Fri 17:35</p>
+<p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>

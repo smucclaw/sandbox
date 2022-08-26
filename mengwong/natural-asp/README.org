@@ -1,0 +1,141 @@
+#+TITLE: a syntax for NaturalL4 that expresses ASP
+
+prioritizing front-end considerations
+
+We propose:
+- an ASP-friendly syntax for Natural4 that compiles to
+- an ASP fragment of Baby L4
+- that can go to ASP proper
+
+* How do we represent Horn clauses in Natural L4
+
+** the various forms of terms and predicates
+
+fact1().
+
+should always be written as
+
+fact2.
+
+
+
+
+
+functor(term1, Variable2).
+
+choiceFunctor(term1; term2; term3).
+
+n {choice1; choice2} m.
+
+not
+
+*** constraints
+
+:- exp1, exp2.
+
+** How do we represent arbitrary first-order Horn clauses in Natural4?
+
+| prolog / asp                                   | Natural4                                                                             |
+|------------------------------------------------+--------------------------------------------------------------------------------------|
+| fact1.                                         | DECIDE fact1 IS true ALWAYS                                                          |
+|------------------------------------------------+--------------------------------------------------------------------------------------|
+| functor1(term1).                               | DECIDE functor1 OF term1 IS true ALWAYS                                              |
+|------------------------------------------------+--------------------------------------------------------------------------------------|
+| functor1(term1) :- functor2(term2).            | DECIDE term1 IS functor1 WHEN term2 IS functor2                                      |
+|------------------------------------------------+--------------------------------------------------------------------------------------|
+| functor1(Var1) :- functor2(Var1).              | EVERY Var1 IS functor1 WHEN Var1 IS functor2                                         |
+|------------------------------------------------+--------------------------------------------------------------------------------------|
+| functor1(Var1,Var2) :- functor2(Var1,Var2).    | EVERY Var1 IS functor1 OF Var2 WHEN Var1 IS functor2 OF Var2                         |
+|                                                |                                                                                      |
+| ancestor(X,Y) :- parent(X,Y).                  | EVERY X IS ancestor OF Y WHEN X IS parent OF Y.                                      |
+|                                                |                                                                                      |
+| ancestor(X,Z) :- ancestor(X,Y), ancestor(Y,Z). | EVERY X is ancestor of Z WHEN X IS ancestor of Y                                     |
+|                                                | AND Y IS ancestor of Z.                                                              |
+|                                                |                                                                                      |
+| functor1(X,Y,Z) :- functor2(Z,Y,X).            | GIVEN X Y Z                                                                          |
+|                                                | functor1 WHEN functor2 OF Z Y X                                                      |
+|                                                |                                                                                      |
+| functor1(X,Y)   :- functor2(Y, X).             | GIVEN X Y                                                                            |
+|                                                | functor1 WHEN functor2 OF Y X                                                        |
+|                                                |                                                                                      |
+|                                                | functor1 WHEN functor2 IS Y X                                                        |
+|                                                | Y IS functor2 OF X                                                                   |
+|                                                |                                                                                      |
+| functor1(X,Y) :- functor2(Y,X).                | EVERY X IS functor1 OF Y WHEN Y IS functor2 OF X                                     |
+|------------------------------------------------+--------------------------------------------------------------------------------------|
+| q(X) :- p(X,Y).                                | $\forall X \exists Y p(X,Y) \implies q(X)$                                           |
+|------------------------------------------------+--------------------------------------------------------------------------------------|
+| f1(X,Y) :- f2(X,Y), f3(X,Y).                   | EVERY X IS f1 OF Y WHEN X IS f2 OF Y AND X IS F3 OF Y                                |
+|------------------------------------------------+--------------------------------------------------------------------------------------|
+| f1(X,Y) :- f2(X,Y); f3(X,Y).                   | EVERY X IS f1 OF Y WHEN X IS f2 OF Y  OR X IS F3 OF Y                                |
+|------------------------------------------------+--------------------------------------------------------------------------------------|
+|                                                | $\forall X \forall Y f2(X,Y) \land f3(X,Y) \implies f1(X,Y)$                         |
+|------------------------------------------------+--------------------------------------------------------------------------------------|
+|                                                | GIVEN X Y                                                                            |
+|                                                | X F1 Y WHEN X F2 Y AND X F3 Y                                                        |
+|------------------------------------------------+--------------------------------------------------------------------------------------|
+|                                                | GIVEN X Y                                                                            |
+|                                                | F1 X Y WHEN F2 AND F3                                                                |
+|------------------------------------------------+--------------------------------------------------------------------------------------|
+|                                                | FOR ALL X Y                                                                          |
+|                                                | F1 X Y WHEN F2 X Y AND F3 X Y                                                        |
+|------------------------------------------------+--------------------------------------------------------------------------------------|
+|                                                | FOR ALL X Y                                                                          |
+|                                                | F1 WHEN F2 AND F3                                                                    |
+|------------------------------------------------+--------------------------------------------------------------------------------------|
+|                                                | FOR ALL Mother Father                                                                |
+|                                                | Mother RelatedTo Father WHEN Mother parent C AND Father parent C                     |
+|------------------------------------------------+--------------------------------------------------------------------------------------|
+|                                                | FOR ALL Mother Father Child                                                          |
+|                                                | Mother RelatedTo Father WHEN Mother IS parent OF Child AND Father IS parent OF Child |
+|------------------------------------------------+--------------------------------------------------------------------------------------|
+| numDependents(D,P).                            | D IS numDependents OF P.                                                             |
+|                                                | Alice HAS 5 dependents.                                                              |
+| numDependents(5, Alice).                       | numDependents IS 5 FOR Alice.                                                        |
+|                                                |                                                                                      |
+|                                                |                                                                                      |
+|                                                |                                                                                      |
+
+(do we want to model Alice as a class with an attribute Dependents which is a List of Person?
+
+Or should the Dependents attribute just be an Int?)
+
+And how do temporals fit into all this?
+
+
+by default we assume a relation is asymmetric:
+
+X is parent OF Y
+
+but with the VICEVERSA keyword we add symmetry when translating to the backend:
+
+X is spouse OF Y WHEN married(X,Y)       VICEVERSA
+
+spouse(X,Y) :- 
+spouse(Y,X) :- spouse(X,Y).
+
+
+
+extending to n>2, perhaps the VICEVERSA keyword defines that the predicate holds for any permutation, and operationally we would sort the predicates to reduce them to a "hashed" signature.
+
+
+do we care about transitivity? associativity, distributivity, commutativity not relevant.
+
+
+
+
+
+
+X is married TO Y    VICEVERSA
+
+X is inLove WITH Y   // much drama
+
+X IS F {OF, TO, WITH, FOR, OVER} Y --> F(X,Y).
+
+$y=f(x)$ would be phrased as F(Y,X) and read as "Y IS F OF X"
+
+Does that mean that we always use it with X as input and Y as output?
+
+Or do we allow a sort of constraint solving / unification engine to use X as output and Y as input?
+
+

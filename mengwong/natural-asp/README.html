@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2022-08-26 Fri 17:35 -->
+<!-- 2022-08-27 Sat 13:55 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>a syntax for NaturalL4 that expresses ASP</title>
@@ -38,14 +38,14 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orgce533ef">1. How do we represent Horn clauses in Natural L4</a>
+<li><a href="#orgd0299ef">1. How do we represent Horn clauses in Natural L4</a>
 <ul>
-<li><a href="#orgc54ecbf">1.1. the various forms of terms and predicates</a>
+<li><a href="#org0ccc129">1.1. the various forms of terms and predicates</a>
 <ul>
-<li><a href="#orge0e0d54">1.1.1. constraints</a></li>
+<li><a href="#orgc67b286">1.1.1. constraints</a></li>
 </ul>
 </li>
-<li><a href="#org6084683">1.2. How do we represent arbitrary first-order Horn clauses in Natural4?</a></li>
+<li><a href="#orgc20f04b">1.2. How do we represent arbitrary first-order Horn clauses in Natural4?</a></li>
 </ul>
 </li>
 </ul>
@@ -64,12 +64,12 @@ We propose:
 <li>that can go to ASP proper</li>
 </ul>
 
-<div id="outline-container-orgce533ef" class="outline-2">
-<h2 id="orgce533ef"><span class="section-number-2">1.</span> How do we represent Horn clauses in Natural L4</h2>
+<div id="outline-container-orgd0299ef" class="outline-2">
+<h2 id="orgd0299ef"><span class="section-number-2">1.</span> How do we represent Horn clauses in Natural L4</h2>
 <div class="outline-text-2" id="text-1">
 </div>
-<div id="outline-container-orgc54ecbf" class="outline-3">
-<h3 id="orgc54ecbf"><span class="section-number-3">1.1.</span> the various forms of terms and predicates</h3>
+<div id="outline-container-org0ccc129" class="outline-3">
+<h3 id="org0ccc129"><span class="section-number-3">1.1.</span> the various forms of terms and predicates</h3>
 <div class="outline-text-3" id="text-1-1">
 <p>
 fact1().
@@ -104,8 +104,8 @@ not
 </p>
 </div>
 
-<div id="outline-container-orge0e0d54" class="outline-4">
-<h4 id="orge0e0d54"><span class="section-number-4">1.1.1.</span> constraints</h4>
+<div id="outline-container-orgc67b286" class="outline-4">
+<h4 id="orgc67b286"><span class="section-number-4">1.1.1.</span> constraints</h4>
 <div class="outline-text-4" id="text-1-1-1">
 <p>
 :- exp1, exp2.
@@ -114,8 +114,8 @@ not
 </div>
 </div>
 
-<div id="outline-container-org6084683" class="outline-3">
-<h3 id="org6084683"><span class="section-number-3">1.2.</span> How do we represent arbitrary first-order Horn clauses in Natural4?</h3>
+<div id="outline-container-orgc20f04b" class="outline-3">
+<h3 id="orgc20f04b"><span class="section-number-3">1.2.</span> How do we represent arbitrary first-order Horn clauses in Natural4?</h3>
 <div class="outline-text-3" id="text-1-2">
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
@@ -124,62 +124,44 @@ not
 <col  class="org-left" />
 
 <col  class="org-left" />
-
-<col  class="org-left" />
-
-<col  class="org-left" />
 </colgroup>
 <thead>
 <tr>
 <th scope="col" class="org-left">prolog / asp</th>
 <th scope="col" class="org-left">Natural4</th>
-<th scope="col" class="org-left">Alloy 6</th>
-<th scope="col" class="org-left">GF???</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td class="org-left">fact1.</td>
 <td class="org-left">DECIDE fact1 IS true ALWAYS</td>
-<td class="org-left">&#xa0;</td>
-<td class="org-left">&#xa0;</td>
 </tr>
 </tbody>
 <tbody>
 <tr>
 <td class="org-left">functor1(term1).</td>
 <td class="org-left">DECIDE functor1 OF term1 IS true ALWAYS</td>
-<td class="org-left">&#xa0;</td>
-<td class="org-left">&#xa0;</td>
 </tr>
 </tbody>
 <tbody>
 <tr>
 <td class="org-left">functor1(term1) :- functor2(term2).</td>
 <td class="org-left">DECIDE term1 IS functor1 WHEN term2 IS functor2</td>
-<td class="org-left">&#xa0;</td>
-<td class="org-left">&#xa0;</td>
 </tr>
 </tbody>
 <tbody>
 <tr>
 <td class="org-left">functor1(Var1) :- functor2(Var1).</td>
 <td class="org-left">EVERY Var1 IS functor1 WHEN Var1 IS functor2</td>
-<td class="org-left">&#xa0;</td>
-<td class="org-left">&#xa0;</td>
 </tr>
 </tbody>
 <tbody>
 <tr>
 <td class="org-left">functor1(Var1,Var2) :- functor2(Var1,Var2).</td>
 <td class="org-left">EVERY Var1 IS functor1 OF Var2 WHEN Var1 IS functor2 OF Var2</td>
-<td class="org-left">&#xa0;</td>
-<td class="org-left">&#xa0;</td>
 </tr>
 
 <tr>
-<td class="org-left">&#xa0;</td>
-<td class="org-left">&#xa0;</td>
 <td class="org-left">&#xa0;</td>
 <td class="org-left">&#xa0;</td>
 </tr>
@@ -187,13 +169,9 @@ not
 <tr>
 <td class="org-left">ancestor(X,Y) :- parent(X,Y).</td>
 <td class="org-left">EVERY X IS ancestor OF Y WHEN X IS parent OF Y.</td>
-<td class="org-left">&#xa0;</td>
-<td class="org-left">&#xa0;</td>
 </tr>
 
 <tr>
-<td class="org-left">&#xa0;</td>
-<td class="org-left">&#xa0;</td>
 <td class="org-left">&#xa0;</td>
 <td class="org-left">&#xa0;</td>
 </tr>
@@ -201,20 +179,14 @@ not
 <tr>
 <td class="org-left">ancestor(X,Z) :- ancestor(X,Y), ancestor(Y,Z).</td>
 <td class="org-left">EVERY X is ancestor of Z WHEN X IS ancestor of Y</td>
-<td class="org-left">&#xa0;</td>
-<td class="org-left">&#xa0;</td>
 </tr>
 
 <tr>
 <td class="org-left">&#xa0;</td>
 <td class="org-left">AND Y IS ancestor of Z.</td>
-<td class="org-left">&#xa0;</td>
-<td class="org-left">&#xa0;</td>
 </tr>
 
 <tr>
-<td class="org-left">&#xa0;</td>
-<td class="org-left">&#xa0;</td>
 <td class="org-left">&#xa0;</td>
 <td class="org-left">&#xa0;</td>
 </tr>
@@ -222,20 +194,14 @@ not
 <tr>
 <td class="org-left">functor1(X,Y,Z) :- functor2(Z,Y,X).</td>
 <td class="org-left">GIVEN X Y Z</td>
-<td class="org-left">&#xa0;</td>
-<td class="org-left">&#xa0;</td>
 </tr>
 
 <tr>
 <td class="org-left">&#xa0;</td>
 <td class="org-left">functor1 WHEN functor2 OF Z Y X</td>
-<td class="org-left">&#xa0;</td>
-<td class="org-left">&#xa0;</td>
 </tr>
 
 <tr>
-<td class="org-left">&#xa0;</td>
-<td class="org-left">&#xa0;</td>
 <td class="org-left">&#xa0;</td>
 <td class="org-left">&#xa0;</td>
 </tr>
@@ -243,20 +209,14 @@ not
 <tr>
 <td class="org-left">functor1(X,Y)   :- functor2(Y, X).</td>
 <td class="org-left">GIVEN X Y</td>
-<td class="org-left">&#xa0;</td>
-<td class="org-left">&#xa0;</td>
 </tr>
 
 <tr>
 <td class="org-left">&#xa0;</td>
 <td class="org-left">functor1 WHEN functor2 OF Y X</td>
-<td class="org-left">&#xa0;</td>
-<td class="org-left">&#xa0;</td>
 </tr>
 
 <tr>
-<td class="org-left">&#xa0;</td>
-<td class="org-left">&#xa0;</td>
 <td class="org-left">&#xa0;</td>
 <td class="org-left">&#xa0;</td>
 </tr>
@@ -264,20 +224,14 @@ not
 <tr>
 <td class="org-left">&#xa0;</td>
 <td class="org-left">functor1 WHEN functor2 IS Y X</td>
-<td class="org-left">&#xa0;</td>
-<td class="org-left">&#xa0;</td>
 </tr>
 
 <tr>
 <td class="org-left">&#xa0;</td>
 <td class="org-left">Y IS functor2 OF X</td>
-<td class="org-left">&#xa0;</td>
-<td class="org-left">&#xa0;</td>
 </tr>
 
 <tr>
-<td class="org-left">&#xa0;</td>
-<td class="org-left">&#xa0;</td>
 <td class="org-left">&#xa0;</td>
 <td class="org-left">&#xa0;</td>
 </tr>
@@ -285,44 +239,142 @@ not
 <tr>
 <td class="org-left">functor1(X,Y) :- functor2(Y,X).</td>
 <td class="org-left">EVERY X IS functor1 OF Y WHEN Y IS functor2 OF X</td>
-<td class="org-left">&#xa0;</td>
-<td class="org-left">&#xa0;</td>
 </tr>
 </tbody>
 <tbody>
 <tr>
 <td class="org-left">q(X) :- p(X,Y).</td>
 <td class="org-left">\(\forall X \exists Y p(X,Y) \implies q(X)\)</td>
-<td class="org-left">&#xa0;</td>
-<td class="org-left">&#xa0;</td>
 </tr>
 </tbody>
 <tbody>
 <tr>
 <td class="org-left">f1(X,Y) :- f2(X,Y), f3(X,Y).</td>
 <td class="org-left">EVERY X IS f1 OF Y WHEN X IS f2 OF Y AND X IS F3 OF Y</td>
-<td class="org-left">&#xa0;</td>
-<td class="org-left">&#xa0;</td>
 </tr>
 </tbody>
 <tbody>
 <tr>
-<td class="org-left">f1(X,Y) :- f2(X,Y), f3(X,Y).</td>
+<td class="org-left">f1(X,Y) :- f2(X,Y); f3(X,Y).</td>
 <td class="org-left">EVERY X IS f1 OF Y WHEN X IS f2 OF Y  OR X IS F3 OF Y</td>
-<td class="org-left">&#xa0;</td>
-<td class="org-left">&#xa0;</td>
 </tr>
 </tbody>
 <tbody>
 <tr>
 <td class="org-left">&#xa0;</td>
-<td class="org-left">\(\forall X \forall Y, f2(X,Y) \land f3(X,Y) \implies f1(X,Y)\)</td>
+<td class="org-left">\(\forall X \forall Y f2(X,Y) \land f3(X,Y) \implies f1(X,Y)\)</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">GIVEN X Y</td>
+</tr>
+
+<tr>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">X F1 Y WHEN X F2 Y AND X F3 Y</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">GIVEN X Y</td>
+</tr>
+
+<tr>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">F1 X Y WHEN F2 AND F3</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">FOR ALL X Y</td>
+</tr>
+
+<tr>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">F1 X Y WHEN F2 X Y AND F3 X Y</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">FOR ALL X Y</td>
+</tr>
+
+<tr>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">F1 WHEN F2 AND F3</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">FOR ALL Mother Father</td>
+</tr>
+
+<tr>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">Mother RelatedTo Father WHEN Mother parent C AND Father parent C</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">FOR ALL Mother Father Child</td>
+</tr>
+
+<tr>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">Mother IS RelatedTo Father WHEN Mother IS parent OF Child AND Father IS parent OF Child</td>
+</tr>
+</tbody>
+<tbody>
+<tr>
+<td class="org-left">numDependents(D,P).</td>
+<td class="org-left">D IS numDependents OF P.</td>
+</tr>
+
+<tr>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">Alice HAS 5 dependents.</td>
+</tr>
+
+<tr>
+<td class="org-left">numDependents(5, Alice).</td>
+<td class="org-left">numDependents IS 5 FOR Alice.</td>
+</tr>
+
+<tr>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">&#xa0;</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
 <td class="org-left">&#xa0;</td>
 <td class="org-left">&#xa0;</td>
 </tr>
 </tbody>
 </table>
 
+<p>
+(do we want to model Alice as a class with an attribute Dependents which is a List of Person?
+</p>
+
+<p>
+Or should the Dependents attribute just be an Int?)
+</p>
+
+<p>
+And how do temporals fit into all this?
+</p>
 
 
 <p>
@@ -391,7 +443,7 @@ Or do we allow a sort of constraint solving / unification engine to use X as out
 </div>
 <div id="postamble" class="status">
 <p class="author">Author: Wong Meng Weng</p>
-<p class="date">Created: 2022-08-26 Fri 17:35</p>
+<p class="date">Created: 2022-08-27 Sat 13:55</p>
 <p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>

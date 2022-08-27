@@ -35,66 +35,66 @@ not
 
 ** How do we represent arbitrary first-order Horn clauses in Natural4?
 
-| prolog / asp                                   | Natural4                                                                             |
-|------------------------------------------------+--------------------------------------------------------------------------------------|
-| fact1.                                         | DECIDE fact1 IS true ALWAYS                                                          |
-|------------------------------------------------+--------------------------------------------------------------------------------------|
-| functor1(term1).                               | DECIDE functor1 OF term1 IS true ALWAYS                                              |
-|------------------------------------------------+--------------------------------------------------------------------------------------|
-| functor1(term1) :- functor2(term2).            | DECIDE term1 IS functor1 WHEN term2 IS functor2                                      |
-|------------------------------------------------+--------------------------------------------------------------------------------------|
-| functor1(Var1) :- functor2(Var1).              | EVERY Var1 IS functor1 WHEN Var1 IS functor2                                         |
-|------------------------------------------------+--------------------------------------------------------------------------------------|
-| functor1(Var1,Var2) :- functor2(Var1,Var2).    | EVERY Var1 IS functor1 OF Var2 WHEN Var1 IS functor2 OF Var2                         |
-|                                                |                                                                                      |
-| ancestor(X,Y) :- parent(X,Y).                  | EVERY X IS ancestor OF Y WHEN X IS parent OF Y.                                      |
-|                                                |                                                                                      |
-| ancestor(X,Z) :- ancestor(X,Y), ancestor(Y,Z). | EVERY X is ancestor of Z WHEN X IS ancestor of Y                                     |
-|                                                | AND Y IS ancestor of Z.                                                              |
-|                                                |                                                                                      |
-| functor1(X,Y,Z) :- functor2(Z,Y,X).            | GIVEN X Y Z                                                                          |
-|                                                | functor1 WHEN functor2 OF Z Y X                                                      |
-|                                                |                                                                                      |
-| functor1(X,Y)   :- functor2(Y, X).             | GIVEN X Y                                                                            |
-|                                                | functor1 WHEN functor2 OF Y X                                                        |
-|                                                |                                                                                      |
-|                                                | functor1 WHEN functor2 IS Y X                                                        |
-|                                                | Y IS functor2 OF X                                                                   |
-|                                                |                                                                                      |
-| functor1(X,Y) :- functor2(Y,X).                | EVERY X IS functor1 OF Y WHEN Y IS functor2 OF X                                     |
-|------------------------------------------------+--------------------------------------------------------------------------------------|
-| q(X) :- p(X,Y).                                | $\forall X \exists Y p(X,Y) \implies q(X)$                                           |
-|------------------------------------------------+--------------------------------------------------------------------------------------|
-| f1(X,Y) :- f2(X,Y), f3(X,Y).                   | EVERY X IS f1 OF Y WHEN X IS f2 OF Y AND X IS F3 OF Y                                |
-|------------------------------------------------+--------------------------------------------------------------------------------------|
-| f1(X,Y) :- f2(X,Y); f3(X,Y).                   | EVERY X IS f1 OF Y WHEN X IS f2 OF Y  OR X IS F3 OF Y                                |
-|------------------------------------------------+--------------------------------------------------------------------------------------|
-|                                                | $\forall X \forall Y f2(X,Y) \land f3(X,Y) \implies f1(X,Y)$                         |
-|------------------------------------------------+--------------------------------------------------------------------------------------|
-|                                                | GIVEN X Y                                                                            |
-|                                                | X F1 Y WHEN X F2 Y AND X F3 Y                                                        |
-|------------------------------------------------+--------------------------------------------------------------------------------------|
-|                                                | GIVEN X Y                                                                            |
-|                                                | F1 X Y WHEN F2 AND F3                                                                |
-|------------------------------------------------+--------------------------------------------------------------------------------------|
-|                                                | FOR ALL X Y                                                                          |
-|                                                | F1 X Y WHEN F2 X Y AND F3 X Y                                                        |
-|------------------------------------------------+--------------------------------------------------------------------------------------|
-|                                                | FOR ALL X Y                                                                          |
-|                                                | F1 WHEN F2 AND F3                                                                    |
-|------------------------------------------------+--------------------------------------------------------------------------------------|
-|                                                | FOR ALL Mother Father                                                                |
-|                                                | Mother RelatedTo Father WHEN Mother parent C AND Father parent C                     |
-|------------------------------------------------+--------------------------------------------------------------------------------------|
-|                                                | FOR ALL Mother Father Child                                                          |
-|                                                | Mother RelatedTo Father WHEN Mother IS parent OF Child AND Father IS parent OF Child |
-|------------------------------------------------+--------------------------------------------------------------------------------------|
-| numDependents(D,P).                            | D IS numDependents OF P.                                                             |
-|                                                | Alice HAS 5 dependents.                                                              |
-| numDependents(5, Alice).                       | numDependents IS 5 FOR Alice.                                                        |
-|                                                |                                                                                      |
-|                                                |                                                                                      |
-|                                                |                                                                                      |
+| prolog / asp                                   | Natural4                                                                                |
+|------------------------------------------------+-----------------------------------------------------------------------------------------|
+| fact1.                                         | DECIDE fact1 IS true ALWAYS                                                             |
+|------------------------------------------------+-----------------------------------------------------------------------------------------|
+| functor1(term1).                               | DECIDE functor1 OF term1 IS true ALWAYS                                                 |
+|------------------------------------------------+-----------------------------------------------------------------------------------------|
+| functor1(term1) :- functor2(term2).            | DECIDE term1 IS functor1 WHEN term2 IS functor2                                         |
+|------------------------------------------------+-----------------------------------------------------------------------------------------|
+| functor1(Var1) :- functor2(Var1).              | EVERY Var1 IS functor1 WHEN Var1 IS functor2                                            |
+|------------------------------------------------+-----------------------------------------------------------------------------------------|
+| functor1(Var1,Var2) :- functor2(Var1,Var2).    | EVERY Var1 IS functor1 OF Var2 WHEN Var1 IS functor2 OF Var2                            |
+|                                                |                                                                                         |
+| ancestor(X,Y) :- parent(X,Y).                  | EVERY X IS ancestor OF Y WHEN X IS parent OF Y.                                         |
+|                                                |                                                                                         |
+| ancestor(X,Z) :- ancestor(X,Y), ancestor(Y,Z). | EVERY X is ancestor of Z WHEN X IS ancestor of Y                                        |
+|                                                | AND Y IS ancestor of Z.                                                                 |
+|                                                |                                                                                         |
+| functor1(X,Y,Z) :- functor2(Z,Y,X).            | GIVEN X Y Z                                                                             |
+|                                                | functor1 WHEN functor2 OF Z Y X                                                         |
+|                                                |                                                                                         |
+| functor1(X,Y)   :- functor2(Y, X).             | GIVEN X Y                                                                               |
+|                                                | functor1 WHEN functor2 OF Y X                                                           |
+|                                                |                                                                                         |
+|                                                | functor1 WHEN functor2 IS Y X                                                           |
+|                                                | Y IS functor2 OF X                                                                      |
+|                                                |                                                                                         |
+| functor1(X,Y) :- functor2(Y,X).                | EVERY X IS functor1 OF Y WHEN Y IS functor2 OF X                                        |
+|------------------------------------------------+-----------------------------------------------------------------------------------------|
+| q(X) :- p(X,Y).                                | $\forall X \exists Y p(X,Y) \implies q(X)$                                              |
+|------------------------------------------------+-----------------------------------------------------------------------------------------|
+| f1(X,Y) :- f2(X,Y), f3(X,Y).                   | EVERY X IS f1 OF Y WHEN X IS f2 OF Y AND X IS F3 OF Y                                   |
+|------------------------------------------------+-----------------------------------------------------------------------------------------|
+| f1(X,Y) :- f2(X,Y); f3(X,Y).                   | EVERY X IS f1 OF Y WHEN X IS f2 OF Y  OR X IS F3 OF Y                                   |
+|------------------------------------------------+-----------------------------------------------------------------------------------------|
+|                                                | $\forall X \forall Y f2(X,Y) \land f3(X,Y) \implies f1(X,Y)$                            |
+|------------------------------------------------+-----------------------------------------------------------------------------------------|
+|                                                | GIVEN X Y                                                                               |
+|                                                | X F1 Y WHEN X F2 Y AND X F3 Y                                                           |
+|------------------------------------------------+-----------------------------------------------------------------------------------------|
+|                                                | GIVEN X Y                                                                               |
+|                                                | F1 X Y WHEN F2 AND F3                                                                   |
+|------------------------------------------------+-----------------------------------------------------------------------------------------|
+|                                                | FOR ALL X Y                                                                             |
+|                                                | F1 X Y WHEN F2 X Y AND F3 X Y                                                           |
+|------------------------------------------------+-----------------------------------------------------------------------------------------|
+|                                                | FOR ALL X Y                                                                             |
+|                                                | F1 WHEN F2 AND F3                                                                       |
+|------------------------------------------------+-----------------------------------------------------------------------------------------|
+|                                                | FOR ALL Mother Father                                                                   |
+|                                                | Mother RelatedTo Father WHEN Mother parent C AND Father parent C                        |
+|------------------------------------------------+-----------------------------------------------------------------------------------------|
+|                                                | FOR ALL Mother Father Child                                                             |
+|                                                | Mother IS RelatedTo Father WHEN Mother IS parent OF Child AND Father IS parent OF Child |
+|------------------------------------------------+-----------------------------------------------------------------------------------------|
+| numDependents(D,P).                            | D IS numDependents OF P.                                                                |
+|                                                | Alice HAS 5 dependents.                                                                 |
+| numDependents(5, Alice).                       | numDependents IS 5 FOR Alice.                                                           |
+|                                                |                                                                                         |
+|                                                |                                                                                         |
+|                                                |                                                                                         |
 
 (do we want to model Alice as a class with an attribute Dependents which is a List of Person?
 

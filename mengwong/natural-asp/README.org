@@ -131,9 +131,18 @@ THERE EXISTS W SUCH THAT pred2 Y, X, Z, W HOLDS.
   
   
   
-pred3(X,Y,Z):-pred4(Y,X,Z).                      GIVEN ANY X,Y,Z:
-                                                    CONCLUDE pred 3 X, Y, Z HOLDS IF pred4 Y, X, Z HOLDS
-pred1(X,Y,Z):-pred2(Y,X,Z,W)                     GIVEN ANY person X,vehicle Y,organisation Z:                                                                                                                   
+pred3(X,Y,Z):-pred4(Y,X,Z).                      
+
+GIVEN ANY X,Y,Z:
+                                                    
+CONCLUDE pred 3 X, Y, Z HOLDS IF 
+
+pred4 Y, X, Z HOLDS 
+
+
+pred1(X,Y,Z):-pred2(Y,X,Z,W)                     
+
+GIVEN ANY person X,vehicle Y,organisation Z:                                                                                                                   
 
 
 

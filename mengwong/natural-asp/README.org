@@ -214,6 +214,10 @@ IF pred(X,Y) HOLDS AND pred(Y,Z) HOLDS
 
 but no synonym for transitivity-like properties for predicates of higher arity. Again user must learn the 'fundamental' Core Natural L4 for full expressivity. 
 
+** Core Natural L4 vs Synonyms
+
+I think Core Natural L4 should be the user facing language that has the full expressivity of l4. This will be a formal language but more intuitive and closer to English than l4. Synonyms for certain expressions of Core Natural L4 that bring it even closer to English can then be implemented in an ad-hoc case by case manner. My hypothesis is that this language of synonyms (call it 'conversational l4') will be neccesarily less expressive than Core Natural L4. So formally there is no distinction between Core Natural L4 and 'conversational l4'. They will both form natural l4, but core natural l4 will be as expressive as l4 and 'conversational l4' can be slowly built up in an organic manner with no commitment/requirement that it will match the expressivity of core natural L4.
+
 
 
 

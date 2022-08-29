@@ -178,6 +178,42 @@ alice IS bob's mother = mother(alice, bob) HOLDS
 
 Can take any bit of natural L4 code and freely interchange the two expressions. However no guarantee that such synonmys are available for 3,4,5 etc place predicates. So user must eventually learn 'Core Natural L4'. 
 
+** Should typing (ie class) information be reflected in ASP?
+GIVEN ANY person X
+
+CONCLUDE mortal X HOLDS
+
+Note that there is no IF part to this piece of natural l4. Assuming person X represents typing information, if this is ommited from ASP, then the above bit of natural l4 gets represented as 
+
+mortal(X). 
+
+This is not allowed in ASP because X is a variable that appears in the head but not the (empty) body.
+
+Representing this as 
+
+mortal(X):- isTypePerson(X).
+
+gives a valid ASP rule but now it means that typing relations/rules all have to be represented in the ASP translation, not sure if this is a good idea. Alternatively, we say that all objects of type Person must be declared up-front/deduced by a separate reasoner. Then say this type consists of the objects {john,james}, we have the ASP rules:
+
+mortal(X):-X=james.
+
+
+mortal(X):-X=john.
+
+
+But then an abductive problem where we want to find an abductive solution to mortal(Tom), where Tom is not declared as a person upfront, will just fail rather than returning the (sensible) answer isTypePerson(tom). Ie gives the user the impression that Tom cannot be mortal rather than just saying that Tom is mortal may be deduced from Tom is a person.
+
+** Transitivity
+Offer the expression pred1 IS TRANSITIVE as a synonym for 
+
+GIVEN ANY X, Y, Z:
+
+CONCLUDE pred1(X,Z) HOLDS IF
+
+IF pred(X,Y) HOLDS AND pred(Y,Z) HOLDS
+
+but no synonym for transitivity-like properties for predicates of higher arity. Again user must learn the 'fundamental' Core Natural L4 for full expressivity. 
+
 
 
 

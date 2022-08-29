@@ -121,28 +121,66 @@ extending to n>2, perhaps the VICEVERSA keyword defines that the predicate holds
 do we care about transitivity? associativity, distributivity, commutativity not relevant.
 
 
-**pred1(X,Y,Z):-pred2(Y,X,Z,W).**
+*** pred1(X,Y,Z):-pred2(Y,X,Z,W).
 
 GIVEN ANY X, Y, Z:
 
 CONCLUDE pred1 X, Y, Z HOLDS IF
 
-THERE EXISTS W SUCH THAT pred2 Y, X, Z, W HOLDS.
+THERE EXISTS SOME W SUCH THAT pred2 Y, X, Z, W HOLDS.
   
   
   
-**pred3(X,Y,Z):-pred4(Y,X,Z).**                      
+*** pred3(X,Y,Z):-pred4(Y,X,Z).                     
 
 GIVEN ANY X,Y,Z:
                                                     
-CONCLUDE pred 3 X, Y, Z HOLDS IF 
+CONCLUDE pred3 X, Y, Z HOLDS IF 
 
 pred4 Y, X, Z HOLDS 
 
 
-**pred1(X,Y,Z):-pred2(Y,X,Z,W)**                     
+*** pred1(X,Y,Z):-pred2(Y,X,Z,W). ---(TYPING INFO IN NATURAL L4 BUT NOT IN ASP) (Current implementation)                   
 
-GIVEN ANY person X,vehicle Y,organisation Z:                                                                                                                   
+GIVEN ANY person X,vehicle Y,organisation Z:
+
+CONCLUDE pred1 X, Y, Z HOLDS IF
+
+THERE EXISTS SOME person W SUCH THAT pred2 Y, X, Z, W HOLDS
+
+
+*** pred1(X,Y,Z):-pred2(Y,X,Z,W), isTypePerson(X), isTypeVehicle(Y),...,. ---(TYPING INFO IN BOTH NATURAL L4 AND ASP)                   
+
+GIVEN ANY person X,vehicle Y,organisation Z:
+
+CONCLUDE pred1 X, Y, Z HOLDS IF
+
+THERE EXISTS SOME person W SUCH THAT pred2 Y, X, Z, W HOLDS
+
+
+** Functions as Rules with contexts (necessary for Clingo ASP, not sure for other LP implementations)
+*** minsavings(P,X,Y):-numdep(P,X),Y=2*X.
+
+GIVEN ANY P, X
+
+IF numdep P, X HOLDS
+
+DEF minsavings OF X TO BE 2*X
+
+So in other words function is only defined in some 'context'. 
+
+** Core Natural L4
+
+The above would be something like 'Core Natural L4'. Syntactic sugar, synonyms can always be given for restricted cases, to make the syntax more intuitive/user friendly, but these synonyms need not extend to the whole language/the most general case. (Ie there no complete language that further sits 'on top' of Core Natural L4)
+
+Example:
+alice is bob's mother = mother(alice, bob) HOLDS
+
+Can take any bit of natural L4 code and freely interchange the two expressions. However no guarantee that such synonmys are available for 3,4,5 etc place predicates. So user must eventually learn 'Core Natural L4'. 
+
+
+
+
 
 
 

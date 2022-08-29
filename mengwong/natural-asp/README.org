@@ -174,7 +174,7 @@ So in other words function is only defined in some 'context'.
 The above would be something like 'Core Natural L4'. Syntactic sugar, synonyms can always be given for restricted cases, to make the syntax more intuitive/user friendly, but these synonyms need not extend to the whole language/the most general case. (Ie there no complete language that further sits 'on top' of Core Natural L4)
 
 Example:
-alice is bob's mother = mother(alice, bob) HOLDS
+alice IS bob's mother = mother(alice, bob) HOLDS
 
 Can take any bit of natural L4 code and freely interchange the two expressions. However no guarantee that such synonmys are available for 3,4,5 etc place predicates. So user must eventually learn 'Core Natural L4'. 
 

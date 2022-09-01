@@ -99,10 +99,22 @@ Expressing laws computably is a classic objective of AI and Law \cite{mccarty_re
 
 Early in the field's history, \cite{bing_designing_1987} had already imagined automatic parsers for translating natural language laws into formal logic programs. Several significant steps have since been taken towards that vision. For instance, McCarty \cite{mccarty_deep_2007} demonstrated how \cite{collins_head-driven_2003}'s statistical parser can extract, from judicial opinion texts, syntax trees which can be further converted into quasi-logical semantic representations of said texts through definite clause grammars implemented in Prolog. Others have examined how far statistical, machine, and deep learning methods are capable of implicitly representing legal principles and concepts \cite{groendijk_neural_1992, de_maat_automatic_2008, winkels_automatic_2012, chalkidis_neural_2019, chalkidis_lexglue_2022}.
 
-This paper contributes to this literature by describing a partially-automated law to logic pipeline built with context-free grammars \cite{} and Grammatical Framework \cite{}. Both technologies are relatively novel to AI and Law, despite being well-known outside the field \cite{}.
-\todoj{Could Aarne or Inari help with citing the relevant papers on these things from outside the JURIX litearture?}
-More importantly, they complement existing research here in [X] ways. First, GF is... Second, ...
-\todoj{Will need to fill this in when we are clearer on the key points this paper will offer}. We exemplify the pipeline using a part of Singapore's \textit{Personal Data Protection Act} 2012 (PDPA). Our code is available open-source.\footnote{See [url to be provided after blind review].}
+This paper contributes to this literature by describing a partially-automated law to logic pipeline built with
+context-free grammars \cite{chomsky-1956} and Grammatical Framework (GF, \cite{ranta-2011}).
+Both technologies are relatively novel to AI and Law, despite being well-known outside the field.
+More importantly, they complement existing research in the following ways.
+
+In previous literature, the bottleneck has often been the chosen NLP framework \cite{quaresma_question_2005,wyner_study_2013}.
+In contrast to many currently popular tools, GF is a purely rule-based formalism, multilingual by design and
+highly modular: a GF grammar can be tailored to a given domain with extreme precision.
+Hence we believe GF to be well suited for a domain with highly specialised conventions, such as law.
+
+As a downside, writing GF requires expertise that is rare in the field of computational law.
+In order to ease the adoption of GF, we have developed a method to automatically extract a preliminary GF grammar from a context-free grammar,
+which is in turn automatically extracted from manual annotation of a small set of legal documents.
+The automatically extracted GF grammar can be manually improved, which requires less effort than writing such a grammar from scratch.
+
+We exemplify the pipeline using a part of Singapore's \textit{Personal Data Protection Act} 2012 (PDPA). Our code is available open-source.\footnote{See [url to be provided after blind review].}
 
 Section \ref{sec:methods} details our pipeline. Section \ref{sec:pdpa} explains how we used it to formalise the PDPA. Section \ref{sec:future} discusses future directions and concludes.
 

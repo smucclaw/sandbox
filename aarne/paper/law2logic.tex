@@ -17,6 +17,7 @@
 \newcommand{\bece}{\begin{center}}
 \newcommand{\ence}{\end{center}}
 \newcommand{\todoj}[1]{{\color{red}\textbf{[J: #1]}}}
+\newcommand{\todoi}[1]{{\color{magenta}\textbf{[I: #1]}}}
 
 
 \newenvironment{compactitem}{\begin{itemize}}{\end{itemize}}
@@ -126,6 +127,12 @@ Figure~\ref{pipeline-ex} shows an example of a text at different stages through 
 % The starting point of the project presented in this paper was a system consisting of \textbf{spreadsheets} and their translation to logical formulas. The cells of the spreasheet were natural language expressions, which were parsed into syntax trees with the help of a grammar. What was missing from the complete pipeline from text to logic was the conversion from the original text to spreadsheets. This step was made manually, and the focus of the projects was on the later parts of the pipeline. Thus the main contribution of the present paper is to define an automated conversion of texts to spreadsheets.
 
 % The first part of this is a grammar that parses texts to abstract syntax trees. The second part is a conversion to a new intermediate representation between syntax trees, spreadsheets, and logic. We call this representation \textbf{assembly logic}, in analogy to assembly languages in compilers, if we think of spreadsheets and logics as "machine languages", whose long distance to the source language is bridged by the assembly language.
+
+% \todoj{ This para below reads like it belongs somewhere in the pipeline overview, probably even before the part where we talk about grammars?}
+\todoi{moved this para as per Jerrold's suggestion, but unsure how it fits.}
+Notice that the ultimate unit of semantic interpretation is a paragraph consisting of several lines. This is the case, for instance with the example in Figure~\ref{pipeline-ex}.
+In the current implementation, the parser reads the document line by line, and a separate process is used for segmenting groups of lines into paragraphs.
+The reason for this set-up is purely practical: semantic units can be arbitrarily long sequences of lines, and the parser may get slow in such cases.
 
 \subsection{Building the Grammars}
 
@@ -255,28 +262,15 @@ Figure~\ref{donkey}
 
 \subsection{Visualisation in Spreadsheets}
 
-\todoj{This part on spreadsheets needs to be simplified and shortened if we are to fit it all into 8 pages. I think we can only give max 1 page to this, and it is not the main focus of the paper. Could the Haskell figure be shortened? Those interested can be linked to the actual github code.}
+Aside from predicate logic, the AST allowed us to visualise the statute's structure in spreadsheet form.
+Presently, the spreadsheet only serves as a form of visualisation, similarly to \cite{mochales_study_2008}.
+However, we plan to use the spreadsheet format as an input to a low-code programming platform,
+to help non-technical users learn, understand, and write (intermediate) legal formalisms more easily.
+This work is currently under development by our research team and will be more formally described in a separate paper.
 
-Aside from predicate logic, the AST allowed us to visualise the statute's structure in spreadsheet form. This spreadsheet notation is presently under development by our research team and will be more formally described in a separate paper. Presently, it suffices to note that this visualisation was developed to help non-technical users learn, understand, and write (intermediate) legal formalisms more easily. To this end, it is a quasi-logical visual language where legal operators, predicates, and conclusions are arranged and indented following a particular, controlled syntax...
-\todoj{Need Meng to properly summarise this. Please make it short and concise.}
-
-We implemented spreadsheets with a recursive datatype \verb6Box6, where a box consists of a header and cells, where each cell is a box with a title.
-
-This structure supports compositional conversion from a tree-like representation, but also rendering as tab-separated files, which can be read into spreadsheet editors.
-Figure~\ref{assembly} shows this type, together with the other concepts related to spreadsheets.
 
 \begin{figure}
   \begin{framed}
-  \bequ
-  \textbf{The recursive Haskell datatype for spreadsheets:}
- \bequ
-\begin{verbatim}
-data Box = Box {
-   header :: String,
-   cells :: [(String, Box)]
-  }
-\end{verbatim}
- \enqu
 
  \textbf{Some assembly logic constructors:}
  \bequ
@@ -304,27 +298,12 @@ iNP env np = case np of
 \end{verbatim}
  \enqu
 
- \textbf{Conversions from assembly logic to spreadsheets:}
- \bequ
-\begin{verbatim}
-formula2box :: Formula -> Box
-formula2box formula = case formula of
-  Atomic _ a  -> atomBox a
-  Implication f g -> ifBox [formula2box f] [formula2box g]
-  Quantification s f -> leftsideBox s [formula2box f]
-\end{verbatim}
- \enqu
- \enqu
    \end{framed}
- \caption{Data structures and conversions related to spreadsheet and the assembly logic.
+ \caption{Data structures and conversions related to the assembly logic.
  }
 \label{assembly}
 \end{figure}
 
-\todoj{ This para below reads like it belongs somewhere in the pipeline overview, probably even before the part where we talk about grammars?}
-Notice that the ultimate unit of semantic interpretation is a paragraph consisting of several lines. This is the case, for instance with the example in Figure~\ref{pipeline-ex}.
-In the current implementation, the parser reads the document line by line, and a separate process is used for segmenting groups of lines into paragraphs.
-The reason for this set-up is purely practical: semantic units can be arbitrarily long sequences of lines, and the parser may get slow in such cases.
 
 \section{Formalising the Personal Data Protection Act}
 \label{sec:pdpa}

@@ -16,6 +16,8 @@
 \newcommand{\enqu}{\end{quote}}
 \newcommand{\bece}{\begin{center}}
 \newcommand{\ence}{\end{center}}
+\newcommand{\todoj}[1]{{\color{red}\textbf{[J: #1]}}}
+
 
 \newenvironment{compactitem}{\begin{itemize}}{\end{itemize}}
 
@@ -96,7 +98,10 @@ Expressing laws computably is a classic objective of AI and Law \cite{mccarty_re
 
 Early in the field's history, \cite{bing_designing_1987} had already imagined automatic parsers for translating natural language laws into formal logic programs. Several significant steps have since been taken towards that vision. For instance, McCarty \cite{mccarty_deep_2007} demonstrated how \cite{collins_head-driven_2003}'s statistical parser can extract, from judicial opinion texts, syntax trees which can be further converted into quasi-logical semantic representations of said texts through definite clause grammars implemented in Prolog. Others have examined how far statistical, machine, and deep learning methods are capable of implicitly representing legal principles and concepts \cite{groendijk_neural_1992, de_maat_automatic_2008, winkels_automatic_2012, chalkidis_neural_2019, chalkidis_lexglue_2022}.
 
-This paper contributes to this literature by describing a partially-automated law to logic pipeline built with context-free grammars \cite{} and Grammatical Framework \cite{}. Both technologies are relatively novel to AI and Law, despite being well-known outside the field \cite{}. [J: Could Aarne or Inari help with citing the relevant papers on these things from outside the JURIX litearture?] More importantly, they complement existing research here in [X] ways. First, GF is... Second, ...[J: Will need to fill this in when we are clearer on the key points this paper will offer]. We exemplify the pipeline using a part of Singapore's \textit{Personal Data Protection Act} 2012 (PDPA). Our code is available open-source.\footnote{See [url to be provided after blind review].}
+This paper contributes to this literature by describing a partially-automated law to logic pipeline built with context-free grammars \cite{} and Grammatical Framework \cite{}. Both technologies are relatively novel to AI and Law, despite being well-known outside the field \cite{}.
+\todoj{Could Aarne or Inari help with citing the relevant papers on these things from outside the JURIX litearture?}
+More importantly, they complement existing research here in [X] ways. First, GF is... Second, ...
+\todoj{Will need to fill this in when we are clearer on the key points this paper will offer}. We exemplify the pipeline using a part of Singapore's \textit{Personal Data Protection Act} 2012 (PDPA). Our code is available open-source.\footnote{See [url to be provided after blind review].}
 
 Section \ref{sec:methods} details our pipeline. Section \ref{sec:pdpa} explains how we used it to formalise the PDPA. Section \ref{sec:future} discusses future directions and concludes.
 
@@ -130,7 +135,7 @@ The parser is driven by a grammar, which specifies a relation between strings an
 However, the RGL does not cover all the constructs in Singaporean law text, which means that some grammar writing needs to be done from scratch. In particular, the text contains indented lists, paragraph numbers, and references, which significant for the logical structure and which we wanted to capture by the parser. In order to make sure to capture everything, we started grammar writing in a data-driven, top-down way, starting from entire lines of text and going forward by stepwise refinements of the grammar rules.
 
 The most efficient way to produce the grammar turned out to be a semi-automatic method consisting of manual annotations from which a script generated GF rules.
-[we need to explain the annotation scheme and show why it might be useful. especially: how can someone other than us do this well? How do we know we have done it well?]
+\todoj{we need to explain the annotation scheme and show why it might be useful. especially: how can someone other than us do this well? How do we know we have done it well?}
 
 Figure~\ref{grammar-gen} shows an example of a line of a text, the annotations added to it, and the resulting grammar rules.
 
@@ -250,9 +255,10 @@ Figure~\ref{donkey}
 
 \subsection{Visualisation in Spreadsheets}
 
-[J: This part on spreadsheets needs to be simplified and shortened if we are to fit it all into 8 pages. I think we can only give max 1 page to this, and it is not the main focus of the paper. Could the Haskell figure be shortened? Those interested can be linked to the actual github code.]
+\todoj{This part on spreadsheets needs to be simplified and shortened if we are to fit it all into 8 pages. I think we can only give max 1 page to this, and it is not the main focus of the paper. Could the Haskell figure be shortened? Those interested can be linked to the actual github code.}
 
-Aside from predicate logic, the AST allowed us to visualise the statute's structure in spreadsheet form. This spreadsheet notation is presently under development by our research team and will be more formally described in a separate paper. Presently, it suffices to note that this visualisation was developed to help non-technical users learn, understand, and write (intermediate) legal formalisms more easily. To this end, it is a quasi-logical visual language where legal operators, predicates, and conclusions are arranged and indented following a particular, controlled syntax...[J: Need Meng to properly sumamrise this. Please make it short and concise.]
+Aside from predicate logic, the AST allowed us to visualise the statute's structure in spreadsheet form. This spreadsheet notation is presently under development by our research team and will be more formally described in a separate paper. Presently, it suffices to note that this visualisation was developed to help non-technical users learn, understand, and write (intermediate) legal formalisms more easily. To this end, it is a quasi-logical visual language where legal operators, predicates, and conclusions are arranged and indented following a particular, controlled syntax...
+\todoj{Need Meng to properly summarise this. Please make it short and concise.}
 
 We implemented spreadsheets with a recursive datatype \verb6Box6, where a box consists of a header and cells, where each cell is a box with a title.
 
@@ -315,7 +321,7 @@ formula2box formula = case formula of
 \label{assembly}
 \end{figure}
 
-[J: This para below reads like it belongs somewhere in the pipeline overview, probably even before the part where we talk about grammars?]
+\todoj{ This para below reads like it belongs somewhere in the pipeline overview, probably even before the part where we talk about grammars?}
 Notice that the ultimate unit of semantic interpretation is a paragraph consisting of several lines. This is the case, for instance with the example in Figure~\ref{pipeline-ex}.
 In the current implementation, the parser reads the document line by line, and a separate process is used for segmenting groups of lines into paragraphs.
 The reason for this set-up is purely practical: semantic units can be arbitrarily long sequences of lines, and the parser may get slow in such cases.
@@ -325,9 +331,11 @@ The reason for this set-up is purely practical: semantic units can be arbitraril
 
 We demonstrate our proposed pipeline on Part 6A the PDPA. Like the EU's \textit{General Data Protection Regulation} (GDPR), the PDPA is Singapore's primary personal data protection statute and prescribes obligations surrounding the collection, use, disclosure, and deletion of personal data. Part 6A in particular stipulates when and how organisations are expected to notify regulators of personal data breaches (e.g.\ a hospital's patient databases are leaked). We chose the PDPA as a case study for three reasons. First, modelling the PDPA was a practical suggestion from the Personal Data Protection Commission (the Commission), Singapore's primary data regulator, based on their experience having to field numerous questions and prepare volumes of public-friendly guidelines on Part 6A. There was thus a clear use case for our technology. Second, while the PDPA has not been examined in prior AI \& Law literature, its subject matter connects it to established work modelling the GDPR \cite{palmirani_modelling_2018, brennan_gdpr_2021, hickey_gdpr_2021}.
 
-Third, the notification sections we examine are sufficiently complex to demonstrate the utility of a computational law approach in general and our pipeline in particular. Counter-intuitively, organisations are not always expected to immediately disclose data breaches upon discovering them. Rather, breaches are only notifiable if they (are likely to) result in significant harm affected individual(s), or if they are of ``significant scale'' (PDPA s 26B(1)). If so, there is a general duty to report the breach to the Commission ``as soon as practicable'' (s 26D(1)). The organisation must thereafter notify each affected individuals ``in any manner that is reasonable in the circumstances'' (s 26B(2)) --- unless the Commission directs them not to (s 26D(2)). The Commission's published guidelines explain that this may be directed if the breach is of such severity that public responses to it may need to be carefully managed [J: Meng please confirm and provide a cite]. Modelling these rules allowed us to surface the implicit race condition between notifying the Commission and the affected individuals: an organisation which proactively informed both groups at the same time might inadvertently flout the statute's design.
+Third, the notification sections we examine are sufficiently complex to demonstrate the utility of a computational law approach in general and our pipeline in particular. Counter-intuitively, organisations are not always expected to immediately disclose data breaches upon discovering them. Rather, breaches are only notifiable if they (are likely to) result in significant harm affected individual(s), or if they are of ``significant scale'' (PDPA s 26B(1)). If so, there is a general duty to report the breach to the Commission ``as soon as practicable'' (s 26D(1)). The organisation must thereafter notify each affected individuals ``in any manner that is reasonable in the circumstances'' (s 26B(2)) --- unless the Commission directs them not to (s 26D(2)). The Commission's published guidelines explain that this may be directed if the breach is of such severity that public responses to it may need to be carefully managed
+ \todoj{ Meng please confirm and provide a cite}.
+ Modelling these rules allowed us to surface the implicit race condition between notifying the Commission and the affected individuals: an organisation which proactively informed both groups at the same time might inadvertently flout the statute's design.
 
-[Jer: Might remove this table if we need space, doesn't add that much]
+\todoj{Might remove this table if we need space, doesn't add that much}
 Table \ref{stats} provides a statistical summary of the primary input text.
 
 [TODO (AR): At the time of writing, the final translation to logic fails for two logical units, and the logic rules require better verification.]
@@ -348,7 +356,9 @@ logical units & 46 \\
   \label{stats}
 \end{table}
 
-To formalise Part 6A, we first... [J: can someone write a one para summary of the actual process here? That is, how exactly did we convert Part 6A into code? How did we build the specific grammars, etc?] Next, we... Finally, ...
+To formalise Part 6A, we first...
+ \todoj{ can someone write a one para summary of the actual process here? That is, how exactly did we convert Part 6A into code? How did we build the specific grammars, etc?}
+  Next, we... Finally, ...
 
 Figure \ref{pipeline-ex} illustrates selected portions of the text through various stages of the pipeline.
 
@@ -376,7 +386,7 @@ TODO (AR): the TPTP formula is not quite correct - I will have to fix the semant
 \section{Discussion and future work}
 \label{sec:future}
 
-[J: We will need to offer some insights on how well the thing worked. How did we know if we got a good logical output? Were there any standards we checked it against?]
+\todoj{ We will need to offer some insights on how well the thing worked. How did we know if we got a good logical output? Were there any standards we checked it against?}
 
 The most important tasks for future work are to link this pipeline with the previous work at CCLAW, which have much more precision and detail: the spreadsheets and the grammar of smaller units.
 

@@ -36,7 +36,7 @@
 \address[A]{
   Department of Computer Science and Engineering,
   Chalmers University of Technology and University of Gothenburg,
-  aarne.ranta@cse.gu.se 
+  aarne.ranta@cse.gu.se
   }
 \address[B]{SMU and Digital Grammars}
 \address[C]{SMU}
@@ -113,12 +113,12 @@ Figure~\ref{pipeline} shows the complete pipeline, and Figure~\ref{pipeline-ex} 
 \includegraphics[width=0.6\textwidth]{assembly.png}
 \small
 \begin{verbatim}
-![X]:(data_breach(X) & ?[Y]:(personal_data(Y) & IN_RELATION_TO(X,Y)) <=> 
-(personal_data(X) & ?[Y]:((access(Y,X) | collection(Y,X) | use(Y,X) | 
-disclosure(Y,X) | copying(Y,X) | modification(Y,X) | disposal(Y,X)) & 
-unauthorized(Y))) | (((storage_medium(X) | device(X)) & (personal_data(X) & 
-?[Y]:((circumstances(Y) & (((unauthorized(Y) & (access(Y) | collection(Y) | 
-use(Y) | disclosure(Y) | copying(Y) | modification(Y) | disposal(Y))) & 
+![X]:(data_breach(X) & ?[Y]:(personal_data(Y) & IN_RELATION_TO(X,Y)) <=>
+(personal_data(X) & ?[Y]:((access(Y,X) | collection(Y,X) | use(Y,X) |
+disclosure(Y,X) | copying(Y,X) | modification(Y,X) | disposal(Y,X)) &
+unauthorized(Y))) | (((storage_medium(X) | device(X)) & (personal_data(X) &
+?[Y]:((circumstances(Y) & (((unauthorized(Y) & (access(Y) | collection(Y) |
+use(Y) | disclosure(Y) | copying(Y) | modification(Y) | disposal(Y))) &
 is_likely_to_occur(Y))) & is_stored_in(X,Y)))) & loss(X))))
 \end{verbatim}
 \normalsize
@@ -186,20 +186,20 @@ Figure~\ref{grammar-gen} shows an example of a line of a text, the annotations a
 \textbf{The line annotated with marks for terminals} (\verb6#6) \textbf{and nonterminals} (\verb6*6):
 \bequ
 \begin{verbatim}
-*Item (2) #without #limiting #subsection *Ref (1)(a) #, 
-#a *CN data breach #is #deemed #to 
+*Item (2) #without #limiting #subsection *Ref (1)(a) #,
+#a *CN data breach #is #deemed #to
 *VP result in significant harm to an individual #—
 \end{verbatim}
 \enqu
 \textbf{Grammar rules derived by the script:}
 \bequ
 \begin{verbatim}
-Line ::= Item "without" "limiting" "subsection" Ref "," 
+Line ::= Item "without" "limiting" "subsection" Ref ","
          "a" CN "is" "deemed" "to" VP "-" ;
 Item ::= "(2)" ;
 Ref  ::= "(1)(a)" ;
 CN   ::= "data" "breach" ;
-VP   ::= "result" "in" "significant" 
+VP   ::= "result" "in" "significant"
          "harm" "to" "an" "individual" ;
 \end{verbatim}
 \enqu
@@ -211,7 +211,7 @@ NP  ::= "significant" "harm" "to" NP ;
 NP  ::= "an" CN ;
 CN  ::= "individual" ;
 \end{verbatim}
-\enqu  
+\enqu
 \textbf{Abstract syntax functions in the resulting GF grammar:}
 \bequ
 \begin{verbatim}
@@ -220,7 +220,7 @@ fun CN_significant_harm_to_NP : NP -> CN ;
 fun NP_an_CN : CN -> NP ;
 fun CN_individual : CN ;
 \end{verbatim}
-\enqu  
+\enqu
 \enqu
 \end{framed}
 \caption{The grammar extraction process.}
@@ -258,13 +258,13 @@ data Box = Box {
  \textbf{Some assembly logic constructors:}
  \bequ
 \begin{verbatim}
-data Cat = 
+data Cat =
   CProp | CSet | CInd | -- ...
 
 data Formula =
-    Atomic Cat Atom                     
-  | Conjunction Cat ConjWord [Formula]  
-  | Implication Formula Formula         
+    Atomic Cat Atom
+  | Conjunction Cat ConjWord [Formula]
+  | Implication Formula Formula
   | Conditional Formula Formula     -- reverse implication
   | Quantification String Formula   -- quantifier + domain
 \end{verbatim}

@@ -1,0 +1,125 @@
+% Contract parameters
+map
+	% This indicates how many payments there are in total.
+	num_payments : Pos;
+
+	% This tells us how much the borrower has to pay in each payment.
+	payment_amt : Pos -> Pos;
+
+	% The principal amount the lender sends the borrower.
+	principal_amt : Pos;
+
+	% This is the initial amount that the borrower owes the lender.
+	initial_outstanding_amt : Pos;
+
+	remainder : Pos;
+
+var n : Pos;
+
+eqn
+	num_payments = 2;
+
+	principal_amt = 1000;
+
+	initial_outstanding_amt = 1075;
+
+	(n == 1) -> payment_amt(n) = 550;
+	(n == 2) -> payment_amt(n) = 525;
+	(n >= 3) -> payment_amt(n) = 1;
+
+sort
+	PaymentType = struct normal | accelerated;
+	Party = struct borrower | lender;
+
+act
+	pay : PaymentType # Party # Party # Pos;
+	accelerated_payment : Pos;
+
+	request_principal,
+	borrower_default, lender_default, cure_default,
+	breached, fulfilled,
+	notify_borrower_of_default;
+
+	main_track_fulfilled, main_track_breached;
+	side_track_fulfilled, side_track_breached;
+
+	payment_default,
+	broadcast_fulfilled, receive_fulfilled,
+	broadcast_breached, receive_breached;
+  
+  days_passed : Pos;
+
+proc
+	Breached = breached . delta;
+	Fulfilled = fulfilled . delta;
+
+	LoanAgreement =
+		tau . Fulfilled
+		+
+		request_principal . (
+			tau . lender_default . Breached
+			+
+			pay(normal, lender, borrower, principal_amt)
+		);
+
+	SideTrackFulfilled = side_track_fulfilled . delta;
+	MainTrackFulfilled = main_track_fulfilled . delta;
+
+	MainTrack =
+		PayPayment(1) . PayPayment(2) . main_track_fulfilled . delta;
+
+	PayPayment(n : Pos) =
+		(pay(normal, borrower, lender, payment_amt(n)) + side_track_fulfilled . delta + side_track_breached . delta)
+		+ tau . (payment_default + side_track_fulfilled . delta + side_track_breached . delta) . (
+			tau . main_track_fulfilled . delta
+			+ (notify_borrower_of_default + side_track_fulfilled . delta + side_track_breached . delta) . (
+				(cure_default + side_track_fulfilled . delta + side_track_breached . delta) . PayPayment(n)
+		  		+
+				% Accelerate remaining payments
+				(pay(accelerated, borrower, lender, remainder) + side_track_fulfilled . delta + side_track_breached . delta) . main_track_fulfilled . delta
+				+ tau . main_track_breached . delta
+			)
+		);
+
+	SideTrack =
+		(borrower_default + main_track_fulfilled . delta + main_track_breached . delta) . (
+			tau . SideTrack
+			+ (notify_borrower_of_default + main_track_fulfilled . delta + main_track_breached . delta) . (
+				(cure_default + main_track_fulfilled . delta + main_track_breached . delta) . SideTrack
+		  		+ % Accelerate remaining payments
+				(pay(accelerated, borrower, lender, remainder) + main_track_fulfilled . delta + main_track_breached . delta) . side_track_fulfilled . delta
+				+ tau . side_track_breached . delta
+			)
+		);
+
+act
+  broadcast, receive_main, receive_side, synchronize,
+  main_track_fulfilled', main_track_breached',
+  side_track_fulfilled', side_track_breached';
+
+init
+	block({
+		broadcast, receive_main, receive_side,
+		broadcast_fulfilled, receive_fulfilled,
+		broadcast_breached, receive_breached,
+		main_track_fulfilled, main_track_breached,
+		main_track_fulfilled', main_track_breached',
+		side_track_fulfilled, side_track_breached,
+		side_track_fulfilled', side_track_breached'
+	},
+	comm({
+		broadcast|receive_main|receive_side -> synchronize,
+    main_track_fulfilled|main_track_fulfilled|main_track_fulfilled' -> synchronize,
+    main_track_breached|main_track_breached|main_track_breached' -> synchronize,
+    side_track_fulfilled|side_track_fulfilled|side_track_fulfilled' -> synchronize,
+    side_track_breached|side_track_breached|side_track_breached' -> synchronize
+		% broadcast_fulfilled|receive_fulfilled|fulfilled' -> synchronize,
+		% broadcast_breached|receive_breached|breached' -> synchronize
+	},
+	LoanAgreement . broadcast
+	|| receive_main . MainTrack
+	|| receive_side . SideTrack
+	|| (main_track_fulfilled' . fulfilled
+    + side_track_fulfilled' . fulfilled
+    + main_track_breached' . breached
+    + side_track_breached' . breached)));

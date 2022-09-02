@@ -1,12 +1,7 @@
-forall m, n : Pos.
-forall payment_type : PaymentType.
-	val((m == 1075 || m == 525) && n <= initial_outstanding_amt) =>
-	[
-		true* .
-    	pay(accelerated, borrower, lender, m) .
-		true* .
-		pay(payment_type, borrower, lender, n) .
-		true* .
-		fulfilled
-	]
-	false
+[
+true* .
+pay(normal, borrower, lender, 550) .
+true* .
+pay(normal, borrower, lender, 525)
+]
+nu X. <fulfilled> X

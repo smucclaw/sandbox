@@ -1,13 +1,1 @@
-% If the borrower cures his default once, he can never end up
-% in trouble again.
-% Obviously, this is false, because he can default either on the
-% same payment again or the next one.
-forall m : Pos.
-val(m <= initial_outstanding_amt) =>
-<
-	true* .
-	borrower_default .
-	true* .
-	cure_default
->
-[true* . pay(accelerated, borrower, lender, m)] false
+[true*] <true*> ((nu X. <fulfilled> X) || nu X. <breached> X)

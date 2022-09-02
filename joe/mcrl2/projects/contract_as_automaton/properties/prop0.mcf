@@ -1,0 +1,9 @@
+[
+true* .
+pay(normal, borrower, lender, 550) .
+true* .
+pay(normal, borrower, lender, 525) .
+true* .
+breached
+]
+false

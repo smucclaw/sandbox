@@ -1,0 +1,28 @@
+# Create a working directory.
+mkdir -p workdir
+
+cd workdir
+
+# Linearize all processes to a restricted Greibach normal form.
+mcrl22lps -lregular2 ../contract_as_automaton_spec.mcrl2 caa.lps
+# lpssumelm caa.lps caa.1.lps
+# mv caa.1.lps caa.lps
+
+# Convert the linearized process into a labelled transition system, while
+# giving priority to actions (ie transitions) labelled "sync".
+# This means the LTS will automatically take "sync" transitions when they're
+# available, so that the resulting LTS will no longer have any such transitions.
+lps2lts -csync caa.lps caa.lts
+
+# Reduce the state space modulo trace equivalence.
+ltsconvert -etrace caa.lts caa.1.lts
+mv caa.1.lts caa.lts
+
+# Convert LTS -> dot -> svg for visualization, though there's not much point
+# since it will be really big and messy.
+ltsconvert caa.lts caa.dot
+dot -Tsvg caa.dot -o caa.svg
+
+# Convert the LTS back to a linearized process so that we can perform
+# simulation and model checking with it.
+lts2lps caa.lts caa.lps

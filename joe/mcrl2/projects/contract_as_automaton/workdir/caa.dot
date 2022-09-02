@@ -1,0 +1,492 @@
+digraph G {
+center = TRUE;
+mclimit = 10.0;
+nodesep = 0.05;
+node [ width=0.25, height=0.25, label="" ];
+S28 [ peripheries=2 ];
+S0
+S1
+S2
+S3
+S4
+S5
+S6
+S7
+S8
+S9
+S10
+S11
+S12
+S13
+S14
+S15
+S16
+S17
+S18
+S19
+S20
+S21
+S22
+S23
+S24
+S25
+S26
+S27
+S28
+S29
+S30
+S31
+S32
+S33
+S34
+S35
+S36
+S37
+S38
+S39
+S40
+S41
+S42
+S43
+S44
+S45
+S46
+S47
+S48
+S49
+S50
+S51
+S52
+S53
+S54
+S55
+S56
+S57
+S58
+S59
+S60
+S61
+S62
+S63
+S64
+S65
+S66
+S67
+S68
+S69
+S70
+S71
+S72
+S73
+S74
+S75
+S0 -> S67[label="tau"];
+S0 -> S65[label="borrower_default"];
+S1 -> S26[label="borrower_default"];
+S1 -> S27[label="payment_default(normal, borrower, lender, 525)"];
+S1 -> S34[label="pay(normal, borrower, lender, 525)"];
+S1 -> S12[label="cure_default"];
+S1 -> S73[label="dont_cure_default|sync"];
+S1 -> S71[label="borrower_default|dont_cure_default|sync"];
+S1 -> S17[label="borrower_default|cure_default"];
+S1 -> S36[label="cure_default|payment_default(normal, borrower, lender, 525)"];
+S1 -> S75[label="dont_cure_default|payment_default(normal, borrower, lender, 525)|sync"];
+S1 -> S5[label="dont_cure_default|pay(normal, borrower, lender, 525)|sync"];
+S1 -> S34[label="cure_default|pay(normal, borrower, lender, 525)"];
+S2 -> S40[label="tau"];
+S2 -> S39[label="payment_default(accelerated, borrower, lender, 1075)"];
+S2 -> S34[label="pay(accelerated, borrower, lender, 1075)"];
+S3 -> S67[label="tau"];
+S3 -> S66[label="notify_borrower_of_default"];
+S3 -> S64[label="dont_notify_borrower"];
+S4 -> S67[label="tau"];
+S4 -> S64[label="cure_default"];
+S5 -> S44[label="tau"];
+S6 -> S7[label="notify_borrower_of_default"];
+S6 -> S1[label="dont_notify_borrower"];
+S6 -> S10[label="cure_default"];
+S6 -> S71[label="dont_cure_default|sync"];
+S6 -> S72[label="dont_cure_default|notify_borrower_of_default|sync"];
+S6 -> S73[label="dont_cure_default|dont_notify_borrower|sync"];
+S6 -> S20[label="cure_default|notify_borrower_of_default"];
+S6 -> S12[label="cure_default|dont_notify_borrower"];
+S7 -> S20[label="cure_default"];
+S7 -> S72[label="dont_cure_default|sync"];
+S7 -> S45[label="dont_cure_default|dont_cure_default|sync"];
+S7 -> S73[label="cure_default|dont_cure_default|sync"];
+S7 -> S19[label="cure_default|cure_default"];
+S8 -> S7[label="notify_borrower_of_default"];
+S8 -> S35[label="dont_notify_borrower"];
+S8 -> S16[label="cure_default"];
+S8 -> S75[label="dont_cure_default|sync"];
+S8 -> S75[label="dont_cure_default|notify_borrower_of_default|sync"];
+S8 -> S75[label="dont_cure_default|dont_notify_borrower|sync"];
+S8 -> S29[label="cure_default|notify_borrower_of_default"];
+S8 -> S38[label="cure_default|dont_notify_borrower"];
+S9 -> S6[label="notify_borrower_of_default"];
+S9 -> S11[label="dont_notify_borrower"];
+S9 -> S7[label="notify_borrower_of_default|notify_borrower_of_default"];
+S9 -> S1[label="dont_notify_borrower|notify_borrower_of_default"];
+S9 -> S38[label="dont_notify_borrower|dont_notify_borrower"];
+S10 -> S9[label="payment_default(normal, borrower, lender, 550)"];
+S10 -> S9[label="borrower_default"];
+S10 -> S56[label="pay(normal, borrower, lender, 550)"];
+S10 -> S20[label="notify_borrower_of_default"];
+S10 -> S12[label="dont_notify_borrower"];
+S10 -> S26[label="borrower_default|notify_borrower_of_default"];
+S10 -> S14[label="borrower_default|dont_notify_borrower"];
+S10 -> S8[label="notify_borrower_of_default|payment_default(normal, borrower, lender, 550)"];
+S10 -> S16[label="dont_notify_borrower|payment_default(normal, borrower, lender, 550)"];
+S10 -> S48[label="notify_borrower_of_default|pay(normal, borrower, lender, 550)"];
+S10 -> S57[label="dont_notify_borrower|pay(normal, borrower, lender, 550)"];
+S11 -> S9[label="borrower_default"];
+S11 -> S1[label="notify_borrower_of_default"];
+S11 -> S38[label="dont_notify_borrower"];
+S11 -> S26[label="borrower_default|notify_borrower_of_default"];
+S11 -> S14[label="borrower_default|dont_notify_borrower"];
+S11 -> S23[label="payment_default(normal, borrower, lender, 525)"];
+S11 -> S34[label="pay(normal, borrower, lender, 525)"];
+S11 -> S27[label="notify_borrower_of_default|payment_default(normal, borrower, lender, 525)"];
+S11 -> S36[label="dont_notify_borrower|payment_default(normal, borrower, lender, 525)"];
+S11 -> S34[label="notify_borrower_of_default|pay(normal, borrower, lender, 525)"];
+S11 -> S34[label="dont_notify_borrower|pay(normal, borrower, lender, 525)"];
+S12 -> S16[label="payment_default(normal, borrower, lender, 550)"];
+S12 -> S13[label="borrower_default"];
+S12 -> S9[label="borrower_default|payment_default(normal, borrower, lender, 550)"];
+S12 -> S57[label="pay(normal, borrower, lender, 550)"];
+S12 -> S56[label="borrower_default|pay(normal, borrower, lender, 550)"];
+S12 -> S36[label="payment_default(normal, borrower, lender, 525)"];
+S12 -> S23[label="borrower_default|payment_default(normal, borrower, lender, 525)"];
+S12 -> S34[label="pay(normal, borrower, lender, 525)"];
+S12 -> S34[label="borrower_default|pay(normal, borrower, lender, 525)"];
+S13 -> S9[label="payment_default(normal, borrower, lender, 550)"];
+S13 -> S56[label="pay(normal, borrower, lender, 550)"];
+S13 -> S18[label="notify_borrower_of_default"];
+S13 -> S12[label="dont_notify_borrower"];
+S13 -> S8[label="notify_borrower_of_default|payment_default(normal, borrower, lender, 550)"];
+S13 -> S16[label="dont_notify_borrower|payment_default(normal, borrower, lender, 550)"];
+S13 -> S48[label="notify_borrower_of_default|pay(normal, borrower, lender, 550)"];
+S13 -> S57[label="dont_notify_borrower|pay(normal, borrower, lender, 550)"];
+S13 -> S23[label="payment_default(normal, borrower, lender, 525)"];
+S13 -> S34[label="pay(normal, borrower, lender, 525)"];
+S13 -> S27[label="notify_borrower_of_default|payment_default(normal, borrower, lender, 525)"];
+S13 -> S36[label="dont_notify_borrower|payment_default(normal, borrower, lender, 525)"];
+S13 -> S34[label="notify_borrower_of_default|pay(normal, borrower, lender, 525)"];
+S13 -> S34[label="dont_notify_borrower|pay(normal, borrower, lender, 525)"];
+S14 -> S35[label="notify_borrower_of_default"];
+S14 -> S38[label="dont_notify_borrower"];
+S14 -> S23[label="payment_default(normal, borrower, lender, 525)"];
+S14 -> S34[label="pay(normal, borrower, lender, 525)"];
+S14 -> S27[label="notify_borrower_of_default|payment_default(normal, borrower, lender, 525)"];
+S14 -> S36[label="dont_notify_borrower|payment_default(normal, borrower, lender, 525)"];
+S14 -> S34[label="notify_borrower_of_default|pay(normal, borrower, lender, 525)"];
+S14 -> S34[label="dont_notify_borrower|pay(normal, borrower, lender, 525)"];
+S15 -> S34[label="fulfilled"];
+S15 -> S14[label="borrower_default"];
+S15 -> S36[label="payment_default(normal, borrower, lender, 525)"];
+S15 -> S23[label="borrower_default|payment_default(normal, borrower, lender, 525)"];
+S15 -> S34[label="pay(normal, borrower, lender, 525)"];
+S15 -> S34[label="borrower_default|pay(normal, borrower, lender, 525)"];
+S16 -> S9[label="borrower_default"];
+S16 -> S29[label="notify_borrower_of_default"];
+S16 -> S38[label="dont_notify_borrower"];
+S16 -> S26[label="borrower_default|notify_borrower_of_default"];
+S16 -> S14[label="borrower_default|dont_notify_borrower"];
+S17 -> S9[label="payment_default(normal, borrower, lender, 550)"];
+S17 -> S56[label="pay(normal, borrower, lender, 550)"];
+S17 -> S21[label="notify_borrower_of_default"];
+S17 -> S19[label="dont_notify_borrower"];
+S17 -> S8[label="notify_borrower_of_default|payment_default(normal, borrower, lender, 550)"];
+S17 -> S16[label="dont_notify_borrower|payment_default(normal, borrower, lender, 550)"];
+S17 -> S48[label="notify_borrower_of_default|pay(normal, borrower, lender, 550)"];
+S17 -> S57[label="dont_notify_borrower|pay(normal, borrower, lender, 550)"];
+S18 -> S8[label="payment_default(normal, borrower, lender, 550)"];
+S18 -> S48[label="pay(normal, borrower, lender, 550)"];
+S18 -> S27[label="payment_default(normal, borrower, lender, 525)"];
+S18 -> S34[label="pay(normal, borrower, lender, 525)"];
+S18 -> S12[label="cure_default"];
+S18 -> S75[label="dont_cure_default|sync"];
+S18 -> S16[label="cure_default|payment_default(normal, borrower, lender, 550)"];
+S18 -> S75[label="dont_cure_default|payment_default(normal, borrower, lender, 550)|sync"];
+S18 -> S47[label="dont_cure_default|pay(normal, borrower, lender, 550)|sync"];
+S18 -> S57[label="cure_default|pay(normal, borrower, lender, 550)"];
+S18 -> S36[label="cure_default|payment_default(normal, borrower, lender, 525)"];
+S18 -> S75[label="dont_cure_default|payment_default(normal, borrower, lender, 525)|sync"];
+S18 -> S5[label="dont_cure_default|pay(normal, borrower, lender, 525)|sync"];
+S18 -> S34[label="cure_default|pay(normal, borrower, lender, 525)"];
+S19 -> S16[label="payment_default(normal, borrower, lender, 550)"];
+S19 -> S17[label="borrower_default"];
+S19 -> S9[label="borrower_default|payment_default(normal, borrower, lender, 550)"];
+S19 -> S57[label="pay(normal, borrower, lender, 550)"];
+S19 -> S56[label="borrower_default|pay(normal, borrower, lender, 550)"];
+S20 -> S8[label="payment_default(normal, borrower, lender, 550)"];
+S20 -> S26[label="borrower_default"];
+S20 -> S48[label="pay(normal, borrower, lender, 550)"];
+S20 -> S19[label="cure_default"];
+S20 -> S73[label="dont_cure_default|sync"];
+S20 -> S71[label="borrower_default|dont_cure_default|sync"];
+S20 -> S17[label="borrower_default|cure_default"];
+S20 -> S16[label="cure_default|payment_default(normal, borrower, lender, 550)"];
+S20 -> S75[label="dont_cure_default|payment_default(normal, borrower, lender, 550)|sync"];
+S20 -> S47[label="dont_cure_default|pay(normal, borrower, lender, 550)|sync"];
+S20 -> S57[label="cure_default|pay(normal, borrower, lender, 550)"];
+S21 -> S8[label="payment_default(normal, borrower, lender, 550)"];
+S21 -> S48[label="pay(normal, borrower, lender, 550)"];
+S21 -> S19[label="cure_default"];
+S21 -> S75[label="dont_cure_default|sync"];
+S21 -> S16[label="cure_default|payment_default(normal, borrower, lender, 550)"];
+S21 -> S75[label="dont_cure_default|payment_default(normal, borrower, lender, 550)|sync"];
+S21 -> S47[label="dont_cure_default|pay(normal, borrower, lender, 550)|sync"];
+S21 -> S57[label="cure_default|pay(normal, borrower, lender, 550)"];
+S22 -> S30[label="notify_borrower_of_default"];
+S22 -> S32[label="dont_notify_borrower"];
+S22 -> S25[label="cure_default"];
+S22 -> S71[label="dont_cure_default|sync"];
+S22 -> S72[label="dont_cure_default|notify_borrower_of_default|sync"];
+S22 -> S73[label="dont_cure_default|dont_notify_borrower|sync"];
+S22 -> S37[label="cure_default|notify_borrower_of_default"];
+S22 -> S15[label="cure_default|dont_notify_borrower"];
+S23 -> S22[label="notify_borrower_of_default"];
+S23 -> S24[label="dont_notify_borrower"];
+S23 -> S30[label="notify_borrower_of_default|notify_borrower_of_default"];
+S23 -> S32[label="dont_notify_borrower|notify_borrower_of_default"];
+S23 -> S34[label="dont_notify_borrower|dont_notify_borrower"];
+S24 -> S34[label="fulfilled"];
+S24 -> S23[label="borrower_default"];
+S24 -> S49[label="notify_borrower_of_default"];
+S24 -> S34[label="dont_notify_borrower"];
+S24 -> S31[label="borrower_default|notify_borrower_of_default"];
+S24 -> S34[label="borrower_default|dont_notify_borrower"];
+S25 -> S23[label="borrower_default"];
+S25 -> S37[label="notify_borrower_of_default"];
+S25 -> S15[label="dont_notify_borrower"];
+S25 -> S31[label="borrower_default|notify_borrower_of_default"];
+S25 -> S34[label="borrower_default|dont_notify_borrower"];
+S25 -> S23[label="payment_default(normal, borrower, lender, 525)"];
+S25 -> S34[label="pay(normal, borrower, lender, 525)"];
+S25 -> S27[label="notify_borrower_of_default|payment_default(normal, borrower, lender, 525)"];
+S25 -> S36[label="dont_notify_borrower|payment_default(normal, borrower, lender, 525)"];
+S25 -> S34[label="notify_borrower_of_default|pay(normal, borrower, lender, 525)"];
+S25 -> S34[label="dont_notify_borrower|pay(normal, borrower, lender, 525)"];
+S26 -> S7[label="notify_borrower_of_default"];
+S26 -> S29[label="dont_notify_borrower"];
+S26 -> S17[label="cure_default"];
+S26 -> S71[label="dont_cure_default|sync"];
+S26 -> S72[label="dont_cure_default|notify_borrower_of_default|sync"];
+S26 -> S73[label="dont_cure_default|dont_notify_borrower|sync"];
+S26 -> S21[label="cure_default|notify_borrower_of_default"];
+S26 -> S19[label="cure_default|dont_notify_borrower"];
+S27 -> S30[label="notify_borrower_of_default"];
+S27 -> S34[label="dont_notify_borrower"];
+S27 -> S36[label="cure_default"];
+S27 -> S75[label="dont_cure_default|sync"];
+S27 -> S75[label="dont_cure_default|notify_borrower_of_default|sync"];
+S27 -> S75[label="dont_cure_default|dont_notify_borrower|sync"];
+S27 -> S49[label="cure_default|notify_borrower_of_default"];
+S27 -> S34[label="cure_default|dont_notify_borrower"];
+S28 -> S33[label="request_principal"];
+S28 -> S34[label="dont_request_principal"];
+S29 -> S26[label="borrower_default"];
+S29 -> S19[label="cure_default"];
+S29 -> S73[label="dont_cure_default|sync"];
+S29 -> S71[label="borrower_default|dont_cure_default|sync"];
+S29 -> S17[label="borrower_default|cure_default"];
+S30 -> S37[label="cure_default"];
+S30 -> S72[label="dont_cure_default|sync"];
+S30 -> S45[label="dont_cure_default|dont_cure_default|sync"];
+S30 -> S73[label="cure_default|dont_cure_default|sync"];
+S30 -> S38[label="cure_default|cure_default"];
+S31 -> S30[label="notify_borrower_of_default"];
+S31 -> S49[label="dont_notify_borrower"];
+S31 -> S14[label="cure_default"];
+S31 -> S71[label="dont_cure_default|sync"];
+S31 -> S72[label="dont_cure_default|notify_borrower_of_default|sync"];
+S31 -> S73[label="dont_cure_default|dont_notify_borrower|sync"];
+S31 -> S35[label="cure_default|notify_borrower_of_default"];
+S31 -> S38[label="cure_default|dont_notify_borrower"];
+S32 -> S34[label="fulfilled"];
+S32 -> S31[label="borrower_default"];
+S32 -> S38[label="cure_default"];
+S32 -> S73[label="dont_cure_default|sync"];
+S32 -> S71[label="borrower_default|dont_cure_default|sync"];
+S32 -> S14[label="borrower_default|cure_default"];
+S33 -> S19[label="pay(principal, lender, borrower, 1000)"];
+S33 -> S39[label="payment_default(principal, lender, borrower, 1000)"];
+S34 -> S34[label="fulfilled"];
+S35 -> S27[label="payment_default(normal, borrower, lender, 525)"];
+S35 -> S34[label="pay(normal, borrower, lender, 525)"];
+S35 -> S38[label="cure_default"];
+S35 -> S75[label="dont_cure_default|sync"];
+S35 -> S36[label="cure_default|payment_default(normal, borrower, lender, 525)"];
+S35 -> S75[label="dont_cure_default|payment_default(normal, borrower, lender, 525)|sync"];
+S35 -> S5[label="dont_cure_default|pay(normal, borrower, lender, 525)|sync"];
+S35 -> S34[label="cure_default|pay(normal, borrower, lender, 525)"];
+S36 -> S23[label="borrower_default"];
+S36 -> S49[label="notify_borrower_of_default"];
+S36 -> S34[label="dont_notify_borrower"];
+S36 -> S31[label="borrower_default|notify_borrower_of_default"];
+S36 -> S34[label="borrower_default|dont_notify_borrower"];
+S37 -> S31[label="borrower_default"];
+S37 -> S27[label="payment_default(normal, borrower, lender, 525)"];
+S37 -> S34[label="pay(normal, borrower, lender, 525)"];
+S37 -> S38[label="cure_default"];
+S37 -> S73[label="dont_cure_default|sync"];
+S37 -> S71[label="borrower_default|dont_cure_default|sync"];
+S37 -> S14[label="borrower_default|cure_default"];
+S37 -> S36[label="cure_default|payment_default(normal, borrower, lender, 525)"];
+S37 -> S75[label="dont_cure_default|payment_default(normal, borrower, lender, 525)|sync"];
+S37 -> S5[label="dont_cure_default|pay(normal, borrower, lender, 525)|sync"];
+S37 -> S34[label="cure_default|pay(normal, borrower, lender, 525)"];
+S38 -> S14[label="borrower_default"];
+S38 -> S36[label="payment_default(normal, borrower, lender, 525)"];
+S38 -> S23[label="borrower_default|payment_default(normal, borrower, lender, 525)"];
+S38 -> S34[label="pay(normal, borrower, lender, 525)"];
+S38 -> S34[label="borrower_default|pay(normal, borrower, lender, 525)"];
+S39 -> S39[label="breached"];
+S40 -> S39[label="payment_default(accelerated, borrower, lender, 1075)"];
+S40 -> S34[label="pay(accelerated, borrower, lender, 1075)"];
+S41 -> S39[label="payment_default(accelerated, borrower, lender, 525)"];
+S41 -> S34[label="pay(accelerated, borrower, lender, 525)"];
+S42 -> S41[label="tau"];
+S42 -> S39[label="payment_default(accelerated, borrower, lender, 525)"];
+S42 -> S34[label="pay(accelerated, borrower, lender, 525)"];
+S43 -> S39[label="payment_default(accelerated, borrower, lender, 550)"];
+S43 -> S34[label="pay(accelerated, borrower, lender, 550)"];
+S44 -> S43[label="tau"];
+S46 -> S45[label="tau"];
+S47 -> S67[label="tau"];
+S48 -> S62[label="payment_default(normal, borrower, lender, 525)"];
+S48 -> S34[label="pay(normal, borrower, lender, 525)"];
+S48 -> S57[label="cure_default"];
+S48 -> S47[label="dont_cure_default|sync"];
+S48 -> S54[label="cure_default|payment_default(normal, borrower, lender, 525)"];
+S48 -> S47[label="dont_cure_default|payment_default(normal, borrower, lender, 525)|sync"];
+S48 -> S46[label="dont_cure_default|pay(normal, borrower, lender, 525)|sync"];
+S48 -> S34[label="cure_default|pay(normal, borrower, lender, 525)"];
+S49 -> S31[label="borrower_default"];
+S49 -> S38[label="cure_default"];
+S49 -> S73[label="dont_cure_default|sync"];
+S49 -> S71[label="borrower_default|dont_cure_default|sync"];
+S49 -> S14[label="borrower_default|cure_default"];
+S50 -> S53[label="borrower_default"];
+S50 -> S59[label="notify_borrower_of_default"];
+S50 -> S58[label="dont_notify_borrower"];
+S50 -> S61[label="borrower_default|notify_borrower_of_default"];
+S50 -> S34[label="borrower_default|dont_notify_borrower"];
+S50 -> S53[label="payment_default(normal, borrower, lender, 525)"];
+S50 -> S34[label="pay(normal, borrower, lender, 525)"];
+S50 -> S62[label="notify_borrower_of_default|payment_default(normal, borrower, lender, 525)"];
+S50 -> S54[label="dont_notify_borrower|payment_default(normal, borrower, lender, 525)"];
+S50 -> S34[label="notify_borrower_of_default|pay(normal, borrower, lender, 525)"];
+S50 -> S34[label="dont_notify_borrower|pay(normal, borrower, lender, 525)"];
+S51 -> S59[label="cure_default"];
+S51 -> S4[label="dont_cure_default|sync"];
+S51 -> S45[label="dont_cure_default|dont_cure_default|sync"];
+S51 -> S0[label="cure_default|dont_cure_default|sync"];
+S51 -> S57[label="cure_default|cure_default"];
+S52 -> S51[label="notify_borrower_of_default"];
+S52 -> S60[label="dont_notify_borrower"];
+S52 -> S50[label="cure_default"];
+S52 -> S3[label="dont_cure_default|sync"];
+S52 -> S4[label="dont_cure_default|notify_borrower_of_default|sync"];
+S52 -> S0[label="dont_cure_default|dont_notify_borrower|sync"];
+S52 -> S59[label="cure_default|notify_borrower_of_default"];
+S52 -> S58[label="cure_default|dont_notify_borrower"];
+S53 -> S52[label="notify_borrower_of_default"];
+S53 -> S55[label="dont_notify_borrower"];
+S53 -> S51[label="notify_borrower_of_default|notify_borrower_of_default"];
+S53 -> S60[label="dont_notify_borrower|notify_borrower_of_default"];
+S53 -> S34[label="dont_notify_borrower|dont_notify_borrower"];
+S54 -> S53[label="borrower_default"];
+S54 -> S63[label="notify_borrower_of_default"];
+S54 -> S34[label="dont_notify_borrower"];
+S54 -> S61[label="borrower_default|notify_borrower_of_default"];
+S54 -> S34[label="borrower_default|dont_notify_borrower"];
+S55 -> S34[label="fulfilled"];
+S55 -> S53[label="borrower_default"];
+S55 -> S63[label="notify_borrower_of_default"];
+S55 -> S34[label="dont_notify_borrower"];
+S55 -> S61[label="borrower_default|notify_borrower_of_default"];
+S55 -> S34[label="borrower_default|dont_notify_borrower"];
+S56 -> S48[label="notify_borrower_of_default"];
+S56 -> S57[label="dont_notify_borrower"];
+S56 -> S53[label="payment_default(normal, borrower, lender, 525)"];
+S56 -> S34[label="pay(normal, borrower, lender, 525)"];
+S56 -> S62[label="notify_borrower_of_default|payment_default(normal, borrower, lender, 525)"];
+S56 -> S54[label="dont_notify_borrower|payment_default(normal, borrower, lender, 525)"];
+S56 -> S34[label="notify_borrower_of_default|pay(normal, borrower, lender, 525)"];
+S56 -> S34[label="dont_notify_borrower|pay(normal, borrower, lender, 525)"];
+S57 -> S56[label="borrower_default"];
+S57 -> S54[label="payment_default(normal, borrower, lender, 525)"];
+S57 -> S53[label="borrower_default|payment_default(normal, borrower, lender, 525)"];
+S57 -> S34[label="pay(normal, borrower, lender, 525)"];
+S57 -> S34[label="borrower_default|pay(normal, borrower, lender, 525)"];
+S58 -> S34[label="fulfilled"];
+S58 -> S56[label="borrower_default"];
+S58 -> S54[label="payment_default(normal, borrower, lender, 525)"];
+S58 -> S53[label="borrower_default|payment_default(normal, borrower, lender, 525)"];
+S58 -> S34[label="pay(normal, borrower, lender, 525)"];
+S58 -> S34[label="borrower_default|pay(normal, borrower, lender, 525)"];
+S59 -> S61[label="borrower_default"];
+S59 -> S62[label="payment_default(normal, borrower, lender, 525)"];
+S59 -> S34[label="pay(normal, borrower, lender, 525)"];
+S59 -> S57[label="cure_default"];
+S59 -> S0[label="dont_cure_default|sync"];
+S59 -> S3[label="borrower_default|dont_cure_default|sync"];
+S59 -> S56[label="borrower_default|cure_default"];
+S59 -> S54[label="cure_default|payment_default(normal, borrower, lender, 525)"];
+S59 -> S47[label="dont_cure_default|payment_default(normal, borrower, lender, 525)|sync"];
+S59 -> S46[label="dont_cure_default|pay(normal, borrower, lender, 525)|sync"];
+S59 -> S34[label="cure_default|pay(normal, borrower, lender, 525)"];
+S60 -> S34[label="fulfilled"];
+S60 -> S61[label="borrower_default"];
+S60 -> S57[label="cure_default"];
+S60 -> S0[label="dont_cure_default|sync"];
+S60 -> S3[label="borrower_default|dont_cure_default|sync"];
+S60 -> S56[label="borrower_default|cure_default"];
+S61 -> S51[label="notify_borrower_of_default"];
+S61 -> S63[label="dont_notify_borrower"];
+S61 -> S56[label="cure_default"];
+S61 -> S3[label="dont_cure_default|sync"];
+S61 -> S4[label="dont_cure_default|notify_borrower_of_default|sync"];
+S61 -> S0[label="dont_cure_default|dont_notify_borrower|sync"];
+S61 -> S48[label="cure_default|notify_borrower_of_default"];
+S61 -> S57[label="cure_default|dont_notify_borrower"];
+S62 -> S51[label="notify_borrower_of_default"];
+S62 -> S34[label="dont_notify_borrower"];
+S62 -> S54[label="cure_default"];
+S62 -> S47[label="dont_cure_default|sync"];
+S62 -> S47[label="dont_cure_default|notify_borrower_of_default|sync"];
+S62 -> S47[label="dont_cure_default|dont_notify_borrower|sync"];
+S62 -> S63[label="cure_default|notify_borrower_of_default"];
+S62 -> S34[label="cure_default|dont_notify_borrower"];
+S63 -> S61[label="borrower_default"];
+S63 -> S57[label="cure_default"];
+S63 -> S0[label="dont_cure_default|sync"];
+S63 -> S3[label="borrower_default|dont_cure_default|sync"];
+S63 -> S56[label="borrower_default|cure_default"];
+S64 -> S42[label="tau"];
+S64 -> S65[label="borrower_default"];
+S65 -> S42[label="tau"];
+S65 -> S66[label="notify_borrower_of_default"];
+S65 -> S64[label="dont_notify_borrower"];
+S66 -> S42[label="tau"];
+S66 -> S64[label="cure_default"];
+S67 -> S41[label="tau"];
+S68 -> S2[label="tau"];
+S68 -> S69[label="notify_borrower_of_default"];
+S68 -> S70[label="dont_notify_borrower"];
+S69 -> S2[label="tau"];
+S69 -> S70[label="cure_default"];
+S70 -> S2[label="tau"];
+S70 -> S68[label="borrower_default"];
+S71 -> S74[label="tau"];
+S71 -> S69[label="notify_borrower_of_default"];
+S71 -> S70[label="dont_notify_borrower"];
+S72 -> S74[label="tau"];
+S72 -> S70[label="cure_default"];
+S73 -> S74[label="tau"];
+S73 -> S68[label="borrower_default"];
+S74 -> S40[label="tau"];
+S75 -> S74[label="tau"];
+}

@@ -1,0 +1,25 @@
+digraph G {
+center = TRUE;
+mclimit = 10.0;
+nodesep = 0.05;
+node [ width=0.25, height=0.25, label="" ];
+s6 [ peripheries=2 ];
+s0 [label="[]"];
+s1 [label="[]"];
+s2 [label="[]"];
+s3 [label="[]"];
+s4 [label="[]"];
+s5 [label="[]"];
+s6 [label="[]"];
+s7 [label="[]"];
+s8 [label="[]"];
+s0->s2[label="tau"];
+s1->s0[label="dont_cure_default|pay(normal, borrower, lender, 525)|sync"];
+s2->s7[label="tau"];
+s3->s1[label="dont_notify_borrower|notify_borrower_of_default"];
+s4->s3[label="borrower_default|payment_default(normal, borrower, lender, 550)"];
+s5->s4[label="pay(principal, lender, borrower, 1000)"];
+s6->s5[label="request_principal"];
+s7->s8[label="payment_default(accelerated, borrower, lender, 550)"];
+s8->s8[label="breached"];
+}

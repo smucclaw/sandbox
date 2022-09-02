@@ -1,11 +1,26 @@
-forall m, n : Pos.
-forall payment_type_1, payment_type_2 : PaymentType.
-	val(m + n == initial_outstanding_amt) =>
-	[
-		true* .
-    	pay(payment_type_1, borrower, lender, m) .
-		true* .
-		pay(payment_type_2, borrower, lender, n) .
-		fulfilled
-	]
-	true
+% Here we ask the model checker to prove the following claim, expressed in the
+% language of arithmetic set in first-order Hennessy-Milner logic with fixed
+% points.
+%
+% Let n be any natural number.
+% Suppose the borrower pays the lender $550 and ends up
+% in default and then pays an accelerated amount of $n.
+% Then the following must hold:
+% 1. n must be 525
+% 2. A "breached" event can never occur.
+% 3. We will always end up in a state where there is an infinite sequence of
+%    "fulfilled" events.
+
+forall n : Nat.
+% val(n <= 1075) =>
+[
+  true* .
+  pay(normal, borrower, lender, 550) .
+  true* .
+  pay(accelerated, borrower, lender, n)
+]
+(
+   val(n == 525)
+&& ([true* . breached] false)
+&& [true*] <true*> nu X. <fulfilled> X
+)

@@ -47,17 +47,7 @@
 % \address[D]{Yong Pung How School of Law, Singapore Management University}
 
 \begin{abstract}
-This paper describes a pipeline starting from ordinary English law text, parsing it with a formal grammar and converting it to logical formulas via a series of structural representations.
-The goal is to show how to cover the complete transition with a sequence of simple, well-understood steps.
-The approach, while rule-based and explainable, is also robust: it can deliver useful results from day 1, but allows refinements and variations later.
-As an case study, we analyse one chapter of the law of Singapore: Part 6A of the Personal Data Protection Act 2012.
-The first step, parsing, is performed by a grammar derived from light-weight text annotations that minimize the need of manual grammar writing.
-The last step, logical interpretation, is based on an intermediate representation, called assembly logic, which supports translations to different back-end logics and visualizations.
-While some work is usually needed to apply the method to new law texts, the software presented here forms a basis on which it can be done with a decreasing effort.
-The main thing needed is to add text annotations that to extend the grammar so that it can parse any new constructs in the text.
-In addition, the new constructs may have to be mapped to the assembly logic.
-But most parts of the pipeline, including the derivation of logical formulas and visualizations, are ready to be deployed as they are. 
-The code is available as open source (link to be published after review process).
+ This paper develops a pipeline for converting natural English law texts into logical formulas via a series of structural representations. The goal is to show how law-to-logic translation can be achieved through a sequence of simple, well-defined steps. The texts are first parsed using a formal grammar derived from light-weight text annotations designed to minimize the need for manual grammar construction. An intermediate representation, called assembly logic, is then used for logical interpretation and supports translations to different back-end logics and visualisations. The approach, while rule-based and explainable, is also robust: it can deliver useful results from day one, but allows subsequent refinements and variations. While some work is needed to extend the method to new laws, the software presented here reduces the marginal effort necessary. As a case study, we demonstrate our approach on one section of Singapore’s Personal Data Protection Act. Our code is available open-source.
 \end{abstract}
 
 

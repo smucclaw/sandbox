@@ -18,7 +18,7 @@ else
 
   # Solve the system of equations, outputting the result to a linearized process
   # in $1.evidence.lps
-  pbessolve.exe -v --threads=6 --file=../../caa.lps $1.pbes
+  pbessolve -v --file=../../caa.lps $1.pbes
   # Convert the output evidence to a LTS, then to dot and svg for visualization. 
   # Note that the resulting svg can be huge and thus not very useful to look at.
   lps2lts $1.pbes.evidence.lps $1.evidence.lts

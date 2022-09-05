@@ -23,7 +23,13 @@ eqn
 
 	initial_outstanding_amt = 1075;
 
-  payment_amt = (lambda n : Pos. 1)[1 -> 550][2 -> 525];
+	(n == 1) -> payment_amt(n) = 550;
+	(n == 2) -> payment_amt(n) = 525;
+
+  % The following clause is included for completeness so that payment_amt is a
+  % total function on Pos.
+  % Sigma types would be nice here :^)
+	(n >= 3) -> payment_amt(n) = 1;
 
 sort
 	PaymentType = struct normal | accelerated | principal;
@@ -45,9 +51,8 @@ act
   start_accelerated,
   sync, invalid;
 
-  broadcast_get_remainder, receive_get_remainder, get_remainder,
-  broadcast_set_remainder, receive_set_remainder, set_remainder : Nat;
-  broadcast_increase_remainder, receive_increase_remainder, increase_remainder : Int;
+  broadcast_update_remainder, receive_update_remainder, update_remainder,
+  broadcast_get_remainder, receive_get_remainder, get_remainder : Nat;
 
 proc
 	Breached = breached . Breached;
@@ -71,8 +76,7 @@ proc
 
         % Otherwise, if he does send the principal, then we start the main and
         % side tracks.
-			  + pay(principal, lender, borrower, principal_amt)|broadcast_set_remainder(1075) .
-          start_main|start_side
+			  + pay(principal, lender, borrower, principal_amt) . start_main_and_side
 		  );
 
   % PayPayments(n) is a helper process that handles all the payments from
@@ -89,7 +93,7 @@ proc
       % Otherwise, if there are outstanding payments, the borrower is obliged
       % to pay the current payment.
       % When that is done, we trnsition to payment (n + 1).
-      (pay(normal, borrower, lender, payment_amt(n))|broadcast_increase_remainder(-payment_amt(n)) + Terminate_main) .
+      (pay(normal, borrower, lender, payment_amt(n))|broadcast_update_remainder(payment_amt(n)) + Terminate_main) .
       PayPayments(n + 1)
 
       % We continue here if the borrower defaults on the payment.
@@ -136,7 +140,7 @@ proc
     );
 
   AcceleratedRepayment =
-    broadcast_terminate_main|broadcast_terminate_side . (
+    broadcast_terminate_main . broadcast_terminate_side . (
       sum remainder : Pos.
         broadcast_get_remainder(remainder) . (
           pay(accelerated, borrower, lender, remainder) . Fulfilled
@@ -146,43 +150,37 @@ proc
 
   Remainder(remainder : Nat) =
     receive_get_remainder(remainder) . Remainder(remainder)
-
-    + sum amt : Int.
-        receive_increase_remainder(amt) .
-        Remainder(Int2Nat(max(0, remainder + amt)))
-
-    + sum amt : Nat.
-      receive_set_remainder(amt) . Remainder(amt);
+    + sum paid : Pos.
+        (remainder >= paid) ->
+          receive_update_remainder(paid) .
+          Remainder(Int2Nat(remainder - paid));
 
 init
 	block({
-    start_main, start_side, start_accelerated,
+    start_main, start_side, start_main_and_side, start_accelerated,
     receive_terminate_main, receive_terminate_side,
     broadcast_get_remainder, receive_get_remainder,
-    broadcast_set_remainder, receive_set_remainder,
-    broadcast_increase_remainder, receive_increase_remainder
+    broadcast_update_remainder, receive_update_remainder
 	},
   hide({
     broadcast_terminate_main, broadcast_terminate_side,
-    set_remainder, get_remainder, increase_remainder
+    update_remainder, get_remainder
   },
   % comm({
   %   broadcast_terminate_side|broadcast_terminate_main -> invalid
   %   % fulfilled|breached -> invalid
   % },
 	comm({
+		start_main_and_side|start_main|start_side -> sync,
     broadcast_terminate_main|receive_terminate_main -> sync,
     broadcast_terminate_side|receive_terminate_side -> sync,
-    start_main|start_main -> sync,
-    start_side|start_side -> sync,
     start_accelerated|start_accelerated -> sync,
-    broadcast_get_remainder|receive_get_remainder -> get_remainder,
-    broadcast_set_remainder|receive_set_remainder -> set_remainder,
-    broadcast_increase_remainder|receive_increase_remainder -> increase_remainder
+    broadcast_update_remainder|receive_update_remainder -> update_remainder,
+    broadcast_get_remainder|receive_get_remainder -> get_remainder
 	},
   Start
 	|| start_main . MainTrack
 	|| start_side . SideTrack
   || start_accelerated . AcceleratedRepayment
-  || Remainder(0)
+  || Remainder(1075)
   )));

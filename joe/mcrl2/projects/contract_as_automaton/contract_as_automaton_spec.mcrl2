@@ -1,4 +1,5 @@
 % Contract parameters
+% These can be redefined as appropriate.
 map
 	% This indicates how many payments there are in total.
 	num_payments : Pos;
@@ -12,8 +13,6 @@ map
 	% This is the initial amount that the borrower owes the lender.
 	initial_outstanding_amt : Pos;
 
-	% remainder : Pos;
-
 var n : Pos;
 
 eqn
@@ -23,166 +22,233 @@ eqn
 
 	initial_outstanding_amt = 1075;
 
-  payment_amt = (lambda n : Pos. 1)[1 -> 550][2 -> 525];
+  (n == 1) -> payment_amt(n) = 550;
+  (n == 2) -> payment_amt(n) = 525;
 
 sort
+  % Union type indicating the 3 types of payments involved in the loan agreement.
+  % This is used to parameterize the pay* actions.
 	PaymentType = struct normal | accelerated | principal;
 	Party = struct borrower | lender;
 
 act
-	pay, payment_default : PaymentType # Party # Party # Nat;
+	pay_s, pay_r, pay, payment_default : PaymentType # Party # Party # Nat;
   borrower_default,
 
 	request_principal, cure_default,
-	breached, fulfilled,
+	breached_s, breached_r, breached,
+  fulfilled_s, fulfilled_r, fulfilled,
 	notify_borrower_of_default,
 
   dont_pay, dont_notify_borrower, dont_cure_default, dont_request_principal,
 
-  start_main, start_side, start_main_and_side,
-  broadcast_terminate_main, receive_terminate_main,
-  broadcast_terminate_side, receive_terminate_side,
-  start_accelerated,
-  sync, invalid;
+  start_main_s, start_main_r, start_main,
+  start_side_s, start_side_r, start_side,
+  start_accelerated_s, start_accelerated_r, start_accelerated,
+  terminate_main_s, terminate_main_r, terminate_main,
+  terminate_side_s, terminate_side_r, terminate_side,
+  terminate, invalid;
 
-  broadcast_get_remainder, receive_get_remainder, get_remainder,
-  broadcast_set_remainder, receive_set_remainder, set_remainder : Nat;
-  broadcast_increase_remainder, receive_increase_remainder, increase_remainder : Int;
+  get_remaining_payments_s, get_remaining_payments_r, get_remaining_payments,
+  get_outstanding_s, get_outstanding_r, get_outstanding : Nat;
+
+  get_next_payment_number_s, get_next_payment_number_r, get_next_payment_number : Pos;
 
 proc
 	Breached = breached . Breached;
 	Fulfilled = fulfilled . Fulfilled;
 
-  Terminate_main = receive_terminate_main . delta;
-  Terminate_side = receive_terminate_side . delta;
+  Terminate_main_r = terminate_main_r . Terminate_main_r;
+  Terminate_side_r = terminate_side_r . Terminate_side_r;
 
   % Start of the loan agreement.
 	Start =
     % First the borrower may or may not request for the principal amount.
     % If he doesn't then the contract is immediately fulfilled.
-		dont_request_principal . Fulfilled
+		dont_request_principal . fulfilled_s
 
     % Otherwise, the lender is now obliged to send the principal.
 		+ request_principal . (
 
         % If the Lender defaults on the payment of the principal, the
         % contract is deemed to be breached.
-			  payment_default(principal, lender, borrower, principal_amt) . Breached
+			  payment_default(principal, lender, borrower, principal_amt) . breached_s
 
         % Otherwise, if he does send the principal, then we start the main and
         % side tracks.
-			  + pay(principal, lender, borrower, principal_amt)|broadcast_set_remainder(1075) .
-          start_main|start_side
+			  + pay(principal, lender, borrower, principal_amt) .
+          start_main_s|start_side_s
 		  );
 
-  % PayPayments(n) is a helper process that handles all the payments from
-  % payment n all the way up to num_payments.
-  % MainTrack starts this off with n = 1.
-	MainTrack = PayPayments(1);
+  % Main repayment track of the loan agreement.
+	Main_track = sum n : Pos.
+    % First we determine the next payment number, ie is it payment 1, payment 2,
+    % etc.
+    % This is done via the get_next_payment_number_s action, which is
+    % synchronized with the corresponding get_next_payment_number_r action of
+    % the Remainder process.
+    % Note that this Remainder process helps us keep track of the number of
+    % remaining payments, as well as the outstanding amount that the borrower
+    % has yet to repay.
+    get_next_payment_number_s(n) .
 
-	PayPayments(n : Pos) =
-    % If all payments have been made, we terminate the side track and go to a
-    % fulfilled state.
-    (n > num_payments) ->
-      broadcast_terminate_side . Fulfilled
-    <>
+    % If all payments have been made, we do nothing except wait and respond to
+    % terminate requests.
+    (n > num_payments) -> 
+      fulfilled_s
+    <> (
       % Otherwise, if there are outstanding payments, the borrower is obliged
       % to pay the current payment.
-      % When that is done, we trnsition to payment (n + 1).
-      (pay(normal, borrower, lender, payment_amt(n))|broadcast_increase_remainder(-payment_amt(n)) + Terminate_main) .
-      PayPayments(n + 1)
+      % If such a payment is made, we continue down the main repayment track.
+      (pay_s(normal, borrower, lender, payment_amt(n)) + Terminate_main_r) .
+      Main_track
 
-      % We continue here if the borrower defaults on the payment.
+      % If the borrower defaults on the payment, we continue here instead.
       % At this point, the lender has the option to notify the borrower.
-      + (payment_default(normal, borrower, lender, payment_amt(n)) + Terminate_main) . (
+      + (payment_default(normal, borrower, lender, payment_amt(n)) + Terminate_main_r) . (
 
         % If the lender doesn't notify the borrower upon payment default,
-        % nothing goes wrong and so we simply move on to the next payment stage.
-        (dont_notify_borrower + Terminate_main) . PayPayments(n + 1)
+        % nothing goes wrong and so we simply continue with repayments.
+        (dont_notify_borrower + Terminate_main_r) . Main_track
 
         % If the lender does notify the borrower, then the borrower is obliged
         % to cure his default.
-        + (notify_borrower_of_default + Terminate_main) . (
+        + (notify_borrower_of_default + Terminate_main_r) . (
 
-          % If the borrower cure his default, then he gets another chance to
-          % pay off the current payment.
-          (cure_default + Terminate_main) . PayPayments(n)
+          % If the borrower cures his default, then we contiunue down the
+          % repayment track, giving him another chance to pay off the current
+          % payment.
+          (cure_default + Terminate_main_r) . Main_track
 
           % If the default is not cured, the borrower is then obliged to make
           % an accelerated payment of the remaining amount to the lender.
-          + (dont_cure_default|start_accelerated + Terminate_main)
+          % The start_accelerated_s action is used to kick off the
+          % AcceleratedRepayment process, which handles this accelerated
+          % repayment stage.
+          + (dont_cure_default + Terminate_main_r) .
+            start_accelerated_s
+          )
         )
       );
 
   % Side track that waits for a borrower default event to occur, and then
   % executes accordingly.
-	SideTrack =
+	Side_track =
     % When a borrower default event occurs, the lender has the option of
     % notifying the borrower.
-		(borrower_default + Terminate_side) . (
+		(borrower_default + Terminate_side_r) . (
 
       % If no such notification occurs, nothing happens and so we loop back to
       % the top of the side track and wait for another default event to occur.
-			(dont_notify_borrower + Terminate_side) . SideTrack
+			(dont_notify_borrower + Terminate_side_r) . Side_track
 
       % If the lender does notify the borrower, then we proceed as we did in the
       % main track above, ie the borrower is then obliged to cure his default,
       % and failing which, he is then obliged to make an accelerated payment
       % of the remaining amount.
-			+ (notify_borrower_of_default + Terminate_side) . (
-				(cure_default + Terminate_side) . SideTrack
-        + (dont_cure_default|start_accelerated + Terminate_side)
+			+ (notify_borrower_of_default + Terminate_side_r) . (
+				(cure_default + Terminate_side_r) . Side_track
+        + (dont_cure_default + Terminate_side_r) .
+          start_accelerated_s
 	    )
     );
 
+  % Process that handles the accelerated repayments stage of the loan agreement.
+  % This situation occurs when the borrower fails to cure his default after
+  % being notified by the lender about it.
   AcceleratedRepayment =
-    broadcast_terminate_main|broadcast_terminate_side . (
-      sum remainder : Pos.
-        broadcast_get_remainder(remainder) . (
-          pay(accelerated, borrower, lender, remainder) . Fulfilled
-          + payment_default(accelerated, borrower, lender, remainder) . Breached
+    % The first thing we do in this situation is we terminate the main and side
+    % tracks.
+    terminate_main_s|terminate_side_s . (
+      sum outstanding : Pos.
+        % Next we grab the outstanding amount from the Remainder process.
+        % At this point, the borrower has an obligation to pay off this
+        % outstanding amount.
+        get_outstanding_s(outstanding) . (
+          pay_s(accelerated, borrower, lender, outstanding) . fulfilled_s
+          + payment_default(accelerated, borrower, lender, outstanding) .
+            breached_s
         )
     );
 
-  Remainder(remainder : Nat) =
-    receive_get_remainder(remainder) . Remainder(remainder)
+  % This Remainder process functions like a mutable object that keeps track of
+  % the global state of the loan agreement, ie it tracks the number of payments
+  % remaining and the outstanding amount.
+  % There are 2 getters for these 2 parameters, which we can view as "fields"
+  % of the "object" and a synchronized pay_r action which "mutates" these 2
+  % "fields".
+  %
+  % get_next_payment_number_r computes the next payment number as a function
+  % of the number of remaining payments.
+  %
+  % pay_r(accelerated, borrower, lender, outstanding) indicates that the
+  % borrower pays the lender an accelerated payment of the outstanding amount.
+  % Notice how we recurse with the remaining number of payments and outstanding
+  % amount set to 0 since no payments remain thereafter.
+  %
+  % pay_r(normal, borrower, lender, amt_paid) indicates that the borrower pays
+  % a normal repayment of amt_paid to the lender.
+  Remainder(remaining_payments : Nat, outstanding : Nat) =
+    get_remaining_payments_r(remaining_payments) .
+    Remainder(remaining_payments, outstanding)
 
-    + sum amt : Int.
-        receive_increase_remainder(amt) .
-        Remainder(Int2Nat(max(0, remainder + amt)))
+    + get_next_payment_number_r(Int2Pos(max(1, num_payments - remaining_payments + 1))) .
+      Remainder(remaining_payments, outstanding)
 
-    + sum amt : Nat.
-      receive_set_remainder(amt) . Remainder(amt);
+    + get_outstanding_r(outstanding) .
+      Remainder(remaining_payments, outstanding)
+
+    + pay_r(accelerated, borrower, lender, outstanding) .
+      Remainder(0, 0)
+
+    + sum amt_paid : Pos. (
+        pay_r(normal, borrower, lender, amt_paid) .
+        Remainder(
+          remaining_payments = Int2Nat(max(0, remaining_payments - 1)),
+          outstanding = Int2Nat(max(0, outstanding - amt_paid))
+        )
+      );
+
+  % Clock(t : Pos) = delay_r@(t + 1) . Clock(t + 1);
 
 init
-	block({
-    start_main, start_side, start_accelerated,
-    receive_terminate_main, receive_terminate_side,
-    broadcast_get_remainder, receive_get_remainder,
-    broadcast_set_remainder, receive_set_remainder,
-    broadcast_increase_remainder, receive_increase_remainder
-	},
+  % These hidden actions are prioritized when converting to an LTS.
   hide({
-    broadcast_terminate_main, broadcast_terminate_side,
-    set_remainder, get_remainder, increase_remainder
+    get_remaining_payments, get_next_payment_number, get_outstanding,
+    terminate, start_accelerated, start_main, start_side
   },
-  % comm({
-  %   broadcast_terminate_side|broadcast_terminate_main -> invalid
-  %   % fulfilled|breached -> invalid
-  % },
+	block({
+    fulfilled_s, fulfilled_r,
+    breached_s, breached_r,
+    start_accelerated_s, start_accelerated_r,
+    start_main_s, start_main_r,
+    start_side_s, start_side_r,
+    terminate_main_s, terminate_main_r,
+    terminate_side_s, terminate_side_r,
+    pay_s, pay_r,
+    get_remaining_payments_s, get_remaining_payments_r,
+    get_next_payment_number_s, get_next_payment_number_r,
+    get_outstanding_s, get_outstanding_r
+	},
 	comm({
-    broadcast_terminate_main|receive_terminate_main -> sync,
-    broadcast_terminate_side|receive_terminate_side -> sync,
-    start_main|start_main -> sync,
-    start_side|start_side -> sync,
-    start_accelerated|start_accelerated -> sync,
-    broadcast_get_remainder|receive_get_remainder -> get_remainder,
-    broadcast_set_remainder|receive_set_remainder -> set_remainder,
-    broadcast_increase_remainder|receive_increase_remainder -> increase_remainder
+    fulfilled_s|fulfilled_r -> fulfilled,
+    breached_s|breached_r -> breached,
+    terminate_main_s|terminate_main_r -> terminate,
+    terminate_side_s|terminate_side_r -> terminate,
+    start_main_s|start_main_r -> start_main,
+    start_side_s|start_side_r -> start_side,
+    start_accelerated_s|start_accelerated_r -> start_accelerated,
+    pay_s|pay_r -> pay,
+    get_remaining_payments_s|get_remaining_payments_r -> get_remaining_payments,
+    get_next_payment_number_s|get_next_payment_number_r -> get_next_payment_number,
+    get_outstanding_s|get_outstanding_r -> get_outstanding
 	},
   Start
-	|| start_main . MainTrack
-	|| start_side . SideTrack
-  || start_accelerated . AcceleratedRepayment
-  || Remainder(0)
+	|| start_main_r . Main_track . Terminate_main_r
+	|| start_side_r . Side_track . Terminate_side_r
+  || get_outstanding_s(0)|terminate_side_s
+  || start_accelerated_r . AcceleratedRepayment
+  || fulfilled_r . Fulfilled
+  || breached_r . Breached
+  || Remainder(num_payments, initial_outstanding_amt)
   )));

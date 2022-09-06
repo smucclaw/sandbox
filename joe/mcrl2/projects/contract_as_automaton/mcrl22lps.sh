@@ -5,17 +5,19 @@ cd workdir
 
 # Linearize all processes to a restricted Greibach normal form.
 mcrl22lps -lregular2 ../contract_as_automaton_spec.mcrl2 caa.lps
-# lpssumelm caa.lps caa.1.lps
-# mv caa.1.lps caa.lps
+
+# Eliminate superfluous sums.
+lpssumelm caa.lps caa.1.lps
+mv caa.1.lps caa.lps
 
 # Convert the linearized process into a labelled transition system, while
-# giving priority to actions (ie transitions) labelled "sync".
-# This means the LTS will automatically take "sync" transitions when they're
+# giving priority to internal tau actions/transitions.
+# This means the LTS will automatically take tau transitions when they're
 # available, so that the resulting LTS will no longer have any such transitions.
-lps2lts -csync caa.lps caa.lts
+lps2lts -ctau caa.lps caa.lts
 
-# Reduce the state space modulo trace equivalence.
-ltsconvert -etrace caa.lts caa.1.lts
+# Reduce the state space modulo branching bisimilarity.
+ltsconvert -ebranching-bisim --no-state caa.lts caa.1.lts
 mv caa.1.lts caa.lts
 
 # Convert LTS -> dot -> svg for visualization, though there's not much point

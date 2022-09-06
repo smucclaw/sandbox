@@ -162,16 +162,30 @@ THERE EXISTS SOME person W SUCH THAT pred2 Y, X, Z, W HOLDS
 *** minsavings(P,X,Y):-numdep(P,X),Y=2*X.
 
 GIVEN ANY P, X
-
 IF numdep P, X HOLDS
-
 DEF minsavings OF X TO BE 2*X
 
 So in other words function is only defined in some 'context'. 
 
-** Core Natural L4
+#+begin_src prolog
+  minsavings(P,X,Out) :- numdep(P,X), Out IS 2*X.
+#+end_src
 
-The above would be something like 'Core Natural L4'. Syntactic sugar, synonyms can always be given for restricted cases, to make the syntax more intuitive/user friendly, but these synonyms need not extend to the whole language/the most general case. (Ie there no complete language that further sits 'on top' of Core Natural L4)
+GIVEN ANY P, X
+DEF minsavings OF X IS 2*X WHEN numdep P, X HOLDS
+    minsavings OF X IS 3*X OTHERWISE
+
+GIVEN ANY X
+DEF collatz IS X / 2 WHEN X IS EVEN
+    collatz IS 3*X+1 OTHERWISE
+
+** Core Natural L4 / (L4 Full)
+
+The above would be something like 'Core Natural L4'.
+
+** L4 Lite
+
+Syntactic sugar, synonyms can always be given for restricted cases, to make the syntax more intuitive/user friendly, but these synonyms need not extend to the whole language/the most general case. (Ie there no complete language that further sits 'on top' of Core Natural L4)
 
 Example:
 alice IS bob's mother = mother(alice, bob) HOLDS
@@ -182,6 +196,14 @@ Can take any bit of natural L4 code and freely interchange the two expressions. 
 GIVEN ANY person X
 
 CONCLUDE mortal X HOLDS
+
+#+begin_comment
+https://en.wikipedia.org/wiki/First-order_logic#Many-sorted_logic
+
+Ordinary first-order interpretations have a single domain of discourse over which all quantifiers range. Many-sorted first-order logic allows variables to have different sorts, which have different domains. This is also called typed first-order logic, and the sorts called types (as in data type), but it is not the same as first-order type theory. Many-sorted first-order logic is often used in the study of second-order arithmetic.[31]
+
+When there are only finitely many sorts in a theory, many-sorted first-order logic can be reduced to single-sorted first-order logic.[32]: 296–299  One introduces into the single-sorted theory a unary predicate symbol for each sort in the many-sorted theory, and adds an axiom saying that these unary predicates partition the domain of discourse.
+#+end_comment
 
 Note that there is no IF part to this piece of natural l4. Assuming person X represents typing information, if this is ommited from ASP, then the above bit of natural l4 gets represented as 
 
@@ -203,6 +225,21 @@ mortal(X):-X=john.
 
 But then an abductive problem where we want to find an abductive solution to mortal(Tom), where Tom is not declared as a person upfront, will just fail rather than returning the (sensible) answer isTypePerson(tom). Ie gives the user the impression that Tom cannot be mortal rather than just saying that Tom is mortal may be deduced from Tom is a person.
 
+*** Alloy
+
+#+begin_src allooy
+  sig Mortality
+  sig Mortal, Immortal extends Mortality
+  
+  sig Person { m : Mortality }
+  fact { all p: Person | p.m == Immortal }
+#+end_src
+
+** Subtyping, Subclassing...
+
+https://en.wikipedia.org/wiki/Structural_type_system
+
+
 ** Transitivity
 Offer the expression pred1 IS TRANSITIVE as a synonym for 
 
@@ -213,6 +250,14 @@ CONCLUDE pred1(X,Z) HOLDS IF
 IF pred(X,Y) HOLDS AND pred(Y,Z) HOLDS
 
 but no synonym for transitivity-like properties for predicates of higher arity. Again user must learn the 'fundamental' Core Natural L4 for full expressivity. 
+
+#+begin_example
+  GIVEN ANY person P1 P2
+  DECIDE olderThan P1 P2
+  WHEN   P1.born < P2.born
+
+  olderThan IS TRANSITIVE
+#+end_example
 
 ** Core Natural L4 vs Synonyms
 
@@ -239,4 +284,10 @@ Does that mean that we always use it with X as input and Y as output?
 
 Or do we allow a sort of constraint solving / unification engine to use X as output and Y as input?
 
+
+** Some Prior Art
+
+*** ACE and ACERules
+
+attempto: http://attempto.ifi.uzh.ch/site/resources/
 

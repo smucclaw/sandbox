@@ -1,33 +1,56 @@
 sort Place = struct p0 | p1 | p2;
 sort Trans = struct trans(
   trans_name : Trans_name,
-  from : Set(PlaceTokens),
-  to : Set(PlaceTokens)
+  from : List(PlaceTokens),
+  to : List(PlaceTokens)
 );
 
-sort PlaceTokens = struct place_tokens(place' : Place, tokens' : Bag(Token));
+sort PlaceTokens = struct place_tokens(place' : Place, tokens' : List(Token));
 
 sort Trans_name = struct t0 | t1 | t2;
 
-sort Token = Singleton;
-sort Marking = Place -> Bag(Token);
+sort Token = Nat;
+sort Marking = Place -> List(Token);
 
-sort Singleton = struct singleton;
+% sort Singleton = struct singleton;
 
 map
   initial_marking : Marking;
-  transitions : Set(Trans);
+  transitions : List(Trans);
 
   is_enabled : Marking # Trans -> Bool;
 
-var marking : Marking, t : Trans;
+  remove_tokens : Marking # List(PlaceTokens) -> Marking;
+
+  remove : Token # List(Token) -> List(Token);
+
+var
+  marking : Marking,
+  p : Place, t : Trans, tokens : List(Token), token : Token, token' : Token,
+  place_tokenss : List(PlaceTokens);
 
 eqn
+  remove_tokens(marking, []) = marking;
+  remove_tokens(marking, place_tokens(p, tokens) |> place_tokenss) =
+    remove_tokens(marking, place_tokenss)[p -> marking(p) - tokens];
+
+  remove(token, []) = [];
+  (token == token') -> remove(token, token' |> tokens) = tokens;
+  (token != token') -> remove(token, token' |> tokens) = remove(token, tokens);
+
   initial_marking =
-    (lambda place : Place. Set2Bag({}))[p0 -> {singleton: 1}];
+    (lambda place : Place. {})[p0 -> {0}];
+
+  transitions = {
+    trans(
+      t0,
+      [place_tokens(p0, {0})],
+      [place_tokens(p1, {0}), place_tokens(p2, {0})]
+    )
+  };
 
   is_enabled(marking, t) =
-    forall p : Place, b : Bag(Token).
+    forall p : Place, b : List(Token).
       (place_tokens(p, b) in from(t)) => b <= marking(p);
 
 act fire_trans : Trans_name;
@@ -36,7 +59,12 @@ proc
   P(marking : Marking) = sum t : Trans.
     (t in transitions) -> (
       fire_trans(trans_name(t)) .
-      P(if(is_enabled(marking, t), marking, marking))
+      P(
+        if(is_enabled(marking, t),
+          marking,
+          marking
+        )
+      )
     );
 
   % T0(marking : Marking) =

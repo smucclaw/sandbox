@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<svg width="2291" height="1262" viewBox="0 0 2291 1262" xmlns="http://www.w3.org/2000/svg">
+	<style>
+		.edge { stroke: black; fill: none; }
+		.node { stroke: black; fill: white; }
+		.arrow { stroke: none; fill: black; }
+		.initial { fill: Lime !important; }
+		.inactive { stroke-dasharray: 3.5; }
+		.prob { stroke-width: 5px; }
+		.label { text-anchor: middle; dominant-baseline: middle; font-family: sans-serif; font-size: 16px; }
+	</style>
+
+	<path class="edge" d="M1994.073486 627.526917 C1870.964355 696.053711, 1747.850830 764.581177, 1624.730347 833.110718" />
+	<path class="arrow" d="M1605.282471 843.935486 L1628.338623 839.593262 L 1621.122070 826.628174 z" />
+	<path class="edge" d="M1994.081421 606.449646 C1870.614258 537.604187, 1747.147217 468.756836, 1623.677246 399.906006" />
+	<path class="arrow" d="M1604.245361 389.070068 L1620.065308 406.383270 L 1627.289185 393.428741 z" />
+	<path class="edge" d="M1023.344971 366.849243 C1207.471191 157.281525, 1386.921143 151.239182, 1561.700317 348.722321" />
+	<path class="arrow" d="M1576.014282 365.755493 L1567.378052 343.951019 L 1556.022583 353.493622 z" />
+	<path class="edge" d="M1570.499390 854.987000 C1443.958740 868.628174, 1317.419556 882.268799, 1190.878662 895.909363" />
+	<path class="arrow" d="M1170.216431 898.136658 L1191.621094 902.796753 L 1190.136230 889.021973 z" />
+	<path class="edge" d="M1575.640991 840.032654 C1513.726563 780.030396, 1451.811646 720.030029, 1389.894775 660.030396" />
+	<path class="arrow" d="M1374.690186 645.296692 L1384.983521 665.098572 L 1394.806030 654.962219 z" />
+	<path class="edge" d="M1153.072632 917.312378 C1153.338013 977.834595, 1153.598267 1038.357178, 1153.853638 1098.881226" />
+	<path class="arrow" d="M1153.941040 1119.663452 L1160.780884 1098.852051 L 1146.926392 1098.910400 z" />
+	<path class="edge" d="M1136.488281 905.231079 C933.971741 969.490234, 731.448425 1033.749878, 528.912842 1098.011475" />
+	<path class="arrow" d="M506.552917 1105.105957 L531.277649 1105.464722 L 526.548035 1090.558228 z" />
+	<path class="edge" d="M1135.687744 900.609192 C912.751709 908.548035, 689.808411 916.487427, 466.852600 924.427124" />
+	<path class="arrow" d="M442.883362 925.280701 L467.137115 932.416809 L 466.568085 916.437439 z" />
+	<path class="edge" d="M1148.465088 883.276794 C1106.321411 727.821045, 1064.171387 572.365723, 1022.013672 416.906769" />
+	<path class="arrow" d="M1016.552124 396.767334 L1015.300598 418.727264 L 1028.726807 415.086273 z" />
+	<path class="edge" d="M1137.004395 893.343384 C969.108215 823.533203, 801.205078 753.723267, 633.291138 683.911926" />
+	<path class="arrow" d="M612.365967 675.212158 L630.391235 690.886902 L 636.191040 676.936951 z" />
+	<path class="edge" d="M997.716125 389.875519 C874.860657 474.732727, 751.997864 559.586365, 629.124207 644.438354" />
+	<path class="arrow" d="M610.476746 657.315491 L633.416565 650.654114 L 624.831848 638.222595 z" />
+	<path class="edge" d="M996.199524 372.808960 C883.633545 321.563446, 771.060303 270.314392, 658.477051 219.060562" />
+	<path class="arrow" d="M638.003113 209.739761 L655.370178 225.885132 L 661.583923 212.235992 z" />
+	<path class="edge" d="M994.819275 382.505219 C795.401001 411.514557, 595.974670 440.520020, 396.535156 469.522278" />
+	<path class="arrow" d="M372.185181 473.063171 L397.715454 477.638855 L 395.354858 461.405701 z" />
+	<path class="edge" d="M1027.549805 387.753876 C1225.873657 484.523773, 1401.151245 489.185364, 1553.386230 401.738586" />
+	<path class="arrow" d="M1572.227173 389.904846 L1549.441650 395.458313 L 1557.330811 408.018860 z" />
+	<circle class="initial node" cx="2012.993896" cy="616.995239" r="21.654"/>
+	<circle class="node" cx="1589.012573" cy="852.991333" r="18.6203"/>
+	<circle class="node" cx="1587.989014" cy="380.005005" r="18.613"/>
+	<circle class="node" cx="1152.996582" cy="899.992859" r="17.3196"/>
+	<circle class="node" cx="1361.994019" cy="632.993835" r="17.6791"/>
+	<circle class="inactive node" cx="1154.013794" cy="1136.983154" r="17.3199"/>
+	<circle class="inactive node" cx="488.014282" cy="1110.987915" r="19.4494"/>
+	<circle class="inactive node" cx="423.021698" cy="925.988037" r="19.8743"/>
+	<circle class="node" cx="1012.006348" cy="380.005005" r="17.3678"/>
+	<circle class="inactive node" cx="595.009827" cy="667.996277" r="18.7964"/>
+	<circle class="inactive node" cx="621.014404" cy="202.005615" r="18.6664"/>
+	<circle class="inactive node" cx="352.017914" cy="475.995850" r="20.3794"/>
+	<text class="label" x="2012.993896" y="616.995239"></text>
+	<text class="label" x="1589.012573" y="852.991333"></text>
+	<text class="label" x="1587.989014" y="380.005005"></text>
+	<text class="label" x="1152.996582" y="899.992859"></text>
+	<text class="label" x="1361.994019" y="632.993835"></text>
+	<text class="label" x="1154.013794" y="1136.983154"></text>
+	<text class="label" x="488.014282" y="1110.987915"></text>
+	<text class="label" x="423.021698" y="925.988037"></text>
+	<text class="label" x="1012.006348" y="380.005005"></text>
+	<text class="label" x="595.009827" y="667.996277"></text>
+	<text class="label" x="621.014404" y="202.005615"></text>
+	<text class="label" x="352.017914" y="475.995850"></text>
+	<text class="label" x="1801.009766" y="734.989746">request_principal</text>
+	<text class="label" x="1800.491455" y="498.500122">dont_request_principal</text>
+	<text class="label" x="1309.004883" y="166.004395">borrower_default|pay(normal, borrower, lender, 525)</text>
+	<text class="label" x="1412.005493" y="914.992615">pay(principal, lender, borrower, 1000)</text>
+	<text class="label" x="1460.001099" y="734.995728">payment_default(principal, lender, borrower, 1000)</text>
+	<text class="label" x="1417.998047" y="617.994080">breached</text>
+	<text class="label" x="1153.505249" y="1018.487976">payment_default(normal, borrower, lender, 550)</text>
+	<text class="label" x="820.505371" y="1005.490356">borrower_default</text>
+	<text class="label" x="788.009033" y="912.990479">borrower_default|payment_default(normal, borrower, lender, 550)</text>
+	<text class="label" x="1082.501465" y="639.998901">pay(normal, borrower, lender, 550)</text>
+	<text class="label" x="874.003174" y="783.994507">borrower_default|pay(normal, borrower, lender, 550)</text>
+	<text class="label" x="803.508118" y="524.000671">borrower_default</text>
+	<text class="label" x="816.510376" y="291.005310">payment_default(normal, borrower, lender, 525)</text>
+	<text class="label" x="682.012146" y="428.000488">borrower_default|payment_default(normal, borrower, lender, 525)</text>
+	<text class="label" x="1322.007202" y="502.999207">pay(normal, borrower, lender, 525)</text>
+	<text class="label" x="1652.001343" y="362.998474">fulfilled</text>
+</svg>

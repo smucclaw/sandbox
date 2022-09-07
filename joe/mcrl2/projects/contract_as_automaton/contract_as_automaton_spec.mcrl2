@@ -36,18 +36,20 @@ act
   borrower_default,
 
 	request_principal, cure_default,
-	breached_s, breached_r, breached,
-  fulfilled_s, fulfilled_r, fulfilled,
+	breach_s, breach_r, breach, breached,
+  fulfill_s, fulfill_r, fulfill, fulfilled,
 	notify_borrower_of_default,
 
   dont_pay, dont_notify_borrower, dont_cure_default, dont_request_principal,
 
+  start_init_s, start_init_r, start_init,
+  stop_init_s, stop_init_r, stop_init,
   start_main_s, start_main_r, start_main,
+  stop_main_s, stop_main_r, stop_main,
   start_side_s, start_side_r, start_side,
-  start_accelerated_s, start_accelerated_r, start_accelerated,
-  terminate_main_s, terminate_main_r, terminate_main,
-  terminate_side_s, terminate_side_r, terminate_side,
-  terminate, invalid;
+  stop_side_s, stop_side_r, stop_side,
+  start_accel_s, start_accel_r, start_accel,
+  stop_accel_s, stop_accel_r, stop_accel;
 
   get_remaining_payments_s, get_remaining_payments_r, get_remaining_payments,
   get_outstanding_s, get_outstanding_r, get_outstanding : Nat;
@@ -58,25 +60,53 @@ proc
 	Breached = breached . Breached;
 	Fulfilled = fulfilled . Fulfilled;
 
-  Terminate_main_r = terminate_main_r . Terminate_main_r;
-  Terminate_side_r = terminate_side_r . Terminate_side_r;
+  % Main_idling is a process representing the process Main_track in an idl
+  % state.
+  % In such a idle state, we can:
+  % - Receive a stop signal, ie stop_main_r, in which case we transition back
+  %   to this idle state.
+  % - Receive a start signal, ie start_main_r, in which case we transition to
+  %   Main_track and begin executing there.
+  %
+  % Note here that we allow Main_track to be interrupted by decorating each
+  % atomic, non-internal, action in Main_track with the process Stop_main_r, so
+  % that an action a becomes (a + Stop_main_r).
+  % This means that whenever Main_track is executing, it listens out for
+  % the stop signal and when it receives such a signal, it transitions back to
+  % this idle state.
+  Main_idling =
+    stop_main_r . Main_idling + start_main_r . Main_track . Main_idling;
+  Stop_main_r = stop_main_r . Main_idling;
+
+  Side_idling =
+    stop_side_r . Side_idling + start_side_r . Side_track . Side_idling;
+  Stop_side_r = stop_side_r . Side_idling;
+
+  Init_idling =
+    stop_init_r . Init_idling + start_init_r . Init . Init_idling;
+  Stop_init_r = stop_init_r . Init_idling;
+
+  Accel_idling =
+    stop_accel_r . Accel_idling + start_accel_r . Accel . Accel_idling;
+  Stop_accel_r = stop_accel_r . Accel_idling;
 
   % Start of the loan agreement.
-	Start =
+	Init =
     % First the borrower may or may not request for the principal amount.
     % If he doesn't then the contract is immediately fulfilled.
-		dont_request_principal . fulfilled_s
+		(dont_request_principal + Stop_init_r) . fulfill_s
 
     % Otherwise, the lender is now obliged to send the principal.
-		+ request_principal . (
+		+ (request_principal + Stop_init_r). (
 
         % If the Lender defaults on the payment of the principal, the
         % contract is deemed to be breached.
-			  payment_default(principal, lender, borrower, principal_amt) . breached_s
+			  (payment_default(principal, lender, borrower, principal_amt) + Stop_init_r) .
+        breach_s
 
         % Otherwise, if he does send the principal, then we start the main and
         % side tracks.
-			  + pay(principal, lender, borrower, principal_amt) .
+			  + (pay(principal, lender, borrower, principal_amt) + Stop_init_r) .
           start_main_s|start_side_s
 		  );
 
@@ -87,46 +117,51 @@ proc
     % This is done via the get_next_payment_number_s action, which is
     % synchronized with the corresponding get_next_payment_number_r action of
     % the Remainder process.
+    %
     % Note that this Remainder process helps us keep track of the number of
     % remaining payments, as well as the outstanding amount that the borrower
     % has yet to repay.
+    %
+    % Note also that since the Main_track process is "parameterized" over this
+    % global state, starting up the Main_track process again after stopping it
+    % actually has the effect of resuming where it left off, rather than
+    % starting all the payment stages from scratch.
     get_next_payment_number_s(n) .
 
-    % If all payments have been made, we do nothing except wait and respond to
-    % terminate requests.
+    % If all payments have been made, we perform fulfill_s, which signals that
+    % the contract has been fulfilled.
     (n > num_payments) -> 
-      fulfilled_s
+      fulfill_s
     <> (
       % Otherwise, if there are outstanding payments, the borrower is obliged
       % to pay the current payment.
       % If such a payment is made, we continue down the main repayment track.
-      (pay_s(normal, borrower, lender, payment_amt(n)) + Terminate_main_r) .
+      (pay_s(normal, borrower, lender, payment_amt(n)) + Stop_main_r) .
       Main_track
 
       % If the borrower defaults on the payment, we continue here instead.
       % At this point, the lender has the option to notify the borrower.
-      + (payment_default(normal, borrower, lender, payment_amt(n)) + Terminate_main_r) . (
+      + (payment_default(normal, borrower, lender, payment_amt(n)) + Stop_main_r) . (
 
         % If the lender doesn't notify the borrower upon payment default,
         % nothing goes wrong and so we simply continue with repayments.
-        (dont_notify_borrower + Terminate_main_r) . Main_track
+        (dont_notify_borrower + Stop_main_r) . Main_track
 
         % If the lender does notify the borrower, then the borrower is obliged
         % to cure his default.
-        + (notify_borrower_of_default + Terminate_main_r) . (
+        + (notify_borrower_of_default + Stop_main_r) . (
 
           % If the borrower cures his default, then we contiunue down the
           % repayment track, giving him another chance to pay off the current
           % payment.
-          (cure_default + Terminate_main_r) . Main_track
+          (cure_default + Stop_main_r) . Main_track
 
           % If the default is not cured, the borrower is then obliged to make
           % an accelerated payment of the remaining amount to the lender.
-          % The start_accelerated_s action is used to kick off the
-          % AcceleratedRepayment process, which handles this accelerated
-          % repayment stage.
-          + (dont_cure_default + Terminate_main_r) .
-            start_accelerated_s
+          % The start_accel_s action is used to kick off the
+          % Accel process, which handles this accelerated repayment stage.
+          + (dont_cure_default + Stop_main_r) .
+            start_accel_s
           )
         )
       );
@@ -136,38 +171,40 @@ proc
 	Side_track =
     % When a borrower default event occurs, the lender has the option of
     % notifying the borrower.
-		(borrower_default + Terminate_side_r) . (
+		(borrower_default + Stop_side_r) . (
 
       % If no such notification occurs, nothing happens and so we loop back to
       % the top of the side track and wait for another default event to occur.
-			(dont_notify_borrower + Terminate_side_r) . Side_track
+			(dont_notify_borrower + Stop_side_r) . Side_track
 
       % If the lender does notify the borrower, then we proceed as we did in the
       % main track above, ie the borrower is then obliged to cure his default,
       % and failing which, he is then obliged to make an accelerated payment
       % of the remaining amount.
-			+ (notify_borrower_of_default + Terminate_side_r) . (
-				(cure_default + Terminate_side_r) . Side_track
-        + (dont_cure_default + Terminate_side_r) .
-          start_accelerated_s
+			+ (notify_borrower_of_default + Stop_side_r) . (
+				(cure_default + Stop_side_r) . Side_track
+        + (dont_cure_default + Stop_side_r) .
+          start_accel_s
 	    )
     );
 
   % Process that handles the accelerated repayments stage of the loan agreement.
   % This situation occurs when the borrower fails to cure his default after
   % being notified by the lender about it.
-  AcceleratedRepayment =
-    % The first thing we do in this situation is we terminate the main and side
-    % tracks.
-    terminate_main_s|terminate_side_s . (
+  Accel =
+    % The first thing we do here is we stop the main and side tracks.
+    stop_main_s|stop_side_s . (
       sum outstanding : Pos.
         % Next we grab the outstanding amount from the Remainder process.
-        % At this point, the borrower has an obligation to pay off this
-        % outstanding amount.
+        % Then, the borrower has an obligation to pay off this outstanding
+        % amount.
+        % If he does, we signal that the contract is fulfilled.
+        % Otherwise, we signal that the contract has been breached.
         get_outstanding_s(outstanding) . (
-          pay_s(accelerated, borrower, lender, outstanding) . fulfilled_s
-          + payment_default(accelerated, borrower, lender, outstanding) .
-            breached_s
+          (pay_s(accelerated, borrower, lender, outstanding) + Stop_accel_r) .
+          fulfill_s
+          + (payment_default(accelerated, borrower, lender, outstanding) + Stop_accel_r) .
+            breach_s
         )
     );
 
@@ -209,46 +246,84 @@ proc
         )
       );
 
+  % Adding timing is a work in progress.
   % Clock(t : Pos) = delay_r@(t + 1) . Clock(t + 1);
 
 init
-  % These hidden actions are prioritized when converting to an LTS.
+  % Here we synchronize a lot of the *_r and *_s actions and block them from
+  % occuring individually.
+  % This forces a pair of a_r and a_s actions to behave like pairs of broadcasts
+  % a? and a! as in UPPAAL.
+  % Since we want to treat these transitions as internal, ie users don't need
+  % to see or care about them, we hide them so they become tau transitions.
+  % Moreover, when converting this to an LTS, we instruct the mcrl2 tools to
+  % prioritize these tau transitions, so that they are automatically taken and
+  % eliminated from the resulting LTS.
+  % This is the same idea behind eliding internal nodes when constructing
+  % and stitching together petri nets.
   hide({
     get_remaining_payments, get_next_payment_number, get_outstanding,
-    terminate, start_accelerated, start_main, start_side
+    start_init, stop_init,
+    start_main, stop_main,
+    start_side, stop_side,
+    start_accel, stop_accel,
+    fulfill, breach
   },
 	block({
-    fulfilled_s, fulfilled_r,
-    breached_s, breached_r,
-    start_accelerated_s, start_accelerated_r,
+    fulfill_s, fulfill_r,
+    breach_s, breach_r,
+    start_init_s, start_init_r,
+    stop_init_s, stop_init_r,
+    start_accel_s, start_accel_r,
+    stop_accel_s, stop_accel_r,
     start_main_s, start_main_r,
+    stop_main_s, stop_main_r,
     start_side_s, start_side_r,
-    terminate_main_s, terminate_main_r,
-    terminate_side_s, terminate_side_r,
+    stop_side_s, stop_side_r,
     pay_s, pay_r,
     get_remaining_payments_s, get_remaining_payments_r,
     get_next_payment_number_s, get_next_payment_number_r,
     get_outstanding_s, get_outstanding_r
 	},
 	comm({
-    fulfilled_s|fulfilled_r -> fulfilled,
-    breached_s|breached_r -> breached,
-    terminate_main_s|terminate_main_r -> terminate,
-    terminate_side_s|terminate_side_r -> terminate,
+    fulfill_s|fulfill_r -> fulfill,
+    breach_s|breach_r -> breach,
+    start_init_s|start_init_r -> start_init,
+    stop_init_s|stop_init_r -> stop_init,
     start_main_s|start_main_r -> start_main,
+    stop_main_s|stop_main_r -> stop_main,
     start_side_s|start_side_r -> start_side,
-    start_accelerated_s|start_accelerated_r -> start_accelerated,
+    stop_side_s|stop_side_r -> stop_side,
+    start_accel_s|start_accel_r -> start_accel,
+    stop_accel_s|stop_accel_r -> stop_accel,
     pay_s|pay_r -> pay,
     get_remaining_payments_s|get_remaining_payments_r -> get_remaining_payments,
     get_next_payment_number_s|get_next_payment_number_r -> get_next_payment_number,
     get_outstanding_s|get_outstanding_r -> get_outstanding
 	},
-  Start
-	|| start_main_r . Main_track . Terminate_main_r
-	|| start_side_r . Side_track . Terminate_side_r
-  || get_outstanding_s(0)|terminate_side_s
-  || start_accelerated_r . AcceleratedRepayment
-  || fulfilled_r . Fulfilled
-  || breached_r . Breached
+  % The 4 main phases of the contract:
+  % - The initialization phase, where the principal is requested and so on.
+  % - The main repayment track.
+  % - The side borrower default on representations, warranties etc track.
+  % - The accelerated repayment track, which kicks in when the borrower
+  %   defaults, either on payments in the main track or representations, warranties
+  %   etc in the side track.
+  Init_idling
+  || Main_idling
+  || Side_idling
+  || Accel_idling
+
+  % Initialize the contract by signalling the Init process to start.
+  || start_init_s
+
+  % Terminate the side track once the outstanding amount reaches 0.
+  || get_outstanding_s(0)|stop_side_s
+
+  % Wait for a fulfill/breach signal to transition to the Fulfilled/Breached
+  % state.
+  || (fulfill_r . Fulfilled + breach_r . Breached)
+
+  % Process which functions like a "mutable object" carrying the global state,
+  % ie the remaining number of payments and outstanding amount.
   || Remainder(num_payments, initial_outstanding_amt)
   )));

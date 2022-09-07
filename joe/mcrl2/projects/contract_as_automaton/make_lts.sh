@@ -17,14 +17,16 @@ mv caa.1.lps caa.lps
 lps2lts -ctau caa.lps caa.lts
 
 # Reduce the state space modulo branching bisimilarity.
-ltsconvert -ebranching-bisim --no-state caa.lts caa.1.lts
+ltsconvert -ebranching-bisim -n caa.lts caa.1.lts
 mv caa.1.lts caa.lts
 
 # Convert LTS -> dot -> svg for visualization, though there's not much point
 # since it will be really big and messy.
+# A better way to visualize is to use the visualize.sh script, which launches
+# ltsgraph, and then set it to exploration mode.
 ltsconvert caa.lts caa.dot
 dot -Tsvg caa.dot -o caa.svg
 
 # Convert the LTS back to a linearized process so that we can perform
 # simulation and model checking with it.
-lts2lps caa.lts caa.lps
+# lts2lps caa.lts caa.lps

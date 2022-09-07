@@ -46,8 +46,8 @@ act
   dont_pay, dont_notify_borrower, dont_cure_default, dont_request_principal,
 
   start_main, start_side, start_main_and_side,
-  broadcast_terminate_main, receive_terminate_main,
-  broadcast_terminate_side, receive_terminate_side,
+  broadcast_stop_main, receive_stop_main,
+  broadcast_stop_side, receive_stop_side,
   start_accelerated,
   sync, invalid;
 
@@ -58,8 +58,8 @@ proc
 	Breached = breached . Breached;
 	Fulfilled = fulfilled . Fulfilled;
 
-  Receive_terminate_main = receive_terminate_main . delta;
-  Terminate_side_r = receive_terminate_side . delta;
+  Receive_stop_main = receive_stop_main . delta;
+  Stop_side_r = receive_stop_side . delta;
 
   % Start of the loan agreement.
 	Start =
@@ -85,36 +85,36 @@ proc
 	MainTrack = PayPayments(1);
 
 	PayPayments(n : Pos) =
-    % If all payments have been made, we terminate the side track and go to a
+    % If all payments have been made, we stop the side track and go to a
     % fulfilled state.
     (n > num_payments) ->
-      broadcast_terminate_side . Fulfilled
+      broadcast_stop_side . Fulfilled
     <>
       % Otherwise, if there are outstanding payments, the borrower is obliged
       % to pay the current payment.
       % When that is done, we trnsition to payment (n + 1).
-      (pay(normal, borrower, lender, payment_amt(n))|broadcast_update_remainder(payment_amt(n)) + Receive_terminate_main) .
+      (pay(normal, borrower, lender, payment_amt(n))|broadcast_update_remainder(payment_amt(n)) + Receive_stop_main) .
       PayPayments(n + 1)
 
       % We continue here if the borrower defaults on the payment.
       % At this point, the lender has the option to notify the borrower.
-      + (payment_default(normal, borrower, lender, payment_amt(n)) + Receive_terminate_main) . (
+      + (payment_default(normal, borrower, lender, payment_amt(n)) + Receive_stop_main) . (
 
         % If the lender doesn't notify the borrower upon payment default,
         % nothing goes wrong and so we simply move on to the next payment stage.
-        (dont_notify_borrower + Receive_terminate_main) . PayPayments(n + 1)
+        (dont_notify_borrower + Receive_stop_main) . PayPayments(n + 1)
 
         % If the lender does notify the borrower, then the borrower is obliged
         % to cure his default.
-        + (notify_borrower_of_default + Receive_terminate_main) . (
+        + (notify_borrower_of_default + Receive_stop_main) . (
 
           % If the borrower cure his default, then he gets another chance to
           % pay off the current payment.
-          (cure_default + Receive_terminate_main) . PayPayments(n)
+          (cure_default + Receive_stop_main) . PayPayments(n)
 
           % If the default is not cured, the borrower is then obliged to make
           % an accelerated payment of the remaining amount to the lender.
-          + (dont_cure_default|start_accelerated + Receive_terminate_main)
+          + (dont_cure_default|start_accelerated + Receive_stop_main)
         )
       );
 
@@ -123,24 +123,24 @@ proc
 	SideTrack =
     % When a borrower default event occurs, the lender has the option of
     % notifying the borrower.
-		(borrower_default + Terminate_side_r) . (
+		(borrower_default + Stop_side_r) . (
 
       % If no such notification occurs, nothing happens and so we loop back to
       % the top of the side track and wait for another default event to occur.
-			(dont_notify_borrower + Terminate_side_r) . SideTrack
+			(dont_notify_borrower + Stop_side_r) . SideTrack
 
       % If the lender does notify the borrower, then we proceed as we did in the
       % main track above, ie the borrower is then obliged to cure his default,
       % and failing which, he is then obliged to make an accelerated payment
       % of the remaining amount.
-			+ (notify_borrower_of_default + Terminate_side_r) . (
-				(cure_default + Terminate_side_r) . SideTrack
-        + (dont_cure_default|start_accelerated + Terminate_side_r)
+			+ (notify_borrower_of_default + Stop_side_r) . (
+				(cure_default + Stop_side_r) . SideTrack
+        + (dont_cure_default|start_accelerated + Stop_side_r)
 	    )
     );
 
   AcceleratedRepayment =
-    broadcast_terminate_main . broadcast_terminate_side . (
+    broadcast_stop_main . broadcast_stop_side . (
       sum remainder : Pos.
         broadcast_get_remainder(remainder) . (
           pay(accelerated, borrower, lender, remainder) . Fulfilled
@@ -158,22 +158,22 @@ proc
 init
 	block({
     start_main, start_side, start_main_and_side, start_accelerated,
-    receive_terminate_main, receive_terminate_side,
+    receive_stop_main, receive_stop_side,
     broadcast_get_remainder, receive_get_remainder,
     broadcast_update_remainder, receive_update_remainder
 	},
   hide({
-    broadcast_terminate_main, broadcast_terminate_side,
+    broadcast_stop_main, broadcast_stop_side,
     update_remainder, get_remainder
   },
   % comm({
-  %   broadcast_terminate_side|broadcast_terminate_main -> invalid
+  %   broadcast_stop_side|broadcast_stop_main -> invalid
   %   % fulfilled|breached -> invalid
   % },
 	comm({
 		start_main_and_side|start_main|start_side -> sync,
-    broadcast_terminate_main|receive_terminate_main -> sync,
-    broadcast_terminate_side|receive_terminate_side -> sync,
+    broadcast_stop_main|receive_stop_main -> sync,
+    broadcast_stop_side|receive_stop_side -> sync,
     start_accelerated|start_accelerated -> sync,
     broadcast_update_remainder|receive_update_remainder -> update_remainder,
     broadcast_get_remainder|receive_get_remainder -> get_remainder

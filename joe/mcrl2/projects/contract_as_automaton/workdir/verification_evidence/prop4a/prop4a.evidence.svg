@@ -106,14 +106,14 @@
 <title>s3&#45;&gt;s2</title>
 <path fill="none" stroke="black" d="M18535.34,-98.48C18488.56,-97.13 18372.47,-89.82 18409.96,-50.53 18433.77,-25.57 18958.98,-18.81 19089.03,-17.52"/>
 <polygon fill="black" stroke="black" points="19089.41,-21.02 19099.37,-17.42 19089.34,-14.02 19089.41,-21.02"/>
-<text text-anchor="middle" x="18479.46" y="-54.33" font-family="Times,serif" font-size="14.00">broadcast_terminate_side</text>
+<text text-anchor="middle" x="18479.46" y="-54.33" font-family="Times,serif" font-size="14.00">broadcast_stop_side</text>
 </g>
 <!-- s3&#45;&gt;s2 -->
 <g id="edge10" class="edge">
 <title>s3&#45;&gt;s2</title>
 <path fill="none" stroke="black" d="M18551.27,-83.48C18550.33,-72.68 18551.22,-58.73 18559.96,-50.53 18598.76,-14.14 18980.29,-15.68 19089.12,-16.87"/>
 <polygon fill="black" stroke="black" points="19089.3,-20.38 19099.34,-16.99 19089.39,-13.38 19089.3,-20.38"/>
-<text text-anchor="middle" x="18655.46" y="-54.33" font-family="Times,serif" font-size="14.00">breached|broadcast_terminate_side</text>
+<text text-anchor="middle" x="18655.46" y="-54.33" font-family="Times,serif" font-size="14.00">breached|broadcast_stop_side</text>
 </g>
 <!-- s3&#45;&gt;s3 -->
 <g id="edge8" class="edge">
@@ -133,21 +133,21 @@
 <title>s4&#45;&gt;s2</title>
 <path fill="none" stroke="black" d="M18935.36,-169.73C18939.82,-163.78 18944.73,-156.38 18947.96,-149.05 18953.98,-135.38 18951.97,-93.64 18962.96,-83.53 19004.59,-45.22 19041.83,-96.8 19088.96,-65.53 19093.88,-62.27 19100.6,-51.36 19106.34,-40.74"/>
 <polygon fill="black" stroke="black" points="19109.54,-42.16 19111.05,-31.67 19103.33,-38.93 19109.54,-42.16"/>
-<text text-anchor="middle" x="19032.46" y="-96.09" font-family="Times,serif" font-size="14.00">broadcast_terminate_side</text>
+<text text-anchor="middle" x="19032.46" y="-96.09" font-family="Times,serif" font-size="14.00">broadcast_stop_side</text>
 </g>
 <!-- s4&#45;&gt;s2 -->
 <g id="edge14" class="edge">
 <title>s4&#45;&gt;s2</title>
 <path fill="none" stroke="black" d="M18943.26,-181.02C18979.1,-177.44 19058.53,-164.2 19098.96,-116.05 19103.65,-110.47 19110.3,-70.2 19114.36,-42.83"/>
 <polygon fill="black" stroke="black" points="19117.85,-43.12 19115.83,-32.72 19110.93,-42.12 19117.85,-43.12"/>
-<text text-anchor="middle" x="19202.46" y="-96.09" font-family="Times,serif" font-size="14.00">breached|broadcast_terminate_side</text>
+<text text-anchor="middle" x="19202.46" y="-96.09" font-family="Times,serif" font-size="14.00">breached|broadcast_stop_side</text>
 </g>
 <!-- s4&#45;&gt;s2 -->
 <g id="edge15" class="edge">
 <title>s4&#45;&gt;s2</title>
 <path fill="none" stroke="black" d="M18943.66,-182.01C19012.71,-180.46 19251.81,-171.13 19297.96,-116.05 19307.25,-104.97 19307.64,-94.27 19297.96,-83.53 19272.08,-54.82 19152.84,-92.3 19124.96,-65.53 19118.87,-59.67 19116.46,-51.04 19115.79,-42.69"/>
 <polygon fill="black" stroke="black" points="19119.29,-42.48 19115.73,-32.5 19112.29,-42.52 19119.29,-42.48"/>
-<text text-anchor="middle" x="19397.96" y="-96.09" font-family="Times,serif" font-size="14.00">broadcast_terminate_side|fulfilled</text>
+<text text-anchor="middle" x="19397.96" y="-96.09" font-family="Times,serif" font-size="14.00">broadcast_stop_side|fulfilled</text>
 </g>
 <!-- s4&#45;&gt;s3 -->
 <g id="edge12" class="edge">
@@ -180,21 +180,21 @@
 <title>s5&#45;&gt;s2</title>
 <path fill="none" stroke="black" d="M19696.36,-169.73C19700.82,-163.78 19705.73,-156.38 19708.96,-149.05 19714.98,-135.38 19713.07,-93.75 19723.96,-83.53 19761.17,-48.59 19869.21,-87.45 19833.96,-50.53 19809.85,-25.27 19277.59,-18.73 19146.79,-17.5"/>
 <polygon fill="black" stroke="black" points="19146.43,-14 19136.4,-17.41 19146.37,-21 19146.43,-14"/>
-<text text-anchor="middle" x="19796.46" y="-96.09" font-family="Times,serif" font-size="14.00">broadcast_terminate_main</text>
+<text text-anchor="middle" x="19796.46" y="-96.09" font-family="Times,serif" font-size="14.00">broadcast_stop_main</text>
 </g>
 <!-- s5&#45;&gt;s2 -->
 <g id="edge19" class="edge">
 <title>s5&#45;&gt;s2</title>
 <path fill="none" stroke="black" d="M19704.55,-181.94C19742.51,-180.04 19828.53,-169.72 19865.96,-116.05 19883.79,-90.49 19868.55,-65.04 19840.96,-50.53 19778.76,-17.81 19273.07,-16.87 19146.57,-17.16"/>
 <polygon fill="black" stroke="black" points="19146.48,-13.66 19136.49,-17.18 19146.5,-20.66 19146.48,-13.66"/>
-<text text-anchor="middle" x="19968.96" y="-96.09" font-family="Times,serif" font-size="14.00">broadcast_terminate_main|fulfilled</text>
+<text text-anchor="middle" x="19968.96" y="-96.09" font-family="Times,serif" font-size="14.00">broadcast_stop_main|fulfilled</text>
 </g>
 <!-- s5&#45;&gt;s2 -->
 <g id="edge20" class="edge">
 <title>s5&#45;&gt;s2</title>
 <path fill="none" stroke="black" d="M19704.52,-182.08C19774.23,-180.77 20018.77,-172.18 20065.96,-116.05 20075.26,-104.99 20075.37,-94.51 20065.96,-83.53 20004.71,-12.01 19298.84,-15.35 19146.73,-16.91"/>
 <polygon fill="black" stroke="black" points="19146.33,-13.41 19136.37,-17.02 19146.41,-20.41 19146.33,-13.41"/>
-<text text-anchor="middle" x="20171.46" y="-96.09" font-family="Times,serif" font-size="14.00">breached|broadcast_terminate_main</text>
+<text text-anchor="middle" x="20171.46" y="-96.09" font-family="Times,serif" font-size="14.00">breached|broadcast_stop_main</text>
 </g>
 <!-- s6 -->
 <g id="node7" class="node">
@@ -227,14 +227,14 @@
 <title>s6&#45;&gt;s2</title>
 <path fill="none" stroke="black" d="M19501.11,-88.14C19498.26,-86.29 19495.13,-84.61 19491.96,-83.53 19454.26,-70.68 19165.66,-89.64 19133.96,-65.53 19126.87,-60.13 19122.88,-51.48 19120.66,-42.99"/>
 <polygon fill="black" stroke="black" points="19124.05,-42.09 19118.72,-32.94 19117.17,-43.42 19124.05,-42.09"/>
-<text text-anchor="middle" x="19206.46" y="-54.33" font-family="Times,serif" font-size="14.00">broadcast_terminate_main</text>
+<text text-anchor="middle" x="19206.46" y="-54.33" font-family="Times,serif" font-size="14.00">broadcast_stop_main</text>
 </g>
 <!-- s6&#45;&gt;s2 -->
 <g id="edge23" class="edge">
 <title>s6&#45;&gt;s2</title>
 <path fill="none" stroke="black" d="M19500.6,-87.93C19497.88,-86.18 19494.93,-84.6 19491.96,-83.53 19406.38,-52.55 19368.18,-108.53 19287.96,-65.53 19280.44,-61.49 19283.23,-55 19275.96,-50.53 19235.68,-25.73 19179.86,-19.17 19146.48,-17.58"/>
 <polygon fill="black" stroke="black" points="19146.6,-14.08 19136.48,-17.22 19146.35,-21.08 19146.6,-14.08"/>
-<text text-anchor="middle" x="19386.46" y="-54.33" font-family="Times,serif" font-size="14.00">breached|broadcast_terminate_main</text>
+<text text-anchor="middle" x="19386.46" y="-54.33" font-family="Times,serif" font-size="14.00">breached|broadcast_stop_main</text>
 </g>
 <!-- s6&#45;&gt;s6 -->
 <g id="edge21" class="edge">
@@ -392,21 +392,21 @@
 <title>s8&#45;&gt;s2</title>
 <path fill="none" stroke="black" d="M18511.21,-255.98C18467.3,-223.39 18337.07,-117.45 18400.96,-50.53 18425.13,-25.21 18959.18,-18.71 19089.48,-17.5"/>
 <polygon fill="black" stroke="black" points="19089.53,-21 19099.49,-17.41 19089.46,-14 19089.53,-21"/>
-<text text-anchor="middle" x="18545.46" y="-137.85" font-family="Times,serif" font-size="14.00">broadcast_terminate_main|broadcast_terminate_side</text>
+<text text-anchor="middle" x="18545.46" y="-137.85" font-family="Times,serif" font-size="14.00">broadcast_stop_main|broadcast_stop_side</text>
 </g>
 <!-- s8&#45;&gt;s4 -->
 <g id="edge37" class="edge">
 <title>s8&#45;&gt;s4</title>
 <path fill="none" stroke="black" d="M18542.67,-262.24C18605.77,-249.37 18820.03,-205.7 18897.08,-190"/>
 <polygon fill="black" stroke="black" points="18897.91,-193.4 18907.01,-187.98 18896.51,-186.54 18897.91,-193.4"/>
-<text text-anchor="middle" x="18832.46" y="-221.38" font-family="Times,serif" font-size="14.00">broadcast_terminate_main</text>
+<text text-anchor="middle" x="18832.46" y="-221.38" font-family="Times,serif" font-size="14.00">broadcast_stop_main</text>
 </g>
 <!-- s8&#45;&gt;s5 -->
 <g id="edge36" class="edge">
 <title>s8&#45;&gt;s5</title>
 <path fill="none" stroke="black" d="M18543.2,-264.56C18675.88,-255.25 19492.34,-197.91 19657.03,-186.35"/>
 <polygon fill="black" stroke="black" points="19657.6,-189.82 19667.33,-185.63 19657.11,-182.83 19657.6,-189.82"/>
-<text text-anchor="middle" x="19278.46" y="-221.38" font-family="Times,serif" font-size="14.00">broadcast_terminate_side</text>
+<text text-anchor="middle" x="19278.46" y="-221.38" font-family="Times,serif" font-size="14.00">broadcast_stop_side</text>
 </g>
 <!-- s9 -->
 <g id="node10" class="node">
@@ -466,14 +466,14 @@
 <title>s10&#45;&gt;s2</title>
 <path fill="none" stroke="black" d="M19617.69,-90.44C19612.51,-87.9 19606.6,-85.31 19600.96,-83.53 19554.98,-69.01 19535.54,-89.96 19493.96,-65.53 19486.6,-61.2 19489.48,-54.57 19481.96,-50.53 19424.17,-19.43 19222.16,-16.87 19146.69,-17.03"/>
 <polygon fill="black" stroke="black" points="19146.5,-13.53 19136.51,-17.07 19146.52,-20.53 19146.5,-13.53"/>
-<text text-anchor="middle" x="19566.46" y="-54.33" font-family="Times,serif" font-size="14.00">broadcast_terminate_main</text>
+<text text-anchor="middle" x="19566.46" y="-54.33" font-family="Times,serif" font-size="14.00">broadcast_stop_main</text>
 </g>
 <!-- s10&#45;&gt;s2 -->
 <g id="edge46" class="edge">
 <title>s10&#45;&gt;s2</title>
 <path fill="none" stroke="black" d="M19638.93,-84.22C19642.25,-73.51 19644.23,-59.34 19635.96,-50.53 19602.36,-14.7 19250.25,-15.77 19146.54,-16.88"/>
 <polygon fill="black" stroke="black" points="19146.45,-13.38 19136.49,-16.99 19146.53,-20.38 19146.45,-13.38"/>
-<text text-anchor="middle" x="19736.96" y="-54.33" font-family="Times,serif" font-size="14.00">broadcast_terminate_main|fulfilled</text>
+<text text-anchor="middle" x="19736.96" y="-54.33" font-family="Times,serif" font-size="14.00">broadcast_stop_main|fulfilled</text>
 </g>
 <!-- s10&#45;&gt;s10 -->
 <g id="edge44" class="edge">
@@ -487,14 +487,14 @@
 <title>s11&#45;&gt;s2</title>
 <path fill="none" stroke="black" d="M18853.53,-97.41C18814.44,-93.82 18729.07,-82.21 18757.96,-50.53 18780.17,-26.17 19008.34,-19.39 19089.5,-17.74"/>
 <polygon fill="black" stroke="black" points="19089.58,-21.24 19099.51,-17.55 19089.44,-14.24 19089.58,-21.24"/>
-<text text-anchor="middle" x="18827.46" y="-54.33" font-family="Times,serif" font-size="14.00">broadcast_terminate_side</text>
+<text text-anchor="middle" x="18827.46" y="-54.33" font-family="Times,serif" font-size="14.00">broadcast_stop_side</text>
 </g>
 <!-- s11&#45;&gt;s2 -->
 <g id="edge49" class="edge">
 <title>s11&#45;&gt;s2</title>
 <path fill="none" stroke="black" d="M18880.6,-85.43C18889.44,-71.93 18902.39,-52.75 18905.96,-50.53 18936.1,-31.78 19038.8,-22.52 19089.36,-19"/>
 <polygon fill="black" stroke="black" points="19089.86,-22.48 19099.6,-18.32 19089.39,-15.49 19089.86,-22.48"/>
-<text text-anchor="middle" x="18998.96" y="-54.33" font-family="Times,serif" font-size="14.00">broadcast_terminate_side|fulfilled</text>
+<text text-anchor="middle" x="18998.96" y="-54.33" font-family="Times,serif" font-size="14.00">broadcast_stop_side|fulfilled</text>
 </g>
 <!-- s11&#45;&gt;s11 -->
 <g id="edge47" class="edge">
@@ -3883,14 +3883,14 @@
 <title>s63&#45;&gt;s81</title>
 <path fill="none" stroke="black" d="M17895.31,-177.69C17920.33,-170.19 17961.81,-154.16 17944.96,-134.05 17925.12,-110.37 17834.12,-103.54 17786.77,-101.57"/>
 <polygon fill="black" stroke="black" points="17786.68,-98.07 17776.56,-101.2 17786.42,-105.06 17786.68,-98.07"/>
-<text text-anchor="middle" x="18017.46" y="-137.85" font-family="Times,serif" font-size="14.00">broadcast_terminate_side</text>
+<text text-anchor="middle" x="18017.46" y="-137.85" font-family="Times,serif" font-size="14.00">broadcast_stop_side</text>
 </g>
 <!-- s63&#45;&gt;s81 -->
 <g id="edge480" class="edge">
 <title>s63&#45;&gt;s81</title>
 <path fill="none" stroke="black" d="M17859.66,-179.95C17829.21,-175.59 17770.26,-165.23 17757.96,-149.05 17753.02,-142.56 17751.84,-134.03 17752.27,-125.94"/>
 <polygon fill="black" stroke="black" points="17755.77,-126.15 17753.59,-115.79 17748.83,-125.25 17755.77,-126.15"/>
-<text text-anchor="middle" x="17850.96" y="-137.85" font-family="Times,serif" font-size="14.00">broadcast_terminate_side|fulfilled</text>
+<text text-anchor="middle" x="17850.96" y="-137.85" font-family="Times,serif" font-size="14.00">broadcast_stop_side|fulfilled</text>
 </g>
 <!-- s64 -->
 <g id="node65" class="node">
@@ -3916,14 +3916,14 @@
 <title>s64&#45;&gt;s77</title>
 <path fill="none" stroke="black" d="M17190.87,-167C17192.58,-156.49 17192.71,-142.88 17184.96,-134.05 17163.9,-110.06 17069.55,-103.37 17021.41,-101.5"/>
 <polygon fill="black" stroke="black" points="17021.44,-98 17011.33,-101.16 17021.2,-105 17021.44,-98"/>
-<text text-anchor="middle" x="17261.46" y="-137.85" font-family="Times,serif" font-size="14.00">broadcast_terminate_side</text>
+<text text-anchor="middle" x="17261.46" y="-137.85" font-family="Times,serif" font-size="14.00">broadcast_stop_side</text>
 </g>
 <!-- s64&#45;&gt;s77 -->
 <g id="edge483" class="edge">
 <title>s64&#45;&gt;s77</title>
 <path fill="none" stroke="black" d="M17168.33,-182.04C17124.21,-180.95 17015.32,-175.57 16992.96,-149.05 16987.57,-142.66 16986.38,-133.91 16986.94,-125.62"/>
 <polygon fill="black" stroke="black" points="16990.43,-125.97 16988.4,-115.57 16983.5,-124.96 16990.43,-125.97"/>
-<text text-anchor="middle" x="17088.46" y="-137.85" font-family="Times,serif" font-size="14.00">breached|broadcast_terminate_side</text>
+<text text-anchor="middle" x="17088.46" y="-137.85" font-family="Times,serif" font-size="14.00">breached|broadcast_stop_side</text>
 </g>
 <!-- s65&#45;&gt;s42 -->
 <g id="edge486" class="edge">
@@ -4377,7 +4377,7 @@
 <title>s74&#45;&gt;s64</title>
 <path fill="none" stroke="black" d="M17244.87,-262.79C17227.94,-258.9 17203.43,-250.41 17190.96,-232.58 17186.34,-225.97 17184.62,-217.53 17184.28,-209.57"/>
 <polygon fill="black" stroke="black" points="17187.77,-209.64 17184.49,-199.57 17180.78,-209.49 17187.77,-209.64"/>
-<text text-anchor="middle" x="17263.46" y="-221.38" font-family="Times,serif" font-size="14.00">broadcast_terminate_main</text>
+<text text-anchor="middle" x="17263.46" y="-221.38" font-family="Times,serif" font-size="14.00">broadcast_stop_main</text>
 </g>
 <!-- s76 -->
 <g id="node77" class="node">
@@ -4390,21 +4390,21 @@
 <title>s74&#45;&gt;s76</title>
 <path fill="none" stroke="black" d="M17244.93,-263.28C17207.69,-257.94 17119.61,-245.08 17045.96,-232.58 16961.66,-218.27 16862.37,-199.12 16814.93,-189.83"/>
 <polygon fill="black" stroke="black" points="16815.31,-186.34 16804.82,-187.85 16813.96,-193.21 16815.31,-186.34"/>
-<text text-anchor="middle" x="17115.46" y="-221.38" font-family="Times,serif" font-size="14.00">broadcast_terminate_side</text>
+<text text-anchor="middle" x="17115.46" y="-221.38" font-family="Times,serif" font-size="14.00">broadcast_stop_side</text>
 </g>
 <!-- s74&#45;&gt;s77 -->
 <g id="edge549" class="edge">
 <title>s74&#45;&gt;s77</title>
 <path fill="none" stroke="black" d="M17280.89,-262.85C17297.6,-259.01 17321.6,-250.55 17332.96,-232.58 17336.35,-227.22 17350.47,-154.23 17331.96,-134.05 17311.15,-111.37 17099.95,-103.58 17021.82,-101.46"/>
 <polygon fill="black" stroke="black" points="17021.8,-97.96 17011.71,-101.2 17021.62,-104.96 17021.8,-97.96"/>
-<text text-anchor="middle" x="17485.46" y="-179.62" font-family="Times,serif" font-size="14.00">broadcast_terminate_main|broadcast_terminate_side</text>
+<text text-anchor="middle" x="17485.46" y="-179.62" font-family="Times,serif" font-size="14.00">broadcast_stop_main|broadcast_stop_side</text>
 </g>
 <!-- s75&#45;&gt;s63 -->
 <g id="edge551" class="edge">
 <title>s75&#45;&gt;s63</title>
 <path fill="none" stroke="black" d="M17877.96,-250.51C17877.96,-239.01 17877.96,-223.01 17877.96,-209.62"/>
 <polygon fill="black" stroke="black" points="17881.46,-209.58 17877.96,-199.58 17874.46,-209.58 17881.46,-209.58"/>
-<text text-anchor="middle" x="17950.46" y="-221.38" font-family="Times,serif" font-size="14.00">broadcast_terminate_main</text>
+<text text-anchor="middle" x="17950.46" y="-221.38" font-family="Times,serif" font-size="14.00">broadcast_stop_main</text>
 </g>
 <!-- s80 -->
 <g id="node81" class="node">
@@ -4417,14 +4417,14 @@
 <title>s75&#45;&gt;s80</title>
 <path fill="none" stroke="black" d="M17859.83,-263.11C17832.7,-258.67 17780.2,-248.72 17737.96,-232.58 17714.69,-223.69 17689.9,-209.84 17672.41,-199.26"/>
 <polygon fill="black" stroke="black" points="17673.85,-196.04 17663.5,-193.77 17670.18,-202 17673.85,-196.04"/>
-<text text-anchor="middle" x="17807.46" y="-221.38" font-family="Times,serif" font-size="14.00">broadcast_terminate_side</text>
+<text text-anchor="middle" x="17807.46" y="-221.38" font-family="Times,serif" font-size="14.00">broadcast_stop_side</text>
 </g>
 <!-- s75&#45;&gt;s81 -->
 <g id="edge552" class="edge">
 <title>s75&#45;&gt;s81</title>
 <path fill="none" stroke="black" d="M17896.56,-265.56C17925.89,-264.3 17983.7,-258.41 18023.96,-232.58 18067.91,-204.38 18122.98,-172.78 18087.96,-134.05 18067.95,-111.92 17863.95,-103.82 17787.07,-101.54"/>
 <polygon fill="black" stroke="black" points="17786.78,-98.03 17776.68,-101.25 17786.58,-105.03 17786.78,-98.03"/>
-<text text-anchor="middle" x="18240.46" y="-179.62" font-family="Times,serif" font-size="14.00">broadcast_terminate_main|broadcast_terminate_side</text>
+<text text-anchor="middle" x="18240.46" y="-179.62" font-family="Times,serif" font-size="14.00">broadcast_stop_main|broadcast_stop_side</text>
 </g>
 <!-- s76&#45;&gt;s76 -->
 <g id="edge553" class="edge">
@@ -4438,14 +4438,14 @@
 <title>s76&#45;&gt;s77</title>
 <path fill="none" stroke="black" d="M16768.39,-182.29C16720.44,-181.64 16598.83,-175.92 16636.96,-134.05 16658.82,-110.06 16882.61,-103.07 16963.77,-101.31"/>
 <polygon fill="black" stroke="black" points="16964.31,-104.8 16974.24,-101.1 16964.17,-97.8 16964.31,-104.8"/>
-<text text-anchor="middle" x="16709.46" y="-137.85" font-family="Times,serif" font-size="14.00">broadcast_terminate_main</text>
+<text text-anchor="middle" x="16709.46" y="-137.85" font-family="Times,serif" font-size="14.00">broadcast_stop_main</text>
 </g>
 <!-- s76&#45;&gt;s77 -->
 <g id="edge555" class="edge">
 <title>s76&#45;&gt;s77</title>
 <path fill="none" stroke="black" d="M16783.4,-166.94C16781.92,-156.39 16782.08,-142.77 16789.96,-134.05 16812.78,-108.82 16914.07,-102.72 16964.39,-101.25"/>
 <polygon fill="black" stroke="black" points="16964.69,-104.75 16974.59,-101 16964.51,-97.75 16964.69,-104.75"/>
-<text text-anchor="middle" x="16888.46" y="-137.85" font-family="Times,serif" font-size="14.00">breached|broadcast_terminate_main</text>
+<text text-anchor="middle" x="16888.46" y="-137.85" font-family="Times,serif" font-size="14.00">breached|broadcast_stop_main</text>
 </g>
 <!-- s77&#45;&gt;s77 -->
 <g id="edge556" class="edge">
@@ -4536,14 +4536,14 @@
 <title>s80&#45;&gt;s81</title>
 <path fill="none" stroke="black" d="M17635.61,-171.44C17632.88,-169.7 17629.94,-168.12 17626.96,-167.05 17580.79,-150.51 17440.2,-185.13 17406.96,-149.05 17402.44,-144.15 17402.48,-138.99 17406.96,-134.05 17428.5,-110.38 17649.15,-103.19 17729.18,-101.35"/>
 <polygon fill="black" stroke="black" points="17729.58,-104.84 17739.5,-101.12 17729.42,-97.84 17729.58,-104.84"/>
-<text text-anchor="middle" x="17479.46" y="-137.85" font-family="Times,serif" font-size="14.00">broadcast_terminate_main</text>
+<text text-anchor="middle" x="17479.46" y="-137.85" font-family="Times,serif" font-size="14.00">broadcast_stop_main</text>
 </g>
 <!-- s80&#45;&gt;s81 -->
 <g id="edge569" class="edge">
 <title>s80&#45;&gt;s81</title>
 <path fill="none" stroke="black" d="M17635.43,-171.87C17632.72,-170.09 17629.83,-168.39 17626.96,-167.05 17597.24,-153.19 17539.79,-159.1 17560.96,-134.05 17582.19,-108.94 17680.02,-102.78 17729.35,-101.27"/>
 <polygon fill="black" stroke="black" points="17729.47,-104.77 17739.38,-101.01 17729.29,-97.78 17729.47,-104.77"/>
-<text text-anchor="middle" x="17656.96" y="-137.85" font-family="Times,serif" font-size="14.00">broadcast_terminate_main|fulfilled</text>
+<text text-anchor="middle" x="17656.96" y="-137.85" font-family="Times,serif" font-size="14.00">broadcast_stop_main|fulfilled</text>
 </g>
 <!-- s81&#45;&gt;s81 -->
 <g id="edge570" class="edge">

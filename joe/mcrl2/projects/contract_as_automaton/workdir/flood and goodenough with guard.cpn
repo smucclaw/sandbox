@@ -1264,7 +1264,7 @@ success</text>
                   type="solid"/>
         <textattr colour="Black"
                   bold="false"/>
-        <text>terminate
+        <text>stop
 mainTrack</text>
         <box w="94.000000"
              h="40.000000"/>

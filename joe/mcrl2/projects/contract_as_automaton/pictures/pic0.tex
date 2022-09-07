@@ -1,0 +1,83 @@
+\documentclass[10pt]{standalone}
+
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta}
+
+\begin{document}
+\begin{tikzpicture}
+   \tikzstyle{state}=[circle,draw,minimum width=20pt,minimum height=20pt]
+   \tikzstyle{initstate}=[state,fill=green]
+   \tikzstyle{inactive}=[dashed]
+   \tikzstyle{prob}=[line width = 2.5pt]
+   \tikzstyle{transition}=[->,arrows={-Stealth[scale=2,inset=1pt]}]
+\definecolor{currentcolor}{rgb}{1.000,1.000,1.000}
+\definecolor{currentlabelcolor}{rgb}{0.000,0.000,0.000}
+\node[label={[color=currentlabelcolor]above:}] at (18.189587pt, 138.595459pt) [fill=currentcolor, initstate] (state4) {};
+\definecolor{currentcolor}{rgb}{1.000,1.000,1.000}
+\definecolor{currentlabelcolor}{rgb}{0.000,0.000,0.000}
+\node[label={[color=currentlabelcolor]above:}] at (-226.671448pt, 2.317660pt) [fill=currentcolor, state] (state5) {};
+\definecolor{currentcolor}{rgb}{1.000,1.000,1.000}
+\definecolor{currentlabelcolor}{rgb}{0.000,0.000,0.000}
+\node[label={[color=currentlabelcolor]above:}] at (-227.246994pt, 275.455261pt) [fill=currentcolor, state] (state10) {};
+\definecolor{currentcolor}{rgb}{1.000,1.000,1.000}
+\definecolor{currentlabelcolor}{rgb}{0.000,0.000,0.000}
+\node[label={[color=currentlabelcolor]above:}] at (-478.451263pt, -24.833111pt) [fill=currentcolor, state] (state11) {};
+\definecolor{currentcolor}{rgb}{1.000,1.000,1.000}
+\definecolor{currentlabelcolor}{rgb}{0.000,0.000,0.000}
+\node[label={[color=currentlabelcolor]above:}] at (-357.757019pt, 129.356476pt) [fill=currentcolor, state] (state20) {};
+\definecolor{currentcolor}{rgb}{1.000,1.000,1.000}
+\definecolor{currentlabelcolor}{rgb}{0.000,0.000,0.000}
+\node[label={[color=currentlabelcolor]above:}] at (-477.863831pt, -161.692917pt) [fill=currentcolor, state, inactive] (state24) {};
+\definecolor{currentcolor}{rgb}{1.000,1.000,1.000}
+\definecolor{currentlabelcolor}{rgb}{0.000,0.000,0.000}
+\node[label={[color=currentlabelcolor]above:}] at (-862.472656pt, -146.680908pt) [fill=currentcolor, state, inactive] (state12) {};
+\definecolor{currentcolor}{rgb}{1.000,1.000,1.000}
+\definecolor{currentlabelcolor}{rgb}{0.000,0.000,0.000}
+\node[label={[color=currentlabelcolor]above:}] at (-900.005310pt, -39.845127pt) [fill=currentcolor, state, inactive] (state23) {};
+\definecolor{currentcolor}{rgb}{1.000,1.000,1.000}
+\definecolor{currentlabelcolor}{rgb}{0.000,0.000,0.000}
+\node[label={[color=currentlabelcolor]above:}] at (-559.871826pt, 275.455261pt) [fill=currentcolor, state] (state22) {};
+\definecolor{currentcolor}{rgb}{1.000,1.000,1.000}
+\definecolor{currentlabelcolor}{rgb}{0.000,0.000,0.000}
+\node[label={[color=currentlabelcolor]above:}] at (-800.683594pt, 109.142860pt) [fill=currentcolor, state, inactive] (state21) {};
+\definecolor{currentcolor}{rgb}{1.000,1.000,1.000}
+\definecolor{currentlabelcolor}{rgb}{0.000,0.000,0.000}
+\node[label={[color=currentlabelcolor]above:}] at (-785.666199pt, 378.248322pt) [fill=currentcolor, state, inactive] (state19) {};
+\definecolor{currentcolor}{rgb}{1.000,1.000,1.000}
+\definecolor{currentlabelcolor}{rgb}{0.000,0.000,0.000}
+\node[label={[color=currentlabelcolor]above:}] at (-941.009338pt, 220.021362pt) [fill=currentcolor, state, inactive] (state0) {};
+\definecolor{currentcolor}{rgb}{0.000,0.000,0.000}
+\draw [transition] (state4) .. node[auto,color=currentcolor] {request\_principal} controls (-63.430122pt, 93.168594pt) and (-145.049652pt, 47.743114pt) .. (state5);
+\definecolor{currentcolor}{rgb}{0.000,0.000,0.000}
+\draw [transition] (state4) .. node[auto,color=currentcolor] {dont\_request\_principal} controls (-63.621971pt, 184.213562pt) and (-145.433350pt, 229.833038pt) .. (state10);
+\definecolor{currentcolor}{rgb}{0.000,0.000,0.000}
+\draw [transition] (state22) .. node[auto,color=currentcolor] {borrower\_default|pay(normal, borrower, lender, 525)} controls (-445.902100pt, 410.201538pt) and (-335.028259pt, 410.201538pt) .. (state10);
+\definecolor{currentcolor}{rgb}{0.000,0.000,0.000}
+\draw [transition] (state5) .. node[auto,color=currentcolor] {pay(principal, lender, borrower, 1000)} controls (-310.594940pt, -6.732529pt) and (-394.520691pt, -15.782696pt) .. (state11);
+\definecolor{currentcolor}{rgb}{0.000,0.000,0.000}
+\draw [transition] (state5) .. node[auto,color=currentcolor] {payment\_default(principal, lender, borrower, 1000)} controls (-270.363953pt, 44.663483pt) and (-314.058685pt, 87.009331pt) .. (state20);
+\definecolor{currentcolor}{rgb}{0.000,0.000,0.000}
+\draw [transition] (state20) .. node[auto,color=currentcolor] {breached} controls (-357.755829pt, 129.356049pt) and (-357.755829pt, 129.356049pt) .. (state20);
+\definecolor{currentcolor}{rgb}{0.000,0.000,0.000}
+\draw [transition] (state11) .. node[auto,color=currentcolor] {payment\_default(normal, borrower, lender, 550)} controls (-478.250671pt, -70.452347pt) and (-478.054840pt, -116.071823pt) .. (state24);
+\definecolor{currentcolor}{rgb}{0.000,0.000,0.000}
+\draw [transition] (state11) .. node[auto,color=currentcolor] {borrower\_default} controls (-606.452332pt, -65.448387pt) and (-734.458191pt, -106.063919pt) .. (state12);
+\definecolor{currentcolor}{rgb}{0.000,0.000,0.000}
+\draw [transition] (state11) .. node[auto,color=currentcolor] {borrower\_default|payment\_default(normal, borrower, lender, 550)} controls (-618.963074pt, -29.836819pt) and (-759.479736pt, -34.840775pt) .. (state23);
+\definecolor{currentcolor}{rgb}{0.000,0.000,0.000}
+\draw [transition] (state11) .. node[auto,color=currentcolor] {pay(normal, borrower, lender, 550)} controls (-505.586426pt, 75.262260pt) and (-532.726318pt, 175.357391pt) .. (state22);
+\definecolor{currentcolor}{rgb}{0.000,0.000,0.000}
+\draw [transition] (state11) .. node[auto,color=currentcolor] {borrower\_default|pay(normal, borrower, lender, 550)} controls (-585.856201pt, 19.825348pt) and (-693.265930pt, 64.483559pt) .. (state21);
+\definecolor{currentcolor}{rgb}{0.000,0.000,0.000}
+\draw [transition] (state22) .. node[auto,color=currentcolor] {borrower\_default} controls (-640.136047pt, 220.015594pt) and (-720.405823pt, 164.578674pt) .. (state21);
+\definecolor{currentcolor}{rgb}{0.000,0.000,0.000}
+\draw [transition] (state22) .. node[auto,color=currentcolor] {payment\_default(normal, borrower, lender, 525)} controls (-635.130310pt, 309.716553pt) and (-710.394287pt, 343.980530pt) .. (state19);
+\definecolor{currentcolor}{rgb}{0.000,0.000,0.000}
+\draw [transition] (state22) .. node[auto,color=currentcolor] {borrower\_default|payment\_default(normal, borrower, lender, 525)} controls (-686.910767pt, 256.974731pt) and (-813.955322pt, 238.496948pt) .. (state0);
+\definecolor{currentcolor}{rgb}{0.000,0.000,0.000}
+\draw [transition] (state22) .. node[auto,color=currentcolor] {pay(normal, borrower, lender, 525)} controls (-432.814575pt, 210.776733pt) and (-321.940735pt, 210.776733pt) .. (state10);
+\definecolor{currentcolor}{rgb}{0.000,0.000,0.000}
+\draw [transition] (state10) .. node[auto,color=currentcolor] {fulfilled} controls (-227.246246pt, 275.454346pt) and (-227.246246pt, 275.454346pt) .. (state10);
+
+\end{tikzpicture}
+\end{document}

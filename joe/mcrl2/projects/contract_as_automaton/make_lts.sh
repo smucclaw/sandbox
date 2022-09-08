@@ -27,6 +27,6 @@ mv caa.1.lts caa.lts
 ltsconvert caa.lts caa.dot
 dot -Tsvg caa.dot -o caa.svg
 
-# Convert the LTS back to a linearized process so that we can perform
-# simulation and model checking with it.
-# lts2lps caa.lts caa.lps
+# Convert the LTS back to a linearized process so that we can simulate it using
+# lpsxsim.
+lts2lps caa.lts caa.lps

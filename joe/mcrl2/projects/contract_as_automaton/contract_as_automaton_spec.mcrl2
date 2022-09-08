@@ -2,7 +2,7 @@
 % These can be redefined as appropriate.
 map
 	% This indicates how many payments there are in total.
-	num_payments : Pos;
+	total_num_payments : Pos;
 
 	% This tells us how much the borrower has to pay in each payment.
 	payment_amt : Pos -> Pos;
@@ -16,7 +16,7 @@ map
 var n : Pos;
 
 eqn
-	num_payments = 2;
+	total_num_payments = 2;
 
 	principal_amt = 1000;
 
@@ -130,7 +130,7 @@ proc
 
     % If all payments have been made, we perform fulfill_s, which signals that
     % the contract has been fulfilled.
-    (n > num_payments) -> 
+    (n > total_num_payments) -> 
       fulfill_s
     <> (
       % Otherwise, if there are outstanding payments, the borrower is obliged
@@ -229,7 +229,7 @@ proc
     get_remaining_payments_r(remaining_payments) .
     Remainder(remaining_payments, outstanding)
 
-    + get_next_payment_number_r(Int2Pos(max(1, num_payments - remaining_payments + 1))) .
+    + get_next_payment_number_r(Int2Pos(max(1, total_num_payments - remaining_payments + 1))) .
       Remainder(remaining_payments, outstanding)
 
     + get_outstanding_r(outstanding) .
@@ -245,6 +245,9 @@ proc
           outstanding = Int2Nat(max(0, outstanding - amt_paid))
         )
       );
+
+  % Helper process that stops all processes in the contract.
+  Stop_all= stop_init_s|stop_main_s|stop_side_s|stop_accel_s;
 
   % Adding timing is a work in progress.
   % Clock(t : Pos) = delay_r@(t + 1) . Clock(t + 1);
@@ -317,13 +320,17 @@ init
   || start_init_s
 
   % Terminate the side track once the outstanding amount reaches 0.
-  || get_outstanding_s(0)|stop_side_s
+  % Not needed since side track (and all the other other processes as well)
+  % are automatically stopped when Main_track sends a fulfill_r signal.
+  % || get_outstanding_s(0)|stop_side_s
 
   % Wait for a fulfill/breach signal to transition to the Fulfilled/Breached
   % state.
-  || (fulfill_r . Fulfilled + breach_r . Breached)
+  % For safety, we stop all processes in between these events.
+  || (fulfill_r . Stop_all . Fulfilled
+      + breach_r . Stop_all . Breached)
 
   % Process which functions like a "mutable object" carrying the global state,
   % ie the remaining number of payments and outstanding amount.
-  || Remainder(num_payments, initial_outstanding_amt)
+  || Remainder(total_num_payments, initial_outstanding_amt)
   )));

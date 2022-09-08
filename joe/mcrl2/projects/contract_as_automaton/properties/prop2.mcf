@@ -3,24 +3,24 @@
 % points.
 %
 % Let n be any natural number.
-% Suppose the borrower pays the lender $550 and ends up
-% in default and then pays an accelerated amount of $n.
+% Suppose the borrower pays the lender $m (this m is existentially quantified)
+% and ends up in default and then pays an accelerated amount of $n.
 % Then the following must hold:
-% 1. n must be 525
+% 1. n must be strictly less than the initial outstanding amount of $1075.
 % 2. A "breached" event can never occur.
 % 3. We will always end up in a state where there is an infinite sequence of
 %    "fulfilled" events.
 
 forall n : Nat.
-% val(n <= 1075) =>
+val(n <= 5000) =>
 [
   true* .
-  pay(normal, borrower, lender, 550) .
+  exists m : Nat. pay(normal, borrower, lender, m) .
   true* .
   pay(accelerated, borrower, lender, n)
 ]
 (
-   val(n == 525)
+   val(n < initial_outstanding_amt)
 && ([true* . breached] false)
 && [true*] <true*> nu X. <fulfilled> X
 )

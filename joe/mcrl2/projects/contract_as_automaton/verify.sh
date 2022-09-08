@@ -21,6 +21,6 @@ else
   pbessolve -v --file=../../caa.lts $1.pbes
   # Convert the output evidence to a LTS, then to dot and svg for visualization. 
   # Note that the resulting svg can be huge and thus not very useful to look at.
-  ltsconvert -ebranching-bisim $1.evidence.lts $1.evidence.dot
+  ltsconvert -ebranching-bisim $1.pbes.evidence.lts $1.evidence.dot
   dot -Tsvg $1.evidence.dot -o $1.evidence.svg
 fi

@@ -1,0 +1,35 @@
+class Person
+
+class Corporation
+
+class City
+
+decl mustPayCorpTax: Person -> Corporation -> Boolean
+decl owner: Person -> Corporation -> Boolean
+decl profitable: Corporation -> Boolean
+decl isNotTaxHaven: City -> Boolean
+decl hasHQ: Corporation -> City -> Boolean
+
+rule <a_1>
+   for p: Person, c: Corporation, x: City
+   if owner p c && profitable c && hasHQ c x && isNotTaxHaven x
+   then mustPayCorpTax p c
+
+We want the above chunk of code (including the rule id) to come out of the following piece of natural l4:
+
+GIVEN ANY Person p, Corporation c, City x
+DECIDE mustPayCorpTax p c HOLDS
+WHEN owner p c HOLDS AND profitable c HOLDS AND hasHQ c x HOLDS AND isNotTaxHaven x HOLDS
+
+GIVEN ANY Person p, Corporation c
+DECIDE mustPayCorpTax p c HOLDS
+WHEN THERE EXISTS A City x SUCH THAT 
+owner p c HOLDS AND profitable c HOLDS AND hasHQ c x HOLDS AND isNotTaxHaven x HOLDS
+
+GIVEN ANY Person p, Corporation c
+DECIDE VIA RULE a_1 THAT
+mustPayCorpTax p c HOLDS
+WHEN THERE EXISTS A City x SUCH THAT 
+owner p c HOLDS AND profitable c HOLDS AND hasHQ c x HOLDS AND isNotTaxHaven x HOLDS
+
+The 3rd version above gives all the required info to reconstruct the required l4 program

@@ -6,7 +6,7 @@ sort Trans_name = struct t0 | t1 | t2 | t3;
 % They are identified with their incoming and outgoing arcs.
 sort Trans = struct trans(
   trans_name : Trans_name,   % Name of the transition.
-  guard : Marking -> Bool,              % Guard condition.
+  guard : Bool,              % Guard condition.
   priority : Nat,            % Priority of the transition.
   from : List(PlaceTokens),  % Input places and their respective multiplicities.
   to : List(PlaceTokens)     % Output places and their respective multiplicities.
@@ -27,7 +27,7 @@ sort HistoryLogEntry = struct history_log_entry(
 
 sort PlaceTokens = struct place_tokens(
   place' : Place,
-  tokens' : Bag(Token)
+  tokens' : List(Token)
 );
 
 sort MarkingTrans = struct marking_trans(
@@ -37,14 +37,14 @@ sort MarkingTrans = struct marking_trans(
 
 % Type of (colored) tokens and markings.
 sort Token = Nat;
-sort Marking = Place -> Bag(Token);
+sort Marking = Place -> List(Token);
 
 map
   % Initial marking.
   initial_marking : Marking;
 
   % List of all transitions in the petri net.
-  transitions : Set(Trans);
+  transitions : Marking -> List(Trans);
 
   % Determines if a transitions is enabled under a given marking.
   is_enabled : Marking # Trans -> Bool;
@@ -63,11 +63,17 @@ map
 
   fire_trans_fn : Marking # Trans -> Marking;
 
+  % Helper functions to remove tokens from markings.
+  % Basically, these implement list difference since that is not a predefined
+  % operation.
+  remove_token : Token # List(Token) -> List(Token);
+  remove_tokens_helper : List(Token) # List(Token) -> List(Token);
+
   % bounded : Nat # Marking -> Bool;
 
 var
   marking : Marking,
-  p : Place, t : Trans, tokens, tokens1 : Bag(Token), token : Token, token' : Token,
+  p : Place, t : Trans, tokens, tokens1 : List(Token), token : Token, token' : Token,
   tname : Trans_name;
   place_tokenss : List(PlaceTokens),
   M : Nat;
@@ -76,53 +82,53 @@ eqn
   % The initial marking assigns p0 2 tokens of value 0, and none to all the
   % other places.
   initial_marking =
-    (lambda p : Place. Set2Bag({}))[p0 -> {0: 2}];
+    (lambda p : Place. [])[p0 -> [0, 0]];
 
   % This defines a simple fork-join.
   % p0 - [0] -> t0 - [1] -> p1 - [1] -> t1 - [3] -> p3 - [3] -> t3 - [5] -> t5 
   %             t0 - [2] -> p2 - [2] -> t2 - [4] -> p4 - [4] -> t3
   % We also add an inhibitor arc from p2 to t1.
-  transitions = {
+  transitions(marking) = [
     trans(
       % By default, all transitions have no guard and have a priority of 999.
-      t0, lambda m : Marking. true, 999,
-      [place_tokens(p0, {0: 1})],
-      [place_tokens(p1, {1: 1}), place_tokens(p2, {2: 1})]
+      t0, true, 999,
+      [place_tokens(p0, [0])],
+      [place_tokens(p1, [1]), place_tokens(p2, [2])]
     ),
     trans(
       t1,
       % This guard condition is equivalent to adding an inibitor arc from
       % p2 to t1.
-      lambda m : Marking. (m(p2) != Set2Bag({})),
+      # marking(p2) == 0,
       999,
-      [place_tokens(p1, {1: 1})],
-      [place_tokens(p3, {3: 1})]
+      [place_tokens(p1, [1])],
+      [place_tokens(p3, [3])]
     ),
     trans(
-      t2, lambda m : Marking. true, 999,
-      [place_tokens(p2, {2: 1})],
-      [place_tokens(p4, {4: 1})]
+      t2, true, 999,
+      [place_tokens(p2, [2])],
+      [place_tokens(p4, [4])]
     ),
     trans(
-      t3, lambda m : Marking. true, 999,
-      [place_tokens(p3, {3: 1}), place_tokens(p4, {4: 1})],
-      [place_tokens(p5, {5: 1})]
+      t3, true, 999,
+      [place_tokens(p3, [3]), place_tokens(p4, [4])],
+      [place_tokens(p5, [5])]
     )
-  };
+  ];
 
   % This says that a transition with the name tname is enabled given a marking
   % if there are enough tokens and the guard condition is met.
   is_enabled(marking, t) =
-    forall p : Place, tokens : Bag(Token).
+    forall p : Place, tokens : List(Token).
       ((place_tokens(p, tokens) in from(t)) => (tokens <= marking(p)))
-      && guard(t)(marking);
+      && guard(t);
 
   % This condition says that a transition t has the highest priority of all
   % enabled transitions.
   % More formally, for all other transitions t', if t' is enabled, then the
   % priority of t must be <= priority of t'.
   has_highest_priority(marking, t) =
-    forall t' : Trans. t' in transitions =>
+    forall t' : Trans. t' in transitions(marking) =>
       is_enabled(marking, t') => (priority(t) <= priority(t'));
 
   % is_enabled(marking, tname) =
@@ -133,19 +139,30 @@ eqn
 
   remove_tokens(marking, []) = marking;
   remove_tokens(marking, place_tokens(p, tokens) |> place_tokenss) =
-    remove_tokens(marking, place_tokenss)[p -> marking(p) - tokens];
+    remove_tokens(marking, place_tokenss)[p -> remove_tokens_helper(tokens, marking(p))];
 
   add_tokens(marking, []) = marking;
   add_tokens(marking, place_tokens(p, tokens) |> place_tokenss) =
-    add_tokens(marking, place_tokenss)[p -> marking(p) + tokens];
+    add_tokens(marking, place_tokenss)[p -> tokens ++ marking(p)];
 
   fire_trans_fn(marking, t) =
     add_tokens(remove_tokens(marking, from(t)), to(t));
 
+  remove_token(token, []) = [];
+  (token == token') -> remove_token(token, token' |> tokens) = tokens;
+  (token != token') -> remove_token(token, token' |> tokens) = remove_token(token, tokens);
+
+  remove_tokens_helper([], tokens1) = tokens1;
+  remove_tokens_helper(token |> tokens, tokens1) =
+    remove_tokens_helper(tokens, remove_token(token, tokens1));
+
+  % bounded(M, marking) =
+  %   forall p : Place. # marking(p) < M;
+
 act
   % Atomic action representing the firing of a transition.
   fire_trans : Trans_name;
-  get_tokens : Place # Bag(Token);
+  get_tokens : Place # List(Token);
 
   add_to_log_s, add_to_log_r, add_to_log : Trans_name # Marking # Marking;
 
@@ -159,7 +176,7 @@ proc
     % Note here that we use add_tokens and remove_tokens accordingly to move the
     % tokens around the marking.
     + sum t : Trans.
-        (t in transitions
+        (t in transitions(marking)
         && is_enabled(marking, t)
         && has_highest_priority(marking, t)) -> (
           fire_trans(trans_name(t))|add_to_log_s(trans_name(t), marking, fire_trans_fn(marking, t)) .
@@ -169,7 +186,7 @@ proc
   History(history : List(HistoryLogEntry)) =
     sum t : Trans_name, old_marking' : Marking, new_marking' : Marking.
       add_to_log_r(t, old_marking', new_marking') .
-      History(history_log_entry(t, old_marking', new_marking') |> history);
+    History(history_log_entry(t, old_marking', new_marking') |> history);
 
 init
   hide({

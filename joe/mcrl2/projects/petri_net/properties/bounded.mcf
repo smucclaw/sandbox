@@ -1,0 +1,10 @@
+% Fix an upper bound of M = 1000.
+% Then after firing any sequence of transitions that we fire, the following
+% must hold:
+% Every place p contains a list of (colored) tokens of length < M. 
+
+exists M : Nat. val(M == 1000)
+&& [(exists t : Trans_name. fire_trans(t))*]
+    forall p : Place.
+      <exists tokens : Bag(Token). val(#tokens < M) && get_tokens(p, tokens)>
+      true

@@ -1,0 +1,78 @@
+./jittyc_23573_4253040_3943441354.cpp: In instantiation of ‘static mcrl2::data::data_expression {anonymous}::rewr_functions::rewr_542_2(const DATA_EXPR0&, const DATA_EXPR1&, mcrl2::data::detail::RewriterCompilingJitty*) [with DATA_EXPR0 = term_not_in_normal_form; DATA_EXPR1 = term_not_in_normal_form]’:
+./jittyc_23573_4253040_3943441354.cpp:3187:129:   required from here
+./jittyc_23573_4253040_3943441354.cpp:2980:44: warning: unused variable ‘t3’ [-Wunused-variable]
+ 2980 |                     const data_expression& t3 = down_cast<data_expression>(arg1[1]);
+      |                                            ^~
+./jittyc_23573_4253040_3943441354.cpp:2993:44: warning: unused variable ‘t3’ [-Wunused-variable]
+ 2993 |                     const data_expression& t3 = down_cast<data_expression>(arg1[1]);
+      |                                            ^~
+./jittyc_23573_4253040_3943441354.cpp:2960:34: warning: unused variable ‘t1’ [-Wunused-variable]
+ 2960 |           const data_expression& t1 = down_cast<data_expression>(arg0[1]);
+      |                                  ^~
+./jittyc_23573_4253040_3943441354.cpp:3039:46: warning: unused variable ‘t3’ [-Wunused-variable]
+ 3039 |                       const data_expression& t3 = down_cast<data_expression>(arg1[1]);
+      |                                              ^~
+./jittyc_23573_4253040_3943441354.cpp:3052:46: warning: unused variable ‘t3’ [-Wunused-variable]
+ 3052 |                       const data_expression& t3 = down_cast<data_expression>(arg1[1]);
+      |                                              ^~
+./jittyc_23573_4253040_3943441354.cpp:3019:36: warning: unused variable ‘t1’ [-Wunused-variable]
+ 3019 |             const data_expression& t1 = down_cast<data_expression>(arg0[1]);
+      |                                    ^~
+./jittyc_23573_4253040_3943441354.cpp: In instantiation of ‘static mcrl2::data::data_expression {anonymous}::rewr_functions::rewr_542_2(const DATA_EXPR0&, const DATA_EXPR1&, mcrl2::data::detail::RewriterCompilingJitty*) [with DATA_EXPR0 = mcrl2::data::data_expression; DATA_EXPR1 = mcrl2::data::data_expression]’:
+./jittyc_23573_4253040_3943441354.cpp:3189:148:   required from here
+./jittyc_23573_4253040_3943441354.cpp:2980:44: warning: unused variable ‘t3’ [-Wunused-variable]
+ 2980 |                     const data_expression& t3 = down_cast<data_expression>(arg1[1]);
+      |                                            ^~
+./jittyc_23573_4253040_3943441354.cpp:2993:44: warning: unused variable ‘t3’ [-Wunused-variable]
+ 2993 |                     const data_expression& t3 = down_cast<data_expression>(arg1[1]);
+      |                                            ^~
+./jittyc_23573_4253040_3943441354.cpp:2960:34: warning: unused variable ‘t1’ [-Wunused-variable]
+ 2960 |           const data_expression& t1 = down_cast<data_expression>(arg0[1]);
+      |                                  ^~
+./jittyc_23573_4253040_3943441354.cpp:3039:46: warning: unused variable ‘t3’ [-Wunused-variable]
+ 3039 |                       const data_expression& t3 = down_cast<data_expression>(arg1[1]);
+      |                                              ^~
+./jittyc_23573_4253040_3943441354.cpp:3052:46: warning: unused variable ‘t3’ [-Wunused-variable]
+ 3052 |                       const data_expression& t3 = down_cast<data_expression>(arg1[1]);
+      |                                              ^~
+./jittyc_23573_4253040_3943441354.cpp:3019:36: warning: unused variable ‘t1’ [-Wunused-variable]
+ 3019 |             const data_expression& t1 = down_cast<data_expression>(arg0[1]);
+      |                                    ^~
+./jittyc_23573_4253040_3943441354.cpp: In instantiation of ‘static mcrl2::data::data_expression {anonymous}::rewr_functions::rewr_112_1(const DATA_EXPR0&, mcrl2::data::detail::RewriterCompilingJitty*) [with DATA_EXPR0 = term_not_in_normal_form]’:
+./jittyc_23573_4253040_3943441354.cpp:3296:129:   required from here
+./jittyc_23573_4253040_3943441354.cpp:3249:34: warning: unused variable ‘t1’ [-Wunused-variable]
+ 3249 |           const data_expression& t1 = down_cast<data_expression>(arg0[1]);
+      |                                  ^~
+./jittyc_23573_4253040_3943441354.cpp:3269:40: warning: unused variable ‘t2’ [-Wunused-variable]
+ 3269 |                 const data_expression& t2 = down_cast<data_expression>(arg0[2]);
+      |                                        ^~
+./jittyc_23573_4253040_3943441354.cpp:3257:36: warning: unused variable ‘t1’ [-Wunused-variable]
+ 3257 |             const data_expression& t1 = down_cast<data_expression>(arg0[1]);
+      |                                    ^~
+./jittyc_23573_4253040_3943441354.cpp: In instantiation of ‘static mcrl2::data::data_expression {anonymous}::rewr_functions::rewr_112_1(const DATA_EXPR0&, mcrl2::data::detail::RewriterCompilingJitty*) [with DATA_EXPR0 = mcrl2::data::data_expression]’:
+./jittyc_23573_4253040_3943441354.cpp:3298:148:   required from here
+./jittyc_23573_4253040_3943441354.cpp:3249:34: warning: unused variable ‘t1’ [-Wunused-variable]
+ 3249 |           const data_expression& t1 = down_cast<data_expression>(arg0[1]);
+      |                                  ^~
+./jittyc_23573_4253040_3943441354.cpp:3269:40: warning: unused variable ‘t2’ [-Wunused-variable]
+ 3269 |                 const data_expression& t2 = down_cast<data_expression>(arg0[2]);
+      |                                        ^~
+./jittyc_23573_4253040_3943441354.cpp:3257:36: warning: unused variable ‘t1’ [-Wunused-variable]
+ 3257 |             const data_expression& t1 = down_cast<data_expression>(arg0[1]);
+      |                                    ^~
+./jittyc_23573_4253040_3943441354.cpp: In instantiation of ‘static mcrl2::data::data_expression {anonymous}::rewr_functions::rewr_100_1(const DATA_EXPR0&, mcrl2::data::detail::RewriterCompilingJitty*) [with DATA_EXPR0 = term_not_in_normal_form]’:
+./jittyc_23573_4253040_3943441354.cpp:3533:129:   required from here
+./jittyc_23573_4253040_3943441354.cpp:3494:34: warning: unused variable ‘t1’ [-Wunused-variable]
+ 3494 |           const data_expression& t1 = down_cast<data_expression>(arg0[1]);
+      |                                  ^~
+./jittyc_23573_4253040_3943441354.cpp:3502:36: warning: unused variable ‘t1’ [-Wunused-variable]
+ 3502 |             const data_expression& t1 = down_cast<data_expression>(arg0[1]);
+      |                                    ^~
+./jittyc_23573_4253040_3943441354.cpp: In instantiation of ‘static mcrl2::data::data_expression {anonymous}::rewr_functions::rewr_100_1(const DATA_EXPR0&, mcrl2::data::detail::RewriterCompilingJitty*) [with DATA_EXPR0 = mcrl2::data::data_expression]’:
+./jittyc_23573_4253040_3943441354.cpp:3535:148:   required from here
+./jittyc_23573_4253040_3943441354.cpp:3494:34: warning: unused variable ‘t1’ [-Wunused-variable]
+ 3494 |           const data_expression& t1 = down_cast<data_expression>(arg0[1]);
+      |                                  ^~
+./jittyc_23573_4253040_3943441354.cpp:3502:36: warning: unused variable ‘t1’ [-Wunused-variable]
+ 3502 |             const data_expression& t1 = down_cast<data_expression>(arg0[1]);
+      |                                    ^~

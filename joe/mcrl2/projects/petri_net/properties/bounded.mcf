@@ -1,10 +1,17 @@
-% Fix an upper bound of M = 1000.
+% Fix an upper bound of 0 < M < 10.
 % Then after firing any sequence of transitions that we fire, the following
 % must hold:
 % Every place p contains a list of (colored) tokens of length < M. 
+%
+% Note that this is equivalent to k-boundedness because we only allow for
+% finitely many places.
 
-exists M : Nat. val(M == 1000)
-&& [(exists t : Trans_name. fire_trans(t))*]
-    forall p : Place.
-      <exists tokens : Bag(Token). val(#tokens < M) && get_tokens(p, tokens)>
-      true
+exists M : Pos. val(M < 10) &&
+[(exists t : Trans_name. fire_trans(t))*]
+  forall p : Place. exists tokens : List(Token).
+    (val(#tokens < M) && <get_tokens(p, tokens)> true)
+
+    % <exists tokens : List(Token). val(#tokens < M) && get_tokens(p, tokens)> true
+
+  % exists f : Place -> List(Token). forall p : Place.
+  %  (val(#f(p) < M) && <get_tokens(p, f(p))> true)

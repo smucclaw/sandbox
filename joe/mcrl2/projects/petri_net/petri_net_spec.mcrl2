@@ -1,20 +1,32 @@
-% Names of places and transitions.
+% Names of places and transitions, represented as union types.
 sort Place = struct p0 | p1 | p2 | p3 | p4 | p5;
 sort Trans_name = struct t0 | t1 | t2 | t3;
 
 % Transitions are represented as product/record types as below.
-% They are identified with their incoming and outgoing arcs.
+% They are identified with their incoming/outgoing arcs and input/output places.
 sort Trans = struct trans(
   trans_name : Trans_name,   % Name of the transition.
-  guard : Marking -> Bool,              % Guard condition.
+  guard : Bool,              % Guard condition, expressed in the language of
+                             % first-order logic.
   priority : Nat,            % Priority of the transition.
   from : List(PlaceTokens),  % Input places and their respective multiplicities.
   to : List(PlaceTokens)     % Output places and their respective multiplicities.
 );
 
+% Maybe monad
+sort Maybe_trans_name = struct
+  just(just_trans_name : Trans_name)?is_just
+  | nothing?is_nothing;
+
+% A HistoryLog keeps track of all the transitions that have been fired and the
+% new markings that result from firing them.
+% Transition names are wrapped in a maybe monad because the very first entry
+% of the history log has the form
+%            history_log_entry(nothing, initial_marking)
+sort HistoryLog = List(HistoryLogEntry);
+
 sort HistoryLogEntry = struct history_log_entry(
-  fired_trans : Trans_name,
-  old_marking : Marking,
+  fired_trans : Maybe_trans_name,
   new_marking : Marking
 );
 
@@ -23,11 +35,11 @@ sort HistoryLogEntry = struct history_log_entry(
 % So what we do instead is we parameterize the list of all transitions over
 % the current marking, so that we have
 %       transitions : Marking -> List(Trans)
-% This allows us to evaluate the guared condition based on the current marking.
+% This allows us to evaluate the guard condition based on the current marking.
 
 sort PlaceTokens = struct place_tokens(
   place' : Place,
-  tokens' : Bag(Token)
+  tokens' : List(Token)
 );
 
 sort MarkingTrans = struct marking_trans(
@@ -37,21 +49,24 @@ sort MarkingTrans = struct marking_trans(
 
 % Type of (colored) tokens and markings.
 sort Token = Nat;
-sort Marking = Place -> Bag(Token);
+sort Marking = Place -> List(Token);
 
 map
   % Initial marking.
   initial_marking : Marking;
 
-  % List of all transitions in the petri net.
-  transitions : Set(Trans);
+  % Static structure of a petri net.
+  % Note that this is indexed by a history log so that each transition is allowed
+  % to introspect the current and previous states of the petri net and dynamically
+  % modify themselves at runtime.
+  petri_net_statics : HistoryLog -> List(Trans);
 
-  % Determines if a transitions is enabled under a given marking.
-  is_enabled : Marking # Trans -> Bool;
+  % Determines if a transition is enabled under a given marking.
+  is_enabled : HistoryLog # Trans -> Bool;
 
   % Determines if a transition has the highest priority of compared to all the
   % curently enabled transitions.
-  has_highest_priority : Marking # Trans -> Bool;
+  has_highest_priority : HistoryLog # Trans -> Bool;
 
   % Here we allow all transitions to be guarded based on the state (ie marking)
   % of the petri net.
@@ -61,69 +76,90 @@ map
   remove_tokens : Marking # List(PlaceTokens) -> Marking;
   add_tokens : Marking # List(PlaceTokens) -> Marking;
 
-  fire_trans_fn : Marking # Trans -> Marking;
+  add_and_remove_tokens : Marking # Trans -> Marking;
+
+  % Helper functions to remove tokens from markings.
+  % Basically, these implement list difference since that is not a predefined
+  % operation.
+  remove_token : Token # List(Token) -> List(Token);
+  remove_tokens_helper : List(Token) # List(Token) -> List(Token);
+
+  tokens_subset_of : List(Token) # List(Token) -> Bool;
+  tokens_eq : List(Token) # List(Token) -> Bool;
+
+  latest_marking : HistoryLog -> Marking;
 
   % bounded : Nat # Marking -> Bool;
 
 var
   marking : Marking,
-  p : Place, t : Trans, tokens, tokens1 : Bag(Token), token : Token, token' : Token,
-  tname : Trans_name;
-  place_tokenss : List(PlaceTokens),
-  M : Nat;
+  p : Place, t : Trans, tokens, tokens1 : List(Token), token : Token, token' : Token,
+  tname : Trans_name, history_log : HistoryLog,
+  place_tokenss : List(PlaceTokens);
 
 eqn
   % The initial marking assigns p0 2 tokens of value 0, and none to all the
   % other places.
   initial_marking =
-    (lambda p : Place. Set2Bag({}))[p0 -> {0: 2}];
+    (lambda p : Place. [])[p0 -> [0, 0]];
 
   % This defines a simple fork-join.
   % p0 - [0] -> t0 - [1] -> p1 - [1] -> t1 - [3] -> p3 - [3] -> t3 - [5] -> t5 
   %             t0 - [2] -> p2 - [2] -> t2 - [4] -> p4 - [4] -> t3
   % We also add an inhibitor arc from p2 to t1.
-  transitions = {
+  %
+  % Note here that the static structure of a petri net is collection of
+  % transitions with input/output places.
+  % Moreover, this structure indexed by a (global) history log which stores all
+  % the previously fired transitions and markings.
+  % This means that the petri net is allowed to dynamically modify its own
+  % static structure at runtime.
+  petri_net_statics(history_log) = [
     trans(
       % By default, all transitions have no guard and have a priority of 999.
-      t0, lambda m : Marking. true, 999,
-      [place_tokens(p0, {0: 1})],
-      [place_tokens(p1, {1: 1}), place_tokens(p2, {2: 1})]
+      t0, true, 999,
+      [place_tokens(p0, [0])],
+      [place_tokens(p1, [1]), place_tokens(p2, [2])]
     ),
     trans(
       t1,
       % This guard condition is equivalent to adding an inibitor arc from
       % p2 to t1.
-      lambda m : Marking. (m(p2) != Set2Bag({})),
+      latest_marking(history_log)(p2) == [],
       999,
-      [place_tokens(p1, {1: 1})],
-      [place_tokens(p3, {3: 1})]
+      [place_tokens(p1, [1])],
+      [place_tokens(p3, [3])]
     ),
     trans(
-      t2, lambda m : Marking. true, 999,
-      [place_tokens(p2, {2: 1})],
-      [place_tokens(p4, {4: 1})]
+      t2, true, 999,
+      [place_tokens(p2, [2])],
+      [place_tokens(p4, [4])]
     ),
     trans(
-      t3, lambda m : Marking. true, 999,
-      [place_tokens(p3, {3: 1}), place_tokens(p4, {4: 1})],
-      [place_tokens(p5, {5: 1})]
+      t3, true, 999,
+      [place_tokens(p3, [3]), place_tokens(p4, [4])],
+      [place_tokens(p5, [5])]
     )
-  };
+  ];
 
-  % This says that a transition with the name tname is enabled given a marking
-  % if there are enough tokens and the guard condition is met.
-  is_enabled(marking, t) =
-    forall p : Place, tokens : Bag(Token).
-      ((place_tokens(p, tokens) in from(t)) => (tokens <= marking(p)))
-      && guard(t)(marking);
+  % This says that a transition t is enabled given a marking if there are
+  % enough tokens and the guard condition is met.
+  is_enabled(history_log, t) =
+    forall p : Place, tokens : List(Token).
+      ((place_tokens(p, tokens) in from(t)) =>
+        tokens_subset_of(tokens, marking(p)))
+      && guard(t)
+    whr
+      marking = latest_marking(history_log)
+    end;
 
   % This condition says that a transition t has the highest priority of all
   % enabled transitions.
   % More formally, for all other transitions t', if t' is enabled, then the
   % priority of t must be <= priority of t'.
-  has_highest_priority(marking, t) =
-    forall t' : Trans. t' in transitions =>
-      is_enabled(marking, t') => (priority(t) <= priority(t'));
+  has_highest_priority(history_log, t) =
+    forall t' : Trans. t' in petri_net_statics(history_log) =>
+      is_enabled(history_log, t') => (priority(t) <= priority(t'));
 
   % is_enabled(marking, tname) =
   %   is_enabled_unguarded(marking, tname);
@@ -133,25 +169,48 @@ eqn
 
   remove_tokens(marking, []) = marking;
   remove_tokens(marking, place_tokens(p, tokens) |> place_tokenss) =
-    remove_tokens(marking, place_tokenss)[p -> marking(p) - tokens];
+    remove_tokens(marking, place_tokenss)[p -> remove_tokens_helper(tokens, marking(p))];
 
   add_tokens(marking, []) = marking;
   add_tokens(marking, place_tokens(p, tokens) |> place_tokenss) =
-    add_tokens(marking, place_tokenss)[p -> marking(p) + tokens];
+    add_tokens(marking, place_tokenss)[p -> tokens ++ marking(p)];
 
-  fire_trans_fn(marking, t) =
+  add_and_remove_tokens(marking, t) =
     add_tokens(remove_tokens(marking, from(t)), to(t));
+
+  remove_token(token, []) = [];
+  (token == token') -> remove_token(token, token' |> tokens) = tokens;
+  (token != token') -> remove_token(token, token' |> tokens) = remove_token(token, tokens);
+
+  remove_tokens_helper([], tokens1) = tokens1;
+  remove_tokens_helper(token |> tokens, tokens1) =
+    remove_tokens_helper(tokens, remove_token(token, tokens1));
+
+  tokens_subset_of(tokens, tokens1) =
+    forall token : Token. token in tokens => token in tokens1;
+
+  tokens_eq(tokens, tokens1) =
+    tokens_subset_of(tokens, tokens1) && tokens_subset_of(tokens1, tokens);
+
+  latest_marking(history_log) = new_marking(head(history_log));
+
+  % bounded(M, marking) =
+  %   forall p : Place. # marking(p) < M;
 
 act
   % Atomic action representing the firing of a transition.
   fire_trans : Trans_name;
-  get_tokens : Place # Bag(Token);
+  get_tokens : Place # List(Token);
 
-  add_to_log_s, add_to_log_r, add_to_log : Trans_name # Marking # Marking;
+  % add_to_log_s, add_to_log_r, add_to_log : Trans_name # Marking # Marking;
 
 proc
-  PetriNet(marking : Marking) =
-    sum p : Place. get_tokens(p, marking(p))
+  % The dynamic behavior of a petri net is given by a process parameterized
+  % over a history log indicating the current state of the petri net.
+  Petri_net_dynamics(history_log : HistoryLog) =
+    sum p : Place.
+      get_tokens(p, latest_marking(history_log)(p)) .
+      Petri_net_dynamics(history_log)
     % For each transition in the list of all transitions, we check if it's enabled
     % and if it has the highest priority of all the enabled transitions.
     % If so, we perform an action indicating that the transition has been fired
@@ -159,28 +218,37 @@ proc
     % Note here that we use add_tokens and remove_tokens accordingly to move the
     % tokens around the marking.
     + sum t : Trans.
-        (t in transitions
-        && is_enabled(marking, t)
-        && has_highest_priority(marking, t)) -> (
-          fire_trans(trans_name(t))|add_to_log_s(trans_name(t), marking, fire_trans_fn(marking, t)) .
-          PetriNet(fire_trans_fn(marking, t))
+        (t in petri_net_statics(history_log)
+          && is_enabled(history_log, t)
+          && has_highest_priority(history_log, t)
+        ) -> (
+          fire_trans(trans_name(t)) .
+          % |add_to_log_s(trans_name(t), marking, fire_trans_fn(marking, t)) .
+          Petri_net_dynamics(
+            history_log_entry(
+              just(trans_name(t)),
+              add_and_remove_tokens(latest_marking(history_log), t)
+            ) |> history_log
+          )
         );
 
-  History(history : List(HistoryLogEntry)) =
-    sum t : Trans_name, old_marking' : Marking, new_marking' : Marking.
-      add_to_log_r(t, old_marking', new_marking') .
-      History(history_log_entry(t, old_marking', new_marking') |> history);
+  % History(history : List(HistoryLogEntry)) =
+  %   sum t : Trans_name, old_marking' : Marking, new_marking' : Marking.
+  %     add_to_log_r(t, old_marking', new_marking') .
+  %   History(history_log_entry(t, old_marking', new_marking') |> history);
 
 init
-  hide({
-    add_to_log
-  },
-  block({
-    add_to_log_r, add_to_log_s
-  },
-  comm({
-    add_to_log_s|add_to_log_r -> add_to_log
-  },
-  PetriNet(initial_marking)
-  || History([])
-  )));
+  % hide({
+  %   add_to_log
+  % },
+  % block({
+  %   add_to_log_r, add_to_log_s
+  % },
+  % comm({
+  %   add_to_log_s|add_to_log_r -> add_to_log
+  % },
+  Petri_net_dynamics(
+    [history_log_entry(nothing, initial_marking)]
+  );
+  % || History([])
+  % )));

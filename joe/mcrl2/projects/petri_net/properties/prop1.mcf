@@ -1,10 +1,12 @@
 % Suppose we fire some transitions and end up in a state where p2 has at least 
 % 1 token.
-% Then due to the inhibitor arc from p2 to t1, transition t2 must fire before
-% t1 can fire.
+% Then transition t2 must fire before t1 can fire.
+%
+% This holds because we added an inhibitor arc from p2 to t1, and t2 is the only
+% transition with p2 as an input place.
 
 [
 (exists t : Trans_name. fire_trans(t))* .
-exists tokens : List(Token). val(#tokens >= 1) => get_tokens(p2, tokens)
+exists tokens : List(Token). get_tokens(p2, tokens) && val(tokens != [])
 ]
-[!fire_trans(t2)* . fire_trans(t1)] true
+[!fire_trans(t2)* . fire_trans(t1)] false

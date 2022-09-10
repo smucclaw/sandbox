@@ -1,9 +1,11 @@
-% Whenever we fire a bunch of transitions until we hit a deadlock, place p5 must
-% have 2 (colored) tokens and 5 must be one of them.
+% Suppose we fire a bunch of transitions until we can fire no more.
+% Then at this point, place p5 must have at least 2 (colored) tokens and 5 must
+% be one of them.
 
 [(exists t : Trans_name. fire_trans(t))*] (
   [exists t : Trans_name. fire_trans(t)] false =>
-  forall tokens : List(Token).
-    [get_tokens(p5, tokens)]
-    val(#tokens == 2 && 5 in tokens)
+  exists tokens : List(Token). (
+    val(#tokens >= 2 && 5 in tokens)
+    && <get_tokens(p5, tokens)> true
+  )
 )

@@ -9,7 +9,7 @@
 exists M : Pos. val(M < 10) &&
 [(exists t : Trans_name. fire_trans(t))*]
   forall p : Place. exists tokens : List(Token).
-    (val(#tokens < M) && <get_tokens(p, tokens)> true)
+    (val(#tokens < M) && <get_untimed_tokens(p, tokens)> true)
 
     % <exists tokens : List(Token). val(#tokens < M) && get_tokens(p, tokens)> true
 

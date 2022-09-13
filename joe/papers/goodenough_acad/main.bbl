@@ -1,0 +1,22 @@
+\begin{thebibliography}{}
+
+\bibitem[Bunte et~al., 2019]{mcrl_toolset}
+Bunte, O., Groote, J.~F., Keiren, J. J.~A., Laveaux, M., Neele, T., de~Vink,
+  E.~P., Wesselink, W., Wijs, A., and Willemse, T. A.~C. (2019).
+\newblock The mcrl2 toolset for analysing concurrent systems.
+\newblock In Vojnar, T. and Zhang, L., editors, {\em Tools and Algorithms for
+  the Construction and Analysis of Systems}, pages 21--39, Cham. Springer
+  International Publishing.
+
+\bibitem[Flood and Goodenough, 2021]{contract_as_automaton}
+Flood, M.~D. and Goodenough, O.~R. (2021).
+\newblock Contract as automaton: representing a simple financial agreement in
+  computational form.
+\newblock {\em Artificial Intelligence and Law}.
+
+\bibitem[Groote and Mousavi, 2014]{mcrl_book}
+Groote, J.~F. and Mousavi, M.~R. (2014).
+\newblock {\em Modeling and Analysis of Communicating Systems}.
+\newblock The MIT Press.
+
+\end{thebibliography}

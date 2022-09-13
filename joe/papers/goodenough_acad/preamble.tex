@@ -1,0 +1,95 @@
+\usepackage[dvipsnames]{xcolor}
+\usepackage[altpo]{backnaur}
+
+\usepackage{
+  amsmath, amssymb, amsthm, thmtools, thm-restate, tikz, graphicx,
+  hyperref, cleveref, comment, expl3, xparse, ebproof, enumitem, stmaryrd,
+  enumitem, verbatim, todonotes, xargs, url, mathtools, mathrsfs, xfrac, cite,
+  setspace, titlesec, bbm, dirtytalk, fancyhdr, esvect, tikz
+}
+
+\usetikzlibrary{shapes.geometric, arrows}
+
+\newcommandx{\mygather}[3][1=1ex, 2=\normalsize]{
+  \begin{spreadlines}{#1}
+    {#2
+      \begin{gather*}
+        #3
+      \end{gather*}
+    }%
+  \end{spreadlines}
+}
+
+\newcommandx{\myenumerate}[2][1=1ex]{
+  \begin{enumerate}
+    \setlength \itemsep{#1}
+    #2
+  \end{enumerate}
+}
+
+\newcommandx{\myitemize}[2][1=1ex]{
+  \begin{itemize}
+    \setlength \itemsep{#1}
+    #2
+  \end{itemize}
+}
+
+\newcommandx{\myalign}[3][1=1ex, 2=\normalsize]{
+  \begin{spreadlines}{#1}
+    {#2
+    \begin{align*}
+      #3
+    \end{align*}
+    }%
+  \end{spreadlines}
+}
+
+\DeclareMathOperator{\Boolean}{\mathtt{Boolean}}
+\DeclareMathOperator{\Class}{\mathtt{Class}}
+\DeclareMathOperator{\Number}{\mathtt{Number}}
+\DeclareMathOperator{\Object}{\mathtt{Object}}
+
+\DeclareMathOperator{\decl}{decl}
+
+\DeclareMathOperator{\Pre}{Pre}
+\DeclareMathOperator{\Post}{Post}
+
+\DeclareMathOperator{\true}{\mathtt{true}}
+\DeclareMathOperator{\false}{\mathtt{false}}
+
+\newcommand{\mcrl}{\texttt{mcrl2}}
+
+\newcommandx{\class}[2]{
+    \texttt{class } #1 \, \{ #2 \}
+}
+
+\newcommandx{\classextends}[3]{
+    \texttt{class } #1 \texttt{ extends } #2 \, \{ #3 \}
+}
+
+\newcommandx{\pair}[2]{
+    (#1, \, #2)
+}
+
+\newcommandx{\jdgmt}[3][1=\Gamma, 2=\Delta]{
+    #1; \, #2 \vdash #3
+}
+
+\newcommandx{\subtypejdgmt}[2]{
+   #1 \leq_\Delta #2 
+}
+
+% https://tex.stackexchange.com/questions/9796/how-to-add-todo-notes
+\newcommandx{\info}[2][1=] {
+  \vspace{5mm}
+  \todo[inline, linecolor=OliveGreen,backgroundcolor=OliveGreen!25,bordercolor=OliveGreen,#1]{#2}
+  \vspace{5mm}
+}
+
+\newcommand{\inlinetodo}[1]{
+  \info{
+    \textbf{TODO:}
+
+    #1
+  }
+}

@@ -12,7 +12,7 @@
 %    "fulfilled" events.
 
 forall n : Nat.
-val(n <= 5000) =>
+% val(n <= 5000) =>
 [
   true* .
   exists m : Nat. pay(normal, borrower, lender, m) .

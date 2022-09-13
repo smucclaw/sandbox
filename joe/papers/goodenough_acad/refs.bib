@@ -1,0 +1,45 @@
+@article{contract_as_automaton,
+  author   = {Flood, Mark D.
+              and Goodenough, Oliver R.},
+  title    = {Contract as automaton: representing a simple financial agreement in computational form},
+  journal  = {Artificial Intelligence and Law},
+  year     = {2021},
+  month    = {Oct},
+  day      = {13},
+  abstract = {We show that the fundamental legal structure of a well-written financial contract follows a state-transition logic that can be formalized mathematically as a finite-state machine (specifically, a deterministic finite automaton or DFA). The automaton defines the states that a financial relationship can be in, such as ``default,'' ``delinquency,'' ``performing,'' etc., and it defines an ``alphabet'' of events that can trigger state transitions, such as ``payment arrives,'' ``due date passes,'' etc. The core of a contract describes the rules by which different sequences of events trigger particular sequences of state transitions in the relationship between the counterparties. By conceptualizing and representing the legal structure of a contract in this way, we expose it to a range of powerful tools and results from the theory of computation. These allow, for example, automated reasoning to determine whether a contract is internally coherent and whether it is complete relative to a particular event alphabet. We illustrate the process by representing a simple loan agreement as an automaton.},
+  issn     = {1572-8382},
+  doi      = {10.1007/s10506-021-09300-9},
+  url      = {https://doi.org/10.1007/s10506-021-09300-9}
+}
+
+@book{mcrl_book,
+  author    = {Groote, Jan Friso and Mousavi, Mohammad Reza},
+  title     = {Modeling and Analysis of Communicating Systems},
+  year      = {2014},
+  isbn      = {0262027712},
+  publisher = {The MIT Press},
+  abstract  = {Complex communicating computer systems -- computers connected by data networks and in constant communication with their environments -- do not always behave as expected. This book introduces behavioral modeling, a rigorous approach to behavioral specification and verification of concurrent and distributed systems. It is among the very few techniques capable of modeling systems interaction at a level of abstraction sufficient for the interaction to be understood and analyzed. Offering both a mathematically grounded theory and real-world applications, the book is suitable for classroom use and as a reference for system architects. The book covers the foundation of behavioral modeling using process algebra, transition systems, abstract data types, and modal logics. Exercises and examples augment the theoretical discussion. The book introduces a modeling language, mCRL2, that enables concise descriptions of even the most intricate distributed algorithms and protocols. Using behavioral axioms and such proof methods as confluence, cones, and foci, readers will learn how to prove such algorithms equal to their specifications. Specifications in mCRL2 can be simulated, visualized, or verified against their requirements. An extensive mCRL2 toolset for mechanically verifying the requirements is freely available online; this toolset has been successfully used to design and analyze industrial software that ranges from healthcare applications to particle accelerators at CERN. Appendixes offer material on equations and notation as well as exercise solutions.}
+}
+
+@inproceedings{mcrl_toolset,
+  author    = {Bunte, Olav
+               and Groote, Jan Friso
+               and Keiren, Jeroen J. A.
+               and Laveaux, Maurice
+               and Neele, Thomas
+               and de Vink, Erik P.
+               and Wesselink, Wieger
+               and Wijs, Anton
+               and Willemse, Tim A. C.},
+  editor    = {Vojnar, Tom{\'a}{\v{s}}
+               and Zhang, Lijun},
+  title     = {The mCRL2 Toolset for Analysing Concurrent Systems},
+  booktitle = {Tools and Algorithms for the Construction and Analysis of Systems},
+  year      = {2019},
+  publisher = {Springer International Publishing},
+  address   = {Cham},
+  pages     = {21--39},
+  abstract  = {Reasoning about the correctness of parallel and distributed systems requires automated tools. By now, the mCRL2 toolset and language have been developed over a course of more than fifteen years. In this paper, we report on the progress and advancements over the past six years. Firstly, the mCRL2 language has been extended to support the modelling of probabilistic behaviour. Furthermore, the usability has been improved with the addition of refinement checking, counterexample generation and a user-friendly GUI. Finally, several performance improvements have been made in the treatment of behavioural equivalences. Besides the changes to the toolset itself, we cover recent applications of mCRL2 in software product line engineering and the use of domain specific languages (DSLs).},
+  isbn      = {978-3-030-17465-1}
+}
+

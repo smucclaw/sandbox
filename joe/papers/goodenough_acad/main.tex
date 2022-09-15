@@ -22,6 +22,8 @@
 % Main body.
 \section{Intro and shortcomings of DFA formalization}
 
+\subsection{Intro}
+
 \inlinetodo{
   Write a better intro and provide more background on
   \cite{contract_as_automaton}.
@@ -41,36 +43,86 @@ directly as a DFA.
 % Finally, they claim that such a formalism opens up the possibility of performing
 % automated analyses on contracts.
 
-While this approach is a nice proof of concept, there are various shortcomings
-with such a formalism, one of them being that encoding such a DFA manually
-is a laborious process.
-A simplified visual representation of the automaton corresponding to this
-simple contract \cite[Fig. 1]{contract_as_automaton} already contains more than
-20 states and 40 transitions.
-This would explode in complexity if the contract were more complex, like say if
-it contained more repayment stages instead of just two.
+\subsection{Shortcomings}
 
-Upon closer inspection of the states in the DFA, one may notice that this
-high complexity is a result of a verbose duplication of states along the main
-``happy path''.
+While this approach is a nice proof of concept, there are various shortcomings
+with such a formalism, perhaps the most apparent being that the manual encoding
+of a contract as a DFA is a laborious process.
+A simplified, arguably inaccurate, visual representation of the automaton
+\cite[Fig. 1]{contract_as_automaton}
+corresponding to this simple contract already contains more than 20 states and
+40 transitions.
+Here, we discuss 2 reasons contributing to the complexity involved with a more
+accurate formalization of the contract as a DFA.
+We claim that even for such a simple contract, a more accurate formalization
+as a DFA is too impractical to be carried out by hand.
+
+The first source of complexity is a consequence of DFAs not having an explicit
+notion of global variables, as well as their inability to
+perform arithmetic computations.
+To see this, observe how there are verbose duplication of
+``Payments \dots \, accelerating'' states.
 Note here that when we say ``duplication'', we do not mean that there are states
 which play exactly the same role from the point of view of bisimilarity or
 language acceptance as in the sense of the Myhill-Nerode technique of DFA
 minimization.
-What we mean instead is that there are similarly named states whose subgraphs
-have similar structure.
-These include the 2 main repayment stages along this path, given by the
-``Payment\dots accruing'' states.
-Each of the subgraphs rooted at these nodes has a similar structure, with
-borrower default events giving rise to transitions to the unhappy paths.
-These in turn also have similar structure, with similar
-``Payment\dots accelerating'' and ``Crisis\dots'' states.
+What we mean instead is that these states play similar roles, and viewing the
+DFA as a graph, the subgraphs rooted at these states have similar structure.
+
+Viewing these subgraphs as sub-automata, we see that they both accept
+similar sequences of events from the point when the borrower defaults and is
+obliged to make an accelerated repayment of the outstanding amount.
+Notice that the key difference between them is the ``Payment made $\$n$''
+transition, corresponding to the event that the borrower pays off the
+outstanding amount of $\$n$.
+While we would like to collapse both of these subgraphs into a single one,
+this is not possible as the value of $n$ varies at runtime, with the current
+state of the contract, ie with the number of payments the borrower has paid off
+previously.
+In other words, $n$ can be thought of as a global variable whose actual value
+is updated at runtime, whenever payment events occur.
+However, DFAs do not have a notion of global state, nor can they perform
+sophisticated computations like arithmetic ones, so that these values must
+be manually computed by hand and then encoded in the DFA.
+The result of this manual encoding is the aforementioned duplication of states
+and transitions.
+Now, if the contract were to contain more than just 2 repayment stages, more
+manual computations would be required, resulting in even more duplicated states
+and transitions that would then need to be added to the DFA.
+
+% Consequently, a more practical formalism should provide mechanisms like
+% global variables and arithmetic operations.
+
+% Such an issue could be addressed by a formalism that is more sophisticated than
+% a DFA, something that allows for global variables, which can be updated at
+% runtime.
+
+% Ideally, we would like to be able to collapse these into a single subgraph
+% corresponding to the``accelerated repayments'' phase of the contract.
+% However, this is not possible here as both accelerated repayment stages as in
+% the 
+
+% Likewise, the transitions between them are similar as well, with the only
+% difference being the 
+
+% % verbose duplication of states along the main ``happy path''.
+
+% What we mean instead is that there are similarly named states whose subgraphs
+% have similar structure.
+% These include the 2 main repayment stages along this path, given by the
+% ``Payment\dots accruing'' states.
+% Each of the subgraphs rooted at these nodes has a similar structure, with
+% borrower default events giving rise to transitions to the unhappy paths.
+% These in turn also have similar structure, with similar
+% ``Payment\dots accelerating'' and ``Crisis\dots'' states.
 % The only difference between the transitions between these states is
 
-The DFA formalization in \cite{contract_as_automaton} also has some subtle
-concurrency bugs in that the DFA does not allow for some possible interleaving
-of events.
-To see this, consider the following scenario.
+The second source of complexity arises from the concurrent interleaving
+of real world events.
+Perhaps for the sake of simplicity, this has not been accounted for in the DFA
+formalization.
+As an example of such a scenario that is not handled by the DFA, consider the
+following.
 On May 31, 2015, the day before payment 1 is due, the borrower defaults on his
 representations and warranties.
 On the next day, when payment 1 becomes due, the borrower diligently
@@ -79,36 +131,120 @@ One day later, on June 2, 2015, the lender notifies the borrower of his
 earlier default, which does not get cured after another 2 days.
 Now all outstanding payments become accelerated, and the borrower pays off
 the remaining amount of \$525 in time, causing the contract to terminate.
-This scenario, when formalized as a word over the event alphabet, is
+This sequence of events, when viewed as a word over the event alphabet, is
 unfortunately not accepted by the automaton.
 
-Perhaps for the sake of simplicity or otherwise, there is an implicit
-assumption being made that once an event of default occurs,
-the borrower will immediately be notified by the lender, so that no other
-events like payments can occur in between.
-A more realistic encoding of this simplified contract should allow for such
-interleaving of events, as the real world is inherently concurrent in nature.
-However, this would further increase the complexity
-of the DFA and thus the tedium involved in its manual encoding.
-This suggests that for practical purposes, one should not use a DFA
-directly, but rather, a formalism that can conveniently accommodate the
-concurrency that is present in the real world.
-Better still if it could then be compiled automatically into an automaton
-of some kind and automated analysis performed on it.
+Closer inspection of the DFA suggests that there is an
+implicit assumption being made that once an event of default occurs,
+the borrower will be notified by the lender soon after, with no other events
+like payments occurring in between.
+More formally, it is assumed that the default and notification events occur
+\textit{within the same atomic step}.
+One could argue that the real world is inherently concurrent and asynchronous
+in nature, so that a more realistic encoding of this contract would
+account for such interleaving of events.
+Of source, doing so would significantly increase the complexity of the DFA,
+and consequently, the labor involved with its manual construction.
 
-In search for such a formalism, we have surveyed various approaches for
-representing legal contracts, using the simplified contract in
+% It should be noted here that this only poses problems in the manual encoding
+% of a contract, by hand, as a DFA.
+% For the purposes of automated reasoning as in the field of 
+% \textit{formal verification}, model checking tools like UPPAAL
+% \todo{cite properly here}
+% are able to automatically analyze automata comprising thousands of states.
+
+Therefore, we argue that this evinces that accurately
+encoding contracts as a DFA directly is too laborious and difficult,
+even for a contract as simple as the one presented in
+\cite[Fig 1.]{contract_as_automaton}.
+In our view, a more practical formalism should sit at a higher-level than a DFA,
+providing mechanisms for tackling these 2 issues.
+Firstly, it should provide global variables, or at least, some way of encoding
+global state.
+There should also be operations that allow us to retrieve and update the global
+state.
+Secondly, it should be able to conveniently accommodate the concurrency
+inherent in the real world.
+% Consequently, we believe that a practical formalism for encoding contracts
+% should be something higher-level than a DFA, one that can conveniently
+% accommodate the concurrency inherent in the real world.
+Better still if the formalism comes with tools that allow us to compile down
+to something like automata for visualization and automated reasoning.
+
+% However, it should be noted that for the purposes of visualization and
+% automated reasoning in the sense of \textit{formal verification}, DFAs are a
+% suitable choice of formalism.
+% Indeed, tools such as UPPAAL \todo{list more tools and cite properly} are able to
+% efficiently simulate and analyze automata with thousands of states.
+% In fact, these tools rely on analyzing \textit{labelled transition systems},
+% generalizations of nondeterministic finite automata (NFA) that allow for
+% infinitely \footnote{Possibly uncountably} many states and transitions.
+
+\section{Our approach}
+
+In search for such a suitable formalism for encoding contracts,
+we have surveyed various approaches, using the simplified contract in
 \cite[Fig 1.]{contract_as_automaton} as an example.
-In particular, one of the formalisms we explored is the \mcrl \, toolset
-\cite{mcrl_book, mcrl_toolset}.
-This toolset provides a high-level modeling language based on a
-\textit{process algebra}, a formalism \dots
-\inlinetodo{Describe process algebras}
+One of these which we explored is the \mcrl \, toolset
+\cite{mcrl_toolset}, which provides a high-level modeling language based on a
+process algebra \cite{mcrl_book}.
 
-Here, we discuss our formalization and show how it generates a DFA that better
-handles the concurrent interleaving of events.
-We also demonstrate how we can use the \mcrl \, toolset to perform automated
-analysis with the contract.
+In this section, we begin by providing some background on \mcrl.
+Thereafter, we discuss our formalization of the simple loan agreement and how
+it relates to the DFA as in \cite{contract_as_automaton}.
+In particular, we show how we can generate a DFA that accounts for the
+concurrent interleaving of real world events.
+Finally, we demonstrate how we can use the \mcrl \, toolset to help us reason
+about the contract.
+
+\inlinetodo{
+  May also want to cover other related approaches, like
+  Symboleo and how they use
+  nuxmv for verification.
+  Need to investigate how they model that further first.
+
+  Should mention limitations of our approach, the most obvious being that
+  we don't handle real-time.
+}
+
+\subsection{Background on mcrl2}
+Techniques originating from the field of formal methods have been devised to
+automatically analyze the behavior of computer systems.
+These often rely on first modelling these systems as
+\textit{labelled transition systems} (LTS), which can be seen as
+generalizations of nondeterministic finite automata (NFA).
+As with finite automata, LTSes can be seen as directed graphs, with nodes
+representing states that the system can be in, and labelled edges denoting
+transitions that change the state of a system.
+Where they differ from finite automata is that they are allowed to have an
+infinite \footnote{Possibly uncountable} number of states and transitions
+between them.
+They are also not required to come with a notion of initial and final states.
+
+While DFAs and LTSes in general are formalisms that are well suited for
+computers to analyze and reason about, they are cumbersome for humans to use
+to encode systems.
+This is especially so for systems like the simple loan agreement of
+\cite{contract_as_automaton} which involve concurrency, in that there are
+many possible ways in which events can be interleaved.
+Modelling concurrent systems like this directly as a transition system is
+often impractical as the interleaving of events gives rise to numerous states
+and transitions.
+As a result, many tools like the one we use, ie \mcrl, come equipped with
+more sophisticated formalisms that allow us to more conveniently specify these
+transition systems.
+Given a specification expressed in the provided formalism, these tools
+automatically generate the corresponding LTS, which they can then analyze.
+
+The formalism provided by the \mcrl \, toolset is a textual specification
+language based on a process algebra, extended with real-time and data
+\cite{mcrl_book}.
+
+\inlinetodo{
+  More details about mcrl2 and some example code illustrating basic concepts.
+}
+
+\subsection{The formalization of the contract itself}
 
 % which make such an encoding cumbersome.
 
@@ -128,6 +264,8 @@ analysis with the contract.
 % rise to a duplication in states along the unhappy paths.
 
 % ``borrower defaults on representations/warranties'' and ``payment made''.
+
+\newpage
 
 % Bibliography stuff.
 \bibliographystyle{apalike}

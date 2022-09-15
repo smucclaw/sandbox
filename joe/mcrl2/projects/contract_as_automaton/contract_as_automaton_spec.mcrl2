@@ -51,12 +51,10 @@ act
   start_accel_s, start_accel_r, start_accel,
   stop_accel_s, stop_accel_r, stop_accel;
 
-  get_remaining_payments_s, get_remaining_payments_r, get_remaining_payments,
-  get_outstanding_s, get_outstanding_r, get_outstanding : Nat;
+  remaining_payments_s, remaining_payments_r, remaining_payments,
+  outstanding_s, outstanding_r, outstanding : Nat;
 
-  get_next_payment_number_s, get_next_payment_number_r, get_next_payment_number : Pos;
-
-  % wait_r, wait_s, wait;
+  next_payment_number_s, next_payment_number_r, next_payment_number : Pos;
 
 proc
 	Breached = breached . Breached;
@@ -116,11 +114,11 @@ proc
 	Main_track = sum n : Pos.
     % First we determine the next payment number, ie is it payment 1, payment 2,
     % etc.
-    % This is done via the get_next_payment_number_s action, which is
-    % synchronized with the corresponding get_next_payment_number_r action of
-    % the Remainder process.
+    % This is done via the next_payment_number_s action, which is
+    % synchronized with the corresponding next_payment_number_r action of
+    % the Outstanding process.
     %
-    % Note that this Remainder process helps us keep track of the number of
+    % Note that this Outstanding process helps us keep track of the number of
     % remaining payments, as well as the outstanding amount that the borrower
     % has yet to repay.
     %
@@ -128,7 +126,7 @@ proc
     % global state, starting up the Main_track process again after stopping it
     % actually has the effect of resuming where it left off, rather than
     % starting all the payment stages from scratch.
-    get_next_payment_number_s(n) .
+    next_payment_number_s(n) .
 
     % If all payments have been made, we perform fulfill_s, which signals that
     % the contract has been fulfilled.
@@ -197,12 +195,12 @@ proc
     % The first thing we do here is we stop the main and side tracks.
     stop_main_s . stop_side_s . (
       sum outstanding : Pos.
-        % Next we grab the outstanding amount from the Remainder process.
+        % Next we grab the outstanding amount from the Outstanding process.
         % Then, the borrower has an obligation to pay off this outstanding
         % amount.
         % If he does, we signal that the contract is fulfilled.
         % Otherwise, we signal that the contract has been breached.
-        get_outstanding_s(outstanding) . (
+        outstanding_s(outstanding) . (
           (pay_s(accelerated, borrower, lender, outstanding)
             + pay_s(accelerated, borrower, lender, outstanding)
             + Stop_accel_r) .
@@ -214,14 +212,14 @@ proc
         )
     );
 
-  % This Remainder process functions like a mutable object that keeps track of
+  % This Outstanding process functions like a mutable object that keeps track of
   % the global state of the loan agreement, ie it tracks the number of payments
   % remaining and the outstanding amount.
   % There are 2 getters for these 2 parameters, which we can view as "fields"
   % of the "object" and a synchronized pay_r action which "mutates" these 2
   % "fields".
   %
-  % get_next_payment_number_r computes the next payment number as a function
+  % next_payment_number_r computes the next payment number as a function
   % of the number of remaining payments.
   %
   % pay_r(accelerated, borrower, lender, outstanding) indicates that the
@@ -231,22 +229,22 @@ proc
   %
   % pay_r(normal, borrower, lender, amt_paid) indicates that the borrower pays
   % a normal repayment of amt_paid to the lender.
-  Remainder(remaining_payments : Nat, outstanding : Nat) =
-    get_remaining_payments_r(remaining_payments) .
-    Remainder(remaining_payments, outstanding)
+  Outstanding(remaining_payments : Nat, outstanding : Nat) =
+    remaining_payments_r(remaining_payments) .
+    Outstanding(remaining_payments, outstanding)
 
-    + get_next_payment_number_r(Int2Pos(max(1, total_num_payments - remaining_payments + 1))) .
-      Remainder(remaining_payments, outstanding)
+    + next_payment_number_r(Int2Pos(max(1, total_num_payments - remaining_payments + 1))) .
+      Outstanding(remaining_payments, outstanding)
 
-    + get_outstanding_r(outstanding) .
-      Remainder(remaining_payments, outstanding)
+    + outstanding_r(outstanding) .
+      Outstanding(remaining_payments, outstanding)
 
     + pay_r(accelerated, borrower, lender, outstanding) .
-      Remainder(0, 0)
+      Outstanding(0, 0)
 
     + sum amt_paid : Pos. (
         pay_r(normal, borrower, lender, amt_paid) .
-        Remainder(
+        Outstanding(
           remaining_payments = Int2Nat(max(0, remaining_payments - 1)),
           outstanding = Int2Nat(max(0, outstanding - amt_paid))
         )
@@ -254,13 +252,6 @@ proc
 
   % Helper process that stops all processes in the contract.
   Stop_all = stop_init_s . stop_main_s . stop_side_s . stop_accel_s;
-
-  % Adding timing is a work in progress.
-  % Clock(global_time : Real) =
-  %   get_current_time_r(global_time)
-  %   + sum t : Pos. (
-  %       wait_r@(global_time + t) . Clock(global_time + t)
-  %     );
 
 init
   % Here we synchronize a lot of the *_r and *_s actions and block them from
@@ -275,41 +266,23 @@ init
   % This is the same idea behind eliding internal nodes when constructing
   % and stitching together petri nets.
   hide({
-    get_remaining_payments, get_next_payment_number, get_outstanding,
+    remaining_payments, next_payment_number, outstanding,
     start_init, stop_init,
     start_main, stop_main,
     start_side, stop_side,
     start_accel, stop_accel,
     fulfill, breach
-    % wait
   },
   allow({
     fulfill, fulfilled, breach, breached,
     start_init, stop_init, start_main, stop_main,
     start_side, stop_side, start_accel, stop_accel,
-    get_remaining_payments, get_next_payment_number, get_outstanding, pay,
+    remaining_payments, next_payment_number, outstanding, pay,
     request_principal, dont_request_principal,
     borrower_default, payment_default,
     notify_borrower_of_default, dont_notify_borrower,
     cure_default, dont_cure_default
   },
-	% block({
-  %   fulfill_s, fulfill_r,
-  %   breach_s, breach_r,
-  %   start_init_s, start_init_r,
-  %   stop_init_s, stop_init_r,
-  %   start_accel_s, start_accel_r,
-  %   stop_accel_s, stop_accel_r,
-  %   start_main_s, start_main_r,
-  %   stop_main_s, stop_main_r,
-  %   start_side_s, start_side_r,
-  %   stop_side_s, stop_side_r,
-  %   pay_s, pay_r,
-  %   get_remaining_payments_s, get_remaining_payments_r,
-  %   get_next_payment_number_s, get_next_payment_number_r,
-  %   get_outstanding_s, get_outstanding_r
-  %   % wait_s, wait_r
-	% },
 	comm({
     fulfill_s|fulfill_r -> fulfill,
     breach_s|breach_r -> breach,
@@ -322,10 +295,9 @@ init
     start_accel_s|start_accel_r -> start_accel,
     stop_accel_s|stop_accel_r -> stop_accel,
     pay_s|pay_r -> pay,
-    get_remaining_payments_s|get_remaining_payments_r -> get_remaining_payments,
-    get_next_payment_number_s|get_next_payment_number_r -> get_next_payment_number,
-    get_outstanding_s|get_outstanding_r -> get_outstanding
-    % wait_s|wait_r -> wait
+    remaining_payments_s|remaining_payments_r -> remaining_payments,
+    next_payment_number_s|next_payment_number_r -> next_payment_number,
+    outstanding_s|outstanding_r -> outstanding
 	},
   % The 4 main phases of the contract:
   % - The initialization phase, where the principal is requested and so on.
@@ -339,8 +311,6 @@ init
   || Side_idling
   || Accel_idling
 
-  % || Clock(0)
-
   % Initialize the contract by signalling the Init process to start.
   || start_init_s
 
@@ -352,5 +322,5 @@ init
 
   % Process which functions like a "mutable object" carrying the global state,
   % ie the remaining number of payments and outstanding amount.
-  || Remainder(total_num_payments, initial_outstanding_amt)
+  || Outstanding(total_num_payments, initial_outstanding_amt)
   )));

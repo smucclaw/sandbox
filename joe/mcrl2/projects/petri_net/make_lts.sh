@@ -13,7 +13,7 @@ mv pnet.1.lps pnet.lps
 
 # Instantiate sums.
 # This provides a huge speedup to lps2lts.
-lpssuminst -v -f pnet.lps pnet.1.lps
+lpssuminst -v pnet.lps pnet.1.lps
 mv pnet.1.lps pnet.lps
 
 lpsuntime -e pnet.lps pnet.1.lps
@@ -23,13 +23,13 @@ mv pnet.1.lps pnet.lps
 lpsrewr -v -pquantifier-one-point pnet.lps pnet.1.lps
 mv pnet.1.lps pnet.lps
 
-# lps2lts -v pnet.lps pnet.lts
+lps2lts -v pnet.lps pnet.lts
 
 # Reduce the state space modulo strong bisimilarity.
-# ltsconvert -ebisim -n pnet.lts pnet.1.lts
-# mv pnet.1.lts pnet.lts
+ltsconvert -ebisim -n pnet.lts pnet.1.lts
+mv pnet.1.lts pnet.lts
 
-# lts2lps pnet.lts pnet.lps 
+lts2lps pnet.lts pnet.lps 
 
-# ltsconvert pnet.lts pnet.dot
-# dot -Tsvg pnet.dot -o pnet.svg
+ltsconvert pnet.lts pnet.dot
+dot -Tsvg pnet.dot -o pnet.svg

@@ -6,6 +6,6 @@
   [exists t : Trans_name. fire_trans(t)] false =>
   exists tokens : List(Token). (
     val(#tokens >= 2 && 5 in tokens)
-    && <get_untimed_tokens(p5, tokens)> true
+    && <get_tokens(p5, tokens)> true
   )
 )

@@ -3,4 +3,7 @@
 \contentsline {subsection}{\numberline {1.2}Shortcomings}{2}{subsection.1.2}%
 \contentsline {section}{\numberline {2}Our approach}{3}{section.2}%
 \contentsline {subsection}{\numberline {2.1}Background on mcrl2}{4}{subsection.2.1}%
-\contentsline {subsection}{\numberline {2.2}The formalization of the contract itself}{4}{subsection.2.2}%
+\contentsline {subsection}{\numberline {2.2}The formalization of the contract itself}{5}{subsection.2.2}%
+\contentsline {subsection}{\numberline {2.3}Background on the modal mu calculus in mcrl2}{5}{subsection.2.3}%
+\contentsline {subsection}{\numberline {2.4}Automated reasoning with the contract}{5}{subsection.2.4}%
+\contentsline {subsection}{\numberline {2.5}Limitations and future work}{5}{subsection.2.5}%

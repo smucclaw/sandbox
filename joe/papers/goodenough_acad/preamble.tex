@@ -5,7 +5,7 @@
   amsmath, amssymb, amsthm, thmtools, thm-restate, tikz, graphicx,
   hyperref, cleveref, comment, expl3, xparse, ebproof, enumitem, stmaryrd,
   enumitem, verbatim, todonotes, xargs, url, mathtools, mathrsfs, xfrac, cite,
-  setspace, titlesec, bbm, dirtytalk, fancyhdr, esvect, tikz
+  setspace, titlesec, bbm, dirtytalk, fancyhdr, esvect, tikz, listings
 }
 
 \usetikzlibrary{shapes.geometric, arrows}
@@ -86,9 +86,9 @@
   \vspace{5mm}
 }
 
-\newcommand{\inlinetodo}[1]{
+\newcommandx{\inlinetodo}[1][1=]{
   \info{
-    \textbf{TODO:}
+    \textbf{TODO}
 
     #1
   }

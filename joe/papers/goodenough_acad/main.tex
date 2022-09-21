@@ -230,27 +230,160 @@ many possible ways in which events can be interleaved.
 Modelling concurrent systems like this directly as a transition system is
 often impractical as the interleaving of events gives rise to numerous states
 and transitions.
-As a result, many tools like the one we use, ie \mcrl, come equipped with
-more sophisticated formalisms that allow us to more conveniently specify these
-transition systems.
-Given a specification expressed in the provided formalism, these tools
-automatically generate the corresponding LTS, which they can then analyze.
 
-The formalism provided by the \mcrl \, toolset is a textual specification
-language based on a process algebra, extended with real-time and data
-\cite{mcrl_book}.
+The toolset we use, \mcrl, allows us to model and analyze such concurrent systems.
+As with others like it, it comes equipped with a more sophisticated formalism
+that allow us to more conveniently specify these transition systems.
+% Given a specification expressed in the provided formalism, these tools
+% automatically generate the corresponding LTS, which they can then analyze.
+In the case of \mcrl, the formalism it uses is a textual specification
+language \cite{mcrl_book} based on a variant of the process algebra known
+as the Algebra of Communicating Processes (ACP).
+It also comes with a data language that allows for us to define abstract data
+types built on top of primitive types like booleans and natural numbers.
+A specification can then be simulated and visualized using the provided tools.
+For automated reasoning, we can use the provided tools to verify properties
+expressed in a first-order modal $\mu$-calculus.
+Witnesses (resp. counter-examples) can then be provided for successful
+(resp. failed) verifications.
 
-\inlinetodo{
-  More details about mcrl2 and some example code illustrating basic concepts.
-}
+As an example, one can define a binary search tree as such:
+\begin{verbatim}
+sort
+  Tree = struct
+    Empty
+    | T(left : Tree, value : Nat, right : Tree);
+\end{verbatim}
+Here we define a \texttt{Tree} sort of natural numbers with 2 constructors,
+namely \texttt{Empty} and \texttt{T}, the second of which has 3 parameters which
+can be projected via functions \texttt{left}, \texttt{value} and \texttt{right}.
+Readers familiar with functional programming will recognize that this is
+reminiscent of algebraic data types.
+
+With this, we can define an insert function with the following equations.
+
+\begin{verbatim}
+map insert : Nat # Tree -> Tree;
+
+var t, t' : Tree; n, m : Nat;
+
+eqn
+  insert(n, Empty) = T(Empty, n, Empty);
+  (n < m) -> insert(n, T(t, m, t')) = insert(n, t);
+  (n > m) -> insert(n, T(t, m, t')) = insert(n, t');
+  (n == m) -> insert(n, T(t, m, t')) = T(t, m, t');
+\end{verbatim}
+
+Note here that \texttt{Nat \# Tree} denotes the cartesian product
+\texttt{Nat $\times$ Tree} and that the arrows \texttt{(->)} as in
+\texttt{(n < m) -> \dots} denote optional boolean guards on the equations.
+As with functional programming, there is some support for writing them using
+pattern matching.
+To evaluate these equations, the toolset treats them as rewriting rules
+\cite{mcrl_rewriting}, oriented from left to right.
+
+Next, we define, as processes, a binary search tree and a button which
+when pressed, empties the tree:
+
+\begin{verbatim}
+act
+  insert : Nat;
+  press, press_r, press_s;
+
+proc
+  Tree(t : Tree) =
+    sum n : Nat. (
+      insert(n) .
+      Tree(insert(n, t))
+    )
+    + press_r . Tree(Empty);
+
+  Button =
+    press_s . Button;
+\end{verbatim}
+
+The \texttt{Tree} process is parameterized over a tree \texttt{t}, indicating
+the current state of the tree.
+It has 2 actions, namely \texttt{insert(n)} which inserts \texttt{n} into the
+tree and \texttt{press\_r}, which receives (hence the \texttt{\_r}) a button
+press.
+These are composed together using the (nondeterministic) choice operator
+\texttt{+} so that the
+tree may either have something inserted into it or receive a button press at
+each step.
+The button then has a corresponding \texttt{press\_s} which sends
+(hence the \texttt{\_s}) such a press to the tree.
+Briefly, \texttt{sum n : Nat. \dots} is used to indicate a
+choice over all possible natural numbers, so that any natural number can be
+inserted into the tree.
+Also note that we use recursion to update the internal state of the tree, as in
+the case of functional programming.
+
+Finally, we can define the initial process as a parallel composition
+(\texttt{$\cdot$ || $\cdot$}) of the \texttt{Tree} process, beginning with an
+empty tree and the button, \texttt{Button}.
+
+\begin{verbatim}
+init
+  allow({insert, press},
+  comm({press_r|press_s -> press},
+  Tree(Empty) || Button));
+\end{verbatim}
+
+Since we only want the tree to empty itself when the button is pressed, and
+not at any other times, we use \texttt{allow} and \texttt{comm}(unicate) to
+enforce communication.
+Simply put, this means that the \texttt{press\_s} and \texttt{press\_r} in both
+processes must be executed together in the same atomic step.
+
+% \inlinetodo{
+%   More details about mcrl2 and some example code illustrating basic concepts.
+% }
 
 \subsection{The formalization of the contract itself}
+In this section, we describe how we formalized the loan agreement in \mcrl.
+\inlinetodo
+
+Describe structure of loan agreement, with the 4 key stages being:
+\begin{enumerate}
+  \item Initialization
+  \item Repay payments
+  \item Borrower default
+  \item Accelerated repayment
+\end{enumerate}
+
+Remember to draw and insert picture here.
+
+Each of these is modelled as a separate process, with all of them running
+in parallel at the top level.
+Initially, they are in an idle state, waiting for a start signal to begin
+executing.
+Initialization process runs first, and then signals for the repayment and
+borrower default processes to run.
+
+Talk about how the main repayment track is recursive, modelling a loop that
+iterates through the number of payments involved in the loan agreement.
+
+\subsection{Visualization and simulation}
 
 \subsection{Background on the modal mu calculus in mcrl2}
 
 \subsection{Automated reasoning with the contract}
 
-\subsection{Limitations and future work}
+\section{Related work}
+
+\section{Limitations and future work}
+
+\begin{enumerate}
+  \item No explicit notion of real time, ie no global clock process.
+
+  \item We don't keep track of blame assignment, ie who is in breach of the
+  contract.
+
+  \item Lack of native notion of process interruption, and inability of
+  linearizer to handle parallel composition under sequential comp and recursion,
+  ie \texttt{A . (B || C)}, makes modelling a bit inconvenient and unnatural.
+\end{enumerate}
 
 % which make such an encoding cumbersome.
 
@@ -274,7 +407,7 @@ language based on a process algebra, extended with real-time and data
 \newpage
 
 % Bibliography stuff.
-\bibliographystyle{apalike}
+\bibliographystyle{acm}
 \bibliography{refs}
 
 \end{document}

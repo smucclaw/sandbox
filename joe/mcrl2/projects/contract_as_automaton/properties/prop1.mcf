@@ -1,7 +1,8 @@
-[
-true* .
-pay(normal, borrower, lender, 550) .
-true* .
-pay(normal, borrower, lender, 525)
-]
-nu X. <fulfilled> X
+<
+  true* .
+  pay(Principal, Lender, Borrower, 1000) .
+  true* .
+  borrower_default .
+  true* .
+  fulfilled
+> true

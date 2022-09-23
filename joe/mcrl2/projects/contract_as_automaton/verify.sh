@@ -9,7 +9,7 @@ cd $Dir
 if [[ ${2:-""} = "symbolic" ]]
 then
   lts2pbes -f../../../properties/$1.mcf ../../caa.lts $1.pbes
-  pbessymbolicbisim -v -rjittyc $1.pbes
+  pbessymbolicbisim -v $1.pbes
 else
   # Generate a system of parameterized boolean equations, including enough
   # information to generate witnesses (resp counter-egs) from successful

@@ -1,26 +1,18 @@
-% Here we ask the model checker to prove the following claim, expressed in the
-% language of arithmetic set in first-order Hennessy-Milner logic with fixed
-% points.
-%
-% Let n be any natural number.
-% Suppose the borrower pays the lender $m (this m is existentially quantified)
-% and ends up in default and then pays an accelerated amount of $n.
+% Here we ask the model checker to prove the following claim.
+% Let n be any natural number and suppose there is a another natural number m
+% such that the borrower makes a first payment of $m and then a second payment
+% of $n.
 % Then the following must hold:
 % 1. n must be strictly less than the initial outstanding amount of $1075.
-% 2. A "breached" event can never occur.
-% 3. We will always end up in a state where there is an infinite sequence of
-%    "fulfilled" events.
+% 3. The contract is immediately fulfilled at that point.
 
-forall n : Nat.
-% val(n <= 5000) =>
-[
+forall n : Nat. [
   true* .
-  exists m : Nat. pay(normal, borrower, lender, m) .
+  exists payment_type : Payment_type, m : Nat.
+    pay(payment_type, Borrower, Lender, m) .
   true* .
-  pay(accelerated, borrower, lender, n)
-]
-(
-   val(n < initial_outstanding_amt)
-&& ([true* . breached] false)
-&& [true*] <true*> nu X. <fulfilled> X
+  exists payment_type : Payment_type. pay(payment_type, Borrower, Lender, n)
+] (
+  val(n < initial_outstanding_amt)
+  && <fulfilled> true
 )

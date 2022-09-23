@@ -1,9 +1,12 @@
-[
-true* .
-pay(normal, borrower, lender, 550) .
-true* .
-pay(normal, borrower, lender, 525) .
-true* .
-breached
-]
-false
+% This says that the contract will eventually (ie in a finite number of steps)
+% reach a state in which it will be fulfilled or breached.
+% Moreover, once that happens, no other events are allowed to occur.
+%
+% Note that this implies that fulfilled and breached events are mutually
+% exclusive, in that they can never be found together along any trace.
+[(!fulfilled && !breached)*] (
+  mu X. (
+    (<!fulfilled && !breached> X)
+    || <fulfilled || breached> (true && [true] false)
+  )
+)

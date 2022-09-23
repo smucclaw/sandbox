@@ -28,28 +28,24 @@ eqn
 sort
   % Union type indicating the 3 types of payments involved in the loan agreement.
   % This is used to parameterize the pay* actions.
-	PaymentType = struct normal | accelerated | principal;
-	Party = struct borrower | lender;
+	Payment_type = struct Normal | Accelerated | Principal;
+	Party = struct Borrower | Lender;
 
 act
-	pay_s, pay_r, pay, payment_default : PaymentType # Party # Party # Nat;
+	pay_s, pay_r, pay, payment_default : Payment_type # Party # Party # Nat;
   borrower_default,
 
 	request_principal, cure_default,
-	breach_s, breach_r, breach, breached,
-  fulfill_s, fulfill_r, fulfill, fulfilled,
+  breached, fulfilled,
 	notify_borrower_of_default,
 
   dont_notify_borrower, dont_cure_default, dont_request_principal,
 
-  start_init_s, start_init_r, start_init,
-  stop_init_s, stop_init_r, stop_init,
   start_main_s, start_main_r, start_main,
   stop_main_s, stop_main_r, stop_main,
   start_side_s, start_side_r, start_side,
   stop_side_s, stop_side_r, stop_side,
-  start_accel_s, start_accel_r, start_accel,
-  stop_accel_s, stop_accel_r, stop_accel;
+  start_accel_s, start_accel_r, start_accel;
 
   remaining_payments_s, remaining_payments_r, remaining_payments,
   outstanding_s, outstanding_r, outstanding : Nat;
@@ -57,8 +53,8 @@ act
   next_payment_number_s, next_payment_number_r, next_payment_number : Pos;
 
 proc
-	Breached = breached . Breached;
-	Fulfilled = fulfilled . Fulfilled;
+	% Breached = breached . Breached;
+	% Fulfilled = fulfilled . Fulfilled;
 
   % Main_idling is a process representing the process Main_track in an idl
   % state.
@@ -82,31 +78,25 @@ proc
     stop_side_r . Side_idling + start_side_r . Side_track . Side_idling;
   Stop_side_r = stop_side_r . Side_idling;
 
-  Init_idling =
-    stop_init_r . Init_idling + start_init_r . Init . Init_idling;
-  Stop_init_r = stop_init_r . Init_idling;
-
-  Accel_idling =
-    stop_accel_r . Accel_idling + start_accel_r . Accel . Accel_idling;
-  Stop_accel_r = stop_accel_r . Accel_idling;
+  Accel_idling = start_accel_r . Accel;
 
   % Start of the loan agreement.
 	Init =
     % First the borrower may or may not request for the principal amount.
     % If he doesn't then the contract is immediately fulfilled.
-		(dont_request_principal + Stop_init_r) . fulfill_s
+		dont_request_principal . fulfilled
 
     % Otherwise, the lender is now obliged to send the principal.
-		+ (request_principal + Stop_init_r). (
+		+ request_principal . (
 
         % If the Lender defaults on the payment of the principal, the
         % contract is deemed to be breached.
-			  (payment_default(principal, lender, borrower, principal_amt) + Stop_init_r) .
-        breach_s
+			  payment_default(Principal, Lender, Borrower, principal_amt) .
+        breached
 
         % Otherwise, if he does send the principal, then we start the main and
         % side tracks.
-			  + (pay(principal, lender, borrower, principal_amt) + Stop_init_r) .
+			  + pay(Principal, Lender, Borrower, principal_amt) .
           start_main_s . start_side_s
 		  );
 
@@ -131,17 +121,17 @@ proc
     % If all payments have been made, we perform fulfill_s, which signals that
     % the contract has been fulfilled.
     (n > total_num_payments) -> 
-      fulfill_s
+      stop_side_s . fulfilled
     <> (
       % Otherwise, if there are outstanding payments, the borrower is obliged
       % to pay the current payment.
       % If such a payment is made, we continue down the main repayment track.
-      (pay_s(normal, borrower, lender, payment_amt(n)) + Stop_main_r) .
+      (pay_s(Normal, Borrower, Lender, payment_amt(n)) + Stop_main_r) .
       Main_track
 
       % If the borrower defaults on the payment, we continue here instead.
       % At this point, the lender has the option to notify the borrower.
-      + (payment_default(normal, borrower, lender, payment_amt(n)) + Stop_main_r) . (
+      + (payment_default(Normal, Borrower, Lender, payment_amt(n)) + Stop_main_r) . (
 
         % If the lender doesn't notify the borrower upon payment default,
         % nothing goes wrong and so we simply continue with repayments.
@@ -196,19 +186,15 @@ proc
     stop_main_s . stop_side_s . (
       sum outstanding : Pos.
         % Next we grab the outstanding amount from the Outstanding process.
-        % Then, the borrower has an obligation to pay off this outstanding
-        % amount.
-        % If he does, we signal that the contract is fulfilled.
-        % Otherwise, we signal that the contract has been breached.
         outstanding_s(outstanding) . (
-          (pay_s(accelerated, borrower, lender, outstanding)
-            + pay_s(accelerated, borrower, lender, outstanding)
-            + Stop_accel_r) .
-          fulfill_s
-          + (payment_default(accelerated, borrower, lender, outstanding)
-              + payment_default(accelerated, borrower, lender, outstanding)
-              + Stop_accel_r) .
-            breach_s
+          % Then, the borrower has an obligation to pay off this outstanding
+          % amount.
+          % If he does, we signal that the contract is fulfilled.
+          % Otherwise, we signal that the contract has been breached.
+          pay_s(Accelerated, Borrower, Lender, outstanding) .
+          fulfilled
+          + payment_default(Accelerated, Borrower, Lender, outstanding) .
+            breached
         )
     );
 
@@ -239,19 +225,16 @@ proc
     + outstanding_r(outstanding) .
       Outstanding(remaining_payments, outstanding)
 
-    + pay_r(accelerated, borrower, lender, outstanding) .
+    + pay_r(Accelerated, Borrower, Lender, outstanding) .
       Outstanding(0, 0)
 
     + sum amt_paid : Pos. (
-        pay_r(normal, borrower, lender, amt_paid) .
+        pay_r(Normal, Borrower, Lender, amt_paid) .
         Outstanding(
           remaining_payments = Int2Nat(max(0, remaining_payments - 1)),
           outstanding = Int2Nat(max(0, outstanding - amt_paid))
         )
       );
-
-  % Helper process that stops all processes in the contract.
-  Stop_all = stop_init_s . stop_main_s . stop_side_s . stop_accel_s;
 
 init
   % Here we synchronize a lot of the *_r and *_s actions and block them from
@@ -267,16 +250,11 @@ init
   % and stitching together petri nets.
   hide({
     remaining_payments, next_payment_number, outstanding,
-    start_init, stop_init,
-    start_main, stop_main,
-    start_side, stop_side,
-    start_accel, stop_accel,
-    fulfill, breach
+    start_main, stop_main, start_side, stop_side, start_accel
   },
   allow({
-    fulfill, fulfilled, breach, breached,
-    start_init, stop_init, start_main, stop_main,
-    start_side, stop_side, start_accel, stop_accel,
+    fulfilled, breached,
+    start_main, stop_main, start_side, stop_side, start_accel,
     remaining_payments, next_payment_number, outstanding, pay,
     request_principal, dont_request_principal,
     borrower_default, payment_default,
@@ -284,16 +262,11 @@ init
     cure_default, dont_cure_default
   },
 	comm({
-    fulfill_s|fulfill_r -> fulfill,
-    breach_s|breach_r -> breach,
-    start_init_s|start_init_r -> start_init,
-    stop_init_s|stop_init_r -> stop_init,
     start_main_s|start_main_r -> start_main,
     stop_main_s|stop_main_r -> stop_main,
     start_side_s|start_side_r -> start_side,
     stop_side_s|stop_side_r -> stop_side,
     start_accel_s|start_accel_r -> start_accel,
-    stop_accel_s|stop_accel_r -> stop_accel,
     pay_s|pay_r -> pay,
     remaining_payments_s|remaining_payments_r -> remaining_payments,
     next_payment_number_s|next_payment_number_r -> next_payment_number,
@@ -306,19 +279,10 @@ init
   % - The accelerated repayment track, which kicks in when the borrower
   %   defaults, either on payments in the main track or representations, warranties
   %   etc in the side track.
-  Init_idling
+  Init
   || Main_idling
   || Side_idling
   || Accel_idling
-
-  % Initialize the contract by signalling the Init process to start.
-  || start_init_s
-
-  % Wait for a fulfill/breach signal to transition to the Fulfilled/Breached
-  % state.
-  % For safety, we stop all processes in between these events.
-  || (fulfill_r . Stop_all . Fulfilled
-      + breach_r . Stop_all . Breached)
 
   % Process which functions like a "mutable object" carrying the global state,
   % ie the remaining number of payments and outstanding amount.

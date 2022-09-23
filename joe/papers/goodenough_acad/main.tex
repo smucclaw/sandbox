@@ -383,6 +383,21 @@ iterates through the number of payments involved in the loan agreement.
   \item Lack of native notion of process interruption, and inability of
   linearizer to handle parallel composition under sequential comp and recursion,
   ie \texttt{A . (B || C)}, makes modelling a bit inconvenient and unnatural.
+
+  \item Squeezing out deontics completely means we have no way to really reason
+  about obligations and permissions.
+
+  Explore Guido's work on why deontics cannot be adequately represented in
+  temporal logics, LTL in particular.
+
+  Eg: if we take
+  \begin{enumerate}
+    \item Maintenance obligation $\Rightarrow$ Always
+    \item Achievement obligation $\Rightarrow$ Eventually
+  \end{enumerate}
+  then how to handle permission?
+
+  Also, how to handle reparation/compensation?
 \end{enumerate}
 
 % which make such an encoding cumbersome.

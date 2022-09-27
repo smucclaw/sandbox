@@ -1,16 +1,16 @@
 % Contract parameters
 % These can be redefined as appropriate.
 map
-	% This indicates how many payments there are in total.
+	% The total number of payments involved in the contract.
 	total_num_payments : Pos;
 
-	% This tells us how much the borrower has to pay in each payment.
+ % payment_amt(n) is the amount the borrower has to pay for payment n.
 	payment_amt : Pos -> Pos;
 
 	% The principal amount the lender sends the borrower.
 	principal_amt : Pos;
 
-	% This is the initial amount that the borrower owes the lender.
+	% The initial amount that the borrower owes the lender.
 	initial_outstanding_amt : Pos;
 
 var n : Pos;
@@ -32,50 +32,53 @@ sort
 	Party = struct Borrower | Lender;
 
 act
+  % Actions to handle payment events.
 	pay_s, pay_r, pay, payment_default : Payment_type # Party # Party # Nat;
-  borrower_default,
 
-	request_principal, cure_default,
+  request_principal, dont_request_principal,
+
+  % Actions that indicate if the contract has been fulfilled or breached.
   breached, fulfilled,
-	notify_borrower_of_default,
 
-  dont_notify_borrower, dont_cure_default, dont_request_principal,
+  % Actions related to borrower default events.
+  borrower_default,
+	notify_borrower_of_default, dont_notify_borrower,
+  cure_default, dont_cure_default,
 
+  % Actions that handle the starting and stopping of processes.
   start_main_s, start_main_r, start_main,
   stop_main_s, stop_main_r, stop_main,
   start_side_s, start_side_r, start_side,
   stop_side_s, stop_side_r, stop_side,
   start_accel_s, start_accel_r, start_accel;
 
+  % Actions concering the Outstanding process which keeps track of
+  % the remaining number of payments and outstanding amount.
   remaining_payments_s, remaining_payments_r, remaining_payments,
   outstanding_s, outstanding_r, outstanding : Nat;
-
   next_payment_number_s, next_payment_number_r, next_payment_number : Pos;
 
 proc
-	% Breached = breached . Breached;
-	% Fulfilled = fulfilled . Fulfilled;
-
-  % Main_idling is a process representing the process Main_track in an idl
+  % Main_idling is a process representing the process Main in an idle
   % state.
   % In such a idle state, we can:
   % - Receive a stop signal, ie stop_main_r, in which case we transition back
   %   to this idle state.
   % - Receive a start signal, ie start_main_r, in which case we transition to
-  %   Main_track and begin executing there.
+  %   Main and begin executing there.
   %
-  % Note here that we allow Main_track to be interrupted by decorating each
-  % atomic, non-internal, action in Main_track with the process Stop_main_r, so
+  % Note here that we allow Main to be interrupted by decorating each
+  % atomic, non-internal action in Main with the process Stop_main_r, so
   % that an action a becomes (a + Stop_main_r).
-  % This means that whenever Main_track is executing, it listens out for
+  % This means that whenever Main is executing, it listens out for
   % the stop signal and when it receives such a signal, it transitions back to
   % this idle state.
   Main_idling =
-    stop_main_r . Main_idling + start_main_r . Main_track . Main_idling;
+    stop_main_r . Main_idling + start_main_r . Main . Main_idling;
   Stop_main_r = stop_main_r . Main_idling;
 
   Side_idling =
-    stop_side_r . Side_idling + start_side_r . Side_track . Side_idling;
+    stop_side_r . Side_idling + start_side_r . Side . Side_idling;
   Stop_side_r = stop_side_r . Side_idling;
 
   Accel_idling = start_accel_r . Accel;
@@ -101,7 +104,7 @@ proc
 		  );
 
   % Main repayment track of the loan agreement.
-	Main_track = sum n : Pos.
+	Main = sum n : Pos.
     % First we determine the next payment number, ie is it payment 1, payment 2,
     % etc.
     % This is done via the next_payment_number_s action, which is
@@ -112,8 +115,8 @@ proc
     % remaining payments, as well as the outstanding amount that the borrower
     % has yet to repay.
     %
-    % Note also that since the Main_track process is "parameterized" over this
-    % global state, starting up the Main_track process again after stopping it
+    % Note also that since the Main process is "parameterized" over this
+    % global state, starting up the Main process again after stopping it
     % actually has the effect of resuming where it left off, rather than
     % starting all the payment stages from scratch.
     next_payment_number_s(n) .
@@ -127,7 +130,7 @@ proc
       % to pay the current payment.
       % If such a payment is made, we continue down the main repayment track.
       (pay_s(Normal, Borrower, Lender, payment_amt(n)) + Stop_main_r) .
-      Main_track
+      Main
 
       % If the borrower defaults on the payment, we continue here instead.
       % At this point, the lender has the option to notify the borrower.
@@ -135,7 +138,7 @@ proc
 
         % If the lender doesn't notify the borrower upon payment default,
         % nothing goes wrong and so we simply continue with repayments.
-        (dont_notify_borrower + Stop_main_r) . Main_track
+        (dont_notify_borrower + Stop_main_r) . Main
 
         % If the lender does notify the borrower, then the borrower is obliged
         % to cure his default.
@@ -144,7 +147,7 @@ proc
           % If the borrower cures his default, then we contiunue down the
           % repayment track, giving him another chance to pay off the current
           % payment.
-          (cure_default + Stop_main_r) . Main_track
+          (cure_default + Stop_main_r) . Main
 
           % If the default is not cured, the borrower is then obliged to make
           % an accelerated payment of the remaining amount to the lender.
@@ -158,21 +161,21 @@ proc
 
   % Side track that waits for a borrower default event to occur, and then
   % executes accordingly.
-	Side_track =
+	Side =
     % When a borrower default event occurs, the lender has the option of
     % notifying the borrower.
 		(borrower_default + Stop_side_r) . (
 
       % If no such notification occurs, nothing happens and so we loop back to
       % the top of the side track and wait for another default event to occur.
-			(dont_notify_borrower + Stop_side_r) . Side_track
+			(dont_notify_borrower + Stop_side_r) . Side
 
       % If the lender does notify the borrower, then we proceed as we did in the
       % main track above, ie the borrower is then obliged to cure his default,
       % and failing which, he is then obliged to make an accelerated payment
       % of the remaining amount.
 			+ (notify_borrower_of_default + Stop_side_r) . (
-				(cure_default + Stop_side_r) . Side_track
+				(cure_default + Stop_side_r) . Side
         + (dont_cure_default + Stop_side_r) .
           start_accel_s
 	    )
@@ -187,10 +190,12 @@ proc
       sum outstanding : Pos.
         % Next we grab the outstanding amount from the Outstanding process.
         outstanding_s(outstanding) . (
-          % Then, the borrower has an obligation to pay off this outstanding
+          % Now the borrower has an obligation to pay off this outstanding
           % amount.
-          % If he does, we signal that the contract is fulfilled.
-          % Otherwise, we signal that the contract has been breached.
+          % If he does, we terminate and indicate that the contract has been
+          % fulfilled.
+          % Otherwise, we terminate and indicate that the contract has been
+          % breached.
           pay_s(Accelerated, Borrower, Lender, outstanding) .
           fulfilled
           + payment_default(Accelerated, Borrower, Lender, outstanding) .
@@ -198,36 +203,38 @@ proc
         )
     );
 
-  % This Outstanding process functions like a mutable object that keeps track of
-  % the global state of the loan agreement, ie it tracks the number of payments
-  % remaining and the outstanding amount.
-  % There are 2 getters for these 2 parameters, which we can view as "fields"
-  % of the "object" and a synchronized pay_r action which "mutates" these 2
-  % "fields".
-  %
-  % next_payment_number_r computes the next payment number as a function
-  % of the number of remaining payments.
-  %
-  % pay_r(accelerated, borrower, lender, outstanding) indicates that the
-  % borrower pays the lender an accelerated payment of the outstanding amount.
-  % Notice how we recurse with the remaining number of payments and outstanding
-  % amount set to 0 since no payments remain thereafter.
-  %
-  % pay_r(normal, borrower, lender, amt_paid) indicates that the borrower pays
-  % a normal repayment of amt_paid to the lender.
+  % This Outstanding process keeps track of the global state of the loan
+  % agreement, that is, it tracks the number of payments remaining and the
+  % outstanding amount.
   Outstanding(remaining_payments : Nat, outstanding : Nat) =
     remaining_payments_r(remaining_payments) .
     Outstanding(remaining_payments, outstanding)
 
-    + next_payment_number_r(Int2Pos(max(1, total_num_payments - remaining_payments + 1))) .
+    % Compute the next payment number as a function of the number of remaining
+    % payments.
+    + next_payment_number_r(
+        % Subtraction yields an Int which we need to cast to a Pos(itive integer)
+        % via Int2Pos.
+        Int2Pos(max(1, total_num_payments - remaining_payments + 1))
+      ) .
       Outstanding(remaining_payments, outstanding)
 
     + outstanding_r(outstanding) .
       Outstanding(remaining_payments, outstanding)
 
+    % pay_r(Accelerated, Borrower, Lender, outstanding) indicates that the
+    % borrower pays the lender an accelerated payment of the outstanding amount.
+    % Notice how we recurse with the remaining number of payments and outstanding
+    % amount set to 0 since no payments remain thereafter.
     + pay_r(Accelerated, Borrower, Lender, outstanding) .
       Outstanding(0, 0)
 
+    % pay_r(Normal, Borrower, Lender, amt_paid) indicates that the borrower pays
+    % a normal repayment of amt_paid to the lender.
+    % When such an action is run, we recurse and update both parameters, ie
+    % remaining_payments and outstanding.
+    % As above, subtraction yields an Int which needs to be casted to a Nat
+    % via Int2Nat.
     + sum amt_paid : Pos. (
         pay_r(Normal, Borrower, Lender, amt_paid) .
         Outstanding(

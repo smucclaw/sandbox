@@ -58,3 +58,18 @@
   keywords = {efficient rewriting, open terms, nonlinear match trees},
   abstract = {Generation of labelled transition systems from system specifications is highly dependent on efficient rewriting (or related techniques). We give an account of the implementation of two rewriters of the mCRL2 toolset. These rewriters work on open terms and use nonlinear match trees. A comparison is made with other commonly used efficient rewriters.}
 }
+
+@article{mcrl_lhc,
+  title    = {Using model checking to analyze the system behavior of the LHC production grid},
+  journal  = {Future Generation Computer Systems},
+  volume   = {29},
+  number   = {8},
+  pages    = {2239-2251},
+  year     = {2013},
+  issn     = {0167-739X},
+  doi      = {https://doi.org/10.1016/j.future.2013.06.004},
+  url      = {https://www.sciencedirect.com/science/article/pii/S0167739X13001180},
+  author   = {Daniela Remenska and Tim A.C. Willemse and Kees Verstoep and Jeff Templon and Henri Bal},
+  keywords = {Model checking, Process algebra, Grid, LHC, Distributed system, Workflow},
+  abstract = {DIRAC (Distributed Infrastructure with Remote Agent Control) is the grid solution designed to support production activities as well as user data analysis for the Large Hadron Collider “beauty” experiment. It consists of cooperating distributed services and a plethora of light-weight agents delivering the workload to the grid resources. Services accept requests from agents and running jobs, while agents actively fulfill specific goals. Services maintain database back-ends to store dynamic state information of entities such as jobs, queues, or requests for data transfer. Agents continuously check for changes in the service states and react to these accordingly. The logic of each agent is rather simple; the main source of complexity lies in their cooperation. These agents run concurrently and communicate using the services’ databases as a shared memory for synchronizing the state transitions. Despite the effort invested in making DIRAC reliable, entities occasionally get into inconsistent states. Tracing and fixing such behaviors is difficult, given the inherent parallelism among the distributed components and the size of the implementation. In this paper we present an analysis of DIRAC with mCRL2, process algebra with data. We have reverse engineered two critical and related DIRAC subsystems, and subsequently modeled their behavior with the mCRL2 toolset. This enabled us to easily locate race conditions and livelocks which were confirmed to occur in the real system. We further formalized and verified several behavioral properties of the two modeled subsystems.}
+}

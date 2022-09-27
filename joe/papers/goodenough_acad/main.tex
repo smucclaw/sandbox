@@ -189,13 +189,13 @@ One of these which we explored is the \mcrl \, toolset
 \cite{mcrl_toolset}, which provides a high-level modeling language based on a
 process algebra \cite{mcrl_book}.
 
-In this section, we begin by providing some background on \mcrl.
-Thereafter, we discuss our formalization of the simple loan agreement and how
-it relates to the DFA as in \cite{contract_as_automaton}.
-In particular, we show how we can generate a DFA that accounts for the
-concurrent interleaving of real world events.
-Finally, we demonstrate how we can use the \mcrl \, toolset to help us reason
-about the contract.
+In this section, we begin by providing some background on \mcrl before
+we discuss our formalization of the simple loan agreement and along
+the way, we explain how we addressed the aforementioned shortcomings.
+In particular, we show how we can generate an arguably more accurate DFA that
+accounts for the concurrent interleaving of real world events.
+Thereafter, we demonstrate how we can use the \mcrl \, toolset to help us
+visualize and reason about the contract.
 
 \inlinetodo{
   May also want to cover other related approaches, like
@@ -227,6 +227,9 @@ to encode systems.
 This is especially so for systems like the simple loan agreement of
 \cite{contract_as_automaton} which involve concurrency, in that there are
 many possible ways in which events can be interleaved.
+\todo{
+  May be good to explain what is ``concurrent interleaving'' a bit more.
+}
 Modelling concurrent systems like this directly as a transition system is
 often impractical as the interleaving of events gives rise to numerous states
 and transitions.
@@ -316,8 +319,8 @@ The button then has a corresponding \texttt{press\_s} which sends
 Briefly, \texttt{sum n : Nat. \dots} is used to indicate a
 choice over all possible natural numbers, so that any natural number can be
 inserted into the tree.
-Also note that we use recursion to update the internal state of the tree, as in
-the case of functional programming.
+Also note that we use tail recursion to update the internal state of the tree,
+as is common in functional programming.
 
 Finally, we can define the initial process as a parallel composition
 (\texttt{$\cdot$ || $\cdot$}) of the \texttt{Tree} process, beginning with an
@@ -335,34 +338,165 @@ not at any other times, we use \texttt{allow} and \texttt{comm}(unicate) to
 enforce communication.
 Simply put, this means that the \texttt{press\_s} and \texttt{press\_r} in both
 processes must be executed together in the same atomic step.
+Here, \texttt{press\_r|press\_s} is a \textit{multi-action} which is an atomic
+action representing the simultaneous execution of both the individual actions.
 
-% \inlinetodo{
-%   More details about mcrl2 and some example code illustrating basic concepts.
-% }
+One can then use the tools provided by the \mcrl \, toolset to automatically
+transform this specification into a LTS.
+Note that the resulting transition system contains infinitely many states as
+each $\mathtt{n} \in \N$ gives rise to a transition labelled \texttt{insert(n)}.
+Thus, we see that the \mcrl \, toolset provides us with a convenient, high level
+formalism with which we can concisely express large (infinite in this case)
+transition systems.
 
-\subsection{The formalization of the contract itself}
-In this section, we describe how we formalized the loan agreement in \mcrl.
-\inlinetodo
+\subsection{Formalizing the contract in mcrl2}
+As we wanted our specification to be modular, we began by defining the
+following global constants and functions over which the rest of our
+specification is parameterized.
 
-Describe structure of loan agreement, with the 4 key stages being:
+\begin{verbatim}
+map
+  % The total number of payments involved in the contract.
+  total_num_payments : Pos;
+
+  % payment_amt(n) is the amount the borrower has to pay for payment n.
+  payment_amt : Pos -> Pos;
+
+  % The principal amount the lender sends the borrower.
+  principal_amt : Pos;
+
+  % The initial amount that the borrower owes the lender.
+  initial_outstanding_amt : Pos;
+
+var n : Pos;
+
+eqn
+  total_num_payments = 2;
+  principal_amt = 1000;
+  initial_outstanding_amt = 1075;
+
+  (n == 1) -> payment_amt(n) = 550;
+  (n == 2) -> payment_amt(n) = 525;
+\end{verbatim}
+
+% As aforementioned, the \mcrl \, specification language operates at a higher
+% level of abstraction than LTSes, so that
+% we do not need to ``hard code'' the values of these variables like in the
+% original DFA encoding in \cite{contract_as_automaton}.
+These can be easily changed for instance to
+account for additional payment stages, or to incorporate interest rate
+calculations into \texttt{payment\_amt}.
+We only require that:
+
 \begin{enumerate}
-  \item Initialization
-  \item Repay payments
-  \item Borrower default
-  \item Accelerated repayment
+  \item
+  \texttt{payment\_amt} is a partial function defined on the domain:
+  \begin{align*}
+    \dom \text{payment\_amt} = \set{n \in \N}{n \leq \text{total\_num\_payments}}
+  \end{align*}
+
+  \item
+  The sum of all payment amounts is equal to the initial outstanding amount,
+  that is:
+  \begin{align*}
+    \sum_{n \in \dom \text{payment\_amt}}
+      \text{payment\_amt}(n) = \text{initial\_outstanding\_amt}
+  \end{align*}
 \end{enumerate}
 
-Remember to draw and insert picture here.
+As the rest of our specification makes no further assumptions about the values
+of these constants and the computation performed in \texttt{payment\_amt},
+changing these do not require any further changes in the structure of the 
+specification.
+In comparison, if one were to add additional payment stages to the DFA in
+\cite{contract_as_automaton} directly, one will need to manually alter the
+structure of the DFA by introducing more states and transitions.
+This highlights one advantage of our approach.
 
-Each of these is modelled as a separate process, with all of them running
-in parallel at the top level.
-Initially, they are in an idle state, waiting for a start signal to begin
-executing.
-Initialization process runs first, and then signals for the repayment and
-borrower default processes to run.
+To proceed with our formalization, we observed that the contract has 4 key
+stages, which we can model as processes in \mcrl.
+\inlinetodo{
+  Mention modeling real world events as atomic actions.
+}
+These stages are:
 
-Talk about how the main repayment track is recursive, modelling a loop that
-iterates through the number of payments involved in the loan agreement.
+\begin{enumerate}
+  \item \textbf{Initialization}
+  
+  The contract begins in this stage, where the borrower may
+  request for the principal amount.
+  Upon such a request, the lender is obliged to send it.
+  Thereafter, the process starts the main and side tracks below simultaneously,
+  before terminating.
+
+  \item \textbf{Main repay payments track}
+
+  This process handles all the payments that the borrower makes to the lender.
+  Once these are completed, the side track process is
+  terminated and the contract as a whole is fulfilled.
+  Should the borrower default on a payment, the accelerated repayment process
+  is started.
+
+  \item \textbf{Side borrower default track}
+
+  This process waits for the occurrence of a borrower default event and starts
+  the accelerated repayment process should the borrower fail to cure the
+  default.
+
+  \item \textbf{Accelerated repayment}
+
+  As described above, this is triggered when things go wrong.
+  Once started, it terminates both the main and side track processes and then
+  handles the accelerated repayment stage, in which the borrower is obliged to
+  repay the outstanding amount immediately.
+\end{enumerate}
+
+\inlinetodo{
+  Draw and insert picture.
+}
+
+The initialization phase of the contract is modelled by the following
+\texttt{Init} process:
+
+\begin{verbatim}
+Init =
+  dont_request_principal . fulfilled
+  + request_principal . (
+      payment_default(Principal, Lender, Borrower, principal_amt) .
+      breached
+      + pay(Principal, Lender, Borrower, principal_amt) .
+        start_main_s . start_side_s
+    );
+\end{verbatim}
+
+At the start of the contract, the borrower has the option of requesting for
+the principal amount.
+When that happens,
+
+\info{
+  Some notes:
+
+  Talk about how the main repayment track is recursive, modelling a loop that
+  iterates through the number of payments involved in the loan agreement.
+
+  While \mcrl \, does not have a notion of global variables like other formalisms
+  (mention other formalisms here, maybe uppaal?), these can be easily
+  simulated.
+  Our specification defines ``global variables'' representing the current
+  runtime state of the contract, namely the remaining number of payments as well
+  as the outstanding amount.
+  These variables are then updated whenever a normal repayment event occurs, and
+  referenced during accelerated repayment event.
+
+  % using the technique described in \cite[Section 3.2.2]{mcrl_lhc}.
+
+  Finally, our formalization also allow for more events to be interleaved
+  concurrently.
+  In particular, we make no assumption that the borrower is notified immediately
+  after a default event occurs.
+  Payment events or even other default events may occur in the meantime, so that
+  in the latter case, the borrower has multiple defaults to cure.
+}
 
 \subsection{Visualization and simulation}
 

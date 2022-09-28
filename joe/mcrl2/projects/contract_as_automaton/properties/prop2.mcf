@@ -1,14 +1,14 @@
 % Here we ask the model checker to prove the following claim.
-% Let n be any natural number and suppose there is a another natural number m
-% such that the borrower makes a first payment of $m and then a second payment
+% Let n be any positive integer and suppose there is a another positive integer
+% m such that the borrower makes a first payment of $m and then a second payment
 % of $n.
 % Then the following must hold:
 % 1. n must be strictly less than the initial outstanding amount of $1075.
 % 3. The contract is immediately fulfilled at that point.
 
-forall n : Nat. [
+forall n : Pos. [
   true* .
-  exists payment_type : Payment_type, m : Nat.
+  exists payment_type : Payment_type, m : Pos.
     pay(payment_type, Borrower, Lender, m) .
   true* .
   exists payment_type : Payment_type.

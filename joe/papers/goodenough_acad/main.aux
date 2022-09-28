@@ -24,7 +24,7 @@
 \@writefile{toc}{\contentsline {section}{\numberline {1}Intro and shortcomings of DFA formalization}{1}{section.1}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {1.1}Intro}{1}{subsection.1.1}\protected@file@percent }
 \@writefile{tdo}{\contentsline {todo}{ \textbf  {TODO} \par  Write a better intro and provide more background on \cite  {contract_as_automaton}.  }{1}{section*.2}\protected@file@percent }
-\pgfsyspdfmark {pgfid2}{20088094}{11557546}
+\pgfsyspdfmark {pgfid2}{20088094}{9984682}
 \citation{contract_as_automaton}
 \@writefile{toc}{\contentsline {subsection}{\numberline {1.2}Shortcomings}{2}{subsection.1.2}\protected@file@percent }
 \citation{contract_as_automaton}
@@ -32,33 +32,33 @@
 \citation{mcrl_toolset}
 \citation{mcrl_book}
 \@writefile{toc}{\contentsline {section}{\numberline {2}Our approach}{3}{section.2}\protected@file@percent }
-\@writefile{tdo}{\contentsline {todo}{ \textbf  {TODO} \par  May also want to cover other related approaches, like Symboleo and how they use nuxmv for verification. Need to investigate how they model that further first. \par Should mention limitations of our approach, the most obvious being that we don't handle real-time.  }{3}{section*.3}\protected@file@percent }
+\@writefile{tdo}{\contentsline {todo}{ \textbf  {TODO} \par  May also want to cover other related approaches, like Symboleo and how they use nuxmv for verification. Need to investigate how they model that further first.  }{3}{section*.3}\protected@file@percent }
 \citation{contract_as_automaton}
 \citation{mcrl_book}
-\pgfsyspdfmark {pgfid3}{20088094}{41456435}
+\pgfsyspdfmark {pgfid3}{20088094}{42242867}
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Background on mcrl2}{4}{subsection.2.1}\protected@file@percent }
 \@writefile{tdo}{\contentsline {todo}{ May be good to explain what is ``concurrent interleaving'' a bit more. }{4}{section*.4}\protected@file@percent }
-\pgfsyspdfmark {pgfid4}{20504970}{24248416}
-\pgfsyspdfmark {pgfid7}{34243870}{24260704}
-\pgfsyspdfmark {pgfid8}{36357406}{24036790}
+\pgfsyspdfmark {pgfid4}{20504970}{25821280}
+\pgfsyspdfmark {pgfid7}{34243870}{25833568}
+\pgfsyspdfmark {pgfid8}{36357406}{25609654}
 \citation{mcrl_rewriting}
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Formalizing the contract in mcrl2}{6}{subsection.2.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.2.1}Generic parameters}{6}{subsubsection.2.2.1}\protected@file@percent }
 \citation{contract_as_automaton}
-\@writefile{tdo}{\contentsline {todo}{ \textbf  {TODO} \par  Mention modeling real world events as atomic actions.  }{7}{section*.5}\protected@file@percent }
-\pgfsyspdfmark {pgfid9}{20088094}{19941553}
-\@writefile{tdo}{\contentsline {todo}{ \textbf  {TODO} \par  Draw and insert picture.  }{8}{section*.6}\protected@file@percent }
-\pgfsyspdfmark {pgfid10}{20088094}{33777147}
-\@writefile{tdo}{\contentsline {todo}{ Some notes: \par Talk about how the main repayment track is recursive, modelling a loop that iterates through the number of payments involved in the loan agreement. \par While \texttt  {mcrl2}\, does not have a notion of global variables like other formalisms (mention other formalisms here, maybe uppaal?), these can be easily simulated. Our specification defines ``global variables'' representing the current runtime state of the contract, namely the remaining number of payments as well as the outstanding amount. These variables are then updated whenever a normal repayment event occurs, and referenced during accelerated repayment event. \par \par Finally, our formalization also allow for more events to be interleaved concurrently. In particular, we make no assumption that the borrower is notified immediately after a default event occurs. Payment events or even other default events may occur in the meantime, so that in the latter case, the borrower has multiple defaults to cure. }{8}{section*.7}\protected@file@percent }
-\pgfsyspdfmark {pgfid11}{20088094}{14272647}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Visualization and simulation}{9}{subsection.2.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.4}Background on the modal mu calculus in mcrl2}{9}{subsection.2.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.5}Automated reasoning with the contract}{9}{subsection.2.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {3}Related work}{9}{section.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {4}Limitations and future work}{9}{section.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.2.2}Events and contract stages}{7}{subsubsection.2.2.2}\protected@file@percent }
+\@writefile{tdo}{\contentsline {todo}{ \textbf  {TODO} \par  Draw and insert picture.  }{8}{section*.5}\protected@file@percent }
+\pgfsyspdfmark {pgfid9}{20088094}{28813804}
+\@writefile{tdo}{\contentsline {todo}{ Some notes: \par Talk about how the main repayment track is recursive, modelling a loop that iterates through the number of payments involved in the loan agreement. \par While \texttt  {mcrl2}\, does not have a notion of global variables like other formalisms (mention other formalisms here, maybe uppaal?), these can be easily simulated. Our specification defines ``global variables'' representing the current runtime state of the contract, namely the remaining number of payments as well as the outstanding amount. These variables are then updated whenever a normal repayment event occurs, and referenced during accelerated repayment event. \par \par Finally, our formalization also allow for more events to be interleaved concurrently. In particular, we make no assumption that the borrower is notified immediately after a default event occurs. Payment events or even other default events may occur in the meantime, so that in the latter case, the borrower has multiple defaults to cure. }{9}{section*.6}\protected@file@percent }
+\pgfsyspdfmark {pgfid10}{20088094}{17986085}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Visualization and simulation}{10}{subsection.2.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.4}Background on the modal mu calculus in mcrl2}{10}{subsection.2.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.5}Automated reasoning with the contract}{10}{subsection.2.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {3}Related work}{10}{section.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {4}Limitations and future work}{10}{section.4}\protected@file@percent }
 \bibstyle{acm}
 \bibdata{refs}
 \bibcite{mcrl_toolset}{1}
 \bibcite{contract_as_automaton}{2}
 \bibcite{mcrl_book}{3}
 \bibcite{mcrl_rewriting}{4}
-\gdef \@abspage@last{10}
+\gdef \@abspage@last{11}

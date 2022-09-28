@@ -202,9 +202,6 @@ visualize and reason about the contract.
   Symboleo and how they use
   nuxmv for verification.
   Need to investigate how they model that further first.
-
-  Should mention limitations of our approach, the most obvious being that
-  we don't handle real-time.
 }
 
 \subsection{Background on mcrl2}
@@ -257,9 +254,15 @@ sort
     Empty
     | T(left : Tree, value : Nat, right : Tree);
 \end{verbatim}
-Here we define a \texttt{Tree} sort of natural numbers with 2 constructors,
-namely \texttt{Empty} and \texttt{T}, the second of which has 3 parameters which
-can be projected via functions \texttt{left}, \texttt{value} and \texttt{right}.
+Here we define a \texttt{Tree} sort
+\footnote{
+  The term ``sort'' comes from multi-sorted logics since sorts in \mcrl \,
+  are interpreted logically as such. 
+}
+(ie type) of natural numbers with 2
+constructors, namely \texttt{Empty} and \texttt{T}, the second of which has 3
+parameters which can be projected via functions \texttt{left}, \texttt{value}
+and \texttt{right}.
 Readers familiar with functional programming will recognize that this is
 reminiscent of algebraic data types.
 
@@ -307,20 +310,23 @@ proc
 
 The \texttt{Tree} process is parameterized over a tree \texttt{t}, indicating
 the current state of the tree.
-It has 2 actions, namely \texttt{insert(n)} which inserts \texttt{n} into the
+It has 2 actions, the first being \texttt{insert},  which is parameterized over
+all $n \in \N$.
+\texttt{insert(n)} indicates that \texttt{n} is inserted into the
 tree and \texttt{press\_r}, which receives (hence the \texttt{\_r}) a button
 press.
+The button then has a corresponding \texttt{press\_s} which sends
+(hence the \texttt{\_s}) such a press to the tree.
 These are composed together using the (nondeterministic) choice operator
 \texttt{+} so that the
 tree may either have something inserted into it or receive a button press at
 each step.
-The button then has a corresponding \texttt{press\_s} which sends
-(hence the \texttt{\_s}) such a press to the tree.
 Briefly, \texttt{sum n : Nat. \dots} is used to indicate a
 choice over all possible natural numbers, so that any natural number can be
 inserted into the tree.
-Also note that we use tail recursion to update the internal state of the tree,
-as is common in functional programming.
+The dot (\texttt{.}) following \texttt{insert(n)} denotes sequential composition
+with the tail recursion \texttt{Tree(insert(n, t))}, which  update the internal
+state of the tree.
 
 Finally, we can define the initial process as a parallel composition
 (\texttt{$\cdot$ || $\cdot$}) of the \texttt{Tree} process, beginning with an
@@ -350,6 +356,9 @@ formalism with which we can concisely express large (infinite in this case)
 transition systems.
 
 \subsection{Formalizing the contract in mcrl2}
+
+\subsubsection{Generic parameters}
+
 As we wanted our specification to be modular, we began by defining the
 following global constants and functions over which the rest of our
 specification is parameterized.
@@ -405,7 +414,7 @@ We only require that:
 \end{enumerate}
 
 As the rest of our specification makes no further assumptions about the values
-of these constants and the computation performed in \texttt{payment\_amt},
+of these constants and the computation performed by \texttt{payment\_amt},
 changing these do not require any further changes in the structure of the 
 specification.
 In comparison, if one were to add additional payment stages to the DFA in
@@ -413,12 +422,19 @@ In comparison, if one were to add additional payment stages to the DFA in
 structure of the DFA by introducing more states and transitions.
 This highlights one advantage of our approach.
 
-To proceed with our formalization, we observed that the contract has 4 key
-stages, which we can model as processes in \mcrl.
-\inlinetodo{
-  Mention modeling real world events as atomic actions.
-}
-These stages are:
+\subsubsection{Events and contract stages}
+
+To proceed with our formalization, we decided to model events as atomic
+actions in \mcrl.
+For instance, we have the actions \texttt{borrower\_default} for borrower
+defaults and \texttt{pay} for payments.
+These payment events include normal repayments, accelerated repayments,
+as well as principal repayments.
+We also have the actions \texttt{fulfilled} and \texttt{breached}, which as
+their names suggest, represent the events where the contract has terminated
+in a fulfilled or breached state.
+
+We then observe that the contract has 4 key stages, namely:
 
 \begin{enumerate}
   \item \textbf{Initialization}
@@ -455,8 +471,36 @@ These stages are:
   Draw and insert picture.
 }
 
-The initialization phase of the contract is modelled by the following
-\texttt{Init} process:
+These are modelled in \mcrl \, as the processes
+\texttt{Init}, \texttt{Main}, \texttt{Side} and \texttt{Accel} respectively.
+\texttt{Init} is defined as follows:
+% Note that \mcrl \, does not have a notion of global mutable variables
+% \footnote{
+%   It does however allow for global constants, as shown earlier
+% }.
+% We define our main top-level process as the parallel composition:
+
+% \begin{verbatim}
+%   init
+%     allow({...}, comm({...},
+%     Init || Main_idling || Side_idling
+%     || Outstanding(total_num_payments, initial_outstanding_amt)))
+% \end{verbatim}
+
+% where the \texttt{Outstanding} process is used to keep track of the remaining
+% number of payments and outstanding amount that the borrower owes.
+% For brevity, we omit the details of the actions in \texttt{allow} and
+% \texttt{comm}.
+% As before, we use these to enforce communication so that some actions
+% cannot be run on their own.
+
+% Note here that \texttt{Main\_idling} (resp. \texttt{Side\_idling}) is
+% essentially the \texttt{Main} process in an idle state.
+
+% \begin{verbatim}
+%   Main_idling =
+%     stop_main_r . Main_idling + start_main_r . Main . Main_idling;
+% \end{verbatim}
 
 \begin{verbatim}
 Init =
@@ -471,7 +515,54 @@ Init =
 
 At the start of the contract, the borrower has the option of requesting for
 the principal amount.
-When that happens,
+\texttt{dont\_request\_principal} is an action modelling the event where the
+borrower does not request for it on the day the loan agreement comes into
+effect.
+In this case, the contract immediately terminates in a fulfilled state.
+If the principal is requested for, ie the \texttt{request\_principal} action
+is executed, then the lender is obligated to send it.
+The contract is breached in the event that the lender defaults on this payment,
+ie the \texttt{payment\_default(Principal, Lender, Borrower, principal\_amt)}
+action is executed.
+On the other hand, if the lender does send the principal amount,
+so that \texttt{pay(Principal, Lender, Borrower, principal\_amt)} runs,
+then the actions \texttt{start\_main\_s} and \texttt{start\_side\_s} will be run.
+These communicate with the corresponding \texttt{start\_main\_r} and
+\texttt{start\_side\_r} actions which start the \texttt{Main} and
+\texttt{Side} processes.
+
+Note here that we would have preferred to write:
+
+\begin{verbatim}
+pay(Principal, Lender, Borrower, principal_amt) .
+(Main || Side)
+\end{verbatim}
+
+However, the \mcrl \, tools do not allow for parallel composition nested under
+sequential composition.
+Parallel composition can only be used at the top-level, so that we had to lift
+it up using the following structure:
+
+\begin{verbatim}
+  proc
+    Main_idling = start_main_r . Main;
+    Side_idling = start_side_r . Side;
+  
+  init
+    allow({start_main, start_side},
+    comm({
+      start_main_s|start_main_r -> start_main,
+      start_side_s|start_side_r -> start_side,
+    },
+      init Init || Main_idling || Side_idling;
+    ))
+\end{verbatim}
+
+This means that the \texttt{Main} (resp. \texttt{Side}) process begins in an
+idle state, waiting for the \texttt{start\_main\_s}
+(resp. \texttt{start\_side\_s}) action to be run in the \texttt{Init} process.
+This behaves like a trigger that causes the \texttt{Main} and \texttt{Side}
+processes to begin running.
 
 \info{
   Some notes:

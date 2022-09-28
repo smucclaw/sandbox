@@ -4,13 +4,5 @@
 %
 % Note that this implies that fulfilled and breached events are mutually
 % exclusive, in that they can never be found together along any trace.
-[(!fulfilled && !breached)*]
-  % Denotationally, mu (resp. nu) is interpreted as an initial algebra
-  % (resp. final coalgebra).
-  % Note that syntactic restrictions ensure that all formulae are monotonic
-  % so that these (co)algebra can be computed using the usual approach of
-  % bottom-up (resp. top-down) iteration.
-  mu X. (
-    (<!fulfilled && !breached> X)
-    || <fulfilled || breached> (true && [true] false)
-  )
+[(!fulfilled && !breached)*] <(!fulfilled && !breached)*>
+<fulfilled || breached> [true] false

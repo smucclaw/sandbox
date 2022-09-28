@@ -33,7 +33,7 @@ sort
 
 act
   % Actions to handle payment events.
-	pay_s, pay_r, pay, payment_default : Payment_type # Party # Party # Nat;
+	pay_s, pay_r, pay, payment_default : Payment_type # Party # Party # Pos;
 
   request_principal, dont_request_principal,
 
@@ -226,15 +226,15 @@ proc
     % borrower pays the lender an accelerated payment of the outstanding amount.
     % Notice how we recurse with the remaining number of payments and outstanding
     % amount set to 0 since no payments remain thereafter.
-    + pay_r(Accelerated, Borrower, Lender, outstanding) .
-      Outstanding(0, 0)
+    + (outstanding > 0) -> (
+        pay_r(Accelerated, Borrower, Lender, Nat2Pos(outstanding)) .
+        Outstanding(0, 0)
+      )
 
     % pay_r(Normal, Borrower, Lender, amt_paid) indicates that the borrower pays
     % a normal repayment of amt_paid to the lender.
     % When such an action is run, we recurse and update both parameters, ie
     % remaining_payments and outstanding.
-    % As above, subtraction yields an Int which needs to be casted to a Nat
-    % via Int2Nat.
     + sum amt_paid : Pos. (
         pay_r(Normal, Borrower, Lender, amt_paid) .
         Outstanding(

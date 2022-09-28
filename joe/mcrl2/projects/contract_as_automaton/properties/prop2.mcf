@@ -11,7 +11,8 @@ forall n : Nat. [
   exists payment_type : Payment_type, m : Nat.
     pay(payment_type, Borrower, Lender, m) .
   true* .
-  exists payment_type : Payment_type. pay(payment_type, Borrower, Lender, n)
+  exists payment_type : Payment_type.
+    pay(payment_type, Borrower, Lender, n)
 ] (
   val(n < initial_outstanding_amt)
   && <fulfilled> true

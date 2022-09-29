@@ -1,13 +1,13 @@
 # Fdb version 3
-["bibtex main"] 1664358207 "main.aux" "main.bbl" "main" 1664358208
+["bibtex main"] 1664452854 "main.aux" "main.bbl" "main" 1664452855
   "/usr/share/texmf-dist/bibtex/bst/base/acm.bst" 1650183167 21064 c61a48664f3c347ce7f73c1a6a530506 ""
-  "main.aux" 1664358208 5142 e6a864cca4a477f33733f95f5492710c "pdflatex"
-  "refs.bib" 1664267120 8145 f6a1f41546aa7a2fd66f105d9ac14b39 ""
+  "main.aux" 1664452855 5142 0031d39d22cd928cfb08f3f46b895b2a "pdflatex"
+  "refs.bib" 1664280872 8145 f6a1f41546aa7a2fd66f105d9ac14b39 ""
   (generated)
   "main.bbl"
   "main.blg"
-["pdflatex"] 1664358207 "/home/joe/dev/smucclaw/sandbox/joe/papers/goodenough_acad/main.tex" "main.pdf" "main" 1664358208
-  "/home/joe/dev/smucclaw/sandbox/joe/papers/goodenough_acad/main.tex" 1664358207 26791 8f24d8fc2d2231a8cb8644a47943e174 ""
+["pdflatex"] 1664452854 "/home/joe/dev/smucclaw/sandbox/joe/papers/goodenough_acad/main.tex" "main.pdf" "main" 1664452855
+  "/home/joe/dev/smucclaw/sandbox/joe/papers/goodenough_acad/main.tex" 1664452852 26894 35b9ec9ebcb99ab36994bf081ae99c92 ""
   "/usr/share/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc" 1650183167 2900 1537cc8184ad1792082cd229ecc269f4 ""
   "/usr/share/texmf-dist/fonts/map/fontname/texfonts.map" 1650183167 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/share/texmf-dist/fonts/tfm/jknappen/ec/tcrm1000.tfm" 1650183167 1536 e07581a4bb3136ece9eeb4c3ffab8233 ""
@@ -237,14 +237,14 @@
   "/usr/share/texmf-dist/tex/latex/xcolor/xcolor.sty" 1650183167 56029 3f7889dab51d620aa43177c391b7b190 ""
   "/usr/share/texmf-dist/tex/latex/xkeyval/xkeyval.sty" 1650183167 4902 efb3d66683a2da2a232f71e3a571a899 ""
   "/usr/share/texmf-dist/web2c/texmf.cnf" 1650183167 39911 2da6c67557ec033436fe5418a70a8a61 ""
-  "/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map" 1651283098 4276404 c85ee5114b0e5590ee79a1d1365a6f5a ""
-  "/var/lib/texmf/web2c/pdftex/pdflatex.fmt" 1651283068 2927661 46d37f70f162ca74795495ed5b216899 ""
-  "main.aux" 1664358208 5142 e6a864cca4a477f33733f95f5492710c "pdflatex"
-  "main.bbl" 1664358207 1188 bceda56544f06d7b46c9a3f8e97214b2 "bibtex main"
-  "main.out" 1664358208 2388 112d3c8e8f163328feab444196d48576 "pdflatex"
-  "main.tex" 1664358207 26791 8f24d8fc2d2231a8cb8644a47943e174 ""
-  "main.toc" 1664358208 1159 dc372d8147ba0bbd6196596bc48dbab0 "pdflatex"
-  "preamble.tex" 1664253194 2119 438ffd1a17a493019b578c9f9377db6d ""
+  "/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map" 1651282788 4276404 c85ee5114b0e5590ee79a1d1365a6f5a ""
+  "/var/lib/texmf/web2c/pdftex/pdflatex.fmt" 1651282764 2927662 2256d8b6e05e1dd44b894e8472273f08 ""
+  "main.aux" 1664452855 5142 0031d39d22cd928cfb08f3f46b895b2a "pdflatex"
+  "main.bbl" 1664452854 1188 bceda56544f06d7b46c9a3f8e97214b2 "bibtex main"
+  "main.out" 1664452855 2388 112d3c8e8f163328feab444196d48576 "pdflatex"
+  "main.tex" 1664452852 26894 35b9ec9ebcb99ab36994bf081ae99c92 ""
+  "main.toc" 1664452855 1159 dc372d8147ba0bbd6196596bc48dbab0 "pdflatex"
+  "preamble.tex" 1664280872 2119 438ffd1a17a493019b578c9f9377db6d ""
   (generated)
   "main.aux"
   "main.log"

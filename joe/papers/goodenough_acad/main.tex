@@ -450,14 +450,15 @@ We then observe that the contract has 4 key stages, namely:
   This process handles all the payments that the borrower makes to the lender.
   Once these are completed, the side track process is
   terminated and the contract as a whole is fulfilled.
-  Should the borrower default on a payment, the accelerated repayment process
-  is started.
+  Should the borrower default on a payment, the side track is stopped and
+  the accelerated repayment process is started.
 
   \item \textbf{Side borrower default track}
 
-  This process waits for the occurrence of a borrower default event and starts
-  the accelerated repayment process should the borrower fail to cure the
-  default.
+  When this process starts running, it waits for the occurrence of a borrower
+  default event.
+  If that happens, and the borrower fails to cure the default,
+  the main track is stopped and the accelerated repayment process is started.
 
   \item \textbf{Accelerated repayment}
 

@@ -14,13 +14,13 @@ else
   # Generate a system of parameterized boolean equations, including enough
   # information to generate witnesses (resp counter-egs) from successful
   # (resp failed) verifications.
-  lts2pbes -c -f../../../properties/$1.mcf ../../caa.lts $1.pbes
+  lts2pbes -v -c -f../../../properties/$1.mcf ../../caa.lts $1.pbes
 
   # Solve the system of equations, outputting the result to a linearized process
   # in $1.evidence.lps
   pbessolve -v --file=../../caa.lts $1.pbes
   # Convert the output evidence to a LTS, then to dot and svg for visualization. 
   # Note that the resulting svg can be huge and thus not very useful to look at.
-  ltsconvert -ebranching-bisim $1.pbes.evidence.lts $1.evidence.dot
+  ltsconvert -ebisim $1.pbes.evidence.lts $1.evidence.dot
   dot -Tsvg $1.evidence.dot -o $1.evidence.svg
 fi

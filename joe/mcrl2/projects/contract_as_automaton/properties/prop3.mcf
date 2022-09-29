@@ -1,0 +1,40 @@
+nu X(
+  % Number of repayments the borrower makes.
+  num_payments : Nat = 0,
+  % Total amount repaid by the borrower.
+  total_paid : Nat = 0,
+  % This indicates if the borrower has received the principal from the lender.
+  principal_received : Bool = false
+).
+val(num_payments <= total_num_payments)
+&& val(total_paid <= initial_outstanding_amt)
+&& (
+  (<true> true) => (
+    (
+      [fulfilled] (
+        val(principal_received => total_paid == initial_outstanding_amt)
+        && ([true] false)
+        && X(num_payments, total_paid, principal_received)
+      )
+    ) && (
+      [breached] (
+        val(total_paid < initial_outstanding_amt)
+        && ([true] false)
+        && X(num_payments, total_paid, principal_received)
+      )
+    ) && (
+      [exists amt : Pos. pay(Principal, Lender, Borrower, amt)]
+      X(num_payments, total_paid, true)
+    ) && (
+      forall amt : Pos.
+        [exists pt : Payment_type. pay(pt, Borrower, Lender, amt)]
+        X(num_payments + 1, total_paid + amt, principal_received)
+    ) && (
+      [
+        !fulfilled && !breached &&
+        !(exists pt : Payment_type, p1, p2 : Party, amt : Pos. pay(pt, p1, p2, amt))
+      ]
+      X(num_payments, total_paid, principal_received)
+    )
+  )
+)

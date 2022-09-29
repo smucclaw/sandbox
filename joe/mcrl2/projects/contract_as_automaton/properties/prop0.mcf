@@ -4,5 +4,8 @@
 %
 % Note that this implies that fulfilled and breached events are mutually
 % exclusive, in that they can never be found together along any trace.
-[(!fulfilled && !breached)*] <(!fulfilled && !breached)*>
-<fulfilled || breached> [true] false
+(
+  [(!fulfilled && !breached)*] <true* . (fulfilled || breached)> true
+) && (
+  [(fulfilled || breached) . true] false
+)

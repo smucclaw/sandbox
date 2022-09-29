@@ -9,32 +9,30 @@ nu X(
 val(num_payments <= total_num_payments)
 && val(total_paid <= initial_outstanding_amt)
 && (
-  (<true> true) => (
-    (
-      [fulfilled] (
-        val(principal_received => total_paid == initial_outstanding_amt)
-        && ([true] false)
-        && X(num_payments, total_paid, principal_received)
-      )
-    ) && (
-      [breached] (
-        val(total_paid < initial_outstanding_amt)
-        && ([true] false)
-        && X(num_payments, total_paid, principal_received)
-      )
-    ) && (
-      [exists amt : Pos. pay(Principal, Lender, Borrower, amt)]
-      X(num_payments, total_paid, true)
-    ) && (
-      forall amt : Pos.
-        [exists pt : Payment_type. pay(pt, Borrower, Lender, amt)]
-        X(num_payments + 1, total_paid + amt, principal_received)
-    ) && (
-      [
-        !fulfilled && !breached &&
-        !(exists pt : Payment_type, p1, p2 : Party, amt : Pos. pay(pt, p1, p2, amt))
-      ]
-      X(num_payments, total_paid, principal_received)
-    )
+  [fulfilled] (
+    ([true] false)
+    && val(principal_received => total_paid == initial_outstanding_amt)
+    && val(!principal_received => total_paid == 0)
+    && X(num_payments, total_paid, principal_received)
   )
+) && (
+  [breached] (
+    ([true] false)
+    && val(total_paid < initial_outstanding_amt)
+    && X(num_payments, total_paid, principal_received)
+  )
+) && (
+  [exists amt : Pos. pay(Principal, Lender, Borrower, amt)]
+  X(num_payments, total_paid, true)
+) && (
+  forall amt : Pos.
+    [exists pt : Payment_type. pay(pt, Borrower, Lender, amt)]
+    X(num_payments + 1, total_paid + amt, principal_received)
+) && (
+  [
+    !fulfilled && !breached &&
+    !(exists pt : Payment_type, p1, p2 : Party, amt : Pos.
+        pay(pt, p1, p2, amt))
+  ]
+  X(num_payments, total_paid, principal_received)
 )

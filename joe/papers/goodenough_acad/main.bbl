@@ -19,6 +19,12 @@
 \newblock {\em Modeling and Analysis of Communicating Systems}.
 \newblock The MIT Press, 2014.
 
+\bibitem{mcrl_lhc}
+{\sc Remenska, D., Willemse, T.~A., Verstoep, K., Templon, J., and Bal, H.}
+\newblock Using model checking to analyze the system behavior of the lhc
+  production grid.
+\newblock {\em Future Generation Computer Systems 29}, 8 (2013), 2239--2251.
+
 \bibitem{mcrl_rewriting}
 {\sc {van Weerdenburg}, M.}
 \newblock An account of implementing applicative term rewriting.

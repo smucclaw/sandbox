@@ -6,8 +6,10 @@
 \contentsline {subsection}{\numberline {2.2}Formalizing the contract in mcrl2}{6}{subsection.2.2}%
 \contentsline {subsubsection}{\numberline {2.2.1}Generic parameters}{6}{subsubsection.2.2.1}%
 \contentsline {subsubsection}{\numberline {2.2.2}Events and contract stages}{7}{subsubsection.2.2.2}%
-\contentsline {subsection}{\numberline {2.3}Visualization and simulation}{10}{subsection.2.3}%
-\contentsline {subsection}{\numberline {2.4}Background on the modal mu calculus in mcrl2}{10}{subsection.2.4}%
-\contentsline {subsection}{\numberline {2.5}Automated reasoning with the contract}{10}{subsection.2.5}%
-\contentsline {section}{\numberline {3}Related work}{10}{section.3}%
-\contentsline {section}{\numberline {4}Limitations and future work}{10}{section.4}%
+\contentsline {subsubsection}{\numberline {2.2.3}Tracking global state}{9}{subsubsection.2.2.3}%
+\contentsline {subsubsection}{\numberline {2.2.4}Main payment loop}{10}{subsubsection.2.2.4}%
+\contentsline {subsection}{\numberline {2.3}Visualization and simulation}{12}{subsection.2.3}%
+\contentsline {subsection}{\numberline {2.4}Background on the modal mu calculus in mcrl2}{12}{subsection.2.4}%
+\contentsline {subsection}{\numberline {2.5}Automated reasoning with the contract}{12}{subsection.2.5}%
+\contentsline {section}{\numberline {3}Related work}{12}{section.3}%
+\contentsline {section}{\numberline {4}Limitations and future work}{12}{section.4}%

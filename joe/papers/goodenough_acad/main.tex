@@ -248,12 +248,12 @@ Witnesses (resp. counter-examples) can then be provided for successful
 (resp. failed) verifications.
 
 As an example, one can define a binary search tree as such:
-\begin{verbatim}
+\begin{lstlisting}
 sort
   Tree = struct
     Empty
     | T(left : Tree, value : Nat, right : Tree);
-\end{verbatim}
+\end{lstlisting}
 Here we define a \texttt{Tree} sort
 \footnote{
   The term ``sort'' comes from multi-sorted logics since sorts in \mcrl \,
@@ -268,7 +268,7 @@ reminiscent of algebraic data types.
 
 With this, we can define an insert function with the following equations.
 
-\begin{verbatim}
+\begin{lstlisting}
 map insert : Nat # Tree -> Tree;
 
 var t, t' : Tree; n, m : Nat;
@@ -278,7 +278,7 @@ eqn
   (n < m) -> insert(n, T(t, m, t')) = insert(n, t);
   (n > m) -> insert(n, T(t, m, t')) = insert(n, t');
   (n == m) -> insert(n, T(t, m, t')) = T(t, m, t');
-\end{verbatim}
+\end{lstlisting}
 
 Note here that \texttt{Nat \# Tree} denotes the cartesian product
 \texttt{Nat $\times$ Tree} and that the arrows \texttt{(->)} as in
@@ -291,7 +291,7 @@ To evaluate these equations, the toolset treats them as rewriting rules
 Next, we define, as processes, a binary search tree and a button which
 when pressed, empties the tree:
 
-\begin{verbatim}
+\begin{lstlisting}
 act
   insert : Nat;
   press, press_r, press_s;
@@ -306,7 +306,7 @@ proc
 
   Button =
     press_s . Button;
-\end{verbatim}
+\end{lstlisting}
 
 The \texttt{Tree} process is parameterized over a tree \texttt{t}, indicating
 the current state of the tree.
@@ -332,12 +332,12 @@ Finally, we can define the initial process as a parallel composition
 (\texttt{$\cdot$ || $\cdot$}) of the \texttt{Tree} process, beginning with an
 empty tree and the button, \texttt{Button}.
 
-\begin{verbatim}
+\begin{lstlisting}
 init
   allow({insert, press},
   comm({press_r|press_s -> press},
   Tree(Empty) || Button));
-\end{verbatim}
+\end{lstlisting}
 
 Since we only want the tree to empty itself when the button is pressed, and
 not at any other times, we use \texttt{allow} and \texttt{comm}(unicate) to
@@ -363,7 +363,7 @@ As we wanted our specification to be modular, we began by defining the
 following global constants and functions over which the rest of our
 specification is parameterized.
 
-\begin{verbatim}
+\begin{lstlisting}
 map
   % The total number of payments involved in the contract.
   total_num_payments : Pos;
@@ -386,7 +386,7 @@ eqn
 
   (n == 1) -> payment_amt(n) = 550;
   (n == 2) -> payment_amt(n) = 525;
-\end{verbatim}
+\end{lstlisting}
 
 % As aforementioned, the \mcrl \, specification language operates at a higher
 % level of abstraction than LTSes, so that
@@ -428,6 +428,11 @@ To proceed with our formalization, we decided to model events as atomic
 actions in \mcrl.
 For instance, we have the actions \texttt{borrower\_default} for borrower
 defaults and \texttt{pay} for payments.
+Note here that for simplicity, we have ignored multiple kinds of defaults,
+preferring instead to use a single event to indicate defaults by
+representations, warranties, covenants and so on.
+We do however, have a separate action \texttt{payment\_default} for payment
+default events.
 These payment events include normal repayments, accelerated repayments,
 as well as principal repayments.
 We also have the actions \texttt{fulfilled} and \texttt{breached}, which as
@@ -463,9 +468,8 @@ We then observe that the contract has 4 key stages, namely:
   \item \textbf{Accelerated repayment}
 
   As described above, this is triggered when things go wrong.
-  Once started, it terminates both the main and side track processes and then
-  handles the accelerated repayment stage, in which the borrower is obliged to
-  repay the outstanding amount immediately.
+  It handles the accelerated repayment stage, in which the borrower is obliged
+  to repay the outstanding amount immediately.
 \end{enumerate}
 
 \inlinetodo{
@@ -481,12 +485,12 @@ These are modelled in \mcrl \, as the processes
 % }.
 % We define our main top-level process as the parallel composition:
 
-% \begin{verbatim}
+% \begin{lstlisting}
 %   init
 %     allow({...}, comm({...},
 %     Init || Main_idling || Side_idling
 %     || Outstanding(total_num_payments, initial_outstanding_amt)))
-% \end{verbatim}
+% \end{lstlisting}
 
 % where the \texttt{Outstanding} process is used to keep track of the remaining
 % number of payments and outstanding amount that the borrower owes.
@@ -498,12 +502,12 @@ These are modelled in \mcrl \, as the processes
 % Note here that \texttt{Main\_idling} (resp. \texttt{Side\_idling}) is
 % essentially the \texttt{Main} process in an idle state.
 
-% \begin{verbatim}
+% \begin{lstlisting}
 %   Main_idling =
 %     stop_main_r . Main_idling + start_main_r . Main . Main_idling;
-% \end{verbatim}
+% \end{lstlisting}
 
-\begin{verbatim}
+\begin{lstlisting}
 Init =
   dont_request_principal . fulfilled
   + request_principal . (
@@ -512,7 +516,7 @@ Init =
       + pay(Principal, Lender, Borrower, principal_amt) .
         start_main_s . start_side_s
     );
-\end{verbatim}
+\end{lstlisting}
 
 At the start of the contract, the borrower has the option of requesting for
 the principal amount.
@@ -534,36 +538,203 @@ These communicate with the corresponding \texttt{start\_main\_r} and
 
 Note here that we would have preferred to write:
 
-\begin{verbatim}
+\begin{lstlisting}
 pay(Principal, Lender, Borrower, principal_amt) .
 (Main || Side)
-\end{verbatim}
+\end{lstlisting}
 
 However, the \mcrl \, tools do not allow for parallel composition nested under
 sequential composition.
 Parallel composition can only be used at the top-level, so that we had to lift
-it up using the following structure:
+it up via:
 
-\begin{verbatim}
-  proc
-    Main_idling = start_main_r . Main;
-    Side_idling = start_side_r . Side;
-  
-  init
-    allow({start_main, start_side},
-    comm({
-      start_main_s|start_main_r -> start_main,
-      start_side_s|start_side_r -> start_side,
-    },
-      init Init || Main_idling || Side_idling;
-    ))
-\end{verbatim}
+\begin{lstlisting}[label=init1, caption=Top-level process version 1]
+init
+  allow({start_main, start_side},
+  comm({
+    start_main_s|start_main_r -> start_main,
+    start_side_s|start_side_r -> start_side,
+  },
+    Init || start_main_r . Main || start_side_r . Side;
+  ))
+\end{lstlisting}
 
-This means that the \texttt{Main} (resp. \texttt{Side}) process begins in an
-idle state, waiting for the \texttt{start\_main\_s}
-(resp. \texttt{start\_side\_s}) action to be run in the \texttt{Init} process.
-This behaves like a trigger that causes the \texttt{Main} and \texttt{Side}
-processes to begin running.
+\subsubsection{Tracking global state}
+
+As \mcrl \, does not allow for global mutable variables as found in
+imperative programming language, we cannot simply create global variables to
+track the state of the contract, namely the remaining number of payments and
+outstanding amount.
+
+Fortunately, \cite[Section 3.2.2]{mcrl_lhc} describes a simple, common
+technique for this.
+We define a new \texttt{Outstanding} process which keeps track of these
+variables, which communicates with all the other processes, like
+\texttt{Main}, \texttt{Side} and \texttt{Accel}.
+Intuitively, payment events that occur in these other processes will cause
+these variables to be updated here and when accelerated repayment events
+occur in \texttt{Accel}, this process can be queried to obtain the current
+outstanding amount.
+
+\begin{lstlisting}
+proc Outstanding(remaining_payments : Nat, outstanding : Nat) =
+  remaining_payments_r(remaining_payments) .
+  Outstanding(remaining_payments, outstanding)
+
+  + next_payment_number_r(
+      Int2Pos(max(1, total_num_payments - remaining_payments + 1))
+    ) .
+    Outstanding(remaining_payments, outstanding)
+
+  + outstanding_r(outstanding) .
+    Outstanding(remaining_payments, outstanding)
+
+  + (outstanding > 0) -> (
+      pay_r(Accelerated, Borrower, Lender, Nat2Pos(outstanding)) .
+      Outstanding(0, 0)
+    )
+
+  + sum amt_paid : Pos. (
+      pay_r(Normal, Borrower, Lender, amt_paid) .
+      Outstanding(
+        remaining_payments = Int2Nat(max(0, remaining_payments - 1)),
+        outstanding = Int2Nat(max(0, outstanding - amt_paid))
+      )
+    );
+\end{lstlisting}
+
+Whenever a \texttt{pay\_s} event corresponding to a borrower repayment occurs
+in the \texttt{Main} process,
+the corresponding \texttt{pay\_r} event triggers, causing the
+\texttt{Outstanding} process to recurse with the updated variable values.
+The actions \texttt{remaining\_payments\_r}, \texttt{next\_payment\_number\_r}
+and \texttt{outstanding\_r} allow other processes to query this process for
+the remaining number of payments, next payment number and outstanding amount.
+
+% With this, we can define our top-level process to be
+% \begin{lstlisting}[label=init1, caption=Top-level process version 2]
+% init
+%   allow({...},
+%   comm({...}},
+%     Init || start_main_r . Main || start_side_r . Side
+%     || Outstanding(total_num_payments, initial_outstanding_amt);
+%   ))
+% \end{lstlisting}
+
+\subsubsection{Main payment loop}
+\inlinetodo{
+  It's worth mentioning how this explicates how we can model process interruption
+  as a meta-level operator in process algebras that don't have them built in.
+}
+
+The \texttt{Main} payment process communicates with the \texttt{Outstanding}
+process, looping through all repayment stages.
+Recall that we want this \texttt{Main} process, along with the \texttt{Side}
+track process, to be interruptible because we want to terminate them
+before switching over to the \texttt{Accel} process for accelerated repayments.
+Consequently, we first define a wrapper process, \texttt{Main\_idling} that
+represents the \texttt{Main} track process in an idle state:
+
+\begin{lstlisting}
+proc
+  Main_idling =
+    stop_main_r . Main_idling + start_main_r . Main . Main_idling;
+\end{lstlisting}
+
+This idle process listens for start and stop signals in the form of
+\texttt{start\_main\_s} and \texttt{stop\_main\_s} actions.
+If a stop signal is received via a \texttt{stop\_main\_r} action,
+the \texttt{Main\_idling} process continues to idle as indicated by the
+recursion.
+When \texttt{start\_main\_s} is run in the \texttt{Init} process, it
+communicates with this \texttt{start\_main\_r} action, kicking the
+\texttt{Main\_idling} process out of its idle state so that the
+\texttt{Main} process begins to run.
+Thereafter, the process goes back to its idle state.
+
+We define the \texttt{Main} process using tail recursion as in
+functional programming to express the looping structure:
+
+\begin{lstlisting}
+proc
+  Stop_main_r = stop_main_r . Main_idling;
+
+  Main = sum n : Pos.
+    next_payment_number_s(n) .
+
+    (n > total_num_payments) -> 
+      stop_side_s . fulfilled
+    <> (
+      (pay_s(Normal, Borrower, Lender, payment_amt(n)) + Stop_main_r) .
+      Main
+
+      + (payment_default(Normal, Borrower, Lender, payment_amt(n))
+          + Stop_main_r) . (
+        (dont_notify_borrower + Stop_main_r) . Main
+
+        + (notify_borrower_of_default + Stop_main_r) . (
+          (cure_default + Stop_main_r) . Main
+
+          + (dont_cure_default + Stop_main_r) .
+            stop_side_s . Accel
+          )
+        )
+      );
+\end{lstlisting}
+
+Notice that all actions corresponding to events like
+\texttt{pay\_s} and \texttt{cure\_default} are annotated with a choice
+\texttt{+ Stop\_main\_r}.
+This allows the \texttt{Main} process to listen out for a stop signal and
+transition back to the idling state upon receiving one.
+More precisely, \texttt{stop\_main\_r} communicates with
+\texttt{stop\_main\_s} actions, causing it to execute instead as per
+the idle \texttt{Main\_idling} process. 
+
+\inlinetodo{
+  Should probably mention about how we hide those actions and prioritize tau
+  transitions in the LTS to give them priority.
+}
+
+Observe that we first perform \texttt{next\_payment\_number(n)}, which as
+mentioned earlier, communicates with the \texttt{Outstanding} process to
+determine what the next payment number is.
+\texttt{(n > total\_num\_payments) -> \dots <> \dots} is a conditional
+if-then-else that checks if all payments have been made.
+If so, the side track is stopped via the \texttt{stop\_side\_s} action and
+the \texttt{fulfilled} action is performed.
+Otherwise, the borrower is obligated to pay the lender.
+In the event that he does, \texttt{pay\_s} is run and communicates with the
+corresponding \texttt{pay\_r} action in the \texttt{Outstanding} process to
+update the state of the contract.
+
+Suppose now the borrower defaults on the payment as indicated by the
+\texttt{payment\_default} event. 
+Then, if he is not notified by the borrower or eventually cures his default,
+he does not get into trouble, so we recurse to the start of the \texttt{Main}
+process and continue handling the remaining payments.
+If instead he is notified but fails to cure his default in time,
+\texttt{stop\_side\_s} is run, stopping the \texttt{Side} track process.
+Thereafter, we proceed with the accelerated repayment stage via the
+\texttt{Accel} process.
+
+% where \texttt{Main\_idling} is given by
+% \begin{lstlisting}
+%     proc Main_idling =
+%       stop_main_r . Main_idling + start_main_r . Main . Main_idling;
+%     Stop_main_r = stop_main_r . Main_idling;
+% \end{lstlisting}
+
+% \texttt{Side\_idling} is similarly defined.
+% Intuitively, \texttt{Main\_idling} is a process wrapping \texttt{Main} that
+% begins in an idle state, waiting for the \texttt{start\_main\_s}
+% action to be run in the \texttt{Init} process.
+% When run, this action triggers the \texttt{Main} (resp. \texttt{Side}) track
+% processes to start running.
+
+% In order to allow for both the \texttt{Main} and \texttt{Side}
+% processes to be interrupted during execution, we had to define, for instance
+% for the main process:
 
 \info{
   Some notes:
@@ -624,6 +795,25 @@ processes to begin running.
   then how to handle permission?
 
   Also, how to handle reparation/compensation?
+
+  \item Connecting this to l4.
+  
+  \mcrl \, is a capable tool but not exactly what we want to use, because it
+  lacks some higher level conveniences that we would like to have.
+  These include things like global state, global clock for time and interrupts.
+
+  Still, this experiment gives us a good idea of what kind of features we want
+  for l4's semantics, specifically if we want to use some process algebra for
+  it.
+  Moreover, it also demonstrates how we can model these in \mcrl.
+  While global state, time and interrupts aren't too difficult to handle, the
+  inability to express parallel composition like \texttt{A. (B || C)} suggests
+  that we may need to do some non-trivial encoding into \mcrl.
+
+  There seems to be various works out there about formalizing semantics of
+  various things like UML state machines in various tools like \mcrl \, and
+  beyond.
+  Should look into this for clues on how we can model l4's semantics.
 \end{enumerate}
 
 % which make such an encoding cumbersome.

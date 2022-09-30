@@ -20,11 +20,11 @@
 \citation{contract_as_automaton}
 \citation{contract_as_automaton}
 \@writefile{tdo}{\contentsline {todo}{ This is a work in progress. }{1}{section*.1}\protected@file@percent }
-\pgfsyspdfmark {pgfid1}{20088094}{33716175}
+\pgfsyspdfmark {pgfid1}{20088094}{33995044}
 \@writefile{toc}{\contentsline {section}{\numberline {1}Intro and shortcomings of DFA formalization}{1}{section.1}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {1.1}Intro}{1}{subsection.1.1}\protected@file@percent }
 \@writefile{tdo}{\contentsline {todo}{ \textbf  {TODO} \par  Write a better intro and provide more background on \cite  {contract_as_automaton}.  }{1}{section*.2}\protected@file@percent }
-\pgfsyspdfmark {pgfid2}{20088094}{9984682}
+\pgfsyspdfmark {pgfid2}{20088094}{8786739}
 \citation{contract_as_automaton}
 \@writefile{toc}{\contentsline {subsection}{\numberline {1.2}Shortcomings}{2}{subsection.1.2}\protected@file@percent }
 \citation{contract_as_automaton}
@@ -47,18 +47,29 @@
 \citation{contract_as_automaton}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {2.2.2}Events and contract stages}{7}{subsubsection.2.2.2}\protected@file@percent }
 \@writefile{tdo}{\contentsline {todo}{ \textbf  {TODO} \par  Draw and insert picture.  }{8}{section*.5}\protected@file@percent }
-\pgfsyspdfmark {pgfid9}{20088094}{28027372}
-\@writefile{tdo}{\contentsline {todo}{ Some notes: \par Talk about how the main repayment track is recursive, modelling a loop that iterates through the number of payments involved in the loan agreement. \par While \texttt  {mcrl2}\, does not have a notion of global variables like other formalisms (mention other formalisms here, maybe uppaal?), these can be easily simulated. Our specification defines ``global variables'' representing the current runtime state of the contract, namely the remaining number of payments as well as the outstanding amount. These variables are then updated whenever a normal repayment event occurs, and referenced during accelerated repayment event. \par \par Finally, our formalization also allow for more events to be interleaved concurrently. In particular, we make no assumption that the borrower is notified immediately after a default event occurs. Payment events or even other default events may occur in the meantime, so that in the latter case, the borrower has multiple defaults to cure. }{9}{section*.6}\protected@file@percent }
-\pgfsyspdfmark {pgfid10}{20088094}{16544293}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Visualization and simulation}{10}{subsection.2.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.4}Background on the modal mu calculus in mcrl2}{10}{subsection.2.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.5}Automated reasoning with the contract}{10}{subsection.2.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {3}Related work}{10}{section.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {4}Limitations and future work}{10}{section.4}\protected@file@percent }
+\pgfsyspdfmark {pgfid9}{20088094}{28470934}
+\citation{mcrl_lhc}
+\newlabel{init1}{{1}{9}{Top-level process version 1}{lstlisting.1}{}}
+\newlabel{init1@cref}{{[lstlisting][1][]1}{[1][9][]9}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {1}Top-level process version 1}{9}{lstlisting.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.2.3}Tracking global state}{9}{subsubsection.2.2.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.2.4}Main payment loop}{10}{subsubsection.2.2.4}\protected@file@percent }
+\@writefile{tdo}{\contentsline {todo}{ \textbf  {TODO} \par  It's worth mentioning how this explicates how we can model process interruption as a meta-level operator in process algebras that don't have them built in.  }{10}{section*.6}\protected@file@percent }
+\pgfsyspdfmark {pgfid10}{20088094}{30231578}
+\@writefile{tdo}{\contentsline {todo}{ \textbf  {TODO} \par  Should probably mention about how we hide those actions and prioritize tau transitions in the LTS to give them priority.  }{11}{section*.7}\protected@file@percent }
+\pgfsyspdfmark {pgfid11}{20088094}{24192889}
+\@writefile{tdo}{\contentsline {todo}{ Some notes: \par Talk about how the main repayment track is recursive, modelling a loop that iterates through the number of payments involved in the loan agreement. \par While \texttt  {mcrl2}\, does not have a notion of global variables like other formalisms (mention other formalisms here, maybe uppaal?), these can be easily simulated. Our specification defines ``global variables'' representing the current runtime state of the contract, namely the remaining number of payments as well as the outstanding amount. These variables are then updated whenever a normal repayment event occurs, and referenced during accelerated repayment event. \par \par Finally, our formalization also allow for more events to be interleaved concurrently. In particular, we make no assumption that the borrower is notified immediately after a default event occurs. Payment events or even other default events may occur in the meantime, so that in the latter case, the borrower has multiple defaults to cure. }{11}{section*.8}\protected@file@percent }
+\pgfsyspdfmark {pgfid12}{20088094}{37461471}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Visualization and simulation}{12}{subsection.2.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.4}Background on the modal mu calculus in mcrl2}{12}{subsection.2.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.5}Automated reasoning with the contract}{12}{subsection.2.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {3}Related work}{12}{section.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {4}Limitations and future work}{12}{section.4}\protected@file@percent }
 \bibstyle{acm}
 \bibdata{refs}
 \bibcite{mcrl_toolset}{1}
 \bibcite{contract_as_automaton}{2}
 \bibcite{mcrl_book}{3}
-\bibcite{mcrl_rewriting}{4}
-\gdef \@abspage@last{11}
+\bibcite{mcrl_lhc}{4}
+\bibcite{mcrl_rewriting}{5}
+\gdef \@abspage@last{14}

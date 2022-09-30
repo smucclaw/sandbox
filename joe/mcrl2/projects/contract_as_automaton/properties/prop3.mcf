@@ -1,38 +1,58 @@
+% This formula says the following:
+%
+% 1. First, it asserts a safety property which says that throughout the
+%    execution of the DFA:
+%    1.a. The borrower cannot overpay the lender in that he cannot:
+%         1.a.i. Make more payments that agreed upon in total_num_payments.
+%         1.a.ii. Pay more than the initial outstanding amount across all payments. 
+%    1.b. As long as the borrower has yet to receive the principal, he cannot
+%         have made any repayment to the lender.
+%
+% 2. Next, it asserts the following post-conditions upon breached and fulfilled
+%    events. Note that these events denote the completion of the contract.
+%    2.a. On the occurrence of a fulfilled event, if the principal has been
+%         received by the borrower, then he must have made at least 1 payment,
+%         with a total amount equal to the initial outstanding amount.
+%    2.b. When a breached event occurs, it must have been the case that the
+%         borrower did not pay the initial outstanding amount to the lender.
+
 nu X(
   % Number of repayments the borrower makes.
   num_payments : Nat = 0,
-  % Total amount repaid by the borrower.
-  total_paid : Nat = 0,
+  % Amount repaid by the borrower across all payments.
+  paid : Nat = 0,
   % This indicates if the borrower has received the principal from the lender.
   principal_received : Bool = false
 ).
-val(num_payments <= total_num_payments)
-&& val(total_paid <= initial_outstanding_amt)
-&& (
-  [fulfilled] (
-    ([true] false)
-    && val(principal_received => total_paid == initial_outstanding_amt)
-    && val(!principal_received => total_paid == 0)
-    && X(num_payments, total_paid, principal_received)
+% Safety property
+val(
+  num_payments <= total_num_payments && paid <= initial_outstanding_amt
+  && (!principal_received => {num_payments, paid} == {0})
+) && (
+  % Post-condition for fulfilled events.
+  [fulfilled] val(
+    principal_received =>
+      (num_payments >= 1 && paid == initial_outstanding_amt)
   )
 ) && (
-  [breached] (
-    ([true] false)
-    && val(total_paid < initial_outstanding_amt)
-    && X(num_payments, total_paid, principal_received)
-  )
+  % Post-condition for breached events.
+  [breached] val(paid < initial_outstanding_amt)
 ) && (
+  % If the borrower receives the principal from the lender, we set
+  % principal_received to true and continue to recurse over the transition
+  % system.
   [exists amt : Pos. pay(Principal, Lender, Borrower, amt)]
-  X(num_payments, total_paid, true)
+  X(num_payments, paid, true)
 ) && (
+  % In the event that the borrower pays amt to the lender, we update
+  % num_payments and paid accordingly and recurse.
   forall amt : Pos.
     [exists pt : Payment_type. pay(pt, Borrower, Lender, amt)]
-    X(num_payments + 1, total_paid + amt, principal_received)
+    X(num_payments + 1, paid + amt, principal_received)
 ) && (
-  [
-    !fulfilled && !breached &&
-    !(exists pt : Payment_type, p1, p2 : Party, amt : Pos.
-        pay(pt, p1, p2, amt))
-  ]
-  X(num_payments, total_paid, principal_received)
+  % For any event that is not a pay event, we simply continue recursing without
+  % updating any variables.
+  [!(exists pt : Payment_type, p1, p2 : Party, amt : Pos.
+    pay(pt, p1, p2, amt))]
+  X(num_payments, paid, principal_received)
 )

@@ -1,5 +1,6 @@
 sort
   Global_var = struct X;
+  Global_var_domain = Int;
 
   Event_name = struct Event1 | Event2;
 
@@ -7,9 +8,11 @@ sort
 
   Party = struct Party1 | Party2;
 
-  % TODO: Augment events with global store updates.
-  Event = struct Event(
-    event_name : Event_name
+  Assn_stmt = struct Assn_stmt(
+    assn_var : Global_var,
+    % TODO: Implement a proper big step operational semantics that handles
+    % lookups of free variables etc.
+    assn_val : Global_var_domain
   );
 
   Ob_state = struct In_effect | Fulfilled | Violated | Terminated;
@@ -27,28 +30,21 @@ sort
         obs_terminated : Set(Ob_name)
       )?is_state_update_entry;
 
-  % Trigger_params = struct Trigger_params(
-  %   trigger_event : Event_name,
-  %   trigger_fulfilled_obs : Set(Ob_name),
-  %   trigger_violated_obs : Set(Ob_name)
-  % );
-  
-  % Termination_cond = struct
-  %   Termination_event_log(
-  %     termination_event_log : Event_log -> Ob_state,
-  %   )?is_termination_event_log
-  %   | Termination_event(
-  %     termination_event : Event_name -> Ob_state
-  %   )is_termination_event;
-
-  % Regulative rule defining an obligation.
+  % Obligation corresponding to some regulative rule.
   Ob = struct Ob(
     % Parties the obligation is attached to.
     % This will be used for blame assignment.
     parties : Set(Party),
 
-    num_to_instantiate : Event_log -> Pos,
+    % Trigger condition which determines how many instances of the obligation
+    % are to be created based on the event log.
+    % This is kinda like a formula in a first-order extension of LTL, interpreted
+    % over the (finite) runtime trace, augmented with actions indicating state
+    % transitions of obligation instances.
+    num_to_instantiate : Event_log -> Nat,
 
+    % Transition function which given event_log, determines what state the
+    % an obligation instance transitions to.
     trans_fn : Ob_state # Event_log -> Ob_state,
 
     % Active instances of this obligation.
@@ -101,13 +97,19 @@ map
 
   is_event_enabled : Event_name # Contract_config -> Bool;
 
+  event_assns : Event_name -> List(Assn_stmt);
+
+  update_store : List(Assn_stmt) # Store -> Store;
+
 var
   contract_config : Contract_config;
   event_name' : Event_name;
+  assn_var' : Global_var; assn_val' : Global_var_domain;
+  assns : List(Assn_stmt);
   obs' : Obs; store' : Store; event_log' : Event_log;
   old_state, new_state : Ob_state;
   event_log_entry : Event_log_entry;
-  num_instantiated : Pos;
+  num_instantiated : Nat;
 
 eqn
   instantiated_obs(Contract_config(obs', store', event_log')) =
@@ -120,11 +122,9 @@ eqn
   % We curry this so that we can do pointfree partial application as below.
   obs_state_change(old_state, new_state) =
     lambda contract_config : Contract_config. {ob_name : Ob_name |
-      if(
-        trans_fn(ob)(old_state, event_log') == new_state,
+      if(trans_fn(ob)(old_state, event_log') == new_state,
         count(old_state, instances(ob)),
-        0
-      )
+        0)
       whr
         ob = obs(contract_config)(ob_name),
         event_log' = event_log(contract_config)
@@ -147,6 +147,12 @@ eqn
       end
     );
 
+  event_assns(event_name') = [];
+
+  update_store([], store') = store';
+  update_store(Assn_stmt(assn_var', assn_val') |> assns, store') = 
+    update_store(assns, store'[assn_var' -> assn_val']);
+
 act
   event : Event_name;
   ob : Ob_name # Ob_state;
@@ -159,8 +165,7 @@ proc
       Update_obs(
         Contract_config(
           obs(contract_config),
-          % TODO: Incorporate updates to global variable store.
-          store(contract_config),
+          update_store(event_assns(event_name'), store(contract_config)),
           Event_entry(event_name') |> event_log(contract_config))
       )
     ) <> Termination(contract_config)
@@ -190,7 +195,7 @@ init Update_obs(Contract_config(
   lambda x : Ob_name.
     Ob(
       {Party1},
-      lambda event_log' : Event_log. 1,
+      lambda event_log' : Event_log. Pos2Nat(1),
       lambda curr_state : Ob_state, event_log' : Event_log.
         if(head(event_log') == Event_entry(Event1) && curr_state == In_effect,
           Fulfilled,

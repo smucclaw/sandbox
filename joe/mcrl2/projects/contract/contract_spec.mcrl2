@@ -1,0 +1,206 @@
+sort
+  Global_var = struct X;
+
+  Event_name = struct Event1 | Event2;
+
+  Ob_name = struct Some_obligation;
+
+  Party = struct Party1 | Party2;
+
+  % TODO: Augment events with global store updates.
+  Event = struct Event(
+    event_name : Event_name
+  );
+
+  Ob_state = struct In_effect | Fulfilled | Violated | Terminated;
+
+  % The event log keeps track of past events that have occured, as well as the
+  % change in state of obligations caused by the firing of those events.
+  Event_log = List(Event_log_entry);
+
+  Event_log_entry = struct
+    Event_entry(event_entry_event : Event_name)?is_event_entry
+    | State_update_entry(
+        obs_instantiated : Set(Ob_name),
+        obs_fulfilled : Set(Ob_name),
+        obs_violated : Set(Ob_name),
+        obs_terminated : Set(Ob_name)
+      )?is_state_update_entry;
+
+  % Trigger_params = struct Trigger_params(
+  %   trigger_event : Event_name,
+  %   trigger_fulfilled_obs : Set(Ob_name),
+  %   trigger_violated_obs : Set(Ob_name)
+  % );
+  
+  % Termination_cond = struct
+  %   Termination_event_log(
+  %     termination_event_log : Event_log -> Ob_state,
+  %   )?is_termination_event_log
+  %   | Termination_event(
+  %     termination_event : Event_name -> Ob_state
+  %   )is_termination_event;
+
+  % Regulative rule defining an obligation.
+  Ob = struct Ob(
+    % Parties the obligation is attached to.
+    % This will be used for blame assignment.
+    parties : Set(Party),
+
+    num_to_instantiate : Event_log -> Pos,
+
+    trans_fn : Ob_state # Event_log -> Ob_state,
+
+    % Active instances of this obligation.
+    instances : Bag(Ob_state)
+  );
+
+  Obs = Ob_name -> Ob;
+
+  Store = Global_var -> Int;
+
+  % The state of a contract is defined via contract configurations
+  %   C =  <obs, store, event_log>
+  % where:
+  % - obs is a set of obligations definitions and their active instances.
+  % - store is a store for global variables.
+  % - event_log keeps track of events that occured as well as the induced
+  %   state changes in obligation instances.
+  %
+  % A contract defines a process that executes given an initial contract
+  % configuration.
+  % The execution proceeds as a multiplayer game involving:
+  % - P: Parties involved in the contract
+  % - O: The contract environment
+  % O makes the first move by setting up some initial obligations that
+  % P needs to fulfill.
+  % P (or some nonempty subset of P) then proceeds by performing an action in
+  % the real world, which we model as an event.
+  % In response, O then updates the state of the obligations, as some of them
+  % become fulfilled, violated or breached.
+  % O may also create new instances of obligations, each of which is assigned to
+  % somen nonempty subset of P.
+  % The game continues as such, alternating between P and O moves until no more
+  % P moves are available.
+  % In other words, the execution of a contract terminates when there is no
+  % more event that can trigger a change in state of any of the instantiated
+  % obligations.
+  Contract_config = struct Contract_config(
+    obs : Obs,
+    store : Store,
+    event_log : Event_log
+  ); 
+
+map
+  obs_state_change : Ob_state # Ob_state -> Contract_config -> Bag(Ob_name);
+
+  terminated_obs, fulfilled_obs, violated_obs
+    : Contract_config -> Bag(Ob_name);
+
+  instantiated_obs : Contract_config -> Bag(Ob_name);
+
+  is_event_enabled : Event_name # Contract_config -> Bool;
+
+var
+  contract_config : Contract_config;
+  event_name' : Event_name;
+  obs' : Obs; store' : Store; event_log' : Event_log;
+  old_state, new_state : Ob_state;
+  event_log_entry : Event_log_entry;
+  num_instantiated : Pos;
+
+eqn
+  instantiated_obs(Contract_config(obs', store', event_log')) =
+    {ob_name : Ob_name | num_to_instantiate(obs'(ob_name))(event_log')};
+
+  % This defines the bag of all obligations which transition from
+  % old_state to new_state given the contract configuration contract_config.
+  % This is paramterized over the free variables old_State, new_state and
+  % contract_config.
+  % We curry this so that we can do pointfree partial application as below.
+  obs_state_change(old_state, new_state) =
+    lambda contract_config : Contract_config. {ob_name : Ob_name |
+      if(
+        trans_fn(ob)(old_state, event_log') == new_state,
+        count(old_state, instances(ob)),
+        0
+      )
+      whr
+        ob = obs(contract_config)(ob_name),
+        event_log' = event_log(contract_config)
+      end
+    };
+
+  terminated_obs = obs_state_change(In_effect, Terminated);
+  fulfilled_obs = obs_state_change(In_effect, Fulfilled);
+  violated_obs = obs_state_change(In_effect, Violated);
+
+  % Given an event, an event log and the set of obligations, the event is
+  % enabled if it triggers a state change of some obligation instance.
+  is_event_enabled(event_name', Contract_config(obs', store', event_log')) =
+    exists ob_name : Ob_name, ob_state : Ob_state. (
+      ob_state in instances(ob)
+      && trans_fn(ob)(ob_state, event_log'') != ob_state
+      whr
+        ob = obs'(ob_name),
+        event_log'' = Event_entry(event_name') |> event_log'
+      end
+    );
+
+act
+  event : Event_name;
+  ob : Ob_name # Ob_state;
+  fulfilled, breached;
+
+proc
+  Event(contract_config : Contract_config) = sum event_name' : Event_name. (
+    is_event_enabled(event_name', contract_config) -> (
+      event(event_name') .
+      Update_obs(
+        Contract_config(
+          obs(contract_config),
+          % TODO: Incorporate updates to global variable store.
+          store(contract_config),
+          Event_entry(event_name') |> event_log(contract_config))
+      )
+    ) <> Termination(contract_config)
+  );
+
+  Update_obs(contract_config : Contract_config) =
+    % TODO: update obligation instances accordingly
+    Event(contract_config);
+
+  Termination(contract_config : Contract_config) =
+    % TODO: determine if the contract terminates successfully or not, ie
+    % fulfilled or breached.
+    tau;
+
+    % exists ob_aut : Ob_aut.
+    % ob_aut in ob_auts
+    % && forall ob : Ob. (
+    %     (ob in obs && ob_name(ob) == ob_aut_name(ob_aut)) =>
+    %       trans_fn(ob)(ob_curr_state(ob_aut), event) != Dead_state
+    % )
+
+    % && ob(ob_aut_name(ob_aut))) ->
+    % event(event_name') . Contract_config(obs = obs);
+
+init Update_obs(Contract_config(
+  % Obligations
+  lambda x : Ob_name.
+    Ob(
+      {Party1},
+      lambda event_log' : Event_log. 1,
+      lambda curr_state : Ob_state, event_log' : Event_log.
+        if(head(event_log') == Event_entry(Event1) && curr_state == In_effect,
+          Fulfilled,
+          if(head(event_log') == Event_entry(Event2) && curr_state == In_effect,
+            Violated,
+            curr_state)),
+      {In_effect : 1}
+    ),
+  % Store
+  lambda x : Global_var. Nat2Int(0),
+  % Event log
+  []
+));

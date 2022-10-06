@@ -1,0 +1,8 @@
+digraph G {
+center = TRUE;
+mclimit = 10.0;
+nodesep = 0.05;
+node [ width=0.25, height=0.25, label="" ];
+S0 [ peripheries=2 ];
+S0
+}

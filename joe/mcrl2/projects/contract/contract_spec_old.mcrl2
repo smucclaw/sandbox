@@ -1,0 +1,156 @@
+sort
+  Global_var = struct X;
+
+  Event_name = struct Event1 | Event2;
+
+  Ob_name = struct Some_obligation;
+
+  Party = struct Party1 | Party2;
+
+  Event = struct Event(
+    event_name : Event_name,
+    global_var : Global_var,
+    new_value : Int
+  );
+
+  Ob_state = struct In_effect | Suspended | Fulfilled | Violated;
+
+  % The event log keeps track of past events that have occured, as well as the
+  % change in state of obligations caused by the firing of those events.
+  Event_log = List(Event_log_entry);
+
+  Event_log_entry = struct Event_log_entry(
+    event_log_entry_event_name : Event_name,
+    % TODO: Change Set to Bag
+    event_log_created : Set(Ob_name),
+    event_log_suspended : Set(Ob_name),
+    event_log_fulfilled : Set(Ob_name),
+    event_log_violated : Set(Ob_name)
+  );
+
+  % Trigger_params = struct Trigger_params(
+  %   trigger_event : Event_name,
+  %   trigger_fulfilled_obs : Set(Ob_name),
+  %   trigger_violated_obs : Set(Ob_name)
+  % );
+
+  % Regulative rule defining an obligation.
+  % Think of obligations as quests and a contract composed of obligations
+  % as a quest log.
+  % Execution of a contract proceeds as a game with an initially populated
+  % quest log.
+  % Each quest can be attached to multiple players and may have a time limit
+  % to be completed.
+  Ob = struct Ob(
+    % Parties the obligation is attached to.
+    % This will be used for blame assignment.
+    parties : Set(Party),
+
+    % Trigger condition that determines when the obligation comes into effect.
+    % This is a first-order formula parameterized by:
+    % - The event that just occurred.
+    % - The set of obligations that got fulfilled by the event.
+    % -     "            "              violated   "
+    trigger : Event_name # Set(Ob_name) # Set(Ob_name) -> Bool,
+
+    % Obligations to interrupt when this one comes into effect.
+    suspend_on_creation : Set(Ob_name),
+
+    % Any of these events will cause this obligation to become fulfilled.
+    fulfill_events : Set(Event_name),
+
+    % Any of these events will cause this obligation to become violated.
+    violate_events : Set(Event_name),
+
+    % Instances of this obligation that are active.
+    instances : Bag(Ob_state) 
+  );
+
+  Obs = Ob_name -> Ob;
+
+  Store = Global_var -> Int;
+
+act
+  event : Event_name;
+  ob : Ob_name # Ob_state;
+  fulfilled, breached;
+
+proc
+  % The process below defines a small step operational semantics with
+  % judgements of the form C ---- E ----> C'
+  % where:
+  % - C = <obs, store, event_log> is called a contract configuration.
+  % - E is an event
+  Contract_config(
+    obs : Obs,
+    store : Store,
+    event_log : Event_log
+  ) =
+    % event E lies in the event alphabet of some obligation automaton 
+    % ------------------------------------------------------------------
+    %                 C -----> E -----> C'
+    % where C' is C with an updated event log and variable store.
+    % Also, all automata that can take the E transition do so.
+    sum event_name' : Event_name. (
+      exists ob_name : Ob_name.
+        In_effect in instances(obs(ob_name))
+        && event_name' in fulfill_events(obs(ob_name)) + violate_events(obs(ob_name))
+    ) ->
+      event(event_name') .
+      Contract_config(
+        event_log =
+          Event_log_entry(
+            event_name',
+            % New obligations that come into effect.
+            {ob_name : Ob_name |
+              trigger(obs(ob_name))(
+                event_name',
+                {ob_name : Ob_name | event_name' in fulfill_events(obs(ob_name))},
+                {ob_name : Ob_name | event_name' in violate_events(obs(ob_name))}
+              )},
+            % Existing obligations which get suspended by any new ones that
+            % come into effect.
+            {ob_name : Ob_name |
+              exists ob_name' : Ob_name.
+                trigger(obs(ob_name'))(
+                  event_name',
+                  {ob_name : Ob_name | event_name' in fulfill_events(obs(ob_name))},
+                  {ob_name : Ob_name | event_name' in violate_events(obs(ob_name))}
+                )
+                && ob_name in suspend_on_creation(obs(ob_name'))},
+            % Obligations that are fulfilled by the event that just occured.
+            {ob_name : Ob_name | event_name' in fulfill_events(obs(ob_name))},
+            % Obligations that are violated by the event that just occured.
+            {ob_name : Ob_name | event_name' in violate_events(obs(ob_name))}
+          ) |> event_log,
+        % TODO: Update active obligations.
+        obs = obs,
+        % TODO: Incorporate updates to global variable store.
+        store = store
+      );
+
+      % exists ob_aut : Ob_aut.
+      % ob_aut in ob_auts
+      % && forall ob : Ob. (
+      %     (ob in obs && ob_name(ob) == ob_aut_name(ob_aut)) =>
+      %       trans_fn(ob)(ob_curr_state(ob_aut), event) != Dead_state
+      % )
+
+      % && ob(ob_aut_name(ob_aut))) ->
+      % event(event_name') . Contract_config(obs = obs);
+
+init Contract_config(
+  % Obligations
+  lambda x : Ob_name.
+    Ob(
+      {Party1},
+      lambda e : Event_name, fulfilled_obs : Set(Ob_name), violated_obs : Set(Ob_name). true,
+      {},
+      {Event1}, {Event2},
+      {In_effect : 1}
+    ),
+  % Initial store
+  lambda x : Global_var. 0,
+  % Initial event log
+  []
+);

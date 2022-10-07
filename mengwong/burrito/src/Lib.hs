@@ -76,14 +76,9 @@ someFunc = do
   putStrLn "\n* we try to use an infinite stream of IDs, relying on laziness."
   sg <- getStdGen
   let infWords = randomRs (1 :: Int, 65535) sg
-  putStr "infWords: "; print $ take 10 infWords
-
-  -- lolwut
-  -- infWords: [40673,43483,51992,64848,19763,8559,44030,2584,56300,46584]
-  -- showHex:  ["9ee1","9ee1","9ee1","9ee1","9ee1","9ee1","9ee1","9ee1","9ee1","9ee1"]
-
-  let infHexStrings = showHex <$> infWords <*> repeat ""
-  putStr "showHex:  "; print $ take 10 infHexStrings
+  putStr "- infWords :: "; print $ take 10 infWords
+  let infHexStrings = showHex <$> infWords <*> [""]
+  putStr "- showHex :: "; print $ take 10 infHexStrings
   
   let idsInserted3 = pureplace " id=\"" "\">" haystack (T.pack <$> infHexStrings)
   srchtml $ T.unpack idsInserted3

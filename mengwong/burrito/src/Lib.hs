@@ -82,14 +82,18 @@ someFunc = do
   let idsInserted3 = pureplace " id=\"" "\">" haystack (T.pack <$> infHexStrings)
   srchtml $ T.unpack idsInserted3
 
+  putStrLn "\n* you know, there's no law that the IDs have to be random, just unique, so sequential is fine!"
+  let idsInserted3b = pureplace " id=\"" "\">" haystack (T.pack . show <$> [1..])
+  srchtml $ T.unpack idsInserted3b
+
   putStrLn "\n* we use a non-random state monad representing an integer sequence."
   let (idsInserted4, stateN) = runState (statereplace " id=\"" "\">" haystack) 1
   srchtml $ T.unpack idsInserted4
 
-  putStrLn "\n** heck, we could even do it twice!"
+  putStrLn "\n* heck, we could even do it twice!"
   let (idsInserted5, stateM) = runState (statereplace " id=\"" "\">" haystack) stateN
   srchtml $ T.unpack idsInserted5
-  putStrLn $ "and after all that, we have state n = " <> show stateM
+  putStrLn $ "\n* and after all that, we have state n = " <> show stateM
   
   where
     insertIDs :: IO T.Text -> String -> IO T.Text
@@ -116,8 +120,9 @@ someFunc = do
         pureres :: T.Text  -- ^ split element of an input haystack
                 -> T.Text  -- ^ an ID for intercalation
                 -> T.Text  -- ^ output haystack element ready for rejoining
-        pureres x idT =
-          x <> prefix <> idT <> postfix
+        pureres x idT
+          | not $ T.null x || '/' `T.elem` x = x <> prefix <> idT <> postfix
+          | otherwise                        = x <> ">"
     
     statereplace :: T.Text -> T.Text -> [T.Text] -> State Int T.Text
     statereplace _refix _uffix []     = return ""

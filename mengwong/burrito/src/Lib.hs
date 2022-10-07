@@ -9,8 +9,8 @@ module Lib
 -- - haskellbook.com chapter 23
 -- - https://hackage.haskell.org/package/random-1.2.1.1/docs/System-Random.html
 -- - https://hackage.haskell.org/package/string-random-0.1.4.3/docs/Text-StringRandom.html
--- - https://hackage.haskell.org/package/string-random-0.1.4.3/docs/Text-StringRandom.html
 
+import Numeric
 import System.Random
 import Control.Monad.Trans.State
 import Control.Monad
@@ -74,8 +74,18 @@ someFunc = do
   srchtml $ T.unpack idsInserted2
 
   putStrLn "\n* we try to use an infinite stream of IDs, relying on laziness."
-  infiniteIDs <- repeatM rollStringIO -- this doesn't run as lazy as it should! [ERROR]
-  let idsInserted3 = pureplace " id=\"" "\">" haystack infiniteIDs
+  sg <- getStdGen
+  let infWords = randomRs (1 :: Int, 65535) sg
+  putStr "infWords: "; print $ take 10 infWords
+
+  -- lolwut
+  -- infWords: [40673,43483,51992,64848,19763,8559,44030,2584,56300,46584]
+  -- showHex:  ["9ee1","9ee1","9ee1","9ee1","9ee1","9ee1","9ee1","9ee1","9ee1","9ee1"]
+
+  let infHexStrings = showHex <$> infWords <*> repeat ""
+  putStr "showHex:  "; print $ take 10 infHexStrings
+  
+  let idsInserted3 = pureplace " id=\"" "\">" haystack (T.pack <$> infHexStrings)
   srchtml $ T.unpack idsInserted3
   
   where
@@ -105,8 +115,6 @@ someFunc = do
                 -> T.Text  -- ^ output haystack element ready for rejoining
         pureres x idT =
           x <> prefix <> idT <> postfix
-
-    repeatM = sequence . repeat
 
     srchtml x = mapM_ putStrLn [ "#+BEGIN_SRC html", x, "#+END_SRC" ]
     

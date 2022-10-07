@@ -79,9 +79,17 @@ someFunc = do
   putStr "- infWords :: "; print $ take 10 infWords
   let infHexStrings = showHex <$> infWords <*> [""]
   putStr "- showHex :: "; print $ take 10 infHexStrings
-  
   let idsInserted3 = pureplace " id=\"" "\">" haystack (T.pack <$> infHexStrings)
   srchtml $ T.unpack idsInserted3
+
+  putStrLn "\n* we use a non-random state monad representing an integer sequence."
+  let (idsInserted4, stateN) = runState (statereplace " id=\"" "\">" haystack) 1
+  srchtml $ T.unpack idsInserted4
+
+  putStrLn "\n** heck, we could even do it twice!"
+  let (idsInserted5, stateM) = runState (statereplace " id=\"" "\">" haystack) stateN
+  srchtml $ T.unpack idsInserted5
+  putStrLn $ "and after all that, we have state n = " <> show stateM
   
   where
     insertIDs :: IO T.Text -> String -> IO T.Text
@@ -110,6 +118,21 @@ someFunc = do
                 -> T.Text  -- ^ output haystack element ready for rejoining
         pureres x idT =
           x <> prefix <> idT <> postfix
-
-    srchtml x = mapM_ putStrLn [ "#+BEGIN_SRC html", x, "#+END_SRC" ]
     
+    statereplace :: T.Text -> T.Text -> [T.Text] -> State Int T.Text
+    statereplace _refix _uffix []     = return ""
+    statereplace _refix _uffix [x]    = return x
+    statereplace prefix suffix (x:xs)
+      | not $ '/' `T.elem` x = do
+          n <- get
+          let (rhs, m) = runState (statereplace prefix suffix xs) (n+1)
+          put m
+          return $ x <> prefix <> T.pack (show n) <> suffix <> rhs
+      | otherwise = do
+          rhs <- statereplace prefix suffix xs
+          return $ x <> ">" <> rhs
+    
+    srchtml x = mapM_ putStrLn [ "#+BEGIN_SRC html", x, "#+END_SRC" ]
+
+
+

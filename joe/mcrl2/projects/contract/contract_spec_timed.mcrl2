@@ -15,7 +15,12 @@ sort
     assn_val : Global_var_domain
   );
 
-  Ob_state = struct In_effect | Fulfilled | Violated | Terminated;
+  Ob_state = struct In_effect | Fulfilled | Violated | Terminated | Expired;
+
+  Ob_timed_state = struct Ob_timed_state(
+    ob_state : Ob_state,
+    ob_deadline : Int 
+  );
 
   % The event log keeps track of past events that have occured, as well as the
   % change in state of obligations caused by the firing of those events.
@@ -23,12 +28,18 @@ sort
 
   Event_log_entry = struct
     Event_entry(event_entry_event : Event_name)?is_event_entry
+    | Wait_entry(wait_entry_time : Pos)?is_wait_entry
     | State_update_entry(
         obs_instantiated : Set(Ob_name),
         obs_fulfilled : Set(Ob_name),
         obs_violated : Set(Ob_name),
         obs_terminated : Set(Ob_name)
       )?is_state_update_entry;
+
+  % Poor man's maybe monad, specialized to obligation deadlines.
+  Maybe_deadline = struct 
+    Some_deadline(some_deadline : Nat)
+    | No_deadline;
 
   % Obligation corresponding to some regulative rule.
   Ob = struct Ob(
@@ -43,6 +54,12 @@ sort
     % transitions of obligation instances.
     num_to_instantiate : Event_log -> Nat,
 
+    % Given the current time of instantiation, return the deadline of the
+    % obligation.
+    % This can be absolute or relative to the current time.
+    % Negative indicates no deadline.
+    deadline : Nat -> Maybe_deadline,
+
     % Transition function which given event_log, determines what state the
     % an obligation instance transitions to.
     trans_fn : Ob_state # Event_log -> Ob_state,
@@ -51,7 +68,7 @@ sort
     reparates : Set(Ob_name),
 
     % Active instances of this obligation.
-    instances : Bag(Ob_state)
+    instances : Ob_state -> Bag(Maybe_deadline) % Bag(Ob_timed_state)
   );
 
   Obs = Ob_name -> Ob;
@@ -98,7 +115,7 @@ map
 
   instantiated_obs : Contract_config -> Bag(Ob_name);
 
-  is_event_enabled : Event_name # Contract_config -> Bool;
+  is_event_allowed : Event_name # Contract_config -> Bool;
 
   event_assns : Event_name -> List(Assn_stmt);
 
@@ -141,11 +158,12 @@ eqn
   violated_obs = obs_state_change(In_effect, Violated);
 
   % Given an event, an event log and the set of obligations, the event is
-  % enabled if it triggers a state change of some obligation instance.
-  is_event_enabled(event_name', Contract_config(obs', store', event_log')) =
-    exists ob_name : Ob_name, ob_state : Ob_state. (
-      ob_state in instances(ob)
-      && trans_fn(ob)(ob_state, event_log'') != ob_state
+  % allowed if it triggers a state change of some obligation instance.
+  is_event_allowed(event_name', Contract_config(obs', store', event_log')) =
+    exists ob_name : Ob_name. (
+      (exists ob_deadline : Maybe_deadline.
+        Ob_timed_state(In_effect, ob_deadline) in instances(ob)
+      && trans_fn(ob)(ob_state, event_log'') != ob_state)
       whr
         ob = obs'(ob_name),
         event_log'' = Event_entry(event_name') |> event_log'
@@ -163,27 +181,44 @@ eqn
 
 act
   event : Event_name;
+  wait;
   ob : Ob_name # Ob_state;
   fulfilled, breached;
 
 proc
-  Event(contract_config : Contract_config) = sum event_name' : Event_name. (
-    is_event_enabled(event_name', contract_config) -> (
-      event(event_name') .
-      Update_obs(
-        Contract_config(
-          obs(contract_config),
-          update_store(event_assns(event_name'), store(contract_config)),
-          Event_entry(event_name') |> event_log(contract_config))
-      )
-    ) <> Termination(contract_config)
-  );
+  % Our semantics is a variant of a timed transition system, in that we allow
+  % for 2 kinds of actions/transitions:
+  % 1. A delay transition corresponding to the "wait" action.
+  % 2. Transitions corresponding to the firing of events, given by the "event"
+  %    action.
+  Event(contract_config : Contract_config, time : Real) =
+    sum event_name' : Event_name, t : Pos. (
+      (is_event_allowed(event_name', contract_config)) -> (
+        ((time + t <= max_time) ->
+          wait@(time + t) .
+          Update_obs(
+            Contract_config(
+                obs(contract_config),
+                store(contract_config),
+                Wait_entry(t) |> event_log(contract_config)),
+              time + t)) 
+        + (time <= max_time) ->
+            event(event_name')@time .
+            Update_obs(
+              Contract_config(
+                obs(contract_config),
+                update_store(event_assns(event_name'), store(contract_config)),
+                Event_entry(event_name') |> event_log(contract_config)),
+              time
+            )
+      ) <> Termination(contract_config, time)
+    );
 
-  Update_obs(contract_config : Contract_config) =
+  Update_obs(contract_config : Contract_config, time : Real) =
     % TODO: update obligation instances accordingly
-    Event(contract_config);
+    Event(contract_config, time);
 
-  Termination(contract_config : Contract_config) =
+  Termination(contract_config : Contract_config, time : Real) =
     % TODO: determine if the contract terminates successfully or not, ie
     % fulfilled or breached.
     tau;
@@ -204,6 +239,7 @@ init Update_obs(Contract_config(
     Ob(
       {Party1},
       lambda event_log' : Event_log. Pos2Nat(1),
+      lambda current_time : Nat. No_deadline,
       lambda curr_state : Ob_state, event_log' : Event_log.
         if(head(event_log') == Event_entry(Event1) && curr_state == In_effect,
           Fulfilled,
@@ -217,4 +253,4 @@ init Update_obs(Contract_config(
   lambda x : Global_var. Nat2Int(0),
   % Event log
   []
-));
+), 0);

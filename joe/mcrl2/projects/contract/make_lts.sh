@@ -4,7 +4,9 @@ mkdir -p workdir
 cd workdir
 
 # Linearize all processes.
-mcrl22lps ../contract_spec.mcrl2 -lregular2 contract.lps
+#  mcrl22lps ../contract_spec.mcrl2 -lregular2 contract.lps
+
+mcrl22lps ../contract_spec_timed.mcrl2 --timed -lregular2 contract.lps
 
 # Convert the linearized process into a labelled transition system, while
 # giving priority to internal tau actions/transitions.

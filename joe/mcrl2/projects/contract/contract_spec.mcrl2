@@ -47,6 +47,9 @@ sort
     % an obligation instance transitions to.
     trans_fn : Ob_state # Event_log -> Ob_state,
 
+    % Set of obligations that this obligation reparates for.
+    reparates : Set(Ob_name),
+
     % Active instances of this obligation.
     instances : Bag(Ob_state)
   );
@@ -85,7 +88,7 @@ sort
     obs : Obs,
     store : Store,
     event_log : Event_log
-  ); 
+  );
 
 map
   obs_state_change : Ob_state # Ob_state -> Contract_config -> Bag(Ob_name);
@@ -100,6 +103,8 @@ map
   event_assns : Event_name -> List(Assn_stmt);
 
   update_store : List(Assn_stmt) # Store -> Store;
+
+  is_reparable : Obs # Ob_name -> Bool;
 
 var
   contract_config : Contract_config;
@@ -146,6 +151,9 @@ eqn
         event_log'' = Event_entry(event_name') |> event_log'
       end
     );
+
+  is_reparable(obs', ob_name') =
+    exists ob_name'' : Ob_name. ob_name' in reparates(ob_name'');
 
   event_assns(event_name') = [];
 

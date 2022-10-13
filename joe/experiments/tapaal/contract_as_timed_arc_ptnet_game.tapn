@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<pnml xmlns="http://www.informatik.hu-berlin.de/top/pnml/ptNetb">
+  <shared-place initialMarking="0" invariant="&lt; inf" name="Event1Input"/>
+  <shared-transition name="Suspend1" player="1" urgent="true"/>
+  <shared-transition name="Instantiate1" player="1" urgent="true"/>
+  <shared-transition name="Fulfill1" player="1" urgent="true"/>
+  <shared-transition name="Resume1" player="1" urgent="true"/>
+  <shared-transition name="Breach1" player="1" urgent="true"/>
+  <shared-transition name="Terminate1" player="1" urgent="true"/>
+  <shared-transition name="Initialization" player="0" urgent="false"/>
+  <shared-transition name="Event1" player="1" urgent="false"/>
+  <shared-transition name="Event1Timeout" player="1" urgent="true"/>
+  <shared-transition name="Event1Complete" player="0" urgent="false"/>
+  <shared-transition name="Event1Start" player="1" urgent="true"/>
+  <net active="true" id="Initialization" type="P/T net">
+    <labels border="true" height="756" positionX="811" positionY="76" width="376">Statically, the state of a contract is given by a configuration,
+which is the collective state of all the instantiated obligations.
+In terms of petri nets, this is the marking across all obligation
+components.
+In the event where there are global variables to keep track of
+during the lifetime of the contract, we will need to include a
+notion of variable store, as in the case of imperative
+programming languages.
+
+Dynamically, the small-step operational semantics of a contract
+is inspired by the game semantics of abstract machines, where
+sequences of instructions corresponding to P(layer) moves are evaluated
+against a control stack corresponding to O(pponent) moves.
+
+A contract gives rise to a 2-player game with:
+- P: the parties involved in the contract.
+- O: the system defined by the contract.
+
+P gets to make the first move by initializing the contract.
+Consequently, O responds and updates the
+internal state of the process, given by a marking indicating
+the states of all the individual obligations.
+Note here that O may make multiple moves because a change in the state of
+an obligation instance, eg from InEffect to Fulfilled or Suspended can
+trigger state changes in other obligations.
+Subsequent P moves then correspond to the occurrence of real world events.
+
+When the game ends, ie no more events can be fired, we say that
+P wins iff no unreparable obligation has been breached.
+
+This semantics can be formalized using the notion of a timed arc
+petri net game, which TAPAAL implements.
+P moves correspond to black controllable transitions and O moves
+correspond to white uncontrollable transitions.
+
+Given a property, the verification problem is now about
+synthesizing strategies for P that conform to that property.
+Note here that we can encode normative requirements as temporal
+formulae so that a strategy for P conforming to a property is a
+subnet of real world events that complies with some normative requirement.
+
+Fun thought: Determinacy of timed arc petri net games?</labels>
+    <labels border="true" height="212" positionX="1261" positionY="91" width="406">TODO:
+- Figure out how to suspend and resume timers on suspend/resume transitions.
+- Also figure out how to terminate timers on terminate transitions.
+- Technically, time petri nets as in TINA and Romeo can
+  handle timeouts, no need for timed arcs as in TAPAAL.
+  Check these out since TINA has support for modal mu calculus
+  and Romeo has convenient features for suspending timers etc.</labels>
+    <place displayName="true" id="P10" initialMarking="1" invariant="&lt; inf" name="P10" nameOffsetX="0" nameOffsetY="0" positionX="330" positionY="255"/>
+    <transition angle="0" displayName="true" id="Initialization" infiniteServer="false" name="Initialization" nameOffsetX="0" nameOffsetY="0" player="0" positionX="330" positionY="375" priority="0" urgent="false"/>
+    <arc id="A2" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="P10" target="Initialization" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="355" yCoord="280"/>
+      <arcpath arcPointType="false" id="1" xCoord="351" yCoord="276"/>
+      <arcpath arcPointType="false" id="2" xCoord="345" yCoord="375"/>
+    </arc>
+  </net>
+  <net active="true" id="Obligation1" type="P/T net">
+    <place displayName="true" id="InstantiateInput" initialMarking="0" invariant="&lt; inf" name="InstantiateInput" nameOffsetX="0" nameOffsetY="0" positionX="225" positionY="375"/>
+    <place displayName="true" id="Fulfilled" initialMarking="0" invariant="&lt; inf" name="Fulfilled" nameOffsetX="0" nameOffsetY="0" positionX="1035" positionY="255"/>
+    <place displayName="true" id="InEffect" initialMarking="0" invariant="&lt; inf" name="InEffect" nameOffsetX="0" nameOffsetY="0" positionX="645" positionY="375"/>
+    <place displayName="true" id="Suspended" initialMarking="0" invariant="&lt; inf" name="Suspended" nameOffsetX="0" nameOffsetY="0" positionX="570" positionY="750"/>
+    <place displayName="true" id="Breached" initialMarking="0" invariant="&lt; inf" name="Breached" nameOffsetX="0" nameOffsetY="0" positionX="1035" positionY="375"/>
+    <place displayName="true" id="FulfillInput" initialMarking="0" invariant="&lt; inf" name="FulfillInput" nameOffsetX="0" nameOffsetY="0" positionX="795" positionY="150"/>
+    <place displayName="true" id="SuspendInput" initialMarking="0" invariant="&lt; inf" name="SuspendInput" nameOffsetX="0" nameOffsetY="0" positionX="285" positionY="525"/>
+    <place displayName="true" id="ResumeInput" initialMarking="0" invariant="&lt; inf" name="ResumeInput" nameOffsetX="0" nameOffsetY="0" positionX="675" positionY="525"/>
+    <place displayName="true" id="BreachInput" initialMarking="0" invariant="&lt; inf" name="BreachInput" nameOffsetX="0" nameOffsetY="0" positionX="885" positionY="465"/>
+    <place displayName="true" id="TerminateInput" initialMarking="0" invariant="&lt; inf" name="TerminateInput" nameOffsetX="0" nameOffsetY="0" positionX="780" positionY="600"/>
+    <place displayName="true" id="Terminated" initialMarking="0" invariant="&lt; inf" name="Terminated" nameOffsetX="0" nameOffsetY="0" positionX="1080" positionY="615"/>
+    <place displayName="true" id="P22" initialMarking="0" invariant="&lt; inf" name="P22" nameOffsetX="0" nameOffsetY="0" positionX="1290" positionY="615"/>
+    <place displayName="true" id="P26" initialMarking="0" invariant="&lt; inf" name="P26" nameOffsetX="0" nameOffsetY="0" positionX="480" positionY="300"/>
+    <place displayName="true" id="Event1Input" initialMarking="0" invariant="&lt; inf" name="Event1Input" nameOffsetX="0" nameOffsetY="0" positionX="480" positionY="150"/>
+    <transition angle="0" displayName="true" id="Fulfill1" infiniteServer="false" name="Fulfill1" nameOffsetX="0" nameOffsetY="0" player="1" positionX="795" positionY="255" priority="0" urgent="true"/>
+    <transition angle="0" displayName="true" id="Breach1" infiniteServer="false" name="Breach1" nameOffsetX="0" nameOffsetY="0" player="1" positionX="885" positionY="375" priority="0" urgent="true"/>
+    <transition angle="0" displayName="true" id="Instantiate1" infiniteServer="false" name="Instantiate1" nameOffsetX="0" nameOffsetY="0" player="1" positionX="480" positionY="375" priority="0" urgent="true"/>
+    <transition angle="0" displayName="true" id="Suspend1" infiniteServer="false" name="Suspend1" nameOffsetX="0" nameOffsetY="0" player="1" positionX="405" positionY="525" priority="0" urgent="true"/>
+    <transition angle="0" displayName="true" id="Resume1" infiniteServer="false" name="Resume1" nameOffsetX="0" nameOffsetY="0" player="1" positionX="570" positionY="525" priority="0" urgent="true"/>
+    <transition angle="0" displayName="true" id="T18" infiniteServer="false" name="T18" nameOffsetX="0" nameOffsetY="0" player="1" positionX="780" positionY="495" priority="0" urgent="true"/>
+    <transition angle="0" displayName="true" id="T16" infiniteServer="false" name="T16" nameOffsetX="0" nameOffsetY="0" player="1" positionX="780" positionY="705" priority="0" urgent="true"/>
+    <transition angle="0" displayName="true" id="Terminate1" infiniteServer="false" name="Terminate1" nameOffsetX="0" nameOffsetY="0" player="1" positionX="1170" positionY="615" priority="0" urgent="true"/>
+    <transition angle="0" displayName="true" id="Initialization" infiniteServer="false" name="Initialization" nameOffsetX="0" nameOffsetY="0" player="0" positionX="225" positionY="225" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="T23" infiniteServer="false" name="T23" nameOffsetX="0" nameOffsetY="0" player="1" positionX="480" positionY="225" priority="0" urgent="true"/>
+    <transition angle="0" displayName="true" id="Event1Complete" infiniteServer="false" name="Event1Complete" nameOffsetX="0" nameOffsetY="0" player="0" positionX="660" positionY="150" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="Event1Timeout" infiniteServer="false" name="Event1Timeout" nameOffsetX="0" nameOffsetY="0" player="1" positionX="990" positionY="465" priority="0" urgent="true"/>
+    <arc id="A0" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="InstantiateInput" target="Instantiate1" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="255" yCoord="390"/>
+      <arcpath arcPointType="false" id="1" xCoord="489" yCoord="390"/>
+    </arc>
+    <arc id="A1" inscription="1" nameOffsetX="0" nameOffsetY="0" source="Instantiate1" target="InEffect" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="499" yCoord="390"/>
+      <arcpath arcPointType="false" id="1" xCoord="645" yCoord="390"/>
+    </arc>
+    <arc id="A2" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="InEffect" target="Suspend1" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="647" yCoord="397"/>
+      <arcpath arcPointType="false" id="1" xCoord="425" yCoord="535"/>
+    </arc>
+    <arc id="A3" inscription="1" nameOffsetX="0" nameOffsetY="0" source="Suspend1" target="Suspended" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="424" yCoord="545"/>
+      <arcpath arcPointType="false" id="1" xCoord="576" yCoord="752"/>
+    </arc>
+    <arc id="A9" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="InEffect" target="Fulfill1" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="671" yCoord="380"/>
+      <arcpath arcPointType="false" id="1" xCoord="804" yCoord="270"/>
+    </arc>
+    <arc id="A10" inscription="1" nameOffsetX="0" nameOffsetY="0" source="Fulfill1" target="Fulfilled" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="814" yCoord="270"/>
+      <arcpath arcPointType="false" id="1" xCoord="1035" yCoord="270"/>
+    </arc>
+    <arc id="A11" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="InEffect" target="Breach1" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="675" yCoord="390"/>
+      <arcpath arcPointType="false" id="1" xCoord="894" yCoord="390"/>
+    </arc>
+    <arc id="A12" inscription="1" nameOffsetX="0" nameOffsetY="0" source="Breach1" target="Breached" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="904" yCoord="390"/>
+      <arcpath arcPointType="false" id="1" xCoord="1035" yCoord="390"/>
+    </arc>
+    <arc id="A13" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="Suspended" target="Resume1" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="585" yCoord="750"/>
+      <arcpath arcPointType="false" id="1" xCoord="585" yCoord="555"/>
+    </arc>
+    <arc id="A14" inscription="1" nameOffsetX="0" nameOffsetY="0" source="Resume1" target="InEffect" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="585" yCoord="525"/>
+      <arcpath arcPointType="false" id="1" xCoord="652" yCoord="403"/>
+    </arc>
+    <arc id="A15" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="FulfillInput" target="Fulfill1" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="810" yCoord="180"/>
+      <arcpath arcPointType="false" id="1" xCoord="810" yCoord="255"/>
+    </arc>
+    <arc id="A16" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="SuspendInput" target="Suspend1" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="315" yCoord="540"/>
+      <arcpath arcPointType="false" id="1" xCoord="414" yCoord="540"/>
+    </arc>
+    <arc id="A17" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="ResumeInput" target="Resume1" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="675" yCoord="540"/>
+      <arcpath arcPointType="false" id="1" xCoord="589" yCoord="540"/>
+    </arc>
+    <arc id="A18" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="BreachInput" target="Breach1" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="900" yCoord="465"/>
+      <arcpath arcPointType="false" id="1" xCoord="900" yCoord="405"/>
+    </arc>
+    <arc id="A20" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="InEffect" target="T18" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="670" yCoord="400"/>
+      <arcpath arcPointType="false" id="1" xCoord="789" yCoord="510"/>
+    </arc>
+    <arc id="A21" inscription="1" nameOffsetX="0" nameOffsetY="0" source="T18" target="Terminated" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="799" yCoord="510"/>
+      <arcpath arcPointType="false" id="1" xCoord="1081" yCoord="624"/>
+    </arc>
+    <arc id="A22" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="Suspended" target="T16" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="599" yCoord="761"/>
+      <arcpath arcPointType="false" id="1" xCoord="789" yCoord="720"/>
+    </arc>
+    <arc id="A23" inscription="1" nameOffsetX="0" nameOffsetY="0" source="T16" target="Terminated" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="799" yCoord="720"/>
+      <arcpath arcPointType="false" id="1" xCoord="1080" yCoord="634"/>
+    </arc>
+    <arc id="A25" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="TerminateInput" target="T18" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="795" yCoord="600"/>
+      <arcpath arcPointType="false" id="1" xCoord="795" yCoord="525"/>
+    </arc>
+    <arc id="A26" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="TerminateInput" target="T16" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="795" yCoord="630"/>
+      <arcpath arcPointType="false" id="1" xCoord="795" yCoord="705"/>
+    </arc>
+    <arc id="A24" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="Terminated" target="Terminate1" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="1110" yCoord="630"/>
+      <arcpath arcPointType="false" id="1" xCoord="1179" yCoord="630"/>
+    </arc>
+    <arc id="A27" inscription="1" nameOffsetX="0" nameOffsetY="0" source="Terminate1" target="P22" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="1189" yCoord="630"/>
+      <arcpath arcPointType="false" id="1" xCoord="1290" yCoord="630"/>
+    </arc>
+    <arc id="A28" inscription="1" nameOffsetX="0" nameOffsetY="0" source="Initialization" target="InstantiateInput" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="240" yCoord="255"/>
+      <arcpath arcPointType="false" id="1" xCoord="240" yCoord="375"/>
+    </arc>
+    <arc id="A25" inscription="1" nameOffsetX="0" nameOffsetY="0" source="Instantiate1" target="P26" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="495" yCoord="375"/>
+      <arcpath arcPointType="false" id="1" xCoord="495" yCoord="330"/>
+    </arc>
+    <arc id="A29" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="P26" target="T23" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="495" yCoord="300"/>
+      <arcpath arcPointType="false" id="1" xCoord="495" yCoord="255"/>
+    </arc>
+    <arc id="A30" inscription="1" nameOffsetX="0" nameOffsetY="0" source="T23" target="Event1Input" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="495" yCoord="225"/>
+      <arcpath arcPointType="false" id="1" xCoord="495" yCoord="180"/>
+    </arc>
+    <arc id="A31" inscription="1" nameOffsetX="0" nameOffsetY="0" source="Event1Complete" target="FulfillInput" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="679" yCoord="165"/>
+      <arcpath arcPointType="false" id="1" xCoord="795" yCoord="165"/>
+    </arc>
+    <arc id="A32" inscription="1" nameOffsetX="0" nameOffsetY="0" source="Event1Timeout" target="BreachInput" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="999" yCoord="480"/>
+      <arcpath arcPointType="false" id="1" xCoord="915" yCoord="480"/>
+    </arc>
+  </net>
+  <net active="true" id="Event1Timer" type="P/T net">
+    <place displayName="true" id="Event1TimerStarted" initialMarking="0" invariant="&lt; inf" name="Event1TimerStarted" nameOffsetX="0" nameOffsetY="0" positionX="660" positionY="360"/>
+    <place displayName="true" id="Event1Input" initialMarking="0" invariant="&lt; inf" name="Event1Input" nameOffsetX="0" nameOffsetY="0" positionX="660" positionY="195"/>
+    <transition angle="0" displayName="true" id="Event1Complete" infiniteServer="false" name="Event1Complete" nameOffsetX="0" nameOffsetY="0" player="0" positionX="495" positionY="495" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="Event1Timeout" infiniteServer="false" name="Event1Timeout" nameOffsetX="0" nameOffsetY="0" player="1" positionX="885" positionY="495" priority="0" urgent="true"/>
+    <transition angle="0" displayName="true" id="Event1TimerStart" infiniteServer="false" name="Event1TimerStart" nameOffsetX="0" nameOffsetY="0" player="1" positionX="660" positionY="285" priority="0" urgent="true"/>
+    <arc id="A2" inscription="[0,3]" nameOffsetX="0" nameOffsetY="0" source="Event1TimerStarted" target="Event1Complete" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="663" yCoord="384"/>
+      <arcpath arcPointType="false" id="1" xCoord="514" yCoord="510"/>
+    </arc>
+    <arc id="A3" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="Event1TimerStarted" target="Event1Timeout" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="687" yCoord="382"/>
+      <arcpath arcPointType="false" id="1" xCoord="894" yCoord="510"/>
+    </arc>
+    <arc id="A4" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="Event1Input" target="Event1TimerStart" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="675" yCoord="225"/>
+      <arcpath arcPointType="false" id="1" xCoord="675" yCoord="285"/>
+    </arc>
+    <arc id="A5" inscription="1" nameOffsetX="0" nameOffsetY="0" source="Event1TimerStart" target="Event1TimerStarted" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="675" yCoord="315"/>
+      <arcpath arcPointType="false" id="1" xCoord="675" yCoord="360"/>
+    </arc>
+  </net>
+  <query active="true" approximationDenominator="2" capacity="4" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="null" gcd="false" hashTableSize="null" inclusionPlaces="*NONE*" name="Obligation1BreachedOrFulfilled" overApproximation="false" pTrie="true" query="AF (Obligation1.Fulfilled = 1 or Obligation1.Breached = 1)" reduction="true" reductionOption="VerifyTAPNdiscreteVerification" searchOption="DFS" symmetry="true" timeDarts="false" traceOption="NONE" useStubbornReduction="false" useTarOption="false"/>
+  <query active="true" approximationDenominator="2" capacity="4" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="null" gcd="false" hashTableSize="null" inclusionPlaces="*NONE*" name="Obligation1NeverBreachedAndFulfilled" overApproximation="true" pTrie="true" query="AG !(Obligation1.Fulfilled &gt;= 1 and Obligation1.Breached &gt;= 1)" reduction="true" reductionOption="VerifyTAPNdiscreteVerification" searchOption="DFS" symmetry="true" timeDarts="false" traceOption="NONE" useStubbornReduction="true" useTarOption="false"/>
+  <k-bound bound="3"/>
+  <feature isGame="true" isTimed="true"/>
+</pnml>

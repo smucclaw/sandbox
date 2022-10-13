@@ -1,0 +1,70 @@
+Ideas for a more declarative abstract syntax for the simple loan agreement,
+closer to the text in Table 1 of Flood and Goodenough.
+
+Key ontological elements in regulative rules that we want to talk about:
+- Party: an agent in the real world involved in a contract.
+- Event: something that happens in the real world, brought about by the actions of parties.
+- Obligation: the legal duty of some agents to do something, like bring about an event or fulfill another obligation.
+  Obligations can be instantiated and upon instantiation, they come into effect.
+  They are like automata with various states:
+	- In effect
+	- Fulfilled
+	- Breached
+	- Suspended
+	- Terminated
+  They can be attached to some parties so we know who to point our finger at if things go wrong.
+  They can change their state based on events that happen in the real world, as well as the change in state of other obligations.
+- Contract: TODO
+
+Things to do:
+- Handle timers in a more declarative fashion.
+- Try out petri net tools like Tina and Romeo since they allow for global variables.
+- How do we know which obligations are reparable? We need to know this to determine if the contract has been breached.
+
+-- Initialization of contract and requesting principal amount goes here.
+
+-- Primary obligations:
+Obligation: Pay payment 1
+Parties: Borrower
+Instantiated upon: TODO
+Upon instantiation, start timer for 1 year
+Fulfilled upon: Payment 1 event occurs
+Breached upon: Timeout.
+
+Obligation: Pay payment 2
+Parties: Borrower
+Instantiated upon: TODO
+Upon instantiation, start timer for 2 years
+Fulfilled upon: Payment 1 event occurs
+Breached upon: Timeout.
+
+-- Contrary to duty obligations:
+Permission: Notify Borrower
+Parties: Lender
+Instantiated upon:
+	Either of the following:
+	- Breach of Pay payment 1
+	- Breach of Pay payment 2
+	- Representations and warranties
+	- Covenants
+	- Bankruptcy
+Upon instantiation, start timer for 2 days.
+Fulfilled upon:
+	Either of the following:
+	- Lender notifies borrower event.
+	- Timeout.
+
+Obligation: Cure default
+Parties: Borrower
+Instantiated upon: Lender notifies borrower event.
+Upon instantiation, start a timer for 3 days.
+Fulfilled upon: Borrower cures event of default.
+Breached upon: Timeout.
+
+Obligation: Accelerated repayment
+Parties: Borrower
+Instantiated upon: Borrower pays outstanding amount to Lender.
+Upon instantiation, terminate all other active obligations and start a timer for 1 day.
+Fulfilled upon: Borrower pays Lender outstanding event.
+Breached upon: Timeout.
+Special rule: Unreparable.

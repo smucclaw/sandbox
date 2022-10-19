@@ -29,20 +29,20 @@
 
 \title{An End-to-End Pipeline from Law Text to Logical Formulas}
 
-\markboth{}{October 2022 - Final Version\hb}
+\markboth{}{September 2022 - Anonymised Review Copy\hb}
 
-\author[A]{Aarne Ranta}
-\author[B,C]{Inari Listenmaa}
-\author[C]{Jerrold Soh}
-\author[C]{Meng Weng Wong}
+% \author[A]{Aarne Ranta}
+% \author[B,C]{Inari Listenmaa}
+% \author[C]{Jerrold Soh}
+% \author[C]{Meng Weng Wong}
 
-\address[A]{
-   Department of Computer Science and Engineering,
-   Chalmers University of Technology and University of Gothenburg,
-   aarne.ranta@cse.gu.se
-   }
- \address[B]{Digital Grammars AB}
- \address[C]{Centre for Computational Law, Singapore Management University}
+% \address[A]{
+%   Department of Computer Science and Engineering,
+%   Chalmers University of Technology and University of Gothenburg,
+%   aarne.ranta@cse.gu.se
+%   }
+% \address[B]{Digital Grammars}
+% \address[C]{Centre for Computational Law, Singapore Management University}
 
 \begin{abstract}
  This paper develops a pipeline for converting natural English law texts into logical formulas via a series of structural representations. The goal is to study how law-to-logic translation can be achieved with a sequence of well-defined steps. The texts are first parsed using a formal grammar derived from light-weight text annotations designed to minimise the need for manual grammar construction. An intermediate representation, called assembly logic, is then used for logical interpretation and supports translations to different back-end logics and visualisations. The approach, while rule-based and explainable, is also robust: it can deliver useful results from day one, but allows subsequent refinements and variations. While some work is needed to extend the method to new laws, the software presented here reduces the marginal effort necessary. As a case study, we demonstrate our approach on one part of Singapore’s Personal Data Protection Act. Our code is available open-source.
@@ -52,7 +52,7 @@
 legal formalisms, legal text parsing, Grammatical Framework, context-free grammars, methodology
 \end{keyword}
 \end{frontmatter}
-\markboth{October 2022 - Final Version\hb}{October 2022 - Final Version\hb}
+\markboth{September 2022 - Anonymised Review Copy\hb}{September 2022 - Anonymised Review Copy\hb}
 
 %\maketitle
 \section{Introduction}
@@ -61,8 +61,8 @@ Expressing laws computably is a classic objective of AI \& Law \cite{mccarty_ref
 
 Early in the field's history, \cite{bing_designing_1987} had already imagined automatic parsers for translating natural language laws into formal logic programs. Several steps have since been taken towards that vision. For instance, McCarty \cite{mccarty_deep_2007} demonstrated how \cite{collins_head-driven_2003}'s statistical parser can extract, from judicial opinion texts, syntax trees which may then be converted into quasi-logical semantic representations of said texts using definite clause grammars. Others have examined how far machine learning methods can implicit learn or represent legal principles and concepts \cite{groendijk_neural_1992, de_maat_automatic_2008, winkels_automatic_2012, chalkidis_neural_2019, chalkidis_lexglue_2022}. However, the NLP framework chosen often constrains the translation process (see e.g.\ \cite{quaresma_question_2005}). In particular, whether the chosen framework accommodates the logic representation desired is not always clear \cite{wyner_study_2013}.
 
-This paper contributes to this literature by describing a partially-automated law to logic pipeline based on Grammatical Framework (GF, \cite{ranta-2011}). Prior legal applications of GF \cite{angelov-al-2013, gdpr-2018} have typically focused on Controlled Natural Languages (CNL, e.g., \cite{fuchs-al-2008, angelov-ranta-2009}).
-Our approach is novel in that we tackle real-world law texts. Nonetheless, we exploit features of GF which have proven fruitful for CNL processing: modularity, precision, and support for semantic back-ends via an abstract syntax. One limitation of GF is that writing GF grammars requires specialised expertise. To counteract this, we develop a method for automatically extracting a preliminary grammar from light-weight annotations which non-experts can create. The preliminary grammar is usable as-is for a rough analysis of law texts but can be gradually improved by manual refinement. Overall, this approach requires less effort than writing grammars from scratch. Our code is available open-source.\footnote{\url{https://github.com/smucclaw/sandbox}}
+This paper contributes to this literature by describing a partially-automated law to logic pipeline based on Grammatical Framework (GF, \cite{ranta-2011}). Prior legal applications of GF \cite{angelov-al-2013, gdpr-2018} have typically focused on Controlled Natural Languages (CNL, e.g.\ \cite{fuchs-al-2008, angelov-ranta-2009}).
+Our approach is novel in that we tackle real-world law texts. Nonetheless, we exploit features of GF which have proven fruitful for CNL processing: modularity, precision, and support for semantic back-ends via an abstract syntax. One limitation of GF is that writing GF grammars requires specialised expertise. To counteract this, we develop a method for automatically extracting a preliminary grammar from light-weight annotations which non-experts can create. The preliminary grammar is usable as-is for a rough analysis of law texts but can be gradually improved by manual refinement. Overall, this approach requires less effort than writing grammars from scratch. Our code is available open-source.\footnote{URL to be provided here after blind review.}
 
 Section \ref{sec:methods} details our pipeline. Section \ref{sec:pdpa} exemplifies the pipeline using a case study on Singapore's \textit{Personal Data Protection Act} 2012 (PDPA). Section \ref{sec:discussion} discusses future directions and concludes.
 
@@ -77,7 +77,7 @@ Section \ref{sec:methods} details our pipeline. Section \ref{sec:pdpa} exemplifi
 
 \subsection{Pipeline Overview}
 
-Figure~\ref{pipeline} provides an overview of the pipeline. The primary input is a statutory text in natural language which we assume has been tokenised by some standard tool.
+Figure~\ref{pipeline} provides an overview of the pipeline. The primary input is a statutory text in natural language which we assume has been properly extracted and tokenised by some standard tool such as GF's \texttt{lextext} converter.
 The resulting \texttt{.txt} is converted to abstract syntax trees (ASTs) line by line using the GF parser driven by a grammar (see Section \ref{sec:2.2}). 
 The ASTs are then converted into an intermediate representation we call assembly logic (Section \ref{sec:assembly-logic}) using the Haskell-based methodology described in \cite{ranta-2011c}. Assembly logic is more abstract than the ASTs from the parser, but preserves more distinctions than standard back-end logics.
 These distinctions are useful for deriving different output formats such as predicate logic (Section \ref{sec:predicate-logic}) and visualisations (Section \ref{sec:vis:spreadsheets}).
@@ -100,10 +100,13 @@ These distinctions are useful for deriving different output formats such as pred
 \subsection{From Law Text to ASTs}
 \label{sec:2.2}
 
-The primary legal texts are first converted into ASTs using the parser of GF \cite{ranta-2011}.
-The parser is driven by a grammar, such as GF's extensive Resource Grammar Library (RGL, \cite{ranta-2009}).
-Not surprisingly, however, the RGL is not sufficient for law texts, which contain special constructs, such as itemised lists and paragraphs, which are essential for the logical structure that the parser must support.
-Thus, we developed a tailored grammar on top of the RGL.
+The primary legal texts are first converted into ASTs using GF \cite{ranta-2011}, a special-purpose programming language for grammar development. 
+In typical GF applications, the ASTs are intended for further processing such as translations to other natural languages or to logical semantics.
+GF grammars are usually written by hand to guarantee precise correspondence to the desired ASTs.
+Nonetheless, GF's extensive Resource Grammar Library (RGL, \cite{ranta-2009}), which implements the basic syntax and morphology of over 40 languages, reduces the manual effort necessary.
+
+Not surprisingly, however, the RGL is not sufficient for legal purposes. The constructs covered by the RGL are limited to single utterances; parsing law texts commonly requires handling long itemised lists and paragraphs. As these syntactic constructs are significant for law's logical structure, we wanted the parser to capture them appropriately.
+Thus, we developed a tailored grammar for our purposes using the RGL as a base.
 We began building the grammar in a data-driven, top-down manner, starting from entire lines of text and going forward by stepwise refinement of the grammar rules.
 To this end, we developed a semi-automatic method where a Haskell script generates GF rules from manual annotations of the source text.
 Figure~\ref{grammar-gen} illustrates the grammar building workflow.
@@ -168,16 +171,19 @@ fun CN_individual : CN ;
 
 The script produces a BNF (context-free) grammar in a notation usable in GF as-is.
 Internally, GF then automatically adds to each rule an abstract syntax function whose name is derived from items in the rule itself.
-The final GF grammar is more expressive and more abstract than BNF and can merge morphological variants of rules, as shown in Figure~\ref{grammar-gen}.
-
+The final GF grammar is more expressive and more abstract than BNF and can merge morphological variants of rules. As Figure~\ref{grammar-gen} shows, \verb6CN_individual6 can be merged with \verb6CN_individuals6 (which is derived from a different part of the source text).
+The automatically derived functions only cover the respective strings ``individual'' and ``individuals'', but the manually merged function covers both the singular and plural forms.
+Similarly, \verb6NP_an_CN6 can be merged with \verb6NP_a_CN6.
+An advantage, in addition to having fewer rules, is that the choice of the singular and the plural, or \textit{a} vs.\ \textit{an}, can then be made precisely depending on the context.
 
 \subsection{From ASTs to Assembly Logic}
 \label{sec:assembly-logic}
 
 Assembly logic is an intermediate representation between ASTs and standard logics.
-It is designed to preserve enough syntactic structure to generate representations that humans can easily relate to the original text.
-For example, it distinguishes between ordinary and reverse implications (``if A then B'' vs.\ ``B if A'') and preserves quantified noun phrases as units (e.g.\ ```any organisation'').
-At the same time, it is intended to be sufficient for this purpose, so that when the grammar is extended (e.g., new law texts), the assembly logic and its back-ends can be kept constant.
+It is designed to preserve enough of the raw texts' syntactic structure to generate alternative forms recognizable by humans as representations of the original text.
+For example, it distinguishes between ordinary and reverse implications (``if A then B'' vs.\ ``B if A'').
+It also preserves quantified noun phrases as units (e.g.\ ```any organization'') and is neutral as to how modalities (e.g.\ ``must'', ``may'') are formalised.
+At the same time, it is intended to be sufficient to represent more varied sets of ASTs, so that when the grammar is extended (e.g.\ via annotations of new law texts), the assembly logic and its back-ends can be kept constant.
 
 Figure~\ref{assembly} shows a sample of the assembly logic implemented as a Haskell datatype \texttt{Formula}.
 It also shows part of an \textbf{interpretation function} \cite{ranta-2011c}, \texttt{iNP}, which converts ASTs of GF type \texttt{NP} (Noun Phrase) to assembly logic.
@@ -199,6 +205,7 @@ Atomic expressions can then be converted to atomic formulas or constants in logi
     CProp | CSet | CInd | ...
   data Formula =
     Atomic Cat Atom
+  | Conjunction Cat ConjWord [Formula]
   | Implication Formula Formula
   | Conditional Formula Formula     -- reverse implication
   | Quantification String Formula   -- quantifier + domain
@@ -228,18 +235,19 @@ Atomic expressions can then be converted to atomic formulas or constants in logi
 
 Assembly logic is then mapped into a many-sorted logic with Russell's iota terms. In turn, the many-sorted logic is mapped into ordinary predicate logic and rendered in TPTP \cite{sutcliffe2009tptp} notation. 
 We use many-sorted logic because it better supports compositional translation.
-Thus quantification expressed by noun phrases (e.g.\ ``any organisation'') are compositionally interpreted as quantifiers with sorts rather than divided into unsorted quantifiers and sort predicates.
+Thus quantification expressed by noun phrases (e.g.\ ``any storage medium'') are compositionally interpreted as quantifiers with sorts rather than divided into unsorted quantifiers and sort predicates.
 The sorts are eliminated during the conversion from many-sorted to ordinary predicate logic.
 
-More importantly, anaphoric expressions (e.g.\ ``that organisation'') are interpreted as definite descriptions formalised as iota terms. (We write $\iota(A)$ instead of $(\iota x)A(x)$, leaving possible variable bindings to $A$ itself, as is customary in higher-order logic.)
+More importantly, anaphoric expressions (e.g.\ ``that organization'') are interpreted as definite descriptions formalised as iota terms. (We write $\iota(A)$ instead of $(\iota x)A(x)$, leaving possible variable bindings to $A$ itself, as is customary in higher-order logic.)
 These iota terms are eliminated in a pass that looks for non-iota terms in their context of use.
+Figure~\ref{anaphora} illustrates this using the well-known ``donkey sentence'' \cite{geach-1962,kamp-1981}: ``if a man owns a donkey he beats it.''
 This sentence has an existential quantifier in the antecedent and a pronoun or definite description referring to it in the succedent.
 To express this reference in ordinary predicate logic, the existential quantifier is changed into a universal one with a wide scope of implication.
 
 \begin{figure}
   \begin{framed}
   \bequ
-    \textbf{An example sentence with anaphoric reference:}
+    \textbf{A donkey sentence inspired by our case study below:}
     \bequ
         \textit{if a notification is a data breach, the notification is affected}
     \enqu
@@ -261,8 +269,8 @@ To express this reference in ordinary predicate logic, the existential quantifie
 \label{anaphora}
 \end{figure}
 
-Figure~\ref{donkey} shows an example from real law text, with an inverted conditional.
-Note that the logic output still has unanalysed parts treated as atomic predicates.
+Donkey sentences are ubiquitous in law texts, as in many other types of text.
+Interestingly, inverted donkey sentences --- where the existential appears in the succedent and is referred to in the antecedent --- also occurred in our sample text. Figure~\ref{donkey} shows an example of one such sentence undergoing the conversion to many-sorted logic and thereafter TPTP. Note that the TPTP output is not guaranteed to be error-free and still requires manual checking.
 
 \begin{figure}
 \includegraphics[width=0.96\textwidth]{anaphora.png}
@@ -282,8 +290,24 @@ We illustrate our pipeline using Part 6A of the PDPA. Like the EU's \textit{Gene
 Second, while the PDPA has not been examined in AI \& Law literature, its subject matter connects it to prior work on the GDPR \cite{palmirani_modelling_2018,palmirani_legal_2018,hickey_gdpr_2021}.
 Third, Part 6A is complex enough to demonstrate the utility of a computational law approach in general and our pipeline in particular. Indeed, modelling these rules allowed us to detect a race condition in the PDPA: an organisation which informed both the Commission and the affected individuals of a data breach, as s~26D PDPA generally requires, might inadvertently violate s~26D(6) which provides that organisations should \textit{not} inform affected individuals if the Commission so directs.
 
-The text in Part 6A of the PDPA consists of 47 lines, 1053 tokens, 228 unique tokens.
-Figure \ref{pipeline-ex} below illustrates the pipeline on a selected portion, and a complete parse of Part 6A into ASTs, assembly logic, and spreadsheets may be found on our repository.
+Table \ref{stats} provides a statistical summary of our raw PDPA text. Given space constraints, Figure \ref{pipeline-ex} below illustrates the pipeline on a selected portion of Part 6A. A complete parse of Part 6A into ASTs, assembly logic, and spreadsheets may be found on our repository. The assembly logic to TPTP conversion is also complete save for two assembly logic formulas which contain nominalised modalities --- we will address this in future work.
+
+\begin{table}[h!]
+  \begin{tabular}{|l|r|}
+\hline
+        
+lines & 47 \\
+characters & 5964 \\
+tokens & 1053 \\
+unique tokens & 228 \\
+tokens per line on average & 22 \\
+tokens on the longest line & 56 \\
+\hline
+  \end{tabular}
+  \caption{Statistics on Part 6A PDPA}
+  \label{stats}
+  \vspace{-8mm}
+\end{table}
 
 \begin{figure}
     \bequ
@@ -292,23 +316,30 @@ Figure \ref{pipeline-ex} below illustrates the pipeline on a selected portion, a
     \includegraphics[width=0.7\textwidth]{text.png}
 
     \bequ
-    \textbf{AST of line (a) and spreadsheet visualization of the paragraph}
+    \textbf{AST of line (a):}
     \enqu
-    \includegraphics[width=0.36\textwidth]{tree.eps} \includegraphics[width=0.48\textwidth]{assembly.png}
+    \includegraphics[width=0.5\textwidth]{tree.eps}
       \bequ
-      \textbf{Logical formula in TPTP notation:}
+      \textbf{TPTP notation of the full paragraph:}
       \enqu
     \bequ
-    \tiny
+    \small
     \begin{verbatim}
   ![X]:(data_breach(X) & ?[Y]:(personal_data(Y) & IN_RELATION_TO(X,Y)) <=>
-  (personal_data(X) & ?[Y]:((access(Y,X) | collection(Y,X) | use(Y,X) | disclosure(Y,X) | 
-  copying(Y,X) | modification(Y,X) | disposal(Y,X)) & unauthorized(Y))) | (((storage_medium(X) |   
-  device(X)) & (personal_data(X) & ?[Y]:((circumstances(Y) & (((unauthorized(Y) & (access(Y) |
-  collection(Y) | use(Y) | disclosure(Y) | copying(Y) | modification(Y) | disposal(Y))) &
+  (personal_data(X) & ?[Y]:((access(Y,X) | collection(Y,X) | use(Y,X) |
+  disclosure(Y,X) | copying(Y,X) | modification(Y,X) | disposal(Y,X)) &
+  unauthorized(Y))) | (((storage_medium(X) | device(X)) & (personal_data(X) &
+  ?[Y]:((circumstances(Y) & (((unauthorized(Y) & (access(Y) | collection(Y) |
+  use(Y) | disclosure(Y) | copying(Y) | modification(Y) | disposal(Y))) &
   is_likely_to_occur(Y))) & is_stored_in(X,Y)))) & loss(X))))
     \end{verbatim}
     \enqu
+
+    \normalsize
+    \bequ
+    \textbf{Visualised in a spreadsheet}
+    \enqu
+    \includegraphics[width=0.4\textwidth]{assembly.png}
 \caption{An example through the pipeline: text, abstract syntax tree (of the second line), spreadsheet, and formula in TPTP notation.}
 \label{pipeline-ex}
 \end{figure}

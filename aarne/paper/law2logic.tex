@@ -57,21 +57,45 @@ legal formalisms, legal text parsing, Grammatical Framework, context-free gramma
 %\maketitle
 \section{Introduction}
 
-Expressing laws computably is a classic objective of AI \& Law \cite{mccarty_reflections_1977, sergot_british_1986} and a crucial pre-requisite to automating downstream tasks such as compliance checking \cite{palmirani_modelling_2018, hickey_gdpr_2021}, policy support \cite{svensson_expertisze_1992, haan_tracs_1992}, information retrieval \cite{bing_designing_1987}, argumentative reasoning \cite{mochales_study_2008}, legislative simulation \cite{bench-capon_logic_1987, bench-capon_support_1992}, and formal verification \cite{haan_tracs_1992}. But faithfully translating law to logic is challenging, often requiring expertise in both legal and formal methods. This ``natural language barrier'' \cite{mccarty_deep_2007} poses a significant ``knowledge bottleneck'' \cite{nazarenko_pragmatic_2021} to the development of computational law systems. Thus, numerous strategies have been devised for bridging the barrier. These include domain-specific ontologies \cite{palmirani_legal_2018}, taxonomies \cite{hulstijn_taxonomy_2020}, vocabularies \cite{hickey_gdpr_2021}, standards \cite{sartor_akoma-ntoso_2011}, logics \cite{prakken_logical_1993}, markup languages \cite{athan_oasis_2013}, and programming languages \cite{huttner_catala_2022}, intermediate formalisms for expressing laws \cite{mccarty_language_1989, kralingen_norm_1993, mccarty_deep_2007}, as well as specialised human workflows \cite{palmirani_legal_2018, witt_converting_2021}.
+Expressing laws computably is a classic objective of AI \& Law \cite{mccarty_reflections_1977, sergot_british_1986} and a crucial pre-requisite to automating downstream tasks such as
+compliance checking \cite{palmirani_modelling_2018, hickey_gdpr_2021},
+policy support \cite{svensson_expertisze_1992, haan_tracs_1992},
+%%%information retrieval \cite{bing_designing_1987},
+%%%argumentative reasoning \cite{mochales_study_2008},
+legislative simulation \cite{bench-capon_logic_1987, bench-capon_support_1992},
+and formal verification \cite{haan_tracs_1992}.
+But faithfully translating law to logic is challenging, often requiring expertise in both legal and formal methods. This ``natural language barrier'' \cite{mccarty_deep_2007} poses a significant ``knowledge bottleneck'' \cite{nazarenko_pragmatic_2021} to computational law systems.
+Numerous strategies have been devised for bridging the gap.
+These include
+domain-specific ontologies \cite{palmirani_legal_2018},
+taxonomies \cite{hulstijn_taxonomy_2020},
+vocabularies \cite{hickey_gdpr_2021},
+%%%standards \cite{sartor_akoma-ntoso_2011},
+%%%logics \cite{prakken_logical_1993},
+%%%markup languages \cite{athan_oasis_2013},
+%%%and programming languages \cite{huttner_catala_2022},
+intermediate formalisms for expressing laws \cite{mccarty_language_1989, kralingen_norm_1993, mccarty_deep_2007},
+as well as specialised human workflows \cite{palmirani_legal_2018, witt_converting_2021}.
 
-Early in the field's history, \cite{bing_designing_1987} had already imagined automatic parsers for translating natural language laws into formal logic programs. Several steps have since been taken towards that vision. For instance, McCarty \cite{mccarty_deep_2007} demonstrated how \cite{collins_head-driven_2003}'s statistical parser can extract, from judicial opinion texts, syntax trees which may then be converted into quasi-logical semantic representations of said texts using definite clause grammars. Others have examined how far machine learning methods can implicit learn or represent legal principles and concepts \cite{groendijk_neural_1992, de_maat_automatic_2008, winkels_automatic_2012, chalkidis_neural_2019, chalkidis_lexglue_2022}. However, the NLP framework chosen often constrains the translation process (see e.g.\ \cite{quaresma_question_2005}). In particular, whether the chosen framework accommodates the logic representation desired is not always clear \cite{wyner_study_2013}.
+Early in the field's history, \cite{bing_designing_1987} had already imagined automatic parsers for translating natural language laws into formal logic programs. Several steps have since been taken towards that vision.
+For instance, McCarty \cite{mccarty_deep_2007} demonstrated how \cite{collins_head-driven_2003}'s statistical parser can extract, from judicial opinion texts, syntax trees which may then be converted into semantic representations.
+In this line of work, \cite{ferraro2019automatic} uses data-driven semantic parsing, and \cite{dragoni2015combining} combines syntactic parsing with lexical semantics and logical relation extraction.
+Others have examined how far machine learning methods can implicitly learn or represent legal principles and concepts \cite{groendijk_neural_1992, de_maat_automatic_2008, winkels_automatic_2012, chalkidis_neural_2019, chalkidis_lexglue_2022}. However,
+%% the NLP framework chosen often constrains the translation process (see e.g.\ \cite{quaresma_question_2005}). In particular,
+whether the chosen framework accommodates the logic representation desired is not always clear \cite{wyner_study_2013}.
 
 This paper contributes to this literature by describing a partially-automated law to logic pipeline based on Grammatical Framework (GF, \cite{ranta-2011}). Prior legal applications of GF \cite{angelov-al-2013, gdpr-2018} have typically focused on Controlled Natural Languages (CNL, e.g., \cite{fuchs-al-2008, angelov-ranta-2009}).
-Our approach is novel in that we tackle real-world law texts. Nonetheless, we exploit features of GF which have proven fruitful for CNL processing: modularity, precision, and support for semantic back-ends via an abstract syntax. One limitation of GF is that writing GF grammars requires specialised expertise. To counteract this, we develop a method for automatically extracting a preliminary grammar from light-weight annotations which non-experts can create. The preliminary grammar is usable as-is for a rough analysis of law texts but can be gradually improved by manual refinement. Overall, this approach requires less effort than writing grammars from scratch. Our code is available open-source.\footnote{\url{https://github.com/smucclaw/sandbox}}
+Our approach is novel in that we tackle real-world law texts, still exploiting the key features of GF such as modularity, precision, and support for semantic back-ends via an abstract syntax. We develop a method for automatically extracting a grammar from light-weight annotations which non-experts can create. This grammar is usable as-is for a rough analysis of law texts, but it can also be gradually improved by manual refinement.
 
-Section \ref{sec:methods} details our pipeline. Section \ref{sec:pdpa} exemplifies the pipeline using a case study on Singapore's \textit{Personal Data Protection Act} 2012 (PDPA). Section \ref{sec:discussion} discusses future directions and concludes.
+Section \ref{sec:methods} details our pipeline. Section \ref{sec:pdpa} explains a case study on Singapore's \textit{Personal Data Protection Act} 2012 (PDPA). Section \ref{sec:discussion} discusses future directions and concludes.
+Our code is available open-source\footnote{\url{https://github.com/smucclaw/sandbox}}.
 
 \section{Methodology}
 \label{sec:methods}
 
 \subsection{Pipeline Overview}
 
-Figure~\ref{pipeline} provides an overview of the pipeline. The primary input is a statutory text in natural language which we assume has been tokenised by some standard tool.
+Figure~\ref{pipeline} provides an overview of the pipeline. The input is a statutory text in natural language which we assume has been tokenised by some standard tool.
 The resulting \texttt{.txt} is converted to abstract syntax trees (ASTs) line by line using the GF parser driven by a grammar (see Section \ref{sec:2.2}). 
 The ASTs are then converted into an intermediate representation we call assembly logic (Section \ref{sec:assembly-logic}) using the Haskell-based methodology described in \cite{ranta-2011c}. Assembly logic is more abstract than the ASTs from the parser, but preserves more distinctions than standard back-end logics.
 These distinctions are useful for deriving different output formats such as predicate logic (Section \ref{sec:predicate-logic}) and visualisations (Section \ref{sec:vis:spreadsheets}).
@@ -101,7 +125,6 @@ These distinctions are useful for deriving different output formats such as pred
 \subsection{From Law Text to ASTs}
 \label{sec:2.2}
 
-The primary legal texts are first converted into ASTs using a GF parser.
 GF parsers are driven by grammars, such as GF's general-purpose Resource Grammar Library (RGL, \cite{ranta-2009}).
 However, the RGL is not sufficient for law texts, which contain special constructs that are essential for the logical structure, such as itemised lists and indented paragraphs.
 Thus we developed a tailored grammar on top of the RGL.
@@ -176,7 +199,7 @@ CN  ::= "individual" ;
 Assembly logic is an intermediate representation between ASTs and standard logics.
 It is designed to preserve enough syntactic structure to generate representations that humans can easily relate to the original text.
 For example, it distinguishes between ordinary and reverse implications (``if A then B'' vs.\ ``B if A'') and preserves quantified noun phrases as units (e.g.\ ```any organisation'').
-At the same time, it is intended to be sufficient for this purpose, so that when the grammar is extended (e.g., new law texts), the assembly logic and its back-ends can be kept constant.
+It is intended to be sufficient for this purpose, so that when the grammar is extended (e.g., new law texts), the assembly logic and its back-ends can be kept constant.
 
 Figure~\ref{assembly} shows a sample of the assembly logic implemented as a Haskell datatype \texttt{Formula}.
 It also shows part of an \textbf{interpretation function} \cite{ranta-2011c}, \texttt{iNP}, which converts ASTs of GF type \texttt{NP} (Noun Phrase) to assembly logic.
@@ -265,7 +288,7 @@ Second, while the PDPA has not been examined in AI \& Law literature, its subjec
 Third, Part 6A is complex enough to demonstrate the utility of a computational law approach in general and our pipeline in particular. Indeed, modelling these rules allowed us to detect a race condition in the PDPA: an organisation which informed both the Commission and the affected individuals of a data breach, as s~26D PDPA generally requires, might inadvertently violate s~26D(6) which provides that organisations should \textit{not} inform affected individuals if the Commission so directs.
 
 The text in Part 6A of the PDPA consists of 47 lines, 1053 tokens, 228 unique tokens.
-Figure \ref{pipeline-ex} below illustrates the pipeline on a selected portion, and a complete parse of Part 6A into ASTs, assembly logic, and spreadsheets may be found on our repository.
+Figure \ref{pipeline-ex} below illustrates the pipeline as applied to one paragraph.
 
 \begin{figure}
     \bequ
@@ -297,9 +320,18 @@ Figure \ref{pipeline-ex} below illustrates the pipeline on a selected portion, a
 
 \section{Conclusion}
 \label{sec:discussion}
-Converting law to logic is a known hard problem. In this paper our goal was to examine how a sophisticated linguistic framework like GF could help with the process. To this end, we developed a GF-based pipeline that parses legal text into ASTs, assembly logic, and thereafter predicate logic. That such a pipeline was successfully developed demonstrates the promise of this approach. While manual effort was still required at various stages, the process was less tedious than a completely manual one. More importantly, some pipeline steps can work out of the box when the input scope is extended. Others, such as the the text annotations for extending the grammar and the conversion to assembly logic, are light-weight enough to make the system feasible to apply to new texts. Further, since GF's mapping between ASTs and natural language is fully reversible, the pipeline can be easily extended to support natural language generation. Once parsed into GF trees, the source text can be modified into novel forms: declarative sentences can become questions, negations, hypotheticals, etc. 
+%%Converting law to logic is a known hard problem.
+In this paper, we developed a pipeline that parses legal text into ASTs using the GF grammar formalism, an intermediate assembly logic, and finally predicate logic. %%That such a pipeline was successfully developed demonstrates the promise of this approach.
+While manual effort was still required at various stages, the process was less tedious than a completely manual one.
+More importantly, some pipeline steps can work out of the box when the input scope is extended.
+The main things to be added are text annotations for extending the grammar, and the conversion of the new grammar rules to the assembly logic.
+These steps light-weight enough to make the system feasible to apply to new texts.
+Further, since GF's mapping between ASTs and natural language is fully reversible, the pipeline can be extended to support natural language generation. Once parsed into GF trees, the source text can be converted into novel forms: declarative sentences can become questions, negations, hypotheticals, etc. 
 
-There remain a few limitations which we hope future work can address. First, the amount of manual checking necessary to refine the intermediate grammars and output logic remains substantial. This did not surprise us given the enormity of the law-to-logic challenge, but it should be possible to optimise the pipeline further (e.g.\ by writing scripts to automatically merge compatible grammar rules in the preliminary, automatically extracted grammar). Second, we have not verified the accuracy and representativeness of our PDPA formalisation (this itself being a standard challenge in this area, see \cite{wyner_study_2013}). We aim to eventually compare logical outputs generated by our approach against gold standards developed by human legal and technical experts and vetted by the relevant regulatory body. The legal language barrier is far from solved, but we hope to have taken one more step towards realising that vision.
+The work is a proof of concept and has a some limitations.
+The most important one is that we have not verified the accuracy of our PDPA formalisation.
+A proper eveluation would reguire gold standards developed by human legal and technical experts and vetted by the relevant regulatory body.
+Thus the legal language barrier is far from solved, but we hope to have taken one more step towards realising that vision.
 
 % Future papers will link this pipeline with other work at CCLAW: on the spreadsheet syntax, the logical semantics, and the grammar of smaller units.
 

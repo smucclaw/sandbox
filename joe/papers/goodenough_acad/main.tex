@@ -356,6 +356,9 @@ formalism with which we can concisely express large (infinite in this case)
 transition systems.
 
 \subsection{Formalizing the contract in mcrl2}
+\todo{
+  Say something about the formalization being in our github repo.
+}
 
 \subsubsection{Generic parameters}
 
@@ -529,6 +532,7 @@ is executed, then the lender is obligated to send it.
 The contract is breached in the event that the lender defaults on this payment,
 ie the \texttt{payment\_default(Principal, Lender, Borrower, principal\_amt)}
 action is executed.
+The execution of the \texttt{breached} action indicates a breach in the contract.
 On the other hand, if the lender does send the principal amount,
 so that \texttt{pay(Principal, Lender, Borrower, principal\_amt)} runs,
 then the actions \texttt{start\_main\_s} and \texttt{start\_side\_s} will be run.
@@ -607,6 +611,8 @@ Whenever a \texttt{pay\_s} event corresponding to a borrower repayment occurs
 in the \texttt{Main} process,
 the corresponding \texttt{pay\_r} event triggers, causing the
 \texttt{Outstanding} process to recurse with the updated variable values.
+More precisely, we decrement \texttt{remaining\_payments} by 1 and
+\texttt{outstanding} by the amount paid, \texttt{amt\_paid}.
 The actions \texttt{remaining\_payments\_r}, \texttt{next\_payment\_number\_r}
 and \texttt{outstanding\_r} allow other processes to query this process for
 the remaining number of payments, next payment number and outstanding amount.
@@ -652,8 +658,7 @@ communicates with this \texttt{start\_main\_r} action, kicking the
 \texttt{Main} process begins to run.
 Thereafter, the process goes back to its idle state.
 
-We define the \texttt{Main} process using tail recursion as in
-functional programming to express the looping structure:
+We define the \texttt{Main} process as follows:
 
 \begin{lstlisting}
 proc
@@ -683,40 +688,129 @@ proc
 \end{lstlisting}
 
 Notice that all actions corresponding to events like
-\texttt{pay\_s} and \texttt{cure\_default} are annotated with a choice
-\texttt{+ Stop\_main\_r}.
-This allows the \texttt{Main} process to listen out for a stop signal and
-transition back to the idling state upon receiving one.
-More precisely, \texttt{stop\_main\_r} communicates with
-\texttt{stop\_main\_s} actions, causing it to execute instead as per
-the idle \texttt{Main\_idling} process. 
+\texttt{pay\_s} and \texttt{cure\_default} are annotated with the
+(non-deterministic) choice \texttt{+ Stop\_main\_r}.
+This means that at every step in the execution of the \texttt{Main} process,
+it may either perform an atomic action or listen out for a stop signal given by
+\texttt{stop\_main\_s}, which communicates with the \texttt{stop\_main\_r}
+action in the \texttt{Stop\_main\_r} process.
+Upon receiving such a signal, the \texttt{Main} process stops running, ie it
+transitions back to the idling state.
+This is used by the \texttt{Side} process to stop the \texttt{Main}
+process before transitioning to the accelerated repayment stage.
+Note that by default, the non-deterministic choice operator \texttt{+}
+does not give priority to one process over the other.
+While \mcrl \, does not allow us to adjust priorities from within specifications
+themselves, unlike other tools like UPPAAL, we found a workaround to force
+the toolset to prioritize these transitions when generating the LTS.
+We describe this in more detail in the next section where we talk about how
+we generate and explore the transition system.
+
+% As mentioned earlier, a choice \texttt{P + Q} between processes \texttt{P}
+% and \texttt{Q} is non-deterministic in that it does not prioritize
+% one action over the other
+
+% More precisely, \texttt{stop\_main\_r} communicates with
+% \texttt{stop\_main\_s} actions, causing it to execute instead as per
+% the idle \texttt{Main\_idling} process.
 
 \inlinetodo{
   Should probably mention about how we hide those actions and prioritize tau
   transitions in the LTS to give them priority.
 }
 
-Observe that we first perform \texttt{next\_payment\_number(n)}, which as
+Observe that we first perform \texttt{next\_payment\_number\_s(n)}, which as
 mentioned earlier, communicates with the \texttt{Outstanding} process to
 determine what the next payment number is.
 \texttt{(n > total\_num\_payments) -> \dots <> \dots} is a conditional
 if-then-else that checks if all payments have been made.
 If so, the side track is stopped via the \texttt{stop\_side\_s} action and
 the \texttt{fulfilled} action is performed.
+This indicates that the contract has been fulfilled.
 Otherwise, the borrower is obligated to pay the lender.
 In the event that he does, \texttt{pay\_s} is run and communicates with the
 corresponding \texttt{pay\_r} action in the \texttt{Outstanding} process to
 update the state of the contract.
 
-Suppose now the borrower defaults on the payment as indicated by the
+Suppose the borrower defaults on the payment as indicated by the
 \texttt{payment\_default} event. 
 Then, if he is not notified by the borrower or eventually cures his default,
 he does not get into trouble, so we recurse to the start of the \texttt{Main}
 process and continue handling the remaining payments.
 If instead he is notified but fails to cure his default in time,
-\texttt{stop\_side\_s} is run, stopping the \texttt{Side} track process.
+\texttt{stop\_side\_s} is run, stopping the \texttt{Side} process.
 Thereafter, we proceed with the accelerated repayment stage via the
 \texttt{Accel} process.
+
+Notice that once the borrower makes a payment, doesn't get notified about his
+default, or cures it, we recurse back to the top of the main process and
+continue with the payment loop.
+This allows us to handle arbitrarily many payment stages.
+Note also that we make no assumption that the borrower is notified immediately
+after the occurrence of a default event, so that payment events, or other
+default events may occur in the meantime.
+In the event of multiple events of default, the borrower will be obligated to
+cure all of them.
+
+\subsubsection{Side avoid default process}
+The \texttt{Side} process handles borrower default events, where the
+\texttt{borrower\_default} action denotes an event of default by
+representations, warranties, covenants and bankruptcy.
+
+\begin{lstlisting}
+proc
+  Side =
+    (borrower_default + Stop_side_r) . (
+      (dont_notify_borrower + Stop_side_r) . Side
+      + (notify_borrower_of_default + Stop_side_r) . (
+          (cure_default + Stop_side_r) . Side
+          + (dont_cure_default + Stop_side_r) .
+          stop_main_s . Accel
+        )
+  );
+\end{lstlisting}
+
+As aforementioned, this process begins it execution with a borrower default
+event.
+When that happens, we proceed as in the case of payment defaults in the
+\texttt{Main} process.
+That is, if the borrower is not notified about it or cures it on time, then
+nothing bad happens and so we recurse back to the top.
+Otherwise, if he is notified but fails to cure it, we use
+\texttt{stop\_main\_s} to stop the main payment process and transition to
+handling accelerated repayments.
+Note here that we also annotate every action with a choice between that and
+the \texttt{Stop\_side\_r} process, which is defined similarly to
+\texttt{Stop\_main\_r}.
+This allows the \texttt{Side} process to be stopped by the \texttt{Main}
+process before \texttt{Accel} is started.
+
+\subsubsection{Accelerated Repayments}
+The accelerated repayments stage kicks in when the borrower fails to cure
+a default.
+When this happens, all previous obligations are suspended and he now has to
+repay the outstanding amount immediately.
+
+\begin{lstlisting}
+proc
+  Accel = sum outstanding : Pos. (
+    outstanding_s(outstanding) . (
+      pay_s(Accelerated, Borrower, Lender, outstanding) .
+      fulfilled
+      + payment_default(Accelerated, Borrower, Lender, outstanding) .
+        breached
+    )
+  );
+\end{lstlisting}
+
+The \texttt{Accel} process begins by running the \texttt{outstanding\_s} action,
+which queries the \texttt{Outstanding} process for the current outstanding
+amount. 
+At this point, the borrower is obligated to repay this amount.
+\texttt{fulfilled} and \texttt{breached} are run depending on whether the
+borrower makes the accelerated repayment or defaults on it.
+Recall that these actions denote the fulfillment and breach of the contract
+respectively.
 
 % where \texttt{Main\_idling} is given by
 % \begin{lstlisting}
@@ -736,32 +830,36 @@ Thereafter, we proceed with the accelerated repayment stage via the
 % processes to be interrupted during execution, we had to define, for instance
 % for the main process:
 
-\info{
-  Some notes:
+% \info{
+%   Some notes:
 
-  Talk about how the main repayment track is recursive, modelling a loop that
-  iterates through the number of payments involved in the loan agreement.
+%   Talk about how the main repayment track is recursive, modelling a loop that
+%   iterates through the number of payments involved in the loan agreement.
 
-  While \mcrl \, does not have a notion of global variables like other formalisms
-  (mention other formalisms here, maybe uppaal?), these can be easily
-  simulated.
-  Our specification defines ``global variables'' representing the current
-  runtime state of the contract, namely the remaining number of payments as well
-  as the outstanding amount.
-  These variables are then updated whenever a normal repayment event occurs, and
-  referenced during accelerated repayment event.
+%   While \mcrl \, does not have a notion of global variables like other formalisms
+%   (mention other formalisms here, maybe uppaal?), these can be easily
+%   simulated.
+%   Our specification defines ``global variables'' representing the current
+%   runtime state of the contract, namely the remaining number of payments as well
+%   as the outstanding amount.
+%   These variables are then updated whenever a normal repayment event occurs, and
+%   referenced during accelerated repayment event.
 
-  % using the technique described in \cite[Section 3.2.2]{mcrl_lhc}.
+%   % using the technique described in \cite[Section 3.2.2]{mcrl_lhc}.
 
-  Finally, our formalization also allow for more events to be interleaved
-  concurrently.
-  In particular, we make no assumption that the borrower is notified immediately
-  after a default event occurs.
-  Payment events or even other default events may occur in the meantime, so that
-  in the latter case, the borrower has multiple defaults to cure.
-}
+%   Finally, our formalization also allow for more events to be interleaved
+%   concurrently.
+%   In particular, we make no assumption that the borrower is notified immediately
+%   after a default event occurs.
+%   Payment events or even other default events may occur in the meantime, so that
+%   in the latter case, the borrower has multiple defaults to cure.
+% }
 
-\subsection{Visualization and simulation}
+\subsection{Generating and Exploring the transition system}
+In order to visualize and simulate the process corresponding to the contract,
+we first use the \mcrl \, toolset to generate a LTS.
+In our case, the LTS that we obtain is a DFA, ie it has finitely many states
+and is deterministic.
 
 \subsection{Background on the modal mu calculus in mcrl2}
 

@@ -1,0 +1,720 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<pnml xmlns="http://www.informatik.hu-berlin.de/top/pnml/ptNetb">
+  <shared-transition name="initialization" player="0" urgent="false"/>
+  <shared-transition name="request_principal" player="0" urgent="false"/>
+  <shared-transition name="transfer_principal" player="0" urgent="false"/>
+  <shared-transition name="payment1" player="0" urgent="false"/>
+  <shared-transition name="payment2" player="0" urgent="false"/>
+  <shared-transition name="reps_and_warranties" player="0" urgent="false"/>
+  <shared-transition name="covenants" player="0" urgent="false"/>
+  <shared-transition name="brankruptcy" player="0" urgent="false"/>
+  <shared-transition name="cure_default" player="0" urgent="false"/>
+  <shared-transition name="pay_outstanding" player="0" urgent="false"/>
+  <shared-transition name="repayment_fulfilled" player="1" urgent="false"/>
+  <shared-transition name="instantiate_repayment" player="1" urgent="false"/>
+  <shared-transition name="repayment_suspended" player="1" urgent="false"/>
+  <shared-transition name="repayment_resume" player="1" urgent="false"/>
+  <shared-transition name="instantiate_request_principal" player="0" urgent="false"/>
+  <shared-transition name="suspend_repayment" player="1" urgent="false"/>
+  <shared-transition name="repayment_instantiate" player="1" urgent="false"/>
+  <shared-transition name="request_principal_suspend" player="1" urgent="false"/>
+  <shared-transition name="request_principal_instantiate" player="1" urgent="false"/>
+  <shared-transition name="request_principal_terminate" player="1" urgent="false"/>
+  <shared-transition name="repayment_terminate" player="1" urgent="false"/>
+  <shared-transition name="repayment_terminated" player="1" urgent="false"/>
+  <shared-transition name="repayment_resumed" player="1" urgent="false"/>
+  <shared-transition name="request_principal_resumed" player="1" urgent="false"/>
+  <shared-transition name="request_principal_suspended" player="1" urgent="false"/>
+  <shared-transition name="request_principal_terminated" player="1" urgent="false"/>
+  <shared-transition name="request_principal_instantiated" player="1" urgent="false"/>
+  <shared-transition name="repayment_instantiated" player="1" urgent="false"/>
+  <shared-transition name="transfer_principal_terminated" player="1" urgent="false"/>
+  <shared-transition name="transfer_principal_instantiated" player="1" urgent="false"/>
+  <shared-transition name="transfer_principal_fulfilled" player="1" urgent="false"/>
+  <shared-transition name="transfer_principal_violated" player="1" urgent="false"/>
+  <shared-transition name="repayment_violated" player="1" urgent="false"/>
+  <shared-transition name="repayment_payment1_timeout" player="1" urgent="false"/>
+  <shared-transition name="repayment_payment2_timeout" player="1" urgent="false"/>
+  <shared-transition name="notify_borrower_instantiated" player="1" urgent="false"/>
+  <shared-transition name="notify_borrower_of_default" player="0" urgent="false"/>
+  <shared-transition name="cure_default_instantiated" player="1" urgent="false"/>
+  <shared-transition name="cure_default_violated" player="1" urgent="false"/>
+  <shared-transition name="cure_default_terminated" player="1" urgent="false"/>
+  <shared-transition name="cure_default_fulfilled" player="1" urgent="false"/>
+  <shared-transition name="notify_borrower_fulfilled" player="1" urgent="false"/>
+  <shared-transition name="notify_borrower_terminated" player="1" urgent="false"/>
+  <shared-transition name="accelerated_repayment_instantiated" player="1" urgent="false"/>
+  <shared-transition name="accelerated_repayment_terminated" player="1" urgent="false"/>
+  <shared-transition name="accelerated_repayment_fulfilled" player="1" urgent="false"/>
+  <shared-transition name="accelerated_repayment_violated" player="1" urgent="false"/>
+  <shared-transition name="request_princial_fulfilled" player="1" urgent="false"/>
+  <shared-transition name="contract_breached" player="1" urgent="false"/>
+  <shared-transition name="contract_fulfilled" player="1" urgent="false"/>
+  <net active="true" id="real_world_events" type="P/T net">
+    <labels border="true" height="758" positionX="723" positionY="33" width="378">Statically, the state of a contract is given by a configuration,
+which is the collective state of all the instantiated obligations.
+In terms of petri nets, this is the marking across all obligation
+components.
+In the event where there are global variables to keep track of
+during the lifetime of the contract, we will need to include a
+notion of variable store, as in the case of imperative
+programming languages.
+
+Dynamically, the small-step operational semantics of a contract
+is inspired by the game semantics of abstract machines, where
+sequences of instructions corresponding to P(layer) moves are evaluated
+against a control stack corresponding to O(pponent) moves.
+
+A contract gives rise to a 2-player game with:
+- P: the parties involved in the contract.
+- O: the system defined by the contract.
+
+P gets to make the first move by initializing the contract.
+Consequently, O responds and updates the
+internal state of the process, given by a marking indicating
+the states of all the individual obligations.
+Note here that O may make multiple moves because a change in the state of
+an obligation instance, eg from InEffect to Fulfilled or Suspended can
+trigger state changes in other obligations.
+Subsequent P moves then correspond to the occurrence of real world events.
+
+When the game ends, ie no more events can be fired, we say that
+P wins iff no unreparable obligation has been breached.
+
+This semantics can be formalized using the notion of a timed arc
+petri net game, which TAPAAL implements.
+P moves correspond to black controllable transitions and O moves
+correspond to white uncontrollable transitions.
+
+Given a property, the verification problem is now about
+synthesizing strategies for P that conform to that property.
+Note here that we can encode normative requirements as temporal
+formulae so that a strategy for P conforming to a property is a
+subnet of real world events that complies with some normative requirement.
+
+Fun thought: Determinacy of timed arc petri net games?</labels>
+    <labels border="true" height="214" positionX="1128" positionY="33" width="408">TODO:
+- Figure out how to suspend and resume timers on suspend/resume transitions.
+- Also figure out how to terminate timers on terminate transitions.
+- Technically, time petri nets as in TINA and Romeo can
+  handle timeouts, no need for timed arcs as in TAPAAL.
+  Check these out since TINA has support for modal mu calculus
+  and Romeo has convenient features for suspending timers etc.</labels>
+    <place displayName="true" id="P10" initialMarking="1" invariant="&lt; inf" name="P10" nameOffsetX="0" nameOffsetY="0" positionX="405" positionY="300"/>
+    <transition angle="0" displayName="true" id="initialization" infiniteServer="false" name="initialization" nameOffsetX="0" nameOffsetY="0" player="0" positionX="420" positionY="135" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="request_principal" infiniteServer="false" name="request_principal" nameOffsetX="0" nameOffsetY="0" player="0" positionX="165" positionY="270" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="transfer_principal" infiniteServer="false" name="transfer_principal" nameOffsetX="0" nameOffsetY="0" player="0" positionX="195" positionY="330" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="payment1" infiniteServer="false" name="payment1" nameOffsetX="0" nameOffsetY="0" player="0" positionX="630" positionY="330" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="payment2" infiniteServer="false" name="payment2" nameOffsetX="0" nameOffsetY="0" player="0" positionX="600" positionY="375" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="reps_and_warranties" infiniteServer="false" name="reps_and_warranties" nameOffsetX="0" nameOffsetY="0" player="0" positionX="180" positionY="405" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="covenants" infiniteServer="false" name="covenants" nameOffsetX="0" nameOffsetY="0" player="0" positionX="435" positionY="510" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="brankruptcy" infiniteServer="false" name="brankruptcy" nameOffsetX="0" nameOffsetY="0" player="0" positionX="585" positionY="465" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="notify_borrower_of_default" infiniteServer="false" name="notify_borrower_of_default" nameOffsetX="0" nameOffsetY="0" player="0" positionX="225" positionY="510" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="cure_default" infiniteServer="false" name="cure_default" nameOffsetX="0" nameOffsetY="0" player="0" positionX="345" positionY="525" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="pay_outstanding" infiniteServer="false" name="pay_outstanding" nameOffsetX="0" nameOffsetY="0" player="0" positionX="525" positionY="495" priority="0" urgent="false"/>
+    <arc id="A2" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="P10" target="initialization" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="421" yCoord="300"/>
+      <arcpath arcPointType="false" id="1" xCoord="435" yCoord="165"/>
+    </arc>
+    <arc id="I1" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="P10" target="request_principal" type="tapnInhibitor" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="405" yCoord="313"/>
+      <arcpath arcPointType="false" id="1" xCoord="184" yCoord="291"/>
+    </arc>
+    <arc id="I2" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="P10" target="transfer_principal" type="tapnInhibitor" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="405" yCoord="317"/>
+      <arcpath arcPointType="false" id="1" xCoord="214" yCoord="350"/>
+    </arc>
+    <arc id="I3" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="P10" target="payment1" type="tapnInhibitor" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="434" yCoord="317"/>
+      <arcpath arcPointType="false" id="1" xCoord="639" yCoord="353"/>
+    </arc>
+    <arc id="I4" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="P10" target="payment2" type="tapnInhibitor" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="433" yCoord="321"/>
+      <arcpath arcPointType="false" id="1" xCoord="609" yCoord="398"/>
+    </arc>
+    <arc id="I5" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="P10" target="reps_and_warranties" type="tapnInhibitor" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="406" yCoord="321"/>
+      <arcpath arcPointType="false" id="1" xCoord="199" yCoord="425"/>
+    </arc>
+    <arc id="I6" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="P10" target="covenants" type="tapnInhibitor" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="422" yCoord="329"/>
+      <arcpath arcPointType="false" id="1" xCoord="450" yCoord="510"/>
+    </arc>
+    <arc id="I7" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="P10" target="brankruptcy" type="tapnInhibitor" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="431" yCoord="325"/>
+      <arcpath arcPointType="false" id="1" xCoord="595" yCoord="474"/>
+    </arc>
+    <arc id="I8" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="P10" target="notify_borrower_of_default" type="tapnInhibitor" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="410" yCoord="326"/>
+      <arcpath arcPointType="false" id="1" xCoord="245" yCoord="520"/>
+    </arc>
+    <arc id="I9" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="P10" target="cure_default" type="tapnInhibitor" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="415" yCoord="329"/>
+      <arcpath arcPointType="false" id="1" xCoord="360" yCoord="525"/>
+    </arc>
+    <arc id="I10" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="P10" target="pay_outstanding" type="tapnInhibitor" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="427" yCoord="327"/>
+      <arcpath arcPointType="false" id="1" xCoord="535" yCoord="504"/>
+    </arc>
+  </net>
+  <net active="true" id="permission_request_principal" type="P/T net">
+    <place displayName="true" id="instantiate_input" initialMarking="0" invariant="&lt; inf" name="instantiate_input" nameOffsetX="0" nameOffsetY="0" positionX="255" positionY="330"/>
+    <place displayName="true" id="fulfilled" initialMarking="0" invariant="&lt; inf" name="fulfilled" nameOffsetX="0" nameOffsetY="0" positionX="1020" positionY="330"/>
+    <place displayName="true" id="in_effect" initialMarking="0" invariant="&lt; inf" name="in_effect" nameOffsetX="0" nameOffsetY="0" positionX="675" positionY="330"/>
+    <place displayName="true" id="fulfilled_input" initialMarking="0" invariant="&lt; inf" name="fulfilled_input" nameOffsetX="0" nameOffsetY="0" positionX="900" positionY="105"/>
+    <place displayName="true" id="timer" initialMarking="0" invariant="&lt; inf" name="timer" nameOffsetX="0" nameOffsetY="0" positionX="510" positionY="210"/>
+    <place displayName="true" id="terminated" initialMarking="0" invariant="&lt; inf" name="terminated" nameOffsetX="0" nameOffsetY="0" positionX="840" positionY="435"/>
+    <place displayName="true" id="terminated_input" initialMarking="0" invariant="&lt; inf" name="terminated_input" nameOffsetX="0" nameOffsetY="0" positionX="390" positionY="435"/>
+    <transition angle="0" displayName="true" id="request_princial_fulfilled" infiniteServer="false" name="request_princial_fulfilled" nameOffsetX="0" nameOffsetY="0" player="1" positionX="900" positionY="330" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="request_principal_instantiated" infiniteServer="false" name="request_principal_instantiated" nameOffsetX="0" nameOffsetY="0" player="1" positionX="510" positionY="330" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="request_principal" infiniteServer="false" name="request_principal" nameOffsetX="0" nameOffsetY="0" player="0" positionX="510" positionY="105" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="request_principal_timeout" infiniteServer="false" name="request_principal_timeout" nameOffsetX="-5" nameOffsetY="24" player="1" positionX="705" positionY="210" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="initialization" infiniteServer="false" name="initialization" nameOffsetX="0" nameOffsetY="0" player="0" positionX="255" positionY="210" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="request_principal_terminated" infiniteServer="false" name="request_principal_terminated" nameOffsetX="0" nameOffsetY="0" player="1" positionX="675" positionY="435" priority="0" urgent="false"/>
+    <arc id="A0" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="instantiate_input" target="request_principal_instantiated" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="285" yCoord="345"/>
+      <arcpath arcPointType="false" id="1" xCoord="519" yCoord="345"/>
+    </arc>
+    <arc id="A1" inscription="1" nameOffsetX="0" nameOffsetY="0" source="request_principal_instantiated" target="in_effect" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="529" yCoord="345"/>
+      <arcpath arcPointType="false" id="1" xCoord="675" yCoord="345"/>
+    </arc>
+    <arc id="A9" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="in_effect" target="request_princial_fulfilled" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="705" yCoord="345"/>
+      <arcpath arcPointType="false" id="1" xCoord="909" yCoord="345"/>
+    </arc>
+    <arc id="A10" inscription="1" nameOffsetX="0" nameOffsetY="0" source="request_princial_fulfilled" target="fulfilled" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="919" yCoord="345"/>
+      <arcpath arcPointType="false" id="1" xCoord="1020" yCoord="345"/>
+    </arc>
+    <arc id="A15" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="fulfilled_input" target="request_princial_fulfilled" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="915" yCoord="135"/>
+      <arcpath arcPointType="false" id="1" xCoord="915" yCoord="330"/>
+    </arc>
+    <arc id="A19" inscription="1" nameOffsetX="0" nameOffsetY="0" source="request_principal_instantiated" target="timer" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="525" yCoord="330"/>
+      <arcpath arcPointType="false" id="1" xCoord="525" yCoord="240"/>
+    </arc>
+    <arc id="A25" inscription="[0,0]" nameOffsetX="-3" nameOffsetY="-7" source="timer" target="request_principal" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="525" yCoord="210"/>
+      <arcpath arcPointType="false" id="1" xCoord="525" yCoord="135"/>
+    </arc>
+    <arc id="A28" inscription="[1,inf)" nameOffsetX="40" nameOffsetY="-7" source="timer" target="request_principal_timeout" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="539" yCoord="225"/>
+      <arcpath arcPointType="false" id="1" xCoord="714" yCoord="230"/>
+    </arc>
+    <arc id="A26" inscription="1" nameOffsetX="0" nameOffsetY="0" source="request_principal_timeout" target="fulfilled_input" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="724" yCoord="225"/>
+      <arcpath arcPointType="false" id="1" xCoord="901" yCoord="127"/>
+    </arc>
+    <arc id="A29" inscription="1" nameOffsetX="0" nameOffsetY="0" source="request_principal" target="fulfilled_input" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="529" yCoord="120"/>
+      <arcpath arcPointType="false" id="1" xCoord="900" yCoord="120"/>
+    </arc>
+    <arc id="A27" inscription="1" nameOffsetX="0" nameOffsetY="0" source="initialization" target="instantiate_input" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="270" yCoord="240"/>
+      <arcpath arcPointType="false" id="1" xCoord="270" yCoord="330"/>
+    </arc>
+    <arc id="A11" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="in_effect" target="request_principal_terminated" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="690" yCoord="360"/>
+      <arcpath arcPointType="false" id="1" xCoord="690" yCoord="435"/>
+    </arc>
+    <arc id="A12" inscription="1" nameOffsetX="0" nameOffsetY="0" source="request_principal_terminated" target="terminated" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="694" yCoord="450"/>
+      <arcpath arcPointType="false" id="1" xCoord="840" yCoord="450"/>
+    </arc>
+    <arc id="A13" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="terminated_input" target="request_principal_terminated" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="419" yCoord="449"/>
+      <arcpath arcPointType="false" id="1" xCoord="685" yCoord="445"/>
+    </arc>
+  </net>
+  <net active="true" id="obligation_transfer_principal" type="P/T net">
+    <place displayName="true" id="instantiate_input" initialMarking="0" invariant="&lt; inf" name="instantiate_input" nameOffsetX="0" nameOffsetY="0" positionX="225" positionY="330"/>
+    <place displayName="true" id="fulfilled" initialMarking="0" invariant="&lt; inf" name="fulfilled" nameOffsetX="0" nameOffsetY="0" positionX="1245" positionY="330"/>
+    <place displayName="true" id="in_effect" initialMarking="0" invariant="&lt; inf" name="in_effect" nameOffsetX="0" nameOffsetY="0" positionX="645" positionY="330"/>
+    <place displayName="true" id="fulfilled_input" initialMarking="0" invariant="&lt; inf" name="fulfilled_input" nameOffsetX="0" nameOffsetY="0" positionX="1050" positionY="90"/>
+    <place displayName="true" id="timer" initialMarking="0" invariant="&lt; inf" name="timer" nameOffsetX="0" nameOffsetY="0" positionX="480" positionY="210"/>
+    <place displayName="true" id="terminated" initialMarking="0" invariant="&lt; inf" name="terminated" nameOffsetX="0" nameOffsetY="0" positionX="765" positionY="435"/>
+    <place displayName="true" id="violated_input" initialMarking="0" invariant="&lt; inf" name="violated_input" nameOffsetX="0" nameOffsetY="0" positionX="735" positionY="210"/>
+    <place displayName="true" id="violated" initialMarking="0" invariant="&lt; inf" name="violated" nameOffsetX="0" nameOffsetY="0" positionX="990" positionY="210"/>
+    <place displayName="true" id="terminated_input" initialMarking="0" invariant="&lt; inf" name="terminated_input" nameOffsetX="0" nameOffsetY="0" positionX="360" positionY="435"/>
+    <transition angle="0" displayName="true" id="transfer_principal_fulfilled" infiniteServer="false" name="transfer_principal_fulfilled" nameOffsetX="0" nameOffsetY="0" player="1" positionX="1050" positionY="330" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="transfer_principal_instantiated" infiniteServer="false" name="transfer_principal_instantiated" nameOffsetX="0" nameOffsetY="0" player="1" positionX="480" positionY="330" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="transfer_principal" infiniteServer="false" name="transfer_principal" nameOffsetX="0" nameOffsetY="0" player="0" positionX="480" positionY="90" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="transfer_principal_timeout" infiniteServer="false" name="transfer_principal_timeout" nameOffsetX="0" nameOffsetY="0" player="1" positionX="630" positionY="210" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="transfer_principal_terminated" infiniteServer="false" name="transfer_principal_terminated" nameOffsetX="0" nameOffsetY="0" player="1" positionX="645" positionY="435" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="transfer_principal_violated" infiniteServer="false" name="transfer_principal_violated" nameOffsetX="0" nameOffsetY="0" player="1" positionX="900" positionY="210" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="request_principal" infiniteServer="false" name="request_principal" nameOffsetX="0" nameOffsetY="0" player="0" positionX="225" positionY="180" priority="0" urgent="false"/>
+    <arc id="A0" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="instantiate_input" target="transfer_principal_instantiated" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="255" yCoord="345"/>
+      <arcpath arcPointType="false" id="1" xCoord="489" yCoord="345"/>
+    </arc>
+    <arc id="A1" inscription="1" nameOffsetX="0" nameOffsetY="0" source="transfer_principal_instantiated" target="in_effect" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="499" yCoord="345"/>
+      <arcpath arcPointType="false" id="1" xCoord="645" yCoord="345"/>
+    </arc>
+    <arc id="A9" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="in_effect" target="transfer_principal_fulfilled" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="675" yCoord="345"/>
+      <arcpath arcPointType="false" id="1" xCoord="1059" yCoord="345"/>
+    </arc>
+    <arc id="A10" inscription="1" nameOffsetX="0" nameOffsetY="0" source="transfer_principal_fulfilled" target="fulfilled" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="1069" yCoord="345"/>
+      <arcpath arcPointType="false" id="1" xCoord="1245" yCoord="345"/>
+    </arc>
+    <arc id="A15" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="fulfilled_input" target="transfer_principal_fulfilled" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="1065" yCoord="120"/>
+      <arcpath arcPointType="false" id="1" xCoord="1065" yCoord="330"/>
+    </arc>
+    <arc id="A19" inscription="1" nameOffsetX="0" nameOffsetY="0" source="transfer_principal_instantiated" target="timer" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="495" yCoord="330"/>
+      <arcpath arcPointType="false" id="1" xCoord="495" yCoord="240"/>
+    </arc>
+    <arc id="A25" inscription="[0,1]" nameOffsetX="0" nameOffsetY="0" source="timer" target="transfer_principal" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="495" yCoord="210"/>
+      <arcpath arcPointType="false" id="1" xCoord="495" yCoord="120"/>
+    </arc>
+    <arc id="A28" inscription="[2,inf)" nameOffsetX="0" nameOffsetY="0" source="timer" target="transfer_principal_timeout" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="510" yCoord="225"/>
+      <arcpath arcPointType="false" id="1" xCoord="639" yCoord="225"/>
+    </arc>
+    <arc id="A29" inscription="1" nameOffsetX="0" nameOffsetY="0" source="transfer_principal" target="fulfilled_input" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="499" yCoord="105"/>
+      <arcpath arcPointType="false" id="1" xCoord="1050" yCoord="105"/>
+    </arc>
+    <arc id="A11" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="in_effect" target="transfer_principal_terminated" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="660" yCoord="360"/>
+      <arcpath arcPointType="false" id="1" xCoord="660" yCoord="435"/>
+    </arc>
+    <arc id="A12" inscription="1" nameOffsetX="0" nameOffsetY="0" source="transfer_principal_terminated" target="terminated" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="664" yCoord="450"/>
+      <arcpath arcPointType="false" id="1" xCoord="765" yCoord="450"/>
+    </arc>
+    <arc id="A13" inscription="1" nameOffsetX="0" nameOffsetY="0" source="transfer_principal_timeout" target="violated_input" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="649" yCoord="225"/>
+      <arcpath arcPointType="false" id="1" xCoord="735" yCoord="225"/>
+    </arc>
+    <arc id="A14" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="violated_input" target="transfer_principal_violated" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="764" yCoord="225"/>
+      <arcpath arcPointType="false" id="1" xCoord="909" yCoord="230"/>
+    </arc>
+    <arc id="A16" inscription="1" nameOffsetX="0" nameOffsetY="0" source="transfer_principal_violated" target="violated" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="919" yCoord="225"/>
+      <arcpath arcPointType="false" id="1" xCoord="990" yCoord="225"/>
+    </arc>
+    <arc id="A15" inscription="1" nameOffsetX="0" nameOffsetY="0" source="request_principal" target="instantiate_input" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="240" yCoord="210"/>
+      <arcpath arcPointType="false" id="1" xCoord="240" yCoord="330"/>
+    </arc>
+    <arc id="A17" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="terminated_input" target="transfer_principal_terminated" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="389" yCoord="449"/>
+      <arcpath arcPointType="false" id="1" xCoord="655" yCoord="445"/>
+    </arc>
+  </net>
+  <net active="true" id="obligation_repayment" type="P/T net">
+    <place displayName="true" id="instantiate_input" initialMarking="0" invariant="&lt; inf" name="instantiate_input" nameOffsetX="0" nameOffsetY="0" positionX="225" positionY="375"/>
+    <place displayName="true" id="fulfilled" initialMarking="0" invariant="&lt; inf" name="fulfilled" nameOffsetX="0" nameOffsetY="0" positionX="915" positionY="270"/>
+    <place displayName="true" id="in_effect" initialMarking="0" invariant="&lt; inf" name="in_effect" nameOffsetX="0" nameOffsetY="0" positionX="645" positionY="375"/>
+    <place displayName="true" id="violated" initialMarking="0" invariant="&lt; inf" name="violated" nameOffsetX="0" nameOffsetY="0" positionX="1140" positionY="375"/>
+    <place displayName="true" id="fulfilled_input" initialMarking="0" invariant="&lt; inf" name="fulfilled_input" nameOffsetX="86" nameOffsetY="0" positionX="720" positionY="195"/>
+    <place displayName="true" id="violated_input" initialMarking="0" invariant="&lt; inf" name="violated_input" nameOffsetX="0" nameOffsetY="0" positionX="1050" positionY="45"/>
+    <place displayName="true" id="payment1timer" initialMarking="0" invariant="&lt; inf" name="payment1timer" nameOffsetX="0" nameOffsetY="0" positionX="270" positionY="225"/>
+    <place displayName="true" id="payment2timer" initialMarking="0" invariant="&lt; inf" name="payment2timer" nameOffsetX="-8" nameOffsetY="12" positionX="600" positionY="300"/>
+    <place displayName="true" id="payment1_done" initialMarking="0" invariant="&lt; inf" name="payment1_done" nameOffsetX="29" nameOffsetY="-11" positionX="390" positionY="135"/>
+    <place displayName="true" id="payment2_done" initialMarking="0" invariant="&lt; inf" name="payment2_done" nameOffsetX="0" nameOffsetY="0" positionX="495" positionY="195"/>
+    <place displayName="true" id="terminated" initialMarking="0" invariant="&lt; inf" name="terminated" nameOffsetX="0" nameOffsetY="0" positionX="870" positionY="495"/>
+    <place displayName="true" id="terminated_input" initialMarking="0" invariant="&lt; inf" name="terminated_input" nameOffsetX="1" nameOffsetY="1" positionX="435" positionY="495"/>
+    <transition angle="0" displayName="true" id="repayment_fulfilled" infiniteServer="false" name="repayment_fulfilled" nameOffsetX="-4" nameOffsetY="10" player="1" positionX="795" positionY="270" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="repayment_violated" infiniteServer="false" name="repayment_violated" nameOffsetX="-4" nameOffsetY="0" player="1" positionX="1050" positionY="375" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="repayment_instantiated" infiniteServer="false" name="repayment_instantiated" nameOffsetX="14" nameOffsetY="47" player="1" positionX="480" positionY="375" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="payment1" infiniteServer="false" name="payment1" nameOffsetX="0" nameOffsetY="0" player="0" positionX="375" positionY="225" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="repayment_payment1_timeout" infiniteServer="false" name="repayment_payment1_timeout" nameOffsetX="0" nameOffsetY="0" player="1" positionX="330" positionY="45" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="payment2" infiniteServer="false" name="payment2" nameOffsetX="0" nameOffsetY="0" player="0" positionX="525" positionY="255" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="repayment_payment2_timeout" infiniteServer="false" name="repayment_payment2_timeout" nameOffsetX="0" nameOffsetY="0" player="1" positionX="705" positionY="135" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="payments_done" infiniteServer="false" name="payments_done" nameOffsetX="0" nameOffsetY="0" player="1" positionX="495" positionY="105" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="repayment_terminated" infiniteServer="false" name="repayment_terminated" nameOffsetX="0" nameOffsetY="0" player="1" positionX="645" positionY="495" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="transfer_principal_fulfilled" infiniteServer="false" name="transfer_principal_fulfilled" nameOffsetX="0" nameOffsetY="0" player="1" positionX="165" positionY="240" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="accelerated_repayment_instantiated" infiniteServer="false" name="accelerated_repayment_instantiated" nameOffsetX="0" nameOffsetY="0" player="1" positionX="270" positionY="495" priority="0" urgent="false"/>
+    <arc id="A0" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="instantiate_input" target="repayment_instantiated" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="255" yCoord="390"/>
+      <arcpath arcPointType="false" id="1" xCoord="489" yCoord="390"/>
+    </arc>
+    <arc id="A1" inscription="1" nameOffsetX="0" nameOffsetY="0" source="repayment_instantiated" target="in_effect" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="499" yCoord="390"/>
+      <arcpath arcPointType="false" id="1" xCoord="645" yCoord="390"/>
+    </arc>
+    <arc id="A9" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="in_effect" target="repayment_fulfilled" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="672" yCoord="381"/>
+      <arcpath arcPointType="false" id="1" xCoord="804" yCoord="290"/>
+    </arc>
+    <arc id="A10" inscription="1" nameOffsetX="0" nameOffsetY="0" source="repayment_fulfilled" target="fulfilled" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="814" yCoord="285"/>
+      <arcpath arcPointType="false" id="1" xCoord="915" yCoord="285"/>
+    </arc>
+    <arc id="A11" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="in_effect" target="repayment_violated" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="675" yCoord="390"/>
+      <arcpath arcPointType="false" id="1" xCoord="1059" yCoord="390"/>
+    </arc>
+    <arc id="A12" inscription="1" nameOffsetX="0" nameOffsetY="0" source="repayment_violated" target="violated" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="1069" yCoord="390"/>
+      <arcpath arcPointType="false" id="1" xCoord="1140" yCoord="390"/>
+    </arc>
+    <arc id="A15" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="fulfilled_input" target="repayment_fulfilled" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="745" yCoord="220"/>
+      <arcpath arcPointType="false" id="1" xCoord="805" yCoord="280"/>
+    </arc>
+    <arc id="A18" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="violated_input" target="repayment_violated" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="1065" yCoord="75"/>
+      <arcpath arcPointType="false" id="1" xCoord="1065" yCoord="375"/>
+    </arc>
+    <arc id="A25" inscription="1" nameOffsetX="0" nameOffsetY="0" source="repayment_instantiated" target="payment1timer" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="490" yCoord="385"/>
+      <arcpath arcPointType="false" id="1" xCoord="297" yCoord="248"/>
+    </arc>
+    <arc id="A29" inscription="[365,365]" nameOffsetX="0" nameOffsetY="0" source="payment1timer" target="payment1" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="300" yCoord="240"/>
+      <arcpath arcPointType="false" id="1" xCoord="384" yCoord="240"/>
+    </arc>
+    <arc id="A30" inscription="[366,inf)" nameOffsetX="0" nameOffsetY="0" source="payment1timer" target="repayment_payment1_timeout" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="290" yCoord="225"/>
+      <arcpath arcPointType="false" id="1" xCoord="345" yCoord="75"/>
+    </arc>
+    <arc id="A32" inscription="1" nameOffsetX="0" nameOffsetY="0" source="repayment_payment1_timeout" target="violated_input" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="349" yCoord="60"/>
+      <arcpath arcPointType="false" id="1" xCoord="1050" yCoord="60"/>
+    </arc>
+    <arc id="A28" inscription="1" nameOffsetX="0" nameOffsetY="0" source="repayment_instantiated" target="payment2timer" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="499" yCoord="390"/>
+      <arcpath arcPointType="false" id="1" xCoord="602" yCoord="323"/>
+    </arc>
+    <arc id="A31" inscription="[730,730]" nameOffsetX="39" nameOffsetY="-11" source="payment2timer" target="payment2" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="602" yCoord="306"/>
+      <arcpath arcPointType="false" id="1" xCoord="545" yCoord="265"/>
+    </arc>
+    <arc id="A29" inscription="1" nameOffsetX="0" nameOffsetY="0" source="repayment_payment2_timeout" target="violated_input" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="724" yCoord="150"/>
+      <arcpath arcPointType="false" id="1" xCoord="1050" yCoord="63"/>
+    </arc>
+    <arc id="A32" inscription="[731,inf)" nameOffsetX="0" nameOffsetY="0" source="payment2timer" target="repayment_payment2_timeout" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="622" yCoord="302"/>
+      <arcpath arcPointType="false" id="1" xCoord="714" yCoord="150"/>
+    </arc>
+    <arc id="A36" inscription="1" nameOffsetX="0" nameOffsetY="0" source="payments_done" target="fulfilled_input" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="514" yCoord="120"/>
+      <arcpath arcPointType="false" id="1" xCoord="721" yCoord="204"/>
+    </arc>
+    <arc id="A33" inscription="1" nameOffsetX="0" nameOffsetY="0" source="payment1" target="payment1_done" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="390" yCoord="225"/>
+      <arcpath arcPointType="false" id="1" xCoord="402" yCoord="164"/>
+    </arc>
+    <arc id="A34" inscription="1" nameOffsetX="0" nameOffsetY="0" source="payment2" target="payment2_done" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="540" yCoord="255"/>
+      <arcpath arcPointType="false" id="1" xCoord="518" yCoord="222"/>
+    </arc>
+    <arc id="A35" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="payment2_done" target="payments_done" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="510" yCoord="195"/>
+      <arcpath arcPointType="false" id="1" xCoord="510" yCoord="135"/>
+    </arc>
+    <arc id="A37" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="payment1_done" target="payments_done" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="419" yCoord="146"/>
+      <arcpath arcPointType="false" id="1" xCoord="504" yCoord="129"/>
+    </arc>
+    <arc id="A21" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="in_effect" target="repayment_terminated" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="660" yCoord="405"/>
+      <arcpath arcPointType="false" id="1" xCoord="660" yCoord="495"/>
+    </arc>
+    <arc id="A22" inscription="1" nameOffsetX="0" nameOffsetY="0" source="repayment_terminated" target="terminated" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="664" yCoord="510"/>
+      <arcpath arcPointType="false" id="1" xCoord="870" yCoord="510"/>
+    </arc>
+    <arc id="A23" inscription="1" nameOffsetX="0" nameOffsetY="0" source="transfer_principal_fulfilled" target="instantiate_input" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="180" yCoord="270"/>
+      <arcpath arcPointType="false" id="1" xCoord="233" yCoord="376"/>
+    </arc>
+    <arc id="A24" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="terminated_input" target="repayment_terminated" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="464" yCoord="509"/>
+      <arcpath arcPointType="false" id="1" xCoord="655" yCoord="505"/>
+    </arc>
+    <arc id="A26" inscription="1" nameOffsetX="0" nameOffsetY="0" source="accelerated_repayment_instantiated" target="terminated_input" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="289" yCoord="510"/>
+      <arcpath arcPointType="false" id="1" xCoord="432" yCoord="508"/>
+      <arcpath arcPointType="false" id="2" xCoord="435" yCoord="508"/>
+    </arc>
+  </net>
+  <net active="true" id="permission_notify_borrower" type="P/T net">
+    <place displayName="true" id="instantiate_input" initialMarking="0" invariant="&lt; inf" name="instantiate_input" nameOffsetX="-6" nameOffsetY="13" positionX="285" positionY="375"/>
+    <place displayName="true" id="fulfilled" initialMarking="0" invariant="&lt; inf" name="fulfilled" nameOffsetX="0" nameOffsetY="0" positionX="1305" positionY="375"/>
+    <place displayName="true" id="in_effect" initialMarking="0" invariant="&lt; inf" name="in_effect" nameOffsetX="0" nameOffsetY="0" positionX="705" positionY="375"/>
+    <place displayName="true" id="fulfilled_input" initialMarking="0" invariant="&lt; inf" name="fulfilled_input" nameOffsetX="0" nameOffsetY="0" positionX="1110" positionY="135"/>
+    <place displayName="true" id="timer" initialMarking="0" invariant="&lt; inf" name="timer" nameOffsetX="0" nameOffsetY="0" positionX="540" positionY="255"/>
+    <place displayName="true" id="terminated" initialMarking="0" invariant="&lt; inf" name="terminated" nameOffsetX="0" nameOffsetY="0" positionX="825" positionY="480"/>
+    <place displayName="true" id="terminated_input" initialMarking="0" invariant="&lt; inf" name="terminated_input" nameOffsetX="0" nameOffsetY="0" positionX="705" positionY="615"/>
+    <transition angle="0" displayName="true" id="notify_borrower_fulfilled" infiniteServer="false" name="notify_borrower_fulfilled" nameOffsetX="0" nameOffsetY="0" player="1" positionX="1110" positionY="375" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="notify_borrower_instantiated" infiniteServer="false" name="notify_borrower_instantiated" nameOffsetX="0" nameOffsetY="0" player="1" positionX="540" positionY="375" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="notify_borrower_of_default" infiniteServer="false" name="notify_borrower_of_default" nameOffsetX="0" nameOffsetY="0" player="0" positionX="540" positionY="135" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="notify_borrower_timeout" infiniteServer="false" name="notify_borrower_timeout" nameOffsetX="0" nameOffsetY="0" player="1" positionX="690" positionY="255" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="notify_borrower_terminated" infiniteServer="false" name="notify_borrower_terminated" nameOffsetX="0" nameOffsetY="0" player="1" positionX="705" positionY="480" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="repayment_payment1_timeout" infiniteServer="false" name="repayment_payment1_timeout" nameOffsetX="65" nameOffsetY="-11" player="1" positionX="210" positionY="255" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="repayment_payment2_timeout" infiniteServer="false" name="repayment_payment2_timeout" nameOffsetX="97" nameOffsetY="-14" player="1" positionX="375" positionY="255" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="reps_and_warranties" infiniteServer="false" name="reps_and_warranties" nameOffsetX="0" nameOffsetY="0" player="0" positionX="180" positionY="510" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="brankruptcy" infiniteServer="false" name="brankruptcy" nameOffsetX="90" nameOffsetY="11" player="0" positionX="405" positionY="510" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="covenants" infiniteServer="false" name="covenants" nameOffsetX="0" nameOffsetY="0" player="0" positionX="285" positionY="510" priority="0" urgent="false"/>
+    <arc id="A0" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="instantiate_input" target="notify_borrower_instantiated" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="315" yCoord="390"/>
+      <arcpath arcPointType="false" id="1" xCoord="549" yCoord="390"/>
+    </arc>
+    <arc id="A1" inscription="1" nameOffsetX="0" nameOffsetY="0" source="notify_borrower_instantiated" target="in_effect" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="559" yCoord="390"/>
+      <arcpath arcPointType="false" id="1" xCoord="705" yCoord="390"/>
+    </arc>
+    <arc id="A9" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="in_effect" target="notify_borrower_fulfilled" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="735" yCoord="390"/>
+      <arcpath arcPointType="false" id="1" xCoord="1119" yCoord="390"/>
+    </arc>
+    <arc id="A10" inscription="1" nameOffsetX="0" nameOffsetY="0" source="notify_borrower_fulfilled" target="fulfilled" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="1129" yCoord="390"/>
+      <arcpath arcPointType="false" id="1" xCoord="1305" yCoord="390"/>
+    </arc>
+    <arc id="A15" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="fulfilled_input" target="notify_borrower_fulfilled" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="1125" yCoord="165"/>
+      <arcpath arcPointType="false" id="1" xCoord="1125" yCoord="375"/>
+    </arc>
+    <arc id="A19" inscription="1" nameOffsetX="0" nameOffsetY="0" source="notify_borrower_instantiated" target="timer" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="555" yCoord="375"/>
+      <arcpath arcPointType="false" id="1" xCoord="555" yCoord="285"/>
+    </arc>
+    <arc id="A25" inscription="[0,2]" nameOffsetX="0" nameOffsetY="0" source="timer" target="notify_borrower_of_default" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="555" yCoord="255"/>
+      <arcpath arcPointType="false" id="1" xCoord="555" yCoord="165"/>
+    </arc>
+    <arc id="A28" inscription="[3,inf)" nameOffsetX="0" nameOffsetY="0" source="timer" target="notify_borrower_timeout" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="570" yCoord="270"/>
+      <arcpath arcPointType="false" id="1" xCoord="699" yCoord="270"/>
+    </arc>
+    <arc id="A29" inscription="1" nameOffsetX="0" nameOffsetY="0" source="notify_borrower_of_default" target="fulfilled_input" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="559" yCoord="150"/>
+      <arcpath arcPointType="false" id="1" xCoord="1110" yCoord="150"/>
+    </arc>
+    <arc id="A11" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="in_effect" target="notify_borrower_terminated" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="720" yCoord="405"/>
+      <arcpath arcPointType="false" id="1" xCoord="720" yCoord="480"/>
+    </arc>
+    <arc id="A12" inscription="1" nameOffsetX="0" nameOffsetY="0" source="notify_borrower_terminated" target="terminated" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="724" yCoord="495"/>
+      <arcpath arcPointType="false" id="1" xCoord="825" yCoord="495"/>
+    </arc>
+    <arc id="A15" inscription="1" nameOffsetX="0" nameOffsetY="0" source="repayment_payment1_timeout" target="instantiate_input" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="229" yCoord="270"/>
+      <arcpath arcPointType="false" id="1" xCoord="292" yCoord="377"/>
+    </arc>
+    <arc id="A17" inscription="1" nameOffsetX="0" nameOffsetY="0" source="repayment_payment2_timeout" target="instantiate_input" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="384" yCoord="270"/>
+      <arcpath arcPointType="false" id="1" xCoord="308" yCoord="377"/>
+    </arc>
+    <arc id="A16" inscription="1" nameOffsetX="0" nameOffsetY="0" source="notify_borrower_timeout" target="fulfilled_input" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="709" yCoord="270"/>
+      <arcpath arcPointType="false" id="1" xCoord="1110" yCoord="154"/>
+    </arc>
+    <arc id="A20" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="terminated_input" target="notify_borrower_terminated" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="720" yCoord="615"/>
+      <arcpath arcPointType="false" id="1" xCoord="720" yCoord="510"/>
+    </arc>
+    <arc id="A17" inscription="1" nameOffsetX="0" nameOffsetY="0" source="reps_and_warranties" target="instantiate_input" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="200" yCoord="520"/>
+      <arcpath arcPointType="false" id="1" xCoord="290" yCoord="401"/>
+    </arc>
+    <arc id="A18" inscription="1" nameOffsetX="0" nameOffsetY="0" source="covenants" target="instantiate_input" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="300" yCoord="510"/>
+      <arcpath arcPointType="false" id="1" xCoord="300" yCoord="405"/>
+    </arc>
+    <arc id="A21" inscription="1" nameOffsetX="0" nameOffsetY="0" source="brankruptcy" target="instantiate_input" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="415" yCoord="520"/>
+      <arcpath arcPointType="false" id="1" xCoord="309" yCoord="401"/>
+    </arc>
+  </net>
+  <net active="true" id="obligation_cure_default" type="P/T net">
+    <place displayName="true" id="instantiate_input" initialMarking="0" invariant="&lt; inf" name="instantiate_input" nameOffsetX="-6" nameOffsetY="13" positionX="225" positionY="330"/>
+    <place displayName="true" id="fulfilled" initialMarking="0" invariant="&lt; inf" name="fulfilled" nameOffsetX="0" nameOffsetY="0" positionX="1245" positionY="330"/>
+    <place displayName="true" id="in_effect" initialMarking="0" invariant="&lt; inf" name="in_effect" nameOffsetX="0" nameOffsetY="0" positionX="645" positionY="330"/>
+    <place displayName="true" id="fulfilled_input" initialMarking="0" invariant="&lt; inf" name="fulfilled_input" nameOffsetX="0" nameOffsetY="0" positionX="1050" positionY="90"/>
+    <place displayName="true" id="timer" initialMarking="0" invariant="&lt; inf" name="timer" nameOffsetX="0" nameOffsetY="0" positionX="480" positionY="210"/>
+    <place displayName="true" id="terminated" initialMarking="0" invariant="&lt; inf" name="terminated" nameOffsetX="0" nameOffsetY="0" positionX="765" positionY="435"/>
+    <place displayName="true" id="violated_input" initialMarking="0" invariant="&lt; inf" name="violated_input" nameOffsetX="0" nameOffsetY="0" positionX="765" positionY="210"/>
+    <place displayName="true" id="violated" initialMarking="0" invariant="&lt; inf" name="violated" nameOffsetX="0" nameOffsetY="0" positionX="945" positionY="210"/>
+    <place displayName="true" id="terminated_input" initialMarking="0" invariant="&lt; inf" name="terminated_input" nameOffsetX="0" nameOffsetY="0" positionX="420" positionY="435"/>
+    <transition angle="0" displayName="true" id="cure_default_fulfilled" infiniteServer="false" name="cure_default_fulfilled" nameOffsetX="0" nameOffsetY="0" player="1" positionX="1050" positionY="330" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="cure_default_instantiated" infiniteServer="false" name="cure_default_instantiated" nameOffsetX="0" nameOffsetY="0" player="1" positionX="480" positionY="330" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="notify_borrower_of_default" infiniteServer="false" name="notify_borrower_of_default" nameOffsetX="0" nameOffsetY="0" player="0" positionX="225" positionY="225" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="cure_default_timeout" infiniteServer="false" name="cure_default_timeout" nameOffsetX="0" nameOffsetY="0" player="1" positionX="630" positionY="210" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="cure_default" infiniteServer="false" name="cure_default" nameOffsetX="0" nameOffsetY="0" player="0" positionX="480" positionY="90" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="cure_default_violated" infiniteServer="false" name="cure_default_violated" nameOffsetX="60" nameOffsetY="-18" player="1" positionX="840" positionY="210" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="cure_default_terminated" infiniteServer="false" name="cure_default_terminated" nameOffsetX="0" nameOffsetY="0" player="1" positionX="645" positionY="435" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="accelerated_repayment_instantiated" infiniteServer="false" name="accelerated_repayment_instantiated" nameOffsetX="0" nameOffsetY="0" player="1" positionX="255" positionY="435" priority="0" urgent="false"/>
+    <arc id="A0" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="instantiate_input" target="cure_default_instantiated" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="255" yCoord="345"/>
+      <arcpath arcPointType="false" id="1" xCoord="489" yCoord="345"/>
+    </arc>
+    <arc id="A1" inscription="1" nameOffsetX="0" nameOffsetY="0" source="cure_default_instantiated" target="in_effect" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="499" yCoord="345"/>
+      <arcpath arcPointType="false" id="1" xCoord="645" yCoord="345"/>
+    </arc>
+    <arc id="A9" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="in_effect" target="cure_default_fulfilled" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="675" yCoord="345"/>
+      <arcpath arcPointType="false" id="1" xCoord="1059" yCoord="345"/>
+    </arc>
+    <arc id="A10" inscription="1" nameOffsetX="0" nameOffsetY="0" source="cure_default_fulfilled" target="fulfilled" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="1069" yCoord="345"/>
+      <arcpath arcPointType="false" id="1" xCoord="1245" yCoord="345"/>
+    </arc>
+    <arc id="A15" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="fulfilled_input" target="cure_default_fulfilled" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="1065" yCoord="120"/>
+      <arcpath arcPointType="false" id="1" xCoord="1065" yCoord="330"/>
+    </arc>
+    <arc id="A19" inscription="1" nameOffsetX="0" nameOffsetY="0" source="cure_default_instantiated" target="timer" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="495" yCoord="330"/>
+      <arcpath arcPointType="false" id="1" xCoord="495" yCoord="240"/>
+    </arc>
+    <arc id="A28" inscription="[3,inf)" nameOffsetX="0" nameOffsetY="0" source="timer" target="cure_default_timeout" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="510" yCoord="225"/>
+      <arcpath arcPointType="false" id="1" xCoord="639" yCoord="225"/>
+    </arc>
+    <arc id="A8" inscription="1" nameOffsetX="0" nameOffsetY="0" source="notify_borrower_of_default" target="instantiate_input" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="240" yCoord="255"/>
+      <arcpath arcPointType="false" id="1" xCoord="240" yCoord="330"/>
+    </arc>
+    <arc id="A11" inscription="1" nameOffsetX="0" nameOffsetY="0" source="cure_default" target="fulfilled_input" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="499" yCoord="105"/>
+      <arcpath arcPointType="false" id="1" xCoord="1050" yCoord="105"/>
+    </arc>
+    <arc id="A12" inscription="[0,2]" nameOffsetX="0" nameOffsetY="0" source="timer" target="cure_default" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="495" yCoord="210"/>
+      <arcpath arcPointType="false" id="1" xCoord="495" yCoord="120"/>
+    </arc>
+    <arc id="A13" inscription="1" nameOffsetX="0" nameOffsetY="0" source="cure_default_timeout" target="violated_input" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="649" yCoord="225"/>
+      <arcpath arcPointType="false" id="1" xCoord="765" yCoord="225"/>
+    </arc>
+    <arc id="A14" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="violated_input" target="cure_default_violated" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="794" yCoord="225"/>
+      <arcpath arcPointType="false" id="1" xCoord="851" yCoord="227"/>
+      <arcpath arcPointType="false" id="2" xCoord="850" yCoord="220"/>
+    </arc>
+    <arc id="A16" inscription="1" nameOffsetX="0" nameOffsetY="0" source="cure_default_violated" target="violated" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="859" yCoord="225"/>
+      <arcpath arcPointType="false" id="1" xCoord="945" yCoord="225"/>
+    </arc>
+    <arc id="A15" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="in_effect" target="cure_default_terminated" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="660" yCoord="360"/>
+      <arcpath arcPointType="false" id="1" xCoord="660" yCoord="435"/>
+    </arc>
+    <arc id="A17" inscription="1" nameOffsetX="0" nameOffsetY="0" source="cure_default_terminated" target="terminated" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="664" yCoord="450"/>
+      <arcpath arcPointType="false" id="1" xCoord="765" yCoord="450"/>
+    </arc>
+    <arc id="A18" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="terminated_input" target="cure_default_terminated" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="449" yCoord="449"/>
+      <arcpath arcPointType="false" id="1" xCoord="655" yCoord="445"/>
+    </arc>
+    <arc id="A20" inscription="1" nameOffsetX="0" nameOffsetY="0" source="accelerated_repayment_instantiated" target="terminated_input" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="274" yCoord="450"/>
+      <arcpath arcPointType="false" id="1" xCoord="420" yCoord="450"/>
+    </arc>
+  </net>
+  <net active="true" id="obligation_accelerated_repayment" type="P/T net">
+    <place displayName="true" id="instantiate_input" initialMarking="0" invariant="&lt; inf" name="instantiate_input" nameOffsetX="-6" nameOffsetY="13" positionX="225" positionY="330"/>
+    <place displayName="true" id="fulfilled" initialMarking="0" invariant="&lt; inf" name="fulfilled" nameOffsetX="0" nameOffsetY="0" positionX="1245" positionY="330"/>
+    <place displayName="true" id="in_effect" initialMarking="0" invariant="&lt; inf" name="in_effect" nameOffsetX="0" nameOffsetY="0" positionX="645" positionY="330"/>
+    <place displayName="true" id="fulfilled_input" initialMarking="0" invariant="&lt; inf" name="fulfilled_input" nameOffsetX="0" nameOffsetY="0" positionX="1050" positionY="90"/>
+    <place displayName="true" id="timer" initialMarking="0" invariant="&lt; inf" name="timer" nameOffsetX="0" nameOffsetY="0" positionX="480" positionY="210"/>
+    <place displayName="true" id="terminated" initialMarking="0" invariant="&lt; inf" name="terminated" nameOffsetX="0" nameOffsetY="0" positionX="795" positionY="435"/>
+    <place displayName="true" id="violated" initialMarking="0" invariant="&lt; inf" name="violated" nameOffsetX="0" nameOffsetY="0" positionX="975" positionY="210"/>
+    <place displayName="true" id="violated_input" initialMarking="0" invariant="&lt; inf" name="violated_input" nameOffsetX="0" nameOffsetY="0" positionX="750" positionY="210"/>
+    <place displayName="true" id="terminated_input" initialMarking="0" invariant="&lt; inf" name="terminated_input" nameOffsetX="0" nameOffsetY="0" positionX="390" positionY="435"/>
+    <transition angle="0" displayName="true" id="accelerated_repayment_fulfilled" infiniteServer="false" name="accelerated_repayment_fulfilled" nameOffsetX="0" nameOffsetY="0" player="1" positionX="1050" positionY="330" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="accelerated_repayment_instantiated" infiniteServer="false" name="accelerated_repayment_instantiated" nameOffsetX="5" nameOffsetY="-17" player="1" positionX="480" positionY="330" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="cure_default_violated" infiniteServer="false" name="cure_default_violated" nameOffsetX="0" nameOffsetY="0" player="1" positionX="225" positionY="210" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="accelerated_repayment_terminated" infiniteServer="false" name="accelerated_repayment_terminated" nameOffsetX="0" nameOffsetY="0" player="1" positionX="645" positionY="435" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="pay_outstanding" infiniteServer="false" name="pay_outstanding" nameOffsetX="0" nameOffsetY="0" player="0" positionX="480" positionY="90" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="cure_default_timeout" infiniteServer="false" name="cure_default_timeout" nameOffsetX="45" nameOffsetY="-14" player="1" positionX="615" positionY="210" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="accelerated_repayment_violated" infiniteServer="false" name="accelerated_repayment_violated" nameOffsetX="89" nameOffsetY="-14" player="1" positionX="855" positionY="210" priority="0" urgent="false"/>
+    <arc id="A0" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="instantiate_input" target="accelerated_repayment_instantiated" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="255" yCoord="345"/>
+      <arcpath arcPointType="false" id="1" xCoord="489" yCoord="345"/>
+    </arc>
+    <arc id="A1" inscription="1" nameOffsetX="0" nameOffsetY="0" source="accelerated_repayment_instantiated" target="in_effect" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="499" yCoord="345"/>
+      <arcpath arcPointType="false" id="1" xCoord="645" yCoord="345"/>
+    </arc>
+    <arc id="A9" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="in_effect" target="accelerated_repayment_fulfilled" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="675" yCoord="345"/>
+      <arcpath arcPointType="false" id="1" xCoord="1059" yCoord="345"/>
+    </arc>
+    <arc id="A10" inscription="1" nameOffsetX="0" nameOffsetY="0" source="accelerated_repayment_fulfilled" target="fulfilled" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="1069" yCoord="345"/>
+      <arcpath arcPointType="false" id="1" xCoord="1245" yCoord="345"/>
+    </arc>
+    <arc id="A15" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="fulfilled_input" target="accelerated_repayment_fulfilled" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="1065" yCoord="120"/>
+      <arcpath arcPointType="false" id="1" xCoord="1065" yCoord="330"/>
+    </arc>
+    <arc id="A19" inscription="1" nameOffsetX="0" nameOffsetY="0" source="accelerated_repayment_instantiated" target="timer" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="495" yCoord="330"/>
+      <arcpath arcPointType="false" id="1" xCoord="495" yCoord="240"/>
+    </arc>
+    <arc id="A8" inscription="1" nameOffsetX="0" nameOffsetY="0" source="cure_default_violated" target="instantiate_input" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="240" yCoord="240"/>
+      <arcpath arcPointType="false" id="1" xCoord="240" yCoord="330"/>
+    </arc>
+    <arc id="A15" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="in_effect" target="accelerated_repayment_terminated" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="660" yCoord="360"/>
+      <arcpath arcPointType="false" id="1" xCoord="660" yCoord="435"/>
+    </arc>
+    <arc id="A17" inscription="1" nameOffsetX="0" nameOffsetY="0" source="accelerated_repayment_terminated" target="terminated" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="664" yCoord="450"/>
+      <arcpath arcPointType="false" id="1" xCoord="795" yCoord="450"/>
+    </arc>
+    <arc id="A11" inscription="[0,2]" nameOffsetX="0" nameOffsetY="0" source="timer" target="pay_outstanding" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="495" yCoord="210"/>
+      <arcpath arcPointType="false" id="1" xCoord="495" yCoord="120"/>
+    </arc>
+    <arc id="A12" inscription="[3,inf)" nameOffsetX="0" nameOffsetY="0" source="timer" target="cure_default_timeout" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="509" yCoord="224"/>
+      <arcpath arcPointType="false" id="1" xCoord="625" yCoord="220"/>
+    </arc>
+    <arc id="A13" inscription="1" nameOffsetX="0" nameOffsetY="0" source="cure_default_timeout" target="violated_input" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="634" yCoord="225"/>
+      <arcpath arcPointType="false" id="1" xCoord="750" yCoord="225"/>
+    </arc>
+    <arc id="A14" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="violated_input" target="accelerated_repayment_violated" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="779" yCoord="224"/>
+      <arcpath arcPointType="false" id="1" xCoord="865" yCoord="219"/>
+    </arc>
+    <arc id="A16" inscription="1" nameOffsetX="0" nameOffsetY="0" source="accelerated_repayment_violated" target="violated" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="874" yCoord="225"/>
+      <arcpath arcPointType="false" id="1" xCoord="975" yCoord="225"/>
+    </arc>
+    <arc id="A15" inscription="1" nameOffsetX="0" nameOffsetY="0" source="pay_outstanding" target="fulfilled_input" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="499" yCoord="105"/>
+      <arcpath arcPointType="false" id="1" xCoord="1050" yCoord="105"/>
+    </arc>
+    <arc id="A17" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="terminated_input" target="accelerated_repayment_terminated" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="419" yCoord="449"/>
+      <arcpath arcPointType="false" id="1" xCoord="655" yCoord="445"/>
+    </arc>
+  </net>
+  <net active="true" id="contract" type="P/T net">
+    <place displayName="true" id="breached" initialMarking="0" invariant="&lt; inf" name="breached" nameOffsetX="0" nameOffsetY="0" positionX="495" positionY="150"/>
+    <place displayName="true" id="fulfilled" initialMarking="0" invariant="&lt; inf" name="fulfilled" nameOffsetX="0" nameOffsetY="0" positionX="495" positionY="285"/>
+    <transition angle="0" displayName="true" id="contract_breached" infiniteServer="false" name="contract_breached" nameOffsetX="0" nameOffsetY="0" player="1" positionX="360" positionY="150" priority="0" urgent="false"/>
+    <transition angle="0" displayName="true" id="contract_fulfilled" infiniteServer="false" name="contract_fulfilled" nameOffsetX="0" nameOffsetY="0" player="1" positionX="360" positionY="285" priority="0" urgent="false"/>
+    <arc id="A0" inscription="1" nameOffsetX="0" nameOffsetY="0" source="contract_breached" target="breached" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="379" yCoord="165"/>
+      <arcpath arcPointType="false" id="1" xCoord="495" yCoord="165"/>
+    </arc>
+    <arc id="A1" inscription="1" nameOffsetX="0" nameOffsetY="0" source="contract_fulfilled" target="fulfilled" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="379" yCoord="300"/>
+      <arcpath arcPointType="false" id="1" xCoord="495" yCoord="300"/>
+    </arc>
+  </net>
+  <k-bound bound="3"/>
+  <feature isGame="true" isTimed="true"/>
+</pnml>

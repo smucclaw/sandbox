@@ -69,18 +69,19 @@ Section \ref{sec:methods} details our pipeline. Section \ref{sec:pdpa} exemplifi
 \section{Methodology}
 \label{sec:methods}
 
-\begin{figure}[h!]
-    \includegraphics[width=0.8\textwidth]{pipeline.png}
-\caption{The pipeline}
-\label{pipeline}
-\end{figure}
-
 \subsection{Pipeline Overview}
 
 Figure~\ref{pipeline} provides an overview of the pipeline. The primary input is a statutory text in natural language which we assume has been tokenised by some standard tool.
 The resulting \texttt{.txt} is converted to abstract syntax trees (ASTs) line by line using the GF parser driven by a grammar (see Section \ref{sec:2.2}). 
 The ASTs are then converted into an intermediate representation we call assembly logic (Section \ref{sec:assembly-logic}) using the Haskell-based methodology described in \cite{ranta-2011c}. Assembly logic is more abstract than the ASTs from the parser, but preserves more distinctions than standard back-end logics.
 These distinctions are useful for deriving different output formats such as predicate logic (Section \ref{sec:predicate-logic}) and visualisations (Section \ref{sec:vis:spreadsheets}).
+
+\begin{figure}[h!]
+    \includegraphics[width=0.8\textwidth]{pipeline.png}
+\caption{The pipeline}
+\label{pipeline}
+\end{figure}
+
 
 % , while Fig.\ref{pipeline-ex} shows a concrete example of its use on a paragraph of text.
 % The second step is converting the abstract syntax trees resulting from the parser into formulas in an \textbf{assembly logic}.
@@ -100,12 +101,13 @@ These distinctions are useful for deriving different output formats such as pred
 \subsection{From Law Text to ASTs}
 \label{sec:2.2}
 
-The primary legal texts are first converted into ASTs using the parser of GF \cite{ranta-2011}.
-The parser is driven by a grammar, such as GF's extensive Resource Grammar Library (RGL, \cite{ranta-2009}).
-Not surprisingly, however, the RGL is not sufficient for law texts, which contain special constructs, such as itemised lists and paragraphs, which are essential for the logical structure that the parser must support.
-Thus, we developed a tailored grammar on top of the RGL.
-We began building the grammar in a data-driven, top-down manner, starting from entire lines of text and going forward by stepwise refinement of the grammar rules.
-To this end, we developed a semi-automatic method where a Haskell script generates GF rules from manual annotations of the source text.
+The primary legal texts are first converted into ASTs using a GF parser.
+GF parsers are driven by grammars, such as GF's general-purpose Resource Grammar Library (RGL, \cite{ranta-2009}).
+However, the RGL is not sufficient for law texts, which contain special constructs that are essential for the logical structure, such as itemised lists and indented paragraphs.
+Thus we developed a tailored grammar on top of the RGL.
+We started in a data-driven, top-down manner, starting from the text itself.
+To this end, we developed a semi-automatic method where the user annotates the text and a Haskell script generates GF rules the annotated text.
+The rules are generated in a context-free format that GF software can process.
 Figure~\ref{grammar-gen} illustrates the grammar building workflow.
 
 \begin{figure}[h!]
@@ -135,7 +137,7 @@ VP   ::= "result" "in" "significant"
          "harm" "to" "an" "individual" ;
 \end{verbatim}
 \enqu
-\textbf{The VP rule above manually refined into more general rules:}
+\textbf{The VP rule above refined into more general rules:}
 \bequ
 \begin{verbatim}
 VP2 ::= "result" "in" NP ;
@@ -144,31 +146,28 @@ NP  ::= "an" CN ;
 CN  ::= "individual" ;
 \end{verbatim}
 \enqu
-\textbf{The same four rules converted into GF abstract syntax functions:}
-\bequ
-\begin{verbatim}
-fun VP2_result_in : VP2 ;
-fun CN_significant_harm_to_NP : NP -> CN ;
-fun NP_an_CN : CN -> NP ;
-fun CN_individual : CN ;
-\end{verbatim}
-\enqu
-\textbf{Manually merging morphological variants (with rules derived elsewhere):}
-\bequ
-\sout{\texttt{fun CN\_individuals : CN ;}} \\
-\texttt{fun CN\_individual : CN ;} {\it --- automated choice of singular vs. plural}
-\sout{\texttt{fun NP\_an\_CN : CN -> NP ;}} \\
-\texttt{fun NP\_a\_CN  : CN -> NP ;} {\it --- automated choice of `a' vs. `an'}
-\enqu
+%\textbf{The same four rules converted into GF abstract syntax functions:}
+%\bequ
+%\begin{verbatim}
+%fun VP2_result_in : VP2 ;
+%fun CN_significant_harm_to_NP : NP -> CN ;
+%fun NP_an_CN : CN -> NP ;
+%fun CN_individual : CN ;
+%\end{verbatim}
+%\enqu
+%\textbf{Manually merging morphological variants (with rules derived elsewhere):}
+%\bequ
+%\sout{\texttt{fun CN\_individuals : CN ;}} \\
+%\texttt{fun CN\_individual : CN ;} {\it --- automated choice of singular vs. plural}
+%\sout{\texttt{fun NP\_an\_CN : CN -> NP ;}} \\
+%\texttt{fun NP\_a\_CN  : CN -> NP ;} {\it --- automated choice of `a' vs. `an'}
+%\enqu
 \enqu
 \end{framed}
 \caption{The grammar extraction process.}
 \label{grammar-gen}
 \end{figure}
 
-The script produces a BNF (context-free) grammar in a notation usable in GF as-is.
-Internally, GF then automatically adds to each rule an abstract syntax function whose name is derived from items in the rule itself.
-The final GF grammar is more expressive and more abstract than BNF and can merge morphological variants of rules, as shown in Figure~\ref{grammar-gen}.
 
 
 \subsection{From ASTs to Assembly Logic}
@@ -226,49 +225,32 @@ Atomic expressions can then be converted to atomic formulas or constants in logi
 \subsection{From Assembly Logic to Predicate Logic}
 \label{sec:predicate-logic}
 
-Assembly logic is then mapped into a many-sorted logic with Russell's iota terms. In turn, the many-sorted logic is mapped into ordinary predicate logic and rendered in TPTP \cite{sutcliffe2009tptp} notation. 
+Assembly logic is first mapped into a many-sorted logic, which is then mapped into ordinary predicate logic and rendered in TPTP \cite{sutcliffe2009tptp} notation. 
 We use many-sorted logic because it better supports compositional translation.
-Thus quantification expressed by noun phrases (e.g.\ ``any organisation'') are compositionally interpreted as quantifiers with sorts rather than divided into unsorted quantifiers and sort predicates.
-The sorts are eliminated during the conversion from many-sorted to ordinary predicate logic.
+Thus quantification expressed by noun phrases (e.g.\ ``any organisation'') are compositionally interpreted as quantifiers with sorts rather than divided into unsorted quantifiers and sort predicates, whereas definite noun phrases  (e.g.\ ``that organisation'') are interpreted as Russell's iota terms (we write $\iota(A)$ instead of $(\iota x)A(x)$, leaving possible variable bindings to $A$ itself, as is customary in higher-order logic).
 
-More importantly, anaphoric expressions (e.g.\ ``that organisation'') are interpreted as definite descriptions formalised as iota terms. (We write $\iota(A)$ instead of $(\iota x)A(x)$, leaving possible variable bindings to $A$ itself, as is customary in higher-order logic.)
-These iota terms are eliminated in a pass that looks for non-iota terms in their context of use.
-This sentence has an existential quantifier in the antecedent and a pronoun or definite description referring to it in the succedent.
-To express this reference in ordinary predicate logic, the existential quantifier is changed into a universal one with a wide scope of implication.
-
-\begin{figure}
-  \begin{framed}
-  \bequ
-    \textbf{An example sentence with anaphoric reference:}
-    \bequ
+Both sorted quantifiers and iota terms are eliminated during the conversion from many-sorted to ordinary predicate logic.
+Iota terms are eliminated in a pass that looks for non-iota terms in their context of use.
+Here is a minimal example, with an existential quantifier in the antecedent and definite noun phrase referring to it in the succedent:
+\bequ
         \textit{if a notification is a data breach, the notification is affected}
-    \enqu
-
-    \textbf{Compositional interpretation in many-sorted logic with iota terms:}
+ \enqu
+Its compositional interpretation in many-sorted logic with iota terms is
 \[
 (\exists x : \eop{notification})\eop{data\_breach}(x) \, \supset \, \eop{affected}(\iota(\eop{notification}))
 \]
-
-    \textbf{Conversions to ordinary predicate logic in TPTP notation:}
-    \bequ
-        \begin{verbatim}
-![X]:(notification(X) => data_breach(X) => affected(X))
-        \end{verbatim}
-    \enqu
-    \enqu
-    \end{framed}
- \caption{Iota terms are eliminated via anaphora resolution.}
-\label{anaphora}
-\end{figure}
-
-Figure~\ref{donkey} shows an example from real law text, with an inverted conditional.
-Note that the logic output still has unanalysed parts treated as atomic predicates.
-
-\begin{figure}
-\includegraphics[width=0.96\textwidth]{anaphora.png}
-\caption{An inverted donkey sentence from the actual law text undergoing similar treatment.}
-\label{donkey}
-\end{figure}
+When converted to ordinary predicate logic, the existential quantifier is changed into a universal one with a wide scope of implication, and the iota term is interpreted as the bound variable:
+\begin{verbatim}
+  ![X]:(notification(X) => data_breach(X) => affected(X))
+\end{verbatim}
+%Figure~\ref{donkey} shows an example from real law text, with an inverted conditional.
+%Note that the logic output still has unanalysed parts treated as atomic predicates.
+%
+%\begin{figure}
+%\includegraphics[width=0.96\textwidth]{anaphora.png}
+%\caption{An inverted conditional in the actual law text interpreetd in the two logics.}
+%\label{donkey}
+%\end{figure}
 
 \subsection{From Assembly Logic to Spreadsheets}
 \label{sec:vis:spreadsheets}

@@ -1,0 +1,15 @@
+channel c, d
+
+datatype List = Nil | Cons.Int.List
+
+head(Cons.x.xs) = x
+head(Nil) = 0
+
+P(x) = c ->
+	let xs = Cons.x.Nil within
+	if head(xs) == 0 then SKIP else (P(0) ||| Q)
+
+Q = d -> Q
+
+-- try { P(1) } catch c { SKIP }
+MAIN = P(1) [| {c} |> SKIP

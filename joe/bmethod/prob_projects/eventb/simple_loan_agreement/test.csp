@@ -1,0 +1,17 @@
+datatype STATE = InProgress | Breached | Fulfilled
+datatype PARTY = Borrower | Lender
+datatype DEONTIC = Ob | Perm | Prohib
+
+channel fulfilled
+channel breached : Set(PARTY)
+
+channel pay_normal
+
+channel a, b
+
+P(n) = 
+  n > 0 & (a -> b -> SKIP ||| P(n - 1))
+
+-- Second argument is for blame assignment.
+
+MAIN = P

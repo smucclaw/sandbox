@@ -1,0 +1,27 @@
+context C0
+
+// constants
+	// public_agencies
+	// not_public_agency
+
+sets ACTOR EVNT
+
+constants
+	pdpc indivs orgs
+
+	assess notify_pdpc notify_indivs
+	become_aware demand_explanation
+
+axioms
+	@axmACTOR1 : finite(ACTOR)
+	@axmACTOR2 : partition(ACTOR, {pdpc}, indivs, orgs)
+	
+	@axmIndivs : indivs ≠ ∅
+	@axmOrgs : orgs ≠ ∅
+
+	@axmEVNT : partition(EVNT, {assess}, {notify_pdpc}, {notify_indivs}, {demand_explanation}, {become_aware})
+
+	// @axmNotPublicAgency1 : not_public_agency ∈ public_agencies → BOOL
+	// @axmNotPublicAgency2 : \forall org. org : ORG => is_public_agency()
+
+end

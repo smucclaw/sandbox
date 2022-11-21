@@ -1,0 +1,329 @@
+MACHINE M1
+SETS /* deferred */
+  EVNT_STATE
+ ; /* enumerated */
+  STATE={InProgress,Breached,Fulfilled};
+  DEONTIC={Ob,Perm,Prohib};
+  PARTY={Borrower,Lender}
+CONCRETE_CONSTANTS
+  maxTime,
+  nextStates,
+  paymentAmt,
+  sum,
+  initialOutstanding,
+  numPayments
+ABSTRACT_VARIABLES
+  outstanding,
+  nextPaymentNum,
+  clock,
+  state,
+  partiesToBlame
+/* PROMOTED OPERATIONS
+  pay_normal,
+  pay_accelerated,
+  send_principal,
+  borrower_default,
+  request_principal,
+  cure_default,
+  notify_borrower_of_default,
+  tick,
+  breached,
+  fulfilled */
+AXIOMS
+    initialOutstanding ∈ ℤ
+  & numPayments ∈ ℤ
+  & /*@label C0:axmNextStates1  */ nextStates ∈ DEONTIC → (BOOL → ℙ(STATE))
+  & /*@label C0:axmNextStates2  */ nextStates(Ob)(TRUE) = {InProgress,Fulfilled}
+  & /*@label C0:axmNextStates3  */ nextStates(Ob)(FALSE) = {InProgress,Breached}
+  & /*@label C0:axmNextStates4  */ nextStates(Perm) = (λx.x ∈ BOOL|{InProgress,Fulfilled})
+  & /*@label C0:axmNextStates5  */ nextStates(Prohib)(TRUE) = nextStates(Ob)(FALSE)
+  & /*@label C0:axmNextStates6  */ nextStates(Prohib)(FALSE) = nextStates(Ob)(TRUE)
+  & /*@label C0:axmMaxTime  */ maxTime ∈ ℕ₁
+  & /*@label C1:axmNumPayments  */ numPayments = 2
+  & /*@label C1:axmMaxTime  */ maxTime = 720
+  & /*@label C1:axmPaymentAmt1  */ paymentAmt ∈ 1 ‥ numPayments → ℕ₁
+  & /*@label C1:axmPaymentAmt2  */ paymentAmt = {(1↦550),(2↦525)}
+  & /*@label C1:axmSum1  */ sum ∈ 1 ‥ numPayments → ℕ₁
+  & /*@label C1:axmSum2  */ sum(1) = paymentAmt(1)
+  & /*@label C1:axmSum3  */ 
+    ∀i.(
+     i ∈ 2 ‥ numPayments
+     ⇒
+     sum(i) = sum(i - 1) + paymentAmt(i)
+    )
+  & /*@label C1:axmInitialOutstanding  */ initialOutstanding = sum(numPayments)
+INVARIANT
+    state ∈ STATE
+  & partiesToBlame ∈ ℙ(PARTY)
+  & /*@label M1:invOutstanding  */ outstanding ∈ 0 ‥ initialOutstanding
+  & /*@label M1:invCurrPayment  */ nextPaymentNum ∈ 1 ‥ numPayments + 1
+  & /*@label M1:invNextPaymentNum  */ (
+     nextPaymentNum = numPayments + 1
+     ⇒
+     outstanding = 0
+    )
+  & /*@label M0:invClock  */ clock ∈ 0 ‥ maxTime
+THEOREMS
+     /*@label C0:thmSTATE  */ card(STATE) = 3
+   ; /*@label C1:thmPARTY  */ card(PARTY) = 2
+   ; /*@label C1:thmBorrowerNeqLender  */ Borrower ≠ Lender
+   ; /*@label C1:thmInitialOutstandingEq  */ initialOutstanding = 1075
+INITIALISATION
+    EVENT /* of machine M1 */
+    BEGIN 
+         state := InProgress
+      ||
+         partiesToBlame := ∅
+      ||
+         clock := 0
+      ||
+         outstanding := 0
+      ||
+         nextPaymentNum := 1
+    REFINES 
+      EVENT /* of machine M0 */
+      BEGIN 
+        skip
+      END
+    END
+EVENTS
+  pay_normal(stateIfHappened,stateIfNotHappened,happened,deontic,parties) = 
+    PRE 
+        stateIfHappened ∈ STATE
+      & stateIfNotHappened ∈ STATE
+      & happened ∈ BOOL
+      & deontic ∈ DEONTIC
+      & parties ∈ ℙ(PARTY)
+    THEN
+      EVENT pay_normal = /* of machine M1 */
+      ANY stateIfHappened,stateIfNotHappened,happened,deontic,parties
+      WHERE 
+          /*@label M1:grdStateInProgress  */ state = InProgress
+        & /*@label M1:grdStateIfHappened  */ stateIfHappened ∈ nextStates(deontic)(TRUE)
+        & /*@label M1:grdStateIfNotHappened  */ stateIfNotHappened ∈ nextStates(deontic)(FALSE)
+        & /*@label M1:grd1  */ outstanding > 0
+        & /*@label M1:grd2  */ nextPaymentNum ≤ numPayments
+        & (/*@label M1:grd3  */ ∃newOutstanding.( newOutstanding=(outstanding - paymentAmt(nextPaymentNum)) ∧ ((newOutstanding = 0 ⇒ stateIfHappened = Fulfilled) ∧ (newOutstanding > 0 ⇒ stateIfHappened = InProgress))))
+      THEN 
+           state : (state ∈ STATE ∧ ((happened = TRUE ⇒ state = stateIfHappened) ∧ (happened = FALSE ⇒ state = stateIfNotHappened)))
+        ||
+           partiesToBlame := parties
+        ||
+           outstanding := outstanding - paymentAmt(nextPaymentNum)
+        ||
+           nextPaymentNum := nextPaymentNum + 1
+      REFINES 
+        EVENT e0 = /* of machine M0 */
+        BEGIN 
+          skip
+        END
+      END
+    END;
+  
+  pay_accelerated(stateIfHappened,stateIfNotHappened,happened,deontic,parties) = 
+    PRE 
+        stateIfHappened ∈ STATE
+      & stateIfNotHappened ∈ STATE
+      & happened ∈ BOOL
+      & deontic ∈ DEONTIC
+      & parties ∈ ℙ(PARTY)
+    THEN
+      EVENT pay_accelerated = /* of machine M1 */
+      ANY stateIfHappened,stateIfNotHappened,happened,deontic,parties
+      WHERE 
+          /*@label M1:grdStateInProgress  */ state = InProgress
+        & /*@label M1:grdStateIfHappened  */ stateIfHappened ∈ nextStates(deontic)(TRUE)
+        & /*@label M1:grdStateIfNotHappened  */ stateIfNotHappened ∈ nextStates(deontic)(FALSE)
+        & /*@label M1:grd1  */ outstanding > 0
+      THEN 
+           state : (state ∈ STATE ∧ ((happened = TRUE ⇒ state = stateIfHappened) ∧ (happened = FALSE ⇒ state = stateIfNotHappened)))
+        ||
+           partiesToBlame := parties
+        ||
+           outstanding := 0
+      REFINES 
+        EVENT e0 = /* of machine M0 */
+        BEGIN 
+          skip
+        END
+      END
+    END;
+  
+  send_principal(stateIfHappened,stateIfNotHappened,happened,deontic,parties) = 
+    PRE 
+        stateIfHappened ∈ STATE
+      & stateIfNotHappened ∈ STATE
+      & happened ∈ BOOL
+      & deontic ∈ DEONTIC
+      & parties ∈ ℙ(PARTY)
+    THEN
+      EVENT send_principal = /* of machine M1 */
+      ANY stateIfHappened,stateIfNotHappened,happened,deontic,parties
+      WHERE 
+          /*@label M1:grdStateInProgress  */ state = InProgress
+        & /*@label M1:grdStateIfHappened  */ stateIfHappened ∈ nextStates(deontic)(TRUE)
+        & /*@label M1:grdStateIfNotHappened  */ stateIfNotHappened ∈ nextStates(deontic)(FALSE)
+      THEN 
+           state : (state ∈ STATE ∧ ((happened = TRUE ⇒ state = stateIfHappened) ∧ (happened = FALSE ⇒ state = stateIfNotHappened)))
+        ||
+           partiesToBlame := parties
+        ||
+           outstanding := initialOutstanding
+      REFINES 
+        EVENT e0 = /* of machine M0 */
+        BEGIN 
+          skip
+        END
+      END
+    END;
+  
+  borrower_default(stateIfHappened,stateIfNotHappened,happened,deontic,parties) = 
+    PRE 
+        stateIfHappened ∈ STATE
+      & stateIfNotHappened ∈ STATE
+      & happened ∈ BOOL
+      & deontic ∈ DEONTIC
+      & parties ∈ ℙ(PARTY)
+    THEN
+      EVENT borrower_default = /* of machine M1 */
+      ANY stateIfHappened,stateIfNotHappened,happened,deontic,parties
+      WHERE 
+          /*@label M1:grdStateInProgress  */ state = InProgress
+        & /*@label M1:grdStateIfHappened  */ stateIfHappened ∈ nextStates(deontic)(TRUE)
+        & /*@label M1:grdStateIfNotHappened  */ stateIfNotHappened ∈ nextStates(deontic)(FALSE)
+      THEN 
+           state : (state ∈ STATE ∧ ((happened = TRUE ⇒ state = stateIfHappened) ∧ (happened = FALSE ⇒ state = stateIfNotHappened)))
+        ||
+           partiesToBlame := parties
+      REFINES 
+        EVENT e0 = /* of machine M0 */
+        BEGIN 
+          skip
+        END
+      END
+    END;
+  
+  request_principal(stateIfHappened,stateIfNotHappened,happened,deontic,parties) = 
+    PRE 
+        stateIfHappened ∈ STATE
+      & stateIfNotHappened ∈ STATE
+      & happened ∈ BOOL
+      & deontic ∈ DEONTIC
+      & parties ∈ ℙ(PARTY)
+    THEN
+      EVENT request_principal = /* of machine M1 */
+      ANY stateIfHappened,stateIfNotHappened,happened,deontic,parties
+      WHERE 
+          /*@label M1:grdStateInProgress  */ state = InProgress
+        & /*@label M1:grdStateIfHappened  */ stateIfHappened ∈ nextStates(deontic)(TRUE)
+        & /*@label M1:grdStateIfNotHappened  */ stateIfNotHappened ∈ nextStates(deontic)(FALSE)
+      THEN 
+           state : (state ∈ STATE ∧ ((happened = TRUE ⇒ state = stateIfHappened) ∧ (happened = FALSE ⇒ state = stateIfNotHappened)))
+        ||
+           partiesToBlame := parties
+      REFINES 
+        EVENT e0 = /* of machine M0 */
+        BEGIN 
+          skip
+        END
+      END
+    END;
+  
+  cure_default(stateIfHappened,stateIfNotHappened,happened,deontic,parties) = 
+    PRE 
+        stateIfHappened ∈ STATE
+      & stateIfNotHappened ∈ STATE
+      & happened ∈ BOOL
+      & deontic ∈ DEONTIC
+      & parties ∈ ℙ(PARTY)
+    THEN
+      EVENT cure_default = /* of machine M1 */
+      ANY stateIfHappened,stateIfNotHappened,happened,deontic,parties
+      WHERE 
+          /*@label M1:grdStateInProgress  */ state = InProgress
+        & /*@label M1:grdStateIfHappened  */ stateIfHappened ∈ nextStates(deontic)(TRUE)
+        & /*@label M1:grdStateIfNotHappened  */ stateIfNotHappened ∈ nextStates(deontic)(FALSE)
+      THEN 
+           state : (state ∈ STATE ∧ ((happened = TRUE ⇒ state = stateIfHappened) ∧ (happened = FALSE ⇒ state = stateIfNotHappened)))
+        ||
+           partiesToBlame := parties
+      REFINES 
+        EVENT e0 = /* of machine M0 */
+        BEGIN 
+          skip
+        END
+      END
+    END;
+  
+  notify_borrower_of_default(stateIfHappened,stateIfNotHappened,happened,deontic,parties) = 
+    PRE 
+        stateIfHappened ∈ STATE
+      & stateIfNotHappened ∈ STATE
+      & happened ∈ BOOL
+      & deontic ∈ DEONTIC
+      & parties ∈ ℙ(PARTY)
+    THEN
+      EVENT notify_borrower_of_default = /* of machine M1 */
+      ANY stateIfHappened,stateIfNotHappened,happened,deontic,parties
+      WHERE 
+          /*@label M1:grdStateInProgress  */ state = InProgress
+        & /*@label M1:grdStateIfHappened  */ stateIfHappened ∈ nextStates(deontic)(TRUE)
+        & /*@label M1:grdStateIfNotHappened  */ stateIfNotHappened ∈ nextStates(deontic)(FALSE)
+      THEN 
+           state : (state ∈ STATE ∧ ((happened = TRUE ⇒ state = stateIfHappened) ∧ (happened = FALSE ⇒ state = stateIfNotHappened)))
+        ||
+           partiesToBlame := parties
+      REFINES 
+        EVENT e0 = /* of machine M0 */
+        BEGIN 
+          skip
+        END
+      END
+    END;
+  
+  tick = 
+    EVENT tick = /* of machine M1 */
+    WHEN 
+        /*@label M1:grdStateInProgress  */ state = InProgress
+      & /*@label M1:grdDuration  */ clock + 1 ≤ maxTime
+    THEN 
+         clock := clock + 1
+    REFINES 
+      EVENT tick = /* of machine M0 */
+      BEGIN 
+        skip
+      END
+    END;
+  
+  breached(parties) = 
+    PRE 
+        parties ∈ ℙ(PARTY)
+    THEN
+      EVENT breached = /* of machine M1 */
+      ANY parties
+      WHERE 
+          /*@label M1:grdBreached  */ state = Breached
+        & /*@label M1:grdParties  */ parties = partiesToBlame
+      THEN 
+        skip
+      REFINES 
+        EVENT breached = /* of machine M0 */
+        BEGIN 
+          skip
+        END
+      END
+    END;
+  
+  fulfilled = 
+    EVENT fulfilled = /* of machine M1 */
+    WHEN 
+        /*@label M1:grdFulfilled  */ state = Fulfilled
+    THEN 
+      skip
+    REFINES 
+      EVENT fulfilled = /* of machine M0 */
+      BEGIN 
+        skip
+      END
+    END
+END

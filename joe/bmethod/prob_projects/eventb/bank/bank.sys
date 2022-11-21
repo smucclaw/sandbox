@@ -1,0 +1,8 @@
+context C0
+
+sets
+  EVENT
+
+constants
+  c
+  acc_created acc_closed deposited withdrawn

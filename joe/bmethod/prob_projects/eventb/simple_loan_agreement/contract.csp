@@ -1,0 +1,170 @@
+-- Datatypes and event channels for communicating with B/Event-B machines.
+datatype STATE = InProgress | Breached | Fulfilled
+datatype PARTY = Borrower | Lender
+datatype DEONTIC = Ob | Perm | Prohib
+
+-- channel fulfilled
+-- channel breached : Set(PARTY)
+
+channel tick
+
+{-
+Old state, new state, Did it happen?, deontic, parties who are responsible
+-}
+channel pay_normal, pay_accelerated : STATE.STATE.Bool.DEONTIC.Set(PARTY)
+channel request_principal, send_principal, borrower_default : STATE.STATE.Bool.DEONTIC.Set(PARTY)
+channel cure_default, notify_borrower_of_default : STATE.STATE.Bool.DEONTIC.Set(PARTY)
+
+{- Some thoughts:
+CSPm supports higher order processes and interruptions/exceptions.
+Maybe we can make use of this to make dynamic, reconfigurable stuff?
+
+On another note, to what extent can we abstract away the progression of real time?
+Can we simply look at deadlines and progress time accordingly?
+-}
+
+MAIN =
+  let
+    Tick = tick -> Tick
+  within
+    Contract -- ||| Tick
+
+Contract = (
+  -- Permission to request principal.
+  request_principal!InProgress!Fulfilled?_!Perm!{Borrower}
+  -- Non-compensable obligation to send principal.
+  -> send_principal!InProgress!Breached?_!Ob!{Lender}
+  ->
+    let
+      P = Repayment ||| AvoidDefault(5)
+      exc = cure_default.InProgress.InProgress.false.Ob.{Borrower}
+    within
+      P [| {exc} |> AcceleratedRepayment
+  )
+  [| {request_principal.InProgress.Fulfilled.false.Perm.{Borrower},
+      send_principal.InProgress.Breached.false.Ob.{Borrower}} |>
+    SKIP
+
+-- Compensable obligation to repay.
+Repayment = (
+  pay_normal?stateIfHappened!InProgress?happened!Ob!{Borrower}
+  ->
+    let
+      match(true, Fulfilled) = SKIP
+      match(true, InProgress) = Repayment
+    within
+      match(happened, stateIfHappened)
+  )
+  -- Reparation pathway.
+  [| {pay_normal.InProgress.InProgress.false.Ob.{Borrower},
+      pay_normal.Fulfilled.InProgress.false.Ob.{Borrower}} |>
+    (BorrowerDefault; Repayment)
+
+-- Compensable prohibition to avoid default.
+AvoidDefault(n) =
+  n > 0 & (
+    borrower_default!InProgress!InProgress!true!Prohib!{Borrower}
+    -> BorrowerDefault ||| AvoidDefault(n - 1)
+  )
+
+BorrowerDefault =
+    -- Non-compensable obligation to notify borrower of default.
+    notify_borrower_of_default!InProgress!Breached?happened!Ob!{Lender}
+    -> (
+      happened & (
+        -- Compensable obligation to cure default.
+        cure_default!InProgress!InProgress?happened!Ob!{Borrower}
+        -> (not happened & AcceleratedRepayment)
+    ))
+
+AcceleratedRepayment =
+  -- Non-compensable obligation to pay off the outstanding amount
+  -- immediately.
+  pay_accelerated!Fulfilled!Breached?_!Ob!{Borrower} -> SKIP
+
+-- MAIN_old =
+--   -- First the borrower may or may not request for the principal amount.
+--   -- If he doesn't then the contract is immediately fulfilled.
+--   dont_request_principal?_!Fulfilled -> LoopFulfilled
+
+--   -- Otherwise, the lender is now obliged to send the principal.
+--   [] request_principal?_!InProgress -> (
+
+--       -- If the Lender defaults on the payment of the principal, the
+--       -- contract is deemed to be breached.
+--       lender_default!{Lender}!Breached -> LoopBreached
+
+--       -- Otherwise, if he does send the principal, then we start the main and
+--       -- side tracks.
+--       [] send_principal?_!InProgress ->
+--         let
+--           mainandside = (main ||| side) [| excs |> accel
+--           excs = {dont_cure_default.{}.inprogress}
+--         within
+--           mainandside
+--   )
+
+-- LoopFulfilled = SKIP -- fulfilled -> LoopFulfilled
+-- LoopBreached = SKIP -- breached?partiesToBlame -> LoopBreached
+
+-- Main =
+--   pay_normal?_ -> (LoopFulfilled [] Main)
+--   -- (get_outstanding!0 -> SKIP) [[ get_outstanding.0 <- fulfilled ]]
+--   -- pay_normal?_?newState ->
+--   --   let
+--   --     -- Pattern matching is implemented via unification in Prolog.
+--   --     match(Fulfilled) = LoopFulfilled
+--   --     match(InProgress) = Main
+--   --     -- The preconditions for the pay_normal event in the EventB machine ensures
+--   --     -- that this last case is not possible.
+--   --     match(Breached) = STOP
+--   --   within
+--   --     match(newState)
+
+--   -- If the borrower defaults on the payment, we continue here instead.
+--   -- At this point, the lender has the option to notify the borrower.
+--   [] pay_normal_default?_!InProgress -> (
+
+--     -- If the lender doesn't notify the borrower upon payment default,
+--     -- nothing goes wrong and so we simply continue with repayments.
+--     dont_notify_borrower?_!InProgress -> Main
+
+--     -- If the lender does notify the borrower, then the borrower is obliged
+--     -- to cure his default.
+--     [] notify_borrower_of_default?_!InProgress -> (
+
+--       -- If the borrower cures his default, then we contiunue down the
+--       -- repayment track, giving him another chance to pay off the current
+--       -- payment.
+--       cure_default?_!InProgress -> Main
+
+--       -- If the default is not cured, the borrower is then obliged to make
+--       -- an accelerated payment of the remaining amount to the lender.
+--       -- The start_accel_s action is used to kick off the
+--       -- Accel process, which handles this accelerated repayment stage.
+--       [] dont_cure_default?_!InProgress -> Main
+--     )
+--   )
+
+-- Side =
+--   -- When a borrower default event occurs, the lender has the option of
+--   -- notifying the borrower.
+-- 	borrower_default?_!InProgress -> (
+
+--     -- If no such notification occurs, nothing happens and so we loop back to
+--     -- the top of the side track and wait for another default event to occur.
+--     dont_notify_borrower?_!InProgress -> Side
+
+--     -- If the lender does notify the borrower, then we proceed as we did in the
+--     -- main track above, ie the borrower is then obliged to cure his default,
+--     -- and failing which, he is then obliged to make an accelerated payment
+--     -- of the remaining amount.
+--     [] notify_borrower_of_default?_!InProgress -> (
+--       cure_default?_!InProgress -> Side
+--       [] dont_cure_default?_!InProgress -> Side
+--     )
+--   )
+
+-- Accel =
+--   pay_accelerated?_!Fulfilled -> LoopFulfilled
+--   [] pay_accelerated_default!{Borrower}!Breached -> LoopBreached

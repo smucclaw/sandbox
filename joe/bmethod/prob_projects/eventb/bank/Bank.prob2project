@@ -1,0 +1,49 @@
+{
+  "name": "Bank",
+  "description": "(this project was created automatically from file B:\\joe personal\\work\\smu complaw\\readings\\logic and formal verification\\bmethod\\prob\\projects\\bank\\C0_ctx.eventb)",
+  "machines": [
+    {
+      "name": "C0_ctx",
+      "description": "",
+      "location": "C0_ctx.eventb",
+      "lastUsedPreferenceName": "default",
+      "ltlFormulas": [],
+      "ltlPatterns": [],
+      "symbolicCheckingFormulas": [],
+      "symbolicAnimationFormulas": [],
+      "testCases": [],
+      "traces": [],
+      "modelcheckingItems": [],
+      "simulations": [],
+      "visBVisualisation": null,
+      "historyChartItems": []
+    },
+    {
+      "name": "Bank0_mch",
+      "description": "",
+      "location": "Bank0_mch.eventb",
+      "lastUsedPreferenceName": "default",
+      "ltlFormulas": [],
+      "ltlPatterns": [],
+      "symbolicCheckingFormulas": [],
+      "symbolicAnimationFormulas": [],
+      "testCases": [],
+      "traces": [],
+      "modelcheckingItems": [],
+      "simulations": [],
+      "visBVisualisation": null,
+      "historyChartItems": []
+    }
+  ],
+  "requirements": [],
+  "preferences": [],
+  "metadata": {
+    "fileType": "Project",
+    "formatVersion": 31,
+    "savedAt": "2022-11-03T04:29:38.680284600Z",
+    "creator": "User",
+    "proB2KernelVersion": "4.0.0-SNAPSHOT",
+    "proBCliVersion": null,
+    "modelName": null
+  }
+}

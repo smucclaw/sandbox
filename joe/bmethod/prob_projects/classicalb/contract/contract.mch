@@ -5,6 +5,9 @@
 
 SYSTEM contract
 
+SETS
+  Status = {breached, fulfilled}
+
 VARIABLES
   trigger, interrupt
 
@@ -23,6 +26,12 @@ OPERATIONS
     THEN skip
     END;
 
-  tic = skip
+  tic = skip;
+
+  status(s) =
+    PRE
+      s : Status
+    THEN skip
+    END
 
 END

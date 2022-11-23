@@ -1,0 +1,51 @@
+datatype Status = breached | fulfilled
+datatype Actor = org | indiv | pdpc
+
+datatype RuleName =
+  Assessment | NotifyPdpc | NotifyIndiv | Exclusions
+
+channel trigger_rule : RuleName
+
+channel assess, notifyPdpc : Bool
+
+channel status : RuleName.Status.Actor
+channel tic
+
+Tic = tic -> Tic
+
+Rule(
+  status_on_evnt_done, status_on_evnt_timeout,
+  rule_name, actor, evnt, evnt_timer
+) =
+  -- RuleI stands for rule instance.
+  let
+    RuleI(evnt_timer) =
+      if evnt_timer <= 0
+      then
+        evnt!false -> status!rule_name!status_on_evnt_timeout!actor -> Tic
+      else
+        evnt!true -> status!rule_name!status_on_evnt_done!actor -> Tic []
+        tic -> RuleI(evnt_timer - 1)
+
+    -- Auxiliary helper for recursion.
+    -- We ignore the notion of perdurance for now.
+    go =
+      tic -> go []
+      trigger_rule!rule_name ->
+        RuleI(evnt_timer) -- [| {tic} |] go
+
+    within
+      go
+
+Ob(rule_name, actor, evnt, evnt_timer) =
+  Rule(fulfilled, breached, rule_name, actor, evnt, evnt_timer)
+
+Perm(rule_name, actor, evnt, event_timer) =
+  Rule(fulfilled, fulfilled, rule_name, actor, evnt, event_timer)
+
+Prohib(rule_name, actor, evnt, event_timer) =
+  Rule(breached, fulfilled, rule_name, actor, evnt, event_timer)
+
+MAIN =
+  Ob(Assessment, org, assess, 30) [| {tic} |]
+  Ob(NotifyPdpc, org, notifyPdpc, 3)

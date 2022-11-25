@@ -4,39 +4,37 @@ SETS
   // ContractStatus = {breached, fulfilled, in_progress};
   Actor = {org, indiv, pdpc};
   RuleName = {
-    Assessment, NotifyPdpc,
-    NotifyIndiv, ProhibitNotifyIndiv
+    Assessment, NotifyPdpc, NotifyIndiv, ProhibitNotifyIndiv
   }
 
 CONSTANTS
-  PublicAgency, rule_qualifier
+  PublicAgency, is_notifiable,
+  rule_qualifier
 
 PROPERTIES
-  PublicAgency = {org} &
+  // Invoke the global Choice operator to decide if org is a public agency.
+  PublicAgency <: {org} &
+  is_notifiable : BOOL &
 
+  rule_qualifier : RuleName <-> Actor &
   rule_qualifier =
-    {Assessment, NotifyPdpc, NotifyIndiv} * {PublicAgency} \/
-    {(ProhibitNotifyIndiv, {pdpc})}
+    {Assessment, NotifyPdpc, NotifyIndiv} * PublicAgency \/
+    {(ProhibitNotifyIndiv, pdpc)}
 
 VARIABLES
-  // contract_status,
-  is_notifiable,
-  rules_to_trigger, rules_to_interrupt
+  rules_to_trigger, active_rules, rules_to_interrupt
 
 INVARIANT
-  // Invariants to appease the typechecker.
-  // contract_status : ContractStatus &
-  {rules_to_trigger, rules_to_interrupt} <: POW(RuleName) &
-  is_notifiable : BOOL &
-  rule_qualifier : RuleName --> POW(Actor)
+  rules_to_trigger : RuleName <-> Actor &
+  active_rules <: RuleName &
+  rules_to_interrupt <: RuleName
 
 INITIALISATION
-  // contract_status := in_progress ||
-  rules_to_trigger := {Assessment} ||
-  rules_to_interrupt := {} ||
-  is_notifiable := FALSE
-
-  // Invoke the global choice operator to pick a subset of organisations.
+  rules_to_trigger := {rule_name, actor |
+    rule_name = Assessment & (rule_name, actor) : rule_qualifier
+  } ||
+  active_rules := {} ||
+  rules_to_interrupt := {}
 
 OPERATIONS
 /*
@@ -55,15 +53,12 @@ OPERATIONS
     PRE
       is_done : BOOL &
       actor : Actor &
-      {rules_to_trigger, rules_to_interrupt} = {{}}
+      rules_to_trigger = {} &
+      rules_to_interrupt = {}
     THEN
-      IF is_done = TRUE THEN
-        is_notifiable :: BOOL;
-        IF is_notifiable = TRUE THEN
-          rules_to_trigger := rules_to_trigger \/ {NotifyIndiv, NotifyPdpc}
-        ELSE
-          skip
-        END
+      active_rules := active_rules \ {Assessment} ||
+      IF {is_done, is_notifiable} = {TRUE} THEN
+        rules_to_trigger := {NotifyIndiv, NotifyPdpc} * {actor}
       ELSE
         skip
       END
@@ -73,10 +68,12 @@ OPERATIONS
     PRE
       is_done : BOOL &
       actor : Actor &
-      {rules_to_trigger, rules_to_interrupt} = {{}}
+      rules_to_trigger = {} &
+      rules_to_interrupt = {}
     THEN
+      active_rules := active_rules \ {NotifyPdpc} ||
       IF is_done = TRUE THEN
-        rules_to_trigger := rules_to_trigger \/ {ProhibitNotifyIndiv}
+        rules_to_trigger := {ProhibitNotifyIndiv} <| rule_qualifier
       ELSE
         skip
       END
@@ -86,8 +83,10 @@ OPERATIONS
     PRE
       is_done : BOOL &
       actor : Actor &
-      {rules_to_trigger, rules_to_interrupt} = {{}}
+      rules_to_trigger = {} &
+      rules_to_interrupt = {}
     THEN
+      active_rules := active_rules \ {NotifyIndiv} ||
       IF is_done = TRUE THEN
         skip
       ELSE
@@ -99,9 +98,11 @@ OPERATIONS
     PRE
       is_done : BOOL &
       actor : Actor &
-      {rules_to_trigger, rules_to_interrupt} = {{}}
+      rules_to_trigger = {} &
+      rules_to_interrupt = {}
     THEN
-      IF is_done = TRUE THEN
+      active_rules := active_rules \ {ProhibitNotifyIndiv} ||
+      IF is_done = TRUE & NotifyIndiv : active_rules THEN
         rules_to_interrupt := rules_to_interrupt \/ {NotifyIndiv}
       ELSE
         skip
@@ -110,24 +111,26 @@ OPERATIONS
 
   tic =
     PRE
-      {rules_to_trigger, rules_to_interrupt} = {{}}
+      rules_to_trigger = {} &
+      rules_to_interrupt = {}
     THEN
       skip
     END;
 
   trigger_rule(rule_name, actor) =
     PRE
-      rule_name : rules_to_trigger &
-      actor : rule_qualifier(rule_name)
+      (rule_name, actor) : rules_to_trigger
     THEN
-      rules_to_trigger := rules_to_trigger \ {rule_name}
+      rules_to_trigger := rules_to_trigger \ {(rule_name, actor)} ||
+      active_rules := active_rules \/ {rule_name}
     END;
 
   interrupt_rule(rule_name) =
     PRE
       rule_name : rules_to_interrupt
     THEN
-      rules_to_interrupt := rules_to_interrupt \ {rule_name}
+      rules_to_interrupt := rules_to_interrupt \ {rule_name} ||
+      active_rules := active_rules \ {rule_name}
     END
 
 END

@@ -1,5 +1,205 @@
 digraph history {
 graph [nodesep=1.5, ranksep=1.5];
-root [shape=invtriangle, color="#99BF38", fontsize=12, penwidth=2, label="root"];
+0 [shape=box, color="brown", fontsize=12, penwidth=2, label=""];
+
+3 [shape=box, color="brown", fontsize=12, penwidth=2, label="PublicAgency = \{org\},is_notifiable = TRUE,rule_qualifier(Assessment) = org,\nrule_qualifier(NotifyPdpc) = org,rule_qualifier(NotifyIndiv) = org,rule_qualifier(ProhibitNotifyIndiv) = pdpc"];
+
+7 [shape=box, color="brown", fontsize=12, penwidth=2, label="CSP: MAIN\nactive_rules = \{\},rules_to_interrupt = \{\},rules_to_trigger(Assessment) = org"];
+
+11 [shape=box, color="brown", fontsize=12, penwidth=2, label="CSP: tic-\>Tic [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [] (Rule-\>__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP)) [] (Rule-\>__1(NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP)) [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) [] (Rule-\>__1(NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) [\|\{\|tic\|\}\|] (Rule*RuleI__1(org,30,Assessment,assess,30,\\ E @  if E then Tic else STOP)) /\\ (interrupt_rule!Assessment-\>Tic)\nactive_rules = \{Assessment\},rules_to_interrupt = \{\},rules_to_trigger = \{\}"];
+
+13 [shape=box, color="brown", fontsize=12, penwidth=2, label="CSP: tic-\>Tic [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [] (Rule-\>__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP)) [] (Rule-\>__1(NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP)) [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) [] (Rule-\>__1(NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) [\|\{\|tic\|\}\|] ((assess!true!org-\>\\ E @  if E then Tic else STOP(true)) [] (tic-\>Rule*RuleI__1(org,(29-1),Assessment,assess,30,\\ E @  if E then Tic else STOP))) /\\ (interrupt_rule!Assessment-\>Tic)\nactive_rules = \{Assessment\},rules_to_interrupt = \{\},rules_to_trigger = \{\}"];
+
+14 [shape=box, color="brown", fontsize=12, penwidth=2, label="CSP: tic-\>Tic [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [] (Rule-\>__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP)) [] (Rule-\>__1(NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP)) [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) [] (Rule-\>__1(NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) [\|\{\|tic\|\}\|] (tic-\>Tic) /\\ (interrupt_rule!Assessment-\>Tic)\nactive_rules = \{\},rules_to_interrupt = \{\},rules_to_trigger(NotifyPdpc) = org,\nrules_to_trigger(NotifyIndiv) = org"];
+
+15 [shape=box, color="brown", fontsize=12, penwidth=2, label="CSP: tic-\>Tic [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [] (Rule-\>__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP)) [] (Rule-\>__1(NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP)) [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) [] (Rule-\>__1(NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) [\|\{\|tic\|\}\|] ((assess!true!org-\>\\ E @  if E then Tic else STOP(true)) [] (tic-\>Rule*RuleI__1(org,(28-1),Assessment,assess,30,\\ E @  if E then Tic else STOP))) /\\ (interrupt_rule!Assessment-\>Tic)\nactive_rules = \{Assessment\},rules_to_interrupt = \{\},rules_to_trigger = \{\}"];
+
+16 [shape=box, color="brown", fontsize=12, penwidth=2, label="CSP: tic-\>Tic [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [] (Rule-\>__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [\|\{\|tic\|\}\|] (Rule*RuleI__1(org,3,NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP)) /\\ (interrupt_rule!NotifyPdpc-\>Tic) [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) [] (Rule-\>__1(NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) [\|\{\|tic\|\}\|] (tic-\>Tic) /\\ (interrupt_rule!Assessment-\>Tic)\nactive_rules = \{NotifyPdpc\},rules_to_interrupt = \{\},rules_to_trigger(NotifyIndiv) = org"];
+
+18 [shape=box, color="brown", fontsize=12, penwidth=2, label="CSP: tic-\>Tic [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [] (Rule-\>__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP)) [] (Rule-\>__1(NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP)) [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) [] (Rule-\>__1(NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) [\|\{\|tic\|\}\|] ((assess!true!org-\>\\ E @  if E then Tic else STOP(true)) [] (tic-\>Rule*RuleI__1(org,(27-1),Assessment,assess,30,\\ E @  if E then Tic else STOP))) /\\ (interrupt_rule!Assessment-\>Tic)\nactive_rules = \{Assessment\},rules_to_interrupt = \{\},rules_to_trigger = \{\}"];
+
+19 [shape=box, color="brown", fontsize=12, penwidth=2, label="CSP: tic-\>Tic [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [] (Rule-\>__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP)) [] (Rule-\>__1(NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP)) [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) [] (Rule-\>__1(NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) [\|\{\|tic\|\}\|] ((assess!true!org-\>\\ E @  if E then Tic else STOP(true)) [] (tic-\>Rule*RuleI__1(org,(26-1),Assessment,assess,30,\\ E @  if E then Tic else STOP))) /\\ (interrupt_rule!Assessment-\>Tic)\nactive_rules = \{Assessment\},rules_to_interrupt = \{\},rules_to_trigger = \{\}"];
+
+20 [shape=box, color="brown", fontsize=12, penwidth=2, label="CSP: tic-\>Tic [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [] (Rule-\>__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP)) [] (Rule-\>__1(NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP)) [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) [] (Rule-\>__1(NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) [\|\{\|tic\|\}\|] ((assess!true!org-\>\\ E @  if E then Tic else STOP(true)) [] (tic-\>Rule*RuleI__1(org,(25-1),Assessment,assess,30,\\ E @  if E then Tic else STOP))) /\\ (interrupt_rule!Assessment-\>Tic)\nactive_rules = \{Assessment\},rules_to_interrupt = \{\},rules_to_trigger = \{\}"];
+
+21 [shape=box, color="brown", fontsize=12, penwidth=2, label="CSP: tic-\>Tic [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [] (Rule-\>__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP)) [] (Rule-\>__1(NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP)) [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) [] (Rule-\>__1(NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) [\|\{\|tic\|\}\|] ((assess!true!org-\>\\ E @  if E then Tic else STOP(true)) [] (tic-\>Rule*RuleI__1(org,(24-1),Assessment,assess,30,\\ E @  if E then Tic else STOP))) /\\ (interrupt_rule!Assessment-\>Tic)\nactive_rules = \{Assessment\},rules_to_interrupt = \{\},rules_to_trigger = \{\}"];
+
+22 [shape=box, color="brown", fontsize=12, penwidth=2, label="CSP: tic-\>Tic [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [] (Rule-\>__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP)) [] (Rule-\>__1(NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP)) [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) [] (Rule-\>__1(NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) [\|\{\|tic\|\}\|] ((assess!true!org-\>\\ E @  if E then Tic else STOP(true)) [] (tic-\>Rule*RuleI__1(org,(23-1),Assessment,assess,30,\\ E @  if E then Tic else STOP))) /\\ (interrupt_rule!Assessment-\>Tic)\nactive_rules = \{Assessment\},rules_to_interrupt = \{\},rules_to_trigger = \{\}"];
+
+23 [shape=box, color="brown", fontsize=12, penwidth=2, label="CSP: tic-\>Tic [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [] (Rule-\>__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP)) [] (Rule-\>__1(NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP)) [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) [] (Rule-\>__1(NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) [\|\{\|tic\|\}\|] ((assess!true!org-\>\\ E @  if E then Tic else STOP(true)) [] (tic-\>Rule*RuleI__1(org,(22-1),Assessment,assess,30,\\ E @  if E then Tic else STOP))) /\\ (interrupt_rule!Assessment-\>Tic)\nactive_rules = \{Assessment\},rules_to_interrupt = \{\},rules_to_trigger = \{\}"];
+
+24 [shape=box, color="brown", fontsize=12, penwidth=2, label="CSP: tic-\>Tic [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [] (Rule-\>__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP)) [] (Rule-\>__1(NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP)) [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) [] (Rule-\>__1(NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) [\|\{\|tic\|\}\|] ((assess!true!org-\>\\ E @  if E then Tic else STOP(true)) [] (tic-\>Rule*RuleI__1(org,(21-1),Assessment,assess,30,\\ E @  if E then Tic else STOP))) /\\ (interrupt_rule!Assessment-\>Tic)\nactive_rules = \{Assessment\},rules_to_interrupt = \{\},rules_to_trigger = \{\}"];
+
+25 [shape=box, color="brown", fontsize=12, penwidth=2, label="CSP: tic-\>Tic [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [] (Rule-\>__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP)) [] (Rule-\>__1(NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP)) [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) [] (Rule-\>__1(NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) [\|\{\|tic\|\}\|] ((assess!true!org-\>\\ E @  if E then Tic else STOP(true)) [] (tic-\>Rule*RuleI__1(org,(20-1),Assessment,assess,30,\\ E @  if E then Tic else STOP))) /\\ (interrupt_rule!Assessment-\>Tic)\nactive_rules = \{Assessment\},rules_to_interrupt = \{\},rules_to_trigger = \{\}"];
+
+26 [shape=box, color="brown", fontsize=12, penwidth=2, label="CSP: tic-\>Tic [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [] (Rule-\>__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP)) [] (Rule-\>__1(NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP)) [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) [] (Rule-\>__1(NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) [\|\{\|tic\|\}\|] ((assess!true!org-\>\\ E @  if E then Tic else STOP(true)) [] (tic-\>Rule*RuleI__1(org,(19-1),Assessment,assess,30,\\ E @  if E then Tic else STOP))) /\\ (interrupt_rule!Assessment-\>Tic)\nactive_rules = \{Assessment\},rules_to_interrupt = \{\},rules_to_trigger = \{\}"];
+
+27 [shape=box, color="brown", fontsize=12, penwidth=2, label="CSP: tic-\>Tic [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [] (Rule-\>__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP)) [] (Rule-\>__1(NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP)) [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) [] (Rule-\>__1(NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) [\|\{\|tic\|\}\|] ((assess!true!org-\>\\ E @  if E then Tic else STOP(true)) [] (tic-\>Rule*RuleI__1(org,(18-1),Assessment,assess,30,\\ E @  if E then Tic else STOP))) /\\ (interrupt_rule!Assessment-\>Tic)\nactive_rules = \{Assessment\},rules_to_interrupt = \{\},rules_to_trigger = \{\}"];
+
+28 [shape=box, color="brown", fontsize=12, penwidth=2, label="CSP: tic-\>Tic [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [] (Rule-\>__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP)) [] (Rule-\>__1(NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP)) [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) [] (Rule-\>__1(NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) [\|\{\|tic\|\}\|] ((assess!true!org-\>\\ E @  if E then Tic else STOP(true)) [] (tic-\>Rule*RuleI__1(org,(17-1),Assessment,assess,30,\\ E @  if E then Tic else STOP))) /\\ (interrupt_rule!Assessment-\>Tic)\nactive_rules = \{Assessment\},rules_to_interrupt = \{\},rules_to_trigger = \{\}"];
+
+29 [shape=box, color="brown", fontsize=12, penwidth=2, label="CSP: tic-\>Tic [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [] (Rule-\>__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP)) [] (Rule-\>__1(NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP)) [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) [] (Rule-\>__1(NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) [\|\{\|tic\|\}\|] ((assess!true!org-\>\\ E @  if E then Tic else STOP(true)) [] (tic-\>Rule*RuleI__1(org,(16-1),Assessment,assess,30,\\ E @  if E then Tic else STOP))) /\\ (interrupt_rule!Assessment-\>Tic)\nactive_rules = \{Assessment\},rules_to_interrupt = \{\},rules_to_trigger = \{\}"];
+
+30 [shape=box, color="brown", fontsize=12, penwidth=2, label="CSP: tic-\>Tic [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [] (Rule-\>__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP)) [] (Rule-\>__1(NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP)) [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) [] (Rule-\>__1(NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) [\|\{\|tic\|\}\|] ((assess!true!org-\>\\ E @  if E then Tic else STOP(true)) [] (tic-\>Rule*RuleI__1(org,(15-1),Assessment,assess,30,\\ E @  if E then Tic else STOP))) /\\ (interrupt_rule!Assessment-\>Tic)\nactive_rules = \{Assessment\},rules_to_interrupt = \{\},rules_to_trigger = \{\}"];
+
+31 [shape=box, color="brown", fontsize=12, penwidth=2, label="CSP: tic-\>Tic [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [] (Rule-\>__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP)) [] (Rule-\>__1(NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP)) [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) [] (Rule-\>__1(NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) [\|\{\|tic\|\}\|] ((assess!true!org-\>\\ E @  if E then Tic else STOP(true)) [] (tic-\>Rule*RuleI__1(org,(14-1),Assessment,assess,30,\\ E @  if E then Tic else STOP))) /\\ (interrupt_rule!Assessment-\>Tic)\nactive_rules = \{Assessment\},rules_to_interrupt = \{\},rules_to_trigger = \{\}"];
+
+32 [shape=box, color="brown", fontsize=12, penwidth=2, label="CSP: tic-\>Tic [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [] (Rule-\>__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP)) [] (Rule-\>__1(NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP)) [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) [] (Rule-\>__1(NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) [\|\{\|tic\|\}\|] ((assess!true!org-\>\\ E @  if E then Tic else STOP(true)) [] (tic-\>Rule*RuleI__1(org,(13-1),Assessment,assess,30,\\ E @  if E then Tic else STOP))) /\\ (interrupt_rule!Assessment-\>Tic)\nactive_rules = \{Assessment\},rules_to_interrupt = \{\},rules_to_trigger = \{\}"];
+
+33 [shape=box, color="brown", fontsize=12, penwidth=2, label="CSP: tic-\>Tic [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [] (Rule-\>__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP)) [] (Rule-\>__1(NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP)) [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) [] (Rule-\>__1(NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) [\|\{\|tic\|\}\|] ((assess!true!org-\>\\ E @  if E then Tic else STOP(true)) [] (tic-\>Rule*RuleI__1(org,(12-1),Assessment,assess,30,\\ E @  if E then Tic else STOP))) /\\ (interrupt_rule!Assessment-\>Tic)\nactive_rules = \{Assessment\},rules_to_interrupt = \{\},rules_to_trigger = \{\}"];
+
+34 [shape=box, color="brown", fontsize=12, penwidth=2, label="CSP: tic-\>Tic [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [] (Rule-\>__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP)) [] (Rule-\>__1(NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP)) [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) [] (Rule-\>__1(NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) [\|\{\|tic\|\}\|] ((assess!true!org-\>\\ E @  if E then Tic else STOP(true)) [] (tic-\>Rule*RuleI__1(org,(11-1),Assessment,assess,30,\\ E @  if E then Tic else STOP))) /\\ (interrupt_rule!Assessment-\>Tic)\nactive_rules = \{Assessment\},rules_to_interrupt = \{\},rules_to_trigger = \{\}"];
+
+35 [shape=box, color="brown", fontsize=12, penwidth=2, label="CSP: tic-\>Tic [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [] (Rule-\>__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP)) [] (Rule-\>__1(NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP)) [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) [] (Rule-\>__1(NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) [\|\{\|tic\|\}\|] ((assess!true!org-\>\\ E @  if E then Tic else STOP(true)) [] (tic-\>Rule*RuleI__1(org,(10-1),Assessment,assess,30,\\ E @  if E then Tic else STOP))) /\\ (interrupt_rule!Assessment-\>Tic)\nactive_rules = \{Assessment\},rules_to_interrupt = \{\},rules_to_trigger = \{\}"];
+
+36 [shape=box, color="brown", fontsize=12, penwidth=2, label="CSP: tic-\>Tic [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [] (Rule-\>__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP)) [] (Rule-\>__1(NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP)) [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) [] (Rule-\>__1(NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) [\|\{\|tic\|\}\|] ((assess!true!org-\>\\ E @  if E then Tic else STOP(true)) [] (tic-\>Rule*RuleI__1(org,(9-1),Assessment,assess,30,\\ E @  if E then Tic else STOP))) /\\ (interrupt_rule!Assessment-\>Tic)\nactive_rules = \{Assessment\},rules_to_interrupt = \{\},rules_to_trigger = \{\}"];
+
+37 [shape=box, color="brown", fontsize=12, penwidth=2, label="CSP: tic-\>Tic [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [] (Rule-\>__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP)) [] (Rule-\>__1(NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP)) [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) [] (Rule-\>__1(NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) [\|\{\|tic\|\}\|] ((assess!true!org-\>\\ E @  if E then Tic else STOP(true)) [] (tic-\>Rule*RuleI__1(org,(8-1),Assessment,assess,30,\\ E @  if E then Tic else STOP))) /\\ (interrupt_rule!Assessment-\>Tic)\nactive_rules = \{Assessment\},rules_to_interrupt = \{\},rules_to_trigger = \{\}"];
+
+38 [shape=box, color="brown", fontsize=12, penwidth=2, label="CSP: tic-\>Tic [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [] (Rule-\>__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP)) [] (Rule-\>__1(NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP)) [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) [] (Rule-\>__1(NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) [\|\{\|tic\|\}\|] ((assess!true!org-\>\\ E @  if E then Tic else STOP(true)) [] (tic-\>Rule*RuleI__1(org,(7-1),Assessment,assess,30,\\ E @  if E then Tic else STOP))) /\\ (interrupt_rule!Assessment-\>Tic)\nactive_rules = \{Assessment\},rules_to_interrupt = \{\},rules_to_trigger = \{\}"];
+
+39 [shape=box, color="brown", fontsize=12, penwidth=2, label="CSP: tic-\>Tic [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [] (Rule-\>__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP)) [] (Rule-\>__1(NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP)) [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) [] (Rule-\>__1(NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) [\|\{\|tic\|\}\|] ((assess!true!org-\>\\ E @  if E then Tic else STOP(true)) [] (tic-\>Rule*RuleI__1(org,(6-1),Assessment,assess,30,\\ E @  if E then Tic else STOP))) /\\ (interrupt_rule!Assessment-\>Tic)\nactive_rules = \{Assessment\},rules_to_interrupt = \{\},rules_to_trigger = \{\}"];
+
+40 [shape=box, color="brown", fontsize=12, penwidth=2, label="CSP: tic-\>Tic [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [] (Rule-\>__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP)) [] (Rule-\>__1(NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP)) [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) [] (Rule-\>__1(NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) [\|\{\|tic\|\}\|] ((assess!true!org-\>\\ E @  if E then Tic else STOP(true)) [] (tic-\>Rule*RuleI__1(org,(5-1),Assessment,assess,30,\\ E @  if E then Tic else STOP))) /\\ (interrupt_rule!Assessment-\>Tic)\nactive_rules = \{Assessment\},rules_to_interrupt = \{\},rules_to_trigger = \{\}"];
+
+41 [shape=box, color="brown", fontsize=12, penwidth=2, label="CSP: tic-\>Tic [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [] (Rule-\>__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP)) [] (Rule-\>__1(NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP)) [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) [] (Rule-\>__1(NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) [\|\{\|tic\|\}\|] ((assess!true!org-\>\\ E @  if E then Tic else STOP(true)) [] (tic-\>Rule*RuleI__1(org,(4-1),Assessment,assess,30,\\ E @  if E then Tic else STOP))) /\\ (interrupt_rule!Assessment-\>Tic)\nactive_rules = \{Assessment\},rules_to_interrupt = \{\},rules_to_trigger = \{\}"];
+
+42 [shape=box, color="brown", fontsize=12, penwidth=2, label="CSP: tic-\>Tic [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [] (Rule-\>__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP)) [] (Rule-\>__1(NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP)) [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) [] (Rule-\>__1(NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) [\|\{\|tic\|\}\|] ((assess!true!org-\>\\ E @  if E then Tic else STOP(true)) [] (tic-\>Rule*RuleI__1(org,(3-1),Assessment,assess,30,\\ E @  if E then Tic else STOP))) /\\ (interrupt_rule!Assessment-\>Tic)\nactive_rules = \{Assessment\},rules_to_interrupt = \{\},rules_to_trigger = \{\}"];
+
+43 [shape=box, color="brown", fontsize=12, penwidth=2, label="CSP: tic-\>Tic [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [] (Rule-\>__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP)) [] (Rule-\>__1(NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP)) [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) [] (Rule-\>__1(NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) [\|\{\|tic\|\}\|] ((assess!true!org-\>\\ E @  if E then Tic else STOP(true)) [] (tic-\>Rule*RuleI__1(org,(2-1),Assessment,assess,30,\\ E @  if E then Tic else STOP))) /\\ (interrupt_rule!Assessment-\>Tic)\nactive_rules = \{Assessment\},rules_to_interrupt = \{\},rules_to_trigger = \{\}"];
+
+44 [shape=box, color="brown", fontsize=12, penwidth=2, label="CSP: tic-\>Tic [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [] (Rule-\>__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP)) [] (Rule-\>__1(NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP)) [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) [] (Rule-\>__1(NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) [\|\{\|tic\|\}\|] ((assess!true!org-\>\\ E @  if E then Tic else STOP(true)) [] (tic-\>Rule*RuleI__1(org,(1-1),Assessment,assess,30,\\ E @  if E then Tic else STOP))) /\\ (interrupt_rule!Assessment-\>Tic)\nactive_rules = \{Assessment\},rules_to_interrupt = \{\},rules_to_trigger = \{\}"];
+
+45 [shape=box, color="brown", fontsize=12, penwidth=2, label="CSP: tic-\>Tic [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [] (Rule-\>__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP)) [] (Rule-\>__1(NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP)) [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) [] (Rule-\>__1(NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) [\|\{\|tic\|\}\|] ((assess!true!org-\>\\ E @  if E then Tic else STOP(true)) [] (tic-\>Rule*RuleI__1(org,(0-1),Assessment,assess,30,\\ E @  if E then Tic else STOP))) /\\ (interrupt_rule!Assessment-\>Tic)\nactive_rules = \{Assessment\},rules_to_interrupt = \{\},rules_to_trigger = \{\}"];
+
+48 [shape=box, color="brown", fontsize=12, penwidth=2, label="CSP: tic-\>Tic [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [] (Rule-\>__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [\|\{\|tic\|\}\|] (Rule*RuleI__1(org,3,NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP)) /\\ (interrupt_rule!NotifyPdpc-\>Tic) [\|\{\|tic\|\}\|] (Rule*RuleI__1(org,3,NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP)) /\\ (interrupt_rule!NotifyIndiv-\>Tic) [\|\{\|tic\|\}\|] (tic-\>Tic) /\\ (interrupt_rule!Assessment-\>Tic)\nactive_rules = \{NotifyPdpc,NotifyIndiv\},rules_to_interrupt = \{\},rules_to_trigger = \{\}"];
+
+49 [shape=box, color="brown", fontsize=12, penwidth=2, label="CSP: tic-\>Tic [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [] (Rule-\>__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [\|\{\|tic\|\}\|] ((notify_pdpc!true!org-\>\\ E @  if E then Tic else STOP(true)) [] (tic-\>Rule*RuleI__1(org,(2-1),NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP))) /\\ (interrupt_rule!NotifyPdpc-\>Tic) [\|\{\|tic\|\}\|] ((notify_indiv!true!org-\>\\ E @  if E then Tic else STOP(true)) [] (tic-\>Rule*RuleI__1(org,(2-1),NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP))) /\\ (interrupt_rule!NotifyIndiv-\>Tic) [\|\{\|tic\|\}\|] (tic-\>Tic) /\\ (interrupt_rule!Assessment-\>Tic)\nactive_rules = \{NotifyPdpc,NotifyIndiv\},rules_to_interrupt = \{\},rules_to_trigger = \{\}"];
+
+52 [shape=box, color="brown", fontsize=12, penwidth=2, label="CSP: tic-\>Tic [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [] (Rule-\>__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [\|\{\|tic\|\}\|] ((notify_pdpc!true!org-\>\\ E @  if E then Tic else STOP(true)) [] (tic-\>Rule*RuleI__1(org,(1-1),NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP))) /\\ (interrupt_rule!NotifyPdpc-\>Tic) [\|\{\|tic\|\}\|] ((notify_indiv!true!org-\>\\ E @  if E then Tic else STOP(true)) [] (tic-\>Rule*RuleI__1(org,(1-1),NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP))) /\\ (interrupt_rule!NotifyIndiv-\>Tic) [\|\{\|tic\|\}\|] (tic-\>Tic) /\\ (interrupt_rule!Assessment-\>Tic)\nactive_rules = \{NotifyPdpc,NotifyIndiv\},rules_to_interrupt = \{\},rules_to_trigger = \{\}"];
+
+56 [shape=box, color="brown", fontsize=12, penwidth=2, label="CSP: tic-\>Tic [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [] (Rule-\>__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [\|\{\|tic\|\}\|] ((notify_pdpc!true!org-\>\\ E @  if E then Tic else STOP(true)) [] (tic-\>Rule*RuleI__1(org,(0-1),NotifyPdpc,notify_pdpc,3,\\ E @  if E then Tic else STOP))) /\\ (interrupt_rule!NotifyPdpc-\>Tic) [\|\{\|tic\|\}\|] ((notify_indiv!true!org-\>\\ E @  if E then Tic else STOP(true)) [] (tic-\>Rule*RuleI__1(org,(0-1),NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP))) /\\ (interrupt_rule!NotifyIndiv-\>Tic) [\|\{\|tic\|\}\|] (tic-\>Tic) /\\ (interrupt_rule!Assessment-\>Tic)\nactive_rules = \{NotifyPdpc,NotifyIndiv\},rules_to_interrupt = \{\},rules_to_trigger = \{\}"];
+
+61 [shape=box, color="brown", fontsize=12, penwidth=2, label="CSP: tic-\>Tic [\|\{\|tic\|\}\|] (tic-\>Rule*Go__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [] (Rule-\>__1(ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) [\|\{\|tic\|\}\|] (tic-\>Tic) /\\ (interrupt_rule!NotifyPdpc-\>Tic) [\|\{\|tic\|\}\|] ((notify_indiv!true!org-\>\\ E @  if E then Tic else STOP(true)) [] (tic-\>Rule*RuleI__1(org,(0-1),NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP))) /\\ (interrupt_rule!NotifyIndiv-\>Tic) [\|\{\|tic\|\}\|] (tic-\>Tic) /\\ (interrupt_rule!Assessment-\>Tic)\nactive_rules = \{NotifyIndiv\},rules_to_interrupt = \{\},rules_to_trigger(ProhibitNotifyIndiv) = pdpc"];
+
+66 [shape=box, color="brown", fontsize=12, penwidth=2, label="CSP: tic-\>Tic [\|\{\|tic\|\}\|] (Rule*RuleI__1(pdpc,5,ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) /\\ (interrupt_rule!ProhibitNotifyIndiv-\>Tic) [\|\{\|tic\|\}\|] (tic-\>Tic) /\\ (interrupt_rule!NotifyPdpc-\>Tic) [\|\{\|tic\|\}\|] ((notify_indiv!true!org-\>\\ E @  if E then Tic else STOP(true)) [] (tic-\>Rule*RuleI__1(org,(0-1),NotifyIndiv,notify_indiv,3,\\ E @  if E then Tic else STOP))) /\\ (interrupt_rule!NotifyIndiv-\>Tic) [\|\{\|tic\|\}\|] (tic-\>Tic) /\\ (interrupt_rule!Assessment-\>Tic)\nactive_rules = \{NotifyIndiv,ProhibitNotifyIndiv\},rules_to_interrupt = \{\},rules_to_trigger = \{\}"];
+
+70 [shape=box, color="brown", fontsize=12, penwidth=2, label="CSP: tic-\>Tic [\|\{\|tic\|\}\|] (Rule*RuleI__1(pdpc,5,ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic))) /\\ (interrupt_rule!ProhibitNotifyIndiv-\>Tic) [\|\{\|tic\|\}\|] (tic-\>Tic) /\\ (interrupt_rule!NotifyPdpc-\>Tic) [\|\{\|tic\|\}\|] (tic-\>Tic) /\\ (interrupt_rule!NotifyIndiv-\>Tic) [\|\{\|tic\|\}\|] (tic-\>Tic) /\\ (interrupt_rule!Assessment-\>Tic)\nactive_rules = \{ProhibitNotifyIndiv\},rules_to_interrupt = \{\},rules_to_trigger = \{\}"];
+
+75 [shape=box, color="brown", fontsize=12, penwidth=2, label="CSP: tic-\>Tic [\|\{\|tic\|\}\|] ((prohibit_notify_indiv!true!pdpc-\>\\ A @ (Tic)(true)) [] (tic-\>Rule*RuleI__1(pdpc,(4-1),ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic)))) /\\ (interrupt_rule!ProhibitNotifyIndiv-\>Tic) [\|\{\|tic\|\}\|] (tic-\>Tic) /\\ (interrupt_rule!NotifyPdpc-\>Tic) [\|\{\|tic\|\}\|] (tic-\>Tic) /\\ (interrupt_rule!NotifyIndiv-\>Tic) [\|\{\|tic\|\}\|] (tic-\>Tic) /\\ (interrupt_rule!Assessment-\>Tic)\nactive_rules = \{ProhibitNotifyIndiv\},rules_to_interrupt = \{\},rules_to_trigger = \{\}"];
+
+76 [shape=doubleoctagon, color="brown", fontsize=12, penwidth=2, label="repeated (3)\nCSP: tic-\>Tic [\|\{\|tic\|\}\|] (tic-\>Tic) /\\ (interrupt_rule!ProhibitNotifyIndiv-\>Tic) [\|\{\|tic\|\}\|] (tic-\>Tic) /\\ (interrupt_rule!NotifyPdpc-\>Tic) [\|\{\|tic\|\}\|] (tic-\>Tic) /\\ (interrupt_rule!NotifyIndiv-\>Tic) [\|\{\|tic\|\}\|] (tic-\>Tic) /\\ (interrupt_rule!Assessment-\>Tic)\nactive_rules = \{\},rules_to_interrupt = \{\},rules_to_trigger = \{\}"];
+
+77 [shape=box, color="brown", fontsize=12, penwidth=2, label="CSP: tic-\>Tic [\|\{\|tic\|\}\|] ((prohibit_notify_indiv!true!pdpc-\>\\ A @ (Tic)(true)) [] (tic-\>Rule*RuleI__1(pdpc,(3-1),ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic)))) /\\ (interrupt_rule!ProhibitNotifyIndiv-\>Tic) [\|\{\|tic\|\}\|] (tic-\>Tic) /\\ (interrupt_rule!NotifyPdpc-\>Tic) [\|\{\|tic\|\}\|] (tic-\>Tic) /\\ (interrupt_rule!NotifyIndiv-\>Tic) [\|\{\|tic\|\}\|] (tic-\>Tic) /\\ (interrupt_rule!Assessment-\>Tic)\nactive_rules = \{ProhibitNotifyIndiv\},rules_to_interrupt = \{\},rules_to_trigger = \{\}"];
+
+78 [shape=box, color="brown", fontsize=12, penwidth=2, label="CSP: tic-\>Tic [\|\{\|tic\|\}\|] ((prohibit_notify_indiv!true!pdpc-\>\\ A @ (Tic)(true)) [] (tic-\>Rule*RuleI__1(pdpc,(2-1),ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic)))) /\\ (interrupt_rule!ProhibitNotifyIndiv-\>Tic) [\|\{\|tic\|\}\|] (tic-\>Tic) /\\ (interrupt_rule!NotifyPdpc-\>Tic) [\|\{\|tic\|\}\|] (tic-\>Tic) /\\ (interrupt_rule!NotifyIndiv-\>Tic) [\|\{\|tic\|\}\|] (tic-\>Tic) /\\ (interrupt_rule!Assessment-\>Tic)\nactive_rules = \{ProhibitNotifyIndiv\},rules_to_interrupt = \{\},rules_to_trigger = \{\}"];
+
+79 [shape=box, color="brown", fontsize=12, penwidth=2, label="CSP: tic-\>Tic [\|\{\|tic\|\}\|] ((prohibit_notify_indiv!true!pdpc-\>\\ A @ (Tic)(true)) [] (tic-\>Rule*RuleI__1(pdpc,(1-1),ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic)))) /\\ (interrupt_rule!ProhibitNotifyIndiv-\>Tic) [\|\{\|tic\|\}\|] (tic-\>Tic) /\\ (interrupt_rule!NotifyPdpc-\>Tic) [\|\{\|tic\|\}\|] (tic-\>Tic) /\\ (interrupt_rule!NotifyIndiv-\>Tic) [\|\{\|tic\|\}\|] (tic-\>Tic) /\\ (interrupt_rule!Assessment-\>Tic)\nactive_rules = \{ProhibitNotifyIndiv\},rules_to_interrupt = \{\},rules_to_trigger = \{\}"];
+
+80 [shape=box, color="brown", fontsize=12, penwidth=2, label="CSP: tic-\>Tic [\|\{\|tic\|\}\|] ((prohibit_notify_indiv!true!pdpc-\>\\ A @ (Tic)(true)) [] (tic-\>Rule*RuleI__1(pdpc,(0-1),ProhibitNotifyIndiv,prohibit_notify_indiv,5,\\ A @ (Tic)))) /\\ (interrupt_rule!ProhibitNotifyIndiv-\>Tic) [\|\{\|tic\|\}\|] (tic-\>Tic) /\\ (interrupt_rule!NotifyPdpc-\>Tic) [\|\{\|tic\|\}\|] (tic-\>Tic) /\\ (interrupt_rule!NotifyIndiv-\>Tic) [\|\{\|tic\|\}\|] (tic-\>Tic) /\\ (interrupt_rule!Assessment-\>Tic)\nactive_rules = \{ProhibitNotifyIndiv\},rules_to_interrupt = \{\},rules_to_trigger = \{\}"];
+
+root [shape=invtriangle, color="brown", fontsize=12, penwidth=2, label="root"];
+
+root -> 0 [style = dotted, color = black, label="start_cspm_MAIN", fontsize=12];
+
+0 -> 3 [color = "brown", label="tau($setup_constants)", fontsize=12];
+
+3 -> 7 [color = "brown", label="tau($initialise_machine)", fontsize=12];
+
+7 -> 11 [color = "brown", label="trigger_rule(Assessment,org)", fontsize=12];
+
+11 -> 13 [color = "brown", label="tic", fontsize=12];
+
+13 -> 15 [color = "brown", label="tic", fontsize=12];
+
+15 -> 18 [color = "brown", label="tic", fontsize=12];
+
+18 -> 19 [color = "brown", label="tic", fontsize=12];
+
+19 -> 20 [color = "brown", label="tic", fontsize=12];
+
+20 -> 21 [color = "brown", label="tic", fontsize=12];
+
+21 -> 22 [color = "brown", label="tic", fontsize=12];
+
+22 -> 23 [color = "brown", label="tic", fontsize=12];
+
+23 -> 24 [color = "brown", label="tic", fontsize=12];
+
+24 -> 25 [color = "brown", label="tic", fontsize=12];
+
+25 -> 26 [color = "brown", label="tic", fontsize=12];
+
+26 -> 27 [color = "brown", label="tic", fontsize=12];
+
+27 -> 28 [color = "brown", label="tic", fontsize=12];
+
+28 -> 29 [color = "brown", label="tic", fontsize=12];
+
+29 -> 30 [color = "brown", label="tic", fontsize=12];
+
+30 -> 31 [color = "brown", label="tic", fontsize=12];
+
+31 -> 32 [color = "brown", label="tic", fontsize=12];
+
+32 -> 33 [color = "brown", label="tic", fontsize=12];
+
+33 -> 34 [color = "brown", label="tic", fontsize=12];
+
+34 -> 35 [color = "brown", label="tic", fontsize=12];
+
+35 -> 36 [color = "brown", label="tic", fontsize=12];
+
+36 -> 37 [color = "brown", label="tic", fontsize=12];
+
+37 -> 38 [color = "brown", label="tic", fontsize=12];
+
+38 -> 39 [color = "brown", label="tic", fontsize=12];
+
+39 -> 40 [color = "brown", label="tic", fontsize=12];
+
+40 -> 41 [color = "brown", label="tic", fontsize=12];
+
+41 -> 42 [color = "brown", label="tic", fontsize=12];
+
+42 -> 43 [color = "brown", label="tic", fontsize=12];
+
+43 -> 44 [color = "brown", label="tic", fontsize=12];
+
+44 -> 45 [color = "brown", label="tic", fontsize=12];
+
+45 -> 14 [color = "brown", label="assess(TRUE,org)", fontsize=12];
+
+14 -> 16 [color = "brown", label="trigger_rule(NotifyPdpc,org)", fontsize=12];
+
+16 -> 48 [color = "brown", label="trigger_rule(NotifyIndiv,org)", fontsize=12];
+
+48 -> 49 [color = "brown", label="tic", fontsize=12];
+
+49 -> 52 [color = "brown", label="tic", fontsize=12];
+
+52 -> 56 [color = "brown", label="tic", fontsize=12];
+
+56 -> 61 [color = "brown", label="notify_pdpc(TRUE,org)", fontsize=12];
+
+61 -> 66 [color = "brown", label="trigger_rule(ProhibitNotifyIndiv,pdpc)", fontsize=12];
+
+66 -> 70 [color = "brown", label="notify_indiv(TRUE,org)", fontsize=12];
+
+70 -> 75 [color = "brown", label="tic", fontsize=12];
+
+75 -> 77 [color = "brown", label="tic", fontsize=12];
+
+77 -> 78 [color = "brown", label="tic", fontsize=12];
+
+78 -> 79 [color = "brown", label="tic", fontsize=12];
+
+79 -> 80 [color = "brown", label="tic", fontsize=12];
+
+80 -> 76 [color = "brown", label="prohibit_notify_indiv(TRUE,pdpc)", fontsize=12];
+
+76 -> 76 [color = "brown", label="tic", fontsize=12];
+
+76 -> 76 [color = "brown", label="tic", fontsize=12];
 
 }

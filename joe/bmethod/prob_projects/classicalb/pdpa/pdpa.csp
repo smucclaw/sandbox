@@ -30,12 +30,12 @@ Rule(BreachedOrFulfilled) = \ rule_name, evnt, evnt_timer @
     Go =
       tic -> Go []
       trigger_rule!rule_name?actor -> (
-        RuleI(actor, evnt_timer)
+      -- When we interrupt a rule, are we interrupting existing instances, or do
+      -- we also prevent all future instances from being spawned?
+        RuleI(actor, evnt_timer) /\ interrupt_rule!rule_name -> Tic
       ) -- [| {tic} |] Go
   within
-    -- When we interrupt a rule, are we interrupting existing instances, or do
-    -- we also prevent all future instances from being spawned?
-    Go /\ interrupt_rule!rule_name -> Tic
+    Go 
 
 -- Non-compensable obligations and prohibitions.
 ObProhib(Hence, Lest) =

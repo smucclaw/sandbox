@@ -1,51 +1,61 @@
-datatype Status = breached | fulfilled
+-- datatype Status = breached | fulfilled
 datatype Actor = org | indiv | pdpc
 
 datatype RuleName =
-  Assessment | NotifyPdpc | NotifyIndiv | Exclusions
+  Assessment | NotifyPdpc | NotifyIndiv | ProhibitNotifyIndiv
 
-channel trigger_rule : RuleName
+channel trigger_rule : RuleName.Actor
+channel interrupt_rule : RuleName
 
-channel assess, notifyPdpc : Bool
+channel assess, notify_pdpc, notify_indiv, prohibit_notify_indiv : Bool.Actor
 
-channel status : RuleName.Status.Actor
+channel status : RuleName.Actor
 channel tic
 
 Tic = tic -> Tic
 
-Rule(
-  status_on_evnt_done, status_on_evnt_timeout,
-  rule_name, actor, evnt, evnt_timer
-) =
-  -- RuleI stands for rule instance.
+-- Unfortunately, currying doesn't work properly but at least nested lambdas do.
+Rule(BreachedOrFulfilled) = \ rule_name, evnt, evnt_timer @
   let
-    RuleI(evnt_timer) =
-      if evnt_timer <= 0
-      then
-        evnt!false -> status!rule_name!status_on_evnt_timeout!actor -> Tic
+    -- RuleI stands for rule instance.
+    RuleI(actor, evnt_timer) =
+      if evnt_timer < 0 then
+        evnt!false!actor -> BreachedOrFulfilled(false)
       else
-        evnt!true -> status!rule_name!status_on_evnt_done!actor -> Tic []
-        tic -> RuleI(evnt_timer - 1)
+        evnt!true!actor -> BreachedOrFulfilled(true) []
+        tic -> RuleI(actor, evnt_timer - 1)
 
     -- Auxiliary helper for recursion.
     -- We ignore the notion of perdurance for now.
-    go =
-      tic -> go []
-      trigger_rule!rule_name ->
-        RuleI(evnt_timer) -- [| {tic} |] go
+    Go =
+      tic -> Go []
+      trigger_rule!rule_name?actor -> (
+        RuleI(actor, evnt_timer)
+      ) -- [| {tic} |] Go
+  within
+    -- When we interrupt a rule, are we interrupting existing instances, or do
+    -- we also prevent all future instances from being spawned?
+    Go /\ interrupt_rule!rule_name -> Tic
 
-    within
-      go
+-- Non-compensable obligations and prohibitions.
+ObProhib(Hence, Lest) =
+  Rule(\ is_done @ if is_done then Hence else Lest)
 
-Ob(rule_name, actor, evnt, evnt_timer) =
-  Rule(fulfilled, breached, rule_name, actor, evnt, evnt_timer)
+-- We treat Tic ~ Fulfilled and STOP (aka deadlock) ~ Breached
+Ob = ObProhib(Tic, STOP)
+Prohib = ObProhib(STOP, Tic)
 
-Perm(rule_name, actor, evnt, event_timer) =
-  Rule(fulfilled, fulfilled, rule_name, actor, evnt, event_timer)
-
-Prohib(rule_name, actor, evnt, event_timer) =
-  Rule(breached, fulfilled, rule_name, actor, evnt, event_timer)
+-- Permissions and compensable obligations and prohibitions.
+Perm = Rule(\ _ @ Tic)
 
 MAIN =
-  Ob(Assessment, org, assess, 30) [| {tic} |]
-  Ob(NotifyPdpc, org, notifyPdpc, 3)
+  let
+    Procs = {
+      Tic,
+      Ob(Assessment, assess, 30),
+      Ob(NotifyPdpc, notify_pdpc, 3),
+      Ob(NotifyIndiv, notify_indiv, 3),
+      Perm(ProhibitNotifyIndiv, prohibit_notify_indiv, 5)
+    }
+  within
+    [| {tic} |] P : Procs @ P

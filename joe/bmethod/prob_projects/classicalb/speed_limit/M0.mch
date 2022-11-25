@@ -13,18 +13,23 @@ ABSTRACT_CONSTANTS
 
   tCar, tDay, tRoad, tSpeed1, tSpeed2
 
+  // INTEGER
+  // {x : INTEGER | x >= 0}
+
 DEFINITIONS
   subtypes(X, S) ==
-    S : seq(POW(X)) &
+    S <: POW(X)
+    /*
     !i, j. ((i : dom(S) & j : dom(S) & i < j) =>
       S(i) /\ S(j) = {}
     )
+    */
 
 PROPERTIES
   // Typing information for subsets.
-  subtypes(Vehicle, [Car, Truck]) &
-  subtypes(Road, [Highway]) &
-  subtypes(Day, [Workday, Holiday]) &
+  subtypes(Vehicle, {Car, Truck}) &
+  subtypes(Road, {Highway}) &
+  subtypes(Day, {Workday, Holiday}) &
 
   /*@label maxSpCarWorkdayHighway */
   !v, d, r, s. (

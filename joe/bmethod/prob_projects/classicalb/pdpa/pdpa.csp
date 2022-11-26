@@ -35,7 +35,7 @@ Rule(BreachedOrFulfilled) = \ rule_name, evnt, evnt_timer @
         RuleI(actor, evnt_timer) /\ interrupt_rule!rule_name -> Tic
       ) -- [| {tic} |] Go
   within
-    Go 
+    Go
 
 -- Non-compensable obligations and prohibitions.
 ObProhib(Hence, Lest) =

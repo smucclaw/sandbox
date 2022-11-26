@@ -1,0 +1,191 @@
+\usepackage[dvipsnames]{xcolor}
+\usepackage[altpo]{backnaur}
+
+\usepackage{
+  amsmath, amssymb, amsthm, thmtools, thm-restate, tikz, graphicx,
+  hyperref, cleveref, comment, expl3, xparse, ebproof, enumitem, stmaryrd,
+  enumitem, verbatim, todonotes, xargs, url, mathtools, mathrsfs, xfrac, cite,
+  setspace, titlesec, bbm, dirtytalk, fancyhdr, esvect, tikz, listings
+}
+
+\usepackage[mathscr]{euscript}
+
+\lstset{basicstyle=\small\ttfamily}
+
+\crefname{lstlisting}{listing}{listings}
+\Crefname{lstlisting}{Listing}{Listings}
+
+\usetikzlibrary{shapes.geometric, arrows}
+
+\newcommandx{\mygather}[3][1=1ex, 2=\normalsize]{
+  \begin{spreadlines}{#1}
+    {#2
+      \begin{gather*}
+        #3
+      \end{gather*}
+    }%
+  \end{spreadlines}
+}
+
+\newcommandx{\myenumerate}[2][1=1ex]{
+  \begin{enumerate}
+    \setlength \itemsep{#1}
+    #2
+  \end{enumerate}
+}
+
+\newcommandx{\myitemize}[2][1=1ex]{
+  \begin{itemize}
+    \setlength \itemsep{#1}
+    #2
+  \end{itemize}
+}
+
+\newcommandx{\myalign}[3][1=1ex, 2=\normalsize]{
+  \begin{spreadlines}{#1}
+    {#2
+    \begin{align*}
+      #3
+    \end{align*}
+    }%
+  \end{spreadlines}
+}
+
+
+% https://tex.stackexchange.com/questions/37797/theorem-environment-line-break-after-label
+\newtheoremstyle{break}% name
+{}%         Space above, empty = `usual value'
+{}%         Space below
+{\itshape}% Body font
+{}%         Indent amount (empty = no indent, \parindent = para indent)
+{\bfseries}% Thm head font
+{.}%        Punctuation after thm head
+{\newline}% Space after thm head: \newline = linebreak
+{}%         Thm head spec
+
+% https://tex.stackexchange.com/questions/250035/transform-output-theoremstyleremark-from-italics-to-bold
+\newtheoremstyle{boldremark}
+{\dimexpr\topsep/2\relax} % space above
+{\dimexpr\topsep/2\relax} % space below
+{}          % body font
+{}          % indent amount
+{\itshape\bfseries}% theorem head font
+{.}         % punctuation after theorem head
+{\newline}      % space after theorem head
+{}          % theorem hed spec. (empty = "normal")
+
+\newtheoremstyle{discussion}% name
+{}%         Space above, empty = `usual value'
+{}%         Space below
+{}% Body font
+{}%         Indent amount (empty = no indent, \parindent = para indent)
+{\bfseries}% Thm head font
+{.}%        Punctuation after thm head
+{\newline}% Space after thm head: \newline = linebreak
+{}%         Thm head spec
+
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{notation}{Notation}[section]
+\newtheorem{example}{Example}[section]
+\newtheorem{convention}{Convention}[section]
+
+\theoremstyle{break}
+\newtheorem{theorem}{Theorem}[section]
+\Crefname{theorem}{Theorem}{Theorems}
+
+\theoremstyle{break}
+\newtheorem{corollary}{Corollary}[theorem]
+\Crefname{corollary}{Corollary}{Corollaries}
+
+\theoremstyle{break}
+\newtheorem{lemma}[theorem]{Lemma}
+\Crefname{lemma}{Lemma}{Lemmas}
+
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
+
+% https://latex.org/forum/viewtopic.php?t=24225
+\theoremstyle{discussion}
+\newtheorem{discussion}[theorem]{Discussion}
+\Crefname{discussion}{Discussion}{Discussions}
+
+\theoremstyle{boldremark}
+\newtheorem*{boldremark}{Remark}
+
+% \theoremstyle{convention}
+% \newtheorem{convention}[theorem]{Convention}
+% \Crefname{convention}{Convention}{Conventions}
+
+% \newcommand{\powerset}{\mathscr{P}}
+% \newcommand{\powerset}{\mathscr{P}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\T}{\mathbb{T}}
+
+\DeclareMathOperator{\Boolean}{\mathtt{Boolean}}
+\DeclareMathOperator{\Class}{\mathtt{Class}}
+\DeclareMathOperator{\Number}{\mathtt{Number}}
+\DeclareMathOperator{\Object}{\mathtt{Object}}
+
+\DeclareMathOperator{\decl}{decl}
+
+\DeclareMathOperator{\Pre}{Pre}
+\DeclareMathOperator{\Post}{Post}
+
+\DeclareMathOperator{\true}{\mathtt{true}}
+\DeclareMathOperator{\false}{\mathtt{false}}
+
+\newcommandx{\set}[1]{
+  \{ #1 \}
+}
+
+\newcommandx{\setcompre}[2]{
+  \{#1 \, | \, #2\}
+}
+
+\newcommandx{\pair}[2]{
+    (#1, \, #2)
+}
+
+\newcommandx{\jdgmt}[3][1=\Gamma, 2=\Delta]{
+    #1; \, #2 \vdash #3
+}
+
+\newcommand{\curlyA}{\mathscr{A}}
+
+\newcommand{\defeq}{\stackrel{\text{def}}{=}}
+\newcommand{\traces}{\mathbf{Tr}}
+\newcommand{\fintraces}{\mathbf{Tr}^\text{fin}}
+
+\newcommand{\instwff}{\varphi_\text{inst}}
+\newcommand{\suswff}{\varphi_\text{sus}}
+\newcommand{\termwff}{\varphi_\text{term}}
+\newcommand{\reswff}{\varphi_\text{res}}
+\newcommand{\contwff}{\varphi_\text{cont}}
+\newcommand{\brewff}{\varphi_\text{bre}}
+\newcommand{\fulwff}{\varphi_\text{ful}}
+
+\newcommand{\susstate}{\text{Suspended}}
+\newcommand{\expstate}{\text{Expired}}
+\newcommand{\ineffstate}{\text{InEffect}}
+\newcommand{\brestate}{\text{Breached}}
+\newcommand{\fulstate}{\text{Fulfilled}}
+
+\newcommand{\obaut}{\curlyA_O}
+
+% https://tex.stackexchange.com/questions/9796/how-to-add-todo-notes
+\newcommandx{\info}[2][1=] {
+  \vspace{5mm}
+  \todo[inline, linecolor=OliveGreen,backgroundcolor=OliveGreen!25,bordercolor=OliveGreen,#1]{#2}
+  \vspace{5mm}
+}
+
+\newcommandx{\inlinetodo}[1]{
+  \info{
+    \textbf{TODO}
+
+    #1
+  }
+}

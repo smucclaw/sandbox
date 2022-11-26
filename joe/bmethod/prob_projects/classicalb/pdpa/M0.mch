@@ -1,5 +1,37 @@
 SYSTEM M0
 
+DEFINITIONS
+/*
+  Note here that we prioritze trigger_rule and interrupt_rule over all other
+  events.
+  The trick is to view the logic of guard conditions as a classical theory
+  augmented with a defeasible superiority relation.
+  We then use the same hack that is used in baby l4 to turn all the defeasible
+  rules involving subjectTo etc into classical ones, we squeeze in lots of
+  (... and not ...) in the guard conditions.
+  For more details, see the paper on automating defeasible reasoning.
+
+  As pointed out by Guido, this approach will likely break down when we have a
+  more complicated superiority relation.
+  Can we formalize a defeasible metatheory in classical logic in another
+  B machine and simply include that for use?
+  Or maybe we can use ProB's Prolog interop facilities for that.
+
+  Or we could implement our own priority queue and scheduling mechanism, where
+  after running an event, we set a lock flag preventing all other events from
+  running.
+  At that point, the machine will only run through all rules that it needs to
+  interrupt and trigger.
+  When that's done, we release the lock and let events fire again.
+*/
+  subject_to_interrupts_triggers ==
+    rules_to_interrupt = {} & rules_to_trigger = {};
+
+  event_guard_defeasible(is_done, actor) ==
+    is_done : BOOL &
+    actor : Actor &
+    subject_to_interrupts_triggers
+
 SETS
   // ContractStatus = {breached, fulfilled, in_progress};
   Actor = {org, indiv, pdpc};
@@ -9,15 +41,15 @@ SETS
 
 CONSTANTS
   PublicAgency, is_notifiable,
-  rule_qualifier
+  rule_actors
 
 PROPERTIES
   // Invoke the global Choice operator to decide if org is a public agency.
   PublicAgency <: {org} &
   is_notifiable : BOOL &
 
-  rule_qualifier : RuleName <-> Actor &
-  rule_qualifier =
+  rule_actors : RuleName <-> Actor &
+  rule_actors =
     {Assessment, NotifyPdpc, NotifyIndiv} * PublicAgency \/
     {(ProhibitNotifyIndiv, pdpc)}
 
@@ -25,38 +57,22 @@ VARIABLES
   rules_to_trigger, active_rules, rules_to_interrupt
 
 INVARIANT
-  rules_to_trigger : RuleName <-> Actor &
-  active_rules <: RuleName &
+  {rules_to_trigger, active_rules} <: RuleName <-> Actor &
   rules_to_interrupt <: RuleName
 
 INITIALISATION
   rules_to_trigger := {rule_name, actor |
-    rule_name = Assessment & (rule_name, actor) : rule_qualifier
+    rule_name = Assessment & (rule_name, actor) : rule_actors
   } ||
   active_rules := {} ||
   rules_to_interrupt := {}
 
 OPERATIONS
-/*
-  Note here that we prioritze trigger_rule and interrupt_rule over all other
-  events.
-  The trick is to view the logic of guard conditions as a classical theory
-  augmented with a defeasible superiority relation.
-  We then use the same hack that is used in baby l4 to turn all the defeasible
-  rules involving subjectTo etc into classical ones, we squeeze in lots of
-  (... and not ...) in the guard conditions.
-
-  Can we formalize a defeasible metatheory in classical logic in another
-  B machine and simply include that for use?
-*/
   assess(is_done, actor) =
     PRE
-      is_done : BOOL &
-      actor : Actor &
-      rules_to_trigger = {} &
-      rules_to_interrupt = {}
+      event_guard_defeasible(is_done, actor)
     THEN
-      active_rules := active_rules \ {Assessment} ||
+      active_rules := active_rules \ {(Assessment, actor)} ||
       IF {is_done, is_notifiable} = {TRUE} THEN
         rules_to_trigger := {NotifyIndiv, NotifyPdpc} * {actor}
       ELSE
@@ -66,14 +82,11 @@ OPERATIONS
 
   notify_pdpc(is_done, actor) =
     PRE
-      is_done : BOOL &
-      actor : Actor &
-      rules_to_trigger = {} &
-      rules_to_interrupt = {}
+      event_guard_defeasible(is_done, actor)
     THEN
-      active_rules := active_rules \ {NotifyPdpc} ||
+      active_rules := active_rules \ {(NotifyPdpc, actor)} ||
       IF is_done = TRUE THEN
-        rules_to_trigger := {ProhibitNotifyIndiv} <| rule_qualifier
+        rules_to_trigger := {ProhibitNotifyIndiv} <| rule_actors
       ELSE
         skip
       END
@@ -81,12 +94,9 @@ OPERATIONS
 
   notify_indiv(is_done, actor) =
     PRE
-      is_done : BOOL &
-      actor : Actor &
-      rules_to_trigger = {} &
-      rules_to_interrupt = {}
+      event_guard_defeasible(is_done, actor)
     THEN
-      active_rules := active_rules \ {NotifyIndiv} ||
+      active_rules := active_rules \ {(NotifyIndiv, actor)} ||
       IF is_done = TRUE THEN
         skip
       ELSE
@@ -96,13 +106,10 @@ OPERATIONS
 
   prohibit_notify_indiv(is_done, actor) =
     PRE
-      is_done : BOOL &
-      actor : Actor &
-      rules_to_trigger = {} &
-      rules_to_interrupt = {}
+      event_guard_defeasible(is_done, actor)
     THEN
-      active_rules := active_rules \ {ProhibitNotifyIndiv} ||
-      IF is_done = TRUE & NotifyIndiv : active_rules THEN
+      active_rules := active_rules \ {(ProhibitNotifyIndiv, actor)} ||
+      IF is_done = TRUE & NotifyIndiv : dom(active_rules) THEN
         rules_to_interrupt := rules_to_interrupt \/ {NotifyIndiv}
       ELSE
         skip
@@ -111,8 +118,7 @@ OPERATIONS
 
   tic =
     PRE
-      rules_to_trigger = {} &
-      rules_to_interrupt = {}
+      subject_to_interrupts_triggers
     THEN
       skip
     END;
@@ -122,7 +128,7 @@ OPERATIONS
       (rule_name, actor) : rules_to_trigger
     THEN
       rules_to_trigger := rules_to_trigger \ {(rule_name, actor)} ||
-      active_rules := active_rules \/ {rule_name}
+      active_rules := active_rules \/ {(rule_name, actor)}
     END;
 
   interrupt_rule(rule_name) =
@@ -130,7 +136,7 @@ OPERATIONS
       rule_name : rules_to_interrupt
     THEN
       rules_to_interrupt := rules_to_interrupt \ {rule_name} ||
-      active_rules := active_rules \ {rule_name}
+      active_rules := {rule_name} <| active_rules
     END
 
 END

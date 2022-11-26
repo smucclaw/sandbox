@@ -1,0 +1,46 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+
+\input{preamble}
+
+% Title information
+\title{L4 regulative rules semantics}
+
+\begin{document}
+
+% Title and table of contents.
+\maketitle
+
+\info{
+  This is a work in progress.
+}
+
+\tableofcontents
+
+\begin{definition} [Event]
+  $E@t$ denotes a real world event $E$ occurring at time $t$.
+\end{definition}
+
+We use $\traces$ to denote the set of all traces and $\fintraces$ to denote the
+set of finite traces.
+
+\begin{definition} [Obligation template]
+  An obligation template is a tuple
+  \begin{align*}
+    O \defeq
+    \langle
+      P, \, S, \, n_i, \, \instwff, \,
+      \suswff, \, \termwff, \, \reswff, \, \contwff, \, \brewff, \, \fulwff
+    \rangle
+  \end{align*}
+  where $P$ is a finite, non-empty set of parties involved in the contract,
+  and the $\varphi_i$ formulae in some first-order extension of LTL.
+
+  Such a template can be dynamically instantiated at runtime to form an
+  automaton $\obaut$ with states given by
+  $S = \set{\ineffstate, \, \susstate, \, \expstate, \, \brestate, \, \fulstate}$.
+
+  $n_i$ is the number of obligation instances to instantiate
+\end{definition}
+
+\end{document}

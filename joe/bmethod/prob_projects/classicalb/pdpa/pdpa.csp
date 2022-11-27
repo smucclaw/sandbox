@@ -9,7 +9,6 @@ channel interrupt_rule : RuleName
 
 channel assess, notify_pdpc, notify_indiv, prohibit_notify_indiv : Bool.Actor
 
-channel status : RuleName.Actor
 channel tic
 
 Tic = tic -> Tic

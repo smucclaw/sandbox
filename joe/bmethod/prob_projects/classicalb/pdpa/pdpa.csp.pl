@@ -22,26 +22,25 @@
 'channel'('notify_pdpc','type'('dotTupleType'(['boolType','Actor']))).
 'channel'('notify_indiv','type'('dotTupleType'(['boolType','Actor']))).
 'channel'('prohibit_notify_indiv','type'('dotTupleType'(['boolType','Actor']))).
-'channel'('status','type'('dotTupleType'(['RuleName','Actor']))).
 'channel'('tic','type'('dotUnitType')).
-'bindval'('Tic','prefix'('src_span'(15,7,15,10,365,3),[],'tic','val_of'('Tic','src_span'(15,14,15,17,372,3)),'src_span'(15,11,15,13,368,10)),'src_span'(15,1,15,17,359,16)).
-'agent'('Rule'(_BreachedOrFulfilled),'lambda'([_rule_name,_evnt,_evnt_timer],'let'(['agent'('RuleI'(_actor,_evnt_timer2),'ifte'('<'(_evnt_timer2,'int'(0)),'prefix'('src_span'(23,9,23,13,631,4),['out'('false'),'out'(_actor)],_evnt,'agent_call'('src_span'(23,29,23,48,651,19),_BreachedOrFulfilled,['false']),'src_span'(23,26,23,28,647,36)),'[]'('prefix'('src_span'(25,9,25,13,697,4),['out'('true'),'out'(_actor)],_evnt,'agent_call'('src_span'(25,28,25,47,716,19),_BreachedOrFulfilled,['true']),'src_span'(25,25,25,27,712,35)),'prefix'('src_span'(26,9,26,12,753,3),[],'tic','agent_call'('src_span'(26,16,26,21,760,5),'RuleI',[_actor,'-'(_evnt_timer2,'int'(1))]),'src_span'(26,13,26,15,756,35)),'src_span_operator'('no_loc_info_available','src_span'(25,54,25,56,742,2))),'no_loc_info_available','no_loc_info_available','no_loc_info_available'),'src_span'(22,7,26,44,600,188)),'bindval'('Go','[]'('prefix'('src_span'(31,7,31,10,895,3),[],'tic','val_of'('Go','src_span'(31,14,31,16,902,2)),'src_span'(31,11,31,13,898,9)),'prefix'('src_span'(32,7,32,19,914,12),['out'(_rule_name),'in'(_actor2)],'trigger_rule','/\x5c\'('agent_call'('src_span'(35,9,35,14,1103,5),'RuleI',[_actor2,_evnt_timer]),'prefix'('src_span'(35,37,35,51,1131,14),['out'(_rule_name)],'interrupt_rule','val_of'('Tic','src_span'(35,65,35,68,1159,3)),'src_span'(35,62,35,64,1155,17)),'src_span_operator'('no_loc_info_available','src_span'(35,34,35,36,1128,2))),'src_span'(32,36,32,38,942,234)),'src_span_operator'('no_loc_info_available','src_span'(31,17,31,19,905,2))),'src_span'(30,5,36,8,884,286))],'val_of'('Go','src_span'(38,5,38,7,1202,2)))),'src_span'(18,29,38,7,486,718)).
-'agent'('ObProhib'(_Hence,_Lest),'agent_call'('src_span'(42,3,42,7,1281,4),'Rule',['lambda'([_is_done],'ifte'(_is_done,_Hence,_Lest,'src_span'(42,20,42,30,1298,10),'src_span'(42,31,42,35,1308,18),'src_span'(42,42,42,46,1319,15)))]),'src_span'(42,3,42,52,1281,49)).
-'bindval'('Ob','agent_call'('src_span'(45,6,45,14,1400,8),'ObProhib',['val_of'('Tic','src_span'(45,15,45,18,1409,3)),'stop'('src_span'(45,20,45,24,1414,4))]),'src_span'(45,1,45,25,1395,24)).
-'bindval'('Prohib','agent_call'('src_span'(46,10,46,18,1429,8),'ObProhib',['stop'('src_span'(46,19,46,23,1438,4)),'val_of'('Tic','src_span'(46,25,46,28,1444,3))]),'src_span'(46,1,46,29,1420,28)).
-'bindval'('Perm','agent_call'('src_span'(49,8,49,12,1518,4),'Rule',['lambda'([_],'val_of'('Tic','src_span'(49,19,49,22,1529,3)))]),'src_span'(49,1,49,23,1511,22)).
-'bindval'('MAIN','let'(['bindval'('Procs','setExp'('rangeEnum'(['val_of'('Tic','src_span'(54,7,54,10,1568,3)),'agent_call'('src_span'(55,7,55,9,1579,2),'val_of'('Ob','src_span'(55,7,55,9,1579,2)),['Assessment','assess','int'(30)]),'agent_call'('src_span'(56,7,56,9,1613,2),'val_of'('Ob','src_span'(56,7,56,9,1613,2)),['NotifyPdpc','notify_pdpc','int'(3)]),'agent_call'('src_span'(57,7,57,9,1651,2),'val_of'('Ob','src_span'(57,7,57,9,1651,2)),['NotifyIndiv','notify_indiv','int'(3)]),'agent_call'('src_span'(58,7,58,11,1691,4),'val_of'('Perm','src_span'(58,7,58,11,1691,4)),['ProhibitNotifyIndiv','prohibit_notify_indiv','int'(5)])])),'src_span'(53,5,59,6,1552,196))],'procRepSharing'('setExp'('rangeEnum'(['tic'])),['comprehensionGenerator'(_P,'val_of'('Procs','src_span'(61,21,61,26,1778,5)))],_P,'src_span'(61,17,61,28,1774,11))),'src_span'(51,1,61,30,1535,252)).
+'bindval'('Tic','prefix'('src_span'(14,7,14,10,333,3),[],'tic','val_of'('Tic','src_span'(14,14,14,17,340,3)),'src_span'(14,11,14,13,336,10)),'src_span'(14,1,14,17,327,16)).
+'agent'('Rule'(_BreachedOrFulfilled),'lambda'([_rule_name,_evnt,_evnt_timer],'let'(['agent'('RuleI'(_actor,_evnt_timer2),'ifte'('<'(_evnt_timer2,'int'(0)),'prefix'('src_span'(22,9,22,13,599,4),['out'('false'),'out'(_actor)],_evnt,'agent_call'('src_span'(22,29,22,48,619,19),_BreachedOrFulfilled,['false']),'src_span'(22,26,22,28,615,36)),'[]'('prefix'('src_span'(24,9,24,13,665,4),['out'('true'),'out'(_actor)],_evnt,'agent_call'('src_span'(24,28,24,47,684,19),_BreachedOrFulfilled,['true']),'src_span'(24,25,24,27,680,35)),'prefix'('src_span'(25,9,25,12,721,3),[],'tic','agent_call'('src_span'(25,16,25,21,728,5),'RuleI',[_actor,'-'(_evnt_timer2,'int'(1))]),'src_span'(25,13,25,15,724,35)),'src_span_operator'('no_loc_info_available','src_span'(24,54,24,56,710,2))),'no_loc_info_available','no_loc_info_available','no_loc_info_available'),'src_span'(21,7,25,44,568,188)),'bindval'('Go','[]'('prefix'('src_span'(30,7,30,10,863,3),[],'tic','val_of'('Go','src_span'(30,14,30,16,870,2)),'src_span'(30,11,30,13,866,9)),'prefix'('src_span'(31,7,31,19,882,12),['out'(_rule_name),'in'(_actor2)],'trigger_rule','/\x5c\'('agent_call'('src_span'(34,9,34,14,1071,5),'RuleI',[_actor2,_evnt_timer]),'prefix'('src_span'(34,37,34,51,1099,14),['out'(_rule_name)],'interrupt_rule','val_of'('Tic','src_span'(34,65,34,68,1127,3)),'src_span'(34,62,34,64,1123,17)),'src_span_operator'('no_loc_info_available','src_span'(34,34,34,36,1096,2))),'src_span'(31,36,31,38,910,234)),'src_span_operator'('no_loc_info_available','src_span'(30,17,30,19,873,2))),'src_span'(29,5,35,8,852,286))],'val_of'('Go','src_span'(37,5,37,7,1170,2)))),'src_span'(17,29,37,7,454,718)).
+'agent'('ObProhib'(_Hence,_Lest),'agent_call'('src_span'(41,3,41,7,1249,4),'Rule',['lambda'([_is_done],'ifte'(_is_done,_Hence,_Lest,'src_span'(41,20,41,30,1266,10),'src_span'(41,31,41,35,1276,18),'src_span'(41,42,41,46,1287,15)))]),'src_span'(41,3,41,52,1249,49)).
+'bindval'('Ob','agent_call'('src_span'(44,6,44,14,1368,8),'ObProhib',['val_of'('Tic','src_span'(44,15,44,18,1377,3)),'stop'('src_span'(44,20,44,24,1382,4))]),'src_span'(44,1,44,25,1363,24)).
+'bindval'('Prohib','agent_call'('src_span'(45,10,45,18,1397,8),'ObProhib',['stop'('src_span'(45,19,45,23,1406,4)),'val_of'('Tic','src_span'(45,25,45,28,1412,3))]),'src_span'(45,1,45,29,1388,28)).
+'bindval'('Perm','agent_call'('src_span'(48,8,48,12,1486,4),'Rule',['lambda'([_],'val_of'('Tic','src_span'(48,19,48,22,1497,3)))]),'src_span'(48,1,48,23,1479,22)).
+'bindval'('MAIN','let'(['bindval'('Procs','setExp'('rangeEnum'(['val_of'('Tic','src_span'(53,7,53,10,1536,3)),'agent_call'('src_span'(54,7,54,9,1547,2),'val_of'('Ob','src_span'(54,7,54,9,1547,2)),['Assessment','assess','int'(30)]),'agent_call'('src_span'(55,7,55,9,1581,2),'val_of'('Ob','src_span'(55,7,55,9,1581,2)),['NotifyPdpc','notify_pdpc','int'(3)]),'agent_call'('src_span'(56,7,56,9,1619,2),'val_of'('Ob','src_span'(56,7,56,9,1619,2)),['NotifyIndiv','notify_indiv','int'(3)]),'agent_call'('src_span'(57,7,57,11,1659,4),'val_of'('Perm','src_span'(57,7,57,11,1659,4)),['ProhibitNotifyIndiv','prohibit_notify_indiv','int'(5)])])),'src_span'(52,5,58,6,1520,196))],'procRepSharing'('setExp'('rangeEnum'(['tic'])),['comprehensionGenerator'(_P,'val_of'('Procs','src_span'(60,21,60,26,1746,5)))],_P,'src_span'(60,17,60,28,1742,11))),'src_span'(50,1,60,30,1503,252)).
 'comment'('lineComment'('-- datatype Status = breached | fulfilled'),'src_position'(1,1,0,41)).
-'comment'('lineComment'('-- Unfortunately, currying doesn\x27\t work properly but at least nested lambdas do.'),'src_position'(17,1,377,80)).
-'comment'('lineComment'('-- RuleI stands for rule instance.'),'src_position'(20,5,528,34)).
-'comment'('lineComment'('-- Auxiliary helper for recursion.'),'src_position'(28,5,794,34)).
-'comment'('lineComment'('-- We ignore the notion of perdurance for now.'),'src_position'(29,5,833,46)).
-'comment'('lineComment'('-- When we interrupt a rule, are we interrupting existing instances, or do'),'src_position'(33,7,954,74)).
-'comment'('lineComment'('-- we also prevent all future instances from being spawned?'),'src_position'(34,7,1035,59)).
-'comment'('lineComment'('-- [| {tic} |] Go'),'src_position'(36,9,1171,17)).
-'comment'('lineComment'('-- Non-compensable obligations and prohibitions.'),'src_position'(40,1,1206,48)).
-'comment'('lineComment'('-- We treat Tic ~ Fulfilled and STOP (aka deadlock) ~ Breached'),'src_position'(44,1,1332,62)).
-'comment'('lineComment'('-- Permissions and compensable obligations and prohibitions.'),'src_position'(48,1,1450,60)).
+'comment'('lineComment'('-- Unfortunately, currying doesn\x27\t work properly but at least nested lambdas do.'),'src_position'(16,1,345,80)).
+'comment'('lineComment'('-- RuleI stands for rule instance.'),'src_position'(19,5,496,34)).
+'comment'('lineComment'('-- Auxiliary helper for recursion.'),'src_position'(27,5,762,34)).
+'comment'('lineComment'('-- We ignore the notion of perdurance for now.'),'src_position'(28,5,801,46)).
+'comment'('lineComment'('-- When we interrupt a rule, are we interrupting existing instances, or do'),'src_position'(32,7,922,74)).
+'comment'('lineComment'('-- we also prevent all future instances from being spawned?'),'src_position'(33,7,1003,59)).
+'comment'('lineComment'('-- [| {tic} |] Go'),'src_position'(35,9,1139,17)).
+'comment'('lineComment'('-- Non-compensable obligations and prohibitions.'),'src_position'(39,1,1174,48)).
+'comment'('lineComment'('-- We treat Tic ~ Fulfilled and STOP (aka deadlock) ~ Breached'),'src_position'(43,1,1300,62)).
+'comment'('lineComment'('-- Permissions and compensable obligations and prohibitions.'),'src_position'(47,1,1418,60)).
 'symbol'('Actor','Actor','src_span'(2,10,2,15,51,5),'Datatype').
 'symbol'('org','org','src_span'(2,18,2,21,59,3),'Constructor of Datatype').
 'symbol'('indiv','indiv','src_span'(2,24,2,29,65,5),'Constructor of Datatype').
@@ -57,26 +56,25 @@
 'symbol'('notify_pdpc','notify_pdpc','src_span'(10,17,10,28,251,11),'Channel').
 'symbol'('notify_indiv','notify_indiv','src_span'(10,30,10,42,264,12),'Channel').
 'symbol'('prohibit_notify_indiv','prohibit_notify_indiv','src_span'(10,44,10,65,278,21),'Channel').
-'symbol'('status','status','src_span'(12,9,12,15,322,6),'Channel').
-'symbol'('tic','tic','src_span'(13,9,13,12,354,3),'Channel').
-'symbol'('Tic','Tic','src_span'(15,1,15,4,359,3),'Ident (Groundrep.)').
-'symbol'('Rule','Rule','src_span'(18,1,18,5,458,4),'Funktion or Process').
-'symbol'('BreachedOrFulfilled','BreachedOrFulfilled','src_span'(18,6,18,25,463,19),'Ident (Prolog Variable)').
-'symbol'('rule_name','rule_name','src_span'(18,31,18,40,488,9),'Ident (Prolog Variable)').
-'symbol'('evnt','evnt','src_span'(18,42,18,46,499,4),'Ident (Prolog Variable)').
-'symbol'('evnt_timer','evnt_timer','src_span'(18,48,18,58,505,10),'Ident (Prolog Variable)').
-'symbol'('RuleI','RuleI','src_span'(21,5,21,10,567,5),'Funktion or Process').
-'symbol'('actor','actor','src_span'(21,11,21,16,573,5),'Ident (Prolog Variable)').
-'symbol'('evnt_timer2','evnt_timer','src_span'(21,18,21,28,580,10),'Ident (Prolog Variable)').
-'symbol'('Go','Go','src_span'(30,5,30,7,884,2),'Ident (Groundrep.)').
-'symbol'('actor2','actor','src_span'(32,30,32,35,937,5),'Ident (Prolog Variable)').
-'symbol'('ObProhib','ObProhib','src_span'(41,1,41,9,1255,8),'Funktion or Process').
-'symbol'('Hence','Hence','src_span'(41,10,41,15,1264,5),'Ident (Prolog Variable)').
-'symbol'('Lest','Lest','src_span'(41,17,41,21,1271,4),'Ident (Prolog Variable)').
-'symbol'('is_done','is_done','src_span'(42,10,42,17,1288,7),'Ident (Prolog Variable)').
-'symbol'('Ob','Ob','src_span'(45,1,45,3,1395,2),'Ident (Groundrep.)').
-'symbol'('Prohib','Prohib','src_span'(46,1,46,7,1420,6),'Ident (Groundrep.)').
-'symbol'('Perm','Perm','src_span'(49,1,49,5,1511,4),'Ident (Groundrep.)').
-'symbol'('MAIN','MAIN','src_span'(51,1,51,5,1535,4),'Ident (Groundrep.)').
-'symbol'('Procs','Procs','src_span'(53,5,53,10,1552,5),'Ident (Groundrep.)').
-'symbol'('P','P','src_span'(61,17,61,18,1774,1),'Ident (Prolog Variable)').
+'symbol'('tic','tic','src_span'(12,9,12,12,322,3),'Channel').
+'symbol'('Tic','Tic','src_span'(14,1,14,4,327,3),'Ident (Groundrep.)').
+'symbol'('Rule','Rule','src_span'(17,1,17,5,426,4),'Funktion or Process').
+'symbol'('BreachedOrFulfilled','BreachedOrFulfilled','src_span'(17,6,17,25,431,19),'Ident (Prolog Variable)').
+'symbol'('rule_name','rule_name','src_span'(17,31,17,40,456,9),'Ident (Prolog Variable)').
+'symbol'('evnt','evnt','src_span'(17,42,17,46,467,4),'Ident (Prolog Variable)').
+'symbol'('evnt_timer','evnt_timer','src_span'(17,48,17,58,473,10),'Ident (Prolog Variable)').
+'symbol'('RuleI','RuleI','src_span'(20,5,20,10,535,5),'Funktion or Process').
+'symbol'('actor','actor','src_span'(20,11,20,16,541,5),'Ident (Prolog Variable)').
+'symbol'('evnt_timer2','evnt_timer','src_span'(20,18,20,28,548,10),'Ident (Prolog Variable)').
+'symbol'('Go','Go','src_span'(29,5,29,7,852,2),'Ident (Groundrep.)').
+'symbol'('actor2','actor','src_span'(31,30,31,35,905,5),'Ident (Prolog Variable)').
+'symbol'('ObProhib','ObProhib','src_span'(40,1,40,9,1223,8),'Funktion or Process').
+'symbol'('Hence','Hence','src_span'(40,10,40,15,1232,5),'Ident (Prolog Variable)').
+'symbol'('Lest','Lest','src_span'(40,17,40,21,1239,4),'Ident (Prolog Variable)').
+'symbol'('is_done','is_done','src_span'(41,10,41,17,1256,7),'Ident (Prolog Variable)').
+'symbol'('Ob','Ob','src_span'(44,1,44,3,1363,2),'Ident (Groundrep.)').
+'symbol'('Prohib','Prohib','src_span'(45,1,45,7,1388,6),'Ident (Groundrep.)').
+'symbol'('Perm','Perm','src_span'(48,1,48,5,1479,4),'Ident (Groundrep.)').
+'symbol'('MAIN','MAIN','src_span'(50,1,50,5,1503,4),'Ident (Groundrep.)').
+'symbol'('Procs','Procs','src_span'(52,5,52,10,1520,5),'Ident (Groundrep.)').
+'symbol'('P','P','src_span'(60,17,60,18,1742,1),'Ident (Prolog Variable)').

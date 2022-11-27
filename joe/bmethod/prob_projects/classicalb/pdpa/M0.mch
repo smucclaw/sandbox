@@ -48,7 +48,6 @@ PROPERTIES
   PublicAgency <: {org} &
   is_notifiable : BOOL &
 
-  rule_actors : RuleName <-> Actor &
   rule_actors =
     {Assessment, NotifyPdpc, NotifyIndiv} * PublicAgency \/
     {(ProhibitNotifyIndiv, pdpc)}
@@ -57,13 +56,11 @@ VARIABLES
   rules_to_trigger, active_rules, rules_to_interrupt
 
 INVARIANT
-  {rules_to_trigger, active_rules} <: RuleName <-> Actor &
-  rules_to_interrupt <: RuleName
+  {rules_to_trigger, active_rules} <: POW(rule_actors) &
+  rules_to_interrupt <: dom(active_rules)
 
 INITIALISATION
-  rules_to_trigger := {rule_name, actor |
-    rule_name = Assessment & (rule_name, actor) : rule_actors
-  } ||
+  rules_to_trigger := {Assessment} <| rule_actors ||
   active_rules := {} ||
   rules_to_interrupt := {}
 
@@ -136,7 +133,7 @@ OPERATIONS
       rule_name : rules_to_interrupt
     THEN
       rules_to_interrupt := rules_to_interrupt \ {rule_name} ||
-      active_rules := {rule_name} <| active_rules
+      active_rules := {rule_name} <<| active_rules
     END
 
 END

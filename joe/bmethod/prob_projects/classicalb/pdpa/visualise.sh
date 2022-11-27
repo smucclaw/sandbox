@@ -3,7 +3,7 @@
 probcli M0.mch -csp-guide pdpa.csp \
   -p ALLOW_LOCAL_OPERATION_CALLS TRUE \
   -ctlformula "AG true" \
-  -dot state_space evidence.dot
-  # -dotexpr transition_diagram "(active_rules, rules_to_trigger, rules_to_interrupt)" evidence.dot
+  -dotexpr transition_diagram "(active_rules, rules_to_trigger, rules_to_interrupt)" evidence.dot
+  # -dot state_space evidence.dot
 
 dot -Tsvg evidence.dot -o evidence.svg

@@ -1,6 +1,0 @@
-DEFINITIONS
-
-EXTERNAL_PREDICATE_MINIMIZE_EXPR == INTEGER;
-MINIMIZE_EXPR(x)==(1=1);
-
-// external_predicate_choice(X, Y) == X * Y;

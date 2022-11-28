@@ -1,0 +1,61 @@
+datatype Actor = org | indiv | pdpc
+
+datatype RuleName =
+  Payment1 | Payment2 | EventsOfDefault | NotifyBorrower | CureDefault
+  AcceleratedRepayment
+
+channel trigger_rule : RuleName.Actor
+channel interrupt_rule : RuleName
+
+channel pay1, pay2, event_of_default, notify_borrower, cure_default, pay_accelerated : Bool.Actor
+
+channel tic
+
+Tic = tic -> Tic
+
+-- Unfortunately, currying doesn't work properly but at least nested lambdas do.
+Rule(BreachedOrFulfilled) = \ is_perdurant, rule_name, evnt, evnt_timer @
+  let
+    -- RuleI stands for rule instance.
+    RuleI(actor, evnt_timer) =
+      if evnt_timer < 0 then
+        evnt!false!actor -> BreachedOrFulfilled(false)
+      else
+        evnt!true!actor -> BreachedOrFulfilled(true) []
+        tic -> RuleI(actor, evnt_timer - 1)
+
+    -- Auxiliary helper for recursion.
+    -- We ignore the notion of perdurance for now.
+    Go =
+      tic -> Go []
+      trigger_rule!rule_name?actor -> (
+      -- When we interrupt a rule, are we interrupting existing instances, or do
+      -- we also prevent all future instances from being spawned?
+        (RuleI(actor, evnt_timer); if is_perdurant then Go else Tic)
+        /\ interrupt_rule!rule_name -> Tic
+      ) -- [| {tic} |] Go
+  within
+    Go
+
+-- Non-compensable obligations and prohibitions.
+NonCompensable(WhenDone, WhenTimeout) =
+  Rule(\ is_done @ if is_done then WhenDone else WhenTimeout)
+
+Ob = NonCompensable(Tic, STOP)
+Prohib = NonCompensable(STOP, Tic)
+
+-- Permissions and compensable obligations and prohibitions.
+Perm = Rule(\ _ @ Tic)
+
+MAIN =
+  let
+    Procs = {
+      Tic,
+      Perm(false, Payment1, pay1, 365),
+      Perm(false, Payment2, pay2, 365),
+      Perm(true, EventsOfDefault, event_of_default, 720),
+      Perm(true, NotifyBorrower, notify_borrower, 365),
+
+    }
+  within
+    [| {tic} |] P : Procs @ P

@@ -6,7 +6,8 @@
 SYSTEM contract
 
 SETS
-  Status = {breached, fulfilled}
+  Status = {breached, fulfilled};
+  Party
 
 VARIABLES
   trigger, interrupt

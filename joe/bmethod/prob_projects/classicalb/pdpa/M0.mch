@@ -27,7 +27,7 @@ DEFINITIONS
   subject_to_interrupts_triggers ==
     rules_to_interrupt = {} & rules_to_trigger = {};
 
-  event_guard_defeasible(is_done, actor) ==
+  event_guard_defeasible ==
     is_done : BOOL &
     actor : Actor &
     subject_to_interrupts_triggers
@@ -64,10 +64,10 @@ INITIALISATION
   active_rules := {} ||
   rules_to_interrupt := {}
 
-OPERATIONS
+EVENTS
   assess(is_done, actor) =
     PRE
-      event_guard_defeasible(is_done, actor)
+      event_guard_defeasible
     THEN
       active_rules := active_rules \ {(Assessment, actor)} ||
       IF {is_done, is_notifiable} = {TRUE} THEN
@@ -79,7 +79,7 @@ OPERATIONS
 
   notify_pdpc(is_done, actor) =
     PRE
-      event_guard_defeasible(is_done, actor)
+      event_guard_defeasible
     THEN
       active_rules := active_rules \ {(NotifyPdpc, actor)} ||
       IF is_done = TRUE THEN
@@ -91,7 +91,7 @@ OPERATIONS
 
   notify_indiv(is_done, actor) =
     PRE
-      event_guard_defeasible(is_done, actor)
+      event_guard_defeasible
     THEN
       active_rules := active_rules \ {(NotifyIndiv, actor)} ||
       IF is_done = TRUE THEN
@@ -103,7 +103,7 @@ OPERATIONS
 
   prohibit_notify_indiv(is_done, actor) =
     PRE
-      event_guard_defeasible(is_done, actor)
+      event_guard_defeasible
     THEN
       active_rules := active_rules \ {(ProhibitNotifyIndiv, actor)} ||
       IF is_done = TRUE & NotifyIndiv : dom(active_rules) THEN

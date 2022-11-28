@@ -37,12 +37,12 @@ Rule(BreachedOrFulfilled) = \ rule_name, evnt, evnt_timer @
     Go
 
 -- Non-compensable obligations and prohibitions.
-ObProhib(Hence, Lest) =
-  Rule(\ is_done @ if is_done then Hence else Lest)
+NonCompensable(WhenDone, WhenTimeout) =
+  Rule(\ is_done @ if is_done then WhenDone else WhenTimeout)
 
 -- We treat Tic ~ Fulfilled and STOP (aka deadlock) ~ Breached
-Ob = ObProhib(Tic, STOP)
-Prohib = ObProhib(STOP, Tic)
+Ob = NonCompensable(Tic, STOP)
+Prohib = NonCompensable(STOP, Tic)
 
 -- Permissions and compensable obligations and prohibitions.
 Perm = Rule(\ _ @ Tic)

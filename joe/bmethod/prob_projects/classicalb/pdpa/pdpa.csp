@@ -27,14 +27,15 @@ Tic = tic -> Tic
 -- timer mechanism for the related event.
 Rule(RuleInstance) = \ rule_name, evnt, evnt_timer @
   let
-    -- We ignore the notion of perdurance for now.
+    -- Soak up aditional triggers.
+    Trigger = [] trigger : {|trigger_rule.rule_name|} @ trigger -> Trigger
+
     Go =
       tic -> Go []
       trigger_rule!rule_name?actor -> (
-        -- When we interrupt a rule, are we interrupting existing instances, or do
-        -- we also prevent all future instances from being spawned?
-        (RuleInstance(actor, evnt, evnt_timer) [| {tic} |] Go)
-        /\ interrupt_rule!rule_name -> Go
+        ((RuleInstance(actor, evnt, evnt_timer) ||| Trigger)
+          /\ interrupt_rule!rule_name -> SKIP);
+        Go
       )
   within
     Go

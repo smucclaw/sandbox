@@ -23,7 +23,8 @@ CONSTANTS
 
 PROPERTIES
   rule_actors =
-    RuleName * {borrower} <+ {SendPrincipal, NotifyBorrower} * {lender}
+    RuleName * {borrower} <+
+      {SendPrincipal, NotifyBorrower} * {lender}
 
 VARIABLES
   rules_to_trigger, active_rules, rules_to_interrupt
@@ -144,9 +145,7 @@ EVENTS
     THEN
       active_rules := active_rules \ {(PayAccelerated, actor)} ||
       IF is_done = TRUE THEN
-        rules_to_trigger := rules_to_trigger \/ (
-          {EventOfDefault} <| rule_actors
-        )
+        skip
       ELSE
         skip
       END

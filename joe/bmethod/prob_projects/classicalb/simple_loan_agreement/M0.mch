@@ -89,7 +89,8 @@ EVENTS
     THEN
       active_rules := active_rules \ {(Payment2, actor)} ||
       IF is_done = TRUE THEN
-        skip
+        rules_to_interrupt :=
+          (RuleName \ {Payment2}) /\ dom(active_rules)
       ELSE
         rules_to_trigger :=
           rules_to_trigger \/ ({NotifyBorrower} <| rule_actors)
@@ -135,7 +136,7 @@ EVENTS
       ELSE
         rules_to_trigger := {PayAccelerated} <| rule_actors ||
         rules_to_interrupt :=
-          rules_to_interrupt \/ (RuleName \ {PayAccelerated})
+          (RuleName \ {CureDefault}) /\ dom(active_rules)
       END
     END;
 

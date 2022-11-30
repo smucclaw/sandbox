@@ -60,7 +60,7 @@ NonPreAchvI(Cont) = \ actor, evnt, initial_evnt_timer @
       Go(evnt_timer) =
         if evnt_timer == 0 then
           evnt!true!actor -> Cont(true)
-          [] tic -> Cont(false)
+          [] tic -> evnt!false!actor -> Cont(false)
         else
           tic -> Go(evnt_timer - 1)
     within

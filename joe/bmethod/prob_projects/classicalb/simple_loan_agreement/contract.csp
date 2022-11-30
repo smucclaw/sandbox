@@ -85,7 +85,9 @@ MAIN =
       CNonPreRule(Payment1, pay1, 365),
       CNonPreRule(Payment2, pay2, 365),
       CPreRule(EventOfDefault, event_of_default, 730),
+      -- May notify borrower
       CPreRule(NotifyBorrower, notify_borrower, 3),
+      -- Must notify borrower
       -- NCPreOb(NotifyBorrower, notify_borrower, 3),
       CPreRule(CureDefault, cure_default, 2),
       NCPreOb(PayAccelerated, pay_accelerated, 1)

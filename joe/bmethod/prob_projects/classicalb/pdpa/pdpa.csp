@@ -1,4 +1,13 @@
--- datatype Status = breached | fulfilled
+-- datatype Ord = GT | LT | EQ
+
+-- compare(x, y) =
+--   if x < y then
+--     GT
+--   else if x > y then 
+--     LT
+--   else
+--   EQ
+
 datatype Actor = org | indiv | pdpc
 
 datatype RuleName =
@@ -13,48 +22,73 @@ channel tic
 
 Tic = tic -> Tic
 
--- Unfortunately, currying doesn't work properly but at least nested lambdas do.
-Rule(BreachedOrFulfilled) = \ rule_name, evnt, evnt_timer @
+-- Master process for rules.
+-- This is parameterized over RuleInstance, which is a process containing a
+-- timer mechanism for the related event.
+Rule(RuleInstance) = \ rule_name, evnt, evnt_timer @
   let
-    -- RuleI stands for rule instance.
-    RuleI(actor, evnt_timer) =
-      if evnt_timer < 0 then
-        evnt!false!actor -> BreachedOrFulfilled(false)
-      else
-        evnt!true!actor -> BreachedOrFulfilled(true) []
-        tic -> RuleI(actor, evnt_timer - 1)
-
-    -- Auxiliary helper for recursion.
     -- We ignore the notion of perdurance for now.
     Go =
       tic -> Go []
       trigger_rule!rule_name?actor -> (
-      -- When we interrupt a rule, are we interrupting existing instances, or do
-      -- we also prevent all future instances from being spawned?
-        RuleI(actor, evnt_timer) /\ interrupt_rule!rule_name -> Tic
-      ) -- [| {tic} |] Go
+        -- When we interrupt a rule, are we interrupting existing instances, or do
+        -- we also prevent all future instances from being spawned?
+        (RuleInstance(actor, evnt, evnt_timer) [| {tic} |] Go)
+        /\ interrupt_rule!rule_name -> Go
+      )
   within
     Go
 
--- Non-compensable obligations and prohibitions.
-NonCompensable(WhenDone, WhenTimeout) =
-  Rule(\ is_done @ if is_done then WhenDone else WhenTimeout)
+-- Preemptive achievement instance.
+PreAchvI(Cont) = \ actor, evnt, initial_evnt_timer @ 
+  initial_evnt_timer >= 0 &
+    let
+      Go(evnt_timer) =
+        if evnt_timer < 0 then
+          evnt!false!actor -> Cont(false)
+        else
+          evnt!true!actor -> Cont(true) []
+          tic -> Go(evnt_timer - 1)
+    within
+      Go(initial_evnt_timer)
 
--- We treat Tic ~ Fulfilled and STOP (aka deadlock) ~ Breached
-Ob = NonCompensable(Tic, STOP)
-Prohib = NonCompensable(STOP, Tic)
+-- Non-preemptive achievement instance.
+NonPreAchvI(Cont) = \ actor, evnt, initial_evnt_timer @
+  initial_evnt_timer >= 0 &
+    let
+      Go(evnt_timer) =
+        if evnt_timer == 0 then
+          evnt!true!actor -> Cont(true)
+          [] tic -> Cont(false)
+        else
+          tic -> Go(evnt_timer - 1)
+    within
+      Go(initial_evnt_timer)
 
--- Permissions and compensable obligations and prohibitions.
-Perm = Rule(\ _ @ Tic)
+-- Template for non-compensable preemptive rule.
+NCPreRule(OnDone, OnTimeout) =
+  let
+    Cont(is_done) = if is_done then OnDone else OnTimeout
+  within
+    Rule(PreAchvI(Cont))
+
+-- Non-compensable preemptive achievement obligation.
+NCPreOb = NCPreRule(Tic, STOP)
+
+-- Non-compensable preemptive achievement prohibition.
+NCPreProhib = NCPreRule(STOP, Tic)
+
+-- Compensable, pre-emptive obligations, prohibitions and permissions.
+CPreRule = Rule(PreAchvI(\ _ @ Tic))
 
 MAIN =
   let
     Procs = {
       Tic,
-      Ob(Assessment, assess, 30),
-      Ob(NotifyPdpc, notify_pdpc, 3),
-      Ob(NotifyIndiv, notify_indiv, 3),
-      Perm(ProhibitNotifyIndiv, prohibit_notify_indiv, 5)
+      NCPreOb(Assessment, assess, 30),
+      NCPreOb(NotifyPdpc, notify_pdpc, 3),
+      NCPreOb(NotifyIndiv, notify_indiv, 3),
+      CPreRule(ProhibitNotifyIndiv, prohibit_notify_indiv, 5)
     }
   within
     [| {tic} |] P : Procs @ P

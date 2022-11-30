@@ -70,7 +70,7 @@ EVENTS
       event_guard_defeasible
     THEN
       active_rules := active_rules \ {(Assessment, actor)} ||
-      IF {is_done, is_notifiable} = {TRUE} THEN
+      IF is_done = TRUE & is_notifiable = TRUE THEN
         rules_to_trigger := {NotifyIndiv, NotifyPdpc} * {actor}
       ELSE
         skip

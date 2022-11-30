@@ -10,24 +10,20 @@ DEFINITIONS
     subject_to_interrupts_triggers
 
 SETS
-  // ContractStatus = {breached, fulfilled, in_progress};
-  Actor = {org, indiv, pdpc};
+  Actor = {borrower, lender};
   RuleName = {
-    Assessment, NotifyPdpc, NotifyIndiv, ProhibitNotifyIndiv
+    RequestPrincipal, SendPrincipal,
+    Payment1, Payment2,
+    EventOfDefault, NotifyBorrower, CureDefault,
+    PayAccelerated
   }
 
 CONSTANTS
-  PublicAgency, is_notifiable,
   rule_actors
 
 PROPERTIES
-  // Invoke the global Choice operator to decide if org is a public agency.
-  PublicAgency <: {org} &
-  is_notifiable : BOOL &
-
   rule_actors =
-    {Assessment, NotifyPdpc, NotifyIndiv} * PublicAgency \/
-    {(ProhibitNotifyIndiv, pdpc)}
+    RuleName * {borrower} <+ {SendPrincipal, NotifyBorrower} * {lender}
 
 VARIABLES
   rules_to_trigger, active_rules, rules_to_interrupt
@@ -37,54 +33,120 @@ INVARIANT
   rules_to_interrupt <: dom(active_rules)
 
 INITIALISATION
-  rules_to_trigger := {Assessment} <| rule_actors ||
+  rules_to_trigger := {RequestPrincipal} <| rule_actors ||
   active_rules := {} ||
   rules_to_interrupt := {}
 
 EVENTS
-  assess(is_done, actor) =
+  request_principal(is_done, actor) =
     PRE
       event_guard_defeasible
     THEN
-      active_rules := active_rules \ {(Assessment, actor)} ||
-      IF {is_done, is_notifiable} = {TRUE} THEN
-        rules_to_trigger := {NotifyIndiv, NotifyPdpc} * {actor}
-      ELSE
-        skip
-      END
-    END;
-
-  notify_pdpc(is_done, actor) =
-    PRE
-      event_guard_defeasible
-    THEN
-      active_rules := active_rules \ {(NotifyPdpc, actor)} ||
+      active_rules := active_rules \ {(RequestPrincipal, actor)} ||
       IF is_done = TRUE THEN
-        rules_to_trigger := {ProhibitNotifyIndiv} <| rule_actors
+        rules_to_trigger := rules_to_trigger \/ (
+          {SendPrincipal} <| rule_actors
+        )
       ELSE
         skip
       END
     END;
 
-  notify_indiv(is_done, actor) =
+  send_principal(is_done, actor) =
     PRE
       event_guard_defeasible
     THEN
-      active_rules := active_rules \ {(NotifyIndiv, actor)} ||
+      active_rules := active_rules \ {(SendPrincipal, actor)} ||
+      IF is_done = TRUE THEN
+        rules_to_trigger :=
+          {Payment1, EventOfDefault} <| rule_actors
+      ELSE
+        skip
+      END
+    END;
+
+  pay1(is_done, actor) =
+    PRE
+      event_guard_defeasible
+    THEN
+      active_rules := active_rules \ {(Payment1, actor)} ||
+      LET R BE
+        R = IF is_done = TRUE THEN
+              {Payment2}
+            ELSE
+              {Payment2, NotifyBorrower}
+            END
+      IN
+        rules_to_trigger :=
+          rules_to_trigger \/ (R <| rule_actors)
+      END
+    END;
+
+  pay2(is_done, actor) =
+    PRE
+      event_guard_defeasible
+    THEN
+      active_rules := active_rules \ {(Payment2, actor)} ||
       IF is_done = TRUE THEN
         skip
       ELSE
+        rules_to_trigger :=
+          rules_to_trigger \/ ({NotifyBorrower} <| rule_actors)
+      END
+    END;
+
+  event_of_default(is_done, actor) =
+    PRE
+      event_guard_defeasible
+    THEN
+      active_rules := active_rules \ {(EventOfDefault, actor)} ||
+      rules_to_trigger := {EventOfDefault} <| rule_actors;
+      IF is_done = TRUE THEN
+        rules_to_trigger := rules_to_trigger \/ (
+          {NotifyBorrower} <| rule_actors
+        )
+      ELSE
         skip
       END
     END;
 
-  prohibit_notify_indiv(is_done, actor) =
+  notify_borrower(is_done, actor) =
     PRE
       event_guard_defeasible
     THEN
-      active_rules := active_rules \ {(ProhibitNotifyIndiv, actor)} ||
-      IF is_done = TRUE & NotifyIndiv : dom(active_rules) THEN
-        rules_to_interrupt := rules_to_interrupt \/ {NotifyIndiv}
+      active_rules := active_rules \ {(NotifyBorrower, actor)} ||
+      IF is_done = TRUE THEN
+        rules_to_trigger := rules_to_trigger \/ (
+          {CureDefault} <| rule_actors
+        )
+      ELSE
+        skip
+      END
+    END;
+
+  cure_default(is_done, actor) =
+    PRE
+      event_guard_defeasible
+    THEN
+      active_rules := active_rules \ {(CureDefault, actor)} ||
+      IF is_done = TRUE THEN
+        skip
+      ELSE
+        rules_to_trigger := {PayAccelerated} <| rule_actors ||
+        rules_to_interrupt :=
+          rules_to_interrupt \/ (RuleName \ {PayAccelerated})
+      END
+    END;
+
+  pay_accelerated(is_done, actor) =
+    PRE
+      event_guard_defeasible
+    THEN
+      active_rules := active_rules \ {(PayAccelerated, actor)} ||
+      IF is_done = TRUE THEN
+        rules_to_trigger := rules_to_trigger \/ (
+          {EventOfDefault} <| rule_actors
+        )
       ELSE
         skip
       END

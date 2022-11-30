@@ -1,61 +1,94 @@
-datatype Actor = org | indiv | pdpc
+datatype Actor = borrower | lender
 
 datatype RuleName =
-  Payment1 | Payment2 | EventsOfDefault | NotifyBorrower | CureDefault
-  AcceleratedRepayment
+  RequestPrincipal | SendPrincipal |
+  Payment1 | Payment2 |
+  EventOfDefault | NotifyBorrower | CureDefault |
+  PayAccelerated
 
 channel trigger_rule : RuleName.Actor
 channel interrupt_rule : RuleName
 
-channel pay1, pay2, event_of_default, notify_borrower, cure_default, pay_accelerated : Bool.Actor
+channel request_principal, send_principal, pay1, pay2 : Bool.Actor
+channel event_of_default, notify_borrower, cure_default : Bool.Actor
+channel pay_accelerated : Bool.Actor
 
 channel tic
 
 Tic = tic -> Tic
 
--- Unfortunately, currying doesn't work properly but at least nested lambdas do.
-Rule(BreachedOrFulfilled) = \ is_perdurant, rule_name, evnt, evnt_timer @
+Rule(RuleInstance) = \ rule_name, evnt, evnt_timer @
   let
-    -- RuleI stands for rule instance.
-    RuleI(actor, evnt_timer) =
-      if evnt_timer < 0 then
-        evnt!false!actor -> BreachedOrFulfilled(false)
-      else
-        evnt!true!actor -> BreachedOrFulfilled(true) []
-        tic -> RuleI(actor, evnt_timer - 1)
-
-    -- Auxiliary helper for recursion.
-    -- We ignore the notion of perdurance for now.
     Go =
       tic -> Go []
       trigger_rule!rule_name?actor -> (
-      -- When we interrupt a rule, are we interrupting existing instances, or do
-      -- we also prevent all future instances from being spawned?
-        (RuleI(actor, evnt_timer); if is_perdurant then Go else Tic)
-        /\ interrupt_rule!rule_name -> Tic
-      ) -- [| {tic} |] Go
+        ((RuleInstance(actor, evnt, evnt_timer) ||| trigger_rule!rule_name?actor -> SKIP)
+        /\ interrupt_rule!rule_name -> SKIP)
+        ; Go
+      )
   within
     Go
 
--- Non-compensable obligations and prohibitions.
-NonCompensable(WhenDone, WhenTimeout) =
-  Rule(\ is_done @ if is_done then WhenDone else WhenTimeout)
+-- Preemptive achievement instance.
+PreAchvI(Cont) = \ actor, evnt, initial_evnt_timer @ 
+  initial_evnt_timer >= 0 &
+    let
+      Go(evnt_timer) =
+        if evnt_timer < 0 then
+          evnt!false!actor -> Cont(false)
+        else (
+          evnt!true!actor -> Cont(true) []
+          tic -> Go(evnt_timer - 1)
+        )
+    within
+      Go(initial_evnt_timer)
 
-Ob = NonCompensable(Tic, STOP)
-Prohib = NonCompensable(STOP, Tic)
+-- Non-preemptive achievement instance.
+NonPreAchvI(Cont) = \ actor, evnt, initial_evnt_timer @
+  initial_evnt_timer >= 0 &
+    let
+      Go(evnt_timer) =
+        if evnt_timer == 0 then
+          evnt!true!actor -> Cont(true)
+          [] tic -> evnt!false!actor -> Cont(false)
+        else
+          tic -> Go(evnt_timer - 1)
+    within
+      Go(initial_evnt_timer)
 
--- Permissions and compensable obligations and prohibitions.
-Perm = Rule(\ _ @ Tic)
+-- Template for non-compensable preemptive rule.
+NCPreRule(OnDone, OnTimeout) =
+  let
+    Cont(is_done) = if is_done then OnDone else OnTimeout
+  within
+    Rule(PreAchvI(Cont))
+
+-- Non-compensable preemptive achievement obligation.
+NCPreOb = NCPreRule(Tic, STOP)
+
+-- Non-compensable preemptive achievement prohibition.
+NCPreProhib = NCPreRule(STOP, Tic)
+
+-- Compensable, pre-emptive obligations, prohibitions and permissions.
+CPreRule = Rule(PreAchvI(\ _ @ Tic))
+
+CNonPreRule = Rule(NonPreAchvI(\ _ @ Tic))
 
 MAIN =
   let
     Procs = {
       Tic,
-      Perm(false, Payment1, pay1, 365),
-      Perm(false, Payment2, pay2, 365),
-      Perm(true, EventsOfDefault, event_of_default, 720),
-      Perm(true, NotifyBorrower, notify_borrower, 365),
-
+      CPreRule(RequestPrincipal, request_principal, 1),
+      NCPreOb(SendPrincipal, send_principal, 1),
+      CNonPreRule(Payment1, pay1, 365),
+      CNonPreRule(Payment2, pay2, 365),
+      CPreRule(EventOfDefault, event_of_default, 730),
+      -- May notify borrower
+      CPreRule(NotifyBorrower, notify_borrower, 3),
+      -- Must notify borrower
+      -- NCPreOb(NotifyBorrower, notify_borrower, 3),
+      CPreRule(CureDefault, cure_default, 2),
+      NCPreOb(PayAccelerated, pay_accelerated, 1)
     }
   within
     [| {tic} |] P : Procs @ P

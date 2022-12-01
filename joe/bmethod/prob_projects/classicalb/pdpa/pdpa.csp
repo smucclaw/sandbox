@@ -1,13 +1,3 @@
--- datatype Ord = GT | LT | EQ
-
--- compare(x, y) =
---   if x < y then
---     GT
---   else if x > y then 
---     LT
---   else
---   EQ
-
 datatype Actor = org | indiv | pdpc
 
 datatype RuleName =

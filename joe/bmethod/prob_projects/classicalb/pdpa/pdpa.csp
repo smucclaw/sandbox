@@ -23,63 +23,63 @@ Rule(RuleInstance) = \ rule_name, evnt, evnt_timer @
     Go =
       tic -> Go []
       trigger_rule!rule_name?actor -> (
-        ((RuleInstance(actor, evnt, evnt_timer) ||| Trigger)
-          /\ interrupt_rule!rule_name -> SKIP);
-        Go
+        (RuleInstance(actor, evnt, evnt_timer) ||| Trigger)
+        [| {evnt.true.actor, evnt.false.actor} |> Go
       )
   within
-    Go
+    Go /\ interrupt_rule!rule_name -> SKIP
 
 -- Preemptive achievement instance.
-PreAchvI(Cont) = \ actor, evnt, initial_evnt_timer @ 
+PreAchvI = \ actor, evnt, initial_evnt_timer @ 
   initial_evnt_timer >= 0 &
     let
       Go(evnt_timer) =
         if evnt_timer < 0 then
-          evnt!false!actor -> Cont(false)
+          evnt!false!actor -> SKIP
         else
-          evnt!true!actor -> Cont(true) []
+          evnt!true!actor -> SKIP []
           tic -> Go(evnt_timer - 1)
     within
       Go(initial_evnt_timer)
 
 -- Non-preemptive achievement instance.
-NonPreAchvI(Cont) = \ actor, evnt, initial_evnt_timer @
+NonPreAchvI = \ actor, evnt, initial_evnt_timer @
   initial_evnt_timer >= 0 &
     let
       Go(evnt_timer) =
         if evnt_timer == 0 then
-          evnt!true!actor -> Cont(true)
-          [] tic -> evnt!false!actor -> Cont(false)
+          evnt!true!actor -> SKIP
+          [] tic -> evnt!false!actor -> SKIP
         else
           tic -> Go(evnt_timer - 1)
     within
       Go(initial_evnt_timer)
 
 -- Template for non-compensable preemptive rule.
-NCPreRule(OnDone, OnTimeout) =
-  let
-    Cont(is_done) = if is_done then OnDone else OnTimeout
-  within
-    Rule(PreAchvI(Cont))
+-- NCPreRule(OnDone, OnTimeout) =
+--   let
+--     Cont(is_done) = if is_done then OnDone else OnTimeout
+--   within
+--     Rule(PreAchvI(Cont))
 
 -- Non-compensable preemptive achievement obligation.
-NCPreOb = NCPreRule(Tic, STOP)
+-- NCPreOb = NCPreRule(Tic, STOP)
 
 -- Non-compensable preemptive achievement prohibition.
-NCPreProhib = NCPreRule(STOP, Tic)
+-- NCPreProhib = NCPreRule(STOP, Tic)
 
 -- Compensable, pre-emptive obligations, prohibitions and permissions.
-CPreRule = Rule(PreAchvI(\ _ @ Tic))
+-- CPreRule = Rule(PreAchvI(\ _ @ Tic))
 
-MAIN =
-  let
-    Procs = {
-      Tic,
-      NCPreOb(Assessment, assess, 30),
-      NCPreOb(NotifyPdpc, notify_pdpc, 3),
-      NCPreOb(NotifyIndiv, notify_indiv, 3),
-      CPreRule(ProhibitNotifyIndiv, prohibit_notify_indiv, 5)
-    }
-  within
-    [| {tic} |] P : Procs @ P
+-- Pre-emptive and non-pre-emptive instances.
+PreRule = Rule(PreAchvI)
+NonPreRule = Rule(NonPreAchvI)
+
+Rules = {
+  PreRule(Assessment, assess, 30),
+  PreRule(NotifyPdpc, notify_pdpc, 3),
+  PreRule(NotifyIndiv, notify_indiv, 3),
+  PreRule(ProhibitNotifyIndiv, prohibit_notify_indiv, 5)
+}
+
+MAIN = [| {tic} |] P : union(Rules, {Tic}) @ P

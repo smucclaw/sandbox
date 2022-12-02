@@ -28,6 +28,7 @@ DEFINITIONS
     rules_to_interrupt = {} & rules_to_trigger = {};
 
   event_guard_defeasible ==
+    is_contract_breached = FALSE &
     is_done : BOOL &
     actor : Actor &
     subject_to_interrupts_triggers
@@ -53,13 +54,16 @@ PROPERTIES
     {(ProhibitNotifyIndiv, pdpc)}
 
 VARIABLES
+  is_contract_breached,
   rules_to_trigger, active_rules, rules_to_interrupt
 
 INVARIANT
+  is_contract_breached : BOOL &
   {rules_to_trigger, active_rules} <: POW(rule_actors) &
   rules_to_interrupt <: dom(active_rules)
 
 INITIALISATION
+  is_contract_breached := FALSE ||
   rules_to_trigger := {Assessment} <| rule_actors ||
   active_rules := {} ||
   rules_to_interrupt := {}
@@ -70,10 +74,14 @@ EVENTS
       event_guard_defeasible
     THEN
       active_rules := active_rules \ {(Assessment, actor)} ||
-      IF is_done = TRUE & is_notifiable = TRUE THEN
-        rules_to_trigger := {NotifyIndiv, NotifyPdpc} * {actor}
+      IF is_done = TRUE THEN
+        IF is_notifiable = TRUE THEN
+          rules_to_trigger := {NotifyIndiv, NotifyPdpc} * {actor}
+        ELSE
+          skip
+        END
       ELSE
-        skip
+        is_contract_breached := TRUE
       END
     END;
 
@@ -85,7 +93,7 @@ EVENTS
       IF is_done = TRUE THEN
         rules_to_trigger := {ProhibitNotifyIndiv} <| rule_actors
       ELSE
-        skip
+        is_contract_breached := TRUE
       END
     END;
 
@@ -97,7 +105,7 @@ EVENTS
       IF is_done = TRUE THEN
         skip
       ELSE
-        skip
+        is_contract_breached := TRUE
       END
     END;
 

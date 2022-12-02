@@ -49,7 +49,7 @@
 
 probcli M0.mch -nodead -csp-guide pdpa.csp \
   -ltlformula \
-  "WF(tic) => (((G not deadlock) & F [prohibit_notify_indiv(TRUE, _)]) => G not [notify_indiv(TRUE, _)])" \
+  "WF(tic) => ((G {is_contract_breached = FALSE}) & (F [prohibit_notify_indiv(TRUE, _)]) => G not [notify_indiv(TRUE, _)])" \
   -dot history evidence.dot
 
 dot -Tsvg evidence.dot -o evidence.svg

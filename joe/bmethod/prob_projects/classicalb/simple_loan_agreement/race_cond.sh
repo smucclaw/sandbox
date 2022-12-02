@@ -21,7 +21,7 @@
 # No counter example found for WF(tic) => (((G not deadlock) & (G not [pay_accelerated(TRUE, _)]) & (G not [cure_default(TRUE, _)]) & F [send_principal(TRUE, _)]) => (F [pay1(TRUE, _)] & F [pay2(TRUE, _)])).
 
 probcli M0.mch -csp-guide contract.csp \
-  -ltlformula "WF(tic) => (((G not deadlock) & (G not [pay_accelerated(TRUE, _)]) & (G not [cure_default(TRUE, _)]) & F [send_principal(TRUE, _)]) => (F [pay1(TRUE, _)] & F [pay2(TRUE, _)]))" \
+  -ltlformula "WF(tic) => ((G ({is_contract_breached = FALSE} & not [pay_accelerated(TRUE, _)] & not [cure_default(TRUE, _)]) & F [send_principal(TRUE, _)]) => F [pay1(TRUE, _)] & F [pay2(TRUE, _)])" \
   -dot history evidence.dot
 
 dot -Tsvg evidence.dot -o evidence.svg

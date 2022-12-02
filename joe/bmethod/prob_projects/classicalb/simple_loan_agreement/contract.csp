@@ -24,73 +24,51 @@ Rule(RuleInstance) = \ rule_name, evnt, evnt_timer @
     Go =
       tic -> Go []
       trigger_rule!rule_name?actor -> (
-        ((RuleInstance(actor, evnt, evnt_timer) ||| Trigger)
-          /\ interrupt_rule!rule_name -> SKIP);
-        Go
+        (RuleInstance(actor, evnt, evnt_timer) ||| Trigger)
+        [| {evnt.true.actor, evnt.false.actor} |> Go
       )
   within
-    Go
+    Go /\ interrupt_rule!rule_name -> Go
 
 -- Preemptive achievement instance.
-PreAchvI(Cont) = \ actor, evnt, initial_evnt_timer @ 
+PreAchvI = \ actor, evnt, initial_evnt_timer @ 
   initial_evnt_timer >= 0 &
     let
       Go(evnt_timer) =
         if evnt_timer < 0 then
-          evnt!false!actor -> Cont(false)
+          evnt!false!actor -> SKIP
         else (
-          evnt!true!actor -> Cont(true) []
+          evnt!true!actor -> SKIP []
           tic -> Go(evnt_timer - 1)
         )
     within
       Go(initial_evnt_timer)
 
 -- Non-preemptive achievement instance.
-NonPreAchvI(Cont) = \ actor, evnt, initial_evnt_timer @
+NonPreAchvI = \ actor, evnt, initial_evnt_timer @
   initial_evnt_timer >= 0 &
     let
       Go(evnt_timer) =
         if evnt_timer == 0 then
-          evnt!true!actor -> Cont(true)
-          [] tic -> evnt!false!actor -> Cont(false)
+          evnt!true!actor -> SKIP
+          [] tic -> evnt!false!actor -> SKIP
         else
           tic -> Go(evnt_timer - 1)
     within
       Go(initial_evnt_timer)
 
--- Template for non-compensable preemptive rule.
-NCPreRule(OnDone, OnTimeout) =
-  let
-    Cont(is_done) = if is_done then OnDone else OnTimeout
-  within
-    Rule(PreAchvI(Cont))
+PreRule = Rule(PreAchvI)
+NonPreRule = Rule(NonPreAchvI)
 
--- Non-compensable preemptive achievement obligation.
-NCPreOb = NCPreRule(Tic, STOP)
+Rules = {
+  PreRule(RequestPrincipal, request_principal, 1),
+  NonPreRule(SendPrincipal, send_principal, 1),
+  NonPreRule(Payment1, pay1, 365),
+  NonPreRule(Payment2, pay2, 365),
+  PreRule(EventOfDefault, event_of_default, 710),
+  PreRule(NotifyBorrower, notify_borrower, 3),
+  PreRule(CureDefault, cure_default, 2),
+  PreRule(PayAccelerated, pay_accelerated, 1)
+}
 
--- Non-compensable preemptive achievement prohibition.
-NCPreProhib = NCPreRule(STOP, Tic)
-
--- Compensable, pre-emptive obligations, prohibitions and permissions.
-CPreRule = Rule(PreAchvI(\ _ @ Tic))
-
-CNonPreRule = Rule(NonPreAchvI(\ _ @ Tic))
-
-MAIN =
-  let
-    Procs = {
-      Tic,
-      CPreRule(RequestPrincipal, request_principal, 1),
-      NCPreOb(SendPrincipal, send_principal, 1),
-      CNonPreRule(Payment1, pay1, 365),
-      CNonPreRule(Payment2, pay2, 365),
-      CPreRule(EventOfDefault, event_of_default, 730),
-      -- May notify borrower
-      CPreRule(NotifyBorrower, notify_borrower, 3),
-      -- Must notify borrower
-      -- NCPreOb(NotifyBorrower, notify_borrower, 3),
-      CPreRule(CureDefault, cure_default, 2),
-      NCPreOb(PayAccelerated, pay_accelerated, 1)
-    }
-  within
-    [| {tic} |] P : Procs @ P
+MAIN = [| {tic} |] P : union(Rules, {Tic}) @ P

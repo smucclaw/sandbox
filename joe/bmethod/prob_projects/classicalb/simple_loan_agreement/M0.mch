@@ -2,6 +2,7 @@ SYSTEM M0
 
 DEFINITIONS
   subject_to_interrupts_triggers ==
+    is_contract_breached = FALSE &
     rules_to_interrupt = {} & rules_to_trigger = {};
 
   event_guard_defeasible ==
@@ -27,13 +28,16 @@ PROPERTIES
       {SendPrincipal, NotifyBorrower} * {lender}
 
 VARIABLES
+  is_contract_breached,
   rules_to_trigger, active_rules, rules_to_interrupt
 
 INVARIANT
+  is_contract_breached : BOOL &
   {rules_to_trigger, active_rules} <: POW(rule_actors) &
   rules_to_interrupt <: dom(active_rules)
 
 INITIALISATION
+  is_contract_breached := FALSE ||
   rules_to_trigger := {RequestPrincipal} <| rule_actors ||
   active_rules := {} ||
   rules_to_interrupt := {}
@@ -62,7 +66,7 @@ EVENTS
         rules_to_trigger :=
           {Payment1, EventOfDefault} <| rule_actors
       ELSE
-        skip
+        is_contract_breached := TRUE
       END
     END;
 
@@ -71,15 +75,15 @@ EVENTS
       event_guard_defeasible
     THEN
       active_rules := active_rules \ {(Payment1, actor)} ||
-      LET R BE
-        R = IF is_done = TRUE THEN
-              {Payment2}
-            ELSE
-              {Payment2, NotifyBorrower}
-            END
-      IN
+      rules_to_trigger :=
+        rules_to_trigger \/ (({EventOfDefault} \ dom(active_rules)) <| rule_actors);
+      IF is_done = TRUE THEN
         rules_to_trigger :=
-          rules_to_trigger \/ (R <| rule_actors)
+          rules_to_trigger \/ ({Payment2} <| rule_actors)
+      ELSE
+        rules_to_trigger := rules_to_trigger \/
+          ({Payment2, NotifyBorrower} <| rule_actors) \/
+          ({EventOfDefault} <| rule_actors)
       END
     END;
 
@@ -102,7 +106,7 @@ EVENTS
       event_guard_defeasible
     THEN
       active_rules := active_rules \ {(EventOfDefault, actor)} ||
-      rules_to_trigger := {EventOfDefault} <| rule_actors;
+      // rules_to_trigger := {EventOfDefault} <| rule_actors;
       IF is_done = TRUE THEN
         rules_to_trigger := rules_to_trigger \/ (
           {NotifyBorrower} <| rule_actors
@@ -122,7 +126,9 @@ EVENTS
           {CureDefault} <| rule_actors
         )
       ELSE
+        // is_contract_breached := TRUE
         skip
+        // rules_to_trigger := {(EventOfDefault, borrower)} \ active_rules
       END
     END;
 
@@ -133,6 +139,8 @@ EVENTS
       active_rules := active_rules \ {(CureDefault, actor)} ||
       IF is_done = TRUE THEN
         skip
+        // rules_to_trigger :=
+        //  {EventOfDefault} <| rule_actors
       ELSE
         rules_to_trigger := {PayAccelerated} <| rule_actors ||
         rules_to_interrupt :=
@@ -148,7 +156,7 @@ EVENTS
       IF is_done = TRUE THEN
         skip
       ELSE
-        skip
+        is_contract_breached := TRUE
       END
     END;
 

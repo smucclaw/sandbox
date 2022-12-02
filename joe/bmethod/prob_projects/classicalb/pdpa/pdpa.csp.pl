@@ -23,81 +23,74 @@
 'channel'('notify_indiv','type'('dotTupleType'(['boolType','Actor']))).
 'channel'('prohibit_notify_indiv','type'('dotTupleType'(['boolType','Actor']))).
 'channel'('tic','type'('dotUnitType')).
-'bindval'('Tic','prefix'('src_span'(23,7,23,10,425,3),[],'tic','val_of'('Tic','src_span'(23,14,23,17,432,3)),'src_span'(23,11,23,13,428,10)),'src_span'(23,1,23,17,419,16)).
-'agent'('Rule'(_RuleInstance),'lambda'([_rule_name,_evnt,_evnt_timer],'let'(['bindval'('Trigger','repChoice'(['comprehensionGenerator'(_trigger,'closure'(['dotTuple'(['trigger_rule',_rule_name])]))],'prefix'('src_span'(31,57,31,64,734,7),[],_trigger,'val_of'('Trigger','src_span'(31,68,31,75,745,7)),'src_span'(31,65,31,67,741,18)),'src_span'(31,18,31,56,695,38)),'src_span'(31,5,31,75,682,70)),'bindval'('Go','[]'('prefix'('src_span'(34,7,34,10,769,3),[],'tic','val_of'('Go','src_span'(34,14,34,16,776,2)),'src_span'(34,11,34,13,772,9)),'prefix'('src_span'(35,7,35,19,788,12),['out'(_rule_name),'in'(_actor)],'trigger_rule',';'('/\x5c\'('|||'('agent_call'('src_span'(36,11,36,23,832,12),_RuleInstance,[_actor,_evnt,_evnt_timer]),'val_of'('Trigger','src_span'(36,53,36,60,874,7)),'src_span_operator'('no_loc_info_available','src_span'(36,49,36,52,870,3))),'prefix'('src_span'(37,14,37,28,896,14),['out'(_rule_name)],'interrupt_rule','skip'('src_span'(37,42,37,46,924,4)),'src_span'(37,39,37,41,920,18)),'src_span_operator'('no_loc_info_available','src_span'(37,11,37,13,893,2))),'val_of'('Go','src_span'(38,9,38,11,939,2)),'src_span_operator'('no_loc_info_available','src_span'(37,47,37,48,929,1))),'src_span'(35,36,35,38,816,139)),'src_span_operator'('no_loc_info_available','src_span'(34,17,34,19,779,2))),'src_span'(33,5,39,8,758,191))],'val_of'('Go','src_span'(41,5,41,7,963,2)))),'src_span'(28,22,41,7,605,360)).
-'agent'('PreAchvI'(_Cont),'lambda'([_actor2,_evnt2,_initial_evnt_timer],'&'('>='(_initial_evnt_timer,'int'(0)),'let'(['agent'('Go2'(_evnt_timer2),'ifte'('<'(_evnt_timer2,'int'(0)),'prefix'('src_span'(49,11,49,15,1157,4),['out'('false'),'out'(_actor2)],_evnt2,'agent_call'('src_span'(49,31,49,35,1177,4),_Cont,['false']),'src_span'(49,28,49,30,1173,21)),'[]'('prefix'('src_span'(51,11,51,15,1212,4),['out'('true'),'out'(_actor2)],_evnt2,'agent_call'('src_span'(51,30,51,34,1231,4),_Cont,['true']),'src_span'(51,27,51,29,1227,20)),'prefix'('src_span'(52,11,52,14,1255,3),[],'tic','agent_call'('src_span'(52,18,52,20,1262,2),'Go2',['-'(_evnt_timer2,'int'(1))]),'src_span'(52,15,52,17,1258,25)),'src_span_operator'('no_loc_info_available','src_span'(51,41,51,43,1242,2))),'no_loc_info_available','no_loc_info_available','no_loc_info_available'),'src_span'(48,9,52,36,1124,156))],'agent_call'('src_span'(54,7,54,9,1298,2),'Go2',[_initial_evnt_timer])))),'src_span'(44,18,54,29,1020,300)).
-'agent'('NonPreAchvI'(_Cont2),'lambda'([_actor3,_evnt3,_initial_evnt_timer2],'&'('>='(_initial_evnt_timer2,'int'(0)),'let'(['agent'('Go3'(_evnt_timer3),'ifte'('=='(_evnt_timer3,'int'(0)),'[]'('prefix'('src_span'(62,11,62,15,1519,4),['out'('true'),'out'(_actor3)],_evnt3,'agent_call'('src_span'(62,30,62,34,1538,4),_Cont2,['true']),'src_span'(62,27,62,29,1534,20)),'prefix'('src_span'(63,14,63,17,1562,3),[],'tic','prefix'('src_span'(63,21,63,25,1569,4),['out'('false'),'out'(_actor3)],_evnt3,'agent_call'('src_span'(63,41,63,45,1589,4),_Cont2,['false']),'src_span'(63,38,63,40,1585,21)),'src_span'(63,18,63,20,1565,38)),'src_span_operator'('no_loc_info_available','src_span'(63,11,63,13,1559,2))),'prefix'('src_span'(65,11,65,14,1624,3),[],'tic','agent_call'('src_span'(65,18,65,20,1631,2),'Go3',['-'(_evnt_timer3,'int'(1))]),'src_span'(65,15,65,17,1627,25)),'no_loc_info_available','no_loc_info_available','no_loc_info_available'),'src_span'(61,9,65,36,1485,164))],'agent_call'('src_span'(67,7,67,9,1667,2),'Go3',[_initial_evnt_timer2])))),'src_span'(57,21,67,29,1382,307)).
-'agent'('NCPreRule'(_OnDone,_OnTimeout),'let'(['agent'('Cont3'(_is_done),'ifte'(_is_done,_OnDone,_OnTimeout,'src_span'(72,21,72,31,1797,10),'src_span'(72,32,72,36,1807,19),'src_span'(72,44,72,48,1819,21)),'src_span'(72,21,72,58,1797,37))],'agent_call'('src_span'(74,5,74,9,1848,4),'Rule',['agent_call'('src_span'(74,10,74,18,1853,8),'PreAchvI',['Cont3'])])),'src_span'(71,3,74,25,1773,95)).
-'bindval'('NCPreOb','agent_call'('src_span'(77,11,77,20,1934,9),'NCPreRule',['val_of'('Tic','src_span'(77,21,77,24,1944,3)),'stop'('src_span'(77,26,77,30,1949,4))]),'src_span'(77,1,77,31,1924,30)).
-'bindval'('NCPreProhib','agent_call'('src_span'(80,15,80,24,2025,9),'NCPreRule',['stop'('src_span'(80,25,80,29,2035,4)),'val_of'('Tic','src_span'(80,31,80,34,2041,3))]),'src_span'(80,1,80,35,2011,34)).
-'bindval'('CPreRule','agent_call'('src_span'(83,12,83,16,2129,4),'Rule',['agent_call'('src_span'(83,17,83,25,2134,8),'PreAchvI',['lambda'([_],'val_of'('Tic','src_span'(83,32,83,35,2149,3)))])]),'src_span'(83,1,83,37,2118,36)).
-'bindval'('MAIN','let'(['bindval'('Procs','setExp'('rangeEnum'(['val_of'('Tic','src_span'(88,7,88,10,2189,3)),'agent_call'('src_span'(89,7,89,14,2200,7),'val_of'('NCPreOb','src_span'(89,7,89,14,2200,7)),['Assessment','assess','int'(30)]),'agent_call'('src_span'(90,7,90,14,2239,7),'val_of'('NCPreOb','src_span'(90,7,90,14,2239,7)),['NotifyPdpc','notify_pdpc','int'(3)]),'agent_call'('src_span'(91,7,91,14,2282,7),'val_of'('NCPreOb','src_span'(91,7,91,14,2282,7)),['NotifyIndiv','notify_indiv','int'(3)]),'agent_call'('src_span'(92,7,92,15,2327,8),'val_of'('CPreRule','src_span'(92,7,92,15,2327,8)),['ProhibitNotifyIndiv','prohibit_notify_indiv','int'(5)])])),'src_span'(87,5,93,6,2173,215))],'procRepSharing'('setExp'('rangeEnum'(['tic'])),['comprehensionGenerator'(_P,'val_of'('Procs','src_span'(95,21,95,26,2418,5)))],_P,'src_span'(95,17,95,28,2414,11))),'src_span'(85,1,95,30,2156,271)).
-'comment'('lineComment'('-- datatype Ord = GT | LT | EQ'),'src_position'(1,1,0,30)).
-'comment'('lineComment'('-- compare(x, y) ='),'src_position'(3,1,32,18)).
-'comment'('lineComment'('--   if x < y then'),'src_position'(4,1,51,18)).
-'comment'('lineComment'('--     GT'),'src_position'(5,1,70,9)).
-'comment'('lineComment'('--   else if x > y then '),'src_position'(6,1,80,24)).
-'comment'('lineComment'('--     LT'),'src_position'(7,1,105,9)).
-'comment'('lineComment'('--   else'),'src_position'(8,1,115,9)).
-'comment'('lineComment'('--   EQ'),'src_position'(9,1,125,7)).
-'comment'('lineComment'('-- Master process for rules.'),'src_position'(25,1,437,28)).
-'comment'('lineComment'('-- This is parameterized over RuleInstance, which is a process containing a'),'src_position'(26,1,466,75)).
-'comment'('lineComment'('-- timer mechanism for the related event.'),'src_position'(27,1,542,41)).
-'comment'('lineComment'('-- Soak up aditional triggers.'),'src_position'(30,5,647,30)).
-'comment'('lineComment'('-- Preemptive achievement instance.'),'src_position'(43,1,967,35)).
-'comment'('lineComment'('-- Non-preemptive achievement instance.'),'src_position'(56,1,1322,39)).
-'comment'('lineComment'('-- Template for non-compensable preemptive rule.'),'src_position'(69,1,1691,48)).
-'comment'('lineComment'('-- Non-compensable preemptive achievement obligation.'),'src_position'(76,1,1870,53)).
-'comment'('lineComment'('-- Non-compensable preemptive achievement prohibition.'),'src_position'(79,1,1956,54)).
-'comment'('lineComment'('-- Compensable, pre-emptive obligations, prohibitions and permissions.'),'src_position'(82,1,2047,70)).
-'symbol'('Actor','Actor','src_span'(11,10,11,15,143,5),'Datatype').
-'symbol'('org','org','src_span'(11,18,11,21,151,3),'Constructor of Datatype').
-'symbol'('indiv','indiv','src_span'(11,24,11,29,157,5),'Constructor of Datatype').
-'symbol'('pdpc','pdpc','src_span'(11,32,11,36,165,4),'Constructor of Datatype').
-'symbol'('RuleName','RuleName','src_span'(13,10,13,18,180,8),'Datatype').
-'symbol'('Assessment','Assessment','src_span'(14,3,14,13,193,10),'Constructor of Datatype').
-'symbol'('NotifyPdpc','NotifyPdpc','src_span'(14,16,14,26,206,10),'Constructor of Datatype').
-'symbol'('NotifyIndiv','NotifyIndiv','src_span'(14,29,14,40,219,11),'Constructor of Datatype').
-'symbol'('ProhibitNotifyIndiv','ProhibitNotifyIndiv','src_span'(14,43,14,62,233,19),'Constructor of Datatype').
-'symbol'('trigger_rule','trigger_rule','src_span'(16,9,16,21,262,12),'Channel').
-'symbol'('interrupt_rule','interrupt_rule','src_span'(17,9,17,23,300,14),'Channel').
-'symbol'('assess','assess','src_span'(19,9,19,15,335,6),'Channel').
-'symbol'('notify_pdpc','notify_pdpc','src_span'(19,17,19,28,343,11),'Channel').
-'symbol'('notify_indiv','notify_indiv','src_span'(19,30,19,42,356,12),'Channel').
-'symbol'('prohibit_notify_indiv','prohibit_notify_indiv','src_span'(19,44,19,65,370,21),'Channel').
-'symbol'('tic','tic','src_span'(21,9,21,12,414,3),'Channel').
-'symbol'('Tic','Tic','src_span'(23,1,23,4,419,3),'Ident (Groundrep.)').
-'symbol'('Rule','Rule','src_span'(28,1,28,5,584,4),'Funktion or Process').
-'symbol'('RuleInstance','RuleInstance','src_span'(28,6,28,18,589,12),'Ident (Prolog Variable)').
-'symbol'('rule_name','rule_name','src_span'(28,24,28,33,607,9),'Ident (Prolog Variable)').
-'symbol'('evnt','evnt','src_span'(28,35,28,39,618,4),'Ident (Prolog Variable)').
-'symbol'('evnt_timer','evnt_timer','src_span'(28,41,28,51,624,10),'Ident (Prolog Variable)').
-'symbol'('Trigger','Trigger','src_span'(31,5,31,12,682,7),'Ident (Groundrep.)').
-'symbol'('trigger','trigger','src_span'(31,18,31,25,695,7),'Ident (Prolog Variable)').
-'symbol'('Go','Go','src_span'(33,5,33,7,758,2),'Ident (Groundrep.)').
-'symbol'('actor','actor','src_span'(35,30,35,35,811,5),'Ident (Prolog Variable)').
-'symbol'('PreAchvI','PreAchvI','src_span'(44,1,44,9,1003,8),'Funktion or Process').
-'symbol'('Cont','Cont','src_span'(44,10,44,14,1012,4),'Ident (Prolog Variable)').
-'symbol'('actor2','actor','src_span'(44,20,44,25,1022,5),'Ident (Prolog Variable)').
-'symbol'('evnt2','evnt','src_span'(44,27,44,31,1029,4),'Ident (Prolog Variable)').
-'symbol'('initial_evnt_timer','initial_evnt_timer','src_span'(44,33,44,51,1035,18),'Ident (Prolog Variable)').
-'symbol'('Go2','Go','src_span'(47,7,47,9,1099,2),'Funktion or Process').
-'symbol'('evnt_timer2','evnt_timer','src_span'(47,10,47,20,1102,10),'Ident (Prolog Variable)').
-'symbol'('NonPreAchvI','NonPreAchvI','src_span'(57,1,57,12,1362,11),'Funktion or Process').
-'symbol'('Cont2','Cont','src_span'(57,13,57,17,1374,4),'Ident (Prolog Variable)').
-'symbol'('actor3','actor','src_span'(57,23,57,28,1384,5),'Ident (Prolog Variable)').
-'symbol'('evnt3','evnt','src_span'(57,30,57,34,1391,4),'Ident (Prolog Variable)').
-'symbol'('initial_evnt_timer2','initial_evnt_timer','src_span'(57,36,57,54,1397,18),'Ident (Prolog Variable)').
-'symbol'('Go3','Go','src_span'(60,7,60,9,1460,2),'Funktion or Process').
-'symbol'('evnt_timer3','evnt_timer','src_span'(60,10,60,20,1463,10),'Ident (Prolog Variable)').
-'symbol'('NCPreRule','NCPreRule','src_span'(70,1,70,10,1740,9),'Funktion or Process').
-'symbol'('OnDone','OnDone','src_span'(70,11,70,17,1750,6),'Ident (Prolog Variable)').
-'symbol'('OnTimeout','OnTimeout','src_span'(70,19,70,28,1758,9),'Ident (Prolog Variable)').
-'symbol'('Cont3','Cont','src_span'(72,5,72,9,1781,4),'Funktion or Process').
-'symbol'('is_done','is_done','src_span'(72,10,72,17,1786,7),'Ident (Prolog Variable)').
-'symbol'('NCPreOb','NCPreOb','src_span'(77,1,77,8,1924,7),'Ident (Groundrep.)').
-'symbol'('NCPreProhib','NCPreProhib','src_span'(80,1,80,12,2011,11),'Ident (Groundrep.)').
-'symbol'('CPreRule','CPreRule','src_span'(83,1,83,9,2118,8),'Ident (Groundrep.)').
-'symbol'('MAIN','MAIN','src_span'(85,1,85,5,2156,4),'Ident (Groundrep.)').
-'symbol'('Procs','Procs','src_span'(87,5,87,10,2173,5),'Ident (Groundrep.)').
-'symbol'('P','P','src_span'(95,17,95,18,2414,1),'Ident (Prolog Variable)').
+'bindval'('Tic','prefix'('src_span'(13,7,13,10,291,3),[],'tic','val_of'('Tic','src_span'(13,14,13,17,298,3)),'src_span'(13,11,13,13,294,10)),'src_span'(13,1,13,17,285,16)).
+'agent'('Rule'(_RuleInstance),'lambda'([_rule_name,_evnt,_evnt_timer],'let'(['bindval'('Trigger','repChoice'(['comprehensionGenerator'(_trigger,'closure'(['dotTuple'(['trigger_rule',_rule_name])]))],'prefix'('src_span'(21,57,21,64,600,7),[],_trigger,'val_of'('Trigger','src_span'(21,68,21,75,611,7)),'src_span'(21,65,21,67,607,18)),'src_span'(21,18,21,56,561,38)),'src_span'(21,5,21,75,548,70)),'bindval'('Go','[]'('prefix'('src_span'(24,7,24,10,635,3),[],'tic','val_of'('Go','src_span'(24,14,24,16,642,2)),'src_span'(24,11,24,13,638,9)),'prefix'('src_span'(25,7,25,19,654,12),['out'(_rule_name),'in'(_actor)],'trigger_rule','exception'('setExp'('rangeEnum'(['dotTuple'([_evnt,'true',_actor]),'dotTuple'([_evnt,'false',_actor])])),'|||'('agent_call'('src_span'(26,10,26,22,697,12),_RuleInstance,[_actor,_evnt,_evnt_timer]),'val_of'('Trigger','src_span'(26,52,26,59,739,7)),'src_span_operator'('no_loc_info_available','src_span'(26,48,26,51,735,3))),'val_of'('Go','src_span'(27,51,27,53,798,2)),'src_span'(27,9,27,50,756,41)),'src_span'(25,36,25,38,682,132)),'src_span_operator'('no_loc_info_available','src_span'(24,17,24,19,645,2))),'src_span'(23,5,28,8,624,184))],'/\x5c\'('val_of'('Go','src_span'(30,5,30,7,822,2)),'prefix'('src_span'(30,11,30,25,828,14),['out'(_rule_name)],'interrupt_rule','skip'('src_span'(30,39,30,43,856,4)),'src_span'(30,36,30,38,852,18)),'src_span_operator'('no_loc_info_available','src_span'(30,8,30,10,825,2))))),'src_span'(18,22,30,43,471,389)).
+'bindval'('PreAchvI','lambda'([_actor2,_evnt2,_initial_evnt_timer],'&'('>='(_initial_evnt_timer,'int'(0)),'let'(['agent'('Go2'(_evnt_timer2),'ifte'('<'(_evnt_timer2,'int'(0)),'prefix'('src_span'(38,11,38,15,1046,4),['out'('false'),'out'(_actor2)],_evnt2,'skip'('src_span'(38,31,38,35,1066,4)),'src_span'(38,28,38,30,1062,14)),'[]'('prefix'('src_span'(40,11,40,15,1094,4),['out'('true'),'out'(_actor2)],_evnt2,'skip'('src_span'(40,30,40,34,1113,4)),'src_span'(40,27,40,29,1109,14)),'prefix'('src_span'(41,11,41,14,1131,3),[],'tic','agent_call'('src_span'(41,18,41,20,1138,2),'Go2',['-'(_evnt_timer2,'int'(1))]),'src_span'(41,15,41,17,1134,25)),'src_span_operator'('no_loc_info_available','src_span'(40,35,40,37,1118,2))),'no_loc_info_available','no_loc_info_available','no_loc_info_available'),'src_span'(37,9,41,36,1013,143))],'agent_call'('src_span'(43,7,43,9,1174,2),'Go2',[_initial_evnt_timer])))),'src_span'(33,1,43,29,898,298)).
+'bindval'('NonPreAchvI','lambda'([_actor3,_evnt3,_initial_evnt_timer2],'&'('>='(_initial_evnt_timer2,'int'(0)),'let'(['agent'('Go3'(_evnt_timer3),'ifte'('=='(_evnt_timer3,'int'(0)),'[]'('prefix'('src_span'(51,11,51,15,1389,4),['out'('true'),'out'(_actor3)],_evnt3,'skip'('src_span'(51,30,51,34,1408,4)),'src_span'(51,27,51,29,1404,14)),'prefix'('src_span'(52,14,52,17,1426,3),[],'tic','prefix'('src_span'(52,21,52,25,1433,4),['out'('false'),'out'(_actor3)],_evnt3,'skip'('src_span'(52,41,52,45,1453,4)),'src_span'(52,38,52,40,1449,14)),'src_span'(52,18,52,20,1429,31)),'src_span_operator'('no_loc_info_available','src_span'(52,11,52,13,1423,2))),'prefix'('src_span'(54,11,54,14,1481,3),[],'tic','agent_call'('src_span'(54,18,54,20,1488,2),'Go3',['-'(_evnt_timer3,'int'(1))]),'src_span'(54,15,54,17,1484,25)),'no_loc_info_available','no_loc_info_available','no_loc_info_available'),'src_span'(50,9,54,36,1355,151))],'agent_call'('src_span'(56,7,56,9,1524,2),'Go3',[_initial_evnt_timer2])))),'src_span'(46,1,56,29,1238,308)).
+'bindval'('PreRule','agent_call'('src_span'(75,11,75,15,2093,4),'Rule',['val_of'('PreAchvI','src_span'(75,16,75,24,2098,8))]),'src_span'(75,1,75,25,2083,24)).
+'bindval'('NonPreRule','agent_call'('src_span'(76,14,76,18,2121,4),'Rule',['val_of'('NonPreAchvI','src_span'(76,19,76,30,2126,11))]),'src_span'(76,1,76,31,2108,30)).
+'bindval'('Rules','setExp'('rangeEnum'(['agent_call'('src_span'(79,3,79,10,2152,7),'val_of'('PreRule','src_span'(79,3,79,10,2152,7)),['Assessment','assess','int'(30)]),'agent_call'('src_span'(80,3,80,10,2187,7),'val_of'('PreRule','src_span'(80,3,80,10,2187,7)),['NotifyPdpc','notify_pdpc','int'(3)]),'agent_call'('src_span'(81,3,81,10,2226,7),'val_of'('PreRule','src_span'(81,3,81,10,2226,7)),['NotifyIndiv','notify_indiv','int'(3)]),'agent_call'('src_span'(82,3,82,10,2267,7),'val_of'('PreRule','src_span'(82,3,82,10,2267,7)),['ProhibitNotifyIndiv','prohibit_notify_indiv','int'(5)])])),'src_span'(78,1,83,2,2140,183)).
+'bindval'('MAIN','procRepSharing'('setExp'('rangeEnum'(['tic'])),['comprehensionGenerator'(_P,'agent_call'('src_span'(85,24,85,29,2348,5),'union',['val_of'('Rules','src_span'(85,30,85,35,2354,5)),'setExp'('rangeEnum'(['val_of'('Tic','src_span'(85,38,85,41,2362,3))]))]))],_P,'src_span'(85,20,85,45,2344,25)),'src_span'(85,1,85,47,2325,46)).
+'comment'('lineComment'('-- Master process for rules.'),'src_position'(15,1,303,28)).
+'comment'('lineComment'('-- This is parameterized over RuleInstance, which is a process containing a'),'src_position'(16,1,332,75)).
+'comment'('lineComment'('-- timer mechanism for the related event.'),'src_position'(17,1,408,41)).
+'comment'('lineComment'('-- Soak up aditional triggers.'),'src_position'(20,5,513,30)).
+'comment'('lineComment'('-- Preemptive achievement instance.'),'src_position'(32,1,862,35)).
+'comment'('lineComment'('-- Non-preemptive achievement instance.'),'src_position'(45,1,1198,39)).
+'comment'('lineComment'('-- Template for non-compensable preemptive rule.'),'src_position'(58,1,1548,48)).
+'comment'('lineComment'('-- NCPreRule(OnDone, OnTimeout) ='),'src_position'(59,1,1597,33)).
+'comment'('lineComment'('--   let'),'src_position'(60,1,1631,8)).
+'comment'('lineComment'('--     Cont(is_done) = if is_done then OnDone else OnTimeout'),'src_position'(61,1,1640,60)).
+'comment'('lineComment'('--   within'),'src_position'(62,1,1701,11)).
+'comment'('lineComment'('--     Rule(PreAchvI(Cont))'),'src_position'(63,1,1713,27)).
+'comment'('lineComment'('-- Non-compensable preemptive achievement obligation.'),'src_position'(65,1,1742,53)).
+'comment'('lineComment'('-- NCPreOb = NCPreRule(Tic, STOP)'),'src_position'(66,1,1796,33)).
+'comment'('lineComment'('-- Non-compensable preemptive achievement prohibition.'),'src_position'(68,1,1831,54)).
+'comment'('lineComment'('-- NCPreProhib = NCPreRule(STOP, Tic)'),'src_position'(69,1,1886,37)).
+'comment'('lineComment'('-- Compensable, pre-emptive obligations, prohibitions and permissions.'),'src_position'(71,1,1925,70)).
+'comment'('lineComment'('-- CPreRule = Rule(PreAchvI(\x5c\ _ @ Tic))'),'src_position'(72,1,1996,39)).
+'comment'('lineComment'('-- Pre-emptive and non-pre-emptive instances.'),'src_position'(74,1,2037,45)).
+'symbol'('Actor','Actor','src_span'(1,10,1,15,9,5),'Datatype').
+'symbol'('org','org','src_span'(1,18,1,21,17,3),'Constructor of Datatype').
+'symbol'('indiv','indiv','src_span'(1,24,1,29,23,5),'Constructor of Datatype').
+'symbol'('pdpc','pdpc','src_span'(1,32,1,36,31,4),'Constructor of Datatype').
+'symbol'('RuleName','RuleName','src_span'(3,10,3,18,46,8),'Datatype').
+'symbol'('Assessment','Assessment','src_span'(4,3,4,13,59,10),'Constructor of Datatype').
+'symbol'('NotifyPdpc','NotifyPdpc','src_span'(4,16,4,26,72,10),'Constructor of Datatype').
+'symbol'('NotifyIndiv','NotifyIndiv','src_span'(4,29,4,40,85,11),'Constructor of Datatype').
+'symbol'('ProhibitNotifyIndiv','ProhibitNotifyIndiv','src_span'(4,43,4,62,99,19),'Constructor of Datatype').
+'symbol'('trigger_rule','trigger_rule','src_span'(6,9,6,21,128,12),'Channel').
+'symbol'('interrupt_rule','interrupt_rule','src_span'(7,9,7,23,166,14),'Channel').
+'symbol'('assess','assess','src_span'(9,9,9,15,201,6),'Channel').
+'symbol'('notify_pdpc','notify_pdpc','src_span'(9,17,9,28,209,11),'Channel').
+'symbol'('notify_indiv','notify_indiv','src_span'(9,30,9,42,222,12),'Channel').
+'symbol'('prohibit_notify_indiv','prohibit_notify_indiv','src_span'(9,44,9,65,236,21),'Channel').
+'symbol'('tic','tic','src_span'(11,9,11,12,280,3),'Channel').
+'symbol'('Tic','Tic','src_span'(13,1,13,4,285,3),'Ident (Groundrep.)').
+'symbol'('Rule','Rule','src_span'(18,1,18,5,450,4),'Funktion or Process').
+'symbol'('RuleInstance','RuleInstance','src_span'(18,6,18,18,455,12),'Ident (Prolog Variable)').
+'symbol'('rule_name','rule_name','src_span'(18,24,18,33,473,9),'Ident (Prolog Variable)').
+'symbol'('evnt','evnt','src_span'(18,35,18,39,484,4),'Ident (Prolog Variable)').
+'symbol'('evnt_timer','evnt_timer','src_span'(18,41,18,51,490,10),'Ident (Prolog Variable)').
+'symbol'('Trigger','Trigger','src_span'(21,5,21,12,548,7),'Ident (Groundrep.)').
+'symbol'('trigger','trigger','src_span'(21,18,21,25,561,7),'Ident (Prolog Variable)').
+'symbol'('Go','Go','src_span'(23,5,23,7,624,2),'Ident (Groundrep.)').
+'symbol'('actor','actor','src_span'(25,30,25,35,677,5),'Ident (Prolog Variable)').
+'symbol'('PreAchvI','PreAchvI','src_span'(33,1,33,9,898,8),'Ident (Groundrep.)').
+'symbol'('actor2','actor','src_span'(33,14,33,19,911,5),'Ident (Prolog Variable)').
+'symbol'('evnt2','evnt','src_span'(33,21,33,25,918,4),'Ident (Prolog Variable)').
+'symbol'('initial_evnt_timer','initial_evnt_timer','src_span'(33,27,33,45,924,18),'Ident (Prolog Variable)').
+'symbol'('Go2','Go','src_span'(36,7,36,9,988,2),'Funktion or Process').
+'symbol'('evnt_timer2','evnt_timer','src_span'(36,10,36,20,991,10),'Ident (Prolog Variable)').
+'symbol'('NonPreAchvI','NonPreAchvI','src_span'(46,1,46,12,1238,11),'Ident (Groundrep.)').
+'symbol'('actor3','actor','src_span'(46,17,46,22,1254,5),'Ident (Prolog Variable)').
+'symbol'('evnt3','evnt','src_span'(46,24,46,28,1261,4),'Ident (Prolog Variable)').
+'symbol'('initial_evnt_timer2','initial_evnt_timer','src_span'(46,30,46,48,1267,18),'Ident (Prolog Variable)').
+'symbol'('Go3','Go','src_span'(49,7,49,9,1330,2),'Funktion or Process').
+'symbol'('evnt_timer3','evnt_timer','src_span'(49,10,49,20,1333,10),'Ident (Prolog Variable)').
+'symbol'('PreRule','PreRule','src_span'(75,1,75,8,2083,7),'Ident (Groundrep.)').
+'symbol'('NonPreRule','NonPreRule','src_span'(76,1,76,11,2108,10),'Ident (Groundrep.)').
+'symbol'('Rules','Rules','src_span'(78,1,78,6,2140,5),'Ident (Groundrep.)').
+'symbol'('MAIN','MAIN','src_span'(85,1,85,5,2325,4),'Ident (Groundrep.)').
+'symbol'('P','P','src_span'(85,20,85,21,2344,1),'Ident (Prolog Variable)').
+'symbol'('union','union','src_span'(85,24,85,29,2348,5),'BuiltIn primitive').

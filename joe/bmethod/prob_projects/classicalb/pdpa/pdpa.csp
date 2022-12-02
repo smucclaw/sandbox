@@ -27,7 +27,7 @@ Rule(RuleInstance) = \ rule_name, evnt, evnt_timer @
         [| {evnt.true.actor, evnt.false.actor} |> Go
       )
   within
-    Go /\ interrupt_rule!rule_name -> SKIP
+    Go /\ interrupt_rule!rule_name -> Go
 
 -- Preemptive achievement instance.
 PreAchvI = \ actor, evnt, initial_evnt_timer @ 

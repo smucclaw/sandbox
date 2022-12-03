@@ -1,27 +1,5 @@
-digraph prob_graph { graph [page="8.5, 11",ratio=fill,size="7.5,10"];
- 1 [shape=record, style="bold", color="green", fontsize=12, label="|{breached_by &#8614; dom(active_rules)\n|# states: 1}|"];
- 2 [shape=record, color="green", fontsize=12, label="|{\<\< undefined \>\>\n|# states: 1}|"];
- 8 [shape=record, color="green", fontsize=12, label="|{(&empty;&#8614;&empty;)\n|# states: 1}|"];
- 4 [shape=record, color="blue", fontsize=12, label="|{(&empty;&#8614;\{(NotifyIndiv&#8614;org),(NotifyPdpc&#8614;org)\})\n|# states: 4}|"];
- 5 [shape=record, color="blue", fontsize=12, label="|{(&empty;&#8614;\{(NotifyPdpc&#8614;org)\})\n|# states: 4}|"];
- 9 [shape=record, color="green", fontsize=12, label="|{(\{org\}&#8614;&empty;)\n|# states: 1}|"];
- 7 [shape=record, color="blue", fontsize=12, label="|{(&empty;&#8614;\{(ProhibitNotifyIndiv&#8614;pdpc)\})\n|# states: 6}|"];
- 6 [shape=record, color="blue", fontsize=12, label="|{(&empty;&#8614;\{(NotifyIndiv&#8614;org),(ProhibitNotifyIndiv&#8614;pdpc)\})\n|# states: 10}|"];
- 3 [shape=record, color="blue", fontsize=12, label="|{(&empty;&#8614;\{(Assessment&#8614;org)\})\n|# states: 31}|"];
-
-
- 1 ->  2 [color="black", label="SETUP_CONSTANTS", fontsize=12];
- 2 ->  3 [color="black", label="INITIALISATION", fontsize=12];
- 3 ->  4 [color="black", label="event_happens", fontsize=12];
- 4 ->  5 [color="#806040", label="event_happens", fontsize=12];
- 4 ->  6 [color="#806040", label="event_happens", fontsize=12];
- 5 ->  7 [color="black", label="event_happens", fontsize=12];
- 6 ->  7 [color="black", label="event_happens", fontsize=12];
- 7 ->  8 [color="black", label="event_happens", fontsize=12];
- 4 ->  9 [color="black",style="dashed", label="event_timeout", fontsize=12];
- 5 ->  9 [color="black",style="dashed", label="event_timeout", fontsize=12];
- 6 ->  9 [color="black",style="dashed", label="event_timeout", fontsize=12];
- 7 ->  8 [color="black",style="dashed", label="event_timeout", fontsize=12];
- 3 ->  9 [color="black",style="dashed", label="event_timeout", fontsize=12];
+digraph history {
+graph [nodesep=1.5, ranksep=1.5];
+root [shape=invtriangle, color="#99BF38", fontsize=12, penwidth=2, label="root"];
 
 }

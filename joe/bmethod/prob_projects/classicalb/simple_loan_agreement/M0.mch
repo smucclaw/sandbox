@@ -81,9 +81,9 @@ EVENTS
         rules_to_trigger :=
           rules_to_trigger \/ ({Payment2} <| rule_actors)
       ELSE
-        rules_to_trigger := rules_to_trigger \/
-          ({Payment2, NotifyBorrower} <| rule_actors) \/
-          ({EventOfDefault} <| rule_actors)
+        skip
+        // rules_to_trigger := rules_to_trigger \/
+        //  ({Payment2, NotifyBorrower} <| rule_actors)
       END
     END;
 

@@ -1,8 +1,10 @@
 # export LD_LIBRARY_PATH=../../z3-4.8.14-x64-glibc-2.31/bin
 
-probcli M0.mch -csp-guide pdpa.csp \
+probcli M1.mch \
   -ctlformula "AG true" \
-  -dotexpr transition_diagram "(is_contract_breached, active_rules, rules_to_trigger, rules_to_interrupt)" evidence.dot
+  -disable_timeout \
+  -dot state_space_sfdp evidence.dot
+  # -dotexpr transition_diagram "(is_breached, dom(active_rules))" evidence.dot
 
   # -dot state_space evidence.dot
 

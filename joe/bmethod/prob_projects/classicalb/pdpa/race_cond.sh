@@ -47,9 +47,15 @@
 #
 # Obviously, this fails and we get the expected counter-example.
 
-probcli M0.mch -nodead -csp-guide pdpa.csp \
+probcli M1.mch -nodead \
   -ltlformula \
-  "WF(tic) => ((G {is_contract_breached = FALSE}) & (F [prohibit_notify_indiv(TRUE, _)]) => G not [notify_indiv(TRUE, _)])" \
+  "WF(tic) => ((G {is_breached = FALSE}) & (F [event_happens(prohibit_notify_indiv)]) => G not [event_happens(notify_indiv)])" \
+  -disable_timeout \
   -dot history evidence.dot
+
+# probcli M0.mch -nodead -csp-guide pdpa.csp \
+#   -ltlformula \
+#   "WF(tic) => ((G {is_contract_breached = FALSE}) & (F [prohibit_notify_indiv(TRUE, _)]) => G not [notify_indiv(TRUE, _)])" \
+#   -dot history evidence.dot
 
 dot -Tsvg evidence.dot -o evidence.svg

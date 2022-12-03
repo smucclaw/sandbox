@@ -47,10 +47,11 @@
 #
 # Obviously, this fails and we get the expected counter-example.
 
-probcli M1.mch -nodead \
+probcli PDPA.mch -nodead \
   -ltlformula \
-  "WF(tic) => ((G {is_breached = FALSE}) & (F [event_happens(prohibit_notify_indiv)]) => G not [event_happens(notify_indiv)])" \
-  -disable_timeout \
+  "WF(tic) => ((G {breached_by = {}}) & (F [event_happens(prohibit_notify_indiv, _)]) => G not [event_happens(notify_indiv, _)])" \
+  -p COMPRESSION true \
+  -p OPERATION_REUSE true \
   -dot history evidence.dot
 
 # probcli M0.mch -nodead -csp-guide pdpa.csp \

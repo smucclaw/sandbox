@@ -1,0 +1,4 @@
+WF(tic) => (
+  (G {breached_by = {}}) & (F [event_happens(prohibit_notify_indiv, _)]) =>
+  G not [event_happens(notify_indiv, _)]
+)

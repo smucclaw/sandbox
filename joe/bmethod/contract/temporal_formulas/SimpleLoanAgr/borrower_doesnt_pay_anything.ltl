@@ -1,0 +1,6 @@
+WF(tic) => (
+  (G ({breached_by = {}} & not [event_happens(pay_accelerated, _)] &
+    not [event_happens(cure_default, _)]) &
+  F [event_happens(send_principal, _)]
+  ) => F [event_happens(pay1, _)] & F [event_happens(pay2, _)]
+)

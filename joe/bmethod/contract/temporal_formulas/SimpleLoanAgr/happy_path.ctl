@@ -1,0 +1,1 @@
+EF EX[event_happens(pay1, _)] EF EX[event_happens(pay2, _)] EF EG [tic]

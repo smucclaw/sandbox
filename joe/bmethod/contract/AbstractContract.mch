@@ -58,16 +58,16 @@ PROPERTIES
 
   // Database of rules.
   Rule ⊆ struct(
-    name : RuleName,
-    possible_actors : ℙ(Actor),
-    initial_actors : ℙ(Actor),
-    deontic : Deontic,
-    event : Event,
-    on_done : Effects,
-    on_timeout : Effects
+    name ∈ RuleName,
+    possible_actors ∈ ℙ(Actor),
+    initial_actors ∈ ℙ(Actor),
+    deontic ∈ Deontic,
+    event ∈ Event,
+    on_done ∈ Effects,
+    on_timeout ∈ Effects
   ) ∧
 
-  ∀ rule. (rule : Rule ⇒
+  ∀ rule. (rule ∈ Rule ⇒
     rule'initial_actors ⊆ rule'possible_actors
   )
 
@@ -103,9 +103,9 @@ OPERATIONS
     THEN
       started := TRUE ||
       active_rules := {rule_name, actor, timer_val |
-        ∃ rule. (rule : Rule ∧
+        ∃ rule. (rule ∈ Rule ∧
           rule'name = rule_name ∧
-          actor : rule'initial_actors ∧
+          actor ∈ rule'initial_actors ∩ rule'possible_actors ∧
           rule'event'initial_timer_val = timer_val
         )
       }

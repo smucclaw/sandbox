@@ -89,7 +89,7 @@ PROPERTIES
       event : rec(
         name : pay1,
         is_preemptive : FALSE,
-        initial_timer_val : 365
+        initial_timer_val : 10
       ),
       on_done : rec(
         trigger :
@@ -113,15 +113,13 @@ PROPERTIES
       event : rec(
         name : pay2,
         is_preemptive : FALSE,
-        initial_timer_val : 365
+        initial_timer_val : 10
       ),
       on_done : rec(
         trigger :
           λ actor. (actor : Actor | ∅),
         interrupt :
-          λ actor. (actor : Actor |
-            all_possible_rule_actors(Rule)
-          )
+          λ actor. (actor : Actor | RuleName * Actor)
       ),
       on_timeout : rec(
         trigger :
@@ -139,7 +137,7 @@ PROPERTIES
       event : rec(
         name : event_of_default,
         is_preemptive : TRUE,
-        initial_timer_val : 740
+        initial_timer_val : 25
       ),
       on_done : rec(
         trigger :
@@ -199,9 +197,7 @@ PROPERTIES
         trigger :
           λ actor. (actor ∈ Actor | {(PayAccelerated, actor)}),
         interrupt :
-          λ actor. (actor : Actor |
-            all_possible_rule_actors(Rule)
-          )
+          λ actor. (actor : Actor | RuleName * Actor)
       )
     ),
 

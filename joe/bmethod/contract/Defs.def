@@ -18,8 +18,8 @@ DEFINITIONS
     interrupt ∈ Actor → (RuleName ↔ Actor)
   );
 
-  all_possible_rule_actors(Rule0) ==  {rule_name, actor |
-    ∃ rule. (rule ∈ Rule0 ∧ 
+  all_possible_rule_actors ==  {rule_name, actor |
+    ∃ rule. (rule ∈ Rule ∧ 
       rule'name = rule_name ∧ 
       actor ∈ rule'possible_actors
     )
@@ -54,6 +54,7 @@ DEFINITIONS
         (rule_name, actor0) ∈ rule'on_done'trigger(actor) ∧ 
         ∃ rule. (rule ∈ Rule ∧
           rule'name = rule_name ∧
+          actor0 ∈ rule'possible_actors ∧
           timer_val0 = rule'event'initial_timer_val
         )
       }
@@ -84,6 +85,7 @@ DEFINITIONS
         (rule_name, actor0) ∈ rule'on_timeout'trigger(actor) ∧ 
         ∃ rule. (rule ∈ Rule ∧
           rule'name = rule_name ∧
+          actor0 ∈ rule'possible_actors ∧
           timer_val0 = rule'event'initial_timer_val
         )
       }

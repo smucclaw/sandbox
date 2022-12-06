@@ -14,8 +14,8 @@ out_file_name=${workdir}/${file_name}.state_space
 probcli ../${file_name}.ref -nodead \
   -model_check \
   -p COMPRESSION true \
-  -p OPERATION_REUSE full \
-  -p DOT_ENGINE sfdp \
+  -p OPERATION_REUSE true \
+  -p DOT_ENGINE neato \
   -dotexpr transition_diagram "(breached_by, dom(active_rules), started)" ${out_file_name}.dot
 
   # -dot state_space_sfdp ${out_file_name}.dot

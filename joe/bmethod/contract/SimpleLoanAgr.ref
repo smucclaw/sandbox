@@ -1,6 +1,9 @@
 REFINEMENT SimpleLoanAgr
 REFINES AbstractContract
 
+DEFINITIONS
+  "Defs.def"
+
 CONSTANTS
   // actors
   borrower, lender,
@@ -33,6 +36,7 @@ PROPERTIES
     rec(
       name : RequestPrincipal,
       possible_actors : {borrower},
+      initial_actors : {borrower},
       deontic : COb,
       event : rec(
         name : request_principal
@@ -56,6 +60,7 @@ PROPERTIES
     rec(
       name : SendPrincipal,
       possible_actors : {lender},
+      initial_actors : ∅,
       deontic : NCOb,
       event : rec(
         name : send_principal
@@ -79,6 +84,7 @@ PROPERTIES
     rec(
       name : Payment1,
       possible_actors : {borrower},
+      initial_actors : ∅,
       deontic : COb,
       event : rec(
         name : pay1
@@ -89,13 +95,13 @@ PROPERTIES
       ),
       on_done : rec(
         trigger :
-          λ actor. (actor ∈ Actor | {(Payment2, actor), (EventOfDefault, actor)}),
+          λ actor. (actor ∈ Actor | {(Payment2, actor)}),
         interrupt : ∅
       ),
       on_timeout : rec(
         trigger :
           λ actor. (actor ∈ Actor | {
-            (Payment2, actor), (EventOfDefault, actor),
+            (Payment2, actor),
             (NotifyBorrower, lender)
           }),
         interrupt : ∅
@@ -105,6 +111,7 @@ PROPERTIES
     rec(
       name : Payment2,
       possible_actors : {borrower},
+      initial_actors : ∅,
       deontic : COb,
       event : rec(
         name : pay2
@@ -128,13 +135,14 @@ PROPERTIES
     rec(
       name : EventOfDefault,
       possible_actors : {borrower},
+      initial_actors : ∅,
       deontic : CProhib,
       event : rec(
         name : event_of_default
       ),
       timer : rec(
         is_preemptive : TRUE,
-        initial_val : 365
+        initial_val : 740
       ),
       on_done : rec(
         trigger :
@@ -151,9 +159,10 @@ PROPERTIES
     rec(
       name : NotifyBorrower,
       possible_actors : {lender},
+      initial_actors : ∅,
       deontic : Perm,
       event : rec(
-        name : event_of_default
+        name : notify_borrower
       ),
       timer : rec(
         is_preemptive : TRUE,
@@ -174,6 +183,7 @@ PROPERTIES
     rec(
       name : CureDefault,
       possible_actors : {borrower},
+      initial_actors : ∅,
       deontic : COb,
       event : rec(
         name : cure_default
@@ -197,6 +207,7 @@ PROPERTIES
     rec(
       name : PayAccelerated,
       possible_actors : {borrower},
+      initial_actors : ∅,
       deontic : NCOb,
       event : rec(
         name : pay_accelerated
@@ -219,10 +230,32 @@ PROPERTIES
   }
 
 INITIALISATION
+  started := FALSE ||
   breached_by := ∅ ||
-  active_rules := ∅ ||
-  initial_rules := {
-    (RequestPrincipal, borrower)
-  }
+  active_rules := ∅
 
+OPERATIONS
+  request_principal_happened(actor) = event_happened(request_principal, actor);
+  request_principal_timeout(actor) = event_timeout(request_principal, actor);
+
+  send_principal_happened(actor) = event_happened(send_principal, actor);
+  send_principal_timeout(actor) = event_timeout(send_principal, actor);
+
+  payment1_happened(actor) = event_happened(pay1, actor);
+  payment1_timeout(actor) = event_timeout(pay1, actor);
+
+  payment2_happened(actor) = event_happened(pay2, actor);
+  payment2_timeout(actor) = event_timeout(pay2, actor);
+
+  pay_accelerated_happened(actor) = event_happened(pay_accelerated, actor);
+  pay_accelerated_timeout(actor) = event_timeout(pay_accelerated, actor);
+
+  event_of_default_happened(actor) = event_happened(event_of_default, actor);
+  event_of_default_timeout(actor) = event_timeout(event_of_default, actor);
+
+  notify_borrower_happened(actor) = event_happened(notify_borrower, actor);
+  notify_borrower_timeout(actor) = event_timeout(notify_borrower, actor);
+
+  cure_default_happened(actor) = event_happened(cure_default, actor);
+  cure_default_timeout(actor) = event_timeout(cure_default, actor)
 END

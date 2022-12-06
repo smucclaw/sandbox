@@ -14,7 +14,7 @@ case "${formula_file_name##*.}" in
   (ctl) flag="-ctlformula" ;;
 esac
 
-probcli ../${mch_file_name}.mch -nodead \
+probcli ../${mch_file_name}.ref -nodead \
   -p COMPRESSION true \
   -p OPERATION_REUSE full \
   $flag "$(< ../temporal_formulas/${mch_file_name}/${formula_file_name})" \

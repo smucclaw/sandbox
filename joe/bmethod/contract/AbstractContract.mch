@@ -32,20 +32,7 @@ Interruption of rules by an event corresponds to a reset arc.
 */
 
 DEFINITIONS
-  // For convenience
-  Top == TRUE = TRUE;
-  Bottom == TRUE = FALSE;
-
-  Event == struct(name ∈ EventName);
-
-  Timer == struct(is_preemptive ∈ BOOL, initial_val ∈ ℕ₁);
-
-  Effects == struct(
-    // Multiplicities of the output arcs.
-    trigger ∈ Actor → (RuleName ↔ Actor),
-    // Multiplicities of the reset tarcs.
-    interrupt ∈ ℙ(RuleName)
-  );
+  "Defs.def"
 
 SETS
   Deontic = {
@@ -71,18 +58,23 @@ PROPERTIES
   Rule ⊆ struct(
     name : RuleName,
     possible_actors : ℙ(Actor),
+    initial_actors : ℙ(Actor),
     deontic : Deontic,
     event : Event,
     timer : Timer,
     on_done : Effects,
     on_timeout : Effects
+  ) ∧
+
+  ∀ rule. (rule : Rule ⇒
+    rule'initial_actors ⊆ rule'possible_actors
   )
 
 CONCRETE_VARIABLES
-  initial_rules, breached_by, active_rules
+  started, breached_by, active_rules
 
 INVARIANT
-  initial_rules ∈ RuleName ↔ Actor ∧
+  started : BOOL ∧
   breached_by ∈ ℙ(Actor) ∧
   card(breached_by) ≤ 1 ∧
 
@@ -101,20 +93,20 @@ INVARIANT
   )
 
 INITIALISATION
-  initial_rules := ∅ ||
+  started := FALSE ||
   breached_by := ∅ ||
   active_rules := ∅
 
 OPERATIONS
   start =
     PRE
-      initial_rules ≠ ∅ 
+      started = FALSE
     THEN
-      initial_rules := ∅ ||
+      started := TRUE ||
       active_rules := {rule_name, actor, timer_val |
-        (rule_name, actor) : initial_rules ∧
         ∃ rule. (rule : Rule ∧
           rule'name = rule_name ∧
+          actor : rule'initial_actors ∧
           rule'timer'initial_val = timer_val
         )
       }
@@ -125,7 +117,7 @@ OPERATIONS
     PRE
       // The clock is allowed to tick iff the contract hasn't been breached yet
       // and all timers have a positive value.
-      initial_rules = ∅ ∧
+      started = TRUE ∧
       breached_by = ∅ ∧
       ∀ rule_name, actor, timer_val. (
         (rule_name, actor, timer_val) ∈ active_rules ⇒
@@ -135,80 +127,5 @@ OPERATIONS
       active_rules := {rule_name, actor, timer_val |
         (rule_name, actor, timer_val + 1) ∈ active_rules
       }
-    END;
-
-  /* TODO:
-    Maybe squish event_happens and event_timeout into a single operation since
-    they overlap so much.
-  */
-  event_happens(event_name, actor) =
-    ANY rule, timer_val, triggers, interrupts WHERE
-      breached_by = ∅ ∧
-      // Consume the oldest token.
-      // (active_rules ≠ ∅ ⇒ timer_val = min(ran(active_rules))) ∧
-      rule ∈ Rule ∧
-      (rule'name, actor, timer_val) ∈ active_rules ∧
-      rule'event'name = event_name ∧
-
-      // Disjunction elimination with excluded middle.
-      IF rule'timer'is_preemptive = TRUE THEN
-        timer_val ≥ 0
-      ELSE
-        timer_val = 0
-      END ∧
-
-      interrupts = {rule_name, actor0, timer_val0 |
-        (rule_name, actor0, timer_val0) ∈ active_rules ∧
-        (rule_name ∈ rule'on_done'interrupt)
-      } ∧
-
-      triggers = {rule_name, actor0, timer_val0 |
-        // Here we implicitly invoke the axiom of global choice to discharge the
-        // annoying obligation to prove that the relation is actually a
-        // well-defined function.
-        (rule_name, actor0) ∈ rule'on_done'trigger(actor) ∧ 
-        ∃ rule. (rule ∈ Rule ∧
-          rule'name = rule_name ∧
-          timer_val0 = rule'timer'initial_val
-        )
-      }
-    THEN
-      IF rule'deontic = NCProhib THEN
-        breached_by := {actor} ||
-        active_rules := ∅
-      ELSE
-        active_rules :=
-          ((active_rules \ {(rule'name, actor, timer_val)}) \ interrupts) ∪ triggers
-      END
-    END;
-
-  event_timeout(event_name, actor) =
-    ANY rule, triggers, interrupts WHERE
-      breached_by = ∅ ∧
-      rule ∈ Rule ∧
-      (rule'name, actor, 0) ∈ active_rules ∧
-      rule'event'name = event_name ∧
-
-      interrupts = {rule_name, actor0, timer_val0 |
-        (rule_name, actor0, timer_val0) ∈ active_rules ∧
-        (rule_name ∈ rule'on_timeout'interrupt)
-      } ∧
-
-      triggers = {rule_name, actor0, timer_val0 |
-        (rule_name, actor0) ∈ rule'on_timeout'trigger(actor) ∧ 
-        ∃ rule. (rule ∈ Rule ∧
-          rule'name = rule_name ∧
-          timer_val0 = rule'timer'initial_val
-        )
-      }
-    THEN
-      IF rule'deontic = NCOb THEN
-        breached_by := {actor} ||
-        active_rules := ∅
-      ELSE
-        active_rules :=
-          ((active_rules \ {(rule'name, actor, 0)}) \ interrupts) ∪ triggers
-      END
     END
-
 END

@@ -39,21 +39,21 @@ PROPERTIES
       initial_actors : {borrower},
       deontic : COb,
       event : rec(
-        name : request_principal
-      ),
-      timer : rec(
+        name : request_principal,
         is_preemptive : TRUE,
-        initial_val : 1
+        initial_timer_val : 1
       ),
       on_done : rec(
         trigger :
           λ actor. (actor ∈ Actor | {(SendPrincipal, lender)}),
-        interrupt : ∅
+        interrupt :
+          λ actor. (actor : Actor | ∅)
       ),
       on_timeout : rec(
         trigger :
           λ actor. (actor : Actor | ∅),
-        interrupt : ∅
+        interrupt :
+          λ actor. (actor : Actor | ∅)
       )
     ),
 
@@ -63,21 +63,21 @@ PROPERTIES
       initial_actors : ∅,
       deontic : NCOb,
       event : rec(
-        name : send_principal
-      ),
-      timer : rec(
+        name : send_principal,
         is_preemptive : TRUE,
-        initial_val : 3
+        initial_timer_val : 3
       ),
       on_done : rec(
         trigger :
           λ actor. (actor ∈ Actor | {(Payment1, borrower), (EventOfDefault, borrower)}),
-        interrupt : ∅
+        interrupt :
+          λ actor. (actor ∈ Actor | ∅)
       ),
       on_timeout : rec(
         trigger :
           λ actor. (actor ∈ Actor | ∅),
-        interrupt : ∅
+        interrupt :
+          λ actor. (actor ∈ Actor | ∅)
       )
     ),
 
@@ -87,24 +87,21 @@ PROPERTIES
       initial_actors : ∅,
       deontic : COb,
       event : rec(
-        name : pay1
-      ),
-      timer : rec(
+        name : pay1,
         is_preemptive : FALSE,
-        initial_val : 365
+        initial_timer_val : 365
       ),
       on_done : rec(
         trigger :
           λ actor. (actor ∈ Actor | {(Payment2, actor)}),
-        interrupt : ∅
+        interrupt :
+          λ actor. (actor ∈ Actor | ∅)
       ),
       on_timeout : rec(
         trigger :
-          λ actor. (actor ∈ Actor | {
-            (Payment2, actor),
-            (NotifyBorrower, lender)
-          }),
-        interrupt : ∅
+          λ actor. (actor ∈ Actor | {(Payment2, actor), (NotifyBorrower, lender)}),
+        interrupt :
+          λ actor. (actor ∈ Actor | ∅)
       )
     ),
 
@@ -114,21 +111,23 @@ PROPERTIES
       initial_actors : ∅,
       deontic : COb,
       event : rec(
-        name : pay2
-      ),
-      timer : rec(
+        name : pay2,
         is_preemptive : FALSE,
-        initial_val : 365
+        initial_timer_val : 365
       ),
       on_done : rec(
         trigger :
           λ actor. (actor : Actor | ∅),
-        interrupt : RuleName \ {Payment2}
+        interrupt :
+          λ actor. (actor : Actor |
+            all_possible_rule_actors(Rule)
+          )
       ),
       on_timeout : rec(
         trigger :
           λ actor. (actor ∈ Actor | {(NotifyBorrower, lender)}),
-        interrupt : ∅
+        interrupt :
+          λ actor. (actor : Actor | ∅)
       )
     ),
 
@@ -138,21 +137,21 @@ PROPERTIES
       initial_actors : ∅,
       deontic : CProhib,
       event : rec(
-        name : event_of_default
-      ),
-      timer : rec(
+        name : event_of_default,
         is_preemptive : TRUE,
-        initial_val : 740
+        initial_timer_val : 740
       ),
       on_done : rec(
         trigger :
           λ actor. (actor : Actor | {(NotifyBorrower, lender)}),
-        interrupt : ∅
+        interrupt :
+          λ actor. (actor : Actor | ∅)
       ),
       on_timeout : rec(
         trigger :
-          λ actor. (actor ∈ Actor | ∅),
-        interrupt : ∅
+          λ actor. (actor : Actor | ∅),
+        interrupt :
+          λ actor. (actor : Actor | ∅)
       )
     ),
 
@@ -162,21 +161,21 @@ PROPERTIES
       initial_actors : ∅,
       deontic : Perm,
       event : rec(
-        name : notify_borrower
-      ),
-      timer : rec(
+        name : notify_borrower,
         is_preemptive : TRUE,
-        initial_val : 3
+        initial_timer_val : 3
       ),
       on_done : rec(
         trigger :
           λ actor. (actor : Actor | {(CureDefault, borrower)}),
-        interrupt : ∅
+        interrupt :
+          λ actor. (actor : Actor | ∅)
       ),
       on_timeout : rec(
         trigger :
           λ actor. (actor ∈ Actor | ∅),
-        interrupt : ∅
+        interrupt :
+          λ actor. (actor : Actor | ∅)
       )
     ),
 
@@ -186,21 +185,23 @@ PROPERTIES
       initial_actors : ∅,
       deontic : COb,
       event : rec(
-        name : cure_default
-      ),
-      timer : rec(
+        name : cure_default,
         is_preemptive : TRUE,
-        initial_val : 2
+        initial_timer_val : 2
       ),
       on_done : rec(
         trigger :
           λ actor. (actor : Actor | ∅),
-        interrupt : ∅
+        interrupt :
+          λ actor. (actor : Actor | ∅)
       ),
       on_timeout : rec(
         trigger :
           λ actor. (actor ∈ Actor | {(PayAccelerated, actor)}),
-        interrupt : RuleName \ {CureDefault, PayAccelerated}
+        interrupt :
+          λ actor. (actor : Actor |
+            all_possible_rule_actors(Rule)
+          )
       )
     ),
 
@@ -210,21 +211,21 @@ PROPERTIES
       initial_actors : ∅,
       deontic : NCOb,
       event : rec(
-        name : pay_accelerated
-      ),
-      timer : rec(
+        name : pay_accelerated,
         is_preemptive : TRUE,
-        initial_val : 1
+        initial_timer_val : 1
       ),
       on_done : rec(
         trigger :
           λ actor. (actor : Actor | ∅),
-        interrupt : ∅
+        interrupt : 
+          λ actor. (actor : Actor | ∅)
       ),
       on_timeout : rec(
         trigger :
-        λ actor. (actor ∈ Actor | ∅),
-        interrupt : ∅
+          λ actor. (actor ∈ Actor | ∅),
+        interrupt :
+          λ actor. (actor : Actor | ∅)
       )
     )
   }

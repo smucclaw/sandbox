@@ -15,9 +15,12 @@ probcli ../${file_name}.ref -nodead \
   -model_check \
   -p COMPRESSION true \
   -p OPERATION_REUSE full \
+  -p DOT_ENGINE sfdp \
   -dotexpr transition_diagram "(breached_by, dom(active_rules), started)" ${out_file_name}.dot
-  # -mc_with_lts_sym -p LTSMIN ~/ltsmin-v3.0.2/bin
 
   # -dot state_space_sfdp ${out_file_name}.dot
+
+  # -mc_with_lts_sym -p LTSMIN ~/ltsmin-v3.0.2/bin
+
 
 dot -Tsvg ${out_file_name}.dot -o ${out_file_name}.svg

@@ -46,13 +46,15 @@ SETS
   Actor; RuleName; EventName
 
 CONSTANTS
-  Rule, is_compensable
+  Rule //, is_compensable
 
 PROPERTIES
+  /*
   is_compensable = 
     λ rule. (rule ∈ Rule |
       bool(rule'deontic ∈ {COb, CProhib, Perm})
     ) ∧
+  */
 
   // Database of rules.
   Rule ⊆ struct(
@@ -61,7 +63,6 @@ PROPERTIES
     initial_actors : ℙ(Actor),
     deontic : Deontic,
     event : Event,
-    timer : Timer,
     on_done : Effects,
     on_timeout : Effects
   ) ∧
@@ -80,15 +81,13 @@ INVARIANT
 
   active_rules ∈ RuleName * Actor ↔ ℕ ∧
 
-  // Should we manually apply Choice to invert the quantifiers or just pray the
-  // SMT translation knows how to Skolemnize properly?
   ∀ rule_name, actor, timer_val. (
     (rule_name, actor, timer_val) ∈ active_rules ⇒
     ∃ rule. (rule ∈ Rule ∧
       rule'name = rule_name ∧
       actor ∈ rule'possible_actors ∧
       // This enforces timers to count down and not up.
-      timer_val ≤ rule'timer'initial_val
+      timer_val ≤ rule'event'initial_timer_val
     )
   )
 
@@ -107,7 +106,7 @@ OPERATIONS
         ∃ rule. (rule : Rule ∧
           rule'name = rule_name ∧
           actor : rule'initial_actors ∧
-          rule'timer'initial_val = timer_val
+          rule'event'initial_timer_val = timer_val
         )
       }
     END;

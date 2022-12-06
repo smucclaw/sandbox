@@ -5,16 +5,25 @@ DEFINITIONS
   Top == TRUE = TRUE;
   Bottom == TRUE = FALSE;
 
-  Event == struct(name ∈ EventName);
-
-  Timer == struct(is_preemptive ∈ BOOL, initial_val ∈ ℕ₁);
+  Event == struct(
+    name ∈ EventName,
+    is_preemptive ∈ BOOL,
+    initial_timer_val ∈ ℕ₁
+  );
 
   Effects == struct(
     // Multiplicities of the output arcs.
     trigger ∈ Actor → (RuleName ↔ Actor),
     // Multiplicities of the reset tarcs.
-    interrupt ∈ ℙ(RuleName)
+    interrupt ∈ Actor → (RuleName ↔ Actor)
   );
+
+  all_possible_rule_actors(Rule0) ==  {rule_name, actor |
+    ∃ rule. (rule ∈ Rule0 ∧ 
+      rule'name = rule_name ∧ 
+      actor ∈ rule'possible_actors
+    )
+  };
 
  event_happened(event_name, actor) ==
     ANY rule, timer_val, triggers, interrupts WHERE
@@ -27,7 +36,7 @@ DEFINITIONS
       rule'event'name = event_name ∧
 
       // Disjunction elimination with excluded middle.
-      IF rule'timer'is_preemptive = TRUE THEN
+      IF rule'event'is_preemptive = TRUE THEN
         timer_val ≥ 0
       ELSE
         timer_val = 0
@@ -35,7 +44,7 @@ DEFINITIONS
 
       interrupts = {rule_name, actor0, timer_val0 |
         (rule_name, actor0, timer_val0) ∈ active_rules ∧
-        (rule_name ∈ rule'on_done'interrupt)
+        (rule_name, actor0) ∈ rule'on_done'interrupt(actor)
       } ∧
 
       triggers = {rule_name, actor0, timer_val0 |
@@ -45,7 +54,7 @@ DEFINITIONS
         (rule_name, actor0) ∈ rule'on_done'trigger(actor) ∧ 
         ∃ rule. (rule ∈ Rule ∧
           rule'name = rule_name ∧
-          timer_val0 = rule'timer'initial_val
+          timer_val0 = rule'event'initial_timer_val
         )
       }
     THEN
@@ -68,14 +77,14 @@ DEFINITIONS
 
       interrupts = {rule_name, actor0, timer_val0 |
         (rule_name, actor0, timer_val0) ∈ active_rules ∧
-        (rule_name ∈ rule'on_timeout'interrupt)
+        (rule_name, actor0) ∈ rule'on_timeout'interrupt(actor)
       } ∧
 
       triggers = {rule_name, actor0, timer_val0 |
         (rule_name, actor0) ∈ rule'on_timeout'trigger(actor) ∧ 
         ∃ rule. (rule ∈ Rule ∧
           rule'name = rule_name ∧
-          timer_val0 = rule'timer'initial_val
+          timer_val0 = rule'event'initial_timer_val
         )
       }
     THEN

@@ -1,0 +1,33 @@
+digraph history {
+graph [nodesep=1.5, ranksep=1.5];
+0 [shape=box, color="brown", fontsize=12, penwidth=2, label="Rule = \{rec(deontic:NCOb,event:rec(name:assess),initial_actors:\{org\},name:Assessment,on_done:rec(interrupt:\{\},trigger:\{(org\|-\>\{(NotifyIndiv\|-\>org),(NotifyPdpc\|-\>org)\}),(indiv\|-\>\{(NotifyIndiv\|-\>indiv),(NotifyPdpc\|-\>indiv)\}),(pdpc\|-\>\{(NotifyIndiv\|-\>pdpc),(NotifyPdpc\|-\>pdpc)\})\}),on_timeout:rec(interrupt:\{\},trigger:\{(org\|-\>\{\}),(i...,is_compensable(rec(deontic:NCOb,event:rec(name:assess),initial_actors:\{org\},name...,is_compensable(rec(deontic:NCOb,event:rec(name:notify_indiv),initial_actors:\{\},n...,\nis_compensable(rec(deontic:NCOb,event:rec(name:notify_pdpc),initial_actors:\{\},na...,is_compensable(rec(deontic:NCProhib,event:rec(name:notify_indiv),initial_actors:...,is_compensable(rec(deontic:Perm,event:rec(name:prohibit_notify_indiv),initial_ac..."];
+
+1 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules = \{\},breached_by = \{\},started = FALSE"];
+
+2 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((Assessment\|-\>org)) = 30,breached_by = \{\},started = TRUE"];
+
+3 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((NotifyIndiv\|-\>org)) = 3,active_rules((NotifyPdpc\|-\>org)) = 3,breached_by = \{\},\nstarted = TRUE"];
+
+5 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((NotifyPdpc\|-\>org)) = 3,breached_by = \{\},started = TRUE"];
+
+9 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((ProhibitNotifyIndiv\|-\>pdpc)) = 5,breached_by = \{\},started = TRUE"];
+
+11 [shape=doubleoctagon, color="brown", fontsize=12, penwidth=2, label="active_rules((CannotNotifyIndiv\|-\>org)) = 5,breached_by = \{\},started = TRUE"];
+
+root [shape=invtriangle, color="brown", fontsize=12, penwidth=2, label="root"];
+
+root -> 0 [style = dotted, color = black, label="SETUP_CONSTANTS", fontsize=12];
+
+0 -> 1 [color = "brown", label="INITIALISATION", fontsize=12];
+
+1 -> 2 [color = "brown", label="start", fontsize=12];
+
+2 -> 3 [color = "brown", label="assess_happened(org)", fontsize=12];
+
+3 -> 5 [color = "brown", label="notify_indiv_happened(org)", fontsize=12];
+
+5 -> 9 [color = "brown", label="notify_pdpc_happened(org)", fontsize=12];
+
+9 -> 11 [color = "brown", label="prohibit_notify_indiv_happened(pdpc)", fontsize=12];
+
+}

@@ -1,0 +1,28 @@
+MACHINE Defs
+
+DEFINITIONS
+  Top == TRUE = TRUE;
+  Bottom == TRUE = FALSE;
+
+  Event == struct(
+    name ∈ EventName,
+    is_preemptive ∈ BOOL,
+    initial_timer_val ∈ ℕ₁
+  );
+
+  Rule == struct(
+    name ∈ RuleName,
+    possible_actors ∈ ℙ(Actor),
+    initial_actors ∈ ℙ(Actor),
+    deontic ∈ Deontic,
+    event ∈ Event
+  );
+
+  Effects == struct(
+    // Multiplicities of the output arcs.
+    triggers ∈ Actor → (RuleName ↔ Actor),
+    // Multiplicities of the reset tarcs.
+    discharges ∈ Actor → (RuleName ↔ Actor)
+  );
+
+END

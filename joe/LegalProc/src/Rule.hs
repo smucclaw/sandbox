@@ -1,19 +1,7 @@
--- {-# LANGUAGE ConstraintKinds #-}
--- {-# LANGUAGE DataKinds #-}
--- {-# LANGUAGE DeriveGeneric #-}
--- {-# LANGUAGE FlexibleContexts #-}
--- {-# LANGUAGE FlexibleInstances #-}
--- {-# LANGUAGE GADTs #-}
--- {-# LANGUAGE ImportQualifiedPost #-}
--- {-# LANGUAGE MultiParamTypeClasses #-}
--- {-# LANGUAGE NamedFieldPuns #-}
-{-# LANGUAGE DuplicateRecordFields, OverloadedRecordDot, OverloadedRecordUpdate #-}
--- {-# LANGUAGE RecordWildCards #-}
--- {-# LANGUAGE ScopedTypeVariables #-}
--- {-# LANGUAGE StandaloneDeriving #-}
--- {-# LANGUAGE KindSignatures #-}
--- {-# LANGUAGE UndecidableInstances #-}
-{-# LANGUAGE ViewPatterns #-}
+{-# LANGUAGE
+  DuplicateRecordFields, LambdaCase,
+  OverloadedRecordDot, OverloadedRecordUpdate
+#-}
 
 module Rule where
 
@@ -33,9 +21,9 @@ data Rule :: Type where
       -- B predicate for determining which actors a rule instance can be
       -- attached to.
       posibleActors :: String,
+      initialActors :: String,
       deontic :: Deontic,
       event :: Event,
-      timer :: Timer,
       onDone :: Effects,
       onTimeout :: Effects
     } ->
@@ -76,37 +64,29 @@ data Deontic :: Type where
   deriving (Eq, Generic, Ord, Read, Show)
 
 isCompensable :: Deontic -> Bool
-isCompensable = (`elem` xs)
+isCompensable deon = deon `elem` xs
   where
     xs = [Ob, Prohib, const Perm] <*> [Compensable]
 
 data Event :: Type where
   Event ::
-    { name :: String
+    { name :: String,
+      isPreemptive :: Bool,
+      initialTimerVal :: Int
     } ->
     Event
   deriving (Eq, Generic, Ord, Read, Show)
 
 data Effects :: Type where
   Effects ::
-    { trigger :: String,
-      interrupt :: HS.HashSet String
+    { triggers :: String,
+      discharges :: String
     } ->
     Effects
   deriving (Eq, Generic, Ord, Read, Show)
 
-data Timer :: Type where
-  Timer ::
-    { isPreemptive :: Bool,
-      initialVal :: Int -- Sigma types would have been nice here.
-    } ->
-    Timer
-  deriving (Eq, Generic, Ord, Read, Show)
-
 instance Hashable Compensability
--- instance Hashable CspB
 instance Hashable Deontic
 instance Hashable Event
 instance Hashable Rule
-instance Hashable Timer
 instance Hashable Effects

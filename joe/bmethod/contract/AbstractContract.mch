@@ -32,31 +32,7 @@ Interruption of rules by an event corresponds to a reset arc.
 */
 
 DEFINITIONS
-  Top == TRUE = TRUE;
-  Bottom == TRUE = FALSE;
-
-  Event == struct(
-    name ∈ EventName,
-    is_preemptive ∈ BOOL,
-    initial_timer_val ∈ ℕ₁
-  );
-
-  Rule == struct(
-    name ∈ RuleName,
-    possible_actors ∈ ℙ(Actor),
-    initial_actors ∈ ℙ(Actor),
-    deontic ∈ Deontic,
-    event ∈ Event,
-    on_done ∈ Effects,
-    on_timeout ∈ Effects
-  );
-
-  Effects == struct(
-    // Multiplicities of the output arcs.
-    triggers ∈ Actor → (RuleName ↔ Actor),
-    // Multiplicities of the reset tarcs.
-    discharges ∈ Actor → (RuleName ↔ Actor)
-  );
+  "Defs.def"
 
 SETS
  Deontic = {
@@ -125,55 +101,83 @@ EVENTS
       }
     END;
 
- event(happened_or_timeout, event_name, actor) =
-    LET on_done_timeout BE
-      on_done_timeout =
-        IF happened_or_timeout = happened THEN
-            λ rule. (Top | rule'on_done)
-          ELSE
-            λ rule. (Top | rule'on_timeout)
-          END
-    IN
-      ANY rule, timer_val, triggers, discharges WHERE
-        rule ∈ rules ∧
+  event_happened(event_name, actor) =
+    ANY relevant_rules WHERE
+      breached_by = ∅ ∧
+      relevant_rules ≠ ∅  ∧
+      relevant_rules = {rule |
+        rule : rules &
+        (rule'name, actor) : dom(active_rules) ∧
+        rule'event'name = event_name
+      }
+    THEN
+      IF # rule. (rule : relevant_rules & rule'deontic = NCProhib)
+      THEN
+        breached_by, active_rules := {actor}, ∅
+      ELSE
+        LET to_remove BE
+          to_remove = {rule_name, actor, timer_val |
+            (rule_name, actor, timer_val) : active_rules &
+            # rule. (rule : relevant_rules & rule'name = rule_name &
+              (rule'event'is_preemptive = FALSE => timer_val = 0)
+            )
+          }
+        IN
+          active_rules := active_rules \ to_remove
+        END
+      END
+    END;
+
+  event_timeout(event_name, actor) =
+    ANY relevant_rules WHERE
+      breached_by = ∅ ∧
+      relevant_rules ≠ ∅  ∧
+      relevant_rules = {rule |
+        rule : rules &
+        (rule'name, actor, 0) : active_rules ∧
+        rule'event'name = event_name
+      }
+    THEN
+      IF # rule. (rule : relevant_rules & rule'deontic = NCOb)
+      THEN
+        breached_by, active_rules := {actor}, ∅
+      ELSE
+        LET to_remove BE
+          to_remove = {rule_name, actor, timer_val |
+            # rule. (rule : relevant_rules & rule'name = rule_name)
+          }
+        IN
+          active_rules := active_rules \ to_remove
+        END
+      END
+    END;
+
+    discharge(discharges) =
+      ANY timed_discharges WHERE
         breached_by = ∅ ∧
-        // Consume the oldest token, currently faulty.
-        // (active_rules ≠ ∅ ⇒ timer_val = min(ran(active_rules))) ∧
-        IF rule'event'is_preemptive = FALSE ∨ happened_or_timeout = timeout THEN
-          timer_val = 0
-        ELSE
-          Top
-        END ∧
-        (rule'name, actor, timer_val) ∈ active_rules ∧
-        rule'event'name = event_name ∧
+        discharges : RuleName <-> Actor ∧
+        timed_discharges = {rule_name, actor, timer_val |
+          (rule_name, actor, timer_val) ∈ active_rules ∧
+          (rule_name, actor) ∈ discharges
+        }
+      THEN
+        active_rules := active_rules \ timed_discharges
+      END;
 
-        discharges = {rule_name, actor0, timer_val0 |
-          (rule_name, actor0, timer_val0) ∈ active_rules ∧
-          (rule_name, actor0) ∈ on_done_timeout(rule)'discharges(actor)
-        } ∧
-
-        triggers = {rule_name, actor0, timer_val0 |
-          // Here we implicitly invoke the axiom of global choice to discharge the
-          // annoying obligation to prove that the relation is actually a
-          // well-defined function.
-          (rule_name, actor0) ∈ on_done_timeout(rule)'triggers(actor) ∧ 
+    trigger(triggers) =
+      ANY timed_triggers WHERE
+        breached_by = ∅ ∧
+        triggers : RuleName <-> Actor ∧
+        timed_triggers = {rule_name, actor, timer_val0 |
+          (rule_name, actor) ∈ triggers ∧ 
           ∃ rule. (rule ∈ rules ∧
             rule'name = rule_name ∧
-            actor0 ∈ rule'possible_actors ∧
+            actor ∈ rule'possible_actors ∧
             timer_val0 = rule'event'initial_timer_val
           )
         }
       THEN
-        IF (happened_or_timeout = happened ∧ rule'deontic = NCProhib) ∨
-           (happened_or_timeout = timeout ∧ rule'deontic = NCOb)
-        THEN
-          breached_by := {actor} ||
-          active_rules := ∅
-        ELSE
-          active_rules :=
-            ((active_rules \ {(rule'name, actor, timer_val)}) \ discharges) ∪ triggers
-        END
+        active_rules := active_rules ∪ timed_triggers
       END
-    END
 
 END

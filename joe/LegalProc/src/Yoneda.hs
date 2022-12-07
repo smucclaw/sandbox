@@ -29,10 +29,10 @@ import Data.Monoid (Endo(..))
 import Flow
 
 toCont :: Monoid m => m -> Endo m
-toCont = (<>) .> Endo
+toCont x = (x <>) |> Endo
 
 runCont :: Monoid m => Endo m -> m
-runCont = flip appEndo mempty
+runCont cont = appEndo cont mempty
 
-myConcat :: Monoid a => [a] -> a
-myConcat = fmap toCont .> mconcat .> runCont
+-- myConcat :: Monoid a => [a] -> a
+-- myConcat = fmap toCont .> mconcat .> runCont

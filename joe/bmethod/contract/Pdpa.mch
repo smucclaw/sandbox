@@ -3,6 +3,70 @@ SYSTEM Pdpa
 INCLUDES AbstractContract
 PROMOTES tick
 
+DEFINITIONS
+  "Defs.def";
+  rules0 == {
+    rec(
+      name : Assessment,
+      possible_actors : {org},
+      initial_actors: {org},
+      deontic : NCOb,
+      event : rec(
+        name : assess,
+        is_preemptive : TRUE,
+        initial_timer_val : 30
+      )
+    ),
+
+    rec(
+      name : NotifyIndiv,
+      possible_actors : {org},
+      initial_actors : ∅,
+      deontic : NCOb,
+      event : rec(
+        name : notify_indiv,
+        is_preemptive : TRUE,
+        initial_timer_val : 3
+      )
+    ),
+
+    rec(
+      name : NotifyPdpc,
+      possible_actors : {org},
+      initial_actors : ∅,
+      deontic : NCOb,
+      event : rec(
+        name : notify_pdpc,
+        is_preemptive : TRUE,
+        initial_timer_val : 3
+      )
+    ),
+
+    rec(
+      name : ProhibitNotifyIndiv,
+      possible_actors : {pdpc},
+      initial_actors : ∅,
+      deontic : Perm,
+      event : rec(
+        name : prohibit_notify_indiv,
+        is_preemptive : TRUE,
+        initial_timer_val : 5
+      )
+    ),
+
+    rec(
+      name : CannotNotifyIndiv,
+      possible_actors : {org},
+      initial_actors : ∅,
+      deontic : NCProhib,
+      event : rec(
+        name : notify_indiv,
+        is_preemptive : TRUE,
+        initial_timer_val : 5
+      )
+    )
+  };
+
 CONSTANTS
   // actors
   org, indiv, pdpc,
@@ -30,143 +94,48 @@ PROPERTIES
     assess, notify_pdpc, notify_indiv, prohibit_notify_indiv
   }
 
-DEFINITIONS
-  rules0 == {
-    rec(
-      name : Assessment,
-      possible_actors : {org},
-      initial_actors: {org},
-      deontic : NCOb,
-      event : rec(
-        name : assess,
-        is_preemptive : TRUE,
-        initial_timer_val : 30
-      ),
-      on_done : rec(
-        triggers :
-          λ actor. (actor ∈ Actor | {(NotifyIndiv, actor), (NotifyPdpc, actor)}),
-        discharges :
-          λ actor. (actor ∈ Actor | ∅)
-      ),
-      on_timeout : rec(
-        triggers :
-          λ actor. (actor ∈ Actor | ∅),
-        discharges :
-          λ actor. (actor ∈ Actor | ∅)
-      )
-    ),
-
-    rec(
-      name : NotifyPdpc,
-      possible_actors : {org},
-      initial_actors : ∅,
-      deontic : NCOb,
-      event : rec(
-        name : notify_pdpc,
-        is_preemptive : TRUE,
-        initial_timer_val : 3
-      ),
-      on_done : rec(
-        triggers :
-          λ actor. (actor ∈ Actor | {(ProhibitNotifyIndiv, pdpc)}),
-        discharges :
-          λ actor. (actor ∈ Actor | ∅)
-      ),
-      on_timeout : rec(
-        triggers :
-          λ actor. (actor ∈ Actor | ∅),
-        discharges :
-          λ actor. (actor ∈ Actor | ∅)
-      )
-    ),
-
-    rec(
-      name : NotifyIndiv,
-      possible_actors : {org},
-      initial_actors : ∅,
-      deontic : NCOb,
-      event : rec(
-        name : notify_indiv,
-        is_preemptive : TRUE,
-        initial_timer_val : 3
-      ),
-      on_done : rec(
-        triggers :
-          λ actor. (actor ∈ Actor | ∅),
-        discharges :
-          λ actor. (actor ∈ Actor | ∅)
-      ),
-      on_timeout : rec(
-        triggers :
-          λ actor. (actor ∈ Actor | ∅),
-        discharges :
-          λ actor. (actor ∈ Actor | ∅)
-      )
-    ),
-
-    rec(
-      name : ProhibitNotifyIndiv,
-      possible_actors : {pdpc},
-      initial_actors : ∅,
-      deontic : Perm,
-      event : rec(
-        name : prohibit_notify_indiv,
-        is_preemptive : TRUE,
-        initial_timer_val : 5
-      ),
-      on_done : rec(
-        triggers :
-          λ actor. (actor : Actor | {(CannotNotifyIndiv, org)}),
-        discharges :
-          λ actor. (actor : Actor | {(NotifyIndiv, org)})
-      ),
-      on_timeout : rec(
-        triggers :
-          λ actor. (actor ∈ Actor | ∅),
-        discharges :
-          λ actor. (actor ∈ Actor | ∅)
-      )
-    ),
-
-    rec(
-      name : CannotNotifyIndiv,
-      possible_actors : {org},
-      initial_actors : ∅,
-      deontic : NCProhib,
-      event : rec(
-        name : notify_indiv,
-        is_preemptive : TRUE,
-        initial_timer_val : 5
-      ),
-      on_done : rec(
-        triggers :
-          λ actor. (actor ∈ Actor | ∅),
-        discharges :
-          λ actor. (actor ∈ Actor | {(NotifyIndiv, org)})
-      ),
-      on_timeout : rec(
-        triggers :
-          λ actor. (actor ∈ Actor | ∅),
-        discharges :
-          λ actor. (actor ∈ Actor | ∅)
-      )
-    )
-  }
-
 INITIALISATION
   init(rules0)
 
 EVENTS
-  assess_happened(actor) = event(happened, assess, actor);
-  assess_timeout(actor) = event(timeout, assess, actor);
+  assess_happened(actor) = BEGIN
+    event_happened(assess, actor);
 
-  notify_indiv_happened(actor) = event(happened, notify_indiv, actor);
-  notify_indiv_timeout(actor) = event(timeout, notify_indiv, actor);
+    CHOICE
+      trigger({(NotifyPdpc, actor), (NotifyIndiv, actor)})
+    OR
+      skip
+    END
+  END;
 
-  notify_pdpc_happened(actor) = event(happened, notify_pdpc, actor);
-  notify_pdpc_timeout(actor) = event(timeout, notify_pdpc, actor);
+  assess_timeout(actor) = BEGIN
+    event_timeout(assess, actor)
+  END;
 
-  prohibit_notify_indiv_happened(actor) = event(happened, prohibit_notify_indiv, actor);
-  prohibit_notify_indiv_timeout(actor) = event(timeout, prohibit_notify_indiv, actor)
+  notify_indiv_happened(actor) = BEGIN
+    event_happened(notify_indiv, actor)
+  END;
+
+  notify_indiv_timeout(actor) = BEGIN
+    event_timeout(notify_indiv, actor)
+  END;
+
+  notify_pdpc_happened(actor) = BEGIN
+    event_happened(notify_pdpc, actor);
+    trigger({(ProhibitNotifyIndiv, pdpc)})
+  END;
+
+  notify_pdpc_timeout(actor) = BEGIN
+    event_timeout(notify_pdpc, actor)
+  END;
+
+  prohibit_notify_indiv_happened(actor) = BEGIN
+    event_happened(prohibit_notify_indiv, actor);
+    trigger({(CannotNotifyIndiv, org)})
+  END;
+
+  prohibit_notify_indiv_timeout(actor) = BEGIN
+    event_timeout(prohibit_notify_indiv, actor)
+  END
 
 END

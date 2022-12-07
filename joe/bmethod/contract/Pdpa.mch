@@ -5,11 +5,11 @@ PROMOTES tick
 
 DEFINITIONS
   "Defs.def";
+
   rules0 == {
     rec(
       name : Assessment,
-      possible_actors : {org},
-      initial_actors: {org},
+      possible_actors : {org | is_public_agency(org) = TRUE},
       deontic : NCOb,
       event : rec(
         name : assess,
@@ -21,7 +21,6 @@ DEFINITIONS
     rec(
       name : NotifyIndiv,
       possible_actors : {org},
-      initial_actors : ∅,
       deontic : NCOb,
       event : rec(
         name : notify_indiv,
@@ -33,7 +32,6 @@ DEFINITIONS
     rec(
       name : NotifyPdpc,
       possible_actors : {org},
-      initial_actors : ∅,
       deontic : NCOb,
       event : rec(
         name : notify_pdpc,
@@ -45,7 +43,6 @@ DEFINITIONS
     rec(
       name : ProhibitNotifyIndiv,
       possible_actors : {pdpc},
-      initial_actors : ∅,
       deontic : Perm,
       event : rec(
         name : prohibit_notify_indiv,
@@ -57,7 +54,6 @@ DEFINITIONS
     rec(
       name : CannotNotifyIndiv,
       possible_actors : {org},
-      initial_actors : ∅,
       deontic : NCProhib,
       event : rec(
         name : notify_indiv,
@@ -70,6 +66,7 @@ DEFINITIONS
 CONSTANTS
   // actors
   org, indiv, pdpc,
+  is_public_agency,
   // rule names
   Assessment, NotifyPdpc, NotifyIndiv, ProhibitNotifyIndiv, CannotNotifyIndiv,
   // event names
@@ -92,19 +89,29 @@ PROPERTIES
   card(EventName) = 4 ∧
   EventName = {
     assess, notify_pdpc, notify_indiv, prohibit_notify_indiv
-  }
+  } ∧
+
+  is_public_agency ∈ {org} → BOOL
+
+VARIABLES
+  is_indiv_notified
+
+INVARIANT
+  is_indiv_notified ∈ BOOL
 
 INITIALISATION
-  init(rules0)
+  is_indiv_notified := FALSE ||
+  add_rules(rules0);
+  trigger(TRUE, {(Assessment, org)})
 
 EVENTS
   assess_happened(actor) = BEGIN
     event_happened(assess, actor);
 
-    CHOICE
-      trigger({(NotifyPdpc, actor), (NotifyIndiv, actor)})
-    OR
-      skip
+    VAR is_notifiable IN
+      is_notifiable :∈ BOOL;
+
+      trigger(is_notifiable, {(NotifyPdpc, actor), (NotifyIndiv, actor)})
     END
   END;
 
@@ -113,7 +120,8 @@ EVENTS
   END;
 
   notify_indiv_happened(actor) = BEGIN
-    event_happened(notify_indiv, actor)
+    event_happened(notify_indiv, actor);
+    is_indiv_notified := TRUE
   END;
 
   notify_indiv_timeout(actor) = BEGIN
@@ -122,7 +130,7 @@ EVENTS
 
   notify_pdpc_happened(actor) = BEGIN
     event_happened(notify_pdpc, actor);
-    trigger({(ProhibitNotifyIndiv, pdpc)})
+    trigger(TRUE, {(ProhibitNotifyIndiv, pdpc)})
   END;
 
   notify_pdpc_timeout(actor) = BEGIN
@@ -131,7 +139,8 @@ EVENTS
 
   prohibit_notify_indiv_happened(actor) = BEGIN
     event_happened(prohibit_notify_indiv, actor);
-    trigger({(CannotNotifyIndiv, org)})
+    discharge(TRUE, {(NotifyIndiv, org)});
+    trigger(bool(is_indiv_notified = FALSE), {(CannotNotifyIndiv, org)})
   END;
 
   prohibit_notify_indiv_timeout(actor) = BEGIN

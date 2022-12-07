@@ -68,20 +68,19 @@ INVARIANT
 INITIALISATION
   rules, breached_by, active_rules := ∅, ∅, ∅
 
-EVENTS
-  init(new_rules) =
+OPERATIONS
+  add_rules(rules_to_add) =
     PRE
-      new_rules ⊆ Rule ∧
-      rules = ∅
+      rules_to_add ⊆ Rule
     THEN
-      rules := new_rules ||
-      active_rules := {rule_name, actor, timer_val |
-        ∃ rule. (rule ∈ new_rules ∧
-          rule'name = rule_name ∧
-          actor ∈ rule'initial_actors ∩ rule'possible_actors ∧
-          rule'event'initial_timer_val = timer_val
-        )
-      }
+      rules := rules ∪ rules_to_add
+    END;
+
+  remove_rules(rules_to_remove) =
+    PRE
+      rules_to_remove ⊆ Rule
+    THEN
+      rules := rules \ rules_to_remove
     END;
 
   // Discrete clock tic transition.
@@ -91,8 +90,7 @@ EVENTS
       // and all timers have a positive value.
       rules ≠ ∅ ∧
       breached_by = ∅ ∧
-      ∀ rule_name, actor, timer_val. (
-        (rule_name, actor, timer_val) ∈ active_rules ⇒
+      ∀ timer_val. (timer_val ∈ ran(active_rules) ⇒
         timer_val > 0
       )
     THEN
@@ -106,21 +104,22 @@ EVENTS
       breached_by = ∅ ∧
       relevant_rules ≠ ∅  ∧
       relevant_rules = {rule |
-        rule : rules &
-        (rule'name, actor) : dom(active_rules) ∧
-        rule'event'name = event_name
+        rule ∈ rules ∧
+        ∃ timer_val. (
+          (rule'name, actor, timer_val) ∈ active_rules ∧
+          (rule'event'is_preemptive = FALSE ⇒ timer_val = 0) ∧
+          rule'event'name = event_name
+        )
       }
     THEN
-      IF # rule. (rule : relevant_rules & rule'deontic = NCProhib)
+      IF ∃ rule. (rule ∈ relevant_rules ∧ rule'deontic = NCProhib)
       THEN
         breached_by, active_rules := {actor}, ∅
       ELSE
         LET to_remove BE
           to_remove = {rule_name, actor, timer_val |
-            (rule_name, actor, timer_val) : active_rules &
-            # rule. (rule : relevant_rules & rule'name = rule_name &
-              (rule'event'is_preemptive = FALSE => timer_val = 0)
-            )
+            (rule_name, actor, timer_val) ∈ active_rules ∧
+            ∃ rule. (rule ∈ relevant_rules ∧ rule'name = rule_name)
           }
         IN
           active_rules := active_rules \ to_remove
@@ -133,18 +132,19 @@ EVENTS
       breached_by = ∅ ∧
       relevant_rules ≠ ∅  ∧
       relevant_rules = {rule |
-        rule : rules &
-        (rule'name, actor, 0) : active_rules ∧
+        rule ∈ rules ∧
+        (rule'name, actor, 0) ∈ active_rules ∧
         rule'event'name = event_name
       }
     THEN
-      IF # rule. (rule : relevant_rules & rule'deontic = NCOb)
+      IF ∃ rule. (rule ∈ relevant_rules & rule'deontic = NCOb)
       THEN
         breached_by, active_rules := {actor}, ∅
       ELSE
         LET to_remove BE
           to_remove = {rule_name, actor, timer_val |
-            # rule. (rule : relevant_rules & rule'name = rule_name)
+            timer_val = 0 ∧
+            ∃ rule. (rule ∈ relevant_rules ∧ rule'name = rule_name)
           }
         IN
           active_rules := active_rules \ to_remove
@@ -152,30 +152,40 @@ EVENTS
       END
     END;
 
-    discharge(discharges) =
+    discharge(precond, discharges) =
       ANY timed_discharges WHERE
         breached_by = ∅ ∧
-        discharges : RuleName <-> Actor ∧
-        timed_discharges = {rule_name, actor, timer_val |
-          (rule_name, actor, timer_val) ∈ active_rules ∧
-          (rule_name, actor) ∈ discharges
-        }
+        discharges ∈ RuleName ↔ Actor ∧
+        timed_discharges = IF precond = TRUE
+          THEN
+            {rule_name, actor, timer_val |
+              (rule_name, actor, timer_val) ∈ active_rules ∧
+              (rule_name, actor) ∈ discharges
+            }
+          ELSE
+            ∅
+          END
       THEN
         active_rules := active_rules \ timed_discharges
       END;
 
-    trigger(triggers) =
+    trigger(precond, triggers) =
       ANY timed_triggers WHERE
         breached_by = ∅ ∧
-        triggers : RuleName <-> Actor ∧
-        timed_triggers = {rule_name, actor, timer_val0 |
-          (rule_name, actor) ∈ triggers ∧ 
-          ∃ rule. (rule ∈ rules ∧
-            rule'name = rule_name ∧
-            actor ∈ rule'possible_actors ∧
-            timer_val0 = rule'event'initial_timer_val
-          )
-        }
+        triggers ∈ RuleName ↔ Actor ∧
+        timed_triggers =
+          IF precond = TRUE THEN
+            {rule_name, actor, timer_val0 |
+              (rule_name, actor) ∈ triggers ∧ 
+              ∃ rule. (rule ∈ rules ∧
+                rule'name = rule_name ∧
+                actor ∈ rule'possible_actors ∧
+                timer_val0 = rule'event'initial_timer_val
+              )
+            }
+          ELSE
+            ∅
+          END
       THEN
         active_rules := active_rules ∪ timed_triggers
       END

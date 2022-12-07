@@ -13,16 +13,12 @@ DEFINITIONS
   Rule == struct(
     name ∈ RuleName,
     possible_actors ∈ ℙ(Actor),
-    initial_actors ∈ ℙ(Actor),
     deontic ∈ Deontic,
     event ∈ Event
   );
 
-  Effects == struct(
-    // Multiplicities of the output arcs.
-    triggers ∈ Actor → (RuleName ↔ Actor),
-    // Multiplicities of the reset tarcs.
-    discharges ∈ Actor → (RuleName ↔ Actor)
-  );
+  Option(x) == {None, Some(x)};
+  None == {};
+  Some(x) == {x};
 
 END

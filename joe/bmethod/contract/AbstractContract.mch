@@ -86,13 +86,11 @@ OPERATIONS
   // Discrete clock tic transition.
   tick =
     PRE
-      // The clock is allowed to tick iff the contract hasn't been breached yet
-      // and all timers have a positive value.
+      // The clock is allowed to tick iff the contract has started,
+      // hasn't been breached yet, and all active timers have a positive value.
       rules ≠ ∅ ∧
       breached_by = ∅ ∧
-      ∀ timer_val. (timer_val ∈ ran(active_rules) ⇒
-        timer_val > 0
-      )
+      ran(active_rules) ∈ ℙ(ℕ₁)
     THEN
       active_rules := {rule_name, actor, timer_val |
         (rule_name, actor, timer_val + 1) ∈ active_rules

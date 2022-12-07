@@ -15,6 +15,7 @@ case "${formula_file_name##*.}" in
 esac
 
 probcli ../${mch_file_name}.mch -nodead \
+  -p SMT true \
   -p COMPRESSION true \
   -p OPERATION_REUSE full \
   $flag "$(< ../temporal_formulas/${mch_file_name}/${formula_file_name})" \

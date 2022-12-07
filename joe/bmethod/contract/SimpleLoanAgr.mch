@@ -1,8 +1,7 @@
-REFINEMENT SimpleLoanAgr
-REFINES AbstractContract
+SYSTEM SimpleLoanAgr
 
-DEFINITIONS
-  "Defs.def"
+INCLUDES AbstractContract
+PROMOTES tick
 
 CONSTANTS
   // actors
@@ -30,9 +29,10 @@ PROPERTIES
   EventName = {
     request_principal, send_principal, pay1, pay2, pay_accelerated,
     event_of_default, notify_borrower, cure_default
-  } ∧
+  }
 
-  Rule = {
+DEFINITIONS
+  rules0 == {
     rec(
       name : RequestPrincipal,
       possible_actors : {borrower},
@@ -44,15 +44,15 @@ PROPERTIES
         initial_timer_val : 1
       ),
       on_done : rec(
-        trigger :
+        triggers :
           λ actor. (actor ∈ Actor | {(SendPrincipal, lender)}),
-        interrupt :
+        discharges :
           λ actor. (actor : Actor | ∅)
       ),
       on_timeout : rec(
-        trigger :
+        triggers :
           λ actor. (actor : Actor | ∅),
-        interrupt :
+        discharges :
           λ actor. (actor : Actor | ∅)
       )
     ),
@@ -68,15 +68,15 @@ PROPERTIES
         initial_timer_val : 3
       ),
       on_done : rec(
-        trigger :
+        triggers :
           λ actor. (actor ∈ Actor | {(Payment1, borrower), (EventOfDefault, borrower)}),
-        interrupt :
+        discharges :
           λ actor. (actor ∈ Actor | ∅)
       ),
       on_timeout : rec(
-        trigger :
+        triggers :
           λ actor. (actor ∈ Actor | ∅),
-        interrupt :
+        discharges :
           λ actor. (actor ∈ Actor | ∅)
       )
     ),
@@ -92,15 +92,15 @@ PROPERTIES
         initial_timer_val : 10
       ),
       on_done : rec(
-        trigger :
+        triggers :
           λ actor. (actor ∈ Actor | {(Payment2, actor)}),
-        interrupt :
+        discharges :
           λ actor. (actor ∈ Actor | ∅)
       ),
       on_timeout : rec(
-        trigger :
+        triggers :
           λ actor. (actor ∈ Actor | {(Payment2, actor), (NotifyBorrower, lender)}),
-        interrupt :
+        discharges :
           λ actor. (actor ∈ Actor | ∅)
       )
     ),
@@ -116,15 +116,15 @@ PROPERTIES
         initial_timer_val : 10
       ),
       on_done : rec(
-        trigger :
+        triggers :
           λ actor. (actor : Actor | ∅),
-        interrupt :
+        discharges :
           λ actor. (actor : Actor | RuleName * Actor)
       ),
       on_timeout : rec(
-        trigger :
+        triggers :
           λ actor. (actor ∈ Actor | {(NotifyBorrower, lender)}),
-        interrupt :
+        discharges :
           λ actor. (actor : Actor | ∅)
       )
     ),
@@ -140,15 +140,15 @@ PROPERTIES
         initial_timer_val : 25
       ),
       on_done : rec(
-        trigger :
+        triggers :
           λ actor. (actor : Actor | {(NotifyBorrower, lender)}),
-        interrupt :
+        discharges :
           λ actor. (actor : Actor | ∅)
       ),
       on_timeout : rec(
-        trigger :
+        triggers :
           λ actor. (actor : Actor | ∅),
-        interrupt :
+        discharges :
           λ actor. (actor : Actor | ∅)
       )
     ),
@@ -164,15 +164,15 @@ PROPERTIES
         initial_timer_val : 3
       ),
       on_done : rec(
-        trigger :
+        triggers :
           λ actor. (actor : Actor | {(CureDefault, borrower)}),
-        interrupt :
+        discharges :
           λ actor. (actor : Actor | ∅)
       ),
       on_timeout : rec(
-        trigger :
+        triggers :
           λ actor. (actor ∈ Actor | ∅),
-        interrupt :
+        discharges :
           λ actor. (actor : Actor | ∅)
       )
     ),
@@ -188,15 +188,15 @@ PROPERTIES
         initial_timer_val : 2
       ),
       on_done : rec(
-        trigger :
+        triggers :
           λ actor. (actor : Actor | ∅),
-        interrupt :
+        discharges :
           λ actor. (actor : Actor | ∅)
       ),
       on_timeout : rec(
-        trigger :
+        triggers :
           λ actor. (actor ∈ Actor | {(PayAccelerated, actor)}),
-        interrupt :
+        discharges :
           λ actor. (actor : Actor | RuleName * Actor)
       )
     ),
@@ -212,47 +212,46 @@ PROPERTIES
         initial_timer_val : 1
       ),
       on_done : rec(
-        trigger :
+        triggers :
           λ actor. (actor : Actor | ∅),
-        interrupt : 
+        discharges : 
           λ actor. (actor : Actor | ∅)
       ),
       on_timeout : rec(
-        trigger :
+        triggers :
           λ actor. (actor ∈ Actor | ∅),
-        interrupt :
+        discharges :
           λ actor. (actor : Actor | ∅)
       )
     )
   }
 
 INITIALISATION
-  started := FALSE ||
-  breached_by := ∅ ||
-  active_rules := ∅
+  init(rules0)
 
-OPERATIONS
-  request_principal_happened(actor) = event_happened(request_principal, actor);
-  request_principal_timeout(actor) = event_timeout(request_principal, actor);
+EVENTS
+  request_principal_happened(actor) = event(happened, request_principal, actor);
+  request_principal_timeout(actor) = event(timeout, request_principal, actor);
 
-  send_principal_happened(actor) = event_happened(send_principal, actor);
-  send_principal_timeout(actor) = event_timeout(send_principal, actor);
+  send_principal_happened(actor) = event(happened, send_principal, actor);
+  send_principal_timeout(actor) = event(timeout, send_principal, actor);
 
-  payment1_happened(actor) = event_happened(pay1, actor);
-  payment1_timeout(actor) = event_timeout(pay1, actor);
+  payment1_happened(actor) = event(happened, pay1, actor);
+  payment1_timeout(actor) = event(timeout, pay1, actor);
 
-  payment2_happened(actor) = event_happened(pay2, actor);
-  payment2_timeout(actor) = event_timeout(pay2, actor);
+  payment2_happened(actor) = event(happened, pay2, actor);
+  payment2_timeout(actor) = event(timeout, pay2, actor);
 
-  pay_accelerated_happened(actor) = event_happened(pay_accelerated, actor);
-  pay_accelerated_timeout(actor) = event_timeout(pay_accelerated, actor);
+  pay_accelerated_happened(actor) = event(happened, pay_accelerated, actor);
+  pay_accelerated_timeout(actor) = event(timeout, pay_accelerated, actor);
 
-  event_of_default_happened(actor) = event_happened(event_of_default, actor);
-  event_of_default_timeout(actor) = event_timeout(event_of_default, actor);
+  event_of_default_happened(actor) = event(happened, event_of_default, actor);
+  event_of_default_timeout(actor) = event(timeout, event_of_default, actor);
 
-  notify_borrower_happened(actor) = event_happened(notify_borrower, actor);
-  notify_borrower_timeout(actor) = event_timeout(notify_borrower, actor);
+  notify_borrower_happened(actor) = event(happened, notify_borrower, actor);
+  notify_borrower_timeout(actor) = event(timeout, notify_borrower, actor);
 
-  cure_default_happened(actor) = event_happened(cure_default, actor);
-  cure_default_timeout(actor) = event_timeout(cure_default, actor)
+  cure_default_happened(actor) = event(happened, cure_default, actor);
+  cure_default_timeout(actor) = event(timeout, cure_default, actor)
+
 END

@@ -1,5 +1,7 @@
-REFINEMENT Pdpa
-REFINES AbstractContract
+SYSTEM Pdpa
+
+INCLUDES AbstractContract
+PROMOTES tick
 
 CONSTANTS
   // actors
@@ -8,9 +10,6 @@ CONSTANTS
   Assessment, NotifyPdpc, NotifyIndiv, ProhibitNotifyIndiv, CannotNotifyIndiv,
   // event names
   assess, notify_pdpc, notify_indiv, prohibit_notify_indiv
-
-DEFINITIONS
-  "Defs.def"
 
 PROPERTIES
   /*
@@ -29,9 +28,10 @@ PROPERTIES
   card(EventName) = 4 ∧
   EventName = {
     assess, notify_pdpc, notify_indiv, prohibit_notify_indiv
-  } ∧
+  }
 
-  Rule = {
+DEFINITIONS
+  rules0 == {
     rec(
       name : Assessment,
       possible_actors : {org},
@@ -43,15 +43,15 @@ PROPERTIES
         initial_timer_val : 30
       ),
       on_done : rec(
-        trigger :
+        triggers :
           λ actor. (actor ∈ Actor | {(NotifyIndiv, actor), (NotifyPdpc, actor)}),
-        interrupt :
+        discharges :
           λ actor. (actor ∈ Actor | ∅)
       ),
       on_timeout : rec(
-        trigger :
+        triggers :
           λ actor. (actor ∈ Actor | ∅),
-        interrupt :
+        discharges :
           λ actor. (actor ∈ Actor | ∅)
       )
     ),
@@ -67,15 +67,15 @@ PROPERTIES
         initial_timer_val : 3
       ),
       on_done : rec(
-        trigger :
+        triggers :
           λ actor. (actor ∈ Actor | {(ProhibitNotifyIndiv, pdpc)}),
-        interrupt :
+        discharges :
           λ actor. (actor ∈ Actor | ∅)
       ),
       on_timeout : rec(
-        trigger :
+        triggers :
           λ actor. (actor ∈ Actor | ∅),
-        interrupt :
+        discharges :
           λ actor. (actor ∈ Actor | ∅)
       )
     ),
@@ -91,15 +91,15 @@ PROPERTIES
         initial_timer_val : 3
       ),
       on_done : rec(
-        trigger :
+        triggers :
           λ actor. (actor ∈ Actor | ∅),
-        interrupt :
+        discharges :
           λ actor. (actor ∈ Actor | ∅)
       ),
       on_timeout : rec(
-        trigger :
+        triggers :
           λ actor. (actor ∈ Actor | ∅),
-        interrupt :
+        discharges :
           λ actor. (actor ∈ Actor | ∅)
       )
     ),
@@ -115,15 +115,15 @@ PROPERTIES
         initial_timer_val : 5
       ),
       on_done : rec(
-        trigger :
+        triggers :
           λ actor. (actor : Actor | {(CannotNotifyIndiv, org)}),
-        interrupt :
+        discharges :
           λ actor. (actor : Actor | {(NotifyIndiv, org)})
       ),
       on_timeout : rec(
-        trigger :
+        triggers :
           λ actor. (actor ∈ Actor | ∅),
-        interrupt :
+        discharges :
           λ actor. (actor ∈ Actor | ∅)
       )
     ),
@@ -139,36 +139,34 @@ PROPERTIES
         initial_timer_val : 5
       ),
       on_done : rec(
-        trigger :
+        triggers :
           λ actor. (actor ∈ Actor | ∅),
-        interrupt :
+        discharges :
           λ actor. (actor ∈ Actor | {(NotifyIndiv, org)})
       ),
       on_timeout : rec(
-        trigger :
+        triggers :
           λ actor. (actor ∈ Actor | ∅),
-        interrupt :
+        discharges :
           λ actor. (actor ∈ Actor | ∅)
       )
     )
   }
 
 INITIALISATION
-  started := FALSE ||
-  breached_by := ∅ ||
-  active_rules := ∅
+  init(rules0)
 
-OPERATIONS
-  assess_happened(actor) = event_happened(assess, actor);
-  assess_timeout(actor) = event_timeout(assess, actor);
+EVENTS
+  assess_happened(actor) = event(happened, assess, actor);
+  assess_timeout(actor) = event(timeout, assess, actor);
 
-  notify_indiv_happened(actor) = event_happened(notify_indiv, actor);
-  notify_indiv_timeout(actor) = event_timeout(notify_indiv, actor);
+  notify_indiv_happened(actor) = event(happened, notify_indiv, actor);
+  notify_indiv_timeout(actor) = event(timeout, notify_indiv, actor);
 
-  notify_pdpc_happened(actor) = event_happened(notify_pdpc, actor);
-  notify_pdpc_timeout(actor) = event_timeout(notify_pdpc, actor);
+  notify_pdpc_happened(actor) = event(happened, notify_pdpc, actor);
+  notify_pdpc_timeout(actor) = event(timeout, notify_pdpc, actor);
 
-  prohibit_notify_indiv_happened(actor) = event_happened(prohibit_notify_indiv, actor);
-  prohibit_notify_indiv_timeout(actor) = event_timeout(prohibit_notify_indiv, actor)
+  prohibit_notify_indiv_happened(actor) = event(happened, prohibit_notify_indiv, actor);
+  prohibit_notify_indiv_timeout(actor) = event(timeout, prohibit_notify_indiv, actor)
 
 END

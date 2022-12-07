@@ -32,32 +32,16 @@ Interruption of rules by an event corresponds to a reset arc.
 */
 
 DEFINITIONS
-  "Defs.def"
+  Top == TRUE = TRUE;
+  Bottom == TRUE = FALSE;
 
-SETS
-  Deontic = {
-    COb, // Compensable obligation
-    NCOb, // Non-compensable obligation
-    CProhib, // Compensable prohibition
-    NCProhib, // Non-compensable prohibition
-    Perm // Permission
-  };
+  Event == struct(
+    name ∈ EventName,
+    is_preemptive ∈ BOOL,
+    initial_timer_val ∈ ℕ₁
+  );
 
-  Actor; RuleName; EventName
-
-CONSTANTS
-  Rule //, is_compensable
-
-PROPERTIES
-  /*
-  is_compensable = 
-    λ rule. (rule ∈ Rule |
-      bool(rule'deontic ∈ {COb, CProhib, Perm})
-    ) ∧
-  */
-
-  // Database of rules.
-  Rule ⊆ struct(
+  Rule == struct(
     name ∈ RuleName,
     possible_actors ∈ ℙ(Actor),
     initial_actors ∈ ℙ(Actor),
@@ -65,25 +49,39 @@ PROPERTIES
     event ∈ Event,
     on_done ∈ Effects,
     on_timeout ∈ Effects
-  ) ∧
+  );
 
-  ∀ rule. (rule ∈ Rule ⇒
-    rule'initial_actors ⊆ rule'possible_actors
-  )
+  Effects == struct(
+    // Multiplicities of the output arcs.
+    triggers ∈ Actor → (RuleName ↔ Actor),
+    // Multiplicities of the reset tarcs.
+    discharges ∈ Actor → (RuleName ↔ Actor)
+  );
 
-CONCRETE_VARIABLES
-  started, breached_by, active_rules
+SETS
+ Deontic = {
+    COb, // Compensable obligation
+    NCOb, // Non-compensable obligation
+    CProhib, // Compensable prohibition
+    NCProhib, // Non-compensable prohibition
+    Perm // Permission
+  };
+
+  HappenedTimeout = {happened, timeout};
+
+  Actor; RuleName; EventName
+
+VARIABLES
+  rules, breached_by, active_rules
 
 INVARIANT
-  started : BOOL ∧
-  breached_by ∈ ℙ(Actor) ∧
-  card(breached_by) ≤ 1 ∧
+  rules ⊆ Rule ∧
+  breached_by ∈ ℙ(Actor) ∧ card(breached_by) ≤ 1 ∧
 
   active_rules ∈ RuleName * Actor ↔ ℕ ∧
-
   ∀ rule_name, actor, timer_val. (
     (rule_name, actor, timer_val) ∈ active_rules ⇒
-    ∃ rule. (rule ∈ Rule ∧
+    ∃ rule. (rule ∈ rules ∧
       rule'name = rule_name ∧
       actor ∈ rule'possible_actors ∧
       // This enforces timers to count down and not up.
@@ -92,18 +90,17 @@ INVARIANT
   )
 
 INITIALISATION
-  started := FALSE ||
-  breached_by := ∅ ||
-  active_rules := ∅
+  rules, breached_by, active_rules := ∅, ∅, ∅
 
-OPERATIONS
-  start =
+EVENTS
+  init(new_rules) =
     PRE
-      started = FALSE
+      new_rules ⊆ Rule ∧
+      rules = ∅
     THEN
-      started := TRUE ||
+      rules := new_rules ||
       active_rules := {rule_name, actor, timer_val |
-        ∃ rule. (rule ∈ Rule ∧
+        ∃ rule. (rule ∈ new_rules ∧
           rule'name = rule_name ∧
           actor ∈ rule'initial_actors ∩ rule'possible_actors ∧
           rule'event'initial_timer_val = timer_val
@@ -112,19 +109,71 @@ OPERATIONS
     END;
 
   // Discrete clock tic transition.
-  tic =
+  tick =
     PRE
       // The clock is allowed to tick iff the contract hasn't been breached yet
       // and all timers have a positive value.
-      started = TRUE ∧
+      rules ≠ ∅ ∧
       breached_by = ∅ ∧
       ∀ rule_name, actor, timer_val. (
         (rule_name, actor, timer_val) ∈ active_rules ⇒
-          timer_val > 0
+        timer_val > 0
       )
     THEN
       active_rules := {rule_name, actor, timer_val |
         (rule_name, actor, timer_val + 1) ∈ active_rules
       }
+    END;
+
+ event(happened_or_timeout, event_name, actor) =
+    LET on_done_timeout BE
+      on_done_timeout =
+        IF happened_or_timeout = happened THEN
+            λ rule. (Top | rule'on_done)
+          ELSE
+            λ rule. (Top | rule'on_timeout)
+          END
+    IN
+      ANY rule, timer_val, triggers, discharges WHERE
+        rule ∈ rules ∧
+        breached_by = ∅ ∧
+        // Consume the oldest token, currently faulty.
+        // (active_rules ≠ ∅ ⇒ timer_val = min(ran(active_rules))) ∧
+        IF rule'event'is_preemptive = FALSE ∨ happened_or_timeout = timeout THEN
+          timer_val = 0
+        ELSE
+          Top
+        END ∧
+        (rule'name, actor, timer_val) ∈ active_rules ∧
+        rule'event'name = event_name ∧
+
+        discharges = {rule_name, actor0, timer_val0 |
+          (rule_name, actor0, timer_val0) ∈ active_rules ∧
+          (rule_name, actor0) ∈ on_done_timeout(rule)'discharges(actor)
+        } ∧
+
+        triggers = {rule_name, actor0, timer_val0 |
+          // Here we implicitly invoke the axiom of global choice to discharge the
+          // annoying obligation to prove that the relation is actually a
+          // well-defined function.
+          (rule_name, actor0) ∈ on_done_timeout(rule)'triggers(actor) ∧ 
+          ∃ rule. (rule ∈ rules ∧
+            rule'name = rule_name ∧
+            actor0 ∈ rule'possible_actors ∧
+            timer_val0 = rule'event'initial_timer_val
+          )
+        }
+      THEN
+        IF (happened_or_timeout = happened ∧ rule'deontic = NCProhib) ∨
+           (happened_or_timeout = timeout ∧ rule'deontic = NCOb)
+        THEN
+          breached_by := {actor} ||
+          active_rules := ∅
+        ELSE
+          active_rules :=
+            ((active_rules \ {(rule'name, actor, timer_val)}) \ discharges) ∪ triggers
+        END
+      END
     END
+
 END

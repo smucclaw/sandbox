@@ -11,16 +11,16 @@ mkdir -p ${workdir}
 file_name=${1}
 out_file_name=${workdir}/${file_name}.state_space
 
-probcli ../${file_name}.ref -nodead \
-  -model_check \
+probcli ../${file_name}.mch -nodead \
   -p COMPRESSION true \
-  -p OPERATION_REUSE true \
+  -p OPERATION_REUSE full \
+  -model_check \
   -p DOT_ENGINE neato \
-  -dotexpr transition_diagram "(breached_by, dom(active_rules), started)" ${out_file_name}.dot
+  -dotexpr transition_diagram "(breached_by, dom(active_rules), card(rules))" ${out_file_name}.dot
+
+  #  -mc_with_lts_sym -p LTSMIN ~/ltsmin-v3.0.2/bin \
 
   # -dot state_space_sfdp ${out_file_name}.dot
-
-  # -mc_with_lts_sym -p LTSMIN ~/ltsmin-v3.0.2/bin
 
 
 dot -Tsvg ${out_file_name}.dot -o ${out_file_name}.svg

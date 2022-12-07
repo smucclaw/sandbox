@@ -14,10 +14,11 @@ case "${formula_file_name##*.}" in
   (ctl) flag="-ctlformula" ;;
 esac
 
-probcli ../${mch_file_name}.ref -nodead \
+probcli ../${mch_file_name}.mch -nodead \
   -p COMPRESSION true \
   -p OPERATION_REUSE full \
   $flag "$(< ../temporal_formulas/${mch_file_name}/${formula_file_name})" \
+  -p DOT_ENGINE neato \
   -dot history ${out_file_name}.dot
 
 dot -Tsvg ${out_file_name}.dot -o ${out_file_name}.svg

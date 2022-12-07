@@ -1,4 +1,4 @@
-WF(tic) => (
+WF(tick) => (
   (G ({breached_by = {}} & not [pay_accelerated_happened(_)] &
     not [cure_default_happened(_)]) &
   F [send_principal_happened(_)]

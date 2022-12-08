@@ -1,4 +1,4 @@
-SYSTEM AbstractContract
+SYSTEM AbstractContract(Actor, RuleName, EventName)
 
 /*
 Contract as reconfigurable, colored timed-arc petri net with guard
@@ -32,7 +32,8 @@ Interruption of rules by an event corresponds to a reset arc.
 */
 
 DEFINITIONS
-  "CommonDefs.def"
+  "CommonDefs.def";
+  get_rule_name == λ rule. (rule ∈ Rule | rule'name)
 
 SETS
   Deontic = {
@@ -41,17 +42,9 @@ SETS
     CProhib, // Compensable prohibition
     NCProhib, // Non-compensable prohibition
     Perm // Permission
-  };
+  }
 
-  HappenedTimeout = {happened, timeout};
-
-  Actor; RuleName; EventName
-
-CONSTANTS
-  get_rule_name
-
-PROPERTIES
-  get_rule_name = λ rule. (rule ∈ Rule | rule'name)
+  // Actor; RuleName; EventName
 
 VARIABLES
   rules, breached_by, active_rules
@@ -72,7 +65,7 @@ INVARIANT
   )
 
 INITIALISATION
-  rules, breached_by, active_rules := ∅, ∅, ∅
+  rules, breached_by, active_rules := ∅, None, ∅
 
 OPERATIONS
   add_rules(rules_to_add) =
@@ -89,7 +82,7 @@ OPERATIONS
       rules := rules \ rules_to_remove
     END;
 
-  // Discrete clock tic transition.
+  // Discrete clock tick transition.
   tick =
     PRE
       // The clock is allowed to tick iff the contract has started,
@@ -109,11 +102,13 @@ OPERATIONS
 
     Event operations are expected to pattern match on these and trigger and
     discharge rule instances accordingly.
+
+    TODO: let timeouts go first.
   */
   relevant_rule_names ← event_happened(event_name, actor) =
     ANY relevant_rules WHERE
       breached_by = None ∧
-      relevant_rules ≠ ∅  ∧
+      relevant_rules ≠ ∅ ∧
       relevant_rules = {rule |
         rule ∈ rules ∧
         ∃ timer_val. (
@@ -142,7 +137,7 @@ OPERATIONS
   relevant_rule_names ← event_timeout(event_name, actor) =
     ANY relevant_rules WHERE
       breached_by = None ∧
-      relevant_rules ≠ ∅  ∧
+      relevant_rules ≠ ∅ ∧
       relevant_rules = {rule |
         rule ∈ rules ∧
         (rule'name, actor, 0) ∈ active_rules ∧

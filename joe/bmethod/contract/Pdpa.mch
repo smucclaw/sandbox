@@ -1,39 +1,26 @@
 SYSTEM Pdpa
 
-INCLUDES AbstractContract
+INCLUDES AbstractContract(Actor, RuleName, EventName)
 PROMOTES tick
 
 DEFINITIONS
   "CommonDefs.def"
 
-CONSTANTS
-  rules0,
-  // actors
-  org, indiv, pdpc,
-  // rule names
-  Assessment, NotifyPdpc, NotifyIndiv, ProhibitNotifyIndiv, CannotNotifyIndiv,
-  // event names
-  assess, notify_pdpc, notify_indiv, prohibit_notify_indiv
+SETS
+  Actor = {org, indiv, pdpc};
 
-PROPERTIES
-  /*
-  Remember that writing {a, b} doesn't make a and b different from each other.
-  Hence we need to use cardinality constraints to encode the fact that
-  all the elements are distinct.
-  */
-  card(Actor) = 3 ∧
-  Actor = {org, indiv, pdpc} ∧
-
-  card(RuleName) = 5 ∧
   RuleName = {
     Assessment, NotifyPdpc, NotifyIndiv, ProhibitNotifyIndiv, CannotNotifyIndiv
-  } ∧
+  };
 
-  card(EventName) = 4 ∧
   EventName = {
     assess, notify_pdpc, notify_indiv, prohibit_notify_indiv
-  } ∧
+  }
 
+CONSTANTS
+ rules0
+ 
+PROPERTIES
   rules0 = {
     rec(
       name : Assessment,

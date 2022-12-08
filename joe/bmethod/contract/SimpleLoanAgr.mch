@@ -1,40 +1,29 @@
 SYSTEM SimpleLoanAgr
 
-INCLUDES AbstractContract
+INCLUDES AbstractContract(Actor, RuleName, EventName)
 PROMOTES tick
 
 DEFINITIONS
   "CommonDefs.def"
 
-CONSTANTS
-  rules0,
-  // actors
-  borrower, lender,
-  // rule names
-  RequestPrincipal, SendPrincipal,
-  Payment1, Payment2, PayAccelerated,
-  EventOfDefault, NotifyBorrower, CureDefault,
-  // event names
-  request_principal, send_principal, pay1, pay2, pay_accelerated,
-  event_of_default, notify_borrower, cure_default
+SETS
+  Actor = {borrower, lender};
 
-PROPERTIES
-  card(Actor) = 2 ∧
-  Actor = {borrower, lender} ∧
-
-  card(RuleName) = 8 ∧
   RuleName = {
     RequestPrincipal, SendPrincipal,
     Payment1, Payment2, PayAccelerated,
     EventOfDefault, NotifyBorrower, CureDefault
-  } ∧
+  };
 
-  card(EventName) = 8 ∧
   EventName = {
     request_principal, send_principal, pay1, pay2, pay_accelerated,
     event_of_default, notify_borrower, cure_default
-  } ∧
+  }
 
+CONSTANTS
+  rules0
+
+PROPERTIES
   rules0 = {
     rec(
       name : RequestPrincipal,

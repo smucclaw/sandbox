@@ -1,78 +1,80 @@
 digraph history {
 graph [nodesep=1.5, ranksep=1.5];
-0 [shape=box, color="brown", fontsize=12, penwidth=2, label=""];
+0 [shape=box, color="brown", fontsize=12, penwidth=2, label="get_rule_name = %rule.(rule : struct(deontic:\{COb,NCOb,CProhib,NCProhib,Perm\},event:struct(initial_timer_val:NATURAL1,is_preemptive:\{FALSE,TRUE\},name:EventName),name:\{RequestPrincipal,CureDefault,EventOfDefault,NotifyBorrower,PayAccelerated,Payment1,Payment2,SendPrincipal\},possible_actors:POW(Actor))\|rule\'name),rules0 = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p..."];
 
-1 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((RequestPrincipal\|-\>borrower)) = 1,breached_by = \{\},rules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p..."];
+1 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules = \{\},breached_by = \{\},rules = \{\},\nstarted = FALSE"];
 
-2 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((RequestPrincipal\|-\>borrower)) = 0,breached_by = \{\},rules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p..."];
+2 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((RequestPrincipal\|-\>borrower)) = 1,breached_by = \{\},rules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p...,\nstarted = TRUE"];
 
-3 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((SendPrincipal\|-\>lender)) = 3,breached_by = \{\},rules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p..."];
+3 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((RequestPrincipal\|-\>borrower)) = 0,breached_by = \{\},rules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p...,\nstarted = TRUE"];
 
-4 [shape=doubleoctagon, color="brown", fontsize=12, penwidth=2, label="repeated (3)\nactive_rules = \{\},breached_by = \{\},rules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p..."];
+4 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((SendPrincipal\|-\>lender)) = 3,breached_by = \{\},rules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p...,\nstarted = TRUE"];
 
-5 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((SendPrincipal\|-\>lender)) = 2,breached_by = \{\},rules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p..."];
+5 [shape=doubleoctagon, color="brown", fontsize=12, penwidth=2, label="repeated (3)\nactive_rules = \{\},breached_by = \{\},rules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p...,\nstarted = TRUE"];
 
-6 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((EventOfDefault\|-\>borrower)) = 25,active_rules((Payment1\|-\>borrower)) = 10,breached_by = \{\},\nrules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p..."];
+6 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((SendPrincipal\|-\>lender)) = 2,breached_by = \{\},rules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p...,\nstarted = TRUE"];
 
-7 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((SendPrincipal\|-\>lender)) = 1,breached_by = \{\},rules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p..."];
+7 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((EventOfDefault\|-\>borrower)) = 25,active_rules((Payment1\|-\>borrower)) = 10,breached_by = \{\},\nrules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p...,started = TRUE"];
 
-8 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((SendPrincipal\|-\>lender)) = 0,breached_by = \{\},rules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p..."];
+8 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((SendPrincipal\|-\>lender)) = 1,breached_by = \{\},rules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p...,\nstarted = TRUE"];
 
-10 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((EventOfDefault\|-\>borrower)) = 24,active_rules((Payment1\|-\>borrower)) = 9,breached_by = \{\},\nrules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p..."];
+9 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((SendPrincipal\|-\>lender)) = 0,breached_by = \{\},rules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p...,\nstarted = TRUE"];
 
-12 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((EventOfDefault\|-\>borrower)) = 23,active_rules((Payment1\|-\>borrower)) = 8,breached_by = \{\},\nrules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p..."];
+11 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((EventOfDefault\|-\>borrower)) = 24,active_rules((Payment1\|-\>borrower)) = 9,breached_by = \{\},\nrules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p...,started = TRUE"];
 
-16 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((EventOfDefault\|-\>borrower)) = 22,active_rules((Payment1\|-\>borrower)) = 7,breached_by = \{\},\nrules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p..."];
+13 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((EventOfDefault\|-\>borrower)) = 23,active_rules((Payment1\|-\>borrower)) = 8,breached_by = \{\},\nrules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p...,started = TRUE"];
 
-20 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((EventOfDefault\|-\>borrower)) = 21,active_rules((Payment1\|-\>borrower)) = 6,breached_by = \{\},\nrules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p..."];
+17 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((EventOfDefault\|-\>borrower)) = 22,active_rules((Payment1\|-\>borrower)) = 7,breached_by = \{\},\nrules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p...,started = TRUE"];
 
-24 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((EventOfDefault\|-\>borrower)) = 20,active_rules((Payment1\|-\>borrower)) = 5,breached_by = \{\},\nrules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p..."];
+21 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((EventOfDefault\|-\>borrower)) = 21,active_rules((Payment1\|-\>borrower)) = 6,breached_by = \{\},\nrules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p...,started = TRUE"];
 
-28 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((EventOfDefault\|-\>borrower)) = 19,active_rules((Payment1\|-\>borrower)) = 4,breached_by = \{\},\nrules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p..."];
+25 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((EventOfDefault\|-\>borrower)) = 20,active_rules((Payment1\|-\>borrower)) = 5,breached_by = \{\},\nrules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p...,started = TRUE"];
 
-32 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((EventOfDefault\|-\>borrower)) = 18,active_rules((Payment1\|-\>borrower)) = 3,breached_by = \{\},\nrules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p..."];
+29 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((EventOfDefault\|-\>borrower)) = 19,active_rules((Payment1\|-\>borrower)) = 4,breached_by = \{\},\nrules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p...,started = TRUE"];
 
-36 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((EventOfDefault\|-\>borrower)) = 17,active_rules((Payment1\|-\>borrower)) = 2,breached_by = \{\},\nrules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p..."];
+33 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((EventOfDefault\|-\>borrower)) = 18,active_rules((Payment1\|-\>borrower)) = 3,breached_by = \{\},\nrules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p...,started = TRUE"];
 
-40 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((EventOfDefault\|-\>borrower)) = 16,active_rules((Payment1\|-\>borrower)) = 1,breached_by = \{\},\nrules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p..."];
+37 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((EventOfDefault\|-\>borrower)) = 17,active_rules((Payment1\|-\>borrower)) = 2,breached_by = \{\},\nrules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p...,started = TRUE"];
 
-44 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((EventOfDefault\|-\>borrower)) = 15,active_rules((Payment1\|-\>borrower)) = 0,breached_by = \{\},\nrules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p..."];
+41 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((EventOfDefault\|-\>borrower)) = 16,active_rules((Payment1\|-\>borrower)) = 1,breached_by = \{\},\nrules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p...,started = TRUE"];
 
-49 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((EventOfDefault\|-\>borrower)) = 15,active_rules((NotifyBorrower\|-\>lender)) = 3,active_rules((Payment2\|-\>borrower)) = 10,\nbreached_by = \{\},rules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p..."];
+45 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((EventOfDefault\|-\>borrower)) = 15,active_rules((Payment1\|-\>borrower)) = 0,breached_by = \{\},\nrules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p...,started = TRUE"];
 
-53 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((EventOfDefault\|-\>borrower)) = 14,active_rules((NotifyBorrower\|-\>lender)) = 2,active_rules((Payment2\|-\>borrower)) = 9,\nbreached_by = \{\},rules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p..."];
+50 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((EventOfDefault\|-\>borrower)) = 15,active_rules((NotifyBorrower\|-\>lender)) = 3,active_rules((Payment2\|-\>borrower)) = 10,\nbreached_by = \{\},rules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p...,started = TRUE"];
 
-57 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((EventOfDefault\|-\>borrower)) = 13,active_rules((NotifyBorrower\|-\>lender)) = 1,active_rules((Payment2\|-\>borrower)) = 8,\nbreached_by = \{\},rules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p..."];
+54 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((EventOfDefault\|-\>borrower)) = 14,active_rules((NotifyBorrower\|-\>lender)) = 2,active_rules((Payment2\|-\>borrower)) = 9,\nbreached_by = \{\},rules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p...,started = TRUE"];
 
-64 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((EventOfDefault\|-\>borrower)) = 12,active_rules((NotifyBorrower\|-\>lender)) = 0,active_rules((Payment2\|-\>borrower)) = 7,\nbreached_by = \{\},rules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p..."];
+58 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((EventOfDefault\|-\>borrower)) = 13,active_rules((NotifyBorrower\|-\>lender)) = 1,active_rules((Payment2\|-\>borrower)) = 8,\nbreached_by = \{\},rules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p...,started = TRUE"];
 
-72 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules = \{(NotifyBorrower\|-\>lender\|-\>0),(NotifyBorrower\|-\>lender\|-\>3),(Payment2\|-\>borrower\|-\>7)\},breached_by = \{\},rules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p..."];
+65 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((EventOfDefault\|-\>borrower)) = 12,active_rules((NotifyBorrower\|-\>lender)) = 0,active_rules((Payment2\|-\>borrower)) = 7,\nbreached_by = \{\},rules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p...,started = TRUE"];
 
-81 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((NotifyBorrower\|-\>lender)) = 3,active_rules((Payment2\|-\>borrower)) = 7,breached_by = \{\},\nrules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p..."];
+73 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules = \{(NotifyBorrower\|-\>lender\|-\>0),(NotifyBorrower\|-\>lender\|-\>3),(Payment2\|-\>borrower\|-\>7)\},breached_by = \{\},rules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p...,\nstarted = TRUE"];
 
-87 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((NotifyBorrower\|-\>lender)) = 2,active_rules((Payment2\|-\>borrower)) = 6,breached_by = \{\},\nrules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p..."];
+82 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((NotifyBorrower\|-\>lender)) = 3,active_rules((Payment2\|-\>borrower)) = 7,breached_by = \{\},\nrules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p...,started = TRUE"];
 
-94 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((NotifyBorrower\|-\>lender)) = 1,active_rules((Payment2\|-\>borrower)) = 5,breached_by = \{\},\nrules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p..."];
+88 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((NotifyBorrower\|-\>lender)) = 2,active_rules((Payment2\|-\>borrower)) = 6,breached_by = \{\},\nrules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p...,started = TRUE"];
 
-96 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((NotifyBorrower\|-\>lender)) = 0,active_rules((Payment2\|-\>borrower)) = 4,breached_by = \{\},\nrules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p..."];
+95 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((NotifyBorrower\|-\>lender)) = 1,active_rules((Payment2\|-\>borrower)) = 5,breached_by = \{\},\nrules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p...,started = TRUE"];
 
-100 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((Payment2\|-\>borrower)) = 4,breached_by = \{\},rules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p..."];
+97 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((NotifyBorrower\|-\>lender)) = 0,active_rules((Payment2\|-\>borrower)) = 4,breached_by = \{\},\nrules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p...,started = TRUE"];
 
-103 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((Payment2\|-\>borrower)) = 3,breached_by = \{\},rules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p..."];
+101 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((Payment2\|-\>borrower)) = 4,breached_by = \{\},rules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p...,\nstarted = TRUE"];
 
-105 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((Payment2\|-\>borrower)) = 2,breached_by = \{\},rules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p..."];
+104 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((Payment2\|-\>borrower)) = 3,breached_by = \{\},rules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p...,\nstarted = TRUE"];
 
-106 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((Payment2\|-\>borrower)) = 1,breached_by = \{\},rules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p..."];
+106 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((Payment2\|-\>borrower)) = 2,breached_by = \{\},rules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p...,\nstarted = TRUE"];
 
-107 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((Payment2\|-\>borrower)) = 0,breached_by = \{\},rules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p..."];
+107 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((Payment2\|-\>borrower)) = 1,breached_by = \{\},rules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p...,\nstarted = TRUE"];
 
-108 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((NotifyBorrower\|-\>lender)) = 3,breached_by = \{\},rules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p..."];
+108 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((Payment2\|-\>borrower)) = 0,breached_by = \{\},rules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p...,\nstarted = TRUE"];
 
-109 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((NotifyBorrower\|-\>lender)) = 2,breached_by = \{\},rules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p..."];
+109 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((NotifyBorrower\|-\>lender)) = 3,breached_by = \{\},rules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p...,\nstarted = TRUE"];
 
-111 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((NotifyBorrower\|-\>lender)) = 1,breached_by = \{\},rules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p..."];
+110 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((NotifyBorrower\|-\>lender)) = 2,breached_by = \{\},rules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p...,\nstarted = TRUE"];
 
-113 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((NotifyBorrower\|-\>lender)) = 0,breached_by = \{\},rules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p..."];
+112 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((NotifyBorrower\|-\>lender)) = 1,breached_by = \{\},rules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p...,\nstarted = TRUE"];
+
+114 [shape=box, color="brown", fontsize=12, penwidth=2, label="active_rules((NotifyBorrower\|-\>lender)) = 0,breached_by = \{\},rules = \{rec(deontic:COb,event:rec(initial_timer_val:1,is_preemptive:TRUE,name:request_principal),name:RequestPrincipal,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:2,is_preemptive:TRUE,name:cure_default),name:CureDefault,possible_actors:\{borrower\}),rec(deontic:COb,event:rec(initial_timer_val:10,is_p...,\nstarted = TRUE"];
 
 root [shape=invtriangle, color="brown", fontsize=12, penwidth=2, label="root"];
 
@@ -80,78 +82,80 @@ root -> 0 [style = dotted, color = black, label="SETUP_CONSTANTS", fontsize=12];
 
 0 -> 1 [color = "brown", label="INITIALISATION", fontsize=12];
 
-1 -> 2 [color = "brown", label="tick", fontsize=12];
+1 -> 2 [color = "brown", label="start", fontsize=12];
 
-2 -> 3 [color = "brown", label="request_principal_happened(borrower)", fontsize=12];
+2 -> 3 [color = "brown", label="tick", fontsize=12];
 
-3 -> 5 [color = "brown", label="tick", fontsize=12];
+3 -> 4 [color = "brown", label="request_principal_happened(borrower)", fontsize=12];
 
-5 -> 7 [color = "brown", label="tick", fontsize=12];
+4 -> 6 [color = "brown", label="tick", fontsize=12];
 
-7 -> 8 [color = "brown", label="tick", fontsize=12];
+6 -> 8 [color = "brown", label="tick", fontsize=12];
 
-8 -> 6 [color = "brown", label="send_principal_happened(lender)", fontsize=12];
+8 -> 9 [color = "brown", label="tick", fontsize=12];
 
-6 -> 10 [color = "brown", label="tick", fontsize=12];
+9 -> 7 [color = "brown", label="send_principal_happened(lender)", fontsize=12];
 
-10 -> 12 [color = "brown", label="tick", fontsize=12];
+7 -> 11 [color = "brown", label="tick", fontsize=12];
 
-12 -> 16 [color = "brown", label="tick", fontsize=12];
+11 -> 13 [color = "brown", label="tick", fontsize=12];
 
-16 -> 20 [color = "brown", label="tick", fontsize=12];
+13 -> 17 [color = "brown", label="tick", fontsize=12];
 
-20 -> 24 [color = "brown", label="tick", fontsize=12];
+17 -> 21 [color = "brown", label="tick", fontsize=12];
 
-24 -> 28 [color = "brown", label="tick", fontsize=12];
+21 -> 25 [color = "brown", label="tick", fontsize=12];
 
-28 -> 32 [color = "brown", label="tick", fontsize=12];
+25 -> 29 [color = "brown", label="tick", fontsize=12];
 
-32 -> 36 [color = "brown", label="tick", fontsize=12];
+29 -> 33 [color = "brown", label="tick", fontsize=12];
 
-36 -> 40 [color = "brown", label="tick", fontsize=12];
+33 -> 37 [color = "brown", label="tick", fontsize=12];
 
-40 -> 44 [color = "brown", label="tick", fontsize=12];
+37 -> 41 [color = "brown", label="tick", fontsize=12];
 
-44 -> 49 [color = "brown", label="payment1_timeout(borrower)", fontsize=12];
+41 -> 45 [color = "brown", label="tick", fontsize=12];
 
-49 -> 53 [color = "brown", label="tick", fontsize=12];
+45 -> 50 [color = "brown", label="payment1_timeout(borrower)", fontsize=12];
 
-53 -> 57 [color = "brown", label="tick", fontsize=12];
+50 -> 54 [color = "brown", label="tick", fontsize=12];
 
-57 -> 64 [color = "brown", label="tick", fontsize=12];
+54 -> 58 [color = "brown", label="tick", fontsize=12];
 
-64 -> 72 [color = "brown", label="event_of_default_happened(borrower)", fontsize=12];
+58 -> 65 [color = "brown", label="tick", fontsize=12];
 
-72 -> 81 [color = "brown", label="notify_borrower_timeout(lender)", fontsize=12];
+65 -> 73 [color = "brown", label="event_of_default_happened(borrower)", fontsize=12];
 
-81 -> 87 [color = "brown", label="tick", fontsize=12];
+73 -> 82 [color = "brown", label="notify_borrower_timeout(lender)", fontsize=12];
 
-87 -> 94 [color = "brown", label="tick", fontsize=12];
+82 -> 88 [color = "brown", label="tick", fontsize=12];
 
-94 -> 96 [color = "brown", label="tick", fontsize=12];
+88 -> 95 [color = "brown", label="tick", fontsize=12];
 
-96 -> 100 [color = "brown", label="notify_borrower_timeout(lender)", fontsize=12];
+95 -> 97 [color = "brown", label="tick", fontsize=12];
 
-100 -> 103 [color = "brown", label="tick", fontsize=12];
+97 -> 101 [color = "brown", label="notify_borrower_timeout(lender)", fontsize=12];
 
-103 -> 105 [color = "brown", label="tick", fontsize=12];
+101 -> 104 [color = "brown", label="tick", fontsize=12];
 
-105 -> 106 [color = "brown", label="tick", fontsize=12];
+104 -> 106 [color = "brown", label="tick", fontsize=12];
 
 106 -> 107 [color = "brown", label="tick", fontsize=12];
 
-107 -> 108 [color = "brown", label="payment2_timeout(borrower)", fontsize=12];
+107 -> 108 [color = "brown", label="tick", fontsize=12];
 
-108 -> 109 [color = "brown", label="tick", fontsize=12];
+108 -> 109 [color = "brown", label="payment2_timeout(borrower)", fontsize=12];
 
-109 -> 111 [color = "brown", label="tick", fontsize=12];
+109 -> 110 [color = "brown", label="tick", fontsize=12];
 
-111 -> 113 [color = "brown", label="tick", fontsize=12];
+110 -> 112 [color = "brown", label="tick", fontsize=12];
 
-113 -> 4 [color = "brown", label="notify_borrower_timeout(lender)", fontsize=12];
+112 -> 114 [color = "brown", label="tick", fontsize=12];
 
-4 -> 4 [color = "brown", label="tick", fontsize=12];
+114 -> 5 [color = "brown", label="notify_borrower_timeout(lender)", fontsize=12];
 
-4 -> 4 [color = "brown", label="tick", fontsize=12];
+5 -> 5 [color = "brown", label="tick", fontsize=12];
+
+5 -> 5 [color = "brown", label="tick", fontsize=12];
 
 }

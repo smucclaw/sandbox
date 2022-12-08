@@ -32,10 +32,10 @@ Interruption of rules by an event corresponds to a reset arc.
 */
 
 DEFINITIONS
-  "Defs.def"
+  "CommonDefs.def"
 
 SETS
- Deontic = {
+  Deontic = {
     COb, // Compensable obligation
     NCOb, // Non-compensable obligation
     CProhib, // Compensable prohibition
@@ -47,12 +47,18 @@ SETS
 
   Actor; RuleName; EventName
 
+CONSTANTS
+  get_rule_name
+
+PROPERTIES
+  get_rule_name = λ rule. (rule ∈ Rule | rule'name)
+
 VARIABLES
   rules, breached_by, active_rules
 
 INVARIANT
   rules ⊆ Rule ∧
-  breached_by ∈ ℙ(Actor) ∧ card(breached_by) ≤ 1 ∧
+  breached_by ∈ Option(Actor) ∧
 
   active_rules ∈ RuleName * Actor ↔ ℕ ∧
   ∀ rule_name, actor, timer_val. (
@@ -89,7 +95,7 @@ OPERATIONS
       // The clock is allowed to tick iff the contract has started,
       // hasn't been breached yet, and all active timers have a positive value.
       rules ≠ ∅ ∧
-      breached_by = ∅ ∧
+      breached_by = None ∧
       ran(active_rules) ∈ ℙ(ℕ₁)
     THEN
       active_rules := {rule_name, actor, timer_val |
@@ -97,9 +103,16 @@ OPERATIONS
       }
     END;
 
-  event_happened(event_name, actor) =
+  /*
+    Note that there can be multiple rules that reference the same event, hence
+    we find all relevant rule names, which we then return as output.
+
+    Event operations are expected to pattern match on these and trigger and
+    discharge rule instances accordingly.
+  */
+  relevant_rule_names ← event_happened(event_name, actor) =
     ANY relevant_rules WHERE
-      breached_by = ∅ ∧
+      breached_by = None ∧
       relevant_rules ≠ ∅  ∧
       relevant_rules = {rule |
         rule ∈ rules ∧
@@ -110,9 +123,10 @@ OPERATIONS
         )
       }
     THEN
+      relevant_rule_names := get_rule_name[relevant_rules] ||
       IF ∃ rule. (rule ∈ relevant_rules ∧ rule'deontic = NCProhib)
       THEN
-        breached_by, active_rules := {actor}, ∅
+        breached_by, active_rules := Some(actor), ∅
       ELSE
         LET to_remove BE
           to_remove = {rule_name, actor, timer_val |
@@ -125,9 +139,9 @@ OPERATIONS
       END
     END;
 
-  event_timeout(event_name, actor) =
+  relevant_rule_names ← event_timeout(event_name, actor) =
     ANY relevant_rules WHERE
-      breached_by = ∅ ∧
+      breached_by = None ∧
       relevant_rules ≠ ∅  ∧
       relevant_rules = {rule |
         rule ∈ rules ∧
@@ -135,12 +149,14 @@ OPERATIONS
         rule'event'name = event_name
       }
     THEN
-      IF ∃ rule. (rule ∈ relevant_rules & rule'deontic = NCOb)
+      relevant_rule_names := get_rule_name[relevant_rules] ||
+      IF ∃ rule. (rule ∈ relevant_rules ∧ rule'deontic = NCOb)
       THEN
-        breached_by, active_rules := {actor}, ∅
+        breached_by, active_rules := Some(actor), ∅
       ELSE
         LET to_remove BE
           to_remove = {rule_name, actor, timer_val |
+            (rule_name, actor, timer_val) ∈ active_rules ∧
             timer_val = 0 ∧
             ∃ rule. (rule ∈ relevant_rules ∧ rule'name = rule_name)
           }
@@ -150,42 +166,32 @@ OPERATIONS
       END
     END;
 
-    discharge(precond, discharges) =
-      ANY timed_discharges WHERE
-        breached_by = ∅ ∧
-        discharges ∈ RuleName ↔ Actor ∧
-        timed_discharges = IF precond = TRUE
-          THEN
-            {rule_name, actor, timer_val |
-              (rule_name, actor, timer_val) ∈ active_rules ∧
-              (rule_name, actor) ∈ discharges
-            }
-          ELSE
-            ∅
-          END
-      THEN
-        active_rules := active_rules \ timed_discharges
-      END;
+  trigger(triggers) =
+    ANY timed_triggers WHERE
+      breached_by = None ∧
+      triggers ∈ RuleName ↔ Actor ∧
+      timed_triggers = {rule_name, actor, timer_val0 |
+        (rule_name, actor) ∈ triggers ∧ 
+        ∃ rule. (rule ∈ rules ∧
+          rule'name = rule_name ∧
+          actor ∈ rule'possible_actors ∧
+          timer_val0 = rule'event'initial_timer_val
+        )
+      }
+    THEN
+      active_rules := active_rules ∪ timed_triggers
+    END;
 
-    trigger(precond, triggers) =
-      ANY timed_triggers WHERE
-        breached_by = ∅ ∧
-        triggers ∈ RuleName ↔ Actor ∧
-        timed_triggers =
-          IF precond = TRUE THEN
-            {rule_name, actor, timer_val0 |
-              (rule_name, actor) ∈ triggers ∧ 
-              ∃ rule. (rule ∈ rules ∧
-                rule'name = rule_name ∧
-                actor ∈ rule'possible_actors ∧
-                timer_val0 = rule'event'initial_timer_val
-              )
-            }
-          ELSE
-            ∅
-          END
-      THEN
-        active_rules := active_rules ∪ timed_triggers
-      END
+  discharge(discharges) =
+    ANY timed_discharges WHERE
+      breached_by = None ∧
+      discharges ∈ RuleName ↔ Actor ∧
+      timed_discharges = {rule_name, actor, timer_val |
+        (rule_name, actor, timer_val) ∈ active_rules ∧
+        (rule_name, actor) ∈ discharges
+      }
+    THEN
+      active_rules := active_rules \ timed_discharges
+    END
 
 END

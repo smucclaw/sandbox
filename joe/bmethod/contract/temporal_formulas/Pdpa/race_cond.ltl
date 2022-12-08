@@ -1,5 +1,3 @@
-WF(tick) => (
-  (G {breached_by = {}}) &
-  G ([prohibit_notify_indiv_happened(_)] =>
-    H not [notify_indiv_happened(_)])
-)
+(G {breached_by = {}}) &
+G ([prohibit_notify_indiv_happened(_)] =>
+  H not [notify_indiv_happened(_)])

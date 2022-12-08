@@ -1,3 +1,6 @@
+export LD_LIBRARY_PATH=/opt/prob/lib:$LD_LIBRARY_PATH
+export PATH=/opt/prob:$PATH
+
 parent_path=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
 cd "$parent_path"
 
@@ -14,10 +17,10 @@ case "${formula_file_name##*.}" in
   (ctl) flag="-ctlformula" ;;
 esac
 
-probcli ../${mch_file_name}.mch -nodead \
-  -p SMT true \
+probcli ../${mch_file_name}.mch -nodead -noinv \
   -p COMPRESSION true \
-  -p OPERATION_REUSE full \
+  -p OPERATION_REUSE true \
+  -p LTSMIN ~/ltsmin-v3.0.2/bin \
   $flag "$(< ../temporal_formulas/${mch_file_name}/${formula_file_name})" \
   -p DOT_ENGINE neato \
   -dot history ${out_file_name}.dot

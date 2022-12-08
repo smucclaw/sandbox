@@ -3,7 +3,11 @@ SYSTEM SimpleLoanAgr
 INCLUDES AbstractContract
 PROMOTES tick
 
+DEFINITIONS
+  "CommonDefs.def"
+
 CONSTANTS
+  rules0,
   // actors
   borrower, lender,
   // rule names
@@ -29,10 +33,9 @@ PROPERTIES
   EventName = {
     request_principal, send_principal, pay1, pay2, pay_accelerated,
     event_of_default, notify_borrower, cure_default
-  }
+  } ∧
 
-DEFINITIONS
-  rules0 == {
+  rules0 = {
     rec(
       name : RequestPrincipal,
       possible_actors : {borrower},
@@ -122,83 +125,124 @@ DEFINITIONS
     )
   }
 
+VARIABLES
+  started
+
+INVARIANT
+  started ∈ BOOL
+
 INITIALISATION
-  add_rules(rules0);
-  trigger(TRUE, {(RequestPrincipal, borrower)})
+  started := FALSE
 
-EVENTS
-  request_principal_happened(actor) = BEGIN
-    event_happened(request_principal, actor);
-    trigger(TRUE, {(SendPrincipal, lender)})
+OPERATIONS
+  start =
+    PRE
+      started = FALSE
+    THEN
+      started := TRUE ||
+      add_rules(rules0);
+      trigger({(RequestPrincipal, borrower)}) 
+    END;
+
+  request_principal_happened(actor) = VAR rule_names IN
+    rule_names ← event_happened(request_principal, actor);
+
+    IF RequestPrincipal ∈ rule_names THEN
+      trigger({(SendPrincipal, lender)})
+    END
   END;
 
-  request_principal_timeout(actor) = BEGIN
-    event_timeout(request_principal, actor)
+  request_principal_timeout(actor) = VAR rule_names IN
+    rule_names ← event_timeout(request_principal, actor)
   END;
 
-  send_principal_happened(actor) = BEGIN
-    event_happened(send_principal, actor);
-    trigger(TRUE, {(Payment1, borrower), (EventOfDefault, borrower)})
+  send_principal_happened(actor) = VAR rule_names IN
+    rule_names ← event_happened(send_principal, actor);
+    
+    IF SendPrincipal ∈ rule_names THEN
+      trigger({(Payment1, borrower), (EventOfDefault, borrower)})
+    END
   END;
 
-  send_principal_timeout(actor) = BEGIN
-    event_timeout(send_principal, actor)
+  send_principal_timeout(actor) = VAR rule_names IN
+    rule_names ← event_timeout(send_principal, actor)
   END;
 
-  payment1_happened(actor) = BEGIN
-    event_happened(pay1, actor);
-    trigger(TRUE, {(Payment2, actor)})
+  payment1_happened(actor) = VAR rule_names IN
+    rule_names ← event_happened(pay1, actor);
+
+    IF Payment1 ∈ rule_names THEN
+      trigger({(Payment2, actor)})
+    END
   END;
 
-  payment1_timeout(actor) = BEGIN
-    event_timeout(pay1, actor);
-    trigger(TRUE, {(Payment2, actor), (NotifyBorrower, lender)})
+  payment1_timeout(actor) = VAR rule_names IN
+    rule_names ← event_timeout(pay1, actor);
+
+    IF Payment1 ∈ rule_names THEN
+      trigger({(Payment2, actor), (NotifyBorrower, lender)})
+    END
   END;
 
-  payment2_happened(actor) = BEGIN
-    event_happened(pay2, actor);
-    discharge(TRUE, RuleName * Actor)
+  payment2_happened(actor) = VAR rule_names IN
+    rule_names ← event_happened(pay2, actor);
+
+    IF Payment2 ∈ rule_names THEN
+      discharge(RuleName * Actor)
+    END
   END;
 
-  payment2_timeout(actor) = BEGIN
-    event_timeout(pay2, actor);
-    trigger(TRUE, {(NotifyBorrower, lender)})
+  payment2_timeout(actor) = VAR rule_names IN
+    rule_names ← event_timeout(pay2, actor);
+
+    IF Payment2 ∈ rule_names THEN
+      trigger({(NotifyBorrower, lender)})
+    END
   END;
 
-  pay_accelerated_happened(actor) = BEGIN
-    event_happened(pay_accelerated, actor)
+  pay_accelerated_happened(actor) = VAR rule_names IN
+    rule_names ← event_happened(pay_accelerated, actor)
   END;
 
-  pay_accelerated_timeout(actor) = BEGIN
-    event_timeout(pay_accelerated, actor)
+  pay_accelerated_timeout(actor) = VAR rule_names IN
+    rule_names ← event_timeout(pay_accelerated, actor)
   END;
 
-  event_of_default_happened(actor) = BEGIN
-    event_happened(event_of_default, actor);
-    trigger(TRUE, {(NotifyBorrower, lender)})
+  event_of_default_happened(actor) = VAR rule_names IN
+    rule_names ← event_happened(event_of_default, actor);
+
+    IF EventOfDefault ∈ rule_names THEN
+      trigger({(NotifyBorrower, lender)})
+    END
   END;
 
-  event_of_default_timeout(actor) = BEGIN
-    event_timeout(event_of_default, actor)
+  event_of_default_timeout(actor) = VAR rule_names IN
+    rule_names ← event_timeout(event_of_default, actor)
   END;
 
-  notify_borrower_happened(actor) = BEGIN
-    event_happened(notify_borrower, actor);
-    trigger(TRUE, {(CureDefault, borrower)})
+  notify_borrower_happened(actor) = VAR rule_names IN
+    rule_names ← event_happened(notify_borrower, actor);
+
+    IF NotifyBorrower ∈ rule_names THEN
+      trigger({(CureDefault, borrower)})
+    END
   END;
 
-  notify_borrower_timeout(actor) = BEGIN
-    event_timeout(notify_borrower, actor)
+  notify_borrower_timeout(actor) = VAR rule_names IN
+    rule_names ← event_timeout(notify_borrower, actor)
   END;
 
-  cure_default_happened(actor) = BEGIN
-    event_happened(cure_default, actor)
+  cure_default_happened(actor) = VAR rule_names IN
+    rule_names ← event_happened(cure_default, actor)
   END;
 
-  cure_default_timeout(actor) = BEGIN
-    event_timeout(cure_default, actor);
-    discharge(TRUE, RuleName * Actor);
-    trigger(TRUE, {(PayAccelerated, borrower)})
+  cure_default_timeout(actor) = VAR rule_names IN
+    rule_names ← event_timeout(cure_default, actor);
+
+    IF CureDefault ∈ rule_names THEN
+      discharge(RuleName * Actor);
+      trigger({(PayAccelerated, borrower)})
+    END
   END
 
 END

@@ -33,7 +33,7 @@ Interruption of rules by an event corresponds to a reset arc.
 
 DEFINITIONS
   "CommonDefs.def";
-  get_rule_name == λ rule. (rule ∈ Rule | rule'name)
+  get_rule_name == λ rule. (Top | rule'name)
 
 SETS
   Deontic = {
@@ -52,7 +52,7 @@ PROPERTIES
     bool({deontic1, deontic2} ∈ {
       {COb}, {NCOb}, {COb, NCOb},
       {CProhib}, {NCProhib}, {CProhib, NCProhib},
-      {COb, Perm}, {NCOb, Perm}
+      {COb, Perm}, {NCOb, Perm}, {Perm}
     })
   )
 

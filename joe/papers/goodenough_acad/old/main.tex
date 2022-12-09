@@ -4,7 +4,7 @@
 \input{preamble}
 
 % Title information
-\title{Formalizing a simple loan agreement in L4 and B}
+\title{Formalizing a simple loan agreement in mcrl2}
 \author{Joe Watt}
 % \date{June 2022}
 
@@ -15,9 +15,6 @@
 
 \info{
   This is a work in progress.
-
-  Most of this was originally written based on the work done in mcrl2 but is
-  now being rewritten for L4 and its connection to the modelling done in B.
 }
 
 \tableofcontents
@@ -55,6 +52,43 @@ A simplified, arguably inaccurate, visual representation of the automaton
 \cite[Fig. 1]{contract_as_automaton}
 corresponding to this simple contract already contains more than 20 states and
 40 transitions.
+Here, we discuss 2 reasons contributing to the complexity involved with a more
+accurate formalization of the contract as a DFA.
+We claim that even for such a simple contract, a more accurate formalization
+as a DFA is too impractical to be carried out by hand.
+
+The first source of complexity is a consequence of DFAs not having an explicit
+notion of global variables, as well as their inability to
+perform arithmetic computations.
+To see this, observe how there are verbose duplication of
+``Payments \dots \, accelerating'' states.
+Note here that when we say ``duplication'', we do not mean that there are states
+which play exactly the same role from the point of view of bisimilarity or
+language acceptance as in the sense of the Myhill-Nerode technique of DFA
+minimization.
+What we mean instead is that these states play similar roles, and viewing the
+DFA as a graph, the subgraphs rooted at these states have similar structure.
+
+Viewing these subgraphs as sub-automata, we see that they both accept
+similar sequences of events from the point when the borrower defaults and is
+obliged to make an accelerated repayment of the outstanding amount.
+Notice that the key difference between them is the ``Payment made $\$n$''
+transition, corresponding to the event that the borrower pays off the
+outstanding amount of $\$n$.
+While we would like to collapse both of these subgraphs into a single one,
+this is not possible as the value of $n$ varies at runtime, with the current
+state of the contract, ie with the number of payments the borrower has paid off
+previously.
+In other words, $n$ can be thought of as a global variable whose actual value
+is updated at runtime, whenever payment events occur.
+However, DFAs do not have a notion of global state, nor can they perform
+sophisticated computations like arithmetic ones, so that these values must
+be manually computed by hand and then encoded in the DFA.
+The result of this manual encoding is the aforementioned duplication of states
+and transitions.
+Now, if the contract were to contain more than just 2 repayment stages, more
+manual computations would be required, resulting in even more duplicated states
+and transitions that would then need to be added to the DFA.
 
 % Consequently, a more practical formalism should provide mechanisms like
 % global variables and arithmetic operations.
@@ -83,12 +117,12 @@ corresponding to this simple contract already contains more than 20 states and
 % ``Payment\dots accelerating'' and ``Crisis\dots'' states.
 % The only difference between the transitions between these states is
 
-One of the main causes of this is the concurrent interleaving of real world
-events.
-By this we mean that many real world events can occur in any order and
-perhaps for the sake of simplicity, this has not been accounted for in the DFA
+The second source of complexity arises from the concurrent interleaving
+of real world events.
+Perhaps for the sake of simplicity, this has not been accounted for in the DFA
 formalization.
-As an example of such a scenario, consider the following.
+As an example of such a scenario that is not handled by the DFA, consider the
+following.
 On May 31, 2015, the day before payment 1 is due, the borrower defaults on his
 representations and warranties.
 On the next day, when payment 1 becomes due, the borrower diligently
@@ -106,26 +140,11 @@ the borrower will be notified by the lender soon after, with no other events
 like payments occurring in between.
 More formally, it is assumed that the default and notification events occur
 \textit{within the same atomic step}.
-Splitting this up into separate events would increase the number of states in
-the DFA, especially if we account for concurrency.
-
-We argue that another weakness of the approach is that aside from complexity, it
-is not natural to think of a contract in terms of a DFA and encode it as such.
-
-\inlinetodo{
-  Other weaknesses to mention:
-
-  Representation of time and deadlines.
-  Not handled well by the DFA, but is an important notion that exists in L4.
-  These are translated to B.
-
-  No explicit notion of deontics, which is important to humans because that's
-  what people are used to reasoning about and normative language shows up
-  everywhere in legal drafting.
-  In L4, we have a notion of deontics, though not quite the same as deontic logic.
-  We have an operational interpretation that is made precise by the translation
-  to B.
-}
+One could argue that the real world is inherently concurrent and asynchronous
+in nature, so that a more realistic encoding of this contract would
+account for such interleaving of events.
+Of source, doing so would significantly increase the complexity of the DFA,
+and consequently, the labor involved with its manual construction.
 
 % It should be noted here that this only poses problems in the manual encoding
 % of a contract, by hand, as a DFA.
@@ -161,24 +180,7 @@ to something like automata for visualization and automated reasoning.
 % generalizations of nondeterministic finite automata (NFA) that allow for
 % infinitely \footnote{Possibly uncountably} many states and transitions.
 
-\section{The L4 approach}
-
-\subsection{Intro to L4 as a language}
-\inlinetodo{
-  Talk about how L4 is designed to be friendly to use and so contains ontological
-  concepts from the legal domain that people are used to thinking about and
-  working with.
-
-  These include rules, actors, events, deadlines and deontics.
-
-  Discuss the precise roles of these concepts and how the execution of a
-  contract can be viewed abstractly as a process that arises from the interplay
-  between them.
-}
-
-\subsection{Modelling the loan agreement in L4}
-
-\section{Modelling contracts in B and how it relates to L4}
+\section{Our approach}
 
 In search for such a suitable formalism for encoding contracts,
 we have surveyed various approaches, using the simplified contract in
@@ -202,7 +204,7 @@ visualize and reason about the contract.
   Need to investigate how they model that further first.
 }
 
-\subsection{Background on B}
+\subsection{Background on mcrl2}
 Techniques originating from the field of formal methods have been devised to
 automatically analyze the behavior of computer systems.
 These often rely on first modelling these systems as

@@ -1,0 +1,17 @@
+\contentsline {section}{\numberline {1}Intro and shortcomings of DFA formalization}{2}{section.1}%
+\contentsline {subsection}{\numberline {1.1}Intro}{2}{subsection.1.1}%
+\contentsline {subsection}{\numberline {1.2}Shortcomings}{2}{subsection.1.2}%
+\contentsline {section}{\numberline {2}Our approach}{3}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Background on mcrl2}{4}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}Formalizing the contract in mcrl2}{6}{subsection.2.2}%
+\contentsline {subsubsection}{\numberline {2.2.1}Generic parameters}{6}{subsubsection.2.2.1}%
+\contentsline {subsubsection}{\numberline {2.2.2}Events and contract stages}{7}{subsubsection.2.2.2}%
+\contentsline {subsubsection}{\numberline {2.2.3}Tracking global state}{9}{subsubsection.2.2.3}%
+\contentsline {subsubsection}{\numberline {2.2.4}Main payment loop}{10}{subsubsection.2.2.4}%
+\contentsline {subsubsection}{\numberline {2.2.5}Side avoid default process}{12}{subsubsection.2.2.5}%
+\contentsline {subsubsection}{\numberline {2.2.6}Accelerated Repayments}{13}{subsubsection.2.2.6}%
+\contentsline {subsection}{\numberline {2.3}Generating and Exploring the transition system}{13}{subsection.2.3}%
+\contentsline {subsection}{\numberline {2.4}Background on the modal mu calculus in mcrl2}{13}{subsection.2.4}%
+\contentsline {subsection}{\numberline {2.5}Automated reasoning with the contract}{13}{subsection.2.5}%
+\contentsline {section}{\numberline {3}Related work}{13}{section.3}%
+\contentsline {section}{\numberline {4}Limitations and future work}{13}{section.4}%

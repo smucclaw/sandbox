@@ -1,0 +1,36 @@
+\begin{thebibliography}{1}
+
+\bibitem{mcrl_toolset}
+{\sc Bunte, O., Groote, J.~F., Keiren, J. J.~A., Laveaux, M., Neele, T.,
+  de~Vink, E.~P., Wesselink, W., Wijs, A., and Willemse, T. A.~C.}
+\newblock The mcrl2 toolset for analysing concurrent systems.
+\newblock In {\em Tools and Algorithms for the Construction and Analysis of
+  Systems\/} (Cham, 2019), T.~Vojnar and L.~Zhang, Eds., Springer International
+  Publishing, pp.~21--39.
+
+\bibitem{contract_as_automaton}
+{\sc Flood, M.~D., and Goodenough, O.~R.}
+\newblock Contract as automaton: representing a simple financial agreement in
+  computational form.
+\newblock {\em Artificial Intelligence and Law\/} (Oct 2021).
+
+\bibitem{mcrl_book}
+{\sc Groote, J.~F., and Mousavi, M.~R.}
+\newblock {\em Modeling and Analysis of Communicating Systems}.
+\newblock The MIT Press, 2014.
+
+\bibitem{mcrl_lhc}
+{\sc Remenska, D., Willemse, T.~A., Verstoep, K., Templon, J., and Bal, H.}
+\newblock Using model checking to analyze the system behavior of the lhc
+  production grid.
+\newblock {\em Future Generation Computer Systems 29}, 8 (2013), 2239--2251.
+
+\bibitem{mcrl_rewriting}
+{\sc {van Weerdenburg}, M.}
+\newblock An account of implementing applicative term rewriting.
+\newblock {\em Electronic Notes in Theoretical Computer Science 174}, 10
+  (2007), 139--155.
+\newblock Proceedings of the Sixth International Workshop on Reduction
+  Strategies in Rewriting and Programming (WRS 2006).
+
+\end{thebibliography}

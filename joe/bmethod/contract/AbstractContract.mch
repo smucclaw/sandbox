@@ -44,6 +44,18 @@ SETS
     Perm // Permission
   }
 
+CONSTANTS
+  compatible_deontics
+
+PROPERTIES
+  compatible_deontics = λ deontic1, deontic2. (Top |
+    bool({deontic1, deontic2} ∈ {
+      {COb}, {NCOb}, {COb, NCOb},
+      {CProhib}, {NCProhib}, {CProhib, NCProhib},
+      {COb, Perm}, {NCOb, Perm}
+    })
+  )
+
   // Actor; RuleName; EventName
 
 VARIABLES
@@ -62,6 +74,18 @@ INVARIANT
       // This enforces timers to count down and not up.
       timer_val ≤ rule'event'initial_timer_val
     )
+  ) ∧
+
+  /*
+    No one should be obliged or permitted to do something while being prohibited
+    from doing it.
+  */
+  ∀ rule1, rule2, actor. (
+    (rule1 ≠ rule2 ∧
+      {rule1, rule2} ⊆ rules ∧
+      {(rule1'name, actor), (rule2'name, actor)} ⊆ dom(active_rules) ∧
+      rule1'event'name = rule2'event'name) ⇒
+    compatible_deontics(rule1'deontic, rule2'deontic) = TRUE
   )
 
 INITIALISATION

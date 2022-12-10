@@ -1,12 +1,10 @@
 \begin{thebibliography}{1}
 
-\bibitem{mcrl_toolset}
-{\sc Bunte, O., Groote, J.~F., Keiren, J. J.~A., Laveaux, M., Neele, T.,
-  de~Vink, E.~P., Wesselink, W., Wijs, A., and Willemse, T. A.~C.}
-\newblock The mcrl2 toolset for analysing concurrent systems.
-\newblock In {\em Tools and Algorithms for the Construction and Analysis of
-  Systems\/} (Cham, 2019), T.~Vojnar and L.~Zhang, Eds., Springer International
-  Publishing, pp.~21--39.
+\bibitem{eventb_data_sharing_agreements}
+{\sc Arenas, A.~E., Aziz, B., Bicarregui, J., and Wilson, M.~D.}
+\newblock An event-b approach to data sharing agreements.
+\newblock In {\em Integrated Formal Methods\/} (Berlin, Heidelberg, 2010),
+  D.~M{\'e}ry and S.~Merz, Eds., Springer Berlin Heidelberg, pp.~28--42.
 
 \bibitem{contract_as_automaton}
 {\sc Flood, M.~D., and Goodenough, O.~R.}
@@ -14,23 +12,34 @@
   computational form.
 \newblock {\em Artificial Intelligence and Law\/} (Oct 2021).
 
-\bibitem{mcrl_book}
-{\sc Groote, J.~F., and Mousavi, M.~R.}
-\newblock {\em Modeling and Analysis of Communicating Systems}.
-\newblock The MIT Press, 2014.
+\bibitem{temporal_logic_norms_guido}
+{\sc Governatori, G.}
+\newblock Thou shalt is not you will.
+\newblock {\em CoRR abs/1404.1685\/} (2014).
 
-\bibitem{mcrl_lhc}
-{\sc Remenska, D., Willemse, T.~A., Verstoep, K., Templon, J., and Bal, H.}
-\newblock Using model checking to analyze the system behavior of the lhc
-  production grid.
-\newblock {\em Future Generation Computer Systems 29}, 8 (2013), 2239--2251.
+\bibitem{normative_compliance_guido}
+{\sc Hashmi, M., Governatori, G., and Wynn, M.}
+\newblock Normative requirements for regulatory compliance: An abstract formal
+  framework.
+\newblock {\em Information Systems Frontiers 18\/} (05 2015).
 
-\bibitem{mcrl_rewriting}
-{\sc {van Weerdenburg}, M.}
-\newblock An account of implementing applicative term rewriting.
-\newblock {\em Electronic Notes in Theoretical Computer Science 174}, 10
-  (2007), 139--155.
-\newblock Proceedings of the Sixth International Workshop on Reduction
-  Strategies in Rewriting and Programming (WRS 2006).
+\bibitem{prob_initial_paper}
+{\sc Leuschel, M., and Butler, M.}
+\newblock Pro{B}: A model checker for {B}.
+\newblock In {\em FME 2003: Formal Methods\/} (2003), K.~Araki, S.~Gnesi, and
+  D.~Mandrioli, Eds., LNCS 2805, Springer-Verlag, pp.~855--874.
+
+\bibitem{prob_follow_up_paper}
+{\sc Leuschel, M., and Butler, M.~J.}
+\newblock {ProB}: an automated analysis toolset for the {B} method.
+\newblock {\em STTT 10}, 2 (2008), 185--203.
+
+\bibitem{symboleo_model_checking_contracts}
+{\sc Parvizimosaed, A., Roveri, M., Rasti, A., Amyot, D., Logrippo, L., and
+  Mylopoulos, J.}
+\newblock Model-checking legal contracts with symboleopc.
+\newblock In {\em Proceedings of the 25th International Conference on Model
+  Driven Engineering Languages and Systems\/} (New York, NY, USA, 2022), MODELS
+  '22, Association for Computing Machinery, p.~278–288.
 
 \end{thebibliography}

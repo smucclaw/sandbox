@@ -73,3 +73,89 @@
   keywords = {Model checking, Process algebra, Grid, LHC, Distributed system, Workflow},
   abstract = {DIRAC (Distributed Infrastructure with Remote Agent Control) is the grid solution designed to support production activities as well as user data analysis for the Large Hadron Collider “beauty” experiment. It consists of cooperating distributed services and a plethora of light-weight agents delivering the workload to the grid resources. Services accept requests from agents and running jobs, while agents actively fulfill specific goals. Services maintain database back-ends to store dynamic state information of entities such as jobs, queues, or requests for data transfer. Agents continuously check for changes in the service states and react to these accordingly. The logic of each agent is rather simple; the main source of complexity lies in their cooperation. These agents run concurrently and communicate using the services’ databases as a shared memory for synchronizing the state transitions. Despite the effort invested in making DIRAC reliable, entities occasionally get into inconsistent states. Tracing and fixing such behaviors is difficult, given the inherent parallelism among the distributed components and the size of the implementation. In this paper we present an analysis of DIRAC with mCRL2, process algebra with data. We have reverse engineered two critical and related DIRAC subsystems, and subsequently modeled their behavior with the mCRL2 toolset. This enabled us to easily locate race conditions and livelocks which were confirmed to occur in the real system. We further formalized and verified several behavioral properties of the two modeled subsystems.}
 }
+
+@inproceedings{prob_initial_paper,
+   author =    {Michael Leuschel and Michael Butler},
+   title =     {Pro{B}: A Model Checker for {B}},
+   booktitle = {FME 2003: Formal Methods},
+   editor =	 {Araki, Keijiro and Gnesi, Stefania and Mandrioli, Dino},
+   publisher = {Springer-Verlag},
+   series =    {LNCS 2805},
+   year =      2003,
+  pages =	 {855--874},
+   isbn = {3-540-40828-2},
+  doi       = {10.1007/978-3-540-45236-2\_46},
+}
+
+@article{prob_follow_up_paper,
+  author    = {Michael Leuschel and
+               Michael J. Butler},
+  title     = {{ProB}: an automated analysis toolset for the {B} method},
+  journal   = {STTT},
+  volume    = {10},
+  number    = {2},
+  year      = {2008},
+  pages     = {185--203},
+  ee        = {http://dx.doi.org/10.1007/s10009-007-0063-9},
+  bibsource = {DBLP, http://dblp.uni-trier.de}
+}
+
+@inproceedings{eventb_data_sharing_agreements,
+  author    = {Arenas, Alvaro E.
+               and Aziz, Benjamin
+               and Bicarregui, Juan
+               and Wilson, Michael D.},
+  editor    = {M{\'e}ry, Dominique
+               and Merz, Stephan},
+  title     = {An Event-B Approach to Data Sharing Agreements},
+  booktitle = {Integrated Formal Methods},
+  year      = {2010},
+  publisher = {Springer Berlin Heidelberg},
+  address   = {Berlin, Heidelberg},
+  pages     = {28--42},
+  abstract  = {A Data Sharing Agreement (DSA) is a contract among two or more principals regulating how they share data. Agreements are usually represented as a set of clauses expressed using the deontic notions of obligation, prohibition and permission. In this paper, we present how to model DSAs using the Event-B specification language. Agreement clauses are modelled as temporal-logic formulas that preserve the intuitive meaning of the deontic operators, and constrain the actions that a principal can execute. We have exploited the ProB animator and model checker in order to verify that a system behaves according to its associated DSA and to validate that principals' actions are in agreement with the DSA clauses.},
+  isbn      = {978-3-642-16265-7}
+}
+
+@inproceedings{symboleo_model_checking_contracts,
+  author    = {Parvizimosaed, Alireza and Roveri, Marco and Rasti, Aidin and Amyot, Daniel and Logrippo, Luigi and Mylopoulos, John},
+  title     = {Model-Checking Legal Contracts with SymboleoPC},
+  year      = {2022},
+  isbn      = {9781450394666},
+  publisher = {Association for Computing Machinery},
+  address   = {New York, NY, USA},
+  url       = {https://doi.org/10.1145/3550355.3552449},
+  doi       = {10.1145/3550355.3552449},
+  abstract  = {Legal contracts specify requirements for business transactions. As any other requirements specification, contracts may contain errors and violate properties expected by contracting parties. Symboleo was recently proposed as a formal specification language for legal contracts. This paper presents SymboleoPC, a tool for analyzing Symboleo contracts using model checking. It highlights the architecture, implementation and testing of the tool, as well as a scalability evaluation with respect to the size of contracts and properties to be checked through a series of experiments. The results suggest that SymboleoPC can be usefully applied to the analysis of formal specifications of contracts with real-life sizes and structures.},
+  booktitle = {Proceedings of the 25th International Conference on Model Driven Engineering Languages and Systems},
+  pages     = {278–288},
+  numpages  = {11},
+  keywords  = {nuXmv, smart contracts, performance analysis, formal specification languages, software requirements specifications, legal contracts, model checking},
+  location  = {Montreal, Quebec, Canada},
+  series    = {MODELS '22}
+}
+
+@article{normative_compliance_guido,
+  author  = {Hashmi, Mustafa and Governatori, Guido and Wynn, Moe},
+  year    = {2015},
+  month   = {05},
+  pages   = {},
+  title   = {Normative Requirements for Regulatory Compliance: An Abstract Formal Framework},
+  volume  = {18},
+  journal = {Information Systems Frontiers},
+  doi     = {10.1007/s10796-015-9558-1}
+}
+
+@article{temporal_logic_norms_guido,
+  author     = {Guido Governatori},
+  title      = {Thou Shalt is not You Will},
+  journal    = {CoRR},
+  volume     = {abs/1404.1685},
+  year       = {2014},
+  url        = {http://arxiv.org/abs/1404.1685},
+  eprinttype = {arXiv},
+  eprint     = {1404.1685},
+  timestamp  = {Mon, 13 Aug 2018 16:46:29 +0200},
+  biburl     = {https://dblp.org/rec/journals/corr/Governatori14a.bib},
+  bibsource  = {dblp computer science bibliography, https://dblp.org}
+}

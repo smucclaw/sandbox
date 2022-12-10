@@ -125,6 +125,15 @@ is not natural to think of a contract in terms of a DFA and encode it as such.
   In L4, we have a notion of deontics, though not quite the same as deontic logic.
   We have an operational interpretation that is made precise by the translation
   to B.
+  
+  The focus here is that a friendly-to-use language should provide appropriate
+  constructs and abstractions corresponding to concepts found in the application
+  domain.
+  For the legal domain, these include the notions of rules, actors, events, 
+  deadlines and deontics.
+  Another reason for modelling these explicitly is to be able to achieve a
+  nice correspondence (more technically an isomorphism) with legal texts that
+  are drafted in natural language.
 }
 
 % It should be noted here that this only poses problems in the manual encoding
@@ -134,23 +143,23 @@ is not natural to think of a contract in terms of a DFA and encode it as such.
 % \todo{cite properly here}
 % are able to automatically analyze automata comprising thousands of states.
 
-Therefore, we argue that this evinces that accurately
-encoding contracts as a DFA directly is too laborious and difficult,
-even for a contract as simple as the one presented in
-\cite[Fig 1.]{contract_as_automaton}.
-In our view, a more practical formalism should sit at a higher-level than a DFA,
-providing mechanisms for tackling these 2 issues.
-Firstly, it should provide global variables, or at least, some way of encoding
-global state.
-There should also be operations that allow us to retrieve and update the global
-state.
-Secondly, it should be able to conveniently accommodate the concurrency
-inherent in the real world.
+% Therefore, we argue that this evinces that accurately
+% encoding contracts as a DFA directly is too laborious and difficult,
+% even for a contract as simple as the one presented in
+% \cite[Fig 1.]{contract_as_automaton}.
+% In our view, a more practical formalism should sit at a higher-level than a DFA,
+% providing mechanisms for tackling these 2 issues.
+% Firstly, it should provide global variables, or at least, some way of encoding
+% global state.
+% There should also be operations that allow us to retrieve and update the global
+% state.
+% Secondly, it should be able to conveniently accommodate the concurrency
+% inherent in the real world.
 % Consequently, we believe that a practical formalism for encoding contracts
 % should be something higher-level than a DFA, one that can conveniently
 % accommodate the concurrency inherent in the real world.
-Better still if the formalism comes with tools that allow us to compile down
-to something like automata for visualization and automated reasoning.
+% Better still if the formalism comes with tools that allow us to compile down
+% to something like automata for visualization and automated reasoning.
 
 % However, it should be noted that for the purposes of visualization and
 % automated reasoning in the sense of \textit{formal verification}, DFAs are a
@@ -165,15 +174,30 @@ to something like automata for visualization and automated reasoning.
 
 \subsection{Intro to L4 as a language}
 \inlinetodo{
-  Talk about how L4 is designed to be friendly to use and so contains ontological
+  Talk about how L4 is designed to address these issues.
+  
+  Firstly it comes with a concurrent model of computation (this is made precise
+  by the translation to B) which allows for arbitrary interleaving of events.
+  
+  It is also friendly to use, containing ontological
   concepts from the legal domain that people are used to thinking about and
   working with.
 
-  These include rules, actors, events, deadlines and deontics.
-
   Discuss the precise roles of these concepts and how the execution of a
-  contract can be viewed abstractly as a process that arises from the interplay
+  contract can be viewed abstractly as a process that arises from the interaction
   between them.
+
+  Mention that the precise operational interpretation of rules in L4 is tightly
+  linked to the translation in B and this was heavily inspired by
+  \cite{symboleo_model_checking_contracts,eventb_data_sharing_agreements}.
+
+  We view a rule as a wrapper around an event, a deontic (ie permission,
+  obligation or prohibition) and an actor.
+  Our treatment of deontics accounts for the notion of \textit{compensability},
+  and is based on \cite{normative_compliance_guido}.
+
+  Note that the difference is that instead of reasoning about deontics using
+  deontic logic, we provide an \textit{operational} interpretation for them.
 }
 
 \subsection{Modelling the loan agreement in L4}
@@ -183,36 +207,28 @@ to something like automata for visualization and automated reasoning.
 In search for such a suitable formalism for encoding contracts,
 we have surveyed various approaches, using the simplified contract in
 \cite[Fig 1.]{contract_as_automaton} as an example.
-One of these which we explored is the \mcrl \, toolset
-\cite{mcrl_toolset}, which provides a high-level modeling language based on a
-process algebra \cite{mcrl_book}.
+One of these which we explored is the B language and the ProB toolset
+\cite{prob_initial_paper, prob_follow_up_paper}.
 
-In this section, we begin by providing some background on \mcrl before
+In this section, we begin by providing some background on B before
 we discuss our formalization of the simple loan agreement and along
 the way, we explain how we addressed the aforementioned shortcomings.
 In particular, we show how we can generate an arguably more accurate DFA that
 accounts for the concurrent interleaving of real world events.
-Thereafter, we demonstrate how we can use the \mcrl \, toolset to help us
+Thereafter, we demonstrate how we can use ProB to help us
 visualize and reason about the contract.
-
-\inlinetodo{
-  May also want to cover other related approaches, like
-  Symboleo and how they use
-  nuxmv for verification.
-  Need to investigate how they model that further first.
-}
 
 \subsection{Background on B}
 Techniques originating from the field of formal methods have been devised to
 automatically analyze the behavior of computer systems.
 These often rely on first modelling these systems as
 \textit{labelled transition systems} (LTS), which can be seen as
-generalizations of nondeterministic finite automata (NFA).
+generalizations of nondeterministic finite automata).
 As with finite automata, LTSes can be seen as directed graphs, with nodes
 representing states that the system can be in, and labelled edges denoting
 transitions that change the state of a system.
 Where they differ from finite automata is that they are allowed to have an
-infinite \footnote{Possibly uncountable} number of states and transitions
+infinite (possibly uncountable) number of states and transitions
 between them.
 They are also not required to come with a notion of initial and final states.
 
@@ -222,714 +238,45 @@ to encode systems.
 This is especially so for systems like the simple loan agreement of
 \cite{contract_as_automaton} which involve concurrency, in that there are
 many possible ways in which events can be interleaved.
-\todo{
-  May be good to explain what is ``concurrent interleaving'' a bit more.
-}
 Modelling concurrent systems like this directly as a transition system is
 often impractical as the interleaving of events gives rise to numerous states
 and transitions.
+Moreover, as previously discussed, they leave implicit many of the domain
+specific concepts that people directly reason about.
 
-The toolset we use, \mcrl, allows us to model and analyze such concurrent systems.
+The toolset we use, ProB, allows us to model and analyze such concurrent systems.
 As with others like it, it comes equipped with a more sophisticated formalism
 that allow us to more conveniently specify these transition systems.
-% Given a specification expressed in the provided formalism, these tools
-% automatically generate the corresponding LTS, which they can then analyze.
-In the case of \mcrl, the formalism it uses is a textual specification
-language \cite{mcrl_book} based on a variant of the process algebra known
-as the Algebra of Communicating Processes (ACP).
-It also comes with a data language that allows for us to define abstract data
-types built on top of primitive types like booleans and natural numbers.
-A specification can then be simulated and visualized using the provided tools.
-For automated reasoning, we can use the provided tools to verify properties
-expressed in a first-order modal $\mu$-calculus.
-Witnesses (resp. counter-examples) can then be provided for successful
-(resp. failed) verifications.
 
-As an example, one can define a binary search tree as such:
-\begin{lstlisting}
-sort
-  Tree = struct
-    Empty
-    | T(left : Tree, value : Nat, right : Tree);
-\end{lstlisting}
-Here we define a \texttt{Tree} sort
-\footnote{
-  The term ``sort'' comes from multi-sorted logics since sorts in \mcrl \,
-  are interpreted logically as such. 
-}
-(ie type) of natural numbers with 2
-constructors, namely \texttt{Empty} and \texttt{T}, the second of which has 3
-parameters which can be projected via functions \texttt{left}, \texttt{value}
-and \texttt{right}.
-Readers familiar with functional programming will recognize that this is
-reminiscent of algebraic data types.
-
-With this, we can define an insert function with the following equations.
-
-\begin{lstlisting}
-map insert : Nat # Tree -> Tree;
-
-var t, t' : Tree; n, m : Nat;
-
-eqn
-  insert(n, Empty) = T(Empty, n, Empty);
-  (n < m) -> insert(n, T(t, m, t')) = insert(n, t);
-  (n > m) -> insert(n, T(t, m, t')) = insert(n, t');
-  (n == m) -> insert(n, T(t, m, t')) = T(t, m, t');
-\end{lstlisting}
-
-Note here that \texttt{Nat \# Tree} denotes the cartesian product
-\texttt{Nat $\times$ Tree} and that the arrows \texttt{(->)} as in
-\texttt{(n < m) -> \dots} denote optional boolean guards on the equations.
-As with functional programming, there is some support for writing them using
-pattern matching.
-To evaluate these equations, the toolset treats them as rewriting rules
-\cite{mcrl_rewriting}, oriented from left to right.
-
-Next, we define, as processes, a binary search tree and a button which
-when pressed, empties the tree:
-
-\begin{lstlisting}
-act
-  insert : Nat;
-  press, press_r, press_s;
-
-proc
-  Tree(t : Tree) =
-    sum n : Nat. (
-      insert(n) .
-      Tree(insert(n, t))
-    )
-    + press_r . Tree(Empty);
-
-  Button =
-    press_s . Button;
-\end{lstlisting}
-
-The \texttt{Tree} process is parameterized over a tree \texttt{t}, indicating
-the current state of the tree.
-It has 2 actions, the first being \texttt{insert},  which is parameterized over
-all $n \in \N$.
-\texttt{insert(n)} indicates that \texttt{n} is inserted into the
-tree and \texttt{press\_r}, which receives (hence the \texttt{\_r}) a button
-press.
-The button then has a corresponding \texttt{press\_s} which sends
-(hence the \texttt{\_s}) such a press to the tree.
-These are composed together using the (nondeterministic) choice operator
-\texttt{+} so that the
-tree may either have something inserted into it or receive a button press at
-each step.
-Briefly, \texttt{sum n : Nat. \dots} is used to indicate a
-choice over all possible natural numbers, so that any natural number can be
-inserted into the tree.
-The dot (\texttt{.}) following \texttt{insert(n)} denotes sequential composition
-with the tail recursion \texttt{Tree(insert(n, t))}, which  update the internal
-state of the tree.
-
-Finally, we can define the initial process as a parallel composition
-(\texttt{$\cdot$ || $\cdot$}) of the \texttt{Tree} process, beginning with an
-empty tree and the button, \texttt{Button}.
-
-\begin{lstlisting}
-init
-  allow({insert, press},
-  comm({press_r|press_s -> press},
-  Tree(Empty) || Button));
-\end{lstlisting}
-
-Since we only want the tree to empty itself when the button is pressed, and
-not at any other times, we use \texttt{allow} and \texttt{comm}(unicate) to
-enforce communication.
-Simply put, this means that the \texttt{press\_s} and \texttt{press\_r} in both
-processes must be executed together in the same atomic step.
-Here, \texttt{press\_r|press\_s} is a \textit{multi-action} which is an atomic
-action representing the simultaneous execution of both the individual actions.
-
-One can then use the tools provided by the \mcrl \, toolset to automatically
-transform this specification into a LTS.
-Note that the resulting transition system contains infinitely many states as
-each $\mathtt{n} \in \N$ gives rise to a transition labelled \texttt{insert(n)}.
-Thus, we see that the \mcrl \, toolset provides us with a convenient, high level
-formalism with which we can concisely express large (infinite in this case)
-transition systems.
-
-\subsection{Formalizing the contract in mcrl2}
-\todo{
-  Say something about the formalization being in our github repo.
-}
-
-\subsubsection{Generic parameters}
-
-As we wanted our specification to be modular, we began by defining the
-following global constants and functions over which the rest of our
-specification is parameterized.
-
-\begin{lstlisting}
-map
-  % The total number of payments involved in the contract.
-  total_num_payments : Pos;
-
-  % payment_amt(n) is the amount the borrower has to pay for payment n.
-  payment_amt : Pos -> Pos;
-
-  % The principal amount the lender sends the borrower.
-  principal_amt : Pos;
-
-  % The initial amount that the borrower owes the lender.
-  initial_outstanding_amt : Pos;
-
-var n : Pos;
-
-eqn
-  total_num_payments = 2;
-  principal_amt = 1000;
-  initial_outstanding_amt = 1075;
-
-  (n == 1) -> payment_amt(n) = 550;
-  (n == 2) -> payment_amt(n) = 525;
-\end{lstlisting}
-
-% As aforementioned, the \mcrl \, specification language operates at a higher
-% level of abstraction than LTSes, so that
-% we do not need to ``hard code'' the values of these variables like in the
-% original DFA encoding in \cite{contract_as_automaton}.
-These can be easily changed for instance to
-account for additional payment stages, or to incorporate interest rate
-calculations into \texttt{payment\_amt}.
-We only require that:
-
-\begin{enumerate}
-  \item
-  \texttt{payment\_amt} is a partial function defined on the domain:
-  \begin{align*}
-    \dom \text{payment\_amt} = \set{n \in \N}{n \leq \text{total\_num\_payments}}
-  \end{align*}
-
-  \item
-  The sum of all payment amounts is equal to the initial outstanding amount,
-  that is:
-  \begin{align*}
-    \sum_{n \in \dom \text{payment\_amt}}
-      \text{payment\_amt}(n) = \text{initial\_outstanding\_amt}
-  \end{align*}
-\end{enumerate}
-
-As the rest of our specification makes no further assumptions about the values
-of these constants and the computation performed by \texttt{payment\_amt},
-changing these do not require any further changes in the structure of the 
-specification.
-In comparison, if one were to add additional payment stages to the DFA in
-\cite{contract_as_automaton} directly, one will need to manually alter the
-structure of the DFA by introducing more states and transitions.
-This highlights one advantage of our approach.
-
-\subsubsection{Events and contract stages}
-
-To proceed with our formalization, we decided to model events as atomic
-actions in \mcrl.
-For instance, we have the actions \texttt{borrower\_default} for borrower
-defaults and \texttt{pay} for payments.
-Note here that for simplicity, we have ignored multiple kinds of defaults,
-preferring instead to use a single event to indicate defaults by
-representations, warranties, covenants and so on.
-We do however, have a separate action \texttt{payment\_default} for payment
-default events.
-These payment events include normal repayments, accelerated repayments,
-as well as principal repayments.
-We also have the actions \texttt{fulfilled} and \texttt{breached}, which as
-their names suggest, represent the events where the contract has terminated
-in a fulfilled or breached state.
-
-We then observe that the contract has 4 key stages, namely:
-
-\begin{enumerate}
-  \item \textbf{Initialization}
-  
-  The contract begins in this stage, where the borrower may
-  request for the principal amount.
-  Upon such a request, the lender is obliged to send it.
-  Thereafter, the process starts the main and side tracks below simultaneously,
-  before terminating.
-
-  \item \textbf{Main repay payments track}
-
-  This process handles all the payments that the borrower makes to the lender.
-  Once these are completed, the side track process is
-  terminated and the contract as a whole is fulfilled.
-  Should the borrower default on a payment, the side track is stopped and
-  the accelerated repayment process is started.
-
-  \item \textbf{Side borrower default track}
-
-  When this process starts running, it waits for the occurrence of a borrower
-  default event.
-  If that happens, and the borrower fails to cure the default,
-  the main track is stopped and the accelerated repayment process is started.
-
-  \item \textbf{Accelerated repayment}
-
-  As described above, this is triggered when things go wrong.
-  It handles the accelerated repayment stage, in which the borrower is obliged
-  to repay the outstanding amount immediately.
-\end{enumerate}
+\subsection{Translating from L4 to B}
 
 \inlinetodo{
-  Draw and insert picture.
+  Use the loan agreement as an example here.
+
+  Include sections showing off the visualization that B provides, as well as
+  simulating and analyzing the contract.
 }
 
-These are modelled in \mcrl \, as the processes
-\texttt{Init}, \texttt{Main}, \texttt{Side} and \texttt{Accel} respectively.
-\texttt{Init} is defined as follows:
-% Note that \mcrl \, does not have a notion of global mutable variables
-% \footnote{
-%   It does however allow for global constants, as shown earlier
-% }.
-% We define our main top-level process as the parallel composition:
+\subsection{Visualizing and simulating the contract}
 
-% \begin{lstlisting}
-%   init
-%     allow({...}, comm({...},
-%     Init || Main_idling || Side_idling
-%     || Outstanding(total_num_payments, initial_outstanding_amt)))
-% \end{lstlisting}
-
-% where the \texttt{Outstanding} process is used to keep track of the remaining
-% number of payments and outstanding amount that the borrower owes.
-% For brevity, we omit the details of the actions in \texttt{allow} and
-% \texttt{comm}.
-% As before, we use these to enforce communication so that some actions
-% cannot be run on their own.
-
-% Note here that \texttt{Main\_idling} (resp. \texttt{Side\_idling}) is
-% essentially the \texttt{Main} process in an idle state.
-
-% \begin{lstlisting}
-%   Main_idling =
-%     stop_main_r . Main_idling + start_main_r . Main . Main_idling;
-% \end{lstlisting}
-
-\begin{lstlisting}
-Init =
-  dont_request_principal . fulfilled
-  + request_principal . (
-      payment_default(Principal, Lender, Borrower, principal_amt) .
-      breached
-      + pay(Principal, Lender, Borrower, principal_amt) .
-        start_main_s . start_side_s
-    );
-\end{lstlisting}
-
-At the start of the contract, the borrower has the option of requesting for
-the principal amount.
-\texttt{dont\_request\_principal} is an action modelling the event where the
-borrower does not request for it on the day the loan agreement comes into
-effect.
-In this case, the contract immediately terminates in a fulfilled state.
-If the principal is requested for, ie the \texttt{request\_principal} action
-is executed, then the lender is obligated to send it.
-The contract is breached in the event that the lender defaults on this payment,
-ie the \texttt{payment\_default(Principal, Lender, Borrower, principal\_amt)}
-action is executed.
-The execution of the \texttt{breached} action indicates a breach in the contract.
-On the other hand, if the lender does send the principal amount,
-so that \texttt{pay(Principal, Lender, Borrower, principal\_amt)} runs,
-then the actions \texttt{start\_main\_s} and \texttt{start\_side\_s} will be run.
-These communicate with the corresponding \texttt{start\_main\_r} and
-\texttt{start\_side\_r} actions which start the \texttt{Main} and
-\texttt{Side} processes.
-
-Note here that we would have preferred to write:
-
-\begin{lstlisting}
-pay(Principal, Lender, Borrower, principal_amt) .
-(Main || Side)
-\end{lstlisting}
-
-However, the \mcrl \, tools do not allow for parallel composition nested under
-sequential composition.
-Parallel composition can only be used at the top-level, so that we had to lift
-it up via:
-
-\begin{lstlisting}[label=init1, caption=Top-level process version 1]
-init
-  allow({start_main, start_side},
-  comm({
-    start_main_s|start_main_r -> start_main,
-    start_side_s|start_side_r -> start_side,
-  },
-    Init || start_main_r . Main || start_side_r . Side;
-  ))
-\end{lstlisting}
-
-\subsubsection{Tracking global state}
-
-As \mcrl \, does not allow for global mutable variables as found in
-imperative programming language, we cannot simply create global variables to
-track the state of the contract, namely the remaining number of payments and
-outstanding amount.
-
-Fortunately, \cite[Section 3.2.2]{mcrl_lhc} describes a simple, common
-technique for this.
-We define a new \texttt{Outstanding} process which keeps track of these
-variables, which communicates with all the other processes, like
-\texttt{Main}, \texttt{Side} and \texttt{Accel}.
-Intuitively, payment events that occur in these other processes will cause
-these variables to be updated here and when accelerated repayment events
-occur in \texttt{Accel}, this process can be queried to obtain the current
-outstanding amount.
-
-\begin{lstlisting}
-proc Outstanding(remaining_payments : Nat, outstanding : Nat) =
-  remaining_payments_r(remaining_payments) .
-  Outstanding(remaining_payments, outstanding)
-
-  + next_payment_number_r(
-      Int2Pos(max(1, total_num_payments - remaining_payments + 1))
-    ) .
-    Outstanding(remaining_payments, outstanding)
-
-  + outstanding_r(outstanding) .
-    Outstanding(remaining_payments, outstanding)
-
-  + (outstanding > 0) -> (
-      pay_r(Accelerated, Borrower, Lender, Nat2Pos(outstanding)) .
-      Outstanding(0, 0)
-    )
-
-  + sum amt_paid : Pos. (
-      pay_r(Normal, Borrower, Lender, amt_paid) .
-      Outstanding(
-        remaining_payments = Int2Nat(max(0, remaining_payments - 1)),
-        outstanding = Int2Nat(max(0, outstanding - amt_paid))
-      )
-    );
-\end{lstlisting}
-
-Whenever a \texttt{pay\_s} event corresponding to a borrower repayment occurs
-in the \texttt{Main} process,
-the corresponding \texttt{pay\_r} event triggers, causing the
-\texttt{Outstanding} process to recurse with the updated variable values.
-More precisely, we decrement \texttt{remaining\_payments} by 1 and
-\texttt{outstanding} by the amount paid, \texttt{amt\_paid}.
-The actions \texttt{remaining\_payments\_r}, \texttt{next\_payment\_number\_r}
-and \texttt{outstanding\_r} allow other processes to query this process for
-the remaining number of payments, next payment number and outstanding amount.
-
-% With this, we can define our top-level process to be
-% \begin{lstlisting}[label=init1, caption=Top-level process version 2]
-% init
-%   allow({...},
-%   comm({...}},
-%     Init || start_main_r . Main || start_side_r . Side
-%     || Outstanding(total_num_payments, initial_outstanding_amt);
-%   ))
-% \end{lstlisting}
-
-\subsubsection{Main payment loop}
+\subsection{Analyzing via model checking}
 \inlinetodo{
-  It's worth mentioning how this explicates how we can model process interruption
-  as a meta-level operator in process algebras that don't have them built in.
+  Here we should mention that in \cite{temporal_logic_norms_guido}, the author
+  highlights an issue with using temporal logic to reason about deontics like
+  obligations.
+  We sidestep that issue due to the way we define rules as wrappers around
+  events, and deontics, so that the violation of a rule corresponds directly to
+  whether that event occured or not.
+
+  For instance, a rule of the form ``Party P must do A by D'' is an obligation
+  that is violated if P does not perform A by the deadline D.
+  In this way, we can reason about the violation of obligations by using
+  temporal logic to talk about whether an event occurred or not.
 }
-
-The \texttt{Main} payment process communicates with the \texttt{Outstanding}
-process, looping through all repayment stages.
-Recall that we want this \texttt{Main} process, along with the \texttt{Side}
-track process, to be interruptible because we want to terminate them
-before switching over to the \texttt{Accel} process for accelerated repayments.
-Consequently, we first define a wrapper process, \texttt{Main\_idling} that
-represents the \texttt{Main} track process in an idle state:
-
-\begin{lstlisting}
-proc
-  Main_idling =
-    stop_main_r . Main_idling + start_main_r . Main . Main_idling;
-\end{lstlisting}
-
-This idle process listens for start and stop signals in the form of
-\texttt{start\_main\_s} and \texttt{stop\_main\_s} actions.
-If a stop signal is received via a \texttt{stop\_main\_r} action,
-the \texttt{Main\_idling} process continues to idle as indicated by the
-recursion.
-When \texttt{start\_main\_s} is run in the \texttt{Init} process, it
-communicates with this \texttt{start\_main\_r} action, kicking the
-\texttt{Main\_idling} process out of its idle state so that the
-\texttt{Main} process begins to run.
-Thereafter, the process goes back to its idle state.
-
-We define the \texttt{Main} process as follows:
-
-\begin{lstlisting}
-proc
-  Stop_main_r = stop_main_r . Main_idling;
-
-  Main = sum n : Pos.
-    next_payment_number_s(n) .
-
-    (n > total_num_payments) -> 
-      stop_side_s . fulfilled
-    <> (
-      (pay_s(Normal, Borrower, Lender, payment_amt(n)) + Stop_main_r) .
-      Main
-
-      + (payment_default(Normal, Borrower, Lender, payment_amt(n))
-          + Stop_main_r) . (
-        (dont_notify_borrower + Stop_main_r) . Main
-
-        + (notify_borrower_of_default + Stop_main_r) . (
-          (cure_default + Stop_main_r) . Main
-
-          + (dont_cure_default + Stop_main_r) .
-            stop_side_s . Accel
-          )
-        )
-      );
-\end{lstlisting}
-
-Notice that all actions corresponding to events like
-\texttt{pay\_s} and \texttt{cure\_default} are annotated with the
-(non-deterministic) choice \texttt{+ Stop\_main\_r}.
-This means that at every step in the execution of the \texttt{Main} process,
-it may either perform an atomic action or listen out for a stop signal given by
-\texttt{stop\_main\_s}, which communicates with the \texttt{stop\_main\_r}
-action in the \texttt{Stop\_main\_r} process.
-Upon receiving such a signal, the \texttt{Main} process stops running, ie it
-transitions back to the idling state.
-This is used by the \texttt{Side} process to stop the \texttt{Main}
-process before transitioning to the accelerated repayment stage.
-Note that by default, the non-deterministic choice operator \texttt{+}
-does not give priority to one process over the other.
-While \mcrl \, does not allow us to adjust priorities from within specifications
-themselves, unlike other tools like UPPAAL, we found a workaround to force
-the toolset to prioritize these transitions when generating the LTS.
-We describe this in more detail in the next section where we talk about how
-we generate and explore the transition system.
-
-% As mentioned earlier, a choice \texttt{P + Q} between processes \texttt{P}
-% and \texttt{Q} is non-deterministic in that it does not prioritize
-% one action over the other
-
-% More precisely, \texttt{stop\_main\_r} communicates with
-% \texttt{stop\_main\_s} actions, causing it to execute instead as per
-% the idle \texttt{Main\_idling} process.
-
-\inlinetodo{
-  Should probably mention about how we hide those actions and prioritize tau
-  transitions in the LTS to give them priority.
-}
-
-Observe that we first perform \texttt{next\_payment\_number\_s(n)}, which as
-mentioned earlier, communicates with the \texttt{Outstanding} process to
-determine what the next payment number is.
-\texttt{(n > total\_num\_payments) -> \dots <> \dots} is a conditional
-if-then-else that checks if all payments have been made.
-If so, the side track is stopped via the \texttt{stop\_side\_s} action and
-the \texttt{fulfilled} action is performed.
-This indicates that the contract has been fulfilled.
-Otherwise, the borrower is obligated to pay the lender.
-In the event that he does, \texttt{pay\_s} is run and communicates with the
-corresponding \texttt{pay\_r} action in the \texttt{Outstanding} process to
-update the state of the contract.
-
-Suppose the borrower defaults on the payment as indicated by the
-\texttt{payment\_default} event. 
-Then, if he is not notified by the borrower or eventually cures his default,
-he does not get into trouble, so we recurse to the start of the \texttt{Main}
-process and continue handling the remaining payments.
-If instead he is notified but fails to cure his default in time,
-\texttt{stop\_side\_s} is run, stopping the \texttt{Side} process.
-Thereafter, we proceed with the accelerated repayment stage via the
-\texttt{Accel} process.
-
-Notice that once the borrower makes a payment, doesn't get notified about his
-default, or cures it, we recurse back to the top of the main process and
-continue with the payment loop.
-This allows us to handle arbitrarily many payment stages.
-Note also that we make no assumption that the borrower is notified immediately
-after the occurrence of a default event, so that payment events, or other
-default events may occur in the meantime.
-In the event of multiple events of default, the borrower will be obligated to
-cure all of them.
-
-\subsubsection{Side avoid default process}
-The \texttt{Side} process handles borrower default events, where the
-\texttt{borrower\_default} action denotes an event of default by
-representations, warranties, covenants and bankruptcy.
-
-\begin{lstlisting}
-proc
-  Side =
-    (borrower_default + Stop_side_r) . (
-      (dont_notify_borrower + Stop_side_r) . Side
-      + (notify_borrower_of_default + Stop_side_r) . (
-          (cure_default + Stop_side_r) . Side
-          + (dont_cure_default + Stop_side_r) .
-          stop_main_s . Accel
-        )
-  );
-\end{lstlisting}
-
-As aforementioned, this process begins it execution with a borrower default
-event.
-When that happens, we proceed as in the case of payment defaults in the
-\texttt{Main} process.
-That is, if the borrower is not notified about it or cures it on time, then
-nothing bad happens and so we recurse back to the top.
-Otherwise, if he is notified but fails to cure it, we use
-\texttt{stop\_main\_s} to stop the main payment process and transition to
-handling accelerated repayments.
-Note here that we also annotate every action with a choice between that and
-the \texttt{Stop\_side\_r} process, which is defined similarly to
-\texttt{Stop\_main\_r}.
-This allows the \texttt{Side} process to be stopped by the \texttt{Main}
-process before \texttt{Accel} is started.
-
-\subsubsection{Accelerated Repayments}
-The accelerated repayments stage kicks in when the borrower fails to cure
-a default.
-When this happens, all previous obligations are suspended and he now has to
-repay the outstanding amount immediately.
-
-\begin{lstlisting}
-proc
-  Accel = sum outstanding : Pos. (
-    outstanding_s(outstanding) . (
-      pay_s(Accelerated, Borrower, Lender, outstanding) .
-      fulfilled
-      + payment_default(Accelerated, Borrower, Lender, outstanding) .
-        breached
-    )
-  );
-\end{lstlisting}
-
-The \texttt{Accel} process begins by running the \texttt{outstanding\_s} action,
-which queries the \texttt{Outstanding} process for the current outstanding
-amount. 
-At this point, the borrower is obligated to repay this amount.
-\texttt{fulfilled} and \texttt{breached} are run depending on whether the
-borrower makes the accelerated repayment or defaults on it.
-Recall that these actions denote the fulfillment and breach of the contract
-respectively.
-
-% where \texttt{Main\_idling} is given by
-% \begin{lstlisting}
-%     proc Main_idling =
-%       stop_main_r . Main_idling + start_main_r . Main . Main_idling;
-%     Stop_main_r = stop_main_r . Main_idling;
-% \end{lstlisting}
-
-% \texttt{Side\_idling} is similarly defined.
-% Intuitively, \texttt{Main\_idling} is a process wrapping \texttt{Main} that
-% begins in an idle state, waiting for the \texttt{start\_main\_s}
-% action to be run in the \texttt{Init} process.
-% When run, this action triggers the \texttt{Main} (resp. \texttt{Side}) track
-% processes to start running.
-
-% In order to allow for both the \texttt{Main} and \texttt{Side}
-% processes to be interrupted during execution, we had to define, for instance
-% for the main process:
-
-% \info{
-%   Some notes:
-
-%   Talk about how the main repayment track is recursive, modelling a loop that
-%   iterates through the number of payments involved in the loan agreement.
-
-%   While \mcrl \, does not have a notion of global variables like other formalisms
-%   (mention other formalisms here, maybe uppaal?), these can be easily
-%   simulated.
-%   Our specification defines ``global variables'' representing the current
-%   runtime state of the contract, namely the remaining number of payments as well
-%   as the outstanding amount.
-%   These variables are then updated whenever a normal repayment event occurs, and
-%   referenced during accelerated repayment event.
-
-%   % using the technique described in \cite[Section 3.2.2]{mcrl_lhc}.
-
-%   Finally, our formalization also allow for more events to be interleaved
-%   concurrently.
-%   In particular, we make no assumption that the borrower is notified immediately
-%   after a default event occurs.
-%   Payment events or even other default events may occur in the meantime, so that
-%   in the latter case, the borrower has multiple defaults to cure.
-% }
-
-\subsection{Generating and Exploring the transition system}
-In order to visualize and simulate the process corresponding to the contract,
-we first use the \mcrl \, toolset to generate a LTS.
-In our case, the LTS that we obtain is a DFA, ie it has finitely many states
-and is deterministic.
-
-\subsection{Background on the modal mu calculus in mcrl2}
-
-\subsection{Automated reasoning with the contract}
 
 \section{Related work}
 
 \section{Limitations and future work}
-
-\begin{enumerate}
-  \item No explicit notion of real time, ie no global clock process.
-
-  \item We don't keep track of blame assignment, ie who is in breach of the
-  contract.
-
-  \item Lack of native notion of process interruption, and inability of
-  linearizer to handle parallel composition under sequential comp and recursion,
-  ie \texttt{A . (B || C)}, makes modelling a bit inconvenient and unnatural.
-
-  \item Squeezing out deontics completely means we have no way to really reason
-  about obligations and permissions.
-
-  Explore Guido's work on why deontics cannot be adequately represented in
-  temporal logics, LTL in particular.
-
-  Eg: if we take
-  \begin{enumerate}
-    \item Maintenance obligation $\Rightarrow$ Always
-    \item Achievement obligation $\Rightarrow$ Eventually
-  \end{enumerate}
-  then how to handle permission?
-
-  Also, how to handle reparation/compensation?
-
-  \item Connecting this to l4.
-  
-  \mcrl \, is a capable tool but not exactly what we want to use, because it
-  lacks some higher level conveniences that we would like to have.
-  These include things like global state, global clock for time and interrupts.
-
-  Still, this experiment gives us a good idea of what kind of features we want
-  for l4's semantics, specifically if we want to use some process algebra for
-  it.
-  Moreover, it also demonstrates how we can model these in \mcrl.
-  While global state, time and interrupts aren't too difficult to handle, the
-  inability to express parallel composition like \texttt{A. (B || C)} suggests
-  that we may need to do some non-trivial encoding into \mcrl.
-
-  There seems to be various works out there about formalizing semantics of
-  various things like UML state machines in various tools like \mcrl \, and
-  beyond.
-  Should look into this for clues on how we can model l4's semantics.
-\end{enumerate}
-
-% which make such an encoding cumbersome.
-
-% For instance, there is a verbose duplication of states along the main
-% ``happy path'' in \cite[Fig. 1]{contract_as_automaton}.
-% Note here that when we say ``duplication'', we do not mean that there are states
-% which play exactly the same role from the point of view of language acceptance,
-% as in the sense of the Myhill-Nerode technique of DFA minimization.
-% What we mean instead is that there are similarly named states whose subgraphs
-% have similar structure.
-
-
-% Beneath these, there are similarly named states representing the occurrence of a
-% borrower default event, which in turn lead to payment accelerating states,
-% lying along the unhappy paths.
-% Here, one sees that the duplicated states lying along the happy path also gives
-% rise to a duplication in states along the unhappy paths.
-
-% ``borrower defaults on representations/warranties'' and ``payment made''.
 
 \newpage
 

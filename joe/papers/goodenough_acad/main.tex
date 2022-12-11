@@ -265,6 +265,28 @@ temporal logic to talk about whether an event occurred or not.
 \section{Related work}
 
 \section{Limitations and future work}
+The current B models are not very performant and have huge state spaces.
+One of the main reasons is that we model time naively, with a \texttt{tick}
+transition denoting the passage of 1 unit of time (which can be taken to be
+1 day, 1 month etc).
+We did this because ProB does not come with any built-in support for these notions,
+so we wanted an easy way to model these.
+Unfortunately, this considerably bloats up the state space.
+Again it must be emphasized that this is a proof of concept and these were
+designed to be as high-level and close to the syntax of L4 as possible.
+In the future, we intend to optimize this, among other things.
+We could investigate the use of other formalisms that better support modeling
+time and deadlines, or we could build our own abstractions to handle these more
+efficiently in B.
+
+Currently, we don't yet support global variables and more sophisticated control
+structures like loops.
+Global variables would be useful to capture the notion of the outstanding amount
+in the loan agreement contract, which would then vary with the payments made by
+the borrower.
+B as a formalism supports these, but we currently do not support them in L4.
+For future work, we would like to provide syntax for these in L4 and translate
+them to B.
 
 \newpage
 

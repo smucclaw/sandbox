@@ -32,7 +32,7 @@ Interruption of rules by an event corresponds to a reset arc.
 */
 
 DEFINITIONS
-  "CommonDefs.def";
+  "CommonDefs.def"
 
 SETS
   Deontic = {

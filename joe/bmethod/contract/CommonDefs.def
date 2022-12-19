@@ -17,10 +17,10 @@ DEFINITIONS
 
   get_rule_name == λ rule. (Top | rule'name);
 
-  exists_active_rule(deontics, event_name, actor) ==
-    # rule. (rule : rules &
-      (rule'name, actor) : dom(active_rules) &
-      rule'deontic : deontics &
+  exists_active_rule_with(deontics, event_name, actor) ==
+    ∃ rule. (rule ∈ rules ∧
+      (rule'name, actor) ∈ dom(active_rules) ∧
+      rule'deontic ∈ deontics ∧
       rule'event'name = event_name
     );
 

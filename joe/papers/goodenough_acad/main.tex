@@ -27,10 +27,10 @@
 
 \subsection{Intro}
 
-\inlinetodo{
-  Write a better intro and provide more background on
-  \cite{contract_as_automaton}.
-}
+% \inlinetodo{
+%   Write a better intro and provide more background on
+%   \cite{contract_as_automaton}.
+% }
 
 In \cite{contract_as_automaton}, the authors claim that many financial
 contracts are inherently computational in nature.
@@ -112,29 +112,26 @@ the DFA, especially if we account for concurrency.
 We argue that another weakness of the approach is that aside from complexity, it
 is not natural to think of a contract in terms of a DFA and encode it as such.
 
-\inlinetodo{
-  Other weaknesses to mention:
+Other weaknesses to mention:
 
-  Representation of time and deadlines.
-  Not handled well by the DFA, but is an important notion that exists in L4.
-  These are translated to B.
+Representation of time and deadlines.
+Not handled well by the DFA, but is an important notion that exists in L4.
+These are translated to B.
 
-  No explicit notion of deontics, which is important to humans because that's
-  what people are used to reasoning about and normative language shows up
-  everywhere in legal drafting.
-  In L4, we have a notion of deontics, though not quite the same as deontic logic.
-  We have an operational interpretation that is made precise by the translation
-  to B.
-  
-  The focus here is that a friendly-to-use language should provide appropriate
-  constructs and abstractions corresponding to concepts found in the application
-  domain.
-  For the legal domain, these include the notions of rules, actors, events, 
-  deadlines and deontics.
-  Another reason for modelling these explicitly is to be able to achieve a
-  nice correspondence (more technically an isomorphism) with legal texts that
-  are drafted in natural language.
-}
+No explicit notion of deontics, which is important to humans because that's
+what people are used to reasoning about and normative language shows up
+everywhere in legal drafting.
+In L4, we have a notion of deontics, though not quite the same as deontic logic.
+We have an operational interpretation that is made precise by the translation
+to B.
+
+The focus here is that a friendly-to-use language should provide appropriate
+abstractions corresponding to concepts found in the application domain.
+For the legal domain, these include the notions of rules, actors, events, 
+deadlines and deontics.
+Another reason for modelling these explicitly is to be able to achieve a
+nice correspondence (more technically an isomorphism) with legal texts that
+are drafted in natural language.
 
 % It should be noted here that this only poses problems in the manual encoding
 % of a contract, by hand, as a DFA.
@@ -173,32 +170,30 @@ is not natural to think of a contract in terms of a DFA and encode it as such.
 \section{The L4 approach}
 
 \subsection{Intro to L4 as a language}
-\inlinetodo{
-  Talk about how L4 is designed to address these issues.
-  
-  Firstly it comes with a concurrent model of computation (this is made precise
-  by the translation to B) which allows for arbitrary interleaving of events.
-  
-  It is also friendly to use, containing ontological
-  concepts from the legal domain that people are used to thinking about and
-  working with.
+Talk about how L4 is designed to address these issues.
 
-  Discuss the precise roles of these concepts and how the execution of a
-  contract can be viewed abstractly as a process that arises from the interaction
-  between them.
+Firstly it comes with a concurrent model of computation (this is made precise
+by the translation to B) which allows for arbitrary interleaving of events.
 
-  Mention that the precise operational interpretation of rules in L4 is tightly
-  linked to the translation in B and this was heavily inspired by
-  \cite{symboleo_model_checking_contracts,eventb_data_sharing_agreements}.
+It is also friendly to use, containing ontological
+concepts from the legal domain that people are used to thinking about and
+working with.
 
-  We view a rule as a wrapper around an event, a deontic (ie permission,
-  obligation or prohibition) and an actor.
-  Our treatment of deontics accounts for the notion of \textit{compensability},
-  and is based on \cite{normative_compliance_guido}.
+Discuss the precise roles of these concepts and how the execution of a
+contract can be viewed abstractly as a process that arises from the interaction
+between them.
 
-  Note that the difference is that instead of reasoning about deontics using
-  deontic logic, we provide an \textit{operational} interpretation for them.
-}
+Mention that the precise operational interpretation of rules in L4 is tightly
+linked to the translation in B and this was heavily inspired by
+\cite{symboleo_model_checking_contracts,eventb_data_sharing_agreements}.
+
+We view a rule as a wrapper around an event, a deontic (ie permission,
+obligation or prohibition) and an actor.
+Our treatment of deontics accounts for the notion of \textit{compensability},
+and is based on \cite{normative_compliance_guido}.
+
+Note that the difference is that instead of reasoning about deontics using
+deontic logic, we provide an \textit{operational} interpretation for them.
 
 \subsection{Modelling the loan agreement in L4}
 
@@ -249,34 +244,49 @@ As with others like it, it comes equipped with a more sophisticated formalism
 that allow us to more conveniently specify these transition systems.
 
 \subsection{Translating from L4 to B}
-
-\inlinetodo{
-  Use the loan agreement as an example here.
-
-  Include sections showing off the visualization that B provides, as well as
-  simulating and analyzing the contract.
-}
+Use the loan agreement as an example here.
 
 \subsection{Visualizing and simulating the contract}
+Insert DFA of state space here.
 
 \subsection{Analyzing via model checking}
-\inlinetodo{
-  Here we should mention that in \cite{temporal_logic_norms_guido}, the author
-  highlights an issue with using temporal logic to reason about deontics like
-  obligations.
-  We sidestep that issue due to the way we define rules as wrappers around
-  events, and deontics, so that the violation of a rule corresponds directly to
-  whether that event occured or not.
+Here we should mention that in \cite{temporal_logic_norms_guido}, the author
+highlights an issue with using temporal logic to reason about deontics like
+obligations.
+We sidestep that issue due to the way we define rules as wrappers around
+events, and deontics, so that the violation of a rule corresponds directly to
+whether that event occured or not.
 
-  For instance, a rule of the form ``Party P must do A by D'' is an obligation
-  that is violated if P does not perform A by the deadline D.
-  In this way, we can reason about the violation of obligations by using
-  temporal logic to talk about whether an event occurred or not.
-}
+For instance, a rule of the form ``Party P must do A by D'' is an obligation
+that is violated if P does not perform A by the deadline D.
+In this way, we can reason about the violation of obligations by using
+temporal logic to talk about whether an event occurred or not.
 
 \section{Related work}
 
 \section{Limitations and future work}
+The current B models are not very performant and have huge state spaces.
+One of the main reasons is that we model time naively, with a \texttt{tick}
+transition denoting the passage of 1 unit of time (which can be taken to be
+1 day, 1 month etc).
+We did this because ProB does not come with any built-in support for these notions,
+so we wanted an easy way to model these.
+Unfortunately, this considerably bloats up the state space.
+Again it must be emphasized that this is a proof of concept and these were
+designed to be as high-level and close to the syntax of L4 as possible.
+In the future, we intend to optimize this, among other things.
+We could investigate the use of other formalisms that better support modeling
+time and deadlines, or we could build our own abstractions to handle these more
+efficiently in B.
+
+Currently, we don't yet support global variables and more sophisticated control
+structures like loops.
+Global variables would be useful to capture the notion of the outstanding amount
+in the loan agreement contract, which would then vary with the payments made by
+the borrower.
+B as a formalism supports these, but we currently do not support them in L4.
+For future work, we would like to provide syntax for these in L4 and translate
+them to B.
 
 \newpage
 

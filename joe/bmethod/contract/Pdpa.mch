@@ -89,17 +89,15 @@ states, which messes up the generation of witnessing traces via EF + EX[action].
 */
 VARIABLES
   started,
-  is_public_agency, is_notified, is_notifiable
+  is_public_agency, is_notifiable
 
 INVARIANT
   started ∈ BOOL ∧
   is_public_agency ∈ {org} → BOOL ∧
-  is_notifiable ∈ BOOL ∧
-  is_notified ∈ {indiv} → BOOL
+  is_notifiable ∈ BOOL
 
 INITIALISATION
   started := FALSE ||
-  is_notified := {(indiv, FALSE)} ||
   is_public_agency := {(org, FALSE)} ||
   is_notifiable := FALSE
 
@@ -136,8 +134,7 @@ OPERATIONS
   END;
 
   notify_indiv_happened(actor) = VAR rule_names IN
-    rule_names ← event_happened(notify_indiv, actor);
-    is_notified(indiv) := TRUE
+    rule_names ← event_happened(notify_indiv, actor)
   END;
 
   notify_indiv_timeout(actor) = VAR rule_names IN
@@ -162,9 +159,7 @@ OPERATIONS
     IF ProhibitNotifyIndiv ∈ rule_names THEN
       discharge({(NotifyIndiv, org)});
 
-      IF is_notified(indiv) = FALSE THEN
-        trigger({(CannotNotifyIndiv, org)})
-      END
+      trigger({(CannotNotifyIndiv, org)})
     END
   END;
 

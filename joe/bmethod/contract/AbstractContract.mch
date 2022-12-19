@@ -33,7 +33,6 @@ Interruption of rules by an event corresponds to a reset arc.
 
 DEFINITIONS
   "CommonDefs.def";
-  get_rule_name == λ rule. (Top | rule'name)
 
 SETS
   Deontic = {

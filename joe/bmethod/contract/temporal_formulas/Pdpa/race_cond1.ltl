@@ -1,0 +1,5 @@
+WF(tick) => (
+  (G {breached_by = None}) &
+  G ({exists_active_rule({NCProhib, CProhib}, notify_indiv, org)} =>
+  H not [notify_indiv_happened(org)])
+)

@@ -1,0 +1,51 @@
+Line ::= Title "." ;
+Line ::= Meta "." ;
+Line ::= Item "." ;
+Line ::= Num NP "," AP "nach" Ref "," "ist" NP "." ;
+Line ::= Num Adv "sind" "zunächst" NP "," "dann" NP "zu" VP "." ;
+Line ::= Num NP "ist" "," Adv "," ListAdv "zu" VP "." ;
+Line ::= Num NP "ist" Adv VP "," RS "." ;
+-- 7 lines 7 rules
+
+ListAdv ::= Adv ;
+ListAdv ::= Adv ListAdv ;
+
+Title ::= "§" "2" "Abs." "3" "EStG" "i.d.F." "des" "Steuerentlastungsgesetze" ;
+Meta ::= "1999/2000/2002" "mit" "Euro-Beträge" ;
+Item ::= "(3)" ;
+Num ::= "¹" ;
+NP ::= "die" "Summe" "der" "Einkünfte" ;
+AP ::= VP ;
+VP ::= V ;
+VP ::= "vermindert" "um" NP ; -- This : Kind -> Item
+NP ::= "den" "Altersentlastungsbetrag" "und" "den" "Abzug" ;
+Ref ::= "§" "13" "Abs." "3" ;
+NP ::= "der" "Gesamtbetrag" NP ;
+NP ::= "der" CN ;
+CN ::= "Einkünfte" ;
+Num ::= "²" ;
+Adv ::= "Bei" NP ;
+NP ::= "der" "Ermittlung" NP NP ;
+CN ::= "Summe" ;
+NP ::= "jeweils" NP "aus" "jeder" CN ;
+CN ::= "Einkunftsart" ;
+NP ::= "die" "Summen" NP ;
+NP ::= "die" "Summe" NP ;
+NP ::= "der" "positiven" CN ;
+V ::= "ermitteln" ;
+Num ::= "³" ;
+Adv ::= "soweit" "sie" "den" "Betrag" "von" "100" "000" "Euro" "übersteigt" ;
+Adv ::= "durch" "negative" "Summen" NP "aus" "anderen" CN;
+NP ::= "Einkunftsarten" ;
+Adv ::= "nur" "bis" "zur" "Hälfte" ;
+V ::= "mindern" ;
+Num ::= "⁴" ;
+NP ::= "Die" "Minderung" ;
+Adv ::= "in" NP ;
+NP ::= "dem" CN ;
+CN ::= "Verhältnis" ;
+V ::= "vorzunehmen" ;
+RS ::= "in" "dem" "die" "positiven" "Summen" NP "aus" "verschiedenen" NP VP ;
+VP ::= "zur" CN NP V ;
+V ::= "stehen" ;
+-- 23 lexical rules

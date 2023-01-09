@@ -5,9 +5,9 @@
 \contentsline {subsection}{\numberline {2.1}Intro to L4 as a language}{3}{subsection.2.1}%
 \contentsline {subsection}{\numberline {2.2}Formalizing the loan agreement in L4}{4}{subsection.2.2}%
 \contentsline {section}{\numberline {3}Formalizing contracts in B and how it relates to L4}{4}{section.3}%
-\contentsline {subsection}{\numberline {3.1}Background on B}{4}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.1}Background on B}{5}{subsection.3.1}%
 \contentsline {subsection}{\numberline {3.2}Translating from L4 to B}{5}{subsection.3.2}%
 \contentsline {subsection}{\numberline {3.3}Visualizing and simulating the contract}{5}{subsection.3.3}%
 \contentsline {subsection}{\numberline {3.4}Analyzing via model checking}{5}{subsection.3.4}%
-\contentsline {section}{\numberline {4}Related work}{5}{section.4}%
-\contentsline {section}{\numberline {5}Limitations and future work}{5}{section.5}%
+\contentsline {section}{\numberline {4}Related work}{6}{section.4}%
+\contentsline {section}{\numberline {5}Limitations and future work}{6}{section.5}%

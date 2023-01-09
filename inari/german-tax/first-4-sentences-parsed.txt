@@ -1,0 +1,12 @@
+> p " ¹  die Summe der Einkünfte ,  vermindert um den Altersentlastungsbetrag und den Abzug nach  § 13 Abs. 3 , ist  der Gesamtbetrag der Einkünfte ."
+Line_Num_NP_AP_nach_Ref_ist_NP 'Num_¹' (NP_die_Summe_NP (NP_der_CN CN_Einkünfte)) (AP_VP (VP_vermindert_um_NP NP_den_Altersentlastungsbetrag_und_den_Abzug)) Ref_13_Abs_3 (NP_der_Gesamtbetrag_NP (NP_der_CN CN_Einkünfte))
+
+
+> p " ²  Bei der Ermittlung der Summe der Einkünfte sind zunächst  jeweils die Summen der Einkünfte aus jeder Einkunftsart , dann  die Summe der positiven Einkünfte zu ermitteln ."
+Line_Num_Adv_sind_zunächst_NP_dann_NP_zu_VP 'Num_²' (Adv_Bei_NP (NP_der_Ermittlung_NP_NP (NP_der_CN CN_Summe) (NP_der_CN CN_Einkünfte))) (NP_jeweils_NP_aus_jeder_CN (NP_die_Summen_NP (NP_der_CN CN_Einkünfte)) CN_Einkunftsart) (NP_die_Summe_NP (NP_der_positiven_CN CN_Einkünfte)) (VP_V V_ermitteln)
+
+> p " ³  die Summe der positiven Einkünfte ist ,  soweit sie den Betrag von 100 000 Euro übersteigt ,  durch negative Summen der Einkünfte aus anderen Einkunftsarten  nur bis zur Hälfte zu  mindern ."
+Line_Num_NP_ist_Adv_ListAdv_zu_VP 'Num_³' (NP_die_Summe_NP (NP_der_positiven_CN CN_Einkünfte)) Adv_soweit_sie_den_Betrag_von_100_000_Euro_übersteigt (ListAdv_Adv_ListAdv (Adv_durch_negative_Summen_NP_aus_anderen_CN (NP_der_CN CN_Einkünfte) CN_Einkunftsarten) (ListAdv_Adv Adv_nur_bis_zur_Hälfte)) (VP_V V_mindern)
+
+> p " ⁴  die Minderung ist  in dem Verhältnis  vorzunehmen ,  in dem die positiven Summen der Einkünfte aus verschiedenen Einkunftsarten zur Summe der positiven Einkünfte stehen ."
+Line_Num_NP_ist_Adv_VP_RS 'Num_⁴' NP_die_Minderung (Adv_in_NP (NP_dem_CN CN_Verhältnis)) (VP_V V_vorzunehmen) (RS_in_dem_die_positiven_Summen_NP_aus_verschiedenen_NP_VP (NP_der_CN CN_Einkünfte) NP_Einkunftsarten (VP_zur_CN_NP_V CN_Summe (NP_der_positiven_CN CN_Einkünfte) V_stehen))

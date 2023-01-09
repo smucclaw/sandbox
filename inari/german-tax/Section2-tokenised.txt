@@ -8,9 +8,9 @@
 
  ²  Bei der Ermittlung der Summe der Einkünfte sind zunächst  jeweils die Summen der Einkünfte aus jeder Einkunftsart , dann  die Summe der positiven Einkünfte zu ermitteln .
 
- ³  Die Summe der positiven Einkünfte ist ,  soweit sie den Betrag von 100 000 Euro übersteigt ,  durch negative Summen der Einkünfte aus anderen Einkunftsarten  nur bis zur Hälfte zu  mindern .
+ ³  die Summe der positiven Einkünfte ist ,  soweit sie den Betrag von 100 000 Euro übersteigt ,  durch negative Summen der Einkünfte aus anderen Einkunftsarten  nur bis zur Hälfte zu  mindern .
 
- ⁴  Die Minderung ist  in dem Verhältnis  vorzunehmen ,  in dem die positiven Summen der Einkünfte aus verschiedenen Einkunftsarten zur Summe der positiven Einkünfte stehen .
+ ⁴  die Minderung ist  in dem Verhältnis  vorzunehmen ,  in dem die positiven Summen der Einkünfte aus verschiedenen Einkunftsarten zur Summe der positiven Einkünfte stehen .
 
  ⁵  Übersteigt die Summe der negativen Einkünfte den nach  Satz 3 ausgleichsfähigen Betrag , sind die negativen Summen der Einkünfte aus verschiedenen Einkunftsarten in dem Verhältnis zu berücksichtigen , in dem sie zur Summe der negativen Einkünfte stehen .
 

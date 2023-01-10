@@ -100,11 +100,9 @@ INITIALISATION
   is_notifiable := FALSE
 
 OPERATIONS
-  start =
-    PRE
-      started = FALSE
-    THEN
-      start_with_rules(rules0) ||
+  setup =
+    BEGIN
+      start_contract || add_rules(rules0);
       
       // Nondeterministic initialization of variables.
       is_public_agency :∈ {org} → BOOL;

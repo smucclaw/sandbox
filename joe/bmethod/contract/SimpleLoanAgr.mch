@@ -115,11 +115,9 @@ PROPERTIES
   }
 
 OPERATIONS
-  start =
-    PRE
-      started = FALSE
-    THEN
-      start_with_rules(rules0);
+  setup =
+    BEGIN
+      start_contract || add_rules(rules0);
       trigger({(RequestPrincipal, borrower)}) 
     END;
 

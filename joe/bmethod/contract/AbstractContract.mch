@@ -57,11 +57,8 @@ PROPERTIES
 
   // Actor; RuleName; EventName
 
-CONCRETE_VARIABLES
-  started
-
 VARIABLES
-  rules, breached_by, active_rules
+  started, rules, breached_by, active_rules
 
 INVARIANT
   started ∈ BOOL ∧
@@ -92,26 +89,28 @@ INVARIANT
   )
 
 INITIALISATION
-  started, rules, breached_by, active_rules := FALSE, ∅, None, ∅
+  started := FALSE ||
+  rules := ∅ ||
+  breached_by := None ||
+  active_rules := ∅
 
 OPERATIONS
-  start_with_rules(initial_rules) =
-    PRE
-      started = FALSE ∧
-      initial_rules ⊆ Rule
+  start_contract =
+    SELECT
+      started = FALSE
     THEN
-      started, rules := TRUE, initial_rules
+      started := TRUE
     END;
 
   add_rules(rules_to_add) =
-    PRE
+    SELECT
       rules_to_add ⊆ Rule
     THEN
       rules := rules ∪ rules_to_add
     END;
 
   remove_rules(rules_to_remove) =
-    PRE
+    SELECT
       rules_to_remove ⊆ Rule
     THEN
       rules := rules \ rules_to_remove
@@ -119,7 +118,7 @@ OPERATIONS
 
   // Discrete clock tick transition.
   tick =
-    PRE
+    SELECT
       // The clock is allowed to tick iff the contract has started,
       // hasn't been breached yet, and all active timers have a positive value.
       rules ≠ ∅ ∧

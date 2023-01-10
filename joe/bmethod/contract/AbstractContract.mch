@@ -57,10 +57,14 @@ PROPERTIES
 
   // Actor; RuleName; EventName
 
+CONCRETE_VARIABLES
+  started
+
 VARIABLES
   rules, breached_by, active_rules
 
 INVARIANT
+  started ∈ BOOL ∧
   rules ⊆ Rule ∧
   breached_by ∈ Option(Actor) ∧
 
@@ -88,9 +92,17 @@ INVARIANT
   )
 
 INITIALISATION
-  rules, breached_by, active_rules := ∅, None, ∅
+  started, rules, breached_by, active_rules := FALSE, ∅, None, ∅
 
 OPERATIONS
+  start_with_rules(initial_rules) =
+    PRE
+      started = FALSE ∧
+      initial_rules ⊆ Rule
+    THEN
+      started, rules := TRUE, initial_rules
+    END;
+
   add_rules(rules_to_add) =
     PRE
       rules_to_add ⊆ Rule

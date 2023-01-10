@@ -88,7 +88,6 @@ This is because CTL semantics evaluates formulas over all possible initial
 states, which messes up the generation of witnessing traces via EF + EX[action].
 */
 VARIABLES
-  started,
   is_public_agency, is_notifiable
 
 INVARIANT
@@ -97,7 +96,6 @@ INVARIANT
   is_notifiable ∈ BOOL
 
 INITIALISATION
-  started := FALSE ||
   is_public_agency := {(org, FALSE)} ||
   is_notifiable := FALSE
 
@@ -106,10 +104,12 @@ OPERATIONS
     PRE
       started = FALSE
     THEN
-      started := TRUE ||
-      is_public_agency :∈ {org} → BOOL ||
-      add_rules(rules0);
+      start_with_rules(rules0) ||
+      
+      // Nondeterministic initialization of variables.
+      is_public_agency :∈ {org} → BOOL;
 
+      // Trigger starting rules based on nondet initialization.
       IF is_public_agency(org) = TRUE THEN
         trigger({(Assessment, org)})
       END

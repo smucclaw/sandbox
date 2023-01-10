@@ -114,22 +114,12 @@ PROPERTIES
     )
   }
 
-VARIABLES
-  started
-
-INVARIANT
-  started ∈ BOOL
-
-INITIALISATION
-  started := FALSE
-
 OPERATIONS
   start =
     PRE
       started = FALSE
     THEN
-      started := TRUE ||
-      add_rules(rules0);
+      start_with_rules(rules0);
       trigger({(RequestPrincipal, borrower)}) 
     END;
 

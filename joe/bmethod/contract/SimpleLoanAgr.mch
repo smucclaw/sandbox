@@ -117,7 +117,7 @@ PROPERTIES
 OPERATIONS
   setup =
     BEGIN
-      start_contract || add_rules(rules0);
+      start_contract; add_rules(rules0);
       trigger({(RequestPrincipal, borrower)}) 
     END;
 

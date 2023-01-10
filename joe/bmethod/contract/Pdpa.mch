@@ -102,8 +102,8 @@ INITIALISATION
 OPERATIONS
   setup =
     BEGIN
-      start_contract || add_rules(rules0);
-      
+      start_contract; add_rules(rules0);
+
       // Nondeterministic initialization of variables.
       is_public_agency :∈ {org} → BOOL;
 

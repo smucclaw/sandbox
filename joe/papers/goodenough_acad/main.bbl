@@ -1,4 +1,4 @@
-\begin{thebibliography}{10}
+\begin{thebibliography}{1}
 
 \bibitem{eventb_data_sharing_agreements}
 {\sc Arenas, A.~E., Aziz, B., Bicarregui, J., and Wilson, M.~D.}
@@ -22,12 +22,6 @@
 {\sc Governatori, G.}
 \newblock Thou shalt is not you will.
 \newblock {\em CoRR abs/1404.1685\/} (2014).
-
-\bibitem{normative_reqs_guido}
-{\sc Hashmi, M., Governatori, G., and Wynn, M.}
-\newblock Normative requirements for regulatory compliance: An abstract formal
-  framework.
-\newblock {\em Information Systems Frontiers 18\/} (05 2015).
 
 \bibitem{normative_compliance_guido}
 {\sc Hashmi, M., Governatori, G., and Wynn, M.}

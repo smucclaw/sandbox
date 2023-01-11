@@ -1,13 +1,13 @@
 # Fdb version 3
-["bibtex main"] 1673254779 "main.aux" "main.bbl" "main" 1673254779
+["bibtex main"] 1673422402 "main.aux" "main.bbl" "main" 1673426708
   "/usr/share/texmf-dist/bibtex/bst/base/acm.bst" 1650183167 21064 c61a48664f3c347ce7f73c1a6a530506 ""
-  "main.aux" 1673254779 6876 5fcd814a0425936ecf10e39b565f5b4f "pdflatex"
-  "refs.bib" 1673251535 13650 872b8d5f0330d941be0cbedc9dc5c53f ""
+  "main.aux" 1673426707 6847 b6f23e07ab0fe1738fe6de9b08458e5b "pdflatex"
+  "refs.bib" 1673422392 13297 cf5b10fdf654da66303daa8e35efdc32 ""
   (generated)
   "main.bbl"
   "main.blg"
-["pdflatex"] 1673254779 "/home/joe/dev/smucclaw/sandbox/joe/papers/goodenough_acad/main.tex" "main.pdf" "main" 1673254779
-  "/home/joe/dev/smucclaw/sandbox/joe/papers/goodenough_acad/main.tex" 1673254778 15446 1ce9f0479ed8949be6bb2d48144cf46e ""
+["pdflatex"] 1673426707 "/home/joe/dev/smucclaw/sandbox/joe/papers/goodenough_acad/main.tex" "main.pdf" "main" 1673426708
+  "/home/joe/dev/smucclaw/sandbox/joe/papers/goodenough_acad/main.tex" 1673426707 15490 89436aa395e3aca25d897c553ca1a5bc ""
   "/usr/share/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc" 1650183167 2900 1537cc8184ad1792082cd229ecc269f4 ""
   "/usr/share/texmf-dist/fonts/map/fontname/texfonts.map" 1650183167 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/share/texmf-dist/fonts/tfm/jknappen/ec/tcrm1000.tfm" 1650183167 1536 e07581a4bb3136ece9eeb4c3ffab8233 ""
@@ -228,11 +228,11 @@
   "/usr/share/texmf-dist/web2c/texmf.cnf" 1650183167 39911 2da6c67557ec033436fe5418a70a8a61 ""
   "/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map" 1667870115 4276404 c85ee5114b0e5590ee79a1d1365a6f5a ""
   "/var/lib/texmf/web2c/pdftex/pdflatex.fmt" 1667870095 2927661 b88b9a9fb1158245e5b399dac0422928 ""
-  "main.aux" 1673254779 6876 5fcd814a0425936ecf10e39b565f5b4f "pdflatex"
-  "main.bbl" 1673254779 2464 6490524dd850e7a23a994c89466cb2f7 "bibtex main"
-  "main.out" 1673254779 2464 d72777fa62bd1f5227c29e951d5ad88f "pdflatex"
-  "main.tex" 1673254778 15446 1ce9f0479ed8949be6bb2d48144cf46e ""
-  "main.toc" 1673254779 1140 6c86143c17c6d92ea17584c8fa34c5e6 "pdflatex"
+  "main.aux" 1673426707 6847 b6f23e07ab0fe1738fe6de9b08458e5b "pdflatex"
+  "main.bbl" 1673422402 2229 d066e9474ee95f88d6ef1db405e91e16 "bibtex main"
+  "main.out" 1673426707 2464 d72777fa62bd1f5227c29e951d5ad88f "pdflatex"
+  "main.tex" 1673426707 15490 89436aa395e3aca25d897c553ca1a5bc ""
+  "main.toc" 1673426707 1140 6c86143c17c6d92ea17584c8fa34c5e6 "pdflatex"
   "preamble.tex" 1670570697 2239 6915408a53c681a75704386185d5804a ""
   (generated)
   "main.aux"

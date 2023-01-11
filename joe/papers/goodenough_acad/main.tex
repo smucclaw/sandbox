@@ -62,7 +62,7 @@ understanding of a contract.
 While we can easily encode real-world events as transitions in a DFA, as done
 in \cite{contract_as_automaton}, we often reason about and specify contracts in
 terms of normative requirements that need to be fulfilled by various actors
-\cite{normative_reqs_guido}.
+\cite{normative_compliance_guido}.
 These also come with some notion of time and deadline.
 These are examples of \textit{domain-specific concepts} which are an integral
 part of contract drafting.
@@ -104,9 +104,10 @@ corresponding to this simple contract already contains more than 20 states and
 % ``Payment\dots accelerating'' and ``Crisis\dots'' states.
 % The only difference between the transitions between these states is
 
-One of the main causes of this is the concurrent interleaving of real world
-events.
-By this, we mean that many real world events can occur in any order and
+One of the main causes of this is the \textit{concurrent interleaving} of real
+world events.
+By this, we mean that many real world events can occur in any order (including
+at the same time) and
 perhaps for the sake of simplicity, this has not been accounted for in the DFA
 formalization.
 As an example of such a scenario, consider the following.
@@ -212,7 +213,7 @@ to visualize and analyze contracts written in L4.
   and highlight similarities with them.
 }
 
-As aforementioned, we believe that a friendly to use language for specifying
+As mentioned earlier, we believe that a friendly to use language for specifying
 legal contracts should be situated at a higher level of abstraction than that
 of automata, closer to the application domain.
 
@@ -254,8 +255,8 @@ One of these which we explored is the B language and the ProB toolset
 \cite{prob_initial_paper, prob_follow_up_paper}.
 
 In this section, we begin by providing some background on B before
-we discuss our formalization of the simple loan agreement and along
-the way, we explain how we addressed the aforementioned shortcomings.
+we discuss our formalization of the simple loan agreement.
+Along the way, we explain how we addressed the aforementioned shortcomings.
 In particular, we show how we can generate an arguably more accurate DFA that
 accounts for the concurrent interleaving of real world events.
 Thereafter, we demonstrate how we can use ProB to help us

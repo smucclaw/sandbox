@@ -28,7 +28,7 @@ PROPERTIES
     rec(
       name : RequestPrincipal,
       possible_actors : {borrower},
-      deontic : COb,
+      deontic : Ob,
       event : rec(
         name : request_principal,
         is_preemptive : TRUE,
@@ -39,7 +39,7 @@ PROPERTIES
     rec(
       name : SendPrincipal,
       possible_actors : {lender},
-      deontic : NCOb,
+      deontic : Ob,
       event : rec(
         name : send_principal,
         is_preemptive : TRUE,
@@ -50,33 +50,33 @@ PROPERTIES
     rec(
       name : Payment1,
       possible_actors : {borrower},
-      deontic : COb,
+      deontic : Ob,
       event : rec(
         name : pay1,
         is_preemptive : FALSE,
-        initial_timer_val : 10
+        initial_timer_val : 365
       )
     ),
 
     rec(
       name : Payment2,
       possible_actors : {borrower},
-      deontic : COb,
+      deontic : Ob,
       event : rec(
         name : pay2,
         is_preemptive : FALSE,
-        initial_timer_val : 10
+        initial_timer_val : 365
       )
     ),
 
     rec(
       name : EventOfDefault,
       possible_actors : {borrower},
-      deontic : CProhib,
+      deontic : Forb,
       event : rec(
         name : event_of_default,
         is_preemptive : TRUE,
-        initial_timer_val : 25
+        initial_timer_val : 730
       )
     ),
 
@@ -94,7 +94,7 @@ PROPERTIES
     rec(
       name : CureDefault,
       possible_actors : {borrower},
-      deontic : COb,
+      deontic : Ob,
       event : rec(
         name : cure_default,
         is_preemptive : TRUE,
@@ -105,7 +105,7 @@ PROPERTIES
     rec(
       name : PayAccelerated,
       possible_actors : {borrower},
-      deontic : NCOb,
+      deontic : Ob,
       event : rec(
         name : pay_accelerated,
         is_preemptive : TRUE,
@@ -142,7 +142,11 @@ OPERATIONS
   END;
 
   send_principal_timeout(actor) = VAR rule_names IN
-    rule_names ← event_timeout(send_principal, actor)
+    rule_names ← event_timeout(send_principal, actor);
+
+    IF SendPrincipal ∈ rule_names THEN
+      breach(actor)
+    END
   END;
 
   payment1_happened(actor) = VAR rule_names IN
@@ -182,7 +186,11 @@ OPERATIONS
   END;
 
   pay_accelerated_timeout(actor) = VAR rule_names IN
-    rule_names ← event_timeout(pay_accelerated, actor)
+    rule_names ← event_timeout(pay_accelerated, actor);
+
+    IF PayAccelerated ∈ rule_names THEN
+      breach(actor)
+    END
   END;
 
   event_of_default_happened(actor) = VAR rule_names IN

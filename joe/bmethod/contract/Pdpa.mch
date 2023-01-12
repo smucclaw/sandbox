@@ -25,7 +25,7 @@ PROPERTIES
     rec(
       name : Assessment,
       possible_actors : {org},
-      deontic : NCOb,
+      deontic : Ob,
       event : rec(
         name : assess,
         is_preemptive : TRUE,
@@ -36,7 +36,7 @@ PROPERTIES
     rec(
       name : NotifyIndiv,
       possible_actors : {org},
-      deontic : NCOb,
+      deontic : Ob,
       event : rec(
         name : notify_indiv,
         is_preemptive : TRUE,
@@ -47,7 +47,7 @@ PROPERTIES
     rec(
       name : NotifyPdpc,
       possible_actors : {org},
-      deontic : NCOb,
+      deontic : Ob,
       event : rec(
         name : notify_pdpc,
         is_preemptive : TRUE,
@@ -69,7 +69,7 @@ PROPERTIES
     rec(
       name : CannotNotifyIndiv,
       possible_actors : {org},
-      deontic : NCProhib,
+      deontic : Forb,
       event : rec(
         name : notify_indiv,
         is_preemptive : TRUE,
@@ -128,15 +128,26 @@ OPERATIONS
   END;
 
   assess_timeout(actor) = VAR rule_names IN
-    rule_names ← event_timeout(assess, actor)
+    rule_names ← event_timeout(assess, actor);
+    IF Assessment ∈ rule_names THEN
+      breach(actor)
+    END
   END;
 
   notify_indiv_happened(actor) = VAR rule_names IN
-    rule_names ← event_happened(notify_indiv, actor)
+    rule_names ← event_happened(notify_indiv, actor);
+
+    IF CannotNotifyIndiv ∈ rule_names THEN
+      breach(actor)
+    END
   END;
 
   notify_indiv_timeout(actor) = VAR rule_names IN
-    rule_names ← event_timeout(notify_indiv, actor)
+    rule_names ← event_timeout(notify_indiv, actor);
+
+    IF NotifyIndiv ∈ rule_names THEN
+      breach(actor)
+    END
   END;
 
   notify_pdpc_happened(actor) = VAR rule_names IN
@@ -148,7 +159,11 @@ OPERATIONS
   END;
 
   notify_pdpc_timeout(actor) = VAR rule_names IN
-    rule_names ← event_timeout(notify_pdpc, actor)
+    rule_names ← event_timeout(notify_pdpc, actor);
+
+    IF NotifyPdpc ∈ rule_names THEN
+      breach(actor)
+    END
   END;
 
   prohibit_notify_indiv_happened(actor) = VAR rule_names IN
@@ -156,7 +171,6 @@ OPERATIONS
 
     IF ProhibitNotifyIndiv ∈ rule_names THEN
       discharge({(NotifyIndiv, org)});
-
       trigger({(CannotNotifyIndiv, org)})
     END
   END;

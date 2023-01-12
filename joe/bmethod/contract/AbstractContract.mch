@@ -35,27 +35,19 @@ DEFINITIONS
   "CommonDefs.def"
 
 SETS
-  Deontic = {
-    COb, // Compensable obligation
-    NCOb, // Non-compensable obligation
-    CProhib, // Compensable prohibition
-    NCProhib, // Non-compensable prohibition
-    Perm // Permission
-  }
+  Deontic = {Ob, Forb, Perm}
 
 CONSTANTS
   compatible_deontics
 
 PROPERTIES
   compatible_deontics = λ deontic1, deontic2. (Top |
-    bool({deontic1, deontic2} ∈ {
-      {COb}, {NCOb}, {COb, NCOb},
-      {CProhib}, {NCProhib}, {CProhib, NCProhib},
-      {COb, Perm}, {NCOb, Perm}, {Perm}
-    })
+    LET deontics BE
+      deontics = {deontic1, deontic2}
+    IN
+      bool(Forb ∈ deontics ⇔ card(deontics) = 1)
+    END
   )
-
-  // Actor; RuleName; EventName
 
 VARIABLES
   started, rules, breached_by, active_rules
@@ -130,6 +122,13 @@ OPERATIONS
       }
     END;
 
+  breach(actor) =
+    SELECT
+      actor ∈ Actor
+    THEN
+      breached_by, active_rules := Some(actor), ∅
+    END;
+
   /*
     Note that there can be multiple rules that reference the same event, hence
     we find all relevant rule names, which we then return as output.
@@ -140,7 +139,7 @@ OPERATIONS
     TODO: let timeouts go first.
   */
   relevant_rule_names ← event_happened(event_name, actor) =
-    ANY relevant_rules WHERE
+    ANY relevant_rules, to_remove WHERE
       breached_by = None ∧
       relevant_rules ≠ ∅ ∧
       relevant_rules = {rule |
@@ -150,49 +149,41 @@ OPERATIONS
           (rule'event'is_preemptive = FALSE ⇒ timer_val = 0) ∧
           rule'event'name = event_name
         )
+      } ∧
+      to_remove = {rule_name, actor, timer_val |
+        (rule_name, actor, timer_val) ∈ active_rules ∧
+        ∃ rule. (rule ∈ relevant_rules ∧ rule'name = rule_name)
       }
     THEN
       relevant_rule_names := get_rule_name[relevant_rules] ||
-      IF ∃ rule. (rule ∈ relevant_rules ∧ rule'deontic = NCProhib)
+      active_rules := active_rules \ to_remove
+      /* IF ∃ rule. (rule ∈ relevant_rules ∧ rule'deontic = NCProhib)
       THEN
         breached_by, active_rules := Some(actor), ∅
-      ELSE
-        LET to_remove BE
-          to_remove = {rule_name, actor, timer_val |
-            (rule_name, actor, timer_val) ∈ active_rules ∧
-            ∃ rule. (rule ∈ relevant_rules ∧ rule'name = rule_name)
-          }
-        IN
-          active_rules := active_rules \ to_remove
-        END
-      END
+      ELSE */
     END;
 
   relevant_rule_names ← event_timeout(event_name, actor) =
-    ANY relevant_rules WHERE
+    ANY relevant_rules, to_remove WHERE
       breached_by = None ∧
       relevant_rules ≠ ∅ ∧
       relevant_rules = {rule |
         rule ∈ rules ∧
         (rule'name, actor, 0) ∈ active_rules ∧
         rule'event'name = event_name
+      } ∧
+      to_remove = {rule_name, actor, timer_val |
+        (rule_name, actor, timer_val) ∈ active_rules ∧
+        timer_val = 0 ∧
+        ∃ rule. (rule ∈ relevant_rules ∧ rule'name = rule_name)
       }
     THEN
       relevant_rule_names := get_rule_name[relevant_rules] ||
-      IF ∃ rule. (rule ∈ relevant_rules ∧ rule'deontic = NCOb)
+      active_rules := active_rules \ to_remove
+      /* IF ∃ rule. (rule ∈ relevant_rules ∧ rule'deontic = NCOb)
       THEN
         breached_by, active_rules := Some(actor), ∅
-      ELSE
-        LET to_remove BE
-          to_remove = {rule_name, actor, timer_val |
-            (rule_name, actor, timer_val) ∈ active_rules ∧
-            timer_val = 0 ∧
-            ∃ rule. (rule ∈ relevant_rules ∧ rule'name = rule_name)
-          }
-        IN
-          active_rules := active_rules \ to_remove
-        END
-      END
+      ELSE */
     END;
 
   trigger(triggers) =

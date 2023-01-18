@@ -1,0 +1,5 @@
+load ./verification/model-check
+
+(reduce
+  modelCheck(none, [] Top)
+.)

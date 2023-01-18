@@ -1,0 +1,73 @@
+---(
+  Structural operational semantics ala Plotkin in which a configuration is a
+  multiset of the following objects:
+    - a list of all rules found in the program.
+    - actors
+    - active rule instances
+    - situations that hold
+
+  A conditional rewriting rule of the form
+    crl [rule] : t => t' if C1 /\ ... /\ Cn
+  gives rise to an operational rule of the form
+      C1 ... Cn
+    ----------------
+      C[t] => C[t']
+  where:
+    -  _ => _ denotes the (small-step) evaluation relation.
+    - C[t] is the current configuration, decomposed (via E-unification) into an
+      evaluation context C[.] with a hole and a proper subterm t.
+
+      Note that E-unification is what happens when you perform unification
+      modulo an equational theory E.
+      To see why we're using E-unification instead of just ordinary unification
+      here, note that (finite) multisets are what you get when you quotient
+      lists out by an equivalence relation that disregards the order of the
+      elements in lists.
+      In other words, unifying multisets is done by way of E-unification of lists,
+      modulo an equational theory axiomatizing that equivalence relation.
+
+      One can also define additional equality axioms for configurations to perform
+      model checking under view symmetry as in Lamport's paper
+      https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/charme2005.pdf
+      For instance, one can define an extra axiom that associates configurations
+      of timed transition systems that equates them together, disregarding global time
+      and timers:
+        ceq {C, time} = {C', time'} if ...
+      Such a naive definition messes up the ordering of events though.
+
+  A rewriting logic theory is the logical theory resulting from combining all
+  these rules together.
+  Such a theory axiomatizes the computational behavior of the transition system
+  in that computation by way of the small step relation => is equivalent to
+  provability in that theory.
+)
+load ../syntax/rule
+load full-maude
+
+(omod SEMANTICS is
+  protecting RULE + RULE-LIST .
+
+  subsort String < Oid .
+
+  class Actor .
+  class Situation .
+
+  class Rules |
+    rules : RuleList .
+
+  class RuleInstance |
+    deontic : Deontic,
+    timer : Nat,
+    actor : ActorName,
+    action : ActionName .
+
+  vars A R : Oid .
+
+ --- How to indicate that a specific action occured? Use history log?
+  rl [action] :
+    < A : Actor | >
+    < R : RuleInstance | actor : A >
+  =>
+    < A : Actor | > .
+
+endom)

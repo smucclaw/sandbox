@@ -1,0 +1,53 @@
+fmod RULE is
+  protecting BOOL + STRING + NAT .
+
+  sorts
+    Rule RuleName ActorName Deadline ActionName Event Deontic Date Duration
+    Situation .
+
+  subsorts String < RuleName ActorName ActionName Situation .
+  subsorts Bool < Situation .
+
+---(
+  MUST -- obligation
+  MAY -- permission
+  SHANT -- prohibition
+)
+  ops MUST MAY SHANT : -> Deontic [ctor] .
+
+---(
+  BY is for dates, ie absolute deadlines
+  WITHIN is for relative deadlines
+)
+  op BY _ : Date -> Deadline [ctor].
+  op WITHIN _ : Duration -> Deadline [ctor] .
+
+  ops _DAY _WEEK _MONTH _YEAR : Nat -> Duration [ctor] .
+
+  op _ performs _ at _ : ActorName ActionName Date -> Event [ctor] .
+
+  op RULE _ $ UPON _ PARTY _ _ DO _ _ HENCE _ LEST _ :
+    RuleName Situation ActorName Deontic ActionName Deadline Situation Situation -> Rule [ctor] .
+
+  op testRule1 : -> Rule .
+  eq testRule1 =
+    RULE "rule" $
+      UPON true
+      PARTY "party"
+      MUST DO "action"
+      WITHIN 1 YEAR
+      HENCE "situation 1"
+      LEST "situation 2" .
+
+endfm
+
+view Rule from TRIV to RULE is
+  sort Elt to Rule .
+endv
+
+fmod RULE-LIST is
+  protecting LIST{Rule} * (
+    sort NeList{Rule} to NeRuleList,
+    sort List{Rule} to RuleList
+  ) .
+endfm

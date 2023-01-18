@@ -1,0 +1,21 @@
+load model-checker
+load ../semantics/semantics
+
+(omod MODEL-CHECK is
+  protecting SEMANTICS .
+  including MODEL-CHECKER + SATISFACTION + LTL .
+
+  subsort Configuration < State .
+
+  ops Top : -> Prop .
+
+  vars C : Configuration .
+
+---(
+  The satisfaction relation has type
+    _ |= _ : (Configuration -> Prop) -> 2 
+  where 2 is the 2-valued boolean algebra.
+)
+  eq C |= Top
+  = true .
+endom)

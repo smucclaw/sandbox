@@ -1,7 +1,8 @@
 ***(
   This is based on:
+  https://github.com/carlosolarte/L-framework
   https://www.mat.ufrn.br/cade-27/wp-content/uploads/2019/09/tutorial-RL.pdf
-  http://subsell.logic.at/theorem-maude/
+
 )
 
 *** load full-maude.maude
@@ -13,8 +14,8 @@ fmod WFF is
   sort Wff .
   subsort Qid < Prop < Wff .
 
-  op _->_ : Wff Wff -> Wff [ctor assoc prec 30] .
-  op ~_ : Wff -> Wff [prec 25] .
+  op _→_ : Wff Wff -> Wff [ctor assoc prec 30] .
+  op ¬_ : Wff -> Wff [prec 25] .
 
 endfm
 
@@ -37,7 +38,7 @@ fmod Sequent is
   subsort Sequent < Sequents .
 
   op Leaf : -> Sequent [ctor] .
-  op _|-_ : Ctx Ctx -> Sequent [ctor prec 122] .
+  op _⊢_ : Ctx Ctx -> Sequent [ctor prec 122] .
 
   *** Meta-theoretic conjunction of judgement forms.
   op _ _ : Sequents Sequents -> Sequents [ctor comm assoc id: Leaf] .
@@ -56,34 +57,36 @@ endfm
 mod LK is
   pr Sequent .
   vars P : Prop .
-  vars Gamma Delta : Ctx .
-  vars Phi Psi : Wff .
+  vars Γ Δ : Ctx .
+  vars φ ψ : Wff .
 
   rl [Axm] :
-    Gamma, Phi |- Phi, Delta
+    Γ, φ ⊢ φ, Δ
 *** -------------------------
       => Leaf .
 
   rl [ImpL] :
-    Gamma, Phi -> Psi |- Delta
+    Γ, φ → ψ ⊢ Δ
 *** -------------------------------------------------
-    => (Gamma |- Phi, Delta) (Gamma, Psi |- Delta) .
+    => (Γ ⊢ φ, Δ) (Γ, ψ ⊢ Δ) .
 
   rl [ImpR] :
-    Gamma |- Phi -> Psi, Delta
+    Γ ⊢ φ → ψ, Δ
 *** ------------------------------- 
-     => Gamma, Phi |- Psi, Delta .
+     => Γ, φ ⊢ ψ, Δ .
 
   rl [NegL] :
-    Gamma, ~ Phi |- Delta
+    Γ, ¬ φ ⊢ Δ
 *** ------------------------
-    => Gamma |- Phi, Delta .
+    => Γ ⊢ φ, Δ .
 
   rl [NegR] :
-    Gamma |- ~ Phi, Delta
+    Γ ⊢ ¬ φ, Δ
 *** ------------------------
-    => Gamma, Phi |- Delta .
+    => Γ, φ ⊢ Δ .
 endm
 
-*** search [1] ~ 'P -> ~ 'Q |- 'Q -> 'P =>* Leaf .
+set trace on .
+
+rewrite ¬ 'P → ¬ 'Q ⊢ 'Q → 'P .
 *** show search graph .

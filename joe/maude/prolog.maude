@@ -10,36 +10,36 @@ fmod LP-SYNTAX is
   protecting QID .
 
   sort Variable .
-  op x{_} : Nat → Variable [ctor] .
+  op x{_} : Nat -> Variable [ctor] .
 
   sort Term NvTerm .
   subsort Qid < NvTerm < Term .
   subsort Variable < Term .
-  op _[_] : Qid NeTermList → NvTerm [ctor prec 30 gather (e &)] .
+  op _[_] : Qid NeTermList -> NvTerm [ctor prec 30 gather (e &)] .
 
   sort NeTermList .
   subsort Term < NeTermList .
-  op _,_ : NeTermList NeTermList → NeTermList [ctor assoc] .
+  op _,_ : NeTermList NeTermList -> NeTermList [ctor assoc] .
 
   sort Predicate .
-  op _`(_`) : Qid NeTermList → Predicate [ctor prec 30 gather (e &)] .
+  op _`(_`) : Qid NeTermList -> Predicate [ctor prec 30 gather (e &)] .
 
   sorts PredicateList NePredicateList .
   subsort Predicate < NePredicateList < PredicateList .
 
-  op nil : → PredicateList [ctor] .
+  op nil : -> PredicateList [ctor] .
 
-  op _,_ : PredicateList PredicateList → PredicateList [ctor assoc prec 50 id: nil] .
-  op _,_ : NePredicateList PredicateList → NePredicateList [ditto] .
-  op _,_ : PredicateList NePredicateList → NePredicateList [ditto] .
+  op _,_ : PredicateList PredicateList -> PredicateList [ctor assoc prec 50 id: nil] .
+  op _,_ : NePredicateList PredicateList -> NePredicateList [ditto] .
+  op _,_ : PredicateList NePredicateList -> NePredicateList [ditto] .
 
   sort Clause .
-  op _:-_ : Predicate PredicateList → Clause [ctor prec 60] .
+  op _:-_ : Predicate PredicateList -> Clause [ctor prec 60] .
 
   sort Program .
   subsort Clause < Program .
-  op nil : → Program [ctor] .
-  op _;_ : Program Program → Program [ctor assoc prec 70 id: nil] .
+  op nil : -> Program [ctor] .
+  op _;_ : Program Program -> Program [ctor assoc prec 70 id: nil] .
 
 endfm
 
@@ -51,32 +51,32 @@ fmod LP-SYNTAX+CUT is
   subsorts Predicate < NeCfPredicateList < CfPredicateList NePredicateList < PredicateList .
 
   *** The cut symbol
-  op ! : → NePredicateList [ctor] .
+  op ! : -> NePredicateList [ctor] .
 
-  op nil : → CfPredicateList [ctor ditto] .
+  op nil : -> CfPredicateList [ctor ditto] .
 
-  op _,_ : NeCfPredicateList NeCfPredicateList → NeCfPredicateList [ditto] .
-  op _,_ : CfPredicateList CfPredicateList → CfPredicateList [ditto] .
-  op _,_ : NeCfPredicateList CfPredicateList → NeCfPredicateList [ditto] .
-  op _,_ : CfPredicateList NeCfPredicateList → NeCfPredicateList [ditto] .
-  op _,_ : PredicateList CfPredicateList → PredicateList [ditto] .
-  op _,_ : CfPredicateList PredicateList → PredicateList [ditto] .
+  op _,_ : NeCfPredicateList NeCfPredicateList -> NeCfPredicateList [ditto] .
+  op _,_ : CfPredicateList CfPredicateList -> CfPredicateList [ditto] .
+  op _,_ : NeCfPredicateList CfPredicateList -> NeCfPredicateList [ditto] .
+  op _,_ : CfPredicateList NeCfPredicateList -> NeCfPredicateList [ditto] .
+  op _,_ : PredicateList CfPredicateList -> PredicateList [ditto] .
+  op _,_ : CfPredicateList PredicateList -> PredicateList [ditto] .
 endfm
 
 fmod LP-UNIFICATION is
   protecting LP-SYNTAX .
 
   sort Binding .
-  op _→_ : Variable Term → Binding [ctor prec 60] .
+  op _->_ : Variable Term -> Binding [ctor prec 60] .
 
   sort Substitution .
   subsort Binding < Substitution .
-  op empty : → Substitution [ctor] .
-  op _;_ : Substitution Substitution → Substitution [ctor assoc comm prec 70 id: empty] .
+  op empty : -> Substitution [ctor] .
+  op _;_ : Substitution Substitution -> Substitution [ctor assoc comm prec 70 id: empty] .
 
   sort Substitution? .
   subsort Substitution < Substitution? .
-  op fail : → Substitution? [ctor] .
+  op fail : -> Substitution? [ctor] .
 
   vars F C : Qid .
   vars NeTL NeTL1 NeTL2 : NeTermList .
@@ -88,58 +88,58 @@ fmod LP-UNIFICATION is
   vars NVT NVT1 NVT2 : NvTerm .
   vars N N1 N2 : Nat .
 
-  op checkVar : Variable Substitution → Bool .
-  eq checkVar(V,(V → T) ; S) = true .
+  op checkVar : Variable Substitution -> Bool .
+  eq checkVar(V,(V -> T) ; S) = true .
   eq checkVar(V,S) = false [owise] .
 
-  op unify : Predicate Predicate Substitution → Substitution? .
+  op unify : Predicate Predicate Substitution -> Substitution? .
   eq unify(F(NeTL1),F(NeTL2),S)
    = unify(NeTL1,NeTL2,S) .
   eq unify(P1,P2,S)
    = fail [owise] .
 
-  op unify : NeTermList NeTermList Substitution → Substitution? .
+  op unify : NeTermList NeTermList Substitution -> Substitution? .
   eq unify(C,C,S) = S .
-  eq unify(V,T1,(V → T2) ; S) = unify(T1,T2,(V → T2) ; S) .
- ceq unify(T1,V,(V → T2) ; S) = unify(T1,T2,(V → T2) ; S) if not T1 :: Variable .
- ceq unify(V,T,S) = (V → T) ; S if not checkVar(V,S) .
- ceq unify(NVT,V,S) = (V → NVT) ; S if not checkVar(V,S) .
+  eq unify(V,T1,(V -> T2) ; S) = unify(T1,T2,(V -> T2) ; S) .
+ ceq unify(T1,V,(V -> T2) ; S) = unify(T1,T2,(V -> T2) ; S) if not T1 :: Variable .
+ ceq unify(V,T,S) = (V -> T) ; S if not checkVar(V,S) .
+ ceq unify(NVT,V,S) = (V -> NVT) ; S if not checkVar(V,S) .
   eq unify(F[NeTL1],F[NeTL2],S) = unify(NeTL1,NeTL2,S) .
   eq unify((T1,NeTL1),(T2,NeTL2),S)
    = if unify(T1,T2,S) =/= fail then unify(NeTL1,NeTL2,unify(T1,T2,S)) else fail fi .
   eq unify(T1,T2,S)
    = fail [owise] .
 
-  op rename : Clause Nat → Clause .
+  op rename : Clause Nat -> Clause .
   eq rename(P :- PL,N) = rename(P,N) :- rename(PL,N) .
 
-  op rename : PredicateList Nat → PredicateList .
+  op rename : PredicateList Nat -> PredicateList .
   eq rename((nil).PredicateList,N) = nil .
   eq rename((F(NeTL),PL),N) = F(rename(NeTL,N)),rename(PL,N) .
   eq rename((OPL,PL),N) = OPL,rename(PL,N) [owise] .
 
-  op rename : NeTermList Nat → NeTermList .
+  op rename : NeTermList Nat -> NeTermList .
   eq rename(C,N) = C .
   eq rename(x{N1},N2) = x{N1 + N2} .
   eq rename(F[NeTL],N) = F[rename(NeTL,N)] .
   eq rename((T,NeTL),N) = rename(T,N),rename(NeTL,N) .
 
-  op last : Clause → Nat .
+  op last : Clause -> Nat .
   eq last(P :- PL) = max(last(P),last(PL)) .
 
-  op last : PredicateList → Nat .
+  op last : PredicateList -> Nat .
   eq last((nil).PredicateList) = 0 .
   eq last((F(NeTL),PL)) = max(last(NeTL),last(PL)) .
   eq last((OPL,PL)) = last(PL) [owise] .
 
-  op last : NeTermList → Nat .
+  op last : NeTermList -> Nat .
   eq last(C) = 0 .
   eq last(x{N}) = N .
   eq last(F[NeTL]) = last(NeTL) .
   eq last((T,NeTL)) = max(last(T),last(NeTL)) .
 
   op value : Variable Substitution ~> Term .
-  eq value(V, (V → T) ; S) = T .
+  eq value(V, (V -> T) ; S) = T .
 endfm
 
 mod LP-SEMANTICS is
@@ -157,11 +157,11 @@ mod LP-SEMANTICS is
   var V : Variable .
   var NeTL : NeTermList .
 
-  op <_|_> : PredicateList Program → Configuration [ctor] .
+  op <_|_> : PredicateList Program -> Configuration [ctor] .
   eq < PL1 | Pr >
    = < last(PL1) | PL1 $ empty | Pr > .
 
-  op <_|_$_|_> : Nat PredicateList Substitution Program → Configuration [ctor] .
+  op <_|_$_|_> : Nat PredicateList Substitution Program -> Configuration [ctor] .
 
  crl [clause] : < N1 | P1, PL1 $ S1 | Pr1 ; P2 :- PL2 ; Pr2 >
   => < N2 | PL3, PL1 $ S2 | Pr1 ; P2 :- PL2 ; Pr2 >
@@ -195,7 +195,7 @@ endm
 mod LP-EXTRA is
   protecting LP-SEMANTICS .
 
-  op isSolution : Configuration → Bool .
+  op isSolution : Configuration -> Bool .
 
   var N : Nat .
   var S : Substitution .
@@ -362,12 +362,12 @@ mod PL-SIMPLIFIER-BASE is
   sort VarSet .
   subsort Variable < VarSet .
 
-  op empty : → VarSet [ctor] .
-  op _;_ : VarSet VarSet → VarSet [ctor assoc comm id: empty] .
+  op empty : -> VarSet [ctor] .
+  op _;_ : VarSet VarSet -> VarSet [ctor assoc comm id: empty] .
 
   *** Variables that occur in a the head of the objective list
-  op occurs : Configuration → VarSet .
-  op occurs : NeTermList → VarSet .
+  op occurs : Configuration -> VarSet .
+  op occurs : NeTermList -> VarSet .
 
   eq occurs(< N | Q(NeTL), PL $ S | Pr >) = occurs(NeTL) .
   eq occurs(< N | nil $ S | Pr >) = empty .
@@ -378,46 +378,46 @@ mod PL-SIMPLIFIER-BASE is
   eq occurs(T, NeTL) = occurs(T) ; occurs(NeTL) .
 
   *** Subset of variables
-  op subset : VarSet VarSet → Bool .
+  op subset : VarSet VarSet -> Bool .
 
   eq subset(empty, VS) = true .
   eq subset(V ; VS, V ; VS') = subset(VS, VS') .
   eq subset(V ; VS, VS') = false [owise] .
 
   *** Size of a substitution
-  op size : Substitution → Nat .
+  op size : Substitution -> Nat .
 
   eq size(empty) = 0 .
-  eq size(V → T ; S) = s(size(S)) .
+  eq size(V -> T ; S) = s(size(S)) .
 
   *** Apply a substitution to a term
-  op subst : Term Substitution → Term .
-  op subst : NeTermList Substitution → Term .
+  op subst : Term Substitution -> Term .
+  op subst : NeTermList Substitution -> Term .
 
-  eq subst(V, V → T ; S) = T .
+  eq subst(V, V -> T ; S) = T .
   eq subst(Q[NeTL], S) = Q[subst(NeTL, S)] .
   eq subst(T, S) = T [owise] .
 
   eq subst((T, NeTL), S) = subst(T, S), subst(NeTL, S) .
 
   *** Simplifies a substitution
-  op simplify : Substitution VarSet → Substitution .
-  op simplify : Substitution Substitution Nat VarSet → Substitution .
+  op simplify : Substitution VarSet -> Substitution .
+  op simplify : Substitution Substitution Nat VarSet -> Substitution .
 
   eq simplify(S, VS) = simplify(restrict(S, VS), S, size(S), VS) .
 
-  ceq simplify(V → T ; S1, S2, s(N), VS) = simplify(V → subst(T, S2) ; S1, S2, N, VS)
+  ceq simplify(V -> T ; S1, S2, s(N), VS) = simplify(V -> subst(T, S2) ; S1, S2, N, VS)
     if subst(T, S2) =/= T .
   eq simplify(S1, S2, N, VS) = S1 [owise] .
 
   *** Restrict a substitution to a set of variables
-  op restrict : Substitution VarSet → Substitution .
+  op restrict : Substitution VarSet -> Substitution .
 
   eq restrict(empty, VS) = empty .
-  eq restrict(V → T ; S, V ; VS) = V → T ; restrict(S, V ; VS) .
-  eq restrict(V → T ; S, VS) = restrict(S, VS) [owise] .
+  eq restrict(V -> T ; S, V ; VS) = V -> T ; restrict(S, V ; VS) .
+  eq restrict(V -> T ; S, VS) = restrict(S, VS) [owise] .
 
-  op solution : Substitution → Configuration [ctor format (g! o)] .
+  op solution : Substitution -> Configuration [ctor format (g! o)] .
 
   rl [solution] : < N | nil $ S | Pr > => solution(simplify(S, VS)) [nonexec] .
 endm
@@ -438,13 +438,13 @@ mod EXAMPLES is
   extending LP-EXTRA+NEG .
   extending LP-EXTRA+CUT .
 
-  op negation-bycut : → Program .
+  op negation-bycut : -> Program .
 
   eq negation-bycut =
     '\+(x{1}) :- 'call(x{1}), !, 'fail(x{1}) ;
     '\+(x{1}) :- nil .
 
-  ops socrate socrate2 socrate3 sets family kinship : → Program .
+  ops socrate socrate2 socrate3 sets family kinship : -> Program .
 
   *** Socrate syllogism, to be used with the negation-aware strategy
   eq socrate = 'human('socrate) :- nil ;

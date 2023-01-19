@@ -1,0 +1,14 @@
+fmod MY-BOOL is
+  protecting BOOL + QID .
+  subsorts Qid < Bool .
+
+  --- Test boolean formula.
+  ops test : -> Bool .
+  eq test = 'P and ('Q or (true and false)) .
+
+endfm
+
+--- Setting this flag lets us see all rewriting steps being performed.
+set trace on .
+
+rewrite test .

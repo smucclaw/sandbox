@@ -19,12 +19,12 @@
 
       Note that E-unification is what happens when you perform unification
       modulo an equational theory E.
-      To see why we're using E-unification instead of just ordinary unification
-      here, note that (finite) multisets are what you get when you quotient
-      lists out by an equivalence relation that disregards the order of the
-      elements in lists.
-      In other words, unifying multisets is done by way of E-unification of lists,
-      modulo an equational theory axiomatizing that equivalence relation.
+      Here we are performing unification modulo some equational
+      axioms that says list concatenation is associative and commutative,
+      which is why this type of unification is called AC (associative + commutative)
+      unification.
+      Indeed, one can think of finite multisets as what happens when you quotient
+      out lists by equivalence relation that permutes the elements.
 
       One can also define additional equality axioms for configurations to perform
       model checking under view symmetry as in Lamport's paper
@@ -47,18 +47,26 @@
     Configuration -- actor performs action --> Configuration'
   - Time transition:
     Configuration -- time delay --> Configuration'
+
+  We assume that time is interpreted in some initial model of a totally ordered
+  commutative monoid in which 0 is the least element and +, - and < are
+  primitive recursive.
+  Note here that initality is just to avoid nonstandard models as in the case of
+  Presburger arithmetic.
 )
 load ../syntax/rule
 load full-maude
 
 (omod SEMANTICS is
-  protecting RULE + RULE-LIST .
+  protecting RULE + RULE-LIST + INT .
 
-  subsorts String < Oid .
+  subsorts Qid < Oid .
 
-  sorts Event .
-  subsorts Event < Msg . 
-  ops _performs_ : ActorName ActionName -> Event [ctor] . 
+  sorts Time .
+  --- subsorts Time < Int .
+
+  msgs _did_ : Oid Oid -> Msg .
+  msgs ticked_ : Time -> Msg .
 
   class Actor .
   class Situation .
@@ -67,13 +75,13 @@ load full-maude
     rules : RuleList .
 
   class RuleInstance |
+    actor : Oid,
     deontic : Deontic,
-    timer : Nat,
-    actor : ActorName,
-    action : ActionName .
+    action : ActionName,
+    timer : Time .
 
-  vars A R : String .
-  vars actionName : ActionName .
+  vars actorName ruleName actionName : Oid .
+  vars currentTimer, timeDelta : Time .
 
 ---(
   --------------------------------------------------------------------------
@@ -84,10 +92,16 @@ load full-maude
   How to synchronize across all rule instances?
 )
   rl [action] :
-    < A : Actor | >
-    < R : RuleInstance | actor : A, action : actionName >
+    < actorName : Actor | >
+    < ruleName : RuleInstance | actor : actorName, action : actionName >
   =>
-    < A : Actor | >
-    (A performs actionName) .
+    < actorName : Actor | >
+    (actorName did actionName) .
+
+  --- crl [tick] :
+  ---   < ruleName : RuleInstance | timer : currentTimer >
+  --- =>
+  ---   < ruleName : RuleInstance | timer : (currentTimer - timeDelta) >
+  --- if timeDelta > 0 .
 
 endom)

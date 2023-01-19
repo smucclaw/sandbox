@@ -1,4 +1,23 @@
-load ./verification/model-check
+load ./semantics/semantics
+--- load ./verification/model-check  
+
+(rewrite
+  < 'lender : Actor | > < 'borrower : Actor | >
+
+  < 'payment : RuleInstance |
+    actor : 'borrower,
+    deontic : MUST,
+    action : 'pay_payment,
+    timer : T0:Time >
+
+  < 'avoid_default : RuleInstance |
+    actor : 'borrower,
+    deontic : SHANT,
+    action : 'default,
+    timer : T1:Time >
+.)
+
+eof
 
 (reduce
   modelCheck(none, [] Top)

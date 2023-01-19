@@ -56,7 +56,6 @@ endfm
 )
 mod LK is
   pr Sequent .
-  vars P : Prop .
   vars Γ Δ : Ctx .
   vars φ ψ : Wff .
 

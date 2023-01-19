@@ -1,8 +1,8 @@
-load ./semantics/semantics
---- load ./verification/model-check  
+load ./verification/model-check  
 
 (rewrite
-  < 'lender : Actor | > < 'borrower : Actor | >
+  < 'lender : Actor | >
+  < 'borrower : Actor | >
 
   < 'payment : RuleInstance |
     actor : 'borrower,

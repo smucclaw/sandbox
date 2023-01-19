@@ -1,12 +1,11 @@
 fmod RULE is
-  protecting BOOL + STRING + NAT  + QID .
+  protecting BOOL + STRING + NAT + QID .
 
   sorts
     Rule RuleName ActorName Deadline ActionName Event Deontic Date Duration
     Situation .
 
-  subsorts Qid < RuleName ActorName ActionName Situation .
-  subsorts Bool < Situation .
+  subsorts Qid Bool < Situation .
 
 ---(
   MUST -- obligation
@@ -27,7 +26,7 @@ fmod RULE is
   --- op _ performs _ at _ : ActorName ActionName Date -> Event [ctor] .
 
   op RULE _ UPON _ WHILE _ PARTY _ _ DO _ _ HENCE _ LEST _ :
-    RuleName Situation Situation ActorName Deontic ActionName Deadline
+    Qid Situation Situation Qid Deontic Qid Deadline
     Situation Situation -> Rule [ctor] .
 
   op testRule1 : -> Rule .

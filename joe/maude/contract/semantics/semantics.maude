@@ -37,9 +37,13 @@
 
   A rewriting logic theory is the logical theory resulting from combining all
   these rules together.
-  Such a theory axiomatizes the computational behavior of the transition system
-  in that computation by way of the small step relation => is equivalent to
-  provability in that theory.
+  The initial model of the theory is precisely the transition system whose
+  small step evaluation relation is axiomatized by the rewriting theory.
+  In other words, computation by way of => is equivalent to provability in the
+  rewriting theory.
+  Note that initiality is important here because standard compactness arguments
+  will yield nonstandard models in which there are states that are not
+  reachable from the initial state.
 
   For our semantics, we axiomatize 2 judgement forms in the style of timed
   transition systems:
@@ -58,7 +62,7 @@ load ../syntax/rule
 load full-maude
 
 (omod SEMANTICS is
-  protecting RULE + RULE-LIST + INT .
+  protecting QID + RULE + RULE-LIST + INT .
 
   subsorts Qid < Oid .
 
@@ -77,11 +81,12 @@ load full-maude
   class RuleInstance |
     actor : Oid,
     deontic : Deontic,
-    action : ActionName,
+    action : Qid,
     timer : Time .
 
-  vars actorName ruleName actionName : Oid .
-  vars currentTimer, timeDelta : Time .
+  vars actorName ruleName : Oid .
+  vars actionName : Qid .
+  vars currentTimer timeDelta : Time .
 
 ---(
   --------------------------------------------------------------------------
@@ -91,12 +96,21 @@ load full-maude
 
   How to synchronize across all rule instances?
 )
-  rl [action] :
+  --- rl [test] :
+  ---   < actorName : Actor | >
+  --- =>
+  ---   none .
+
+  rl [act] :
+  --- For some reason, this actor object isn't unifying properly so the rule is
+  --- not being used during rewriting.
     < actorName : Actor | >
-    < ruleName : RuleInstance | actor : actorName, action : actionName >
+    < ruleName : RuleInstance |
+      actor : actorName,
+      action : actionName >
   =>
     < actorName : Actor | >
-    (actorName did actionName) .
+    actorName did actionName .
 
   --- crl [tick] :
   ---   < ruleName : RuleInstance | timer : currentTimer >

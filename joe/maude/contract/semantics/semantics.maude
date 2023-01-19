@@ -40,6 +40,13 @@
   Such a theory axiomatizes the computational behavior of the transition system
   in that computation by way of the small step relation => is equivalent to
   provability in that theory.
+
+  For our semantics, we axiomatize 2 judgement forms in the style of timed
+  transition systems:
+  - Action transition:
+    Configuration -- actor performs action --> Configuration'
+  - Time transition:
+    Configuration -- time delay --> Configuration'
 )
 load ../syntax/rule
 load full-maude
@@ -47,7 +54,11 @@ load full-maude
 (omod SEMANTICS is
   protecting RULE + RULE-LIST .
 
-  subsort String < Oid .
+  subsorts String < Oid .
+
+  sorts Event .
+  subsorts Event < Msg . 
+  ops _performs_ : ActorName ActionName -> Event [ctor] . 
 
   class Actor .
   class Situation .
@@ -61,13 +72,22 @@ load full-maude
     actor : ActorName,
     action : ActionName .
 
-  vars A R : Oid .
+  vars A R : String .
+  vars actionName : ActionName .
 
- --- How to indicate that a specific action occured? Use history log?
+---(
+  --------------------------------------------------------------------------
+  {< A : Actor | >, < R : RuleInstance | actor : A >, ... }
+  -- A performs actionName -->
+  {< A : Actor | >, ... }
+
+  How to synchronize across all rule instances?
+)
   rl [action] :
     < A : Actor | >
-    < R : RuleInstance | actor : A >
+    < R : RuleInstance | actor : A, action : actionName >
   =>
-    < A : Actor | > .
+    < A : Actor | >
+    (A performs actionName) .
 
 endom)

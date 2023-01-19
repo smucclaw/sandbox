@@ -53,11 +53,13 @@
     Configuration -- time delay --> Configuration'
 
   We assume that time is interpreted in some initial model of a totally ordered
-  commutative monoid in which 0 is the least element and +, - and < are
-  primitive recursive.
-  Note here that initality is just to avoid nonstandard models as in the case of
-  Presburger arithmetic.
+  commutative monoid M in which:
+  - 0 is the <-least element.
+  - + and < are primitive recursive.
+  Note that initiality is used to discard nonstandard models that result
+  from a standard Compactness argument.
 )
+
 load ../syntax/rule
 load full-maude
 
@@ -66,11 +68,13 @@ load full-maude
 
   subsorts Qid < Oid .
 
-  sorts Time .
+  sorts Time Event .
   --- subsorts Time < Int .
+  subsorts Event < Msg .
 
-  msgs _did_ : Oid Oid -> Msg .
-  msgs ticked_ : Time -> Msg .
+  ops start : -> Event [ctor] .
+  msgs _did_ : Oid Oid -> Event .
+  --- msgs ticked_ : Time -> Msg .
 
   class Actor .
   class Situation .
@@ -81,18 +85,18 @@ load full-maude
   class RuleInstance |
     actor : Oid,
     deontic : Deontic,
-    action : Qid,
+    action : Oid,
     timer : Time .
 
-  vars actorName ruleName : Oid .
-  vars actionName : Qid .
+  vars actorName actionName ruleName : Oid .
+  vars event : Event .
   vars currentTimer timeDelta : Time .
 
 ---(
   --------------------------------------------------------------------------
-  {< A : Actor | >, < R : RuleInstance | actor : A >, ... }
+  {< A : Actor | ... >, < R : RuleInstance | actor : A >, ... }
   -- A performs actionName -->
-  {< A : Actor | >, ... }
+  {< A : Actor | ... >, ... }
 
   How to synchronize across all rule instances?
 )
@@ -101,13 +105,12 @@ load full-maude
   --- =>
   ---   none .
 
-  rl [act] :
-  --- For some reason, this actor object isn't unifying properly so the rule is
-  --- not being used during rewriting.
+  rl [action] :
     < actorName : Actor | >
     < ruleName : RuleInstance |
       actor : actorName,
       action : actionName >
+    event
   =>
     < actorName : Actor | >
     actorName did actionName .

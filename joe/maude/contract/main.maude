@@ -1,8 +1,9 @@
 load ./verification/model-check  
 
-(rewrite
-  < 'lender : Actor | >
-  < 'borrower : Actor | >
+(rewrite [1]
+  start
+  < 'lender : Actor | none >
+  < 'borrower : Actor | none >
 
   < 'payment : RuleInstance |
     actor : 'borrower,

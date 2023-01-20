@@ -1,6 +1,6 @@
 load ./verification/model-check  
 
-(rewrite [1]
+(srewrite
   start
 
   < 'lender : Actor | none > 
@@ -12,12 +12,10 @@ load ./verification/model-check
     activeRules : (
       PARTY 'borrower MUST DO 'pay_payment WITHIN (T0:Time),
       PARTY 'borrower SHANT DO 'default WITHIN (T1:Time)
-    ),
-    allowedEvents : (
-      ('borrower does 'pay_payment) ++
-      ('borrower does 'default)
     )
+    --- allowedEvents : allEvents
   >
+  using (event[actorName <- 'borrower, actionName <- 'default])
 .)
 
 eof

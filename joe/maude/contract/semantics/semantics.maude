@@ -139,8 +139,7 @@ load full-maude
   class AbstractMachineState |
     rules : Set{Rule},
     time : Time,
-    activeRules : Set{ActiveRule},
-    allowedEvents : AllowedEvent .
+    activeRules : Set{ActiveRule} .
 
   vars actorName actionName ruleName machineState : Oid .
   vars activeRule : ActiveRule .
@@ -179,10 +178,10 @@ load full-maude
 
   How to synchronize across all rule instances?
 )
-  crl [event] :
+  rl [event] :
     < actorName : Actor | >
     < machineState : AbstractMachineState |
-      allowedEvents : allowedEvents,
+      --- allowedEvents : allowedEvents,
       activeRules :
         (PARTY actorName deontic DO actionName WITHIN time, activeRules')
     >
@@ -190,16 +189,16 @@ load full-maude
   =>
     < actorName : Actor | >
     < machineState : AbstractMachineState |
-      allowedEvents : allowedEvents', 
+      --- allowedEvents : allowedEvents', 
       activeRules : deltaEvent (actorName did actionName) activeRules' >
-    (actorName did actionName)
-  if allowedEvents' :=
-    if allowedEvents == allEvents
-    then allEvents
-    else if head(allowedEvents) == (actorName does actionName)
-    then tail(allowedEvents)
-    else emptyEventList
-    fi fi .
+    actorName did actionName .
+  --- if allowedEvents' :=
+  ---   if allowedEvents == allEvents
+  ---   then allEvents
+  ---   else if head allowedEvents == (actorName does actionName)
+  ---   then tail allowedEvents
+  ---   else emptyEventList
+  ---   fi fi .
 
   --- (
   ---   (allowedEvents == allEvents and allowedEvents' == allEvents) or

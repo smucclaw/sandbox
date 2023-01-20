@@ -87,26 +87,39 @@ def getList(tree):
         res = getList(args[1]) # contains another list
         return [args[0], *res]
 
-corpus = [
-    "the number of original shares is 1000",
-    "the number of new shares is two hundred",
-    "the number of Class A shares shall be given by the sum of the number of original shares and the number of new shares",
-    "the number of Class B shares shall be given by the sum of the original shares and the number of new shares",
-    "the number of Class C shares shall be given by the sum of the original shares and the new shares",
-    "the number of Class D shares is the sum of the original shares and the number of new shares",
-    "the number of Class E shares is the sum of the original shares and the new shares",
-    "the number of Class F shares is the sum of the original and the new shares",
-    "the number of Class G shares is the sum of the original and new shares",
-    "the number of Class H shares is the sum of original and new shares",
-    "the number of Class I shares is the sum of original shares and Class A shares",
-    "the number of Class J shares is the sum of Class B and Class C shares",
-    "the number of Class K shares is the sum of the Class I and the Class J shares",
-    "the number of Class L shares is the sum of Class K , Class G and Class H shares",
-]
+def make_corpus(og="1000", new="two hundred"):
+    return [
+        "the number of original shares is " + og,
+        "the number of new shares is " + new,
+        "the number of Class A shares shall be given by the sum of the number of original shares and the number of new shares",
+        "the number of Class B shares shall be given by the sum of the original shares and the number of new shares",
+        "the number of Class C shares shall be given by the sum of the original shares and the new shares",
+        "the number of Class D shares is the sum of the original shares and the number of new shares",
+        "the number of Class E shares is the sum of the original shares and the new shares",
+        "the number of Class F shares is the sum of the original and the new shares",
+        "the number of Class G shares is the sum of the original and new shares",
+        "the number of Class H shares is the sum of original and new shares",
+        "the number of Class I shares is the sum of original shares and Class A shares",
+        "the number of Class J shares is the sum of Class B and Class C shares",
+        "the number of Class K shares is the sum of the Class I and the Class J shares",
+        "the number of Class L shares is the sum of Class K , Class G and Class H shares",
+    ]
 
 if __name__ == '__main__':
 
+    og_shares = input("Number of original shares:\n> ")
+    new_shares = input("Number of new shares:\n> ")
+    if not og_shares or not new_shares:
+        print("No value given, using default values")
+        corpus = make_corpus()
+    else:
+        corpus = make_corpus(og_shares, new_shares)
+
+    print("--------------")
+
+
     trees = []
+
     for sentence in corpus:
         iter = eng.parse(sentence)
         _,tree = iter.__next__()

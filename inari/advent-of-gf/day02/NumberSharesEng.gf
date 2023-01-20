@@ -47,7 +47,7 @@ concrete NumberSharesEng of NumberShares = open
     Original = mkAP (mkA "original") ;
 
     -- : String -> Quality
-    Cls x = mkAP (invarA ("Class" ++ x.s)) ;
+    Class x = mkAP (invarA ("Class" ++ x.s)) ;
 
     -- : Number
     Thousand = mkNP (mkN "1000" "1000") ;

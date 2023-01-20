@@ -31,7 +31,7 @@ abstract NumberShares = {
     -- Quality
     New,
     Original : Quality ;
-    Cls : String -> Quality ;  -- Class A
+    Class : String -> Quality ;  -- Class A
 
     -- Number
     Thousand : Number ;  -- The number of original shares is 1000.

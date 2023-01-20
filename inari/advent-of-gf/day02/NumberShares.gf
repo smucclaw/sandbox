@@ -1,4 +1,4 @@
-abstract NumberShares = {
+abstract NumberShares = Numeral ** {
 
   flags startcat = Comment ;
   cat
@@ -31,11 +31,11 @@ abstract NumberShares = {
     -- Quality
     New,
     Original : Quality ;
-    Cls : String -> Quality ;  -- Class A
+    Class : String -> Quality ;  -- Class A
 
     -- Number
-    Thousand : Number ;  -- The number of original shares is 1000.
-    TwoHundred : Number ; -- The number of new shares is two hundred.
+    NumInt : Int -> Number ; -- The number of original shares is 1000.
+    NumNumeral : Numeral -> Number ; -- The number of new shares is two hundred.
 
     SumOfItem : [Item] -> Number ; -- the sum of [the original shares] and [the number of new shares]
     SumOfKind : [Kind] -> Number ; -- the sum of [original shares] and [Class A shares]

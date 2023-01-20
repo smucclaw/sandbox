@@ -6,16 +6,17 @@ load ./verification/model-check
   < 'lender : Actor | none > 
   < 'borrower : Actor | none >
 
-  < 'state : SimulationState |
+  < 'state : AbstractMachineState |
     time : (T:Time),
-    rules : (Rs0:Set{Rule}),
+    rules : (Rs:Set{Rule}),
     activeRules : (
       PARTY 'borrower MUST DO 'pay_payment WITHIN (T0:Time),
       PARTY 'borrower SHANT DO 'default WITHIN (T1:Time)
     ),
-    remainingTrace :
+    allowedEvents : (
       ('borrower does 'pay_payment) ++
       ('borrower does 'default)
+    )
   >
 .)
 

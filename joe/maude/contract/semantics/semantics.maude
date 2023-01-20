@@ -96,6 +96,15 @@ fmod EVENT-TRACE is
 
   ops emptyEventList : -> EventTrace [ctor] . 
   ops _++_ : EventTrace EventTrace -> EventTrace [ctor assoc id: emptyEventList] .
+
+  vars event : Event .
+  vars events : EventTrace .
+
+  ops head_ : EventTrace -> Event .
+  eq head (event ++ events) = event .
+
+  ops tail_ : EventTrace -> EventTrace .
+  eq tail (event ++ events) = events .
 endfm
 
 view ActiveRule from TRIV to PRE-SEMANTICS is
@@ -106,10 +115,18 @@ view Set`{ActiveRule`} from TRIV to SET{ActiveRule} is
   sort Elt to Set`{ActiveRule`} .
 endv
 
+fmod ALLOWED-EVENT is
+  protecting EVENT-TRACE .
+
+  sorts AllowedEvent .
+  subsorts EventTrace < AllowedEvent .
+  ops allEvents : -> AllowedEvent [ctor] .
+endfm
+
 load full-maude
 
 (omod SEMANTICS is
-  protecting PRE-SEMANTICS + SET{Rule} + SET{ActiveRule} + EVENT-TRACE + QID .
+  protecting PRE-SEMANTICS + ALLOWED-EVENT + SET{Rule} + SET{ActiveRule} + QID .
 
   subsorts Qid < Oid < Id .
   subsorts Message < Msg .
@@ -122,19 +139,15 @@ load full-maude
   class AbstractMachineState |
     rules : Set{Rule},
     time : Time,
-    activeRules : Set{ActiveRule} .
-
-  class VerificationState .
-  class SimulationState |
-    remainingTrace : EventTrace .
-
-  subclasses VerificationState SimulationState < AbstractMachineState .
+    activeRules : Set{ActiveRule},
+    allowedEvents : AllowedEvent .
 
   vars actorName actionName ruleName machineState : Oid .
   vars activeRule : ActiveRule .
   vars activeRules' activeRules'' : Set{ActiveRule} .
-  vars event : Event .
-  vars events' : EventTrace .
+  vars event event' : Event .
+  vars events : EventTrace .
+  vars allowedEvents allowedEvents' : AllowedEvent .
   vars deontic : Deontic .
   vars time : Time .
 
@@ -166,30 +179,61 @@ load full-maude
 
   How to synchronize across all rule instances?
 )
-  rl [verificationEvent] :
+  crl [event] :
     < actorName : Actor | >
-    < machineState : VerificationState |
+    < machineState : AbstractMachineState |
+      allowedEvents : allowedEvents,
       activeRules :
-        (PARTY actorName deontic DO actionName WITHIN time, activeRules') > 
+        (PARTY actorName deontic DO actionName WITHIN time, activeRules')
+    >
     event
   =>
     < actorName : Actor | >
-    < machineState : VerificationState |
+    < machineState : AbstractMachineState |
+      allowedEvents : allowedEvents', 
       activeRules : deltaEvent (actorName did actionName) activeRules' >
-    (actorName did actionName) .
+    (actorName did actionName)
+  if allowedEvents' :=
+    if allowedEvents == allEvents
+    then allEvents
+    else if head(allowedEvents) == (actorName does actionName)
+    then tail(allowedEvents)
+    else emptyEventList
+    fi fi .
+
+  --- (
+  ---   (allowedEvents == allEvents and allowedEvents' == allEvents) or
+  ---   (allowedEvents == (actorName does actionName) ++ allowedEvents')
+  --- )
 
   --- Simulation as primitive recursion on the input list of events.
-  rl [simulationEvent] :
-    < actorName : Actor | >
-    < machineState : SimulationState |
-      remainingTrace : ((actorName does actionName) ++ events'),
-      activeRules :
-        PARTY actorName deontic DO actionName WITHIN time, activeRules' >
-  =>
-    < actorName : Actor | >
-    < machineState : SimulationState |
-      remainingTrace : events',
-      activeRules : deltaEvent (actorName did actionName) activeRules' > .
+  --- crl [simulationEvent] :
+  ---   < actorName : Actor | >
+  ---   < machineState : SimulationState |
+  ---     remainingTrace : ((actorName does actionName) ++ events'),
+  ---     activeRules : activeRules' >
+  --- =>
+  ---   < actorName : Actor | >
+  ---   < machineState : SimulationState |
+  ---     remainingTrace : events',
+  ---     activeRules : activeRules'' >
+  --- if
+  ---   < machineState : VerificationState |
+  ---   >
+  --- =>
+  ---   <> .
+
+  --- rl [simulationEvent] :
+  ---   < actorName : Actor | >
+  ---   < machineState : SimulationState |
+  ---     remainingTrace : ((actorName does actionName) ++ events'),
+  ---     activeRules :
+  ---       PARTY actorName deontic DO actionName WITHIN time, activeRules' >
+  --- =>
+  ---   < actorName : Actor | >
+  ---   < machineState : SimulationState |
+  ---     remainingTrace : events',
+  ---     activeRules : deltaEvent (actorName did actionName) activeRules' > .
 
   --- crl [tick] :
   ---   < ruleName : ActiveRule | timer : currentTimer >

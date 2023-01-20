@@ -2,7 +2,7 @@ fmod RULE is
   protecting BOOL + STRING + NAT + QID .
 
   sorts
-    Rule RuleName ActorName Deadline ActionName Event Deontic Date Duration
+    Rule RuleName ActorName Deadline ActionName Deontic Date Duration
     Situation .
 
   subsorts Qid Bool < Situation .
@@ -50,9 +50,13 @@ view Rule from TRIV to RULE is
   sort Elt to Rule .
 endv
 
-fmod RULE-LIST is
-  protecting LIST{Rule} * (
-    sort NeList{Rule} to NeRuleList,
-    sort List{Rule} to RuleList
-  ) .
-endfm
+view Set`{Rule`} from TRIV to SET{Rule} is
+  sort Elt to Set`{Rule`} .
+endv
+
+--- fmod RULE-LIST is
+---   protecting LIST{Rule} * (
+---     sort NeList{Rule} to NeRuleList,
+---     sort List{Rule} to RuleList
+---   ) .
+--- endfm

@@ -1,21 +1,19 @@
 load ./verification/model-check  
 
-(rewrite [1]
+(rewrite
   start
+
+  < 'clock : Clock | time : (T:Time) >
+
   < 'lender : Actor | none >
   < 'borrower : Actor | none >
 
-  < 'payment : RuleInstance |
-    actor : 'borrower,
-    deontic : MUST,
-    action : 'pay_payment,
-    timer : T0:Time >
-
-  < 'avoid_default : RuleInstance |
-    actor : 'borrower,
-    deontic : SHANT,
-    action : 'default,
-    timer : T1:Time >
+  < 'pid : Process |
+    rules : (Rs0:Set{Rule}),
+    activeRules : (
+      PARTY 'borrower MUST DO 'pay_payment WITHIN (T0:Time),
+      PARTY 'borrower MAY DO 'pay_payment WITHIN (T1:Time)
+    ) >
 .)
 
 eof

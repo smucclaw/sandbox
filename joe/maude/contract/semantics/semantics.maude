@@ -20,9 +20,8 @@
       Note that E-unification is what happens when you perform unification
       modulo an equational theory E.
       Here we are performing unification modulo some equational
-      axioms that says list concatenation is associative and commutative,
-      which is why this type of unification is called AC (associative + commutative)
-      unification.
+      axioms that says list concatenation is (A)ssociative and (C)ommutative,
+      which is why this type of unification is called AC-unification.
       Indeed, one can think of finite multisets as what happens when you quotient
       out lists by equivalence relation that permutes the elements.
 
@@ -61,40 +60,77 @@
 )
 
 load ../syntax/rule
+
+fmod PRE-SEMANTICS is
+  protecting RULE .
+
+  sorts Id Message Time Event ActiveRule .
+  --- subsorts Time < Int .
+  subsorts Event < Message .
+
+  ops start : -> Event [ctor] .
+  msgs _did_ : Id Id -> Event .
+
+  op PARTY _ _ DO _ WITHIN _ : Id Deontic Id Time -> ActiveRule [ctor] .
+
+endfm
+
+view ActiveRule from TRIV to PRE-SEMANTICS is
+  sort Elt to ActiveRule .
+endv
+
+view Set`{ActiveRule`} from TRIV to SET{ActiveRule} is
+  sort Elt to Set`{ActiveRule`} .
+endv
+
 load full-maude
 
 (omod SEMANTICS is
-  protecting QID + RULE + RULE-LIST + INT .
+  protecting PRE-SEMANTICS + SET{Rule} + SET{ActiveRule} + QID .
 
-  subsorts Qid < Oid .
-
-  sorts Time Event .
-  --- subsorts Time < Int .
-  subsorts Event < Msg .
-
-  ops start : -> Event [ctor] .
-  msgs _did_ : Oid Oid -> Event .
-  --- msgs ticked_ : Time -> Msg .
+  subsorts Qid < Oid < Id .
+  subsorts Message < Msg .
 
   class Actor .
-  class Situation .
+  --- class Situation .
 
-  class Rules |
-    rules : RuleList .
+  class Clock |
+    time : Time .
 
-  class RuleInstance |
-    actor : Oid,
-    deontic : Deontic,
-    action : Oid,
-    timer : Time .
+  class Process |
+    rules : Set{Rule},
+    activeRules : Set{ActiveRule} .
 
-  vars actorName actionName ruleName : Oid .
+  vars actorName actionName ruleName pid : Oid .
+  vars activeRule : ActiveRule .
+  vars activeRules' : Set{ActiveRule} .
   vars event : Event .
-  vars currentTimer timeDelta : Time .
+  vars deontic : Deontic .
+  vars time : Time .
+
+---(
+  AC-unification allows us to recurse on sets as if they were lists.
+
+  It may be more efficient to use a balanced binary tree like finger trees or
+  red black trees ala
+  https://matt.might.net/papers/germane2014deletion.pdf
+)
+  ops deltaEvent__ : Event Set{ActiveRule} -> Set{ActiveRule} .
+  eq deltaEvent event empty = empty .
+
+  eq deltaEvent
+    (actorName did actionName)
+    (PARTY actorName deontic DO actionName WITHIN time, activeRules')
+  = deltaEvent (actorName did actionName) activeRules' .
+
+  eq deltaEvent event (activeRule, activeRules')
+  = activeRule, deltaEvent event activeRules' .
+
+  ops deltaTime__ : Time Set{ActiveRule} -> Set{ActiveRule} .
 
 ---(
   --------------------------------------------------------------------------
-  {< A : Actor | ... >, < R : RuleInstance | actor : A >, ... }
+  {< A : Actor | ... >, < R : ActiveRule | actor : A >, ... }
   -- A performs actionName -->
   {< A : Actor | ... >, ... }
 
@@ -105,20 +141,21 @@ load full-maude
   --- =>
   ---   none .
 
-  rl [action] :
+  rl [event] :
     < actorName : Actor | >
-    < ruleName : RuleInstance |
-      actor : actorName,
-      action : actionName >
+    < pid : Process |
+      activeRules : (PARTY actorName deontic DO actionName WITHIN time, activeRules') >
     event
   =>
     < actorName : Actor | >
-    actorName did actionName .
+    < pid : Process |
+      activeRules : deltaEvent (actorName did actionName) activeRules' >
+    (actorName did actionName) .
 
   --- crl [tick] :
-  ---   < ruleName : RuleInstance | timer : currentTimer >
+  ---   < ruleName : ActiveRule | timer : currentTimer >
   --- =>
-  ---   < ruleName : RuleInstance | timer : (currentTimer - timeDelta) >
+  ---   < ruleName : ActiveRule | timer : (currentTimer - timeDelta) >
   --- if timeDelta > 0 .
 
 endom)

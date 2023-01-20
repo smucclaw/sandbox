@@ -1,4 +1,5 @@
 import pgf
+from num2int import numeral2int
 
 gr = pgf.readPGF("NumberShares.pgf")
 eng = gr.languages["NumberSharesEng"]
@@ -27,18 +28,16 @@ def interpret(tree):
 
 def getValue(tree):
     f,args = tree.unpack()
-    if f=="Thousand":
-        return 1000
-    elif f=="TwoHundred":
-        return 200
+    if f=="NumNumeral":
+        return numeral2int(args[0])
+    elif f=="NumInt":
+        return args[0].unpack()
     elif f.startswith("SumOf"):
         val = 0
         for q in getList(args[0]):
             qID = getSharesID(q)
             val += numberShares[qID]
         return val
-
-
 
 
 def getSharesID(tree):
@@ -87,7 +86,6 @@ def getList(tree):
     elif f.startswith("Cons"):
         res = getList(args[1]) # contains another list
         return [args[0], *res]
-
 
 corpus = [
     "the number of original shares is 1000",

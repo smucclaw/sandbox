@@ -69,10 +69,33 @@ fmod PRE-SEMANTICS is
   subsorts Event < Message .
 
   ops start : -> Event [ctor] .
-  msgs _did_ : Id Id -> Event .
+  msgs _did_ _does_ : Id Id -> Event .
 
   op PARTY _ _ DO _ WITHIN _ : Id Deontic Id Time -> ActiveRule [ctor] .
 
+endfm
+
+--- view Event from TRIV to PRE-SEMANTICS is
+---   sort Elt to Event .
+--- endv
+
+--- view List`{Event`} from TRIV to LIST{Event} is
+---   sort Elt to List`{Event`} .
+--- endv
+
+---(
+  The denotational/model-theoretic interpretation of this module is an intial
+  algebra isomorphic to that of List{Event}.
+  As before, initiality is used to disregard nonstandard models.
+)
+fmod EVENT-TRACE is
+  protecting PRE-SEMANTICS .
+
+  sorts EventTrace .
+  subsorts Event < EventTrace .
+
+  ops emptyEventList : -> EventTrace [ctor] . 
+  ops _++_ : EventTrace EventTrace -> EventTrace [ctor assoc id: emptyEventList] .
 endfm
 
 view ActiveRule from TRIV to PRE-SEMANTICS is
@@ -86,7 +109,7 @@ endv
 load full-maude
 
 (omod SEMANTICS is
-  protecting PRE-SEMANTICS + SET{Rule} + SET{ActiveRule} + QID .
+  protecting PRE-SEMANTICS + SET{Rule} + SET{ActiveRule} + EVENT-TRACE + QID .
 
   subsorts Qid < Oid < Id .
   subsorts Message < Msg .
@@ -94,17 +117,24 @@ load full-maude
   class Actor .
   --- class Situation .
 
-  class Clock |
-    time : Time .
-
-  class Process |
+  --- Inspired by Krivine abstract machines and
+  --- https://www.lix.polytechnique.fr/Labo/Dale.Miller/papers/mscs92.pdf
+  class AbstractMachineState |
     rules : Set{Rule},
+    time : Time,
     activeRules : Set{ActiveRule} .
 
-  vars actorName actionName ruleName pid : Oid .
+  class VerificationState .
+  class SimulationState |
+    remainingTrace : EventTrace .
+
+  subclasses VerificationState SimulationState < AbstractMachineState .
+
+  vars actorName actionName ruleName machineState : Oid .
   vars activeRule : ActiveRule .
-  vars activeRules' : Set{ActiveRule} .
+  vars activeRules' activeRules'' : Set{ActiveRule} .
   vars event : Event .
+  vars events' : EventTrace .
   vars deontic : Deontic .
   vars time : Time .
 
@@ -126,7 +156,7 @@ load full-maude
   eq deltaEvent event (activeRule, activeRules')
   = activeRule, deltaEvent event activeRules' .
 
-  ops deltaTime__ : Time Set{ActiveRule} -> Set{ActiveRule} .
+  --- ops deltaTime__ : Time Set{ActiveRule} -> Set{ActiveRule}
 
 ---(
   --------------------------------------------------------------------------
@@ -136,21 +166,30 @@ load full-maude
 
   How to synchronize across all rule instances?
 )
-  --- rl [test] :
-  ---   < actorName : Actor | >
-  --- =>
-  ---   none .
-
-  rl [event] :
+  rl [verificationEvent] :
     < actorName : Actor | >
-    < pid : Process |
-      activeRules : (PARTY actorName deontic DO actionName WITHIN time, activeRules') >
+    < machineState : VerificationState |
+      activeRules :
+        (PARTY actorName deontic DO actionName WITHIN time, activeRules') > 
     event
   =>
     < actorName : Actor | >
-    < pid : Process |
+    < machineState : VerificationState |
       activeRules : deltaEvent (actorName did actionName) activeRules' >
     (actorName did actionName) .
+
+  --- Simulation as primitive recursion on the input list of events.
+  rl [simulationEvent] :
+    < actorName : Actor | >
+    < machineState : SimulationState |
+      remainingTrace : ((actorName does actionName) ++ events'),
+      activeRules :
+        PARTY actorName deontic DO actionName WITHIN time, activeRules' >
+  =>
+    < actorName : Actor | >
+    < machineState : SimulationState |
+      remainingTrace : events',
+      activeRules : deltaEvent (actorName did actionName) activeRules' > .
 
   --- crl [tick] :
   ---   < ruleName : ActiveRule | timer : currentTimer >

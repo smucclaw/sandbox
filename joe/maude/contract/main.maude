@@ -1,19 +1,22 @@
 load ./verification/model-check  
 
-(rewrite
+(rewrite [1]
   start
 
-  < 'clock : Clock | time : (T:Time) >
-
-  < 'lender : Actor | none >
+  < 'lender : Actor | none > 
   < 'borrower : Actor | none >
 
-  < 'pid : Process |
+  < 'state : SimulationState |
+    time : (T:Time),
     rules : (Rs0:Set{Rule}),
     activeRules : (
       PARTY 'borrower MUST DO 'pay_payment WITHIN (T0:Time),
-      PARTY 'borrower MAY DO 'pay_payment WITHIN (T1:Time)
-    ) >
+      PARTY 'borrower SHANT DO 'default WITHIN (T1:Time)
+    ),
+    remainingTrace :
+      ('borrower does 'pay_payment) ++
+      ('borrower does 'default)
+  >
 .)
 
 eof

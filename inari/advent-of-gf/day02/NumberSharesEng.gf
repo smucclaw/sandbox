@@ -1,7 +1,8 @@
-concrete NumberSharesEng of NumberShares = open
+concrete NumberSharesEng of NumberShares = NumeralEng ** open
     Prelude
   , SyntaxEng
   , ParadigmsEng
+  , SymbolicEng
   , (N=NounEng)
   , (C=ConjunctionEng)
   in {
@@ -49,9 +50,10 @@ concrete NumberSharesEng of NumberShares = open
     -- : String -> Quality
     Class x = mkAP (invarA ("Class" ++ x.s)) ;
 
-    -- : Number
-    Thousand = mkNP (mkN "1000" "1000") ;
-    TwoHundred = mkNP (mkN "two hundred" "two hundred") ;
+    -- : Int -> Number ;
+    NumInt int = symb int ;
+    -- : Numeral -> Number ;
+    NumNumeral num = mkNP (mkDet <num : Numeral>) ; -- two hundred
 
     -- [Item] and [Kind] have the same lincat, merge for convenience
     -- : [Item] -> Number ; -- the sum of [the new shares]:Item and [the number of Class A shares]:Item

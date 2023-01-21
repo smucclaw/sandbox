@@ -25,17 +25,20 @@ fmod RULE is
 
   --- op _ performs _ at _ : ActorName ActionName Date -> Event [ctor] .
 
-  op RULE _ UPON _ WHILE _ PARTY _ _ DO _ _ HENCE _ LEST _ :
-    Qid Situation Situation Qid Deontic Qid Deadline
-    Situation Situation -> Rule [ctor] .
+  --- op RULE _ UPON _ WHILE _ PARTY _ _ DO _ _ HENCE _ LEST _ :
+  ---   Qid Situation Situation Qid Deontic Qid Deadline
+  ---   Situation Situation -> Rule [ctor] .
+
+  op RULE _ PARTY _ _ DO _ _ HENCE _ LEST _ :
+    Qid Qid Deontic Qid Deadline Qid Qid -> Rule [ctor] .
 
   op testRule1 : -> Rule .
   eq testRule1 =
     RULE 'rule
     --- Trigger that tells us in which situations the rule come into effect.
-    UPON true
+    --- UPON true
     --- Once the norm is triggered, it remains in effect while this situation holds.
-    WHILE 'situation
+    --- WHILE 'situation
     PARTY 'party
     MUST DO 'action
     WITHIN 1 YEAR

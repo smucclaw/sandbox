@@ -2,7 +2,7 @@ load model-checker
 load ../semantics/semantics
 
 (omod MODEL-CHECK is
-  protecting SEMANTICS .
+  protecting ABSTRACT-MACHINE .
   including MODEL-CHECKER + SATISFACTION + LTL .
 
   subsort Configuration < State .

@@ -1,11 +1,4 @@
 ---(
-  Structural operational semantics ala Plotkin in which a configuration is a
-  multiset of the following objects:
-    - a list of all rules found in the program.
-    - actors
-    - active rule instances
-    - situations that hold
-
   A conditional rewriting rule of the form
     crl [rule] : t => t' if C1 /\ ... /\ Cn
   gives rise to an operational rule of the form
@@ -44,24 +37,33 @@
   will yield nonstandard models in which there are states that are not
   reachable from the initial state.
 
-  For our semantics, we axiomatize 2 judgement forms in the style of timed
-  transition systems:
+  For our semantics, we first define the notion of an abstract machine
+  configuration to be a multiset of the following objects:
+  - a list of all rules found in the program
+  - actors
+  - active rule instances
+
+  Then we axiomatize a structural operational semantics ala Plotkin via 2
+  judgement forms in the style of time transition systems:
   - Action transition:
     Configuration -- actor performs action --> Configuration'
   - Time transition:
     Configuration -- time delay --> Configuration'
 
-  We assume that time is interpreted in some initial model of a totally ordered
+  To transpile L4 rule sets into initial abstract machine configurations for
+  execution, we axiomatize the judgement form:
+    transpile ruleSet |-> configuration
+
+  We assume that time is interpreted in some initial model (with the colimit
+  obtained at omega for computability purposes) of a totally ordered
   commutative monoid M in which:
   - 0 is the <-least element.
   - + and < are primitive recursive.
-  Note that initiality is used to discard nonstandard models that result
-  from a standard Compactness argument.
 )
 
 load ../syntax/rule
 
-fmod PRE-SEMANTICS is
+fmod PRELUDE is
   protecting RULE .
 
   sorts Id Message Time Event ActiveRule .
@@ -89,7 +91,7 @@ endfm
   As before, initiality is used to disregard nonstandard models.
 )
 fmod EVENT-TRACE is
-  protecting PRE-SEMANTICS .
+  protecting PRELUDE .
 
   sorts EventTrace .
   subsorts Event < EventTrace .
@@ -107,7 +109,7 @@ fmod EVENT-TRACE is
   eq tail (event ++ events) = events .
 endfm
 
-view ActiveRule from TRIV to PRE-SEMANTICS is
+view ActiveRule from TRIV to PRELUDE is
   sort Elt to ActiveRule .
 endv
 
@@ -125,11 +127,13 @@ endv
 
 load full-maude
 
-(omod SEMANTICS is
-  protecting PRE-SEMANTICS + SET{Rule} + SET{ActiveRule} + QID .
+(omod ABSTRACT-MACHINE is
+  protecting PRELUDE + SET{Rule} + SET{ActiveRule} + QID .
 
   subsorts Qid < Oid < Id .
   subsorts Message < Msg .
+
+  subsorts Time < Nat .
 
   class Actor .
   --- class Situation .
@@ -144,10 +148,15 @@ load full-maude
   vars actorName actionName ruleName machineState : Oid .
   vars activeRule : ActiveRule .
   vars activeRules' activeRules'' : Set{ActiveRule} .
+  vars rule : Rule .
+  vars rules : Set{Rule} .
+  vars config config' : Configuration .
   vars event event' : Event .
+  vars deadline : Deadline .
   --- vars events : EventTrace .
   --- vars allowedEvents allowedEvents' : AllowedEvent .
   vars deontic : Deontic .
+  vars hence lest : Qid .
   vars time : Time .
 
 ---(
@@ -157,6 +166,7 @@ load full-maude
   red black trees ala
   https://matt.might.net/papers/germane2014deletion.pdf
 )
+
   ops deltaEvent__ : Event Set{ActiveRule} -> Set{ActiveRule} .
   eq deltaEvent event empty = empty .
 
@@ -232,4 +242,58 @@ load full-maude
   ---   < ruleName : ActiveRule | timer : (currentTimer - timeDelta) >
   --- if timeDelta > 0 .
 
+endom)
+
+
+(omod TRANSPILER is
+  protecting ABSTRACT-MACHINE + CONFIGURATION .
+
+  vars actorName actionName ruleName machineState : Oid .
+  vars activeRule : ActiveRule .
+  vars activeRules' activeRules'' : Set{ActiveRule} .
+  vars rule : Rule .
+  vars rules : Set{Rule} .
+  vars config config' : Configuration .
+  vars event event' : Event .
+  vars deadline : Deadline .
+  --- vars events : EventTrace .
+  --- vars allowedEvents allowedEvents' : AllowedEvent .
+  vars deontic : Deontic .
+  vars hence lest : Qid .
+  vars time : Time .
+
+  ops transpile_ : Set{Rule} -> Configuration .
+  ops transpileAux__ : Set{Rule} Configuration -> Configuration .
+  ops _containsActor_ : Configuration Oid -> Bool .
+
+  eq transpile rules = transpileAux rules
+    < 'machineState : AbstractMachineState |
+      rules : rules,
+      time : 0,
+      activeRules : empty > .
+
+  eq (< actorName : Actor | > config) containsActor actorName = true .
+  eq config containsActor actorName = false [owise] .
+
+  eq transpileAux empty config = start config .
+
+  ceq transpileAux
+    (
+      (
+        RULE ruleName
+        PARTY actorName
+        deontic DO actionName
+        deadline
+        HENCE hence
+        LEST lest
+      ), rules
+    )
+    config
+  = transpileAux rules config'
+  if
+    config' :=
+      if config containsActor actorName
+      then < actorName : Actor | none > config
+      else config 
+      fi .
 endom)

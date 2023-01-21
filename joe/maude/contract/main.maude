@@ -1,22 +1,18 @@
-load ./semantics/semantics
---- load ./verification/model-check  
+load ./verification/model-check  
 
---- (rewrite < 'borrower : Actor | none > none containsActor 'borrower .)
+---(rewrite
+  < 'lender : Actor | none >
+  < 'borrower : Actor | none >
+  < 'machineState : AbstractMachineState |
+      rules : empty,
+      time : 0,
+      activeRules : empty >
+  containsActor 'borrower
+.)
 
-(rewrite [100] transpile empty .)
-
-eof
-
-(rewrite
+---(rewrite
   transpile (
     RULE 'PayPayment
-    PARTY 'borrower
-    MUST DO 'pay_payment
-    WITHIN 1 YEAR
-    HENCE 'something
-    LEST 'something_else,
-
-    RULE 'PayPayment1
     PARTY 'borrower
     MUST DO 'pay_payment
     WITHIN 1 YEAR
@@ -25,26 +21,24 @@ eof
   )
 .)
 
-eof
-
 (srewrite
   start
 
   < 'lender : Actor | none > 
   < 'borrower : Actor | none >
 
-  < 'state : AbstractMachineState |
-    time : (T:Time),
-    rules : (Rs:Set{Rule}),
+  < 'machineState : AbstractMachineState |
+    time : 0,
+    rules : empty,
     activeRules : (
-      PARTY 'borrower MUST DO 'pay_payment WITHIN (T0:Time),
-      PARTY 'borrower SHANT DO 'default WITHIN (T1:Time)
+      PARTY 'borrower MUST DO 'pay_payment WITHIN 1,
+      PARTY 'borrower SHANT DO 'default WITHIN 1
     )
   >
-  using event[actorName <- 'lender] 
+  using event[actorName <- 'borrower]
   --- (all ; event *)
 .)
 
-(reduce
+---(reduce
   modelCheck(none, [] Top)
 .)

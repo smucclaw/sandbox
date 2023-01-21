@@ -1,5 +1,5 @@
 load model-checker
-load ../semantics/semantics
+load ../semantics/abstract-machine
 
 (omod MODEL-CHECK is
   protecting ABSTRACT-MACHINE .
@@ -13,8 +13,7 @@ load ../semantics/semantics
 
 ---(
   The satisfaction relation has type
-    _ |= _ : (Configuration -> Prop) -> 2 
-  where 2 is the 2-valued boolean algebra.
+    _ |= _ : Configuration -> Prop -> 2
 )
   eq C |= Top
   = true .

@@ -73,7 +73,7 @@ fmod PRELUDE is
   ops start : -> Event [ctor] .
   msgs _did_ _does_ : Id Id -> Event .
 
-  op PARTY _ _ DO _ WITHIN _ : Id Deontic Id Time -> ActiveRule [ctor] .
+  op PARTY _ _ DO _ WITHIN _ : Id Deontic Id Nat -> ActiveRule [ctor] .
 
 endfm
 
@@ -133,8 +133,6 @@ load full-maude
   subsorts Qid < Oid < Id .
   subsorts Message < Msg .
 
-  subsorts Time < Nat .
-
   class Actor .
   --- class Situation .
 
@@ -142,7 +140,7 @@ load full-maude
   --- https://www.lix.polytechnique.fr/Labo/Dale.Miller/papers/mscs92.pdf
   class AbstractMachineState |
     rules : Set{Rule},
-    time : Time,
+    time : Nat,
     activeRules : Set{ActiveRule} .
 
   vars actorName actionName ruleName machineState : Oid .
@@ -157,7 +155,7 @@ load full-maude
   --- vars allowedEvents allowedEvents' : AllowedEvent .
   vars deontic : Deontic .
   vars hence lest : Qid .
-  vars time : Time .
+  vars time : Nat .
 
 ---(
   AC-unification allows us to recurse on sets as if they were lists.
@@ -193,6 +191,41 @@ load full-maude
       activeRules : deltaEvent event' activeRules' >
     event'
   if event' := actorName did actionName .
+
+  ops transpile_ : Set{Rule} -> Configuration .
+  ops transpileAux__ : Set{Rule} Configuration -> Configuration .
+  ops _containsActor_ : Configuration Oid -> Bool .
+
+  eq transpile rules
+  = transpileAux rules
+    < 'machineState : AbstractMachineState |
+      rules : rules,
+      time : 0,
+      activeRules : empty > .
+
+  eq transpileAux empty config = start config .
+
+  ceq transpileAux
+    (
+      (
+        RULE ruleName
+        PARTY actorName
+        deontic DO actionName
+        deadline
+        HENCE hence
+        LEST lest
+      ), rules
+    )
+    config
+  = transpileAux rules config'
+  if config' := config
+      if config containsActor actorName
+      then none
+      else < actorName : Actor | none >
+      fi .
+
+  eq (< actorName : Actor | > config) containsActor actorName = true .
+  eq config containsActor actorName = false [owise] .
 
   --- if allowedEvents' :=
   ---   if allowedEvents == allEvents
@@ -242,58 +275,4 @@ load full-maude
   ---   < ruleName : ActiveRule | timer : (currentTimer - timeDelta) >
   --- if timeDelta > 0 .
 
-endom)
-
-
-(omod TRANSPILER is
-  protecting ABSTRACT-MACHINE + CONFIGURATION .
-
-  vars actorName actionName ruleName machineState : Oid .
-  vars activeRule : ActiveRule .
-  vars activeRules' activeRules'' : Set{ActiveRule} .
-  vars rule : Rule .
-  vars rules : Set{Rule} .
-  vars config config' : Configuration .
-  vars event event' : Event .
-  vars deadline : Deadline .
-  --- vars events : EventTrace .
-  --- vars allowedEvents allowedEvents' : AllowedEvent .
-  vars deontic : Deontic .
-  vars hence lest : Qid .
-  vars time : Time .
-
-  ops transpile_ : Set{Rule} -> Configuration .
-  ops transpileAux__ : Set{Rule} Configuration -> Configuration .
-  ops _containsActor_ : Configuration Oid -> Bool .
-
-  eq transpile rules = transpileAux rules
-    < 'machineState : AbstractMachineState |
-      rules : rules,
-      time : 0,
-      activeRules : empty > .
-
-  eq (< actorName : Actor | > config) containsActor actorName = true .
-  eq config containsActor actorName = false [owise] .
-
-  eq transpileAux empty config = start config .
-
-  ceq transpileAux
-    (
-      (
-        RULE ruleName
-        PARTY actorName
-        deontic DO actionName
-        deadline
-        HENCE hence
-        LEST lest
-      ), rules
-    )
-    config
-  = transpileAux rules config'
-  if
-    config' :=
-      if config containsActor actorName
-      then < actorName : Actor | none > config
-      else config 
-      fi .
 endom)

@@ -37,25 +37,32 @@
   will yield nonstandard models in which there are states that are not
   reachable from the initial state.
 
-  For our semantics, we first define the notion of an abstract machine
-  configuration to be a multiset of the following objects:
-  - a list of all rules found in the program
-  - actors
-  - active rule instances
+  We define an abstract machine semantics in the spirit of Krivine abstract machines.
+  This can be summarized by the following diagram:
+  rule set
+  -- transpile --> initial abstract machine configuration
+  -- evaluate via structural operational semantics --> resulting configuration 
 
-  Then we axiomatize a structural operational semantics ala Plotkin via 2
-  judgement forms in the style of time transition systems:
+  For this, we first define the notion of an abstract machine configuration to
+  be a multiset of the following objects:
+  - the rule set, ie input program
+  - actors and their current states
+  - currently active rule instances
+  Throughout execution, we assume the rule set remains fixed, ie no
+  dynamic modification.
+
+  Next we axiomatize a structural operational semantics ala Plotkin via 2
+  judgement forms.
+  Essentially, an abstract machine is a timed transition system with:
   - Action transition:
     Configuration -- actor performs action --> Configuration'
   - Time transition:
     Configuration -- time delay --> Configuration'
 
-  To transpile L4 rule sets into initial abstract machine configurations for
+  To transpile rule sets into initial abstract machine configurations for
   execution, we axiomatize the judgement form:
     transpile ruleSet |-> configuration
-  Technically this is a trivial embedding, similar to the standard one used
-  to embed the simply typed lambda calculus into the lambda-mu-mu~ calculus
-  abstract machine.
+  and some other auxiliary things.
 
   We assume that time is interpreted in some initial model (with the colimit
   obtained at omega for computability purposes) of a totally ordered
@@ -74,7 +81,12 @@ fmod PRELUDE is
   subsorts Event < Message .
 
   ops start : -> Event [ctor] .
-  msgs _did_ _does_ : Id Id -> Event .
+  msgs _do_ _does_ _did_ : Id Id -> Event .
+
+  vars actorName actionName : Id .
+
+  eq actorName do actionName = actorName did actionName .
+  eq actorName did actionName = actorName does actionName .
 
   op PARTY _ _ DO _ WITHIN _ : Id Deontic Id Nat -> ActiveRule [ctor] .
 
@@ -99,17 +111,9 @@ fmod EVENT-TRACE is
   sorts EventTrace .
   subsorts Event < EventTrace .
 
-  ops emptyEventTrace : -> EventTrace [ctor] . 
-  ops _++_ : EventTrace EventTrace -> EventTrace [ctor assoc id: emptyEventTrace] .
-
-  vars event : Event .
-  vars events : EventTrace .
-
-  ops head_ : EventTrace -> Event .
-  eq head (event ++ events) = event .
-
-  ops tail_ : EventTrace -> EventTrace .
-  eq tail (event ++ events) = events .
+  ops emptyEventTrace : -> EventTrace [ctor] .
+  ops _++_ : EventTrace EventTrace -> EventTrace
+    [ctor assoc id: emptyEventTrace] .
 endfm
 
 view ActiveRule from TRIV to PRELUDE is
@@ -139,8 +143,6 @@ load full-maude
   class Actor .
   --- class Situation .
 
-  --- Inspired by Krivine abstract machines and
-  --- https://www.lix.polytechnique.fr/Labo/Dale.Miller/papers/mscs92.pdf
   class AbstractMachineState |
     rules : Set{Rule},
     time : Nat,

@@ -1,0 +1,18 @@
+fmod EVENT-TRACE is
+  protecting PRELUDE .
+
+  sorts EventTrace .
+  subsorts Event < EventTrace .
+
+  ops emptyEventTrace : -> EventTrace [ctor] .
+  ops _++_ : EventTrace EventTrace -> EventTrace [ctor assoc id: emptyEventTrace] .
+
+  vars event : Event .
+  vars events : EventTrace .
+
+  ops head_ : EventTrace -> Event .
+  eq head (event ++ events) = event .
+
+  ops tail_ : EventTrace -> EventTrace .
+  eq tail (event ++ events) = events .
+endfm

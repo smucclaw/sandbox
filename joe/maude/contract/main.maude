@@ -1,5 +1,5 @@
 --- load ./verification/model-check  
-load ./semantics/interpreter
+load ./semantics/rewrite-trace
 
 ---(rewrite
   < 'lender : Actor | none >
@@ -36,8 +36,8 @@ load ./semantics/interpreter
       PARTY 'borrower SHANT DO 'default WITHIN 1
     ) >
 
-  using rewriteAlongTrace (
-    ('borrower does 'default) ++
+  using rewriteTrace (
+    ('borrower do 'default) ++
     ('borrower does 'pay_payment)
   )
     ---(event[actorName <- 'borrower, actionName <- 'default] ; all)

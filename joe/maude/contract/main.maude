@@ -1,4 +1,5 @@
-load ./verification/model-check  
+--- load ./verification/model-check  
+load ./semantics/interpreter
 
 ---(rewrite
   < 'lender : Actor | none >
@@ -33,10 +34,13 @@ load ./verification/model-check
     activeRules : (
       PARTY 'borrower MUST DO 'pay_payment WITHIN 1,
       PARTY 'borrower SHANT DO 'default WITHIN 1
-    )
-  >
-  using event[actorName <- 'borrower]
-  --- (all ; event *)
+    ) >
+
+  using rewriteAlongTrace (
+    ('borrower does 'default) ++
+    ('borrower does 'pay_payment)
+  )
+    ---(event[actorName <- 'borrower, actionName <- 'default] ; all)
 .)
 
 ---(reduce

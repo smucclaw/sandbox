@@ -1,6 +1,0 @@
-load semantics
-
-(smod EVAL-TRACE is
-  protecting SEMANTICS .
-
-endsm)

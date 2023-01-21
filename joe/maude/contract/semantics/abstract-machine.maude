@@ -53,6 +53,9 @@
   To transpile L4 rule sets into initial abstract machine configurations for
   execution, we axiomatize the judgement form:
     transpile ruleSet |-> configuration
+  Technically this is a trivial embedding, similar to the standard one used
+  to embed the simply typed lambda calculus into the lambda-mu-mu~ calculus
+  abstract machine.
 
   We assume that time is interpreted in some initial model (with the colimit
   obtained at omega for computability purposes) of a totally ordered
@@ -96,8 +99,8 @@ fmod EVENT-TRACE is
   sorts EventTrace .
   subsorts Event < EventTrace .
 
-  ops emptyEventList : -> EventTrace [ctor] . 
-  ops _++_ : EventTrace EventTrace -> EventTrace [ctor assoc id: emptyEventList] .
+  ops emptyEventTrace : -> EventTrace [ctor] . 
+  ops _++_ : EventTrace EventTrace -> EventTrace [ctor assoc id: emptyEventTrace] .
 
   vars event : Event .
   vars events : EventTrace .

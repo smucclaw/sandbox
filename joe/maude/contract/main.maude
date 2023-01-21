@@ -13,9 +13,9 @@ load ./verification/model-check
       PARTY 'borrower MUST DO 'pay_payment WITHIN (T0:Time),
       PARTY 'borrower SHANT DO 'default WITHIN (T1:Time)
     )
-    --- allowedEvents : allEvents
   >
-  using (event[actorName <- 'borrower, actionName <- 'default])
+  using event[actorName <- 'lender] 
+  --- (all ; event *)
 .)
 
 eof

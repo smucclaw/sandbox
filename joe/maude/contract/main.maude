@@ -23,7 +23,7 @@ load ./semantics/rewrite-trace
 .)
 
 (srewrite
-  start
+  tau
 
   < 'lender : Actor | none > 
   < 'borrower : Actor | none >

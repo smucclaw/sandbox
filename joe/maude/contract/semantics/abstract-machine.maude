@@ -37,11 +37,10 @@
   will yield nonstandard models in which there are states that are not
   reachable from the initial state.
 
-  We define an abstract machine semantics in the spirit of Krivine abstract machines.
-  This can be summarized by the following diagram:
-  rule set
-  -- transpile --> initial abstract machine configuration
-  -- evaluate via structural operational semantics --> resulting configuration 
+  We define an abstract machine semantics and a transpiler which can be
+  summarized by the following diagram:
+  rule set -- transpile --> initial abstract machine configuration
+           -- evaluate via structural operational semantics --> resulting configuration 
 
   For this, we first define the notion of an abstract machine configuration to
   be a multiset of the following objects:
@@ -51,24 +50,24 @@
   Throughout execution, we assume the rule set remains fixed, ie no
   dynamic modification.
 
-  Next we axiomatize a structural operational semantics ala Plotkin via 2
-  judgement forms.
-  Essentially, an abstract machine is a timed transition system with:
+  Next we axiomatize a structural operational semantics ala Plotkin.
+  Essentially, an abstract machine is a timed transition system with the 2
+  judgement forms:
   - Action transition:
     Configuration -- actor does action --> Configuration'
   - Time transition:
     Configuration -- time delay --> Configuration'
 
-  To transpile rule sets into initial abstract machine configurations for
-  execution, we axiomatize the judgement form:
-    transpile ruleSet |-> configuration
-  and some other auxiliary things.
-
-  We assume that time is interpreted in some initial model (with the colimit
-  obtained at omega for computability purposes) of a totally ordered
+  We assume that time is interpreted in some initial model (with a
+  Scott-continuous endofunctor for computability purposes) of a totally ordered
   commutative monoid M in which:
   - 0 is the <-least element.
   - + and < are primitive recursive.
+
+  To transpile rule sets into initial abstract machine configurations for
+  execution, we axiomatize the judgement form:
+    transpile ruleSet --> configuration
+  and some other auxiliary things.
 )
 
 load ../syntax/rule
@@ -80,7 +79,7 @@ fmod PRELUDE is
   --- subsorts Time < Int .
   subsorts Event < Message .
 
-  ops start : -> Event [ctor] .
+  ops tau : -> Event [ctor] .
   msgs _do_ _does_ _did_ : Id Id -> Event .
   msgs tick_ ticked_ : Nat -> Event .
 
@@ -184,8 +183,8 @@ load full-maude
   = deltaAction event activeRules
   if event := actorName did actionName .
 
-  --- eq deltaAction event (activeRule, activeRules')
-  --- = activeRule, deltaAction event activeRules' [owise].
+  eq deltaAction event (activeRule, activeRules')
+  = activeRule, deltaAction event activeRules' [owise].
 
   --- ceq deltaTime event (activeRule, activeRules')
   --- = activeRule', deltaTime event activeRules'
@@ -194,6 +193,14 @@ load full-maude
   --- /\ time' > time
   --- /\ true .
 
+---(
+    there exists some active rule in machineState that
+    is fulfilled/breached when the action is taken
+  ----------------------------------------------------- [action]
+  { actorName, machineState, ... }
+  -- actorName does actionName -->
+  { actorName, machineState \ { R | R is an active rule mentioning the action }}
+)
   crl [action] :
     < actorName : Actor | >
     < machineState : AbstractMachineState |
@@ -220,7 +227,7 @@ load full-maude
       time : 0,
       activeRules : empty > .
 
-  eq transpileAux empty config = start config .
+  eq transpileAux empty config = tau config .
 
   ceq transpileAux
     (

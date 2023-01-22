@@ -11,7 +11,7 @@ load abstract-machine
   sd rewriteTrace(emptyEventTrace) := idle .
 
   sd rewriteTrace((actorName does actionName) ++ events) :=
-    event[actorName <- actorName, actionName <- actionName] ;
+    action[actorName <- actorName, actionName <- actionName] ;
     rewriteTrace(events) .
 
 endsm)

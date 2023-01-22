@@ -76,17 +76,20 @@ load ../syntax/rule
 fmod PRELUDE is
   protecting RULE .
 
-  sorts Id Message Time Event ActiveRule .
+  sorts Id Message Event ActiveRule .
   --- subsorts Time < Int .
   subsorts Event < Message .
 
   ops start : -> Event [ctor] .
   msgs _do_ _does_ _did_ : Id Id -> Event .
+  msgs tick_ ticked_ : Nat -> Event .
 
   vars actorName actionName : Id .
+  vars time : Nat .
 
   eq actorName do actionName = actorName did actionName .
   eq actorName did actionName = actorName does actionName .
+  eq tick time = ticked time .
 
   op PARTY _ _ DO _ WITHIN _ : Id Deontic Id Nat -> ActiveRule [ctor] .
 
@@ -150,7 +153,7 @@ load full-maude
 
   vars actorName actionName ruleName machineState : Oid .
   vars activeRule : ActiveRule .
-  vars activeRules' activeRules'' : Set{ActiveRule} .
+  vars activeRules activeRules' : Set{ActiveRule} .
   vars rule : Rule .
   vars rules : Set{Rule} .
   vars config config' : Configuration .
@@ -160,7 +163,7 @@ load full-maude
   --- vars allowedEvents allowedEvents' : AllowedEvent .
   vars deontic : Deontic .
   vars hence lest : Qid .
-  vars time : Nat .
+  vars time time' : Nat .
 
 ---(
   AC-unification allows us to recurse on sets as if they were lists.
@@ -170,32 +173,38 @@ load full-maude
   https://matt.might.net/papers/germane2014deletion.pdf
 )
 
-  ops deltaEvent__ : Event Set{ActiveRule} -> Set{ActiveRule} .
-  eq deltaEvent event empty = empty .
+  ops deltaAction__ deltaTick__ :
+    Event Set{ActiveRule} -> Set{ActiveRule} .
 
-  ceq deltaEvent
-    event
-    (PARTY actorName deontic DO actionName WITHIN time, activeRules')
-  = deltaEvent event activeRules'
-  if event := actorName did actionName .
+  eq deltaAction event empty = empty .
 
-  eq deltaEvent event (activeRule, activeRules')
-  = activeRule, deltaEvent event activeRules' .
+  ceq deltaAction event (activeRule, activeRules')
+  = deltaAction event activeRules'
+  if event := actorName did actionName
+  /\ activeRule := PARTY actorName deontic DO actionName WITHIN time .
 
-  --- ops deltaTime__ : Time Set{ActiveRule} -> Set{ActiveRule}
+  --- eq deltaAction event (activeRule, activeRules')
+  --- = activeRule, deltaAction event activeRules' [owise].
 
-  crl [event] :
+  --- ceq deltaTime event (activeRule, activeRules')
+  --- = activeRule', deltaTime event activeRules'
+  --- if event := tick time
+  --- /\ activeRule := PARTY actorName deontic DO actionName WITHIN time'
+  --- /\ time' > time
+  --- /\ true .
+
+  crl [action] :
     < actorName : Actor | >
     < machineState : AbstractMachineState |
-      activeRules :
-        PARTY actorName deontic DO actionName WITHIN time, activeRules' >
+      activeRules : (activeRule, activeRules) >
     event
   =>
     < actorName : Actor | >
     < machineState : AbstractMachineState |
-      activeRules : deltaEvent event' activeRules' >
+      activeRules : deltaAction event' activeRules >
     event'
-  if event' := actorName did actionName .
+  if activeRule := PARTY actorName deontic DO actionName WITHIN time
+  /\ event' := actorName did actionName .
 
   ops transpile_ : Set{Rule} -> Configuration .
   ops transpileAux__ : Set{Rule} Configuration -> Configuration .

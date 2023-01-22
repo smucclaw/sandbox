@@ -47,20 +47,25 @@ load ./semantics/rewrite-trace
   action [actorName <- 'org, actionName <- 'notify_indiv]
 
   Per the paper on the semantics of strategy language expressions
-  (see proposition 5 of https://eprints.ucm.es/id/eprint/67449/1/slang.pdf),
-  under some restrictions like a finite state space, such strategy exprs can be
-  interpreted as omega-regular expressions, or equivalently, Buchi automata.
+  (see propositions 5 and 6 of https://eprints.ucm.es/id/eprint/67449/1/slang.pdf),
+  under some restrictions like a finite state space, such strategy exprs are
+  equivalent to omega-regular expressions, or equivalently, Buchi automata.
   In this case, the regex is equivalent to an LTL formula characterizing the PDPA
   race condition.
-  Note that omega-regular expressions are equivalent to Buchi automaton, which
-  are in turn strictly more expressive than LTL.
   The resulting Kripke structure is the intersection of the original Kripke
   structure and the Buchi automaton.
   With this, we can check if the original transition system satisfies the
   omega-regex by checking if the language accepted by the intersection automaton
   is empty.
-  In other words, we can perform LTL model checking using omega-regexs defined
-  in the strategy language.
+  This is actually very similar to how LTL model checking works.
+
+  Note that omega-regexs are technically incomparable to usual formulations of
+  LTL because those are usually state-based, while regexes form an action-based
+  logic.
+  In other words, LTL lets you talk about formulae satisfied by states while
+  regexes let you talk about transitions lying along traces.
+  Some variants like Henessy-Milner based logics let you talk about both
+  together.
 )
 .)
 

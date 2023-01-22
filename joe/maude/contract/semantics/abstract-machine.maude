@@ -178,10 +178,11 @@ load full-maude
 
   eq deltaAction event empty = empty .
 
-  ceq deltaAction event (activeRule, activeRules')
-  = deltaAction event activeRules'
-  if event := actorName did actionName
-  /\ activeRule := PARTY actorName deontic DO actionName WITHIN time .
+  ceq deltaAction
+    event
+    (PARTY actorName deontic DO actionName WITHIN time, activeRules)
+  = deltaAction event activeRules
+  if event := actorName did actionName .
 
   --- eq deltaAction event (activeRule, activeRules')
   --- = activeRule, deltaAction event activeRules' [owise].
@@ -196,15 +197,17 @@ load full-maude
   crl [action] :
     < actorName : Actor | >
     < machineState : AbstractMachineState |
-      activeRules : (activeRule, activeRules) >
+      activeRules : (
+        PARTY actorName deontic DO actionName WITHIN time,
+        activeRules
+      ) >
     event
   =>
     < actorName : Actor | >
     < machineState : AbstractMachineState |
       activeRules : deltaAction event' activeRules >
     event'
-  if activeRule := PARTY actorName deontic DO actionName WITHIN time
-  /\ event' := actorName did actionName .
+  if event' := actorName did actionName .
 
   ops transpile_ : Set{Rule} -> Configuration .
   ops transpileAux__ : Set{Rule} Configuration -> Configuration .

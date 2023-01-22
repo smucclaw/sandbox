@@ -3,15 +3,25 @@ load abstract-machine
 (smod REWRITE-TRACE is
   protecting ABSTRACT-MACHINE + EVENT-TRACE .
 
+  strat rewriteEvent : Event @ Configuration .
   strat rewriteTrace : EventTrace @ Configuration .
 
   vars actorName actionName : Oid . 
+  vars time : Nat .
+  vars event : Event .
   vars events : EventTrace .
+
+  sd rewriteEvent(actorName does actionName) :=
+    action[actorName <- actorName, actionName <- actionName] .
+
+  sd rewriteEvent(tick time) :=
+    --- TODO: tick[time <- time] .
+    idle .
 
   sd rewriteTrace(emptyEventTrace) := idle .
 
-  sd rewriteTrace((actorName does actionName) ++ events) :=
-    action[actorName <- actorName, actionName <- actionName] ;
+  sd rewriteTrace(event ++ events) :=
+    rewriteEvent(event) ;
     rewriteTrace(events) .
 
 endsm)

@@ -55,7 +55,7 @@
   judgement forms.
   Essentially, an abstract machine is a timed transition system with:
   - Action transition:
-    Configuration -- actor performs action --> Configuration'
+    Configuration -- actor does action --> Configuration'
   - Time transition:
     Configuration -- time delay --> Configuration'
 

@@ -40,7 +40,28 @@ load ./semantics/rewrite-trace
     ('borrower do 'default) ++
     ('borrower does 'pay_payment)
   )
-    ---(event[actorName <- 'borrower, actionName <- 'default] ; all)
+
+---( PDPC race condition:
+  action [actorName <- 'pdpc, actionName <- 'prohibit_notify_indiv] ;
+  all * ;
+  action [actorName <- 'org, actionName <- 'notify_indiv]
+
+  Per the paper on the semantics of strategy language expressions
+  (see proposition 5 of https://eprints.ucm.es/id/eprint/67449/1/slang.pdf),
+  under some restrictions like a finite state space, such strategy exprs can be
+  interpreted as omega-regular expressions, or equivalently, Buchi automata.
+  In this case, the regex is equivalent to an LTL formula characterizing the PDPA
+  race condition.
+  Note that omega-regular expressions are equivalent to Buchi automaton, which
+  are in turn strictly more expressive than LTL.
+  The resulting Kripke structure is the intersection of the original Kripke
+  structure and the Buchi automaton.
+  With this, we can check if the original transition system satisfies the
+  omega-regex by checking if the language accepted by the intersection automaton
+  is empty.
+  In other words, we can perform LTL model checking using omega-regexs defined
+  in the strategy language.
+)
 .)
 
 ---(reduce

@@ -1,7 +1,7 @@
 load config .
 
-(fmod TRANSPILER is
-  protecting CONFIG + CONFIGURATION .
+(omod TRANSPILER is
+  protecting CONFIG .
 
   vars actorName actionName ruleName machineState hence lest : Oid .
   vars activeRule : ActiveRule .
@@ -48,13 +48,13 @@ load config .
     )
     config
   = transpileAux rules config'
-  if config' := config
+  if config' :=
       if config containsActor actorName
-      then none
-      else < actorName : Actor | none >
+      then config
+      else < actorName : Actor | none > config
       fi .
 
   eq (< actorName : Actor | > config) containsActor actorName = true .
   eq config containsActor actorName = false [owise] .
 
-endfm)
+endom)

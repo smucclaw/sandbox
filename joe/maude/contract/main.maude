@@ -8,10 +8,24 @@ load ./semantics/transpiler
 
 (rewrite
   transpile (
-    RULE 'PayPayment
-    PARTY 'borrower
-    MUST DO 'pay_payment
+    RULE 'rule1
+    PARTY 'party
+    MUST DO 'action
     WITHIN 1 YEAR
+    HENCE 'hence
+    LEST 'lest,
+
+    RULE 'rule2
+    PARTY 'party
+    SHANT DO 'action
+    BY 10
+    HENCE 'hence
+    LEST 'lest,
+
+    RULE 'rule3
+    PARTY 'someone
+    MAY DO 'action
+    WITHIN 2 DAY
     HENCE 'hence
     LEST 'lest
   )

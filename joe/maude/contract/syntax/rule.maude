@@ -18,7 +18,7 @@ fmod RULE is
   BY is for dates, ie absolute deadlines
   WITHIN is for relative deadlines
 )
-  op BY _ : Date -> Deadline [ctor].
+  op BY _ : Nat -> Deadline [ctor].
   op WITHIN _ : Duration -> Deadline [ctor] .
 
   ops _DAY _WEEK _MONTH _YEAR : Nat -> Duration [ctor] .
@@ -31,21 +31,6 @@ fmod RULE is
 
   op RULE _ PARTY _ _ DO _ _ HENCE _ LEST _ :
     Qid Qid Deontic Qid Deadline Qid Qid -> Rule [ctor] .
-
-  op testRule1 : -> Rule .
-  eq testRule1 =
-    RULE 'rule
-    --- Trigger that tells us in which situations the rule come into effect.
-    --- UPON true
-    --- Once the norm is triggered, it remains in effect while this situation holds.
-    --- WHILE 'situation
-    PARTY 'party
-    MUST DO 'action
-    WITHIN 1 YEAR
-    --- The situation resulting from performing the action.
-    HENCE 'situation1
-    --- The situation resulting from a timeout.
-    LEST 'situation2 .
 
 endfm
 

@@ -1,4 +1,4 @@
-(mod SEMANTICS is
+(omod SEMANTICS is
   protecting CONFIG .
 
   vars actorName actionName ruleName machineState hence lest : Oid .
@@ -92,4 +92,4 @@
       activeRules : deltaTick activeRules >
   if not (activeRules containsRuleWithZeroTimer) .
 
-endm)
+endom)

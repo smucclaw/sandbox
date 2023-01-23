@@ -4,7 +4,7 @@ load ./semantics/transpiler
   For some weird reason, loading anything that requires uses semantics, like
   rewrite-trace and model-check breaks the transpiler module.
 )
---- load ./semantics/semantics
+--- load ./semantics/rewrite-trace
 
 (rewrite
   transpile (

@@ -1,7 +1,7 @@
 load config .
 
-(mod TRANSPILER is
-  protecting CONFIG .
+(fmod TRANSPILER is
+  protecting CONFIG + CONFIGURATION .
 
   vars actorName actionName ruleName machineState hence lest : Oid .
   vars activeRule : ActiveRule .
@@ -11,8 +11,6 @@ load config .
   vars config config' : Configuration .
   vars event event' : Event .
   vars deadline : Deadline .
-  --- vars events : EventTrace .
-  --- vars allowedEvents allowedEvents' : AllowedEvent .
   vars deontic : Deontic .
   vars time time' : Nat .
 
@@ -20,6 +18,10 @@ load config .
   ops transpileAux__ : Set{Rule} Configuration -> Configuration .
   ops _containsActor_ : Configuration Oid -> Bool .
 
+---(
+  Transpile a set of rules to an initial abstract machine configuration for
+  execution and model checking.
+)
   eq transpile rules
   = transpileAux rules
     < 'machineState : AbstractMachineState |
@@ -29,6 +31,10 @@ load config .
 
   eq transpileAux empty config = tau config .
 
+---(
+  During transpilation, we detect all actors and initialize one object for each
+  actor.
+)
   ceq transpileAux
     (
       (
@@ -42,13 +48,13 @@ load config .
     )
     config
   = transpileAux rules config'
-  if config' :=
+  if config' := config
       if config containsActor actorName
-      then config
-      else < actorName : Actor | none > config
+      then none
+      else < actorName : Actor | none >
       fi .
 
   eq (< actorName : Actor | > config) containsActor actorName = true .
   eq config containsActor actorName = false [owise] .
 
-endm)
+endfm)

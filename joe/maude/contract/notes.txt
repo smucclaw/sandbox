@@ -1,0 +1,93 @@
+A conditional rewriting rule of the form
+  crl [rule] : t => t' if C1 /\ ... /\ Cn
+gives rise to an operational rule of the form
+    C1 ... Cn
+  ----------------
+    C[t] => C[t']
+where:
+  -  _ => _ denotes the (small-step) evaluation relation.
+  - C[t] is the current configuration, decomposed (via E-unification) into an
+    evaluation context C[.] with a hole and a proper subterm t.
+
+    Note that E-unification is what happens when you perform unification
+    modulo an equational theory E.
+    Here we are performing unification modulo some equational
+    axioms that says list concatenation is (A)ssociative and (C)ommutative,
+    which is why this type of unification is called AC-unification.
+    Indeed, one can think of finite multisets as what happens when you quotient
+    out lists by equivalence relation that permutes the elements.
+
+    One can also define additional equality axioms for configurations to perform
+    model checking under view symmetry as in Lamport's paper
+    https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/charme2005.pdf
+    For instance, one can define an extra axiom that associates configurations
+    of timed transition systems that equates them together, disregarding global time
+    and timers:
+      ceq {C, time} = {C', time'} if ...
+    Such a naive definition messes up the ordering of events though.
+
+A rewriting logic theory is the logical theory resulting from combining all
+these rules together.
+The initial model of the theory is precisely the transition system whose
+small step evaluation relation is axiomatized by the rewriting theory.
+In other words, computation by way of => is equivalent to provability in the
+rewriting theory.
+Note that initiality is important here because standard compactness arguments
+will yield nonstandard models in which there are states that are not
+reachable from the initial state.
+
+We define an abstract machine semantics and a transpiler inspired by:
+- NASA's PLEXIL project https://github.com/nasa/PLEXIL5
+- Plotkin's seminal paper on structural operational semantics (SOS)
+  https://homepages.inf.ed.ac.uk/gdp/publications/sos_jlap.pdf
+- An implementation of Plotkin's SOS and interpreting automata in Maude:
+  https://arxiv.org/pdf/1805.04650.pdf
+  https://github.com/ChristianoBraga/PiFramework
+  The idea is that one can build a parser and compiler directly in Maude and
+  then leverage the model checking capabilities to directly model check
+  compiled bytecode using its operational semantics.
+  Since the compiler is itself also formalized in Maude, one can also model
+  check the compiler itself.
+
+This can be summarized by the diagram:
+rule set -- transpile --> initial abstract machine config
+
+abstract machine config -- evaluate via st --> resulting config
+abstract machine config -- model checking directly on SOS --> result
+
+For this, we first define the notion of an abstract machine configuration to
+be a multiset of the following objects:
+- the rule set, ie input program
+- actors and their current states
+- currently active rule instances
+Throughout execution, we assume the rule set remains fixed, ie no
+dynamic modification.
+
+Next we axiomatize a structural operational semantics for our abstract
+machines.
+Essentially, an abstract machine is a timed transition system with the 2
+judgement forms:
+- Action transition:
+  Configuration -- actor does action --> Configuration'
+- Time transition:
+  Configuration -- time delay --> Configuration'
+
+We assume that time is interpreted in some initial model (with a
+Scott-continuous endofunctor for computability purposes) of a totally ordered
+commutative monoid M in which:
+- 0 is the <-least element.
+- + and < are primitive recursive.
+
+To transpile rule sets into initial abstract machine configurations for
+execution, we axiomatize the judgement form:
+  transpile ruleSet --> configuration
+and some other auxiliary things.
+
+Note that for model checking to be decidable, we should either:
+- have finitely many reachable configs given the initial config that
+  are model checking with.
+- model check the initial config on a finite state abstraction of the reachable
+  configs.
+For real-time systems, one can adopt Lamport's approach and model check
+under view symmetry, ie quotient out the time component
+https://lamport.azurewebsites.net/pubs/charme2005.pdf

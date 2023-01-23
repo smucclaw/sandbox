@@ -1,0 +1,95 @@
+(mod SEMANTICS is
+  protecting CONFIG .
+
+  vars actorName actionName ruleName machineState hence lest : Oid .
+  vars activeRule : ActiveRule .
+  vars activeRules activeRules' : Set{ActiveRule} .
+  vars rule : Rule .
+  vars rules : Set{Rule} .
+  vars config config' : Configuration .
+  vars event event' : Event .
+  vars deadline : Deadline .
+  --- vars events : EventTrace .
+  --- vars allowedEvents allowedEvents' : AllowedEvent .
+  vars deontic : Deontic .
+  vars time time' : Nat .
+
+---(
+  AC-unification allows us to recurse on sets as if they were lists.
+
+  It may be more efficient to use a balanced binary tree like finger trees or
+  red black trees ala
+  https://matt.might.net/papers/germane2014deletion.pdf
+)
+
+  ops _containsRuleWithEvent_ : Set{ActiveRule} Event -> Bool .
+    
+  eq (PARTY actorName deontic DO actionName WITHIN time, activeRules)
+    containsRuleWithEvent
+    (actorName does actionName)
+  = true .
+
+  eq activeRules containsRuleWithEvent (actorName does actionName)
+  = false [owise].
+
+  ops _containsRuleWithZeroTimer : Set{ActiveRule} -> Bool .
+
+  eq (PARTY actorName deontic DO actionName WITHIN 0, activeRules)
+    containsRuleWithZeroTimer
+  = true .
+
+  eq activeRules containsRuleWithZeroTimer = false [owise] .
+
+  ops deltaAction__ : Event Set{ActiveRule} -> Set{ActiveRule} .
+  eq deltaAction event empty = empty .
+
+  ceq deltaAction
+    event
+    (PARTY actorName deontic DO actionName WITHIN time, activeRules)
+  = deltaAction event activeRules
+  if event := actorName did actionName .
+
+  eq deltaAction event (activeRule, activeRules')
+  = activeRule, deltaAction event activeRules' [owise].
+
+  ops deltaTick_ : Set{ActiveRule} -> Set{ActiveRule} .
+  eq deltaTick empty = empty .
+
+  eq deltaTick
+    (PARTY actorName deontic DO actionName WITHIN (s time), activeRules)
+  = PARTY actorName deontic DO actionName WITHIN time, deltaTick activeRules .
+
+---(
+    there exists some active rule in machineState that
+    is fulfilled/breached when the action is taken
+  ----------------------------------------------------- [action]
+  { actorName, machineState, ... }
+  -- actorName does actionName -->
+  { actorName, machineState[activeRules |-> activeRules \ { R | R is an active rule mentioning the action }] }
+)
+  crl [action] :
+    < actorName : Actor | >
+    < machineState : AbstractMachineState |
+      activeRules : (
+        PARTY actorName deontic DO actionName WITHIN time,
+        activeRules
+      ) >
+    event
+  =>
+    < actorName : Actor | >
+    < machineState : AbstractMachineState |
+      activeRules : deltaAction event' activeRules >
+    event'
+  if event' := actorName did actionName .
+
+  crl [tick] :
+    < machineState : AbstractMachineState |
+      time : time,
+      activeRules : activeRules >
+  =>
+    < machineState : AbstractMachineState |
+      time : s time,
+      activeRules : deltaTick activeRules >
+  if not (activeRules containsRuleWithZeroTimer) .
+
+endm)

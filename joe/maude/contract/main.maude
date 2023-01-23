@@ -1,28 +1,23 @@
---- load ./verification/model-check  
-load ./semantics/rewrite-trace
+load ./semantics/transpiler
 
----(rewrite
-  < 'lender : Actor | none >
-  < 'borrower : Actor | none >
-  < 'machineState : AbstractMachineState |
-      rules : empty,
-      time : 0,
-      activeRules : empty >
-  containsActor 'borrower
-.)
+---(
+  For some weird reason, loading anything that requires uses semantics, like
+  rewrite-trace and model-check breaks the transpiler module.
+)
+--- load ./semantics/semantics
 
----(rewrite
+(rewrite
   transpile (
     RULE 'PayPayment
     PARTY 'borrower
     MUST DO 'pay_payment
     WITHIN 1 YEAR
-    HENCE 'something
-    LEST 'something_else
+    HENCE 'hence
+    LEST 'lest
   )
 .)
 
-(srewrite
+---(srewrite
   tau
 
   < 'lender : Actor | none > 
@@ -38,7 +33,7 @@ load ./semantics/rewrite-trace
 
   using rewriteTrace (
     ('borrower do 'default) ++
-    ('borrower does 'pay_payment)
+    tick
   )
 
 ---( PDPC race condition:

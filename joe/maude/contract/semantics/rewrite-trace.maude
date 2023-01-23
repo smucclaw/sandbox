@@ -1,7 +1,7 @@
-load abstract-machine
+load semantics
 
 (smod REWRITE-TRACE is
-  protecting ABSTRACT-MACHINE + EVENT-TRACE .
+  protecting SEMANTICS + EVENT-TRACE .
 
   strat rewriteEvent : Event @ Configuration .
   strat rewriteTrace : EventTrace @ Configuration .
@@ -14,9 +14,7 @@ load abstract-machine
   sd rewriteEvent(actorName does actionName) :=
     action[actorName <- actorName, actionName <- actionName] .
 
-  sd rewriteEvent(tick time) :=
-    --- TODO: tick[time <- time] .
-    idle .
+  sd rewriteEvent(tick) := tick .
 
   sd rewriteTrace(emptyEventTrace) := idle .
 

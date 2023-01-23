@@ -1,0 +1,54 @@
+load config .
+
+(mod TRANSPILER is
+  protecting CONFIG .
+
+  vars actorName actionName ruleName machineState hence lest : Oid .
+  vars activeRule : ActiveRule .
+  vars activeRules activeRules' : Set{ActiveRule} .
+  vars rule : Rule .
+  vars rules : Set{Rule} .
+  vars config config' : Configuration .
+  vars event event' : Event .
+  vars deadline : Deadline .
+  --- vars events : EventTrace .
+  --- vars allowedEvents allowedEvents' : AllowedEvent .
+  vars deontic : Deontic .
+  vars time time' : Nat .
+
+  ops transpile_ : Set{Rule} -> Configuration .
+  ops transpileAux__ : Set{Rule} Configuration -> Configuration .
+  ops _containsActor_ : Configuration Oid -> Bool .
+
+  eq transpile rules
+  = transpileAux rules
+    < 'machineState : AbstractMachineState |
+      rules : rules,
+      time : 0,
+      activeRules : empty > .
+
+  eq transpileAux empty config = tau config .
+
+  ceq transpileAux
+    (
+      (
+        RULE ruleName
+        PARTY actorName
+        deontic DO actionName
+        deadline
+        HENCE hence
+        LEST lest
+      ), rules
+    )
+    config
+  = transpileAux rules config'
+  if config' :=
+      if config containsActor actorName
+      then config
+      else < actorName : Actor | none > config
+      fi .
+
+  eq (< actorName : Actor | > config) containsActor actorName = true .
+  eq config containsActor actorName = false [owise] .
+
+endm)

@@ -48,10 +48,10 @@ load config .
     )
     config
   = transpileAux rules config'
-  if config' :=
+  if config' := config
       if config containsActor actorName
-      then config
-      else < actorName : Actor | none > config
+      then none
+      else < actorName : Actor | none >
       fi .
 
   eq (< actorName : Actor | > config) containsActor actorName = true .

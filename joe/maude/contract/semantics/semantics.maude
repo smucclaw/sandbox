@@ -9,6 +9,8 @@ load config
   vars rule : Rule .
   vars rules : Set{Rule} .
   vars config config' : Configuration .
+  vars actionEvent : ActionEvent .
+  vars tickEvent : TickEvent .
   vars event event' : Event .
   vars deadline : Deadline .
   --- vars events : EventTrace .
@@ -24,35 +26,34 @@ load config
   https://matt.might.net/papers/germane2014deletion.pdf
 )
 
-  ops _containsRuleWithEvent_ : Set{ActiveRule} Event -> Bool .
+  ops _containsRuleWithEvent_ : Set{ActiveRule} ActionEvent -> Bool .
     
   eq (PARTY actorName deontic DO actionName WITHIN time, activeRules)
     containsRuleWithEvent
     (actorName does actionName)
   = true .
 
-  eq activeRules containsRuleWithEvent (actorName does actionName)
-  = false [owise].
+  eq activeRules containsRuleWithEvent actionEvent = false [owise].
 
-  ops _containsRuleWithZeroTimer : Set{ActiveRule} -> Bool .
+  --- ops _containsRuleWithZeroTimer : Set{ActiveRule} -> Bool .
 
-  eq (PARTY actorName deontic DO actionName WITHIN 0, activeRules)
-    containsRuleWithZeroTimer
-  = true .
+  --- eq (PARTY actorName deontic DO actionName WITHIN 0, activeRules)
+  ---   containsRuleWithZeroTimer
+  --- = true .
 
-  eq activeRules containsRuleWithZeroTimer = false [owise] .
+  --- eq activeRules containsRuleWithZeroTimer = false [owise] .
 
-  ops deltaAction__ : Event Set{ActiveRule} -> Set{ActiveRule} .
-  eq deltaAction event empty = empty .
+  ops deltaAction__ : ActionEvent Set{ActiveRule} -> Set{ActiveRule} .
+  eq deltaAction actionEvent empty = empty .
 
   ceq deltaAction
-    event
+    actionEvent
     (PARTY actorName deontic DO actionName WITHIN time, activeRules)
-  = deltaAction event activeRules
-  if event := actorName did actionName .
+  = deltaAction actionEvent activeRules
+  if actionEvent := actorName did actionName .
 
-  eq deltaAction event (activeRule, activeRules')
-  = activeRule, deltaAction event activeRules' [owise].
+  eq deltaAction actionEvent (activeRule, activeRules')
+  = activeRule, deltaAction actionEvent activeRules' [owise].
 
   ops deltaTick_ : Set{ActiveRule} -> Set{ActiveRule} .
   eq deltaTick empty = empty .
@@ -71,7 +72,7 @@ load config
   ----------------------------------------------------- [action]
   { actorName, machineState, ... }
   -- actorName does actionName -->
-  { actorName, machineState[activeRules |-> activeRules \ { R | R is an active rule mentioning the action }] }
+  { actorName, machineState[activeRules := activeRules \ { R \in activeRules | R mentions the event }] }
 )
   crl [action] :
     < actorName : Actor | >
@@ -88,6 +89,16 @@ load config
     event'
   if event' := actorName did actionName .
 
+---(
+  ----------------------------------- [tick]
+  { machineState, ... }
+  -- tick -->
+  { machineState[activeRules := deltaTick activeRules]}
+
+  Here deltaTick is a function that:
+  - removes all active rule instances with a timer of 0
+  - decrements all active rule instances with a positive timer
+)
   rl [tick] :
     < machineState : AbstractMachineState |
       time : time,

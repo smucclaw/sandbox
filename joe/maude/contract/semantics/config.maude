@@ -3,13 +3,20 @@ load ../syntax/rule
 fmod PRELUDE is
   protecting RULE .
 
-  sorts Id Message Event ActiveRule .
-  --- subsorts Time < Int .
-  subsorts Event < Message .
+  sorts Id Message Event ActionEvent TickEvent ActiveRule .
 
-  ops tau : -> Event [ctor] .
-  msgs _do_ _does_ _did_ : Id Id -> Event .
-  ops tick : -> Event [ctor].
+---(
+  Event is an indexed family of sorts, ie a GADT with:
+  data Event :: Type -> Type where
+    tau :: Event Action
+    do :: Oid -> Oid -> Event Action
+    tick :: Event Tick
+)
+  subsorts ActionEvent TickEvent < Event < Message .
+
+  ops tau : -> ActionEvent [ctor] .
+  msgs _do_ _does_ _did_ : Id Id -> ActionEvent .
+  ops tick : -> TickEvent [ctor].
 
   vars actorName actionName : Id .
 

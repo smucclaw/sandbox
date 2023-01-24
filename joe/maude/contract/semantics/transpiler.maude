@@ -37,14 +37,13 @@ load config
 )
   ceq transpileAux
     (
-      (
-        RULE ruleName
-        PARTY actorName
-        deontic DO actionName
-        deadline
-        HENCE hence
-        LEST lest
-      ), rules
+      RULE ruleName
+      PARTY actorName
+      deontic DO actionName
+      deadline
+      HENCE hence
+      LEST lest,
+      rules
     )
     config
   = transpileAux rules config'

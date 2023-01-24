@@ -1,12 +1,7 @@
 load ./semantics/transpiler
+load ./semantics/rewrite-trace
 
----(
-  For some weird reason, loading anything that requires uses semantics, like
-  rewrite-trace and model-check breaks the transpiler module.
-)
---- load ./semantics/rewrite-trace
-
-(rewrite
+---(rewrite
   transpile (
     RULE 'rule1
     PARTY 'party
@@ -31,7 +26,7 @@ load ./semantics/transpiler
   )
 .)
 
----(srewrite
+(srewrite
   tau
 
   < 'lender : Actor | none > 
@@ -41,7 +36,7 @@ load ./semantics/transpiler
     time : 0,
     rules : empty,
     activeRules : (
-      PARTY 'borrower MUST DO 'pay_payment WITHIN 1,
+      PARTY 'borrower MUST DO 'pay_payment WITHIN 0,
       PARTY 'borrower SHANT DO 'default WITHIN 1
     ) >
 
@@ -49,8 +44,9 @@ load ./semantics/transpiler
     ('borrower do 'default) ++
     tick
   )
+.)
 
----( PDPC race condition:
+---( PDPA race condition:
   action [actorName <- 'pdpc, actionName <- 'prohibit_notify_indiv] ;
   all * ;
   action [actorName <- 'org, actionName <- 'notify_indiv]
@@ -76,7 +72,6 @@ load ./semantics/transpiler
   Some variants like Henessy-Milner based logics let you talk about both
   together.
 )
-.)
 
 ---(reduce
   modelCheck(none, [] Top)

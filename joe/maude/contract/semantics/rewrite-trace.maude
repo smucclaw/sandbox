@@ -22,4 +22,17 @@ load semantics
     rewriteEvent(event) ;
     rewriteTrace(events) .
 
+  --- sd normTriggered(
+  ---   (
+  ---     RULE ruleName
+  ---     PARTY actorName
+  ---     deontic DO actionName
+  ---     deadline
+  ---     HENCE hence
+  ---     LEST lest,
+  ---     rules
+  ---   ),
+  ---   hence
+  --- ) := action[actorName <- actorName, actionName <- actionName] .
+
 endsm)

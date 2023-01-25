@@ -2,14 +2,20 @@ load model-checker
 load ../semantics/semantics
 
 (omod MODEL-CHECK is
-  protecting ABSTRACT-MACHINE .
+  protecting CONFIG .
   including MODEL-CHECKER + SATISFACTION + LTL .
 
-  subsort Configuration < State .
+  subsorts Configuration < State .
+  subsorts ActionEvent < Prop .
 
   ops Top : -> Prop .
+  ops _prohibitedFromDoing_ : Oid Oid -> Prop .
+  ops raceCond_ : ActionEvent -> Formula .
 
   vars C : Configuration .
+  vars actorName actionName machineState : Oid .
+  vars rules : Set{ActiveRule} .
+  vars time : Nat .
 
 ---(
   The satisfaction relation has type
@@ -17,4 +23,27 @@ load ../semantics/semantics
 )
   eq C |= Top
   = true .
+
+  eq (actorName does actionName) C |= actorName does actionName
+  = true .
+
+  eq (
+    < machineState : AbstractMachineState |
+      activeRules : (
+        PARTY actorName
+        SHANT DO actionName
+        WITHIN time,
+        rules
+      ) >
+  ) C |= actorName prohibitedFromDoing actionName
+  = true .
+
+---(
+  Need to loop through all actorName and actionName in a rule set and
+  construct one such formula for each pair.
+  Then take conjunction over all of them.
+)
+  eq raceCond (actorName does actionName) =
+    (actorName does actionName) =>
+      [] ~ (actorName prohibitedFromDoing actionName) .
 endom)

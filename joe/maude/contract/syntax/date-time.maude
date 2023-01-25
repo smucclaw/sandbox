@@ -1,0 +1,18 @@
+fmod DATE-TIME is
+  protecting NAT .
+
+  sorts Duration .
+
+  ops _DAY _WEEK _MONTH _YEAR : Nat -> Duration [ctor] .
+
+  ops _:+:_ : Duration Duration -> Duration [assoc comm id: 0 DAY] .
+
+  vars n : Nat .
+
+  eq (s 0) YEAR = 365 DAY .
+  ceq (s n) YEAR = n DAY :+: 1 DAY .
+
+  eq (s 0) MONTH = 30 DAY .
+  eq (s 0) WEEK = 7 DAY .
+
+endfm

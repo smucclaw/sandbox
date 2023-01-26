@@ -1,6 +1,6 @@
 load semantics
 
-(smod REWRITE-TRACE is
+(smod REWRITE-TRACE-STRAT is
   protecting SEMANTICS + EVENT-TRACE .
 
   strat rewriteEvent : Event @ Configuration .

@@ -1,5 +1,5 @@
 load ./semantics/transpiler
-load ./semantics/rewrite-trace
+load ./semantics/rewrite-trace-strat
 
 ---(rewrite
   transpile (

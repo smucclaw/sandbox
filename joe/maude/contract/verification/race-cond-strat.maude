@@ -1,0 +1,22 @@
+---(
+  Strategy module for detecting PDPA race condition.
+)
+
+load model-check
+
+(smod RACE-COND-STRAT is
+  protecting MODEL-CHECK .
+
+  strat raceCond @ Configuration .
+
+  vars actorName actionName : Oid . 
+  vars config : Configuration .
+
+  sd raceCond :=
+    all * ;
+    action[actorName <- actorName, actionName <- actionName] ;
+    all * ;
+    match config s.t.
+      config |= actorName prohibitedFromDoing actionName .
+
+endsm)

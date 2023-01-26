@@ -4,7 +4,7 @@
 load model-checker
 load ../semantics/semantics
 
-(omod ATOMIC-PROPS-STRAT is
+(omod ATOMIC-PROPS is
   protecting CONFIG .
   including MODEL-CHECKER + SATISFACTION . 
 
@@ -12,12 +12,15 @@ load ../semantics/semantics
   subsorts ActionEvent < Prop .
 
   --- ops Top : -> Prop .
+  ops _allowedToDo_ : Oid Oid -> Prop .
   ops _prohibitedFromDoing_ : Oid Oid -> Prop .
   --- ops raceCond_ : ActionEvent -> Formula .
 
   vars config : Configuration .
   vars actorName actionName machineState : Oid .
-  vars rules : Set{ActiveRule} .
+  vars deontic : Deontic .
+  vars rules : Set{Rule} .
+  vars activeRules : Set{ActiveRule} .
   vars time : Nat .
 
 ---(
@@ -30,13 +33,25 @@ load ../semantics/semantics
   eq (actorName did actionName) config |= actorName did actionName
   = true .
 
+  ceq
+    < machineState : AbstractMachineState |
+      activeRules : (
+        PARTY actorName
+        deontic DO actionName
+        WITHIN time,
+        activeRules
+      ) > config
+    |= actorName allowedToDo actionName
+  = true
+  if deontic == MUST or deontic == MAY . 
+
   eq
     < machineState : AbstractMachineState |
       activeRules : (
         PARTY actorName
         SHANT DO actionName
         WITHIN time,
-        rules
+        activeRules
       ) > config
     |= actorName prohibitedFromDoing actionName
   = true .

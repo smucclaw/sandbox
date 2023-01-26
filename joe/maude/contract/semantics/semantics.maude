@@ -99,13 +99,14 @@ load config
   - removes all active rule instances with a timer of 0
   - decrements all active rule instances with a positive timer
 )
-  rl [tick] :
+  crl [tick] :
     < machineState : AbstractMachineState |
       time : time,
       activeRules : activeRules >
   =>
     < machineState : AbstractMachineState |
       time : s time,
-      activeRules : deltaTick activeRules > .
+      activeRules : deltaTick activeRules >
+  if activeRules =/= empty .
 
 endom)

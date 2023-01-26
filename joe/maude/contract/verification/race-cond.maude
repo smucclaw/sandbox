@@ -1,0 +1,14 @@
+load atomic-props
+
+(omod RACE-COND is
+  protecting ATOMIC-PROPS + LTL .
+
+  ops raceCondLTL_ : ActionEvent -> Formula .
+
+  vars actorName actionName : Oid .
+
+  eq raceCondLTL (actorName does actionName) =
+    (actorName does actionName) =>
+      [] ~ (actorName prohibitedFromDoing actionName) .
+
+endom)

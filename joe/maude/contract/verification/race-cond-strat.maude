@@ -2,17 +2,61 @@
   Strategy module for detecting PDPA race condition.
 )
 
-load model-check
+load atomic-props
 
 (smod RACE-COND-STRAT is
-  protecting MODEL-CHECK .
+  protecting SEMANTICS + ATOMIC-PROPS .
 
-  strat raceCond @ Configuration .
+  strat raceCond : Set{Rule} @ Configuration .
+  strat raceCondAux : ActionEvent @ Configuration .
 
-  vars actorName actionName : Oid . 
+  vars actorName actionName ruleName hence lest machineState : Oid .
+  vars time : Nat .
+  vars deontic : Deontic .
+  vars deadline : Deadline .
+  vars activeRules : Set{ActiveRule} .
+  vars rules : Set{Rule} .
   vars config : Configuration .
 
-  sd raceCond :=
+  sd raceCond(empty) := idle .
+
+  sd raceCond(
+    (
+      RULE ruleName
+      PARTY actorName
+      SHANT DO actionName
+      deadline
+      HENCE hence
+      LEST lest,
+      rules
+    )
+  ) := raceCondAux(actorName does actionName) | raceCond(rules) .
+
+  sd raceCond(
+    (
+      RULE ruleName
+      PARTY actorName
+      MAY DO actionName
+      deadline
+      HENCE hence
+      LEST lest,
+      rules
+    )
+  ) := raceCond(rules) .
+
+  sd raceCond(
+    (
+      RULE ruleName
+      PARTY actorName
+      MUST DO actionName
+      deadline
+      HENCE hence
+      LEST lest,
+      rules
+    )
+  ) := raceCond(rules) .
+
+  sd raceCondAux(actorName does actionName) :=
     all * ;
     action[actorName <- actorName, actionName <- actionName] ;
     all * ;

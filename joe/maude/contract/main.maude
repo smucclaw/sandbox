@@ -1,5 +1,6 @@
 load ./semantics/transpiler
 load ./semantics/rewrite-trace-strat
+load ./verification/race-cond-strat
 
 ---(rewrite
   transpile (
@@ -36,14 +37,24 @@ load ./semantics/rewrite-trace-strat
     time : 0,
     rules : empty,
     activeRules : (
-      PARTY 'borrower MUST DO 'pay_payment WITHIN 0,
-      PARTY 'borrower SHANT DO 'default WITHIN 1
+      PARTY 'borrower MUST DO 'action WITHIN 1,
+      PARTY 'borrower SHANT DO 'action WITHIN 1
     ) >
 
+  using raceCond(
+    RULE 'rule
+    PARTY 'borrower
+    SHANT DO 'action
+    WITHIN 10 DAY
+    HENCE 'hence LEST 'lest
+  )
+
+---(
   using rewriteTrace (
     ('borrower do 'default) ++
     tick
   )
+)
 .)
 
 ---( PDPA race condition:

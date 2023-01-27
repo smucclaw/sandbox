@@ -9,22 +9,23 @@ concrete NumberSharesEng of NumberShares = NumeralEng ** open
   lincat
     Comment = S ;
     Item = NP ;
+    ModKind = CN ;
     Kind = LinKind ; -- needs custom params to prevent "the Gamma"
     Quality = AP ;
     Number = NP ;
   oper
-    LinKind : Type = {s : CN ; mod : ModType} ;
+    LinKind : Type = {s : CN ; det : DetType} ;
   param
-    ModType = CanMod | NoMod ;
+    DetType = CanDet | NoDet ;
   lin
     -- : Item -> Number -> Comment ;  -- {The number of original shares} is {1000}
     Pred numshares hundred = mkS (mkCl numshares hundred) ;
     PredVerbose numshares hundred = mkS (mkCl numshares (shallBeGivenBy hundred)) ;
 
     -- : Kind -> Item ; -- the original shares
-    The kind = case kind.mod of {
-      NoMod => mkNP kind.s ; -- Gamma, not *the Gamma
-      CanMod => the kind.s   -- the new shares
+    The kind = case kind.det of {
+      NoDet => mkNP kind.s ; -- Gamma, not *the Gamma
+      CanDet => the kind.s   -- the new shares
       } ;
     NumberOf kind = the (N.PossNP number_CN (mkNP kind.s)) ;
     ValueOf kind = the (N.PossNP value_CN (mkNP kind.s)) ;
@@ -32,16 +33,14 @@ concrete NumberSharesEng of NumberShares = NumeralEng ** open
     ConversionPrice = the (mkCN (mkN "conversion price")) ;
     PurchasePrice = the (mkCN (mkN "purchase price")) ;
 
-    -- : Quality -> Kind -> Kind ; -- class A shares, original shares , *original Gamma
-    Mod quality kind = kind ** {
-      s = case kind.mod of {
-            CanMod => mkCN quality kind.s ;
-            NoMod => mkCN (mkN nonExist) }
-      } ;
-    Shares = modKind (mkN "shares" "shares") ; -- Always in plural! TODO: should singular be allowed?
-    Beta = noModKind (mkN "Beta" "Beta") ; -- we don't want to accidentally linearise "Deltas", "Gammas" etc.
-    Delta = noModKind (mkN "Delta" "Delta") ;
-    Gamma = noModKind (mkN "Gamma" "Gamma") ;
+    -- : Quality -> ModKind -> Kind ; -- class A shares, original shares , *original Gamma
+    Mod quality kind = {
+      s = mkCN quality kind ;
+      det = CanDet } ;
+    Shares = mkCN (mkN "shares" "shares") ; -- Always in plural! TODO: should singular be allowed?
+    Beta = noDetKind (mkN "Beta" "Beta") ; -- we don't want to accidentally linearise "Deltas", "Gammas" etc.
+    Delta = noDetKind (mkN "Delta" "Delta") ;
+    Gamma = noDetKind (mkN "Gamma" "Gamma") ;
 
     -- : Quality
     New = mkAP (mkA "new") ;
@@ -63,7 +62,7 @@ concrete NumberSharesEng of NumberShares = NumeralEng ** open
     --  : [Quality] -> Kind -> Number ; -- the sum of (the number of)? [Class B and Class C] [shares]
     SumOfQuality daps cn =
       let optNumber : Predet = lin Predet {s = ""|"the number of"} ; -- additional fluff, doesn't add to syntax tree
-          modShares : NP = mkNP (C.ConjDet and_Conj daps) cn.s ;
+          modShares : NP = mkNP (C.ConjDet and_Conj daps) cn ;
           numOfModShares : NP = mkNP optNumber modShares ;
        in the (N.PossNP sum_CN numOfModShares) ;
 
@@ -74,11 +73,11 @@ concrete NumberSharesEng of NumberShares = NumeralEng ** open
 
     the : CN -> NP = \cn -> mkNP theSg_Det cn ;
 
-    modKind : N -> LinKind = \n -> {
+    detKind : N -> LinKind = \n -> {
       s = mkCN n ;
-      mod = CanMod ;
+      det = CanDet ;
       } ;
-    noModKind : N -> LinKind = \n -> modKind n ** {mod = NoMod} ;
+    noDetKind : N -> LinKind = \n -> detKind n ** {det = NoDet} ;
 
     -- lexicon
     shall_VV : VV = auxVV (mkV "shall" "shall" "shall" "shall" "shall") ; --- TODO
@@ -115,7 +114,5 @@ concrete NumberSharesEng of NumberShares = NumeralEng ** open
       emptyDet : Det = aPl_Det ; --- TODO: only works because we have "shares" in plural and Gamma, Delta etc. are invariable
       onlyDAP : AP -> DAP = \ap -> N.AdjDAP (N.DetDAP emptyDet) ap ;
       detDAP : AP -> DAP = \ap -> N.AdjDAP (N.DetDAP theSg_Det) ap ;
-
-
 
 }

@@ -4,6 +4,7 @@ abstract NumberShares = Numeral ** {
   cat
     Comment ;
     Item ;
+    ModKind ;
     Kind ;
     Quality ;
     Number ;
@@ -21,9 +22,9 @@ abstract NumberShares = Numeral ** {
     PurchasePrice : Item ; -- standalone Items, not composed of generalisable subparts
 
     -- Kind
-    Mod : Quality -> Kind -> Kind ; -- class A shares, original shares
+    Mod : Quality -> ModKind -> Kind ; -- class A shares, original shares
 
-    Shares : Kind ; -- can be modified and quantified
+    Shares : ModKind ; -- can be modified and quantified
     Beta,
     Delta,
     Gamma : Kind ; -- can't be modified—this is handled in concrete syntax!
@@ -39,7 +40,7 @@ abstract NumberShares = Numeral ** {
 
     SumOfItem : [Item] -> Number ; -- the sum of [the original shares] and [the number of new shares]
     SumOfKind : [Kind] -> Number ; -- the sum of [original shares] and [Class A shares]
-    SumOfQuality : [Quality] -> Kind -> Number ; -- the sum of [Class B and Class C] [shares]
+    SumOfQuality : [Quality] -> ModKind -> Number ; -- the sum of [Class B and Class C] [shares]
                                                 -- Sums of Kind and Quality allow optional [the] and [the number of] in linearisations:
                                                 -- the sum of (the number of) [Class K, Class G, and Class H] [shares]
                                                 -- the sum of (the) [Class I and (the) Class J] [shares]

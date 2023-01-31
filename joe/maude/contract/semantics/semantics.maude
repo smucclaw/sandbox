@@ -3,8 +3,8 @@ load config
 (omod SEMANTICS is
   protecting CONFIG .
 
-  vars actorName actionName ruleName machineState : Oid .
-  vars hence lest : Set{Qid} .
+  vars actorName actionName ruleName machineState : Qid .
+  vars ruleNames hence lest : Set{Qid} .
   vars activeRule : Rule .
   vars activeRules activeRules' : Set{Rule} .
   vars rule : Rule .
@@ -28,9 +28,10 @@ load config
 )
 
   ops _containsRuleWithEvent_ : Set{Rule} ActionEvent -> Bool .
-    
+
   eq
     (
+      RULE ruleName
       PARTY actorName
       deontic DO actionName
       WITHIN time DAY
@@ -78,15 +79,14 @@ load config
   eq getRulesWithNames rules (ruleName, ruleNames)
   = getRulesWithNames rules ruleNames [owise].
 
-  ops deltaAction___ : ActionEvent Set{Rule} ContractState -> ContractState .
+  ops deltaAction___ : Set{Rule} ActionEvent ContractState -> ContractState .
 
-  eq deltaAction actionEvent rules Fulfilled = Fulfilled .
+  eq deltaAction rules actionEvent Fulfilled = Fulfilled .
 
-  eq deltaAction actionEvent rules (Breached actorName) = Breached actorName .
+  eq deltaAction rules actionEvent (Breached actorName) = Breached actorName .
 
-  ceq deltaAction
+  eq deltaAction rules
     (actorName do actionName)
-    rules
     (
       RULE ruleName
       PARTY actorName
@@ -98,9 +98,8 @@ load config
     )
   = Breached actorName .
 
-  ceq deltaAction
+  ceq deltaAction rules
     (actorName do actionName)
-    rules
     (
       RULE ruleName
       PARTY actorName
@@ -111,12 +110,11 @@ load config
       activeRules
     )
   = (getRulesWithNames rules hence) <>
-    (deltaAction (actorName did actionName) activeRules)
+    (deltaAction rules (actorName did actionName) activeRules)
   if deontic == MUST or deontic == MAY .
 
-  eq deltaAction
+  eq deltaAction rules
     (actorName do actionName)
-    rules
     (
       RULE ruleName
       PARTY actorName
@@ -127,18 +125,19 @@ load config
       activeRules
     )
   = (getRulesWithNames rules lest) <>
-    (deltaAction (actorName did actionName) activeRules) .
+    (deltaAction rules (actorName did actionName) activeRules) .
 
-  eq deltaAction actionEvent rules (activeRule, activeRules')
-  = activeRule <> (deltaAction actionEvent activeRules') [owise].
+  eq deltaAction rules actionEvent (activeRule, activeRules')
+  = activeRule <> (deltaAction rules actionEvent activeRules') [owise].
 
+  --- deltaTick is still a work in progress.
   ops deltaTick__ : Set{Rule} ContractState -> ContractState .
 
   eq deltaTick rules Fulfilled = Fulfilled .
 
   eq deltaTick rules (Breached actorName) = Breached actorName .
 
-  eq deltaTick
+  eq deltaTick rules
     (
       RULE ruleName
       PARTY actorName
@@ -155,9 +154,9 @@ load config
       WITHIN time DAY
       HENCE hence
       LEST lest
-    ) <> (deltaTick activeRules) .
+    ) <> (deltaTick rules activeRules) .
 
-  eq deltaTick
+  eq deltaTick rules
     (
       RULE ruleName
       PARTY actorName
@@ -169,7 +168,7 @@ load config
     )
   = Breached actorName .
 
-  ceq deltaTick
+  ceq deltaTick rules
     (
       RULE ruleName
       PARTY actorName
@@ -179,8 +178,8 @@ load config
       LEST lest,
       activeRules
     )
-  = detaTick activeRules
-  if deontic == SHANT or deontic == MAY.
+  = deltaTick rules activeRules
+  if deontic == SHANT or deontic == MAY .
 
 ---(
     there exists some active rule in machineState that
@@ -194,6 +193,7 @@ load config
     < actorName : Actor | >
     < machineState : AbstractMachineState |
       contractState : (
+        RULE ruleName
         PARTY actorName
         deontic DO actionName
         WITHIN time DAY
@@ -205,7 +205,7 @@ load config
   =>
     < actorName : Actor | >
     < machineState : AbstractMachineState |
-      contractState : deltaAction (actorName did actionName) activeRules >
+      contractState : deltaAction rules (actorName did actionName) activeRules >
     (actorName did actionName) .
 
 ---(
@@ -225,7 +225,7 @@ load config
   =>
     < machineState : AbstractMachineState |
       time : s time,
-      contractState : deltaTick activeRules >
+      contractState : deltaTick rules activeRules >
   if activeRules =/= empty .
 
 endom)

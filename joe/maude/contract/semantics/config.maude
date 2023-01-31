@@ -86,31 +86,30 @@ load full-maude
   subclass StatefulActor < Actor .
 
 ---(
-  data ContractState where
-    Active :: Set{Rule} -> ContractState
-    Breached :: Oid -> ContractState
-    Fulfilled :: ContractState
+  Here we define the set of runtime contract configurations as the set
+    ContractState = Set{Rule} + Breached[P(Actor)] + {Fulfilled}
+  which we equip with a monoidal structure.
+  Here Actor is the set of all actor names in the contract.
 
-  For pattern matching, we perform unification modulo an equational theory
-  which axiomatizes that:
-  - Active empty = Fulfilled
-  - For each fixed actorName : Oid,
-    (ContractState, <>, Breached actorName, Fulfilled) ~ (N, *, 1, 0).
-    is a monoid with an absorbing element.
+  The monoidal structure is axiomatized via an equational theory which says
+  that:
+  - empty = Fulfilled
+  - (ContractState, <>, Fulfilled, Breached Actor) ~ (N, *, 1, 0)
+    is an abelian monoid with an absorbing element.
 
-  We then use this Monoid structure to define a timed transition system,
-  which we view as an automaton with states given by ContractState and
-  a transition function delta.
-  We consider the (free) semigroup formed by considering action and tick transitions
-  together with a sequential composition operator:
-  ({actorName does actionName | actorName, actionName : Oid} \/ {tick}, ;)
-  We define delta as the (left) semigroup actions:
+  Note that for pattern matching purposes, unification modulo this equational
+  theory is performed.
+
+  To define a timed transition system, we first define the action (ie effect) of
+  each type of transition on contract states:
+  We define delta as the (left) actions:
   - deltaAction : ActionEvent * ContractState -> ContractState
   - deltaTick : TickEvent * ContractState -> ContractState
-  These are all defined relative to the current rule set.
+  By the Yoneda Lemma applied to the free monoid on (ActionEvent + TickEvent),
+  we may happily identify events and their corresponding actions.
 
-  Note here that breached states, ie (Breached actorName), are invariant under
-  these actions, so that a contract remains breached, with no active rules,
+  Note here that breached states of the form (Breached actors) are invariant
+  under these actions, so that a contract remains breached, with no active rules,
   regardless of what transition we take.
   On the other hand, if the contract is still in progress with some active rules,
   we use these actions and the Monoid structure to foldMap over the set of
@@ -118,9 +117,14 @@ load full-maude
   More precisely, we first map the action over each rule to obtain new contract
   states for each one of them.
   These can either be:
-  - a set of rules to activate.
-  - a breached state indicating the actor who breached the contract.
+  - (rules : Set{Rule}) a set of rules to activate.
+  - (Breached actors) a breached state indicating the actor who breached the contract.
   Thereafter, we use the Monoid structure to combine these new contract states.
+
+  Note that our equational theory also axiomatizes absorption laws of the form
+  Breached A <> rules = A, for each A : P(Rule).
+  This that during execution, breached states of the form (Breached A) are
+  invariant under both actions.
 )
 
   --- ops Active_ : Set{Rule} -> ContractState [ctor] .
@@ -137,13 +141,11 @@ load full-maude
 
   eq empty = Fulfilled .
 
-  eq activeRules <> activeRules'
-  = activeRules, activeRules' .
+  eq activeRules <> activeRules' = activeRules, activeRules' .
 
-  eq (Breached actorNames) <> activeRules
-  = Breached actorNames .
-
-  eq (Breached actorNames) <> (Breached actorNames')
+  --- Absorption properties.
+  eq Breached actorNames <> activeRules = Breached actorNames .
+  eq Breached actorNames <> Breached actorNames'
   = Breached (actorNames, actorNames') .
 
   --- class Situation .

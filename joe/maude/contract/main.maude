@@ -29,9 +29,10 @@ load ./semantics/semantics
 .)
 
 (rewrite
-  deltaAction empty
+  deltaAction
+  (RULE 'rule0 PARTY 'borrower SHANT DO 'action WITHIN 1 DAY HENCE empty LEST empty)
   ('borrower do 'action)
-  (RULE 'rule0 PARTY 'borrower MUST DO 'action WITHIN 1 DAY HENCE empty LEST empty)
+  (RULE 'rule0 PARTY 'borrower SHANT DO 'action WITHIN 1 DAY HENCE empty LEST empty)
 .)
 
 eof

@@ -101,7 +101,7 @@ load config
   = Breached actorName .
 
   ceq deltaAction rules
-    (actorName do actionName)
+    actionEvent
     (
       RULE ruleName
       PARTY actorName
@@ -112,25 +112,28 @@ load config
       activeRules
     )
   = (getRulesWithNames rules hence) <>
-    (deltaAction rules (actorName do actionName) activeRules)
-  if deontic == MUST or deontic == MAY .
+    (deltaAction rules actionEvent activeRules)
+  if actionEvent := actorName do actionName
+  /\ deontic == MUST or deontic == MAY .
 
-  eq deltaAction rules
-    (actorName do actionName)
+  ceq deltaAction rules
+    actionEvent
     (
       RULE ruleName
       PARTY actorName
       SHANT DO actionName
       WITHIN time DAY
       HENCE hence
-      LEST lest, 
+      LEST lest,
       activeRules
     )
   = (getRulesWithNames rules lest) <>
-    (deltaAction rules (actorName did actionName) activeRules) .
+    (deltaAction rules actionEvent activeRules)
+  if actionEvent := actorName do actionName
+  /\ lest =/= empty .
 
-  eq deltaAction rules actionEvent (activeRule, activeRules')
-  = activeRule <> (deltaAction rules actionEvent activeRules') [owise].
+  eq deltaAction rules actionEvent (activeRule, activeRules)
+  = activeRule <> (deltaAction rules actionEvent activeRules) [owise].
 
   --- deltaTick is still a work in progress.
   ops deltaTick__ : Set{Rule} ContractState -> ContractState .

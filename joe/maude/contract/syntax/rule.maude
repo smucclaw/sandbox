@@ -1,5 +1,9 @@
+--- view Set`{Qid`} from TRIV to SET{Qid} is
+---   sort Elt to Set`{Qid`} .
+--- endv
+
 fmod RULE is
-  protecting BOOL + STRING + NAT + QID .
+  protecting BOOL + STRING + NAT + QID  + SET{Qid} .
 
   sorts
     Rule RuleName ActorName Deadline ActionName Deontic Date Duration
@@ -18,8 +22,8 @@ fmod RULE is
   BY is for dates, ie absolute deadlines
   WITHIN is for relative deadlines
 )
-  op BY _ : Nat -> Deadline [ctor].
-  op WITHIN _ : Duration -> Deadline [ctor] .
+  ops BY_ : Nat -> Deadline [ctor].
+  ops WITHIN_ : Duration -> Deadline [ctor] .
 
   ops _DAY _WEEK _MONTH _YEAR : Nat -> Duration [ctor] .
 
@@ -29,8 +33,8 @@ fmod RULE is
   ---   Qid Situation Situation Qid Deontic Qid Deadline
   ---   Situation Situation -> Rule [ctor] .
 
-  op RULE _ PARTY _ _ DO _ _ HENCE _ LEST _ :
-    Qid Qid Deontic Qid Deadline Qid Qid -> Rule [ctor] .
+  ops RULE_PARTY__DO__HENCE_LEST_ :
+    Qid Qid Deontic Qid Deadline Set{Qid} Set{Qid} -> Rule [ctor] .
 
 endfm
 

@@ -3,9 +3,10 @@ load config
 (omod SEMANTICS is
   protecting CONFIG .
 
-  vars actorName actionName ruleName machineState hence lest : Oid .
-  vars activeRule : ActiveRule .
-  vars activeRules activeRules' : Set{ActiveRule} .
+  vars actorName actionName ruleName machineState : Oid .
+  vars hence lest : Set{Qid} .
+  vars activeRule : Rule .
+  vars activeRules activeRules' : Set{Rule} .
   vars rule : Rule .
   vars rules : Set{Rule} .
   vars config config' : Configuration .
@@ -26,9 +27,17 @@ load config
   https://matt.might.net/papers/germane2014deletion.pdf
 )
 
-  ops _containsRuleWithEvent_ : Set{ActiveRule} ActionEvent -> Bool .
+  ops _containsRuleWithEvent_ : Set{Rule} ActionEvent -> Bool .
     
-  eq (PARTY actorName deontic DO actionName WITHIN time, activeRules)
+  eq
+    (
+      PARTY actorName
+      deontic DO actionName
+      WITHIN time DAY
+      HENCE hence
+      LEST lest, 
+      activeRules
+    )
     containsRuleWithEvent
     (actorName does actionName)
   = true .
@@ -43,28 +52,135 @@ load config
 
   --- eq activeRules containsRuleWithZeroTimer = false [owise] .
 
-  ops deltaAction__ : ActionEvent Set{ActiveRule} -> Set{ActiveRule} .
-  eq deltaAction actionEvent empty = empty .
+  ops getRulesWithNames__ : Set{Rule} Set{Qid} -> Set{Rule} .
+
+  eq getRulesWithNames rules empty = empty .
+
+  eq getRulesWithNames
+    (
+      RULE ruleName
+      PARTY actorName
+      deontic DO actionName
+      deadline
+      HENCE hence
+      LEST lest,
+      rules
+    )
+    (ruleName, ruleNames)
+  = RULE ruleName
+    PARTY actorName
+    deontic DO actionName
+    deadline
+    HENCE hence
+    LEST lest,
+    getRulesWithNames rules ruleNames .
+
+  eq getRulesWithNames rules (ruleName, ruleNames)
+  = getRulesWithNames rules ruleNames [owise].
+
+  ops deltaAction___ : ActionEvent Set{Rule} ContractState -> ContractState .
+
+  eq deltaAction actionEvent rules Fulfilled = Fulfilled .
+
+  eq deltaAction actionEvent rules (Breached actorName) = Breached actorName .
 
   ceq deltaAction
-    actionEvent
-    (PARTY actorName deontic DO actionName WITHIN time, activeRules)
-  = deltaAction actionEvent activeRules
-  if actionEvent := actorName did actionName .
+    (actorName do actionName)
+    rules
+    (
+      RULE ruleName
+      PARTY actorName
+      SHANT DO actionName
+      WITHIN time DAY
+      HENCE hence
+      LEST empty,
+      activeRules
+    )
+  = Breached actorName .
 
-  eq deltaAction actionEvent (activeRule, activeRules')
-  = activeRule, deltaAction actionEvent activeRules' [owise].
+  ceq deltaAction
+    (actorName do actionName)
+    rules
+    (
+      RULE ruleName
+      PARTY actorName
+      deontic DO actionName
+      WITHIN time DAY
+      HENCE hence
+      LEST lest,
+      activeRules
+    )
+  = (getRulesWithNames rules hence) <>
+    (deltaAction (actorName did actionName) activeRules)
+  if deontic == MUST or deontic == MAY .
 
-  ops deltaTick_ : Set{ActiveRule} -> Set{ActiveRule} .
-  eq deltaTick empty = empty .
+  eq deltaAction
+    (actorName do actionName)
+    rules
+    (
+      RULE ruleName
+      PARTY actorName
+      SHANT DO actionName
+      WITHIN time DAY
+      HENCE hence
+      LEST lest, 
+      activeRules
+    )
+  = (getRulesWithNames rules lest) <>
+    (deltaAction (actorName did actionName) activeRules) .
+
+  eq deltaAction actionEvent rules (activeRule, activeRules')
+  = activeRule <> (deltaAction actionEvent activeRules') [owise].
+
+  ops deltaTick__ : Set{Rule} ContractState -> ContractState .
+
+  eq deltaTick rules Fulfilled = Fulfilled .
+
+  eq deltaTick rules (Breached actorName) = Breached actorName .
 
   eq deltaTick
-    (PARTY actorName deontic DO actionName WITHIN (s time), activeRules)
-  = PARTY actorName deontic DO actionName WITHIN time, deltaTick activeRules .
+    (
+      RULE ruleName
+      PARTY actorName
+      deontic DO actionName
+      WITHIN (s time) DAY
+      HENCE hence
+      LEST lest,
+      activeRules
+    )
+  = (
+      RULE ruleName
+      PARTY actorName
+      deontic DO actionName
+      WITHIN time DAY
+      HENCE hence
+      LEST lest
+    ) <> (deltaTick activeRules) .
 
   eq deltaTick
-    (PARTY actorName deontic DO actionName WITHIN 0, activeRules)
-  = deltaTick activeRules .
+    (
+      RULE ruleName
+      PARTY actorName
+      MUST DO actionName
+      WITHIN 0 DAY
+      HENCE empty
+      LEST lest,
+      activeRules
+    )
+  = Breached actorName .
+
+  ceq deltaTick
+    (
+      RULE ruleName
+      PARTY actorName
+      deontic DO actionName
+      WITHIN 0 DAY
+      HENCE hence
+      LEST lest,
+      activeRules
+    )
+  = detaTick activeRules
+  if deontic == SHANT or deontic == MAY.
 
 ---(
     there exists some active rule in machineState that
@@ -74,20 +190,23 @@ load config
   -- actorName does actionName -->
   { actorName, machineState[activeRules := activeRules \ { R \in activeRules | R mentions the event }] }
 )
-  crl [action] :
+  rl [action] :
     < actorName : Actor | >
     < machineState : AbstractMachineState |
-      activeRules : (
-        PARTY actorName deontic DO actionName WITHIN time,
+      contractState : (
+        PARTY actorName
+        deontic DO actionName
+        WITHIN time DAY
+        HENCE hence
+        LEST lest,
         activeRules
       ) >
-    event
+    (actorName did actionName)
   =>
     < actorName : Actor | >
     < machineState : AbstractMachineState |
-      activeRules : deltaAction event' activeRules >
-    event'
-  if event' := actorName did actionName .
+      contractState : deltaAction (actorName did actionName) activeRules >
+    (actorName did actionName) .
 
 ---(
   ----------------------------------- [tick]
@@ -102,11 +221,11 @@ load config
   crl [tick] :
     < machineState : AbstractMachineState |
       time : time,
-      activeRules : activeRules >
+      contractState : activeRules >
   =>
     < machineState : AbstractMachineState |
       time : s time,
-      activeRules : deltaTick activeRules >
+      contractState : deltaTick activeRules >
   if activeRules =/= empty .
 
 endom)

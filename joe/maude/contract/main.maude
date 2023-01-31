@@ -1,6 +1,7 @@
-load ./semantics/transpiler
-load ./semantics/rewrite-trace-strat
-load ./verification/race-cond-strat
+--- load ./semantics/transpiler
+load ./semantics/semantics
+--- load ./semantics/rewrite-trace-strat
+--- load ./verification/race-cond-strat
 
 ---(rewrite
   transpile (
@@ -27,7 +28,15 @@ load ./verification/race-cond-strat
   )
 .)
 
-(srewrite
+(rewrite
+  deltaAction empty
+  ('borrower do 'action)
+  (RULE 'rule0 PARTY 'borrower MUST DO 'action WITHIN 1 DAY HENCE empty LEST empty)
+.)
+
+eof
+
+(rewrite
   tau
 
   < 'lender : Actor | none > 
@@ -36,25 +45,24 @@ load ./verification/race-cond-strat
   < 'machineState : AbstractMachineState |
     time : 0,
     rules : empty,
-    activeRules : (
-      PARTY 'borrower MUST DO 'action WITHIN 1,
-      PARTY 'borrower SHANT DO 'action WITHIN 1
+    contractState : (
+      RULE 'rule0 PARTY 'borrower MUST DO 'action WITHIN 1 DAY HENCE empty LEST empty,
+      RULE 'rule1 PARTY 'borrower SHANT DO 'action WITHIN 1 DAY HENCE empty LEST empty
     ) >
 
-  using raceCond(
-    RULE 'rule
-    PARTY 'borrower
-    SHANT DO 'action
-    WITHIN 10 DAY
-    HENCE 'hence LEST 'lest
-  )
+  --- using raceCond(
+  ---   RULE 'rule
+  ---   PARTY 'borrower
+  ---   SHANT DO 'action
+  ---   WITHIN 10 DAY
+  ---   HENCE 'hence
+  ---   LEST 'lest
+  --- )
 
----(
-  using rewriteTrace (
-    ('borrower do 'default) ++
-    tick
-  )
-)
+  --- using rewriteTrace (
+  ---   ('borrower do 'default) ++
+  ---   tick
+  --- )
 .)
 
 ---( PDPA race condition:

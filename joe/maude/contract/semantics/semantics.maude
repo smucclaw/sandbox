@@ -3,6 +3,8 @@ load config
 (omod SEMANTICS is
   protecting CONFIG .
 
+  subsorts Qid < Oid .
+
   vars actorName actionName ruleName machineState : Qid .
   vars ruleNames hence lest : Set{Qid} .
   vars activeRule : Rule .
@@ -110,7 +112,7 @@ load config
       activeRules
     )
   = (getRulesWithNames rules hence) <>
-    (deltaAction rules (actorName did actionName) activeRules)
+    (deltaAction rules (actorName do actionName) activeRules)
   if deontic == MUST or deontic == MAY .
 
   eq deltaAction rules
@@ -192,6 +194,7 @@ load config
   rl [action] :
     < actorName : Actor | >
     < machineState : AbstractMachineState |
+      rules : rules,
       contractState : (
         RULE ruleName
         PARTY actorName
@@ -220,6 +223,7 @@ load config
 )
   crl [tick] :
     < machineState : AbstractMachineState |
+      rules : rules,
       time : time,
       contractState : activeRules >
   =>

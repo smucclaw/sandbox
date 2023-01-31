@@ -3,11 +3,10 @@ load config
 (omod TRANSPILER is
   protecting CONFIG .
 
-  vars actorName actionName ruleName machineState hence lest : Oid .
-  vars activeRule : ActiveRule .
-  vars activeRules activeRules' : Set{ActiveRule} .
+  vars actorName actionName ruleName machineState : Qid .
+  vars hence lest : Set{Qid} .
+  vars rules activeRules activeRules' : Set{Rule} .
   vars rule : Rule .
-  vars rules : Set{Rule} .
   vars config config' : Configuration .
   vars event event' : Event .
   vars deadline : Deadline .
@@ -16,7 +15,7 @@ load config
 
   ops transpile_ : Set{Rule} -> Configuration .
   ops transpileAux__ : Set{Rule} Configuration -> Configuration .
-  ops _containsActor_ : Configuration Oid -> Bool .
+  ops _containsActor_ : Configuration Qid -> Bool .
 
 ---(
   Transpile a set of rules to an initial abstract machine configuration for
@@ -27,7 +26,7 @@ load config
     < 'machineState : AbstractMachineState |
       rules : rules,
       time : 0,
-      activeRules : empty > .
+      contractState : empty > .
 
   eq transpileAux empty config = tau config .
 

@@ -17,10 +17,11 @@ load ../semantics/semantics
   --- ops raceCond_ : ActionEvent -> Formula .
 
   vars config : Configuration .
-  vars actorName actionName machineState : Oid .
+  vars actorName actionName machineState ruleName : Qid .
+  vars hence lest : Set{Qid} .
   vars deontic : Deontic .
   vars rules : Set{Rule} .
-  vars activeRules : Set{ActiveRule} .
+  vars activeRules : Set{Rule} .
   vars time : Nat .
 
 ---(
@@ -35,10 +36,13 @@ load ../semantics/semantics
 
   ceq
     < machineState : AbstractMachineState |
-      activeRules : (
+      contractState : (
+        RULE ruleName
         PARTY actorName
         deontic DO actionName
-        WITHIN time,
+        WITHIN time DAY
+        HENCE hence
+        LEST lest,
         activeRules
       ) > config
     |= actorName allowedToDo actionName
@@ -47,10 +51,13 @@ load ../semantics/semantics
 
   eq
     < machineState : AbstractMachineState |
-      activeRules : (
+      contractState : (
+        RULE ruleName
         PARTY actorName
         SHANT DO actionName
-        WITHIN time,
+        WITHIN time DAY
+        HENCE hence
+        LEST lest,
         activeRules
       ) > config
     |= actorName prohibitedFromDoing actionName

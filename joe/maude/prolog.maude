@@ -495,8 +495,11 @@ smod PROLOG-MAIN is
   including EXAMPLES .
 endsm
 
-set trace on .
-srew < 'no-children('erica) | family ; negation-bycut ; 'no-children(x{1}) :- '\+('parent[x{1}, x{2}]) > using solve .
+set trace rl on .
+
+srew
+  < 'no-children('erica) | family ; negation-bycut ; 'no-children(x{1}) :- '\+('parent[x{1}, x{2}]) >
+using solve .
 
 eof
 

@@ -1,0 +1,124 @@
+load model-checker
+load full-maude
+
+(omod JUGS is
+  protecting NAT .
+  protecting LIST{Nat} .
+  protecting INT .
+  protecting QID .
+
+  subsorts Qid < Oid .
+
+  class Jug |
+    maxCap : Nat,
+    currCap : Int .
+
+  vars J J' : Oid .
+  vars maxCap maxCap' n n' : Nat .
+  vars currCap currCap' : Int .
+  vars ns : List{Nat} .
+
+  ops mkJugs_ : List{Nat} -> Configuration .
+  eq mkJugs nil = none .
+  eq mkJugs (n ns) =
+    < 'J : Jug | maxCap : n, currCap : 0 >
+    mkJugs ns .
+
+  --- ops initial : -> Configuration .
+  --- eq initial = mkJugs 4 . 
+
+  rl [fill-jug] :
+    < J : Jug |
+      maxCap : maxCap,
+      currCap : currCap >
+  =>
+    < J : Jug |
+      maxCap : maxCap,
+      currCap : maxCap > .
+  
+  rl [empty-jug] :
+    < J : Jug |
+      currCap : currCap >
+  =>
+    < J : Jug |
+      currCap : 0 > .
+
+  crl [transfer-full] :
+    < J : Jug |
+      maxCap : maxCap,
+      currCap : currCap >
+    < J' : Jug |
+      maxCap : maxCap',
+      currCap : currCap' >
+  =>
+    < J : Jug |
+      maxCap : maxCap,
+      currCap : 0 >
+    < J' : Jug |
+      maxCap : maxCap',
+      currCap : currCap + currCap' >
+  if currCap + currCap' <= maxCap' .
+
+  crl [transfer-partial] :
+    < J : Jug |
+      maxCap : maxCap,
+      currCap : currCap >
+    < J' : Jug |
+      maxCap : maxCap',
+      currCap : currCap' >
+  =>
+    < J : Jug |
+      maxCap : maxCap,
+      currCap : currCap' + (- maxCap) + currCap >
+    < J' : Jug |
+      maxCap : maxCap',
+      currCap : maxCap' >
+  if currCap + currCap' > maxCap' .
+
+endom)
+
+(omod ATOMIC-PROPS is
+  protecting JUGS .
+  including MODEL-CHECKER + SATISFACTION . 
+
+  subsorts Configuration < State .
+
+  vars config : Configuration .
+  vars J : Oid .
+  vars cap : Nat .
+
+  ops someJugHasCap_ : Nat -> Prop .
+  eq < J : Jug | currCap : cap > config |= someJugHasCap cap
+  = true .
+
+endom)
+
+(smod JUGS-STRAT is
+  protecting JUGS .
+  protecting ATOMIC-PROPS .
+
+  vars config : Configuration .
+  vars cap : Nat .
+
+  --- Simple goal directed execution strategy, in which we try to find a
+  --- configuration where some jug contains cap amount of water.
+  strat simple : Nat @ Configuration .
+
+  sd simple(cap) :=
+    all * ;
+    match config s.t.
+      config |= someJugHasCap cap .
+
+endsm)
+
+(show all .)
+q
+
+eof
+
+set trace on .
+trace exclude FULL-MAUDE .
+
+(srewrite
+  mkJugs (1 4) using simple(3)
+.)

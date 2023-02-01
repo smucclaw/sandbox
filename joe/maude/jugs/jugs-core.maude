@@ -1,0 +1,575 @@
+smod JUGS-STRAT is
+  sorts Attribute AttributeSet Bool Char Cid Configuration FindResult Formula
+    Int Jug List{Nat}ModelCheckResult Msg Nat NeList{Nat}NzInt NzNat Object Oid
+    Portal Prop Qid RuleName State String Transition TransitionList Zero .
+  subsort Attribute < AttributeSet .
+  subsort Bool < ModelCheckResult .
+  subsort Char < String .
+  subsort Configuration < State .
+  subsort Jug < Cid .
+  subsort Msg < Configuration .
+  subsort Nat < FindResult .
+  subsort Nat < Int .
+  subsort Nat < NeList{Nat}.
+  subsort NeList{Nat}< List{Nat}.
+  subsort NzInt < Int .
+  subsort NzNat < Nat .
+  subsort NzNat < NzInt .
+  subsort Object < Configuration .
+  subsort Portal < Configuration .
+  subsort Prop < Formula .
+  subsort Qid < Oid .
+  subsort Qid < RuleName .
+  subsort Transition < TransitionList .
+  subsort Zero < Nat .
+  op $reverse : List{Nat}List{Nat}-> List{Nat}.
+  op $size : List{Nat}Nat -> Nat .
+  op Jug : -> Jug .
+  op append : List{Nat}List{Nat}-> List{Nat}.
+  op append : List{Nat}NeList{Nat}-> NeList{Nat}.
+  op append : NeList{Nat}List{Nat}-> NeList{Nat}.
+  op deadlock : -> RuleName .
+  op front : NeList{Nat}-> List{Nat}.
+  op getClass : Object -> Cid .
+  op head : NeList{Nat}-> Nat .
+  op last : NeList{Nat}-> Nat .
+  op mkJugs_ : List{Nat}-> Configuration .
+  op occurs : Nat List{Nat}-> Bool .
+  op reverse : List{Nat}-> List{Nat}.
+  op reverse : NeList{Nat}-> NeList{Nat}.
+  op size : List{Nat}-> Nat .
+  op size : NeList{Nat}-> NzNat .
+  op someJugHasCap_ : Nat -> Prop .
+  op tail : NeList{Nat}-> List{Nat}.
+  op unlabeled : -> RuleName .
+  op -_ : Int -> Int
+    [special(id-hook MinusSymbol op-hook succSymbol(s_ : Nat ~> NzNat)op-hook
+    minusSymbol(-_ : NzNat ~> NzInt))] .
+  op -_ : NzInt -> NzInt
+    [special(id-hook MinusSymbol op-hook succSymbol(s_ : Nat ~> NzNat)op-hook
+    minusSymbol(-_ : NzNat ~> NzInt))] .
+  op -_ : NzNat -> NzInt
+    [ctor special(id-hook MinusSymbol op-hook succSymbol(s_ : Nat ~>
+    NzNat)op-hook minusSymbol(-_ : NzNat ~> NzInt))] .
+  op 0 : -> Zero
+    [ctor] .
+  op <> : -> Portal
+    [ctor] .
+  op <>_ : Formula -> Formula
+    [prec 53 format(r o d)] .
+  op <Qids> : -> Qid
+    [special(id-hook QuotedIdentifierSymbol)] .
+  op <Strings> : -> Char
+    [special(id-hook StringSymbol)] .
+  op <Strings> : -> String
+    [special(id-hook StringSymbol)] .
+  op <_:_|_> : Oid Cid AttributeSet -> Object
+    [format(ni!r o !r o !r++ oni !r-- o)ctor object] .
+  op <_:_|`> : Oid Cid -> Object
+    [format(ni!r o !r o !r o o)] .
+  op False : -> Formula
+    [format(g o)ctor] .
+  op O_ : Formula -> Formula
+    [prec 53 format(r o d)ctor] .
+  op True : -> Formula
+    [format(g o)ctor] .
+  op _&_ : Int Int -> Int
+    [assoc comm prec 53 special(id-hook ACU_NumberOpSymbol(&)op-hook
+    succSymbol(s_ : Nat ~> NzNat)op-hook minusSymbol(-_ : NzNat ~> NzInt))] .
+  op _&_ : Nat Int -> Nat
+    [assoc comm prec 53 special(id-hook ACU_NumberOpSymbol(&)op-hook
+    succSymbol(s_ : Nat ~> NzNat)op-hook minusSymbol(-_ : NzNat ~> NzInt))] .
+  op _&_ : Nat Nat -> Nat
+    [assoc comm prec 53 special(id-hook ACU_NumberOpSymbol(&)op-hook
+    succSymbol(s_ : Nat ~> NzNat))] .
+  op _*_ : Int Int -> Int
+    [assoc comm prec 31 special(id-hook ACU_NumberOpSymbol(*)op-hook
+    succSymbol(s_ : Nat ~> NzNat)op-hook minusSymbol(-_ : NzNat ~> NzInt))] .
+  op _*_ : Nat Nat -> Nat
+    [assoc comm prec 31 special(id-hook ACU_NumberOpSymbol(*)op-hook
+    succSymbol(s_ : Nat ~> NzNat))] .
+  op _*_ : NzInt NzInt -> NzInt
+    [assoc comm prec 31 special(id-hook ACU_NumberOpSymbol(*)op-hook
+    succSymbol(s_ : Nat ~> NzNat)op-hook minusSymbol(-_ : NzNat ~> NzInt))] .
+  op _*_ : NzNat NzNat -> NzNat
+    [assoc comm prec 31 special(id-hook ACU_NumberOpSymbol(*)op-hook
+    succSymbol(s_ : Nat ~> NzNat))] .
+  op _+_ : Int Int -> Int
+    [assoc comm prec 33 special(id-hook ACU_NumberOpSymbol(+)op-hook
+    succSymbol(s_ : Nat ~> NzNat)op-hook minusSymbol(-_ : NzNat ~> NzInt))] .
+  op _+_ : Nat Nat -> Nat
+    [assoc comm prec 33 special(id-hook ACU_NumberOpSymbol(+)op-hook
+    succSymbol(s_ : Nat ~> NzNat))] .
+  op _+_ : NzNat Nat -> NzNat
+    [assoc comm prec 33 special(id-hook ACU_NumberOpSymbol(+)op-hook
+    succSymbol(s_ : Nat ~> NzNat))] .
+  op _+_ : String String -> String
+    [prec 33 gather(E e)special(id-hook StringOpSymbol(+)op-hook stringSymbol(
+    <Strings> : ~> Char))] .
+  op _->_ : Formula Formula -> Formula
+    [prec 65 gather(e E)format(d r o d)] .
+  op _-_ : Int Int -> Int
+    [prec 33 gather(E e)special(id-hook NumberOpSymbol(-)op-hook succSymbol(s_
+    : Nat ~> NzNat)op-hook minusSymbol(-_ : NzNat ~> NzInt))] .
+  op _/\_ : Formula Formula -> Formula
+    [comm prec 55 gather(E e)format(d r o d)ctor] .
+  op _<->_ : Formula Formula -> Formula
+    [prec 65 format(d r o d)] .
+  op _<<_ : Int Nat -> Int
+    [prec 35 gather(E e)special(id-hook NumberOpSymbol(<<)op-hook succSymbol(s_
+    : Nat ~> NzNat)op-hook minusSymbol(-_ : NzNat ~> NzInt))] .
+  op _<<_ : Nat Nat -> Nat
+    [prec 35 gather(E e)special(id-hook NumberOpSymbol(<<)op-hook succSymbol(s_
+    : Nat ~> NzNat))] .
+  op _<=>_ : Formula Formula -> Formula
+    [prec 65 format(d r o d)] .
+  op _<=_ : Int Int -> Bool
+    [prec 37 special(id-hook NumberOpSymbol(<=)op-hook succSymbol(s_ : Nat ~>
+    NzNat)op-hook minusSymbol(-_ : NzNat ~> NzInt)term-hook trueTerm(
+    true)term-hook falseTerm(false))] .
+  op _<=_ : Nat Nat -> Bool
+    [prec 37 special(id-hook NumberOpSymbol(<=)op-hook succSymbol(s_ : Nat ~>
+    NzNat)term-hook trueTerm(true)term-hook falseTerm(false))] .
+  op _<=_ : String String -> Bool
+    [prec 37 special(id-hook StringOpSymbol(<=)op-hook stringSymbol(<Strings> :
+    ~> Char)term-hook trueTerm(true)term-hook falseTerm(false))] .
+  op _<_ : Int Int -> Bool
+    [prec 37 special(id-hook NumberOpSymbol(<)op-hook succSymbol(s_ : Nat ~>
+    NzNat)op-hook minusSymbol(-_ : NzNat ~> NzInt)term-hook trueTerm(
+    true)term-hook falseTerm(false))] .
+  op _<_ : Nat Nat -> Bool
+    [prec 37 special(id-hook NumberOpSymbol(<)op-hook succSymbol(s_ : Nat ~>
+    NzNat)term-hook trueTerm(true)term-hook falseTerm(false))] .
+  op _<_ : String String -> Bool
+    [prec 37 special(id-hook StringOpSymbol(<)op-hook stringSymbol(<Strings> :
+    ~> Char)term-hook trueTerm(true)term-hook falseTerm(false))] .
+  op _=/=_ : Universal Universal -> Bool
+    [poly(1 2)prec 51 special(id-hook EqualitySymbol term-hook equalTerm(
+    false)term-hook notEqualTerm(true))] .
+  op _==_ : Universal Universal -> Bool
+    [poly(1 2)prec 51 special(id-hook EqualitySymbol term-hook equalTerm(
+    true)term-hook notEqualTerm(false))] .
+  op _=>_ : Formula Formula -> Formula
+    [prec 65 gather(e E)format(d r o d)] .
+  op _>=_ : Int Int -> Bool
+    [prec 37 special(id-hook NumberOpSymbol(>=)op-hook succSymbol(s_ : Nat ~>
+    NzNat)op-hook minusSymbol(-_ : NzNat ~> NzInt)term-hook trueTerm(
+    true)term-hook falseTerm(false))] .
+  op _>=_ : Nat Nat -> Bool
+    [prec 37 special(id-hook NumberOpSymbol(>=)op-hook succSymbol(s_ : Nat ~>
+    NzNat)term-hook trueTerm(true)term-hook falseTerm(false))] .
+  op _>=_ : String String -> Bool
+    [prec 37 special(id-hook StringOpSymbol(>=)op-hook stringSymbol(<Strings> :
+    ~> Char)term-hook trueTerm(true)term-hook falseTerm(false))] .
+  op _>>_ : Int Nat -> Int
+    [prec 35 gather(E e)special(id-hook NumberOpSymbol(>>)op-hook succSymbol(s_
+    : Nat ~> NzNat)op-hook minusSymbol(-_ : NzNat ~> NzInt))] .
+  op _>>_ : Nat Nat -> Nat
+    [prec 35 gather(E e)special(id-hook NumberOpSymbol(>>)op-hook succSymbol(s_
+    : Nat ~> NzNat))] .
+  op _>_ : Int Int -> Bool
+    [prec 37 special(id-hook NumberOpSymbol(>)op-hook succSymbol(s_ : Nat ~>
+    NzNat)op-hook minusSymbol(-_ : NzNat ~> NzInt)term-hook trueTerm(
+    true)term-hook falseTerm(false))] .
+  op _>_ : Nat Nat -> Bool
+    [prec 37 special(id-hook NumberOpSymbol(>)op-hook succSymbol(s_ : Nat ~>
+    NzNat)term-hook trueTerm(true)term-hook falseTerm(false))] .
+  op _>_ : String String -> Bool
+    [prec 37 special(id-hook StringOpSymbol(>)op-hook stringSymbol(<Strings> :
+    ~> Char)term-hook trueTerm(true)term-hook falseTerm(false))] .
+  op _R_ : Formula Formula -> Formula
+    [prec 63 format(d r o d)ctor] .
+  op _U_ : Formula Formula -> Formula
+    [prec 63 format(d r o d)ctor] .
+  op _W_ : Formula Formula -> Formula
+    [prec 63 format(d r o d)] .
+  op _\/_ : Formula Formula -> Formula
+    [comm prec 59 gather(E e)format(d r o d)ctor] .
+  op _^_ : Int Nat -> Int
+    [prec 29 gather(E e)special(id-hook NumberOpSymbol(^)op-hook succSymbol(s_
+    : Nat ~> NzNat)op-hook minusSymbol(-_ : NzNat ~> NzInt))] .
+  op _^_ : Nat Nat -> Nat
+    [prec 29 gather(E e)special(id-hook NumberOpSymbol(^)op-hook succSymbol(s_
+    : Nat ~> NzNat))] .
+  op _^_ : NzInt Nat -> NzInt
+    [prec 29 gather(E e)special(id-hook NumberOpSymbol(^)op-hook succSymbol(s_
+    : Nat ~> NzNat)op-hook minusSymbol(-_ : NzNat ~> NzInt))] .
+  op _^_ : NzNat Nat -> NzNat
+    [prec 29 gather(E e)special(id-hook NumberOpSymbol(^)op-hook succSymbol(s_
+    : Nat ~> NzNat))] .
+  op __ : Configuration Configuration -> Configuration
+    [assoc comm id:(none).Configuration ctor config] .
+  op __ : List{Nat}List{Nat}-> List{Nat}
+    [assoc id:(nil).List{Nat}prec 25 ctor] .
+  op __ : List{Nat}NeList{Nat}-> NeList{Nat}
+    [assoc id:(nil).List{Nat}prec 25 ctor] .
+  op __ : NeList{Nat}List{Nat}-> NeList{Nat}
+    [assoc id:(nil).List{Nat}prec 25 ctor] .
+  op __ : TransitionList TransitionList -> TransitionList
+    [assoc id:(nil).TransitionList ctor] .
+  op _`,_ : AttributeSet AttributeSet -> AttributeSet
+    [assoc comm id:(none).AttributeSet format(o !r nio o)ctor] .
+  op _and_ : Bool Bool -> Bool
+    [assoc comm prec 55] .
+  op _divides_ : NzInt Int -> Bool
+    [prec 51 special(id-hook NumberOpSymbol(divides)op-hook succSymbol(s_ : Nat
+    ~> NzNat)op-hook minusSymbol(-_ : NzNat ~> NzInt)term-hook trueTerm(
+    true)term-hook falseTerm(false))] .
+  op _divides_ : NzNat Nat -> Bool
+    [prec 51 special(id-hook NumberOpSymbol(divides)op-hook succSymbol(s_ : Nat
+    ~> NzNat)term-hook trueTerm(true)term-hook falseTerm(false))] .
+  op _implies_ : Bool Bool -> Bool
+    [prec 61 gather(e E)] .
+  op _or_ : Bool Bool -> Bool
+    [assoc comm prec 59] .
+  op _quo_ : Int NzInt -> Int
+    [prec 31 gather(E e)special(id-hook NumberOpSymbol(quo)op-hook succSymbol(
+    s_ : Nat ~> NzNat)op-hook minusSymbol(-_ : NzNat ~> NzInt))] .
+  op _quo_ : Nat NzNat -> Nat
+    [prec 31 gather(E e)special(id-hook NumberOpSymbol(quo)op-hook succSymbol(
+    s_ : Nat ~> NzNat))] .
+  op _rem_ : Int NzInt -> Int
+    [prec 31 gather(E e)special(id-hook NumberOpSymbol(rem)op-hook succSymbol(
+    s_ : Nat ~> NzNat)op-hook minusSymbol(-_ : NzNat ~> NzInt))] .
+  op _rem_ : Nat NzNat -> Nat
+    [prec 31 gather(E e)special(id-hook NumberOpSymbol(rem)op-hook succSymbol(
+    s_ : Nat ~> NzNat))] .
+  op _xor_ : Bool Bool -> Bool
+    [assoc comm prec 57] .
+  op _xor_ : Int Int -> Int
+    [assoc comm prec 55 special(id-hook ACU_NumberOpSymbol(xor)op-hook
+    succSymbol(s_ : Nat ~> NzNat)op-hook minusSymbol(-_ : NzNat ~> NzInt))] .
+  op _xor_ : Nat Nat -> Nat
+    [assoc comm prec 55 special(id-hook ACU_NumberOpSymbol(xor)op-hook
+    succSymbol(s_ : Nat ~> NzNat))] .
+  op _|->_ : Formula Formula -> Formula
+    [prec 63 format(d r o d)] .
+  op _|=_ : State Prop -> Bool
+    [frozen(1 2)] .
+  op _|_ : Int Int -> Int
+    [assoc comm prec 57 special(id-hook ACU_NumberOpSymbol(|)op-hook
+    succSymbol(s_ : Nat ~> NzNat)op-hook minusSymbol(-_ : NzNat ~> NzInt))] .
+  op _|_ : Nat Nat -> Nat
+    [assoc comm prec 57 special(id-hook ACU_NumberOpSymbol(|)op-hook
+    succSymbol(s_ : Nat ~> NzNat))] .
+  op _|_ : NzInt Int -> NzInt
+    [assoc comm prec 57 special(id-hook ACU_NumberOpSymbol(|)op-hook
+    succSymbol(s_ : Nat ~> NzNat)op-hook minusSymbol(-_ : NzNat ~> NzInt))] .
+  op _|_ : NzNat Nat -> NzNat
+    [assoc comm prec 57 special(id-hook ACU_NumberOpSymbol(|)op-hook
+    succSymbol(s_ : Nat ~> NzNat))] .
+  op `[`]_ : Formula -> Formula
+    [prec 53 format(r d o d)] .
+  op `{_`,_`} : State RuleName -> Transition
+    [ctor] .
+  op abs : Int -> Nat
+    [special(id-hook NumberOpSymbol(abs)op-hook succSymbol(s_ : Nat ~>
+    NzNat)op-hook minusSymbol(-_ : NzNat ~> NzInt))] .
+  op abs : NzInt -> NzNat
+    [special(id-hook NumberOpSymbol(abs)op-hook succSymbol(s_ : Nat ~>
+    NzNat)op-hook minusSymbol(-_ : NzNat ~> NzInt))] .
+  op ascii : Char -> Nat
+    [special(id-hook StringOpSymbol(ascii)op-hook stringSymbol(<Strings> : ~>
+    Char)op-hook succSymbol(s_ : Nat ~> NzNat))] .
+  op char :[FindResult]->[String]
+    [special(id-hook StringOpSymbol(char)op-hook stringSymbol(<Strings> : ~>
+    Char)op-hook succSymbol(s_ : Nat ~> NzNat))] .
+  op counterexample : TransitionList TransitionList -> ModelCheckResult
+    [ctor] .
+  op currCap`:_ : Int -> Attribute
+    [gather(&)] .
+  op false : -> Bool
+    [ctor special(id-hook SystemFalse)] .
+  op find : String String Nat -> FindResult
+    [special(id-hook StringOpSymbol(find)op-hook stringSymbol(<Strings> : ~>
+    Char)op-hook succSymbol(s_ : Nat ~> NzNat)term-hook notFoundTerm(
+    notFound))] .
+  op gcd : Int Int -> Nat
+    [assoc comm special(id-hook ACU_NumberOpSymbol(gcd)op-hook succSymbol(s_ :
+    Nat ~> NzNat)op-hook minusSymbol(-_ : NzNat ~> NzInt))] .
+  op gcd : Nat Nat -> Nat
+    [assoc comm special(id-hook ACU_NumberOpSymbol(gcd)op-hook succSymbol(s_ :
+    Nat ~> NzNat))] .
+  op gcd : NzInt Int -> NzNat
+    [assoc comm special(id-hook ACU_NumberOpSymbol(gcd)op-hook succSymbol(s_ :
+    Nat ~> NzNat)op-hook minusSymbol(-_ : NzNat ~> NzInt))] .
+  op gcd : NzNat Nat -> NzNat
+    [assoc comm special(id-hook ACU_NumberOpSymbol(gcd)op-hook succSymbol(s_ :
+    Nat ~> NzNat))] .
+  op if_then_else_fi : Bool Universal Universal -> Universal
+    [poly(2 3 0)special(id-hook BranchSymbol term-hook 1(true)term-hook 2(
+    false))] .
+  op lcm : Int Int -> Nat
+    [assoc comm special(id-hook ACU_NumberOpSymbol(lcm)op-hook succSymbol(s_ :
+    Nat ~> NzNat)op-hook minusSymbol(-_ : NzNat ~> NzInt))] .
+  op lcm : Nat Nat -> Nat
+    [assoc comm special(id-hook ACU_NumberOpSymbol(lcm)op-hook succSymbol(s_ :
+    Nat ~> NzNat))] .
+  op lcm : NzInt NzInt -> NzNat
+    [assoc comm special(id-hook ACU_NumberOpSymbol(lcm)op-hook succSymbol(s_ :
+    Nat ~> NzNat)op-hook minusSymbol(-_ : NzNat ~> NzInt))] .
+  op lcm : NzNat NzNat -> NzNat
+    [assoc comm special(id-hook ACU_NumberOpSymbol(lcm)op-hook succSymbol(s_ :
+    Nat ~> NzNat))] .
+  op length : String -> Nat
+    [special(id-hook StringOpSymbol(length)op-hook stringSymbol(<Strings> : ~>
+    Char)op-hook succSymbol(s_ : Nat ~> NzNat))] .
+  op lowerCase : String -> String
+    [special(id-hook StringOpSymbol(lowerCase)op-hook stringSymbol(<Strings> :
+    ~> Char))] .
+  op max : Int Int -> Int
+    [assoc comm special(id-hook ACU_NumberOpSymbol(max)op-hook succSymbol(s_ :
+    Nat ~> NzNat)op-hook minusSymbol(-_ : NzNat ~> NzInt))] .
+  op max : Nat Int -> Nat
+    [assoc comm special(id-hook ACU_NumberOpSymbol(max)op-hook succSymbol(s_ :
+    Nat ~> NzNat)op-hook minusSymbol(-_ : NzNat ~> NzInt))] .
+  op max : Nat Nat -> Nat
+    [assoc comm special(id-hook ACU_NumberOpSymbol(max)op-hook succSymbol(s_ :
+    Nat ~> NzNat))] .
+  op max : NzInt NzInt -> NzInt
+    [assoc comm special(id-hook ACU_NumberOpSymbol(max)op-hook succSymbol(s_ :
+    Nat ~> NzNat)op-hook minusSymbol(-_ : NzNat ~> NzInt))] .
+  op max : NzNat Int -> NzNat
+    [assoc comm special(id-hook ACU_NumberOpSymbol(max)op-hook succSymbol(s_ :
+    Nat ~> NzNat)op-hook minusSymbol(-_ : NzNat ~> NzInt))] .
+  op max : NzNat Nat -> NzNat
+    [assoc comm special(id-hook ACU_NumberOpSymbol(max)op-hook succSymbol(s_ :
+    Nat ~> NzNat))] .
+  op maxCap`:_ : Nat -> Attribute
+    [gather(&)] .
+  op min : Int Int -> Int
+    [assoc comm special(id-hook ACU_NumberOpSymbol(min)op-hook succSymbol(s_ :
+    Nat ~> NzNat)op-hook minusSymbol(-_ : NzNat ~> NzInt))] .
+  op min : Nat Nat -> Nat
+    [assoc comm special(id-hook ACU_NumberOpSymbol(min)op-hook succSymbol(s_ :
+    Nat ~> NzNat))] .
+  op min : NzInt NzInt -> NzInt
+    [assoc comm special(id-hook ACU_NumberOpSymbol(min)op-hook succSymbol(s_ :
+    Nat ~> NzNat)op-hook minusSymbol(-_ : NzNat ~> NzInt))] .
+  op min : NzNat NzNat -> NzNat
+    [assoc comm special(id-hook ACU_NumberOpSymbol(min)op-hook succSymbol(s_ :
+    Nat ~> NzNat))] .
+  op modExp :[Nat][Nat][Nat]->[Nat]
+    [special(id-hook NumberOpSymbol(modExp)op-hook succSymbol(s_ : Nat ~>
+    NzNat))] .
+  op modelCheck :[State][Formula]->[ModelCheckResult]
+    [special(id-hook ModelCheckerSymbol op-hook satisfiesSymbol(_|=_ : State
+    Prop ~> Bool)op-hook qidSymbol(<Qids> : ~> Qid)op-hook unlabeledSymbol(
+    unlabeled : ~> RuleName)op-hook deadlockSymbol(deadlock : ~>
+    RuleName)op-hook transitionSymbol(`{_`,_`} : State RuleName ~>
+    Transition)op-hook transitionListSymbol(__ : TransitionList TransitionList
+    ~> TransitionList)op-hook nilTransitionListSymbol(nil : ~>
+    TransitionList)op-hook counterexampleSymbol(counterexample : TransitionList
+    TransitionList ~> ModelCheckResult)op-hook trueSymbol(True : ~>
+    Formula)op-hook falseSymbol(False : ~> Formula)op-hook notSymbol(~_ :
+    Formula ~> Formula)op-hook nextSymbol(O_ : Formula ~> Formula)op-hook
+    andSymbol(_/\_ : Formula Formula ~> Formula)op-hook orSymbol(_\/_ : Formula
+    Formula ~> Formula)op-hook untilSymbol(_U_ : Formula Formula ~>
+    Formula)op-hook releaseSymbol(_R_ : Formula Formula ~> Formula)term-hook
+    trueTerm(true))] .
+  op nil : -> List{Nat}
+    [ctor] .
+  op nil : -> TransitionList
+    [ctor] .
+  op none : -> AttributeSet
+    [ctor] .
+  op none : -> Configuration
+    [ctor] .
+  op notFound : -> FindResult
+    [ctor] .
+  op not_ : Bool -> Bool
+    [prec 53] .
+  op qid :[String]->[Qid]
+    [special(id-hook QuotedIdentifierOpSymbol(qid)op-hook
+    quotedIdentifierSymbol(<Qids> : ~> Qid)op-hook stringSymbol(<Strings> : ~>
+    Char))] .
+  op rfind : String String Nat -> FindResult
+    [special(id-hook StringOpSymbol(rfind)op-hook stringSymbol(<Strings> : ~>
+    Char)op-hook succSymbol(s_ : Nat ~> NzNat)term-hook notFoundTerm(
+    notFound))] .
+  op s_ : Nat -> NzNat
+    [ctor iter special(id-hook SuccSymbol term-hook zeroTerm(0))] .
+  op sd : Nat Nat -> Nat
+    [comm special(id-hook CUI_NumberOpSymbol(sd)op-hook succSymbol(s_ : Nat ~>
+    NzNat))] .
+  op string : Qid -> String
+    [special(id-hook QuotedIdentifierOpSymbol(string)op-hook
+    quotedIdentifierSymbol(<Qids> : ~> Qid)op-hook stringSymbol(<Strings> : ~>
+    Char))] .
+  op substr : String Nat Nat -> String
+    [special(id-hook StringOpSymbol(substr)op-hook stringSymbol(<Strings> : ~>
+    Char)op-hook succSymbol(s_ : Nat ~> NzNat))] .
+  op true : -> Bool
+    [ctor special(id-hook SystemTrue)] .
+  op upperCase : String -> String
+    [special(id-hook StringOpSymbol(upperCase)op-hook stringSymbol(<Strings> :
+    ~> Char))] .
+  op ~_ : Formula -> Formula
+    [prec 53 format(r o d)ctor] .
+  op ~_ : Int -> Int
+    [special(id-hook NumberOpSymbol(~)op-hook succSymbol(s_ : Nat ~>
+    NzNat)op-hook minusSymbol(-_ : NzNat ~> NzInt))] .
+  eq $reverse(nil,A:List{Nat})
+    = A:List{Nat} .
+  eq $reverse(E:Nat L:List{Nat},A:List{Nat})
+    = $reverse(L:List{Nat},E:Nat A:List{Nat}) .
+  eq $size(nil,C:Nat)
+    = C:Nat .
+  eq $size(E:Nat L:List{Nat},C:Nat)
+    = $size(L:List{Nat},C:Nat + 1) .
+  eq <> f:Formula
+    = True U f:Formula .
+  eq f:Formula -> g:Formula
+    = g:Formula \/ ~ f:Formula .
+  eq f:Formula <-> g:Formula
+    = (g:Formula -> f:Formula)/\(f:Formula -> g:Formula) .
+  eq f:Formula <=> g:Formula
+    = [](f:Formula <-> g:Formula) .
+  eq f:Formula => g:Formula
+    = [](f:Formula -> g:Formula) .
+  eq f:Formula W g:Formula
+    = []f:Formula \/(f:Formula U g:Formula) .
+  eq A:Bool and A:Bool
+    = A:Bool .
+  eq A:Bool and(B:Bool xor C:Bool)
+    = A:Bool and B:Bool xor A:Bool and C:Bool .
+  eq false and A:Bool
+    = false .
+  eq true and A:Bool
+    = A:Bool .
+  eq A:Bool implies B:Bool
+    = not(A:Bool xor A:Bool and B:Bool) .
+  eq A:Bool or B:Bool
+    = A:Bool and B:Bool xor A:Bool xor B:Bool .
+  eq A:Bool xor A:Bool
+    = false .
+  eq false xor A:Bool
+    = A:Bool .
+  eq f:Formula |-> g:Formula
+    = [](f:Formula -> <> g:Formula) .
+  eq (
+< J:Oid : V#0:Jug |
+  maxCap : V#1:Nat,
+  currCap : cap:Nat,
+  none,
+  V#2:AttributeSet > config:Configuration)|= someJugHasCap cap:Nat
+    = true .
+  eq []f:Formula
+    = False R f:Formula .
+  eq append(A:List{Nat},L:List{Nat})
+    = A:List{Nat}L:List{Nat} .
+  eq front(L:List{Nat}E:Nat)
+    = L:List{Nat} .
+  eq getClass(
+< O:Oid : C:Cid |
+  A:AttributeSet >)
+    = C:Cid .
+  eq head(E:Nat L:List{Nat})
+    = E:Nat .
+  eq last(L:List{Nat}E:Nat)
+    = E:Nat .
+  eq mkJugs nil
+    = (none).Configuration .
+  eq mkJugs(n:Nat ns:List{Nat})
+    = 
+< 'J : Jug |
+  maxCap : n:Nat,
+  currCap : 0 > mkJugs ns:List{Nat} .
+  eq not A:Bool
+    = true xor A:Bool .
+  eq occurs(E:Nat,nil)
+    = false .
+  eq occurs(E:Nat,E':Nat L:List{Nat})
+    = if E:Nat == E':Nat then true else occurs(E:Nat,L:List{Nat})fi .
+  eq reverse(L:List{Nat})
+    = $reverse(L:List{Nat},nil) .
+  eq size(L:List{Nat})
+    = $size(L:List{Nat},0) .
+  eq tail(E:Nat L:List{Nat})
+    = L:List{Nat} .
+  eq ~ False
+    = True .
+  eq ~ True
+    = False .
+  eq ~ O f:Formula
+    = O ~ f:Formula .
+  eq ~(g:Formula /\ f:Formula)
+    = ~ g:Formula \/ ~ f:Formula .
+  eq ~(f:Formula R g:Formula)
+    = ~ f:Formula U ~ g:Formula .
+  eq ~(f:Formula U g:Formula)
+    = ~ f:Formula R ~ g:Formula .
+  eq ~(g:Formula \/ f:Formula)
+    = ~ g:Formula /\ ~ f:Formula .
+  eq ~ ~ f:Formula
+    = f:Formula .
+  rl 
+< J:Oid : V#0:Jug |
+  currCap : currCap:Int,
+  maxCap : maxCap:Nat,
+  none,
+  V#1:AttributeSet >
+    => 
+< J:Oid : V#0:Jug |
+  maxCap : maxCap:Nat,
+  currCap : maxCap:Nat,
+  V#1:AttributeSet > [label fill-jug] .
+  rl 
+< J:Oid : V#2:Jug |
+  maxCap : V#3:Nat,
+  currCap : currCap:Int,
+  none,
+  V#4:AttributeSet >
+    => 
+< J:Oid : V#2:Jug |
+  currCap : 0,
+  maxCap : V#3:Nat,
+  V#4:AttributeSet > [label empty-jug] .
+  crl 
+< J:Oid : V#5:Jug |
+  currCap : currCap:Int,
+  maxCap : maxCap:Nat,
+  none,
+  V#6:AttributeSet >
+< J':Oid : V#7:Jug |
+  currCap : currCap':Int,
+  maxCap : maxCap':Nat,
+  none,
+  V#8:AttributeSet >
+    => 
+< J:Oid : V#5:Jug |
+  maxCap : maxCap:Nat,
+  currCap : 0,
+  V#6:AttributeSet >
+< J':Oid : V#7:Jug |
+  maxCap : maxCap':Nat,
+  currCap :(currCap:Int + currCap':Int),
+  V#8:AttributeSet >
+    if currCap:Int + currCap':Int <= maxCap':Nat = true [label transfer-full] .
+  crl 
+< J:Oid : V#9:Jug |
+  currCap : currCap:Int,
+  maxCap : maxCap:Nat,
+  none,
+  V#10:AttributeSet >
+< J':Oid : V#11:Jug |
+  currCap : currCap':Int,
+  maxCap : maxCap':Nat,
+  none,
+  V#12:AttributeSet >
+    => 
+< J:Oid : V#9:Jug |
+  maxCap : maxCap:Nat,
+  currCap :(currCap':Int + - maxCap:Nat + currCap:Int),
+  V#10:AttributeSet >
+< J':Oid : V#11:Jug |
+  maxCap : maxCap':Nat,
+  currCap : maxCap':Nat,
+  V#12:AttributeSet >
+    if currCap:Int + currCap':Int > maxCap':Nat = true [label transfer-partial]
+    .
+  strat simple : Nat @ Configuration .
+  sd simple(cap:Nat)
+    := all * ; match config:Configuration s.t. config:Configuration |=
+    someJugHasCap cap:Nat = true .
+endsm

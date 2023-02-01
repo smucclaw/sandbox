@@ -85,7 +85,8 @@ mod LK is
     Γ, φ ⊢ Δ .
 endm
 
-set trace on .
+eof
+
+set trace rl on .
 
 rewrite ¬ 'P → ¬ 'Q ⊢ 'Q → 'P .
-*** show search graph .

@@ -80,10 +80,10 @@ load full-maude
 
   class Actor .
 
-  class StatefulActor |
-    state : ActorState .
+  --- class StatefulActor |
+  ---   state : ActorState .
 
-  subclass StatefulActor < Actor .
+  --- subclass StatefulActor < Actor .
 
 ---(
   Here we define the set of runtime contract configurations as the set

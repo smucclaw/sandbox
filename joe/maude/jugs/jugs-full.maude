@@ -87,6 +87,10 @@ endom)
   vars J : Oid .
   vars cap : Nat .
 
+---(
+  (someJugHasCap cap) is a proposition which says that the current state
+  contains a jug filled with cap amount of water.
+)
   ops someJugHasCap_ : Nat -> Prop .
   eq < J : Jug | currCap : cap > config |= someJugHasCap cap
   = true .
@@ -116,18 +120,26 @@ endom)
 
   In particular, this strategy is equivalent to the linear mu calculus formula
   mu X. someJugHasCap cap \/ (not someJugHasCap cap /\ O X)
-  Note that this is NOT the same as the LTL formula <> someJugHasCap cap
+
+  Note that this is NOT the same as the LTL formula (<> someJugHasCap cap)
   because the former says that we begin searching from the initial state of the
   transition system (viewed as a Kripke structure) and then stop the instant
   we reach a state in which the state formula (someJugHasCap cap) holds.
-  In other words, every model of this formula cannot have any outgoing transitions
-  from goal states.
 
-  The umaudemc tool allows us to compute the intersection of the Kripke structures
-  corresponding to:
-  - the buchi automata corresponding to strategy
-  - the transition system defined by the above rewriting rules
+  In other words, every model of this formula will have goal states and these
+  goal states will not have any outgoing transitions.
+  Moreover, there cannot be any other dead-end states other than these goal states.
+
+  The umaudemc tool allows us to compute a maximal witness of this formula
+  (maximal in the lattice of subtructures of the transition system rooted at the
+  initial state, defined by the above rewriting rules).
+  More precisely, we can solve the model repair problem as described in
+  https://arxiv.org/pdf/0710.3332.pdf
+  for rewrite theories and linear mu calculus formulae.
+
   This lets us generate a DFA showing all possible ways of reaching goal states.
+  For the PDPA use case, this lets us generate every single trace leading to
+  race condition.
 )
   strat simple : Nat @ Configuration .
 

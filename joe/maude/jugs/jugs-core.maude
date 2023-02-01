@@ -560,7 +560,7 @@ smod JUGS-STRAT is
     => 
 < J:Oid : V#9:Jug |
   maxCap : maxCap:Nat,
-  currCap :(currCap':Int + - maxCap:Nat + currCap:Int),
+  currCap :(currCap:Int + -(maxCap':Nat + - currCap':Int)),
   V#10:AttributeSet >
 < J':Oid : V#11:Jug |
   maxCap : maxCap':Nat,
@@ -570,6 +570,6 @@ smod JUGS-STRAT is
     .
   strat simple : Nat @ Configuration .
   sd simple(cap:Nat)
-    := all * ; match config:Configuration s.t. config:Configuration |=
-    someJugHasCap cap:Nat = true .
+    := match config:Configuration s.t. config:Configuration |= someJugHasCap
+    cap:Nat = true or-else all ; simple(cap:Nat) .
 endsm

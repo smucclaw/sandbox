@@ -1,0 +1,190 @@
+digraph {
+        0 [label="
+< 'J : Jug |
+  currCap : 0,
+  maxCap : 3 > 
+< 'J : Jug |
+  currCap : 0,
+  maxCap : 5 >"];
+        0 -> 1 [label="empty-jug"];
+        1 [label="
+< 'J : Jug |
+  currCap : 0,
+  maxCap : 3 > 
+< 'J : Jug |
+  currCap : 0,
+  maxCap : 5 >"];
+        1 -> 1 [label="empty-jug"];
+        1 -> 2 [label="fill-jug"];
+        2 [label="
+< 'J : Jug |
+  currCap : 0,
+  maxCap : 5 > 
+< 'J : Jug |
+  currCap : 3,
+  maxCap : 3 >"];
+        2 -> 2 [label="fill-jug"];
+        2 -> 3 [label="transfer-full"];
+        3 [label="
+< 'J : Jug |
+  currCap : 0,
+  maxCap : 3 > 
+< 'J : Jug |
+  currCap : 3,
+  maxCap : 5 >"];
+        3 -> 3 [label="empty-jug"];
+        3 -> 2 [label="transfer-full"];
+        3 -> 4 [label="fill-jug"];
+        4 [label="
+< 'J : Jug |
+  currCap : 3,
+  maxCap : 3 > 
+< 'J : Jug |
+  currCap : 3,
+  maxCap : 5 >"];
+        4 -> 5 [label="transfer-partial"];
+        5 [label="
+< 'J : Jug |
+  currCap : 1,
+  maxCap : 3 > 
+< 'J : Jug |
+  currCap : 5,
+  maxCap : 5 >"];
+        5 -> 5 [label="fill-jug"];
+        5 -> 4 [label="transfer-partial"];
+        5 -> 6 [label="fill-jug"];
+        6 [label="
+< 'J : Jug |
+  currCap : 3,
+  maxCap : 3 > 
+< 'J : Jug |
+  currCap : 5,
+  maxCap : 5 >"];
+        6 -> 6 [label="fill-jug"];
+        6 -> 7 [label="empty-jug"];
+        7 [label="
+< 'J : Jug |
+  currCap : 0,
+  maxCap : 3 > 
+< 'J : Jug |
+  currCap : 5,
+  maxCap : 5 >"];
+        7 -> 7 [label="fill-jug"];
+        7 -> 8 [label="transfer-partial"];
+        8 [label="
+< 'J : Jug |
+  currCap : 2,
+  maxCap : 5 > 
+< 'J : Jug |
+  currCap : 3,
+  maxCap : 3 >"];
+        8 -> 7 [label="transfer-full"];
+        8 -> 8 [label="fill-jug"];
+        8 -> 6 [label="fill-jug"];
+        8 -> 2 [label="empty-jug"];
+        8 -> 9 [label="empty-jug"];
+        9 [label="
+< 'J : Jug |
+  currCap : 0,
+  maxCap : 3 > 
+< 'J : Jug |
+  currCap : 2,
+  maxCap : 5 >"];
+        9 -> 9 [label="empty-jug"];
+        9 -> 10 [label="transfer-full"];
+        10 [label="
+< 'J : Jug |
+  currCap : 0,
+  maxCap : 5 > 
+< 'J : Jug |
+  currCap : 2,
+  maxCap : 3 >"];
+        10 -> 10 [label="empty-jug"];
+        10 -> 9 [label="transfer-full"];
+        10 -> 11 [label="fill-jug"];
+        11 [label="
+< 'J : Jug |
+  currCap : 2,
+  maxCap : 3 > 
+< 'J : Jug |
+  currCap : 5,
+  maxCap : 5 >"];
+        11 -> 11 [label="fill-jug"];
+        11 -> 12 [label="transfer-partial"];
+        12 [label="
+< 'J : Jug |
+  currCap : 3,
+  maxCap : 3 > 
+< 'J : Jug |
+  currCap : 4,
+  maxCap : 5 >"];
+        12 -> 12;
+        11 -> 6 [label="fill-jug"];
+        11 -> 7 [label="empty-jug"];
+        11 -> 10 [label="empty-jug"];
+        10 -> 2 [label="fill-jug"];
+        10 -> 1 [label="empty-jug"];
+        9 -> 8 [label="fill-jug"];
+        9 -> 7 [label="fill-jug"];
+        9 -> 1 [label="empty-jug"];
+        7 -> 6 [label="fill-jug"];
+        7 -> 1 [label="empty-jug"];
+        6 -> 2 [label="empty-jug"];
+        5 -> 7 [label="empty-jug"];
+        5 -> 13 [label="empty-jug"];
+        13 [label="
+< 'J : Jug |
+  currCap : 0,
+  maxCap : 5 > 
+< 'J : Jug |
+  currCap : 1,
+  maxCap : 3 >"];
+        13 -> 13 [label="empty-jug"];
+        13 -> 14 [label="transfer-full"];
+        14 [label="
+< 'J : Jug |
+  currCap : 0,
+  maxCap : 3 > 
+< 'J : Jug |
+  currCap : 1,
+  maxCap : 5 >"];
+        14 -> 14 [label="empty-jug"];
+        14 -> 13 [label="transfer-full"];
+        14 -> 15 [label="fill-jug"];
+        15 [label="
+< 'J : Jug |
+  currCap : 1,
+  maxCap : 5 > 
+< 'J : Jug |
+  currCap : 3,
+  maxCap : 3 >"];
+        15 -> 16 [label="transfer-full"];
+        16 [label="
+< 'J : Jug |
+  currCap : 0,
+  maxCap : 3 > 
+< 'J : Jug |
+  currCap : 4,
+  maxCap : 5 >"];
+        16 -> 16;
+        15 -> 15 [label="fill-jug"];
+        15 -> 6 [label="fill-jug"];
+        15 -> 2 [label="empty-jug"];
+        15 -> 14 [label="empty-jug"];
+        14 -> 7 [label="fill-jug"];
+        14 -> 1 [label="empty-jug"];
+        13 -> 5 [label="fill-jug"];
+        13 -> 2 [label="fill-jug"];
+        13 -> 1 [label="empty-jug"];
+        4 -> 4 [label="fill-jug"];
+        4 -> 3 [label="empty-jug"];
+        4 -> 6 [label="fill-jug"];
+        4 -> 2 [label="empty-jug"];
+        3 -> 7 [label="fill-jug"];
+        3 -> 1 [label="empty-jug"];
+        2 -> 6 [label="fill-jug"];
+        2 -> 1 [label="empty-jug"];
+        1 -> 7 [label="fill-jug"];
+        0 -> 2 [label="fill-jug"];
+        0 -> 7 [label="fill-jug"];
+}

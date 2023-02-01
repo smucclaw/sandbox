@@ -69,7 +69,7 @@ load full-maude
   =>
     < J : Jug |
       maxCap : maxCap,
-      currCap : currCap' + (- maxCap) + currCap >
+      currCap : currCap + - (maxCap' + - currCap') >
     < J' : Jug |
       maxCap : maxCap',
       currCap : maxCap' >
@@ -100,14 +100,49 @@ endom)
   vars config : Configuration .
   vars cap : Nat .
 
-  --- Simple goal directed execution strategy, in which we try to find a
-  --- configuration where some jug contains cap amount of water.
+---(
+  Simple goal directed execution strategy, in which we try to find a
+  configuration where some jug contains cap amount of water.
+
+  Note that as per the semantics of the strategy language (see Propositions
+  5 and 6 of https://eprints.ucm.es/id/eprint/67449/1/slang.pdf), in the presence
+  of a finite state space, the strategy language covers the whole space of
+  omega-regular expressions.
+  By the papers cited in  
+  https://cs.stackexchange.com/questions/108/equivalence-of-b%C3%BCchi-automata-and-linear-mu-calculus
+  omega-regexs have the same expressive power as Buchi automata and the _linear_
+  mu calculus.
+  Moreover, these are strictly more expressive than LTL.
+
+  In particular, this strategy is equivalent to the linear mu calculus formula
+  mu X. someJugHasCap cap \/ (not someJugHasCap cap /\ O X)
+  Note that this is NOT the same as the LTL formula <> someJugHasCap cap
+  because the former says that we begin searching from the initial state of the
+  transition system (viewed as a Kripke structure) and then stop the instant
+  we reach a state in which the state formula (someJugHasCap cap) holds.
+  In other words, every model of this formula cannot have any outgoing transitions
+  from goal states.
+
+  The umaudemc tool allows us to compute the intersection of the Kripke structures
+  corresponding to:
+  - the buchi automata corresponding to strategy
+  - the transition system defined by the above rewriting rules
+  This lets us generate a DFA showing all possible ways of reaching goal states.
+)
   strat simple : Nat @ Configuration .
 
+  --- mu X.
   sd simple(cap) :=
-    all * ;
+    --- someJugHasCap cap
     match config s.t.
-      config |= someJugHasCap cap .
+      config |= someJugHasCap cap
+    --- \/ (not someJugHasCap cap /\
+    or-else
+      --- O
+      all ;
+      --- X
+      simple(cap) .
+    --- )
 
 endsm)
 

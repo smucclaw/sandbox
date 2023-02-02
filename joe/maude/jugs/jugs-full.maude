@@ -133,16 +133,15 @@ endom)
   goal states will not have any outgoing transitions.
   Moreover, there cannot be any other dead-end states other than these goal states.
 
-  The umaudemc tool allows us to compute a maximal witness of this formula
+  The umaudemc tool allows us to visualize all traces in the original
+  transition system that satisfy the given linear time mu calculus formula.
+  More precisely, we can compute a maximal witness of this formula
   (maximal in the lattice of subtructures of the transition system rooted at the
   initial state, defined by the above rewriting rules).
-  More precisely, this maximal witness is the formed by combining all traces
-  in the original transition system that satisfies the given linear time
-  mu calculus formula.
 
   This lets us generate a DFA showing all possible ways of reaching goal states.
-  For the PDPA use case, this lets us generate every single trace leading to
-  race condition.
+  For the PDPA use case, this lets us visualize every single trace leading up
+  to the race condition.
 )
   strat simple : Nat @ Configuration .
 

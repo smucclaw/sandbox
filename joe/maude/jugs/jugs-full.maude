@@ -115,10 +115,13 @@ endom)
   By the papers cited in  
   https://cs.stackexchange.com/questions/108/equivalence-of-b%C3%BCchi-automata-and-linear-mu-calculus
   omega-regexs have the same expressive power as Buchi automata and the _linear_
-  mu calculus.
-  Moreover, these are strictly more expressive than LTL.
+  time mu calculus. (basically LTL augmented with fixed point operators).
+  This is strictly more expressive than LTL and incomparable with CTL.
+  Of course, the full modal mu calculus is still the most expressive temporal logic
+  out there (I think).
 
-  In particular, this strategy is equivalent to the linear mu calculus formula
+  In particular, this strategy is equivalent to the linear time mu calculus
+  formula
   mu X. someJugHasCap cap \/ (not someJugHasCap cap /\ O X)
 
   Note that this is NOT the same as the LTL formula (<> someJugHasCap cap)
@@ -133,9 +136,9 @@ endom)
   The umaudemc tool allows us to compute a maximal witness of this formula
   (maximal in the lattice of subtructures of the transition system rooted at the
   initial state, defined by the above rewriting rules).
-  More precisely, we can solve the model repair problem as described in
-  https://arxiv.org/pdf/0710.3332.pdf
-  for rewrite theories and linear mu calculus formulae.
+  More precisely, this maximal witness is the formed by combining all traces
+  in the original transition system that satisfies the given linear time
+  mu calculus formula.
 
   This lets us generate a DFA showing all possible ways of reaching goal states.
   For the PDPA use case, this lets us generate every single trace leading to
@@ -158,10 +161,10 @@ endom)
 
 endsm)
 
-(show all .)
-q
-
 eof
+
+(show all .)
+quit
 
 set trace on .
 trace exclude FULL-MAUDE .

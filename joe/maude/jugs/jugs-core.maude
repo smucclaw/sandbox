@@ -1,3 +1,12 @@
+
+	          Full Maude 3.2.2 Dec 23 2022
+
+Introduced module JUGS
+
+Introduced module ATOMIC-PROPS
+
+Introduced module JUGS-STRAT
+
 smod JUGS-STRAT is
   sorts Attribute AttributeSet Bool Char Cid Configuration FindResult Formula
     Int Jug List{Nat}ModelCheckResult Msg Nat NeList{Nat}NzInt NzNat Object Oid
@@ -573,3 +582,5 @@ smod JUGS-STRAT is
     := match config:Configuration s.t. config:Configuration |= someJugHasCap
     cap:Nat = true or-else all ; simple(cap:Nat) .
 endsm
+
+Bye.

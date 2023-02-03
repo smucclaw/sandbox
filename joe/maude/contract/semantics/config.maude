@@ -88,18 +88,19 @@ load full-maude
 ---(
   With respect to a collection of rules, we define the type of runtime contract
   configurations as the initial algebra satisfying the equation
-    ContractState = 2^Rule + 2^Actor + Fulfilled
+    ContractState = 2^ActiveRule + 2^Actor + Fulfilled
 
-  A contract state contractState in
-  - 2^Rule indicates the rules that are currently active at that point in the
-    contract
-  - 2^Actor indicates the set of actors who breached the contract
+  A contract state in
+  - 2^ActiveRule represents the rules that are currently active at that point in
+    the contract, along with their timer values
+  - 2^Actor represents the set of actors who breached the contract
   - Fulfilled indicates that the contract has been fulfilled
     (ie successful termination)
 
   We equip ContractState with a monoidal structure, via some equational axioms
   saying:
   - empty = Fulfilled
+    This says that the contract is fulfilled if there are no active rules.
   - (ContractState, <>, Fulfilled, Breached Actor) ~ (N, *, 1, 0)
     is an abelian monoid with an absorbing element.
 
@@ -111,16 +112,11 @@ load full-maude
   This is done via the functions:
   - deltaAction : ActionEvent * ContractState -> ContractState
   - deltaTick : TickEvent * ContractState -> ContractState
-  Note that:
-  - as with the runtime state of a contract, these transition
-    relations are also parameterized over a given set of rules.
-  - thanks to the Yoneda Lemma, we shall often confuse events and their
-    corresponding actions.
+  Note that as with the runtime state of a contract, these transition relations
+  are also parameterized over a given set of rules.
 
   The monoid structure, along with these functions are defined in such a way
-  that ensures that breached states are invariant under any action, so that a
-  contract remains breached, with no active rules, regardless of what
-  transition we take.
+  that ensures that breached and fulfilled states are invariant under any action.
   On the other hand, if the contract is still in progress with some active rules,
   we use these actions and the Monoid structure to foldMap over the set of
   active rules.

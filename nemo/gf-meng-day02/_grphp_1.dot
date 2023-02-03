@@ -1,0 +1,43 @@
+graph {
+edge[style="solid"]; node[shape="plaintext"]; 
+subgraph {rank=same;
+  n4[label="S"]; 
+}
+ 
+subgraph {rank=same;
+  n0[label="Expr"]; 
+  n3[label="ComplexExpr"]; 
+  edge[style="invis"]; 
+  n0  --  n3 ;
+}
+n4 -- n0;
+n4 -- n3;
+ 
+subgraph {rank=same;
+  n1[label="Expr"]; 
+  n2[label="Expr"]; 
+  edge[style="invis"]; 
+  n1  --  n2 ;
+}
+n3 -- n1;
+n3 -- n2;
+ 
+edge[style="dashed"]; node[shape="plaintext"]; 
+subgraph {rank=same;
+  n100000[label="two"]; 
+  n100001[label="equals"]; 
+  n100002[label="five"]; 
+  n100003[label="multiplied"]; 
+  n100004[label="by"]; 
+  n100005[label="four"]; 
+  edge[style="invis"]; 
+  n100000  --  n100001  --  n100002  --  n100003  --  n100004  --  n100005 ;
+}
+n0 -- n100000;
+n4 -- n100001;
+n1 -- n100002;
+n3 -- n100003;
+n3 -- n100004;
+n2 -- n100005;
+ 
+}

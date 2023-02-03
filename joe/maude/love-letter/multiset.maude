@@ -1,0 +1,120 @@
+---(
+  Taken from
+  http://maude.sip.ucm.es/datastructures/
+
+  This has been updated using the current Maude syntax as described in section
+  6.3.3 of
+  https://maude.lcc.uma.es/maude31-manual-html/maude-manualch6.html
+)
+fmod MULTISET{X :: TRIV} is
+  protecting NAT .
+
+  sorts Mset{X} .
+
+---(
+  One way to construct a list is as follows.
+  We define a datatype:
+  data PreList t where
+    Empty :: PreList
+    Singleton :: t -> PreList t
+    Concat :: PreList t -> PreList t -> PreList t
+
+  We can then construct lists like:
+  - (Concat (Concat (Singleton 0) (Singleton 1)) (Singleton 2))
+    aka ([0] ++ [1]) ++ [2]
+  - (Concat (Singleton 0) (Concat (Singleton 1) (Singleton 2)))
+    aka [0] ++ ([1] ++ [2])
+
+  While we would like to think that they both represent [0, 1, 2],
+  when we pattern match on these, these won't be identified as exactly the same
+  list because have different structure.
+
+  Another issue is that (Concat Empty Empty) and Empty won't be unified due to
+  the no-confusion assumption behind constructors of algebraic data types.
+  In other words, it is assumed that constructors are range-disjoint.
+  A result of this is that if we define the following isEmpty function via
+  the equation
+    isEmpty Empty = true
+  (isEmpty (Concat Empty Empty)) won't evaluate to true.
+
+  What we would like to do is that when performing unification during pattern
+  matching, we should treat:
+  - Concat as being associative
+  - Empty as being the identity element wrt Concat
+
+  Hence we define an equational theory that states these as axioms, namely we
+  add the equality axioms:
+  - \forall L0 L1 L2. (Concat L0 (Concat L1 L2)) = (Concat (Concat L0 L1) L2)
+  - \forall L. (Concat L Empty) = L
+  - \forall L. (Concat Empty L) = L
+
+  Then we instruct the unification procedure to be performed modulo these
+  additional axioms.
+  This will cause (Concat Empty Empty) to be unified with Empty and so
+  (isEmpty (Concat Empty Empty)) will return true.
+
+  Multisets are what happens when you take lists constructed this way and
+  throw in an extra axioms saying that Concat is also commutative.
+)
+  subsorts X$Elt < Mset{X} .
+
+  op empty : -> Mset{X} [ctor] .
+  op __ : Mset{X} Mset{X} -> Mset{X} [ctor assoc comm id: empty] .
+
+  op size : Mset{X} -> Nat .
+  op mult : X$Elt Mset{X} -> Nat .
+  op delete : X$Elt Mset{X} -> Mset{X} .
+  op delete1 : X$Elt Mset{X} -> Mset{X} .
+  op isIn : X$Elt Mset{X} -> Bool .
+  op isEmpty : Mset{X} -> Bool .
+  op intersection : Mset{X} Mset{X} -> Mset{X} .
+  op diff : Mset{X} Mset{X} -> Mset{X} .
+
+  vars E E' : X$Elt .
+  vars S S' : Mset{X} .
+
+  eq size(empty) = 0 .
+  eq size(E S) = 1 + size(S) .
+
+  eq mult(E, empty) = 0 .
+  eq mult(E, E S) = 1 + mult(E, S) .
+  ceq mult(E, E' S) = mult(E, S)
+  if E =/= E' .
+
+  eq delete(E, empty) = empty .
+  eq delete(E, E S) = delete(E, S) .
+  ceq delete(E, E' S) = E' delete(E, S)
+  if E =/= E' .
+
+  eq delete1(E, empty) = empty .
+  eq delete1(E, E S) = S .
+  ceq delete1(E, E' S) = E' delete1(E, S)
+  if E =/= E' .
+
+  eq isIn(E, S) = mult(E, S) > 0 .
+
+  eq isEmpty(empty) = true .
+  eq isEmpty(E S) = false .
+
+  eq intersection(empty, S') = empty .
+  ceq intersection(E S, S') = intersection(S, S')
+  if mult(E,S') = 0 .
+  ceq intersection(E S, S') = E intersection(S, delete1(E,S')) 
+  if mult(E,S') > 0 .
+
+  eq diff(S, empty) = S .
+  eq diff(S, E S') = diff(delete1(E, S), S') .
+
+endfm
+
+eof
+
+(red in MULTISET(Int) : mult(2, 2 2 1 2 3 2) .)
+
+(red in MULTISET(Int) : intersection(2 2 3 4, 2 2 1 3 3 2) .)
+
+(red in MULTISET(Int) : diference(2 2 3 4, 2 2 1 3 3 2) .)
+
+
+
+

@@ -1,0 +1,25 @@
+load metaInterpreter
+
+mod TEST0 is
+  extending META-MODULE .
+
+  ops testMod : -> Module .
+  eq testMod = (
+    mod 'TEST1 is
+      extending 'META-MODULE .
+      sorts none .
+      none
+      op 'testMod : nil -> 'Module [none] .
+      none
+      eq 'testMod = (
+        'mod 'TEST2 'is
+          'nil '.
+          'sorts 'none '.
+          'none 'none 'none 'none 'none '.
+        'endm
+      ) [none] .
+      none
+    endm
+  ) .
+
+endm

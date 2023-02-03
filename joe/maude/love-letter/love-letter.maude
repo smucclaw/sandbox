@@ -1,0 +1,6 @@
+load model-checker
+load full-maude
+
+(omod CONTROLLER is
+
+endom)

@@ -94,6 +94,7 @@ load full-maude
   - 2^ActiveRule represents the rules that are currently active at that point in
     the contract, along with their timer values
   - 2^Actor represents the set of actors who breached the contract
+    (ie unsuccessful termination)
   - Fulfilled indicates that the contract has been fulfilled
     (ie successful termination)
 
@@ -101,17 +102,18 @@ load full-maude
   saying:
   - empty = Fulfilled
     This says that the contract is fulfilled if there are no active rules.
-  - (ContractState, <>, Fulfilled, Breached Actor) ~ (N, *, 1, 0)
+  - (ContractState, <>, Fulfilled, Actors) ~ (N, *, 1, 0)
     is an abelian monoid with an absorbing element.
+    Here Actors denotes the collection of all Actors.
 
-  Note that for pattern matching purposes, unification modulo this equational
-  theory is performed.
-
-  To define a timed transition system, we define the action of the free monoid
-  over (ActionEvent + TickEvent) on contract states.
+  To define a timed transition system, we adopt an algebraic view of computation.
+  That is, we define the action of the free monoid over
+  (ActionEvent + TickEvent) on contract states.
   This is done via the functions:
   - deltaAction : ActionEvent * ContractState -> ContractState
   - deltaTick : TickEvent * ContractState -> ContractState
+  In other words, we define the action, ie effect, of each individual event on
+  the current state of the contract.
   Note that as with the runtime state of a contract, these transition relations
   are also parameterized over a given set of rules.
 
@@ -123,8 +125,8 @@ load full-maude
   More precisely, we first map the action over each rule to obtain new contract
   states for each one of them.
   These can either be:
-  - (rules : 2^Rule) a set of rules to activate.
-  - (actors : 2^Actor) a breached state indicating the actors who breached the contract.
+  - (rules \in 2^Rule) a set of rules to activate.
+  - (actors \in 2^Actor) a breached state indicating the actors who breached the contract.
   Thereafter, we use the Monoid structure to combine these new contract states.
 )
 

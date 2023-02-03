@@ -1,0 +1,17 @@
+load smt
+
+fmod ALGEBRA is
+  sorts Tile .
+
+  ops haskell sandy : -> Tile [ctor] .
+  ops cw_ ccw_ : Tile -> Tile .
+
+  vars tile : Tile .
+
+  eq cw cw cw cw tile = tile .
+  eq ccw cw tile = tile .
+  eq cw ccw tile = tile .
+
+endfm
+
+check ccw tile === cw cw cw tile .

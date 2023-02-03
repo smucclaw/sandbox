@@ -15,9 +15,10 @@ concrete NumberSharesEng of NumberShares = NumeralEng ** open
     Kind = LinKind ; -- needs custom params to prevent "the Gamma"
     Quality = AP ;
     Number = NP ;
-    Value = NP ;
+    Value = LinValue ;
   oper
     LinKind : Type = {s : CN ; det : DetType} ;
+    LinValue : Type = {s : NP ; isSimple : Bool} ;
   param
     DetType = CanDet | NoDet ;
 
@@ -59,9 +60,9 @@ concrete NumberSharesEng of NumberShares = NumeralEng ** open
     Class x = mkAP (invarA ("Class" ++ x.s)) ;
 
     -- : Int -> Number ;
-    NumInt = numInt ;
+    NumInt int = (numInt int).s ;
     -- : Numeral -> Number ;
-    NumNumeral = numNumeral ;
+    NumNumeral num = (numNumeral num).s ;
 
     -- [Item] and [Kind] have the same lincat, merge for convenience
     -- : [Item] -> Number ; -- the sum of [the new shares]:Item and [the number of Class A shares]:Item
@@ -90,8 +91,8 @@ concrete NumberSharesEng of NumberShares = NumeralEng ** open
       } ;
     noDetKind : N -> LinKind = \n -> detKind n ** {det = NoDet} ;
 
-    numInt : SS -> NP = \int -> symb int ;
-    numNumeral : Numeral -> NP = \num -> mkNP (mkDet <num : Numeral>) ; -- two hundred
+    numInt : SS -> LinValue = \int -> {s = symb int ; isSimple = True} ;
+    numNumeral : Numeral -> LinValue = \num -> {s = mkNP (mkDet <num : Numeral>) ; isSimple = True} ; -- two hundred
 
 
     -- lexicon
@@ -107,10 +108,10 @@ concrete NumberSharesEng of NumberShares = NumeralEng ** open
       ConsItem = C.ConsNP ;
 
     lincat
-      [Value] = [NP] ;
+      [Value] = ListNP ** {isSimple : Bool} ;
     lin
-      BaseValue = C.BaseNP ;
-      ConsValue = C.ConsNP ;
+      BaseValue x y = C.BaseNP x.s y.s ** {isSimple = andB x.isSimple y.isSimple} ;
+      ConsValue x xs = C.ConsNP x.s xs ** {isSimple = andB x.isSimple xs.isSimple} ;
 
     lincat
       [Kind] = [NP] ;
@@ -139,8 +140,8 @@ concrete NumberSharesEng of NumberShares = NumeralEng ** open
 -- Values
   lin
     -- : Item -> Value -> Comment ;
-    PredValue val hundred = mkS (mkCl val hundred) ;
-    PredValueVerbose val hundred = mkS (mkCl val (shallBeGivenBy hundred)) ;
+    PredValue val hundred = mkS (mkCl val hundred.s) ;
+    PredValueVerbose val hundred = mkS (mkCl val (shallBeGivenBy hundred.s)) ;
     -- : Item -> [Value] -> Comment ; -- {item} shall be given by the greater of {twelwe} and {twenty}
     PredValueGreaterOf item vals = PredValueVerbose item (xerOf greater_CN vals) ;
     PredValueLesserOf item vals = PredValueVerbose item (xerOf lesser_CN vals) ;
@@ -148,8 +149,8 @@ concrete NumberSharesEng of NumberShares = NumeralEng ** open
     -- Pure arithmetics
     ValInt = numInt ;
     ValNumeral = numNumeral ;
-    ValKind k = mkNP k.s ;
-    ValItem i = i ;
+    ValKind k = {s = mkNP k.s ; isSimple = True} ;
+    ValItem i = {s = i ; isSimple = False} ;
 
     -- : Value -> Value -> Value ; -- Five plus five / the sum of two and three
     SumValue,
@@ -164,22 +165,46 @@ concrete NumberSharesEng of NumberShares = NumeralEng ** open
     ProductValueValItem = binOpVal "product" "multiplied by" ;
 
     -- : Value -> Numeral -> Value ; -- twenty {less,plus,multiplied by} ten percent
-    SubtractPercent twenty ten = mkNP twenty (percentAdv "less" ten) ;
-    AddPercent twenty ten = mkNP twenty (percentAdv "plus" ten) ;
-    MultiplyPercent twenty ten = mkNP twenty (percentAdv "multiplied by" ten) ;
+    SubtractPercent twenty ten = percentValue "less" twenty ten ;
+    AddPercent twenty ten = percentValue "plus" twenty ten ;
+    MultiplyPercent twenty ten = percentValue "multiplied by" twenty ten ;
 
     -- : Value -> Int -> Value ; -- Gamma {less,plus,multiplied by} 10 %
-    SubtractPercentInt twenty ten = mkNP twenty (percentAdvInt "less" ten) ;
-    AddPercentInt twenty ten = mkNP twenty (percentAdvInt "plus" ten) ;
-    MultiplyPercentInt twenty ten = mkNP twenty (percentAdvInt "multiplied by" ten) ;
+    SubtractPercentInt twenty ten = percentValue "less" twenty ten ;
+    AddPercentInt twenty ten = percentValue "plus" twenty ten ;
+    MultiplyPercentInt twenty ten = percentValue "multiplied by" twenty ten ;
 
   oper
-    binOpVal : Str -> Str -> NP -> NP -> NP = \sum,plus,two,three -> 
-      let sumTwoThree : NP = the (N.PossNP (mkCN (mkN sum)) (mkNP and_Conj two three)) ;
-          plus_Conj : Conj = mkConj plus ;
-          twoPlusThree : NP = mkNP plus_Conj two three ;
-       in sumTwoThree | twoPlusThree ;
+    binOpVal = overload {
+      binOpVal : Str -> Str -> LinValue -> LinValue -> LinValue = \sum,plus,two,three -> 
+        let sumTwoThree : NP = the (N.PossNP (mkCN (mkN sum)) (mkNP and_Conj two.s three.s)) ;
+            plus_Conj : Conj = mkConj plus ;
+            twoPlusThree : NP = mkNP plus_Conj two.s three.s ;
+        in {s = sumTwoThree | twoPlusThree ; isSimple = False} ;
+      binOpVal : Str -> Str -> LinValue -> NP -> LinValue = \sum,plus,two,three -> 
+        let sumTwoThree : NP = the (N.PossNP (mkCN (mkN sum)) (mkNP and_Conj two.s three)) ;
+            plus_Conj : Conj = mkConj plus ;
+            twoPlusThree : NP = mkNP plus_Conj two.s three ;
+        in {s = sumTwoThree | twoPlusThree ; isSimple = False} ;
+      binOpVal : Str -> Str -> NP -> LinValue -> LinValue = \sum,plus,two,three -> 
+        let sumTwoThree : NP = the (N.PossNP (mkCN (mkN sum)) (mkNP and_Conj two three.s)) ;
+            plus_Conj : Conj = mkConj plus ;
+            twoPlusThree : NP = mkNP plus_Conj two three.s ;
+        in {s = sumTwoThree | twoPlusThree ; isSimple = False} ;
+      binOpVal : Str -> Str -> NP -> NP -> LinValue = \sum,plus,two,three -> 
+        let sumTwoThree : NP = the (N.PossNP (mkCN (mkN sum)) (mkNP and_Conj two three)) ;
+            plus_Conj : Conj = mkConj plus ;
+            twoPlusThree : NP = mkNP plus_Conj two three ;
+        in {s = sumTwoThree | twoPlusThree ; isSimple = False}
+    } ;
 
+    percentValue = overload {
+      percentValue : Str -> LinValue -> SS -> LinValue = \less,twenty,ten ->
+        {s = mkNP twenty.s (percentAdvInt less ten) ; isSimple = False} ;
+      percentValue : Str -> LinValue -> Numeral -> LinValue = \less,twenty,ten ->
+        {s = mkNP twenty.s (percentAdv less ten) ; isSimple = False} 
+    } ;
+      
     greater_CN : CN = mkCN (mkN "greater" "greater") ;
     lesser_CN : CN = mkCN (mkN "lesser" "lesser") ;
 
@@ -188,13 +213,18 @@ concrete NumberSharesEng of NumberShares = NumeralEng ** open
           commaTwo : NP = mkNP two commaAdv ;
        in mkNP and commaTwo three ;
 
-    oxfordCommaListNP : Conj -> [NP] -> NP = \and,nps -> 
-      let npsWithComma : [NP] = nps ** {
-            s1 = \\cas => nps.s1 ! cas ++ bindComma} ;
-       in mkNP and npsWithComma ;
+    oxfordCommaListNP : Conj -> ListValue -> NP = \and,vals -> 
+      let valsWithComma : ListValue = case vals.isSimple of {
+            True => vals  ;
+            False => vals ** {s1 = \\cas => vals.s1 ! cas ++ bindComma}
+            } ;
+       in mkNP and <valsWithComma : ListNP> ;
 
     -- : Value -> Value -> Value ; -- {greater,lesser} of twelwe and twenty
-    xerOf : CN -> [NP] -> NP = \cn,vals -> the (N.PossNP cn (oxfordCommaListNP and_Conj vals)) ;
+    xerOf : CN -> ListValue -> LinValue = \cn,vals -> {
+      s = the (N.PossNP cn (oxfordCommaListNP and_Conj vals)) ;
+      isSimple = False 
+      } ;
 
     percentAdv : Str -> Numeral -> Adv = \less,ten -> lin Adv {s = less ++ (mkUtt (mkCard ten)).s ++ "percent"} ;
 

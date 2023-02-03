@@ -52,8 +52,8 @@ abstract NumberShares = Numeral ** {
 
     ValInt : Int -> Value ; -- (The value of original shares is) 1000
     ValNumeral : Numeral -> Value ; -- (The value of new shares is) two hundred
-    -- ValKind : Kind -> Value ; -- Gamma (plus ten percent)
-    -- ValItem : Item -> Value ; -- the number of new shares (less twenty percent)
+    ValKind : Kind -> Value ; -- Gamma (plus ten percent)
+    ValItem : Item -> Value ; -- the number of new shares (less twenty percent)
 
     SumValue : Value -> Value -> Value ; -- Five plus five / the sum of two and three
     ProductValue : Value -> Value -> Value ; -- Five times five / six multiplied by two / four multiplied by the sum of two and three

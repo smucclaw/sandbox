@@ -37,11 +37,11 @@ fmod Sequent is
   sorts Sequent Sequents .
   subsort Sequent < Sequents .
 
-  op Leaf : -> Sequent [ctor] .
+  op Nil : -> Sequent [ctor] .
   op _⊢_ : Ctx Ctx -> Sequent [ctor prec 122] .
 
   *** Meta-theoretic conjunction of judgement forms.
-  op _ _ : Sequents Sequents -> Sequents [ctor comm assoc id: Leaf] .
+  op _ _ : Sequents Sequents -> Sequents [ctor comm assoc id: Nil] .
 endfm
 
 ***(
@@ -59,30 +59,31 @@ mod LK is
   vars Γ Δ : Ctx .
   vars φ ψ : Wff .
 
-  rl [Axm] :
+  rl [axiom] :
     Γ, φ ⊢ φ, Δ
   =>
-    Leaf .
+    Nil .
 
-  rl [ImpL] :
+  rl [impl-left] :
     Γ, φ → ψ ⊢ Δ
   =>
     (Γ ⊢ φ, Δ) (Γ, ψ ⊢ Δ) .
 
-  rl [ImpR] :
+  rl [impl-right] :
     Γ ⊢ φ → ψ, Δ
   =>
     Γ, φ ⊢ ψ, Δ .
 
-  rl [NegL] :
+  rl [neg-left] :
     Γ, ¬ φ ⊢ Δ
   =>
     Γ ⊢ φ, Δ .
 
-  rl [NegR] :
+  rl [neg-right] :
     Γ ⊢ ¬ φ, Δ
   =>
     Γ, φ ⊢ Δ .
+
 endm
 
 eof

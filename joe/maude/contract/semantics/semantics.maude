@@ -6,7 +6,7 @@ load config
   subsorts Qid < Oid .
 
   vars actorName actionName ruleName machineState : Qid .
-  vars ruleNames hence lest : Set{Qid} .
+  vars ruleNames hence lest actorNames : Set{Qid} .
   vars activeRule : Rule .
   vars activeRules activeRules' : Set{Rule} .
   vars rule : Rule .
@@ -94,22 +94,9 @@ load config
 )
   ops deltaAction___ : Set{Rule} ActionEvent ContractState -> ContractState .
 
-  eq deltaAction rules actionEvent (Active empty) = Active empty .
+  eq deltaAction rules actionEvent Fulfilled = Fulfilled .
 
-  eq deltaAction rules actionEvent (Breached actorName) = Breached actorName .
-
-  eq deltaAction rules
-    (actorName do actionName)
-    Active (
-      RULE ruleName
-      PARTY actorName
-      SHANT DO actionName
-      WITHIN time DAY
-      HENCE hence
-      LEST empty,
-      activeRules
-    )
-  = Breached actorName .
+  eq deltaAction rules actionEvent (Breached actorNames) = Breached actorNames .
 
   ceq deltaAction rules
     actionEvent
@@ -138,13 +125,16 @@ load config
       LEST lest,
       activeRules
     )
-  = Active (getRulesWithNames rules lest) <>
-    deltaAction rules actionEvent (Active activeRules)
-  if actionEvent := actorName do actionName
-  /\ lest =/= empty .
+  = (
+    if lest == empty
+    then Breached actorName
+    else Active (getRulesWithNames rules lest)
+    fi
+  ) <> deltaAction rules actionEvent (Active activeRules)
+  if actionEvent := actorName do actionName .
 
-  --- eq deltaAction rules actionEvent Active (activeRule, activeRules)
-  --- = Active activeRule <> deltaAction rules actionEvent (Active activeRules) [owise] .
+  eq deltaAction rules actionEvent Active (activeRule, activeRules)
+  = Active activeRule <> deltaAction rules actionEvent (Active activeRules) [owise] .
 
   --- deltaTick is still a work in progress.
   ops deltaTick__ : Set{Rule} ContractState -> ContractState .

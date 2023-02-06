@@ -91,28 +91,37 @@ load full-maude
 ---(
   With respect to a collection of rules, we define the type of runtime contract
   configurations as the initial algebra satisfying the equation
-    ContractState = 2^ActiveRule + 2^Actor
+    ContractState = 2^Rule + 2^Actor + Fulfilled
+  
+  In Haskell terms we have
+  data ContractState :: Type where
+    Active :: Set{Rule} -> ContractState
+    Breached :: Set{Actor} -> ContractState
+    Fulfilled :: ContractState
 
-  A contract state in
-  - 2^ActiveRule represents the rules that are currently active at that point in
-    the contract, along with their timer values
+  A contract state of the form:
+  - (Active activeRules) represents the rules that are currently active at that
+    point in the contract, along with their timer values
 
-    An empty set of active rules indicates tha the contract has been fulfilled,
-    ie successful termination.
-
-  - 2^Actor represents the set of actors who breached the contract
+  - (Breached actors) represents the set of actors who breached the contract
     (ie unsuccessful termination)
 
-  We equip ContractState with an equational theory axiomatizing the monoidal
-  structure:
-    (ContractState, <>, Fulfilled, Actors) ~ (N, *, 1, 0)
-  is an abelian monoid with an absorbing element.
-  Here Actors denotes the collection of all Actors.
+  - Fulfilled indicates that there are no active rules remaining and that
+    the contract has successfully terminated.
 
-  To define a timed transition system, we adopt an algebraic view of computation.
-  That is, we define the action of the free monoid over
+  We equip ContractState with an equational theory axiomatizing:
+  - Fulfilled = Active empty
+    ie the contract is deemed to be fulfilled when there are no remaining
+    rules active.
+  - a monoidal structure:
+      (ContractState, <>, Fulfilled, Breached Actors) ~ (N, *, 1, 0)
+    is an abelian monoid with an absorbing element.
+    Here Actors denotes the set of all Actors.
+
+  We use this to define a timed transition system algebraically.
+  That is, we define the action of the free monoid over the events
   (ActionEvent + TickEvent) on contract states.
-  This is done via the functions:
+  By the Yoneda Lemma, each event induces an action:
   - deltaAction : ActionEvent * ContractState -> ContractState
   - deltaTick : TickEvent * ContractState -> ContractState
   In other words, we define the action, ie effect, of each individual event on
@@ -128,8 +137,8 @@ load full-maude
   More precisely, we first map the action over each rule to obtain new contract
   states for each one of them.
   These can either be:
-  - (rules \in 2^Rule) a set of rules to activate.
-  - (actors \in 2^Actor) a breached state indicating the actors who breached the contract.
+  - (Active activeRules) a set of rules to activate.
+  - (Breached actors) a breached state indicating the actors who breached the contract.
   Thereafter, we use the Monoid structure to combine these new contract states.
 )
 
@@ -138,14 +147,14 @@ load full-maude
   --- subsorts Set{Qid} < ContractState .
 
   ops Breached_ : Set{Qid} -> ContractState [ctor] .
-  --- ops Fulfilled : -> ContractState [ctor] .
+  ops Fulfilled : -> ContractState [ctor] .
 
-  ops _<>_ : ContractState ContractState -> ContractState [assoc comm] .
+  ops _<>_ : ContractState ContractState -> ContractState [assoc comm id: Fulfilled] .
 
   vars activeRules activeRules' : Set{Rule} .
   vars actorNames actorNames' : Set{Qid} .
 
-  --- eq empty = Fulfilled .
+  eq Active empty = Fulfilled .
 
   eq Active activeRules <> Active activeRules'
   = Active (activeRules, activeRules') .

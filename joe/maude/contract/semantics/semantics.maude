@@ -94,13 +94,13 @@ load config
 )
   ops deltaAction___ : Set{Rule} ActionEvent ContractState -> ContractState .
 
-  eq deltaAction rules actionEvent Fulfilled = Fulfilled .
+  eq deltaAction rules actionEvent (Active empty) = Active empty .
 
   eq deltaAction rules actionEvent (Breached actorName) = Breached actorName .
 
   eq deltaAction rules
     (actorName do actionName)
-    (
+    Active (
       RULE ruleName
       PARTY actorName
       SHANT DO actionName
@@ -113,7 +113,7 @@ load config
 
   ceq deltaAction rules
     actionEvent
-    (
+    Active (
       RULE ruleName
       PARTY actorName
       deontic DO actionName
@@ -122,14 +122,14 @@ load config
       LEST lest,
       activeRules
     )
-  = (getRulesWithNames rules hence) <>
-    (deltaAction rules actionEvent activeRules)
+  = Active (getRulesWithNames rules hence) <>
+    deltaAction rules actionEvent (Active activeRules)
   if actionEvent := actorName do actionName
   /\ deontic == MUST or deontic == MAY .
 
   ceq deltaAction rules
     actionEvent
-    (
+    Active (
       RULE ruleName
       PARTY actorName
       SHANT DO actionName
@@ -138,63 +138,69 @@ load config
       LEST lest,
       activeRules
     )
-  = (getRulesWithNames rules lest) <>
-    (deltaAction rules actionEvent activeRules)
+  = Active (getRulesWithNames rules lest) <>
+    deltaAction rules actionEvent (Active activeRules)
   if actionEvent := actorName do actionName
   /\ lest =/= empty .
 
-  eq deltaAction rules actionEvent (activeRule, activeRules)
-  = activeRule <> (deltaAction rules actionEvent activeRules) [owise].
+  --- eq deltaAction rules actionEvent Active (activeRule, activeRules)
+  --- = Active activeRule <> deltaAction rules actionEvent (Active activeRules) [owise] .
 
   --- deltaTick is still a work in progress.
   ops deltaTick__ : Set{Rule} ContractState -> ContractState .
 
-  eq deltaTick rules Fulfilled = Fulfilled .
+  eq deltaTick rules (Active empty) = (Active empty) .
 
   eq deltaTick rules (Breached actorName) = Breached actorName .
 
   eq deltaTick rules
     (
-      RULE ruleName
-      PARTY actorName
-      deontic DO actionName
-      WITHIN (s time) DAY
-      HENCE hence
-      LEST lest,
-      activeRules
+      Active (
+        RULE ruleName
+        PARTY actorName
+        deontic DO actionName
+        WITHIN (s time) DAY
+        HENCE hence
+        LEST lest,
+        activeRules
+      )
     )
-  = (
+  = Active (
       RULE ruleName
       PARTY actorName
       deontic DO actionName
       WITHIN time DAY
       HENCE hence
       LEST lest
-    ) <> (deltaTick rules activeRules) .
+    ) <> deltaTick rules (Active activeRules) .
 
   eq deltaTick rules
     (
-      RULE ruleName
-      PARTY actorName
-      MUST DO actionName
-      WITHIN 0 DAY
-      HENCE empty
-      LEST lest,
-      activeRules
+      Active (
+        RULE ruleName
+        PARTY actorName
+        MUST DO actionName
+        WITHIN 0 DAY
+        HENCE empty
+        LEST lest,
+        activeRules
+      )
     )
   = Breached actorName .
 
   ceq deltaTick rules
     (
-      RULE ruleName
-      PARTY actorName
-      deontic DO actionName
-      WITHIN 0 DAY
-      HENCE hence
-      LEST lest,
-      activeRules
+      Active (
+        RULE ruleName
+        PARTY actorName
+        deontic DO actionName
+        WITHIN 0 DAY
+        HENCE hence
+        LEST lest,
+        activeRules
+      )
     )
-  = deltaTick rules activeRules
+  = deltaTick rules (Active activeRules)
   if deontic == SHANT or deontic == MAY .
 
 ---(
@@ -209,7 +215,7 @@ load config
     < actorName : Actor | >
     < machineState : AbstractMachineState |
       rules : rules,
-      contractState : (
+      contractState : Active (
         RULE ruleName
         PARTY actorName
         deontic DO actionName
@@ -222,7 +228,8 @@ load config
   =>
     < actorName : Actor | >
     < machineState : AbstractMachineState |
-      contractState : deltaAction rules (actorName did actionName) activeRules >
+      contractState :
+        deltaAction rules (actorName did actionName) (Active activeRules) >
     (actorName did actionName) .
 
 ---(
@@ -239,11 +246,11 @@ load config
     < machineState : AbstractMachineState |
       rules : rules,
       time : time,
-      contractState : activeRules >
+      contractState : Active activeRules >
   =>
     < machineState : AbstractMachineState |
       time : s time,
-      contractState : deltaTick rules activeRules >
+      contractState : deltaTick rules (Active activeRules) >
   if activeRules =/= empty .
 
 endom)

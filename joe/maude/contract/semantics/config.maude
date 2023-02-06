@@ -90,10 +90,8 @@ load full-maude
 
 ---(
   With respect to a collection of rules, we define the type of runtime contract
-  configurations as the initial algebra satisfying the equation
-    ContractState = 2^Rule + 2^Actor + Fulfilled
-  
-  In Haskell terms we have:
+  configurations as an algebra (in the sense of universal algbera) over a
+  signature, which as an algebraic data type in Haskell, looks like:
   data ContractState :: Type where
     Active :: Set{Rule} -> ContractState
     Breached :: Set{Actor} -> ContractState
@@ -102,43 +100,37 @@ load full-maude
   A contract state of the form:
   - (Active activeRules) represents the rules that are currently active at that
     point in the contract, along with their timer values
-
   - (Breached actors) represents the set of actors who breached the contract
     (ie unsuccessful termination)
-
   - Fulfilled indicates that there are no active rules remaining and that
     the contract has successfully terminated.
 
-  Next we quotient the intial algbera ContractState by an equational theory
-  axiomatizing:
+  Our algebra is the (initial aka standard) model of the equational theory
+  which axiomatizes:
   - Fulfilled = Active empty
     This says that the contract is deemed to be fulfilled when there are no 
     remaining active rules.
-    Note that quotiening out by this axiom means that we throw away part of the
-    "No confusion" assumption placed on the constructors of algebraic data types.
-
   - (ContractState, MEET, Fulfilled) is a monoid where
     - Actors is the set of all actors.
     - MEET is the meet of the complete (prob distributive as well) lattice given
       by the linear order:
         Breached actors ⊑ contractState
-        Breached actors ⊑ Actor actors
-        contractState ⊑ Fulfilled
+        Breached actors ⊑ Active activeRules
+        contractState ⊑ Fulfilled (= Active empty)
 
-    This lattice structure is based on section 2 of Hvitved's PHD thesis on CSL:
-    https://di.ku.dk/english/research/phd/phd-theses/2011/hvitved12phd.pdf
-    Note that the monoidal structure:
-    - is abelian and contains a zero element due to the lattice structure.
-    - is important because we actually use it to do foldMap things.
-
-  Note that pattern matching/unification will be performed modulo this
-  equational theory.
-  This means that (f (Active activeRules MEET Fulfilled)) will unify with a term
-  of the form (f (Active activeRules)).
+  This lattice structure is based on section 2 of Hvitved's PHD thesis on CSL:
+  https://di.ku.dk/english/research/phd/phd-theses/2011/hvitved12phd.pdf
+  Note that the monoidal structure:
+  - is abelian and contains a zero element due to the lattice structure.
+  - is important because we actually use it to do foldMap things and pattern
+    matching modulo associativity, commutativity, idempotence and identity.
+    This means that when we do pattern matching on this algebra,
+    (f (Active activeRules MEET Fulfilled)) will unify with a term of the
+    form (f (Active activeRules)).
 
   We use this to define a timed transition system algebraically.
   That is, we define the action of the free monoid over the events
-  (ActionEvent + TickEvent) on contract states.
+  (ActionEvent + TickEvent) on the lattice of contract states.
   By the Yoneda embedding, each event induces a continuation with a hole of type
   ContractState:
   - deltaAction : ActionEvent * ContractState -> ContractState
@@ -151,14 +143,14 @@ load full-maude
   The monoid structure, along with these functions are defined in such a way
   that ensures that breached and fulfilled states are invariant under any action.
   On the other hand, if the contract is still in progress with some active rules,
-  we use these actions and the Monoid structure to foldMap over the set of
+  we use these actions and the monoidal structure to foldMap over the set of
   active rules.
   More precisely, we first map the action over each rule to obtain new contract
   states for each one of them.
   These can either be:
   - (Active activeRules) a set of rules to activate.
   - (Breached actors) a breached state indicating the actors who breached the contract.
-  Thereafter, we use the Monoid structure to combine these new contract states.
+  Thereafter, we combine them together by taking their MEET.
 )
 
   ops Active_ : Set{Rule} -> ContractState [ctor] .

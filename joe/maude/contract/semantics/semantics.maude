@@ -109,7 +109,7 @@ load config
       LEST lest,
       activeRules
     )
-  = Active (getRulesWithNames rules hence) <>
+  = Active (getRulesWithNames rules hence) MEET
     deltaAction rules actionEvent (Active activeRules)
   if actionEvent := actorName do actionName
   /\ deontic == MUST or deontic == MAY .
@@ -130,11 +130,11 @@ load config
     then Breached actorName
     else Active (getRulesWithNames rules lest)
     fi
-  ) <> deltaAction rules actionEvent (Active activeRules)
+  ) MEET deltaAction rules actionEvent (Active activeRules)
   if actionEvent := actorName do actionName .
 
   eq deltaAction rules actionEvent Active (activeRule, activeRules)
-  = Active activeRule <> deltaAction rules actionEvent (Active activeRules) [owise] .
+  = Active activeRule MEET deltaAction rules actionEvent (Active activeRules) [owise] .
 
   --- deltaTick is still a work in progress.
   ops deltaTick__ : Set{Rule} ContractState -> ContractState .
@@ -160,7 +160,7 @@ load config
       WITHIN time DAY
       HENCE hence
       LEST lest
-    ) <> deltaTick rules (Active activeRules) .
+    ) MEET deltaTick rules (Active activeRules) .
 
   ceq deltaTick rules
     Active (
@@ -177,7 +177,7 @@ load config
     then Active (getRulesWithNames rules lest)
     else Breached actorName
     fi
-  ) <> deltaTick rules (Active activeRules)
+  ) MEET deltaTick rules (Active activeRules)
   if deontic == MUST or deontic == MAY .
 
   eq deltaTick rules
@@ -190,7 +190,7 @@ load config
       LEST lest,
       activeRules
     )
-  = Active (getRulesWithNames rules hence) <>
+  = Active (getRulesWithNames rules hence) MEET
     deltaTick rules (Active activeRules) .
 
 ---(
@@ -214,13 +214,13 @@ load config
         LEST lest,
         activeRules
       ) >
-    (actorName did actionName)
+    actorName did actionName
   =>
     < actorName : Actor | >
     < machineState : AbstractMachineState |
       contractState :
         deltaAction rules (actorName did actionName) (Active activeRules) >
-    (actorName did actionName) .
+    actorName did actionName .
 
 ---(
   ----------------------------------- [tick]

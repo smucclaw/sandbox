@@ -115,7 +115,7 @@ load full-maude
     ie the contract is deemed to be fulfilled when there are no remaining
     active rules.
 
-  - (ContractState, <>, Fulfilled, Breached Actors) ~ (N, *, 1, 0)
+  - (ContractState, <>, Fulfilled, Breached Actors)
     is an abelian monoid with an absorbing element.
     Here Actors denotes the set of all Actors.
     This monoidal structure is based on the notion of contract composition and
@@ -162,7 +162,7 @@ load full-maude
   ops Fulfilled : -> ContractState [ctor] .
 
   ops _<>_ : ContractState ContractState -> ContractState
-    [assoc comm id: Fulfilled] .
+    [assoc comm idem id: Fulfilled] .
 
   vars activeRules activeRules' : Set{Rule} .
   vars actorNames actorNames' : Set{Qid} .

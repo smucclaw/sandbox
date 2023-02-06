@@ -144,16 +144,14 @@ load config
   eq deltaTick rules (Breached actorName) = Breached actorName .
 
   eq deltaTick rules
-    (
-      Active (
-        RULE ruleName
-        PARTY actorName
-        deontic DO actionName
-        WITHIN (s time) DAY
-        HENCE hence
-        LEST lest,
-        activeRules
-      )
+    Active (
+      RULE ruleName
+      PARTY actorName
+      deontic DO actionName
+      WITHIN (s time) DAY
+      HENCE hence
+      LEST lest,
+      activeRules
     )
   = Active (
       RULE ruleName
@@ -164,34 +162,36 @@ load config
       LEST lest
     ) <> deltaTick rules (Active activeRules) .
 
-  eq deltaTick rules
-    (
-      Active (
-        RULE ruleName
-        PARTY actorName
-        MUST DO actionName
-        WITHIN 0 DAY
-        HENCE empty
-        LEST lest,
-        activeRules
-      )
-    )
-  = Breached actorName .
-
   ceq deltaTick rules
-    (
-      Active (
-        RULE ruleName
-        PARTY actorName
-        deontic DO actionName
-        WITHIN 0 DAY
-        HENCE hence
-        LEST lest,
-        activeRules
-      )
+    Active (
+      RULE ruleName
+      PARTY actorName
+      deontic DO actionName
+      WITHIN 0 DAY
+      HENCE hence
+      LEST lest,
+      activeRules
     )
-  = deltaTick rules (Active activeRules)
-  if deontic == SHANT or deontic == MAY .
+  = (
+    if deontic == MAY or lest =/= empty
+    then Active (getRulesWithNames rules lest)
+    else Breached actorName
+    fi
+  ) <> deltaTick rules (Active activeRules)
+  if deontic == MUST or deontic == MAY .
+
+  eq deltaTick rules
+    Active (
+      RULE ruleName
+      PARTY actorName
+      SHANT DO actionName
+      WITHIN 0 DAY
+      HENCE hence
+      LEST lest,
+      activeRules
+    )
+  = Active (getRulesWithNames rules hence) <>
+    deltaTick rules (Active activeRules) .
 
 ---(
     there exists some active rule in machineState that

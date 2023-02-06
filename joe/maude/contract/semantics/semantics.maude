@@ -139,7 +139,7 @@ load config
   --- deltaTick is still a work in progress.
   ops deltaTick__ : Set{Rule} ContractState -> ContractState .
 
-  eq deltaTick rules (Active empty) = (Active empty) .
+  eq deltaTick rules Fulfilled = Fulfilled .
 
   eq deltaTick rules (Breached actorName) = Breached actorName .
 

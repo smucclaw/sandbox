@@ -93,7 +93,7 @@ load full-maude
   configurations as the initial algebra satisfying the equation
     ContractState = 2^Rule + 2^Actor + Fulfilled
   
-  In Haskell terms we have
+  In Haskell terms we have:
   data ContractState :: Type where
     Active :: Set{Rule} -> ContractState
     Breached :: Set{Actor} -> ContractState
@@ -109,14 +109,21 @@ load full-maude
   - Fulfilled indicates that there are no active rules remaining and that
     the contract has successfully terminated.
 
-  We equip ContractState with an equational theory axiomatizing:
+  Next we quotient the intial algbera ContractState by an equational theory
+  axiomatizing:
   - Fulfilled = Active empty
     ie the contract is deemed to be fulfilled when there are no remaining
-    rules active.
+    active rules.
+
   - a monoidal structure:
       (ContractState, <>, Fulfilled, Breached Actors) ~ (N, *, 1, 0)
     is an abelian monoid with an absorbing element.
     Here Actors denotes the set of all Actors.
+
+  Note that pattern matching/unification will be performed modulo this
+  equational theory.
+  This means that (f (Active ... <> Fulfilled)) will unify with an equation
+  of the form (f (Active ...)).
 
   We use this to define a timed transition system algebraically.
   That is, we define the action of the free monoid over the events

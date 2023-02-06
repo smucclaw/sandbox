@@ -32,11 +32,14 @@ load ./semantics/semantics
 
 (rewrite
   deltaAction
+  --- Collection of all rules in the contract.
   (
     RULE 'rule0 PARTY 'party SHANT DO 'action0 WITHIN 1 DAY HENCE empty LEST empty,
     RULE 'rule1 PARTY 'party MUST DO 'action1 WITHIN 1 DAY HENCE empty LEST empty
   )
+  --- Current action to be performed.
   'party do 'action0
+  --- Collection of currently active rule instances.
   Active (
     RULE 'rule0 PARTY 'party SHANT DO 'action0 WITHIN 1 DAY HENCE empty LEST empty,
     RULE 'rule1 PARTY 'party MUST DO 'action1 WITHIN 1 DAY HENCE empty LEST empty

@@ -115,15 +115,20 @@ load full-maude
     ie the contract is deemed to be fulfilled when there are no remaining
     active rules.
 
-  - a monoidal structure:
-      (ContractState, <>, Fulfilled, Breached Actors) ~ (N, *, 1, 0)
+  - (ContractState, <>, Fulfilled, Breached Actors) ~ (N, *, 1, 0)
     is an abelian monoid with an absorbing element.
     Here Actors denotes the set of all Actors.
+    This monoidal structure is based on the notion of contract composition and
+    verdict cojunction in definition 2.2.6 of Hvitved's PHD thesis on CSL:
+    https://di.ku.dk/english/research/phd/phd-theses/2011/hvitved12phd.pdf
+    Indeed, the idea is that we can decompose the current state of a contract
+    by partitioning the set of active rule instances and taking each of these
+    subsets to be a sub-contract.
 
   Note that pattern matching/unification will be performed modulo this
   equational theory.
-  This means that (f (Active ... <> Fulfilled)) will unify with an equation
-  of the form (f (Active ...)).
+  This means that (f (Active activeRules <> Fulfilled)) will unify with an equation
+  of the form (f (Active activeRules)).
 
   We use this to define a timed transition system algebraically.
   That is, we define the action of the free monoid over the events
@@ -156,7 +161,8 @@ load full-maude
   ops Breached_ : Set{Qid} -> ContractState [ctor] .
   ops Fulfilled : -> ContractState [ctor] .
 
-  ops _<>_ : ContractState ContractState -> ContractState [assoc comm id: Fulfilled] .
+  ops _<>_ : ContractState ContractState -> ContractState
+    [assoc comm id: Fulfilled] .
 
   vars activeRules activeRules' : Set{Rule} .
   vars actorNames actorNames' : Set{Qid} .

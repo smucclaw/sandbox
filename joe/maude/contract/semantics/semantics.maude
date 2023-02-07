@@ -81,17 +81,6 @@ load config
   eq getRulesWithNames rules (ruleName, ruleNames)
   = getRulesWithNames rules ruleNames [owise].
 
----(
-  Note:
-  Observe that if we define a function say
-    del1 empty = empty
-    del1 (x, xs) = del xs
-  we can get the infinite loop:
-  del1 0 = del1 (0, 0) --> del 0 = del (0, 0) --> ...
-  We need to add an additional constraint to the unification procedure that is
-  performed during pattern matching.
-  More precisely, we need to say that x should not be contained in xs.
-)
   ops deltaAction___ : Set{Rule} ActionEvent ContractState -> ContractState .
 
   eq deltaAction rules actionEvent Fulfilled = Fulfilled .
@@ -199,7 +188,11 @@ load config
   ----------------------------------------------------- [action]
   { actorName, machineState, ... }
   -- actorName does actionName -->
-  { actorName, machineState[activeRules := activeRules \ { R \in activeRules | R mentions the event }] }
+  { actorName, machineState[activeRules := deltaAction activeRules], ... }
+  
+  Here, deltaAction is a function that when given a set of active rules,
+  activeRules, it returns the new set of active rules, namely:
+    { R \in activeRules | R mentions the event (actorName does actionName)}
 )
   rl [action] :
     < actorName : Actor | >

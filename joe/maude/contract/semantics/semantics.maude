@@ -214,6 +214,8 @@ load transpiler
     < machineState : AbstractMachineState |
       contractState :
         deltaAction rules (actorName does actionName)
+          --- Kinda annoying to have to copy and paste this whole block.
+          --- Does Maude have @ as-patterns ala Haskell to alleviate this?
           Active (
             RULE ruleName
             PARTY actorName

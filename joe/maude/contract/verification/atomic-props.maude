@@ -12,8 +12,8 @@ load ../semantics/semantics
   subsorts ActionEvent < Prop .
 
   --- ops Top : -> Prop .
-  ops _allowedToDo_ : Oid Oid -> Prop .
-  ops _prohibitedFromDoing_ : Oid Oid -> Prop .
+  ops _allowedToDo_ : Qid Qid -> Prop .
+  ops _prohibitedFromDoing_ : Qid Qid -> Prop .
   --- ops raceCond_ : ActionEvent -> Formula .
 
   vars config : Configuration .

@@ -154,9 +154,8 @@ endom)
     or-else
       --- O
       all ;
-      --- X
+      --- X)
       simple(cap) .
-    --- )
 
 endsm)
 

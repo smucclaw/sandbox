@@ -3,7 +3,11 @@
 --- endv
 
 fmod RULE is
-  protecting BOOL + STRING + NAT + QID  + SET{Qid} .
+  protecting BOOL .
+  protecting STRING .
+  protecting NAT .
+  protecting QID .
+  protecting SET{Qid} .
 
   sorts
     Rule RuleName ActorName Deadline ActionName Deontic Date Duration

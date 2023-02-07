@@ -1,6 +1,7 @@
-load config
+load transpiler
 
 (omod SEMANTICS is
+  protecting TRANSPILER .
   protecting CONFIG .
 
   subsorts Qid < Oid .
@@ -192,7 +193,7 @@ load config
   
   Here, deltaAction is a function that when given a set of active rules,
   activeRules, it returns the new set of active rules, namely:
-    { R \in activeRules | R mentions the event (actorName does actionName)}
+    { R \in activeRules | R does mentions the event (actorName does actionName)}
 )
   rl [action] :
     < actorName : Actor | >
@@ -207,13 +208,22 @@ load config
         LEST lest,
         activeRules
       ) >
-    actorName did actionName
+    event
   =>
     < actorName : Actor | >
     < machineState : AbstractMachineState |
       contractState :
-        deltaAction rules (actorName did actionName) (Active activeRules) >
-    actorName did actionName .
+        deltaAction rules (actorName does actionName)
+          Active (
+            RULE ruleName
+            PARTY actorName
+            deontic DO actionName
+            WITHIN time DAY
+            HENCE hence
+            LEST lest,
+            activeRules
+          ) >
+    actorName does actionName .
 
 ---(
   ----------------------------------- [tick]

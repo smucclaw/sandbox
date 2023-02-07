@@ -1,62 +1,56 @@
 --- load ./semantics/transpiler
-load ./semantics/semantics
---- load ./semantics/rewrite-trace-strat
+--- load ./semantics/semantics
+load ./semantics/rewrite-trace-strat
 --- load ./verification/race-cond-strat
 
----(rewrite
+(srewrite
   transpile (
+    RULE 'START
+    PARTY 'party0
+    MUST DO 'action0
+    WITHIN 1 DAY
+    HENCE ('rule1, 'rule2)
+    LEST 'rule3,
+
     RULE 'rule1
-    PARTY 'party
-    MUST DO 'action
-    WITHIN 1 YEAR
-    HENCE 'hence
-    LEST 'lest,
+    PARTY 'party1
+    MAY DO 'action1
+    WITHIN 1 DAY
+    HENCE empty
+    LEST empty,
 
     RULE 'rule2
-    PARTY 'party
-    SHANT DO 'action
-    BY 10
-    HENCE 'hence
-    LEST 'lest,
+    PARTY 'party2
+    SHANT DO 'action2
+    WITHIN 2 DAY
+    HENCE empty
+    LEST empty,
 
     RULE 'rule3
-    PARTY 'someone
-    MAY DO 'action
-    WITHIN 2 DAY
-    HENCE 'hence
-    LEST 'lest
+    PARTY 'party3
+    MAY DO 'action3
+    WITHIN 3 DAY
+    HENCE empty
+    LEST empty
+  )
+  using rewriteTrace(
+    --- emptyEventTrace
+    tick ++ ('party0 does 'action0) ++ ('party1 does 'action1) ++ tick ++ tick ++ tick
   )
 .)
-
---- (rewrite Active empty <> Active empty .)
 
 ---(rewrite
-  deltaAction
-  --- Collection of all rules in the contract.
-  (
-    RULE 'rule0 PARTY 'party SHANT DO 'action0 WITHIN 1 DAY HENCE empty LEST empty,
-    RULE 'rule1 PARTY 'party MUST DO 'action1 WITHIN 1 DAY HENCE empty LEST empty
-  )
-  --- Current action to be performed.
-  'party do 'action0
-  --- Collection of currently active rule instances.
-  Active (
-    RULE 'rule0 PARTY 'party SHANT DO 'action0 WITHIN 1 DAY HENCE empty LEST empty,
-    RULE 'rule1 PARTY 'party MUST DO 'action1 WITHIN 1 DAY HENCE empty LEST empty
-  )
-.)
-
-(rewrite
   deltaTick
   --- Collection of all rules in the contract.
   (
-    RULE 'rule0 PARTY 'party SHANT DO 'action0 WITHIN 2 DAY HENCE empty LEST empty,
-    RULE 'rule1 PARTY 'party MUST DO 'action1 WITHIN 1 DAY HENCE empty LEST empty
+    RULE 'START PARTY 'party0 MUST DO 'action0 WITHIN 1 DAY HENCE empty LEST ('rule1, 'rule2),
+    RULE 'rule1 PARTY 'party1 MAY DO 'action1 WITHIN 1 DAY HENCE empty LEST empty,
+    RULE 'rule2 PARTY 'party2 SHANT DO 'action2 WITHIN 1 DAY HENCE empty LEST empty,
+    RULE 'rule3 PARTY 'party3 MAY DO 'action2 WITHIN 1 DAY HENCE empty LEST empty
   )
   --- Collection of currently active rule instances.
   Active (
-    RULE 'rule0 PARTY 'party SHANT DO 'action0 WITHIN 1 DAY HENCE empty LEST empty,
-    RULE 'rule1 PARTY 'party MUST DO 'action1 WITHIN 0 DAY HENCE empty LEST empty
+    RULE 'START PARTY 'party MUST DO 'action0 WITHIN 0 DAY HENCE empty LEST ('rule1, 'rule2),
   )
 .)
 

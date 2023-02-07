@@ -26,7 +26,7 @@ load config
     < 'machineState : AbstractMachineState |
       rules : rules,
       time : 0,
-      contractState : empty > .
+      contractState : Active (getRulesWithNames rules 'START) > .
 
   eq transpileAux empty config = tau config .
 
@@ -47,10 +47,10 @@ load config
     config
   = transpileAux rules config'
   if config' := config
-      if config containsActor actorName
-      then none
-      else < actorName : Actor | none >
-      fi .
+    if config containsActor actorName
+    then none
+    else < actorName : Actor | none >
+    fi .
 
   eq (< actorName : Actor | > config) containsActor actorName = true .
   eq config containsActor actorName = false [owise] .

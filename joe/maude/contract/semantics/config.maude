@@ -74,7 +74,8 @@ load full-maude
 (omod CONFIG is
   protecting PRELUDE .
   protecting SET{Rule} .
-  protecting QID + SET{Qid} .
+  protecting QID .
+  protecting SET{Qid} .
 
   subsorts Qid < Oid < Id .
   subsorts Message < Msg .
@@ -82,6 +83,38 @@ load full-maude
   sorts ActorState ContractState .
 
   class Actor .
+
+  vars ruleName actorName actionName : Qid .
+  vars hence lest ruleNames : Set{Qid} .
+  vars deontic : Deontic .
+  vars rules : Set{Rule} .
+  vars deadline : Deadline .
+
+  ops getRulesWithNames__ : Set{Rule} Set{Qid} -> Set{Rule} .
+
+  eq getRulesWithNames rules empty = empty .
+
+  eq getRulesWithNames
+    (
+      RULE ruleName
+      PARTY actorName
+      deontic DO actionName
+      deadline
+      HENCE hence
+      LEST lest,
+      rules
+    )
+    (ruleName, ruleNames)
+  = RULE ruleName
+    PARTY actorName
+    deontic DO actionName
+    deadline
+    HENCE hence
+    LEST lest,
+    getRulesWithNames rules ruleNames .
+
+  eq getRulesWithNames rules (ruleName, ruleNames)
+  = getRulesWithNames rules ruleNames [owise] .
 
   --- class StatefulActor |
   ---   state : ActorState .

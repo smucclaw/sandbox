@@ -89,63 +89,129 @@ load full-maude
   --- subclass StatefulActor < Actor .
 
 ---(
-  With respect to a collection of rules, we define the set of runtime contract
-  configurations as an algebra.
-  We do so by piggy backing on the denotational (aka model theoretic) semantics
-  of Maude's equational theories.
-  Basically, the idea is that Maude's model theory is grounded in
-  universal algebra with a splash of category theory, and this provides a
-  FOL-based treatment of algebraic structures like monoids etc.
-  
-  In universal algebra terms, the canonical model of an equational theory is
-  the free term algebra, quotiened out by equivalence classes formed by the
-  equations in the theory.
-  All other models are isomorphic to this one anyway.
-  FOr more details of this construction, see Henkin-style proofs of the
-  completeness theorem for FOL.
-  In other words, from a logical pov, we can define an algebraic structure by
-  defining a first-order signature and then axiomatizing it via some equations.
+  Maude allows us to do algebra-driven design ala Haskell, except that
+  instead of using typeclasses, we encode algebras and perform computations with
+  them by piggy backing on its denotational semantics.
 
-  Here, we encode the following algebra as an object theory in the equational
-  fragment of Maude:
-  - Signature:
-    - Active : Set{Rule} -> ContractState
-    - Breached : Set{Actor} -> ContractState
-    - Fulfilled : ContractState
+  This denotational semantics is grounded in universal algebra, which is
+  essentially the model theory of algebraic structures.
+  From this pov, an algebraic structure is a model of an equational theory
+  (ie a first-order theory comprising a bunch of equations).
+  For instance, consider semigroups, which have a signature comprising a single
+  binary operator <> .
+  The accompanying equational theory comprises a single equation axiomatizing
+  the associativity of <>:
+    \forall x y z. (x <> (y <> z) = (x <> y) <> z)
+  A semigroup is then a model of this theory, ie a structure satisfying this
+  equation.
 
-    A contract state of the form:
-    - (Active activeRules) represents the rules that are currently active at that
-      point in the contract, along with their timer values
-    - (Breached actors) represents the set of actors who breached the contract
-      (ie unsuccessful termination)
-    - Fulfilled indicates that there are no active rules remaining and that
-      the contract has successfully terminated.
-
-  - Equations axiomatizing:
-    - Fulfilled = Active empty
-      This says that the contract is deemed to be fulfilled when there are no 
-      remaining active rules.
-    - (ContractState, MEET, Fulfilled) is a monoid where
-      - Actors is the set of all actors.
-      - MEET is the meet of the complete (prob distributive as well) lattice given
-        by the linear order:
-          Breached actors ⊑ contractState
-          Breached actors ⊑ Active activeRules
-          contractState ⊑ Fulfilled (= Active empty)
+  Maude allows us to encode both the algebraic signatures and the accompanying
+  equational theory.
+  Denotationally, these are then interpreted as algebraic structures which are
+  models of the equational theories.
+  This denotational/model theoretic semantics is what enables the tight
+  integration with SMT solving procedures.
 
   Note that:
-  - Only the monoidal structure is encoded in the object theory which is in turn
-    formalized in Maude.
-    The lattice sturcture exists in our meta-theory and not in the object
-    equational theory that is encoded into Maude.
-  - This lattice structure is based on section 2 of Hvitved's PHD thesis on CSL:
+  - In universal algebra terms, the canonical model of an equational theory is
+    the free term algebra, quotiened out by equivalence classes formed by the
+    equations in the theory.
+    All other models are isomorphic to this one anyway.
+    This is the same idea employed in Henkin-style proofs of the completeness
+    theorem for FOL.
+
+  - Maude goes beyond traditional first-order model theory in that it allows
+    for multiple sorts, augmented subsort (aka subset) relation, like we have
+    in babyl4.
+    Models of these theories are known as order-sorted algebraic structures.
+
+  - One can also encode algebraic data types like lists and compute with them:
+    For (cons) lists over a type T, we have the following signature:
+    - nil : -> List{T}
+      is a nullary operator denoting the null constructor.
+    - cons: T List{T} -> List{T}
+      is a binary operator for the cons constructor.
+    For the equations, we can define some recursive functions like concat by
+    adding the following equations into our theory:
+      concat(L1, nil) = L1
+      concat(nil, L2) = L2
+      concat(cons(x, L1), L2) = cons(x, concat(L1, L2))
+    giving us a new signature comprising nil, cons and concat.
+
+    Operationally, we can view these equations as rewriting rules and compute
+    with them by rewriting from left to right.
+    This gives us a small-step semantics that matches up nicely with the style
+    of computation as found in functional programming languages like Haskell.
+    
+    As for the denotational semantics, we view this as an equational theory with
+    equations defining the recursive function concat.
+    This allows us to interpret the theory, denotationally, as an initial
+    F-algebra, an algebraic structure from category theory land.
+    Initial algebras are basically least fixed points and form the foundation
+    of inductive data types in functional programming languages like Haskell,
+    see for intance:
+    https://libres.uncg.edu/ir/asu/f/Johann_Patricia_2007_Intitial%20Algebra%20Semantics%20Is%20Enough.pdf
+
+    Initial algrebras are characterized by their universal property which says
+    that the only way of defining a function over an initial algebra is via a
+    fold, ie primitive recursion.
+    Indeed, from a functional programming pov, interpreting algebraic data types
+    as initial algebras enables the automatic derivation of foldable typeclass
+    instances.
+    One can easily prove that this is equivalent to the "no junk" and
+    "no confusion" properties of constructors of algebraic data types.
+    From a logical pov, the "no junk" property rules out nonstandard models.
+
+  With respect to a collection of rules, we define the set of runtime contract
+  configurations, ContractState, as an algebra.
+  As above, we encode this as an object theory in Maude's equational logic.
+  This will then be interpreted via Maude's universal algebraic denotational
+  semantics as an algebra.
+  
+  For the signature, we have 2 unary and 1 nullary operators which can be viewed
+  as data constructors:
+    Active : Set{Rule} -> ContractState
+    Breached : Set{Actor} -> ContractState
+    Fulfilled : -> ContractState
+
+  A contract state of the form:
+  - (Active activeRules) represents the rules that are currently active at that
+    point in the contract, along with their timer values
+  - (Breached actors) represents the set of actors who breached the contract
+    (ie unsuccessful termination)
+  - Fulfilled indicates that there are no active rules remaining and that
+    the contract has successfully terminated.
+
+  Next we have a (infix) binary operator:
+    _^_ : ContractState ContractState -> ContractState
+
+  For the equations, we axiomatize the following:
+  - Fulfilled = Active empty
+    This says that the contract is deemed to be fulfilled when there are no 
+    remaining active rules.
+  - (ContractState, ^, Fulfilled) is an abelian monoid where
+    - Breached Actors is an absorbing element.
+      Here, Actors is the set of all actors.
+    - ^ is the meet of the complete (likely distributive as well) lattice given
+      by the linear order:
+        Breached actors ⊑ contractState
+        Breached actors ⊑ Active activeRules
+        contractState ⊑ Fulfilled (= Active empty)
+    The lattice structure is inspired by and closely resembls that in chapter 2
+    of Hvitved's PHD thesis:
     https://di.ku.dk/english/research/phd/phd-theses/2011/hvitved12phd.pdf
+
+  Note that:
+  - Only the monoidal structure is formalized in the object theory which is in
+    turn encoded in Maude.
+    The lattice sturcture exists in our meta-theory and not in the object
+    theory.
   - The monoidal structure:
     - is abelian and contains a zero element due to the lattice structure.
     - is important because we actually use it to do foldMap things and pattern
       matching modulo associativity, commutativity, idempotence and identity.
       This means that when we do pattern matching on this algebra,
-      (f (Active activeRules MEET Fulfilled)) will unify with a term of the
+      (f (Active activeRules ^ Fulfilled)) will unify with a term of the
       form (f (Active activeRules)).
 
   We use this to define a timed transition system algebraically.
@@ -170,7 +236,7 @@ load full-maude
   These can either be:
   - (Active activeRules) a set of rules to activate.
   - (Breached actors) a breached state indicating the actors who breached the contract.
-  Thereafter, we combine them together by taking their MEET.
+  Thereafter, we combine them together by taking their ^.
 )
 
   ops Active_ : Set{Rule} -> ContractState [ctor] .
@@ -180,7 +246,7 @@ load full-maude
   ops Breached_ : Set{Qid} -> ContractState [ctor] .
   ops Fulfilled : -> ContractState [ctor] .
 
-  ops _MEET_ : ContractState ContractState -> ContractState
+  ops _^_ : ContractState ContractState -> ContractState
     [assoc comm idem id: Fulfilled] .
 
   vars activeRules activeRules' : Set{Rule} .
@@ -188,12 +254,12 @@ load full-maude
 
   eq Active empty = Fulfilled .
 
-  eq Active activeRules MEET Active activeRules'
+  eq Active activeRules ^ Active activeRules'
   = Active (activeRules, activeRules') .
 
   --- Absorption properties.
-  eq Breached actorNames MEET Active activeRules = Breached actorNames .
-  eq Breached actorNames MEET Breached actorNames'
+  eq Breached actorNames ^ Active activeRules = Breached actorNames .
+  eq Breached actorNames ^ Breached actorNames'
   = Breached (actorNames, actorNames') .
 
   --- class Situation .

@@ -197,9 +197,14 @@ load full-maude
         Breached actors ⊑ contractState
         Breached actors ⊑ Active activeRules
         contractState ⊑ Fulfilled (= Active empty)
-    The lattice structure is inspired by and closely resembls that in chapter 2
-    of Hvitved's PHD thesis:
+    Originally, I (Joe) came up with the monoid operator to do foldMap things
+    but after defining it a bit more, I realized that it comes from a
+    lattice structure that closely resembles that in chapter 2 of Hvitved's
+    PHD thesis:
     https://di.ku.dk/english/research/phd/phd-theses/2011/hvitved12phd.pdf
+    In other words, I somehow reinvented similar notion of contract
+    composition, with the differnece being that I'm working with runtime
+    configurations (ie small step) instead of final verdicts (ie big step).
 
   Note that:
   - Only the monoidal structure is formalized in the object theory which is in

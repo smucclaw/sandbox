@@ -187,9 +187,9 @@ load transpiler
     there exists some active rule in machineState that
     is fulfilled/breached when the action is taken
   ----------------------------------------------------- [action]
-  { actorName, machineState, ... }
+  { actorName, machineState } \/ config
   -- actorName does actionName -->
-  { actorName, machineState[activeRules := deltaAction activeRules], ... }
+  { actorName, machineState[activeRules := deltaAction activeRules] } \/ config
   
   Here, deltaAction is a function that when given a set of active rules,
   activeRules, it returns the new set of active rules, namely:
@@ -229,9 +229,9 @@ load transpiler
 
 ---(
   ----------------------------------- [tick]
-  { machineState, ... }
+  { machineState } \/ config
   -- tick -->
-  { machineState[activeRules := deltaTick activeRules]}
+  { machineState[activeRules := deltaTick activeRules] } \/ config
 
   Here deltaTick is a function that:
   - removes all active rule instances with a timer of 0

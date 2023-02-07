@@ -29,17 +29,6 @@
   framework.
 \newblock {\em Information Systems Frontiers 18\/} (05 2015).
 
-\bibitem{prob_initial_paper}
-{\sc Leuschel, M., and Butler, M.}
-\newblock Pro{B}: A model checker for {B}.
-\newblock In {\em FME 2003: Formal Methods\/} (2003), K.~Araki, S.~Gnesi, and
-  D.~Mandrioli, Eds., LNCS 2805, Springer-Verlag, pp.~855--874.
-
-\bibitem{prob_follow_up_paper}
-{\sc Leuschel, M., and Butler, M.~J.}
-\newblock {ProB}: an automated analysis toolset for the {B} method.
-\newblock {\em STTT 10}, 2 (2008), 185--203.
-
 \bibitem{symboleo_model_checking_contracts}
 {\sc Parvizimosaed, A., Roveri, M., Rasti, A., Amyot, D., Logrippo, L., and
   Mylopoulos, J.}

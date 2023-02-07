@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022/Arch Linux) (preloaded format=pdflatex 2022.11.8)  11 JAN 2023 16:45
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022/Arch Linux) (preloaded format=pdflatex 2022.11.8)  7 FEB 2023 20:54
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -729,7 +729,7 @@ LaTeX Font Info:    Trying to load font information for U+esvect on input line 1
  (/usr/share/texmf-dist/tex/latex/esvect/uesvect.fd
 File: uesvect.fd 
 )
-Package hyperref Info: bookmark level for unknown todo defaults to 0 on input line 21.
+Package hyperref Info: bookmark level for unknown todo defaults to 0 on input line 18.
  (./main.toc)
 \tf@toc=\write6
 \openout6 = `main.toc'.
@@ -738,21 +738,21 @@ Package hyperref Info: bookmark level for unknown todo defaults to 0 on input li
 
 {/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}] [2] [3] [4] [5] [6] (./main.bbl) [7] (./main.aux)
 Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: D72777FA62BD1F5227C29E951D5AD88F;2464.
+(rerunfilecheck)             Checksum: C925B7FFC7F0059B7AB010C598B7F244;2461.
  ) 
 Here is how much of TeX's memory you used:
- 28160 strings out of 478238
- 538450 string characters out of 5850456
- 804899 words of memory out of 5000000
- 45831 multiletter control sequences out of 15000+600000
+ 28156 strings out of 478238
+ 538360 string characters out of 5850456
+ 804821 words of memory out of 5000000
+ 45829 multiletter control sequences out of 15000+600000
  480995 words of font info for 81 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 105i,7n,107p,1276b,873s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 105i,7n,107p,1284b,873s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/share/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc}</usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmcsc10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/share/texmf-dist/fonts/type1/public/cm-super/sfrm1000.pfb>
-Output written on main.pdf (7 pages, 145032 bytes).
+Output written on main.pdf (7 pages, 143787 bytes).
 PDF statistics:
- 190 PDF objects out of 1000 (max. 8388607)
- 161 compressed objects within 2 object streams
- 35 named destinations out of 1000 (max. 500000)
+ 186 PDF objects out of 1000 (max. 8388607)
+ 157 compressed objects within 2 object streams
+ 33 named destinations out of 1000 (max. 500000)
  117 words of extra memory for PDF output out of 10000 (max. 10000000)
 

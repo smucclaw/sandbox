@@ -103,8 +103,8 @@ load transpiler
   if actionEvent := actorName do actionName
   /\ deontic == MUST or deontic == MAY .
 
-  ceq deltaAction rules
-    actionEvent
+  eq deltaAction rules
+    (actorName do actionName)
     Active (
       RULE ruleName
       PARTY actorName
@@ -119,11 +119,11 @@ load transpiler
     then Breached actorName
     else Active (getRulesWithNames rules lest)
     fi
-  ) ^ deltaAction rules actionEvent (Active activeRules)
-  if actionEvent := actorName do actionName .
+  ) ^ deltaAction rules (actorName do actionName) (Active activeRules) .
 
   eq deltaAction rules actionEvent Active (activeRule, activeRules)
-  = Active activeRule ^ deltaAction rules actionEvent (Active activeRules) [owise] .
+  = Active activeRule ^ deltaAction rules actionEvent (Active activeRules)
+    [owise] .
 
   --- deltaTick is still a work in progress.
   ops deltaTick__ : Set{Rule} ContractState -> ContractState .
@@ -186,13 +186,16 @@ load transpiler
     there exists some active rule in coordinator that
     is fulfilled/breached when the action is taken
   ----------------------------------------------------- [action]
-  { actorName, coordinator } \/ config
+  { actorName, coordinator } \/ actorNames
   -- actorName does actionName -->
-  { actorName, coordinator[activeRules := deltaAction activeRules] } \/ config
+  { actorName, coordinator[activeRules := deltaAction activeRules] } \/ actorNames
 
-  Here, deltaAction is a function that when given a set of active rules,
-  activeRules, it returns the new set of active rules, namely:
-    { R \in activeRules | R does mentions the event (actorName does actionName)}
+  Here,
+  - actorNames refers to the set of actor names in the abstract machine.
+  - The "O[x := y]" notation means update the field x in the object/record O to y.
+  - deltaAction is a function that when given a set of active rules,
+    activeRules, it returns the new set of active rules, namely:
+      { R \in activeRules | R does mentions the event (actorName does actionName)}
 )
   rl [action] :
     < actorName : Actor | >
@@ -228,23 +231,22 @@ load transpiler
 
 ---(
   ----------------------------------- [tick]
-  { coordinator } \/ config
+  { coordinator } \/ actorNames
   -- tick -->
-  { coordinator[activeRules := deltaTick activeRules] } \/ config
+  { coordinator[activeRules := deltaTick activeRules, time := time + 1] } \/ actorNames
 
   Here deltaTick is a function that:
   - removes all active rule instances with a timer of 0
   - decrements all active rule instances with a positive timer
 )
-  crl [tick] :
+  rl [tick] :
     < coordinator : Coordinator |
       rules : rules,
       time : time,
-      contractState : Active activeRules >
+      contractState : Active (activeRule, activeRules) >
   =>
     < coordinator : Coordinator |
-      time : s time,
-      contractState : deltaTick rules (Active activeRules) >
-  if activeRules =/= empty .
+      time : time + 1,
+      contractState : deltaTick rules Active (activeRule, activeRules) > .
 
 endom)

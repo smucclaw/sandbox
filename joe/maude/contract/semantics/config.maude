@@ -89,6 +89,7 @@ load full-maude
   vars deontic : Deontic .
   vars rules : Set{Rule} .
   vars deadline : Deadline .
+  vars contractState : ContractState .
 
   ops getRulesWithNames__ : Set{Rule} Set{Qid} -> Set{Rule} .
 
@@ -285,19 +286,23 @@ load full-maude
   ops Fulfilled : -> ContractState [ctor] .
 
   ops _^_ : ContractState ContractState -> ContractState
-    [assoc comm idem id: Fulfilled] .
+    [assoc comm id: Fulfilled] .
 
   vars activeRules activeRules' : Set{Rule} .
   vars actorNames actorNames' : Set{Qid} .
 
   eq Active empty = Fulfilled .
 
-  eq Active activeRules ^ Active activeRules'
+  --- Idempotence because the monoid op is actually a lattice meet.
+  eq contractState ^ contractState = contractState .
+
+  ceq Active activeRules ^ Active activeRules'
   = Active (activeRules, activeRules') .
 
   --- Absorption properties.
   eq Breached actorNames ^ Active activeRules = Breached actorNames .
-  eq Breached actorNames ^ Breached actorNames'
+
+  ceq Breached actorNames ^ Breached actorNames'
   = Breached (actorNames, actorNames') .
 
   --- class Situation .

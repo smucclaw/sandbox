@@ -2,6 +2,10 @@
 ---   sort Elt to Set`{Qid`} .
 --- endv
 
+---(
+  List -- quotient by associativity and commutativity of concat --> finite multiset
+       -- quotient by idempotence of concat --> finite set 
+)
 fmod NAMES is
   protecting QID .
   protecting SET{Qid} .
@@ -28,7 +32,7 @@ fmod RULE is
 
   sorts
     Rule RuleName ActorName Deadline ActionName Deontic Date Duration
-    Situation .
+    Situation DeonticActionNameDeadline .
 
   subsorts Qid Bool < Situation .
 
@@ -38,6 +42,10 @@ fmod RULE is
   SHANT -- prohibition
 )
   ops MUST MAY SHANT : -> Deontic [ctor] .
+
+  ops __DO_ : Deontic Deadline Qid -> DeonticActionNameDeadline [ctor] .
+
+  ops _DO__ : Deontic Qid Deadline -> DeonticActionNameDeadline [ctor] .
 
 ---(
   BY is for dates, ie absolute deadlines
@@ -54,22 +62,24 @@ fmod RULE is
   ---   Qid Situation Situation Qid Deontic Qid Deadline
   ---   Situation Situation -> Rule [ctor] .
 
-  ops RULE_PARTY__DO__HENCE_LEST_ :
-    Qid Qid Deontic Qid Deadline Set{Qid} Set{Qid} -> Rule [ctor] .
+  ops RULE_PARTY__HENCE_LEST_ :
+    Qid Qid DeonticActionNameDeadline Set{Qid} Set{Qid} -> Rule [ctor] .
 
-  ops RULE_PARTY__DO__ :
-    Qid Qid Deontic Qid Deadline -> Rule [ctor] .
+  ops RULE_PARTY__ :
+    Qid Qid DeonticActionNameDeadline -> Rule [ctor] .
 
-  ops RULE_PARTY__DO__HENCE_ :
-    Qid Qid Deontic Qid Deadline Set{Qid} -> Rule [ctor] .
+  ops RULE_PARTY__HENCE_ :
+    Qid Qid DeonticActionNameDeadline Set{Qid} -> Rule [ctor] .
 
-  ops RULE_PARTY__DO__LEST_ :
-    Qid Qid Deontic Qid Deadline Set{Qid} -> Rule [ctor] .
+  ops RULE_PARTY__LEST_ :
+    Qid Qid DeonticActionNameDeadline Set{Qid} -> Rule [ctor] .
 
   vars ruleName actorName actionName : Qid .
   vars deontic : Deontic .
   vars deadline : Deadline .
   vars hence lest : Set{Qid} .
+
+  eq deontic deadline DO actionName = deontic DO actionName deadline .
 
   eq
     RULE ruleName

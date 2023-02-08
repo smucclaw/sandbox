@@ -6,15 +6,24 @@ load ./semantics/rewrite-trace-strat
   - place <-> rule
   - transition <-> action or timeout event
 
-  Eg:
-  (START) --> [party0 does action0] --> (rule0) (rule1)
-          --> [timeout] --> (rule2)
-
   If there is a missing HENCE or LEST clause, we use either:
   - a dead sink place if the contract is not yet breached, or
   - a breach place that:
     - denotes the actor in breach of the contract
-    - contains inhibitor arcs to all transitions.
+    - contains inhibitor arcs to all transitions
+
+  Eg:
+  (START) --> [party0 does action0] --> (rule0) (rule1)
+          --> [timeout] --> (rule2)
+
+  (rule1) --> [party1 does action1] --> (rule3)
+          --> [timeout] --> (Breached party1)
+
+  (rule2) --> [party2 does action2] --> ()
+          --> [timeout] --> (rule3)
+
+  (rule3) --> [party3 does action3] --> ()
+          --> [timeout] --> (Breached party3)
 )
 (srewrite
   transpile (

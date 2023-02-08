@@ -58,6 +58,8 @@ load atomic-props
 
   sd raceCondAux(actorName does actionName) :=
     all * ;
+    match config s.t.
+      config |= actorName allowedToDo actionName ;
     action[actorName <- actorName, actionName <- actionName] ;
     all * ;
     match config s.t.

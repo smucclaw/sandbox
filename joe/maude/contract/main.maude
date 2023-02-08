@@ -5,37 +5,16 @@ load ./semantics/rewrite-trace-strat
 
 (srewrite
   transpile (
-    RULE 'START
-    PARTY 'party0
-    MUST DO 'action0
-    WITHIN 1 DAY
-    HENCE ('rule1, 'rule2)
-    LEST 'rule3,
+    RULE 'START PARTY 'party0 MUST DO 'action0 WITHIN 1 DAY HENCE ('rule0, 'rule1) LEST 'rule2,
 
-    RULE 'rule1
-    PARTY 'party1
-    MAY DO 'action1
-    WITHIN 1 DAY
-    HENCE empty
-    LEST empty,
+    RULE 'rule0 PARTY 'party0 SHANT DO 'action0 WITHIN 1 DAY HENCE empty LEST empty,
 
-    RULE 'rule2
-    PARTY 'party2
-    SHANT DO 'action2
-    WITHIN 2 DAY
-    HENCE empty
-    LEST empty,
+    RULE 'rule1 PARTY 'party1 MUST DO 'action1 WITHIN 2 DAY HENCE empty LEST empty,
 
-    RULE 'rule3
-    PARTY 'party3
-    MAY DO 'action3
-    WITHIN 3 DAY
-    HENCE empty
-    LEST empty
+    RULE 'rule2 PARTY 'party2 MAY DO 'action2 WITHIN 3 DAY HENCE empty LEST empty
   )
   using rewriteTrace(
-    --- emptyEventTrace
-    tick ++ ('party0 does 'action0) ++ ('party1 does 'action1) ++ tick ++ tick ++ tick
+    tick ++ ('party0 does 'action0) ++ ('party1 does 'action1) ++ tick ++ ('party0 does 'action0)
   )
 .)
 

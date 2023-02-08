@@ -293,16 +293,13 @@ load full-maude
 
   eq Active empty = Fulfilled .
 
-  --- Idempotence because the monoid op is actually a lattice meet.
-  eq contractState ^ contractState = contractState .
-
-  ceq Active activeRules ^ Active activeRules'
+  eq Active activeRules ^ Active activeRules'
   = Active (activeRules, activeRules') .
 
   --- Absorption properties.
   eq Breached actorNames ^ Active activeRules = Breached actorNames .
 
-  ceq Breached actorNames ^ Breached actorNames'
+  eq Breached actorNames ^ Breached actorNames'
   = Breached (actorNames, actorNames') .
 
   --- class Situation .

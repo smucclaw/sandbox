@@ -11,12 +11,12 @@ load ../rewrite-trace-strat
   strat raceCond : Set{Rule} @ Configuration .
   strat raceCondAux : ActionEvent @ Configuration .
 
-  vars actorName actionName ruleName hence lest coordinator : Qid .
+  vars actorName actionName ruleName coordinator : Qid .
+  vars hence lest : Set{Qid} .
   vars time : Nat .
   vars deontic : Deontic .
   vars deadline : Deadline .
-  vars activeRules : Set{Rule} .
-  vars rules : Set{Rule} .
+  vars activeRules rules : Set{Rule} .
   vars config : Configuration .
 
   sd raceCond(empty) := idle .
@@ -25,37 +25,13 @@ load ../rewrite-trace-strat
     (
       RULE ruleName
       PARTY actorName
-      SHANT DO actionName
+      deontic DO actionName
       deadline
       HENCE hence
       LEST lest,
       rules
     )
   ) := raceCondAux(actorName does actionName) | raceCond(rules) .
-
-  sd raceCond(
-    (
-      RULE ruleName
-      PARTY actorName
-      MAY DO actionName
-      deadline
-      HENCE hence
-      LEST lest,
-      rules
-    )
-  ) := raceCond(rules) .
-
-  sd raceCond(
-    (
-      RULE ruleName
-      PARTY actorName
-      MUST DO actionName
-      deadline
-      HENCE hence
-      LEST lest,
-      rules
-    )
-  ) := raceCond(rules) .
 
   sd raceCondAux(actorName does actionName) :=
     all * ;

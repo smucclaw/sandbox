@@ -25,9 +25,14 @@ load ./semantics/verification/race-cond-strat
   (rule3) --> [party3 does action3] --> ()
           --> [timeout] --> (Breached party3)
 )
-(srewrite [1]
-  transpile (
-    RULE 'START
+(smod MAIN is
+  protecting RACE-COND-STRAT .
+
+  ops rules : -> Set{Rule} .
+  ops initialConfig : -> Configuration .
+
+  eq rules
+  = RULE 'START
     PARTY 'party0 MUST DO 'action0 WITHIN 1 DAY
     HENCE 'rule0 AND 'rule1
     LEST 'rule2,
@@ -38,10 +43,20 @@ load ./semantics/verification/race-cond-strat
 
     RULE 'rule2 PARTY 'party2 MUST WITHIN 2 DAY DO 'action2 LEST 'rule3,
 
-    RULE 'rule3 PARTY 'party3 MUST DO 'action3 WITHIN 4 DAY
-  )
-  --- using idle
-  using raceCondAux('party0 does 'action0)
+    RULE 'rule3 PARTY 'party3 MUST DO 'action3 WITHIN 4 DAY .
+
+  eq initialConfig = transpile rules .
+
+endsm)
+
+(show all .)
+
+quit
+
+(srewrite [1]
+  initialConfig
+  using raceCond(rules)
+  --- using raceCondAux('party0 does 'action0)
   --- using rewriteTrace(
   ---   tick ++ ('party0 does 'action0) ++ ('party1 does 'action1) ++
   ---   ('party1 does 'action1)

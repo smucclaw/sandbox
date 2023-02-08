@@ -88,7 +88,7 @@ load transpiler
   eq deltaAction rules actionEvent (Breached actorNames) = Breached actorNames .
 
   ceq deltaAction rules
-    actionEvent
+    (actorName does actionName)
     Active (
       RULE ruleName
       PARTY actorName
@@ -99,12 +99,11 @@ load transpiler
       activeRules
     )
   = Active (getRulesWithNames rules hence) ^
-    deltaAction rules actionEvent (Active activeRules)
-  if actionEvent := actorName do actionName
-  /\ deontic == MUST or deontic == MAY .
+    deltaAction rules (actorName does actionName) (Active activeRules)
+  if deontic == MUST or deontic == MAY .
 
   eq deltaAction rules
-    (actorName do actionName)
+    (actorName does actionName)
     Active (
       RULE ruleName
       PARTY actorName
@@ -119,7 +118,7 @@ load transpiler
     then Breached actorName
     else Active (getRulesWithNames rules lest)
     fi
-  ) ^ deltaAction rules (actorName do actionName) (Active activeRules) .
+  ) ^ deltaAction rules (actorName does actionName) (Active activeRules) .
 
   eq deltaAction rules actionEvent Active (activeRule, activeRules)
   = Active activeRule ^ deltaAction rules actionEvent (Active activeRules)

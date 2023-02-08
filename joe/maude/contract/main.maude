@@ -1,15 +1,17 @@
 load ./semantics/rewrite-trace-strat
 --- load ./verification/race-cond-strat
 
-(srewrite [1]
+(srewrite
   transpile (
-    RULE 'START PARTY 'party0 MUST DO 'action0 WITHIN 1 DAY HENCE ('rule0, 'rule1) LEST 'rule2,
+    RULE 'START PARTY 'party0 MUST DO 'action0 WITHIN 1 DAY HENCE 'rule0 AND 'rule1 LEST 'rule2,
 
-    RULE 'rule0 PARTY 'party0 SHANT DO 'action0 WITHIN 1 DAY HENCE empty LEST empty,
+    RULE 'rule0 PARTY 'party0 SHANT DO 'action0 WITHIN 1 DAY,
 
-    RULE 'rule1 PARTY 'party1 MUST DO 'action1 WITHIN 2 DAY HENCE empty LEST empty,
+    RULE 'rule1 PARTY 'party1 MUST DO 'action1 WITHIN 2 DAY,
 
-    RULE 'rule2 PARTY 'party2 MAY DO 'action2 WITHIN 3 DAY HENCE empty LEST empty
+    RULE 'rule2 PARTY 'party2 MAY DO 'action2 WITHIN 3 DAY HENCE 'rule3,
+
+    RULE 'rule3 PARTY 'party3 SHANT DO 'action3 WITHIN 4 DAY
   )
   --- using raceCondAux('party0 does 'action0)
   using rewriteTrace(

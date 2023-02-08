@@ -1,6 +1,21 @@
 load ./semantics/rewrite-trace-strat
 --- load ./verification/race-cond-strat
 
+---(
+  For a petri net representation, we take
+  - place <-> rule
+  - transition <-> action or timeout event
+
+  Eg:
+  (START) --> [party0 does action0] --> (rule0) (rule1)
+          --> [timeout] --> (rule2)
+
+  If there is a missing HENCE or LEST clause, we use either:
+  - a dead sink place if the contract is not yet breached, or
+  - a breach place that:
+    - denotes the actor in breach of the contract
+    - contains inhibitor arcs to all transitions.
+)
 (srewrite
   transpile (
     RULE 'START
@@ -14,12 +29,13 @@ load ./semantics/rewrite-trace-strat
 
     RULE 'rule2 PARTY 'party2 MUST WITHIN 2 DAY DO 'action2 LEST 'rule3,
 
-    RULE 'rule3 PARTY 'party3 MAY DO 'action3 WITHIN 4 DAY
+    RULE 'rule3 PARTY 'party3 MUST DO 'action3 WITHIN 4 DAY
   )
+  --- using idle
   --- using raceCondAux('party0 does 'action0)
   using rewriteTrace(
-    tick ++ ('party0 does 'action0) ++ ('party1 does 'action1) ++ tick ++
-    ('party0 does 'action0)
+    tick ++ ('party0 does 'action0)
+    ++ ('party1 does 'action1) --- ++ tick ++ ('party0 does 'action0)
   )
 .)
 

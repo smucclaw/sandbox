@@ -5,7 +5,8 @@
 load atomic-props
 
 (smod RACE-COND-STRAT is
-  protecting SEMANTICS + ATOMIC-PROPS .
+  protecting SEMANTICS .
+  protecting ATOMIC-PROPS .
 
   strat raceCond : Set{Rule} @ Configuration .
   strat raceCondAux : ActionEvent @ Configuration .

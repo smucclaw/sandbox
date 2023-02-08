@@ -1,7 +1,8 @@
 load atomic-props
 
 (omod RACE-COND is
-  protecting ATOMIC-PROPS + LTL .
+  protecting ATOMIC-PROPS .
+  protecting LTL .
 
   ops raceCondLTL_ : ActionEvent -> Formula .
 

@@ -12,8 +12,7 @@ load ../semantics/semantics
   subsorts ActionEvent < Prop .
 
   --- ops Top : -> Prop .
-  ops _allowedToDo_ : Qid Qid -> Prop .
-  ops _prohibitedFromDoing_ : Qid Qid -> Prop .
+  ops _mustDo_ _mayDo_ _allowedToDo_ _prohibitedFromDoing_ : Qid Qid -> Prop .
   --- ops raceCond_ : ActionEvent -> Formula .
 
   vars config : Configuration .
@@ -34,9 +33,37 @@ load ../semantics/semantics
   eq (actorName did actionName) config |= actorName did actionName
   = true .
 
+  eq
+    < machineState : AbstractMachineState |
+      contractState : Active (
+        RULE ruleName
+        PARTY actorName
+        MUST DO actionName
+        WITHIN time DAY
+        HENCE hence
+        LEST lest,
+        activeRules
+      ) > config
+    |= actorName mustDo actionName
+  = true .
+
+  eq
+    < machineState : AbstractMachineState |
+      contractState : Active (
+        RULE ruleName
+        PARTY actorName
+        MAY DO actionName
+        WITHIN time DAY
+        HENCE hence
+        LEST lest,
+        activeRules
+      ) > config
+    |= actorName mayDo actionName
+  = true .
+
   ceq
     < machineState : AbstractMachineState |
-      contractState : (
+      contractState : Active (
         RULE ruleName
         PARTY actorName
         deontic DO actionName
@@ -47,11 +74,11 @@ load ../semantics/semantics
       ) > config
     |= actorName allowedToDo actionName
   = true
-  if deontic == MUST or deontic == MAY . 
+  if deontic == MUST or deontic == MAY .
 
   eq
     < machineState : AbstractMachineState |
-      contractState : (
+      contractState : Active (
         RULE ruleName
         PARTY actorName
         SHANT DO actionName

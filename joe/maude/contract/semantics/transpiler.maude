@@ -3,7 +3,7 @@ load config
 (omod TRANSPILER is
   protecting CONFIG .
 
-  vars actorName actionName ruleName machineState : Qid .
+  vars actorName actionName ruleName coordinator : Qid .
   vars hence lest : Set{Qid} .
   vars rules activeRules activeRules' : Set{Rule} .
   vars rule : Rule .
@@ -23,7 +23,7 @@ load config
 )
   eq transpile rules
   = transpileAux rules
-    < 'machineState : AbstractMachineState |
+    < 'coordinator : Coordinator |
       rules : rules,
       time : 0,
       contractState : Active (getRulesWithNames rules 'START) > .
@@ -34,7 +34,7 @@ load config
   During transpilation, we detect all actors and initialize one object for each
   actor.
 )
-  ceq transpileAux
+  eq transpileAux
     (
       RULE ruleName
       PARTY actorName
@@ -45,12 +45,11 @@ load config
       rules
     )
     config
-  = transpileAux rules config'
-  if config' := config
-    if config containsActor actorName
-    then none
-    else < actorName : Actor | none >
-    fi .
+  = transpileAux rules config
+      if config containsActor actorName
+      then none
+      else < actorName : Actor | none >
+      fi .
 
   eq (< actorName : Actor | > config) containsActor actorName = true .
   eq config containsActor actorName = false [owise] .

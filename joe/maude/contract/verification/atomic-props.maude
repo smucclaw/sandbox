@@ -16,7 +16,7 @@ load ../semantics/semantics
   --- ops raceCond_ : ActionEvent -> Formula .
 
   vars config : Configuration .
-  vars actorName actionName machineState ruleName : Qid .
+  vars actorName actionName coordinator ruleName : Qid .
   vars hence lest : Set{Qid} .
   vars deontic : Deontic .
   vars rules : Set{Rule} .
@@ -34,7 +34,7 @@ load ../semantics/semantics
   = true .
 
   eq
-    < machineState : AbstractMachineState |
+    < coordinator : Coordinator |
       contractState : Active (
         RULE ruleName
         PARTY actorName
@@ -48,7 +48,7 @@ load ../semantics/semantics
   = true .
 
   eq
-    < machineState : AbstractMachineState |
+    < coordinator : Coordinator |
       contractState : Active (
         RULE ruleName
         PARTY actorName
@@ -62,7 +62,7 @@ load ../semantics/semantics
   = true .
 
   ceq
-    < machineState : AbstractMachineState |
+    < coordinator : Coordinator |
       contractState : Active (
         RULE ruleName
         PARTY actorName
@@ -77,7 +77,7 @@ load ../semantics/semantics
   if deontic == MUST or deontic == MAY .
 
   eq
-    < machineState : AbstractMachineState |
+    < coordinator : Coordinator |
       contractState : Active (
         RULE ruleName
         PARTY actorName

@@ -1,8 +1,7 @@
---- load ./semantics/rewrite-trace-strat
---- load ./verification/atomic-props
-load ./verification/race-cond-strat
+load ./semantics/rewrite-trace-strat
+--- load ./verification/race-cond-strat
 
-(srewrite
+(srewrite [1]
   transpile (
     RULE 'START PARTY 'party0 MUST DO 'action0 WITHIN 1 DAY HENCE ('rule0, 'rule1) LEST 'rule2,
 
@@ -12,10 +11,10 @@ load ./verification/race-cond-strat
 
     RULE 'rule2 PARTY 'party2 MAY DO 'action2 WITHIN 3 DAY HENCE empty LEST empty
   )
-  using raceCondAux('party0 does 'action0)
-  --- using rewriteTrace(
-  ---   tick ++ ('party0 does 'action0) ++ ('party1 does 'action1) ++ tick ++ ('party0 does 'action0)
-  --- )
+  --- using raceCondAux('party0 does 'action0)
+  using rewriteTrace(
+    tick ++ ('party0 does 'action0) ++ ('party1 does 'action1) ++ tick ++ ('party0 does 'action0)
+  )
 .)
 
 quit
@@ -43,7 +42,7 @@ eof
   < 'lender : Actor | none > 
   < 'borrower : Actor | none >
 
-  < 'machineState : AbstractMachineState |
+  < 'coordinator : Coordinator |
     time : 0,
     rules : empty,
     contractState : (

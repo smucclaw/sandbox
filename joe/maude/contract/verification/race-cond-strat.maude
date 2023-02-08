@@ -5,13 +5,13 @@
 load atomic-props
 
 (smod RACE-COND-STRAT is
-  protecting SEMANTICS .
+  --- protecting SEMANTICS .
   protecting ATOMIC-PROPS .
 
   strat raceCond : Set{Rule} @ Configuration .
   strat raceCondAux : ActionEvent @ Configuration .
 
-  vars actorName actionName ruleName hence lest machineState : Qid .
+  vars actorName actionName ruleName hence lest coordinator : Qid .
   vars time : Nat .
   vars deontic : Deontic .
   vars deadline : Deadline .

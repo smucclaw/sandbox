@@ -2,11 +2,10 @@ load transpiler
 
 (omod SEMANTICS is
   protecting TRANSPILER .
-  protecting CONFIG .
 
   subsorts Qid < Oid .
 
-  vars actorName actionName ruleName machineState : Qid .
+  vars actorName actionName ruleName coordinator : Qid .
   vars ruleNames hence lest actorNames : Set{Qid} .
   vars activeRule : Rule .
   vars activeRules activeRules' : Set{Rule} .
@@ -184,20 +183,20 @@ load transpiler
     deltaTick rules (Active activeRules) .
 
 ---(
-    there exists some active rule in machineState that
+    there exists some active rule in coordinator that
     is fulfilled/breached when the action is taken
   ----------------------------------------------------- [action]
-  { actorName, machineState } \/ config
+  { actorName, coordinator } \/ config
   -- actorName does actionName -->
-  { actorName, machineState[activeRules := deltaAction activeRules] } \/ config
-  
+  { actorName, coordinator[activeRules := deltaAction activeRules] } \/ config
+
   Here, deltaAction is a function that when given a set of active rules,
   activeRules, it returns the new set of active rules, namely:
     { R \in activeRules | R does mentions the event (actorName does actionName)}
 )
   rl [action] :
     < actorName : Actor | >
-    < machineState : AbstractMachineState |
+    < coordinator : Coordinator |
       rules : rules,
       contractState : Active (
         RULE ruleName
@@ -211,7 +210,7 @@ load transpiler
     event
   =>
     < actorName : Actor | >
-    < machineState : AbstractMachineState |
+    < coordinator : Coordinator |
       contractState :
         deltaAction rules (actorName does actionName)
           --- Kinda annoying to have to copy and paste this whole block.
@@ -229,21 +228,21 @@ load transpiler
 
 ---(
   ----------------------------------- [tick]
-  { machineState } \/ config
+  { coordinator } \/ config
   -- tick -->
-  { machineState[activeRules := deltaTick activeRules] } \/ config
+  { coordinator[activeRules := deltaTick activeRules] } \/ config
 
   Here deltaTick is a function that:
   - removes all active rule instances with a timer of 0
   - decrements all active rule instances with a positive timer
 )
   crl [tick] :
-    < machineState : AbstractMachineState |
+    < coordinator : Coordinator |
       rules : rules,
       time : time,
       contractState : Active activeRules >
   =>
-    < machineState : AbstractMachineState |
+    < coordinator : Coordinator |
       time : s time,
       contractState : deltaTick rules (Active activeRules) >
   if activeRules =/= empty .

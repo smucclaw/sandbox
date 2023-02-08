@@ -24,8 +24,8 @@ fmod PRELUDE is
   eq actorName do actionName = actorName did actionName .
   eq actorName did actionName = actorName does actionName .
 
-  ops PARTY__DO_WITHIN_HENCE_LEST_ :
-    Id Deontic Id Nat Set{Qid} Set{Qid} -> ActiveRule [ctor] .
+  --- ops PARTY__DO_WITHIN_HENCE_LEST_ :
+  ---   Id Deontic Id Nat Set{Qid} Set{Qid} -> ActiveRule [ctor] .
 
 endfm
 
@@ -302,7 +302,7 @@ load full-maude
 
   --- class Situation .
 
-  class AbstractMachineState |
+  class Coordinator |
     rules : Set{Rule},
     time : Nat,
     --- activeRules : Set{ActiveRule},

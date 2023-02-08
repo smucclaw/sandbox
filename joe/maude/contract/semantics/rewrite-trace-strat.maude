@@ -1,7 +1,7 @@
-load semantics
+load atomic-props
 
 (smod REWRITE-TRACE-STRAT is
-  protecting SEMANTICS .
+  protecting ATOMIC-PROPS .
   protecting EVENT-TRACE .
 
   strat rewriteEvent : Event @ Configuration .
@@ -11,9 +11,13 @@ load semantics
   vars time : Nat .
   vars event : Event .
   vars events : EventTrace .
+  vars config : Configuration .
 
   sd rewriteEvent(actorName does actionName) :=
-    action[actorName <- actorName, actionName <- actionName] .
+    --- action[actorName <- actorName, actionName <- actionName] .
+    all ;
+    match config s.t.
+      config |= actorName does actionName .
 
   sd rewriteEvent(tick) := tick .
 

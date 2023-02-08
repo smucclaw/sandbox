@@ -1,4 +1,4 @@
-load atomic-props
+load ../atomic-props
 
 (omod RACE-COND is
   protecting ATOMIC-PROPS .

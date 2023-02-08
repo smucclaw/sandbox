@@ -1,5 +1,5 @@
-load ./semantics/rewrite-trace-strat
---- load ./verification/race-cond-strat
+--- load ./semantics/rewrite-trace-strat
+load ./semantics/verification/race-cond-strat
 
 ---(
   For a petri net representation, we take
@@ -25,7 +25,7 @@ load ./semantics/rewrite-trace-strat
   (rule3) --> [party3 does action3] --> ()
           --> [timeout] --> (Breached party3)
 )
-(srewrite
+(srewrite [1]
   transpile (
     RULE 'START
     PARTY 'party0 MUST DO 'action0 WITHIN 1 DAY
@@ -41,11 +41,11 @@ load ./semantics/rewrite-trace-strat
     RULE 'rule3 PARTY 'party3 MUST DO 'action3 WITHIN 4 DAY
   )
   --- using idle
-  --- using raceCondAux('party0 does 'action0)
-  using rewriteTrace(
-    tick ++ ('party0 does 'action0)
-    ++ ('party1 does 'action1) --- ++ tick ++ ('party0 does 'action0)
-  )
+  using raceCondAux('party0 does 'action0)
+  --- using rewriteTrace(
+  ---   tick ++ ('party0 does 'action0) ++ ('party1 does 'action1) ++
+  ---   ('party1 does 'action1)
+  --- )
 .)
 
 quit

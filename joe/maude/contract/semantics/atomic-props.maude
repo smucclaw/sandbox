@@ -2,7 +2,7 @@
   Atomic propositions for model checking.
 )
 load model-checker
-load ../semantics/semantics
+load semantics
 
 (omod ATOMIC-PROPS is
   protecting SEMANTICS .
@@ -30,7 +30,7 @@ load ../semantics/semantics
   --- eq config |= Top
   --- = true .
 
-  eq (actorName did actionName) config |= actorName did actionName
+  eq (actorName does actionName) config |= actorName does actionName
   = true .
 
   eq

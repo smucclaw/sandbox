@@ -2,11 +2,11 @@
   Strategy module for detecting PDPA race condition.
 )
 
-load atomic-props
+load ../rewrite-trace-strat
 
 (smod RACE-COND-STRAT is
   --- protecting SEMANTICS .
-  protecting ATOMIC-PROPS .
+  protecting REWRITE-TRACE-STRAT .
 
   strat raceCond : Set{Rule} @ Configuration .
   strat raceCondAux : ActionEvent @ Configuration .
@@ -61,7 +61,7 @@ load atomic-props
     all * ;
     match config s.t.
       config |= actorName allowedToDo actionName ;
-    action[actorName <- actorName, actionName <- actionName] ;
+    rewriteEvent(actorName does actionName) ;
     all * ;
     match config s.t.
       config |= actorName prohibitedFromDoing actionName .

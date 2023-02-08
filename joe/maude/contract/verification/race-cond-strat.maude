@@ -11,11 +11,11 @@ load atomic-props
   strat raceCond : Set{Rule} @ Configuration .
   strat raceCondAux : ActionEvent @ Configuration .
 
-  vars actorName actionName ruleName hence lest machineState : Oid .
+  vars actorName actionName ruleName hence lest machineState : Qid .
   vars time : Nat .
   vars deontic : Deontic .
   vars deadline : Deadline .
-  vars activeRules : Set{ActiveRule} .
+  vars activeRules : Set{Rule} .
   vars rules : Set{Rule} .
   vars config : Configuration .
 

@@ -159,9 +159,8 @@ endom)
 
 endsm)
 
-eof
-
 (show all .)
+
 quit
 
 set trace on .

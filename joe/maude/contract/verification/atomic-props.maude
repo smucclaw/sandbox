@@ -5,7 +5,7 @@ load model-checker
 load ../semantics/semantics
 
 (omod ATOMIC-PROPS is
-  protecting CONFIG .
+  protecting SEMANTICS .
   including MODEL-CHECKER + SATISFACTION . 
 
   subsorts Configuration < State .

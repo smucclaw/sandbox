@@ -1,5 +1,6 @@
-load ./semantics/rewrite-trace-strat
---- load ./verification/race-cond-strat
+--- load ./semantics/rewrite-trace-strat
+--- load ./verification/atomic-props
+load ./verification/race-cond-strat
 
 (srewrite
   transpile (
@@ -11,11 +12,13 @@ load ./semantics/rewrite-trace-strat
 
     RULE 'rule2 PARTY 'party2 MAY DO 'action2 WITHIN 3 DAY HENCE empty LEST empty
   )
-  --- using idle --- raceCondAux('party0 does 'action0)
-  using rewriteTrace(
-    tick ++ ('party0 does 'action0) ++ ('party1 does 'action1) ++ tick ++ ('party0 does 'action0)
-  )
+  using raceCondAux('party0 does 'action0)
+  --- using rewriteTrace(
+  ---   tick ++ ('party0 does 'action0) ++ ('party1 does 'action1) ++ tick ++ ('party0 does 'action0)
+  --- )
 .)
+
+quit
 
 ---(rewrite
   deltaTick

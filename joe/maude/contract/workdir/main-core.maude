@@ -772,9 +772,9 @@ smod MAIN is
   strat rewriteTrace : EventTrace @ Configuration .
   sd raceCond((empty).Set{Rule})
     := idle .
-  sd raceCond(rules:Set{Rule}, RULE ruleName:Qid PARTY actorName:Qid
+  sd raceCond((rules:Set{Rule}, RULE ruleName:Qid PARTY actorName:Qid
     deontic:Deontic DO actionName:Qid deadline:Deadline HENCE hence:Set{
-    Qid}LEST lest:Set{Qid})
+    Qid}LEST lest:Set{Qid}))
     := raceCondAux(actorName:Qid does actionName:Qid)or-else raceCond(
     rules:Set{Rule}) .
   sd raceCondAux(actorName:Qid does actionName:Qid)

@@ -5,15 +5,15 @@
 load ../rewrite-trace-strat
 
 (smod RACE-COND-STRAT is
+  protecting RULE .
   --- protecting SEMANTICS .
   protecting REWRITE-TRACE-STRAT .
 
   strat raceCond : Set{Rule} @ Configuration .
   strat raceCondAux : ActionEvent @ Configuration .
 
-  vars actorName actionName ruleName coordinator : Qid .
+  vars actorName actionName ruleName : Qid .
   vars hence lest : Set{Qid} .
-  vars time : Nat .
   vars deontic : Deontic .
   vars deadline : Deadline .
   vars activeRules rules : Set{Rule} .
@@ -31,7 +31,7 @@ load ../rewrite-trace-strat
       LEST lest,
       rules
     )
-  ) := raceCondAux(actorName does actionName) | raceCond(rules) .
+  ) := raceCondAux(actorName does actionName) or-else raceCond(rules) .
 
   sd raceCondAux(actorName does actionName) :=
     all * ;

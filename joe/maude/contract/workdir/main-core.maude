@@ -775,8 +775,8 @@ smod MAIN is
   sd raceCond(rules:Set{Rule}, RULE ruleName:Qid PARTY actorName:Qid
     deontic:Deontic DO actionName:Qid deadline:Deadline HENCE hence:Set{
     Qid}LEST lest:Set{Qid})
-    := raceCond(rules:Set{Rule})| raceCondAux(actorName:Qid does
-    actionName:Qid) .
+    := raceCondAux(actorName:Qid does actionName:Qid)or-else raceCond(
+    rules:Set{Rule}) .
   sd raceCondAux(actorName:Qid does actionName:Qid)
     := all * ; match config:Configuration s.t. config:Configuration |=
     actorName:Qid allowedToDo actionName:Qid = true ; rewriteEvent(

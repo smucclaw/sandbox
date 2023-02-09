@@ -51,7 +51,7 @@ load ./semantics/verification/race-cond-strat
 
     RULE 'rule2 WITHIN 2 DAY PARTY 'party2 MUST DO 'action2 LEST 'rule3,
 
-    RULE 'rule3 PARTY 'party3 MUST DO 'action3 WITHIN 4 DAY .
+    RULE 'rule3 PARTY 'party3 MUST WITHIN 4 DAY DO 'action3 .
 
   eq initialConfig = transpile rules .
 

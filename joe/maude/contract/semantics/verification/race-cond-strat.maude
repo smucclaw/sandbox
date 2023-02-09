@@ -9,19 +9,33 @@ load ../rewrite-trace-strat
   --- protecting SEMANTICS .
   protecting REWRITE-TRACE-STRAT .
 
-  strat raceCond : Set{Rule} @ Configuration .
-  strat raceCondAux : ActionEvent @ Configuration .
+  strat raceCond @ Configuration .
+  strat raceCondAux : Set{Rule} @ Configuration .
+  strat raceCondActionEvent : ActionEvent @ Configuration .
 
-  vars actorName actionName ruleName : Qid .
+  vars actorName actionName ruleName coordinator : Qid .
   vars hence lest : Set{Qid} .
   vars deontic : Deontic .
   vars deadline : Deadline .
   vars activeRules rules : Set{Rule} .
   vars config : Configuration .
 
-  sd raceCond(empty) := idle .
+---(
+  This strategy isn't working as expected for some reason.
+  This is supposed to extract the set of rules from the initial config and
+  pass that to raceCondAux so we don't have to do it ourselves.
+  For the time being, use raceCondAux and explicitly pass in the set of rules.
+)
+  sd raceCond :=
+    matchrew
+      < coordinator : Coordinator |
+        rules : rules >
+      config
+    by rules using raceCondAux(rules) .
 
-  sd raceCond(
+  sd raceCondAux(empty) := idle .
+
+  sd raceCondAux(
     (
       RULE ruleName
       PARTY actorName
@@ -31,9 +45,9 @@ load ../rewrite-trace-strat
       LEST lest,
       rules
     )
-  ) := raceCondAux(actorName does actionName) or-else raceCond(rules) .
+  ) := raceCondActionEvent(actorName does actionName) or-else raceCondAux(rules) .
 
-  sd raceCondAux(actorName does actionName) :=
+  sd raceCondActionEvent(actorName does actionName) :=
     all * ;
     match config s.t.
       config |= actorName allowedToDo actionName ;

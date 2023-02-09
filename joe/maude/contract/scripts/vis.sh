@@ -6,9 +6,9 @@ workdir="../.workdir"
 cd ${workdir}
 
 ~/.local/bin/umaudemc graph -m MAIN --purge-fails yes --merge-states default \
-  -o out.dot --format dot \
+  --format dot \
   main.maude initialConfig \
-  "all *"
+  # "raceCondAux(rules)"
+  # "all *"
   # "rewriteTrace(tick ++ ('party0 does 'action0) ++ tick)"
-  # "raceCond(rules)"
   # "raceCondAux('party0 does 'action0)"

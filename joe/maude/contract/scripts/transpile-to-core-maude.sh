@@ -8,8 +8,7 @@ workdir="../.workdir"
 mkdir -p ${workdir}
 
 maude -no-banner ../main.maude \
-  | sed '0,/^Introduced\ module\ MAIN$/d' \
-  | sed 's/Bye.//' \
+  | sed -n '/smod MAIN is/,/endsm/p' \
   > ${workdir}/main.maude
 
 # ~/.local/bin/umaudemc graph -m MAIN --purge-fails yes --merge-states state \

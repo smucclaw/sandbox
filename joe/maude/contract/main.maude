@@ -8,9 +8,17 @@ load ./semantics/verification/race-cond-strat
 
   If there is a missing HENCE or LEST clause, we use either:
   - a dead sink place if the contract is not yet breached, or
-  - a breach place that:
-    - denotes the actor in breach of the contract
-    - contains inhibitor arcs to all transitions
+  - a breach place that denotes the actor in breach of the contract
+
+  This gets very messy visually because:
+  - we need to merge all transitions and add things like or-gates so that
+    so that the transitions can fire when less than all input places have tokens.
+  - we also need to add reset arcs from any transition going into breach places
+    to all other places in order to drain them of tokens.
+
+  What we could do is find another formalism based on petri nets that has more
+  sophisticated control flow primtives.
+  Maybe something like: https://yawlfoundation.github.io/index.html
 
   Eg:
   (START) --> [party0 does action0] --> (rule0) (rule1)

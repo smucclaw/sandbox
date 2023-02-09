@@ -34,6 +34,7 @@ fmod RULE is
     Rule RuleName ActorName Deadline ActionName Deontic Date Duration
     Situation ActorDeonticActionDeadline HenceLest .
 
+  --- Dynamic subtyping/subsorting.
   subsorts Qid Bool < Situation .
 
 ---(
@@ -43,6 +44,7 @@ fmod RULE is
 )
   ops MUST MAY SHANT : -> Deontic [ctor] .
 
+  --- Yep we have operator overloading too.
   ops PARTY___DO_ : Qid Deontic Deadline Qid -> ActorDeonticActionDeadline
     [ctor] .
   ops PARTY___DO_ : Qid Deadline Deontic Qid -> ActorDeonticActionDeadline
@@ -83,6 +85,19 @@ fmod RULE is
   vars deadline : Deadline .
   vars hence lest : Set{Qid} .
 
+---(
+  The following equations (universally quantified over the above first-order
+  signature) are used to normalize terms into the following normal form, over
+  which all our semantics is defined:
+    RULE ruleName
+    PARTY actorName
+    deontic DO actionName
+    deadline
+    HENCE hence
+    LEST lest
+  In other words, we always pattern match against this normal form when doing
+  primitive recursion aka folding.
+)
   eq PARTY actorName deontic deadline DO actionName
   = PARTY actorName deontic DO actionName deadline .
 

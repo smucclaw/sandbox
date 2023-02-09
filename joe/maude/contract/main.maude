@@ -37,8 +37,7 @@ load ./semantics/verification/race-cond-strat
     LEST 'rule2
     HENCE ('rule0 AND 'rule1),
 
-    RULE 'rule0 PARTY 'party0 SHANT WITHIN 1 DAY DO 'action0
-    HENCE NOTHING LEST NOTHING,
+    RULE 'rule0 PARTY 'party0 SHANT WITHIN 1 DAY DO 'action0,
 
     RULE 'rule1 PARTY 'party1 MUST DO 'action1 WITHIN 2 DAY HENCE 'rule3,
 

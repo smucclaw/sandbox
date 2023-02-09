@@ -61,20 +61,9 @@ load semantics
     |= actorName mayDo actionName
   = true .
 
-  ceq
-    < coordinator : Coordinator |
-      contractState : Active (
-        RULE ruleName
-        PARTY actorName
-        deontic DO actionName
-        WITHIN time DAY
-        HENCE hence
-        LEST lest,
-        activeRules
-      ) > config
-    |= actorName allowedToDo actionName
-  = true
-  if deontic == MUST or deontic == MAY .
+  eq config |= actorName allowedToDo actionName
+  = config |= actorName mustDo actionName or
+    config |= actorName mayDo actionName .
 
   eq
     < coordinator : Coordinator |

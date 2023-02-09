@@ -32,7 +32,7 @@ fmod RULE is
 
   sorts
     Rule RuleName ActorName Deadline ActionName Deontic Date Duration
-    Situation DeonticActionNameDeadline .
+    Situation ActorDeonticActionDeadline HenceLest .
 
   subsorts Qid Bool < Situation .
 
@@ -43,9 +43,14 @@ fmod RULE is
 )
   ops MUST MAY SHANT : -> Deontic [ctor] .
 
-  ops __DO_ : Deontic Deadline Qid -> DeonticActionNameDeadline [ctor] .
-
-  ops _DO__ : Deontic Qid Deadline -> DeonticActionNameDeadline [ctor] .
+  ops PARTY___DO_ : Qid Deontic Deadline Qid -> ActorDeonticActionDeadline
+    [ctor] .
+  ops PARTY___DO_ : Qid Deadline Deontic Qid -> ActorDeonticActionDeadline
+    [ctor] .
+  ops _PARTY__DO_ : Deadline Qid Deontic Qid -> ActorDeonticActionDeadline
+    [ctor] .
+  ops PARTY__DO__ : Qid Deontic Qid Deadline -> ActorDeonticActionDeadline
+    [ctor] .
 
 ---(
   BY is for dates, ie absolute deadlines
@@ -62,24 +67,34 @@ fmod RULE is
   ---   Qid Situation Situation Qid Deontic Qid Deadline
   ---   Situation Situation -> Rule [ctor] .
 
-  ops RULE_PARTY__HENCE_LEST_ :
-    Qid Qid DeonticActionNameDeadline Set{Qid} Set{Qid} -> Rule [ctor] .
+  ops HENCE_LEST_ : Set{Qid} Set{Qid} -> HenceLest [ctor] .
+  ops LEST_HENCE_ : Set{Qid} Set{Qid} -> HenceLest [ctor] .
+  ops HENCE_ : Set{Qid} -> HenceLest [ctor] .
+  ops LEST_ : Set{Qid} -> HenceLest [ctor] .
 
-  ops RULE_PARTY__ :
-    Qid Qid DeonticActionNameDeadline -> Rule [ctor] .
+  ops RULE___ :
+    Qid ActorDeonticActionDeadline HenceLest -> Rule [ctor] .
 
-  ops RULE_PARTY__HENCE_ :
-    Qid Qid DeonticActionNameDeadline Set{Qid} -> Rule [ctor] .
-
-  ops RULE_PARTY__LEST_ :
-    Qid Qid DeonticActionNameDeadline Set{Qid} -> Rule [ctor] .
+  ops RULE__ :
+    Qid ActorDeonticActionDeadline -> Rule [ctor] .
 
   vars ruleName actorName actionName : Qid .
   vars deontic : Deontic .
   vars deadline : Deadline .
   vars hence lest : Set{Qid} .
 
-  eq deontic deadline DO actionName = deontic DO actionName deadline .
+  eq PARTY actorName deontic deadline DO actionName
+  = PARTY actorName deontic DO actionName deadline .
+
+  eq PARTY actorName deadline deontic DO actionName
+  = PARTY actorName deontic DO actionName deadline .
+
+  eq deadline PARTY actorName deontic DO actionName
+  = PARTY actorName deontic DO actionName deadline .
+
+  eq HENCE hence = HENCE hence LEST NOTHING .
+  eq LEST lest = HENCE NOTHING LEST lest . 
+  eq LEST lest HENCE hence = HENCE hence LEST lest .
 
   eq
     RULE ruleName
@@ -93,31 +108,31 @@ fmod RULE is
     HENCE NOTHING
     LEST NOTHING .
 
-  eq
-    RULE ruleName
-    PARTY actorName
-    deontic DO actionName
-    deadline
-    HENCE hence
-  = RULE ruleName
-    PARTY actorName
-    deontic DO actionName
-    deadline
-    HENCE hence
-    LEST NOTHING .
+  --- eq
+  ---   RULE ruleName
+  ---   PARTY actorName
+  ---   deontic DO actionName
+  ---   deadline
+  ---   HENCE hence
+  --- = RULE ruleName
+  ---   PARTY actorName
+  ---   deontic DO actionName
+  ---   deadline
+  ---   HENCE hence
+  ---   LEST NOTHING .
 
-  eq
-    RULE ruleName
-    PARTY actorName
-    deontic DO actionName
-    deadline
-    LEST lest
-  = RULE ruleName
-    PARTY actorName
-    deontic DO actionName
-    deadline
-    HENCE NOTHING
-    LEST lest .
+  --- eq
+  ---   RULE ruleName
+  ---   PARTY actorName
+  ---   deontic DO actionName
+  ---   deadline
+  ---   LEST lest
+  --- = RULE ruleName
+  ---   PARTY actorName
+  ---   deontic DO actionName
+  ---   deadline
+  ---   HENCE NOTHING
+  ---   LEST lest .
 
 endfm
 

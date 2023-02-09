@@ -8,7 +8,7 @@ cd ${workdir}
 ~/.local/bin/umaudemc graph -m MAIN --purge-fails yes --merge-states default \
   --format dot \
   main.maude initialConfig \
+  "rewriteTrace(tick ++ ('party0 does 'action0) ++ tick)"
   # "raceCondAux(rules)"
   # "all *"
-  # "rewriteTrace(tick ++ ('party0 does 'action0) ++ tick)"
   # "raceCondAux('party0 does 'action0)"

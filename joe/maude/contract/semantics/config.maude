@@ -61,6 +61,14 @@ view Set`{ActiveRule`} from TRIV to SET{ActiveRule} is
   sort Elt to Set`{ActiveRule`} .
 endv
 
+view ActionEvent from TRIV to PRELUDE is
+  sort Elt to ActionEvent .
+endv
+
+view Set`{ActionEvent`} from TRIV to SET{ActionEvent} is
+  sort Elt to Set`{ActionEvent`} .
+endv
+
 --- fmod ALLOWED-EVENT is
 ---   protecting EVENT-TRACE .
 
@@ -76,6 +84,7 @@ load full-maude
   protecting SET{Rule} .
   protecting QID .
   protecting SET{Qid} .
+  protecting SET{ActionEvent} .
 
   subsorts Qid < Oid < Id .
   subsorts Message < Msg .
@@ -116,6 +125,22 @@ load full-maude
 
   eq getRulesWithNames rules (ruleName, ruleNames)
   = getRulesWithNames rules ruleNames [owise] .
+
+  ops getAllActions_ : Set{Rule} -> Set{ActionEvent} .
+
+  eq getAllActions empty = empty .
+
+  eq getAllActions 
+    (
+      RULE ruleName
+      PARTY actorName
+      deontic actionName
+      deadline
+      HENCE hence
+      LEST lest,
+      rules
+    )
+  = actorName does actionName, getAllActions rules .
 
   --- class StatefulActor |
   ---   state : ActorState .

@@ -10,10 +10,12 @@ load ../rewrite-trace-strat
   protecting REWRITE-TRACE-STRAT .
 
   strat raceCond @ Configuration .
-  strat raceCondAux : Set{Rule} @ Configuration .
+  strat raceCondAux : Set{ActionEvent} @ Configuration .
   strat raceCondActionEvent : ActionEvent @ Configuration .
 
   vars actorName actionName ruleName coordinator : Qid .
+  vars actionEvent : ActionEvent .
+  vars actionEvents : Set{ActionEvent} .
   vars hence lest : Set{Qid} .
   vars deontic : Deontic .
   vars deadline : Deadline .
@@ -31,21 +33,12 @@ load ../rewrite-trace-strat
       < coordinator : Coordinator |
         rules : rules >
       config
-    by rules using raceCondAux(rules) .
+    by rules using raceCondAux(getAllActions rules) .
 
   sd raceCondAux(empty) := idle .
 
-  sd raceCondAux(
-    (
-      RULE ruleName
-      PARTY actorName
-      deontic actionName
-      deadline
-      HENCE hence
-      LEST lest,
-      rules
-    )
-  ) := raceCondActionEvent(actorName does actionName) or-else raceCondAux(rules) .
+  sd raceCondAux((actionEvent, actionEvents)) :=
+    raceCondActionEvent(actionEvent) or-else raceCondAux(actionEvents) .
 
   sd raceCondActionEvent(actorName does actionName) :=
     all * ;

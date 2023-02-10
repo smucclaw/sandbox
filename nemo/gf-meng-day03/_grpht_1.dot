@@ -1,0 +1,13 @@
+graph {
+n0[label = "mkQuestion : S", style = "solid", shape = "plaintext"] ;
+n0_0[label = "mkPredicate : Predicate", style = "solid", shape = "plaintext"] ;
+n0 -- n0_0 [style = "solid"];
+n0_0_0[label = "Loyalty : Predicate", style = "solid", shape = "plaintext"] ;
+n0_0 -- n0_0_0 [style = "solid"];
+n0_0_0_0[label = "you : Pronoun", style = "solid", shape = "plaintext"] ;
+n0_0_0 -- n0_0_0_0 [style = "solid"];
+n1_0_0_0[label = "I : Pronoun", style = "solid", shape = "plaintext"] ;
+n0_0_0 -- n1_0_0_0 [style = "solid"];
+n1_0_0[label = "book : Adverbial", style = "solid", shape = "plaintext"] ;
+n0_0 -- n1_0_0 [style = "solid"];
+}

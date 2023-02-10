@@ -35,7 +35,7 @@ load transpiler
     (
       RULE ruleName
       PARTY actorName
-      deontic DO actionName
+      deontic actionName
       WITHIN time DAY
       HENCE hence
       LEST lest, 
@@ -49,7 +49,7 @@ load transpiler
 
   --- ops _containsRuleWithZeroTimer : Set{ActiveRule} -> Bool .
 
-  --- eq (PARTY actorName deontic DO actionName WITHIN 0, activeRules)
+  --- eq (PARTY actorName deontic actionName WITHIN 0, activeRules)
   ---   containsRuleWithZeroTimer
   --- = true .
 
@@ -63,7 +63,7 @@ load transpiler
     (
       RULE ruleName
       PARTY actorName
-      deontic DO actionName
+      deontic actionName
       deadline
       HENCE hence
       LEST lest,
@@ -72,7 +72,7 @@ load transpiler
     (ruleName, ruleNames)
   = RULE ruleName
     PARTY actorName
-    deontic DO actionName
+    deontic actionName
     deadline
     HENCE hence
     LEST lest,
@@ -92,7 +92,7 @@ load transpiler
     Active (
       RULE ruleName
       PARTY actorName
-      deontic DO actionName
+      deontic actionName
       WITHIN time DAY
       HENCE hence
       LEST lest,
@@ -107,7 +107,7 @@ load transpiler
     Active (
       RULE ruleName
       PARTY actorName
-      SHANT DO actionName
+      SHANT actionName
       WITHIN time DAY
       HENCE hence
       LEST lest,
@@ -135,7 +135,7 @@ load transpiler
     Active (
       RULE ruleName
       PARTY actorName
-      deontic DO actionName
+      deontic actionName
       WITHIN (s time) DAY
       HENCE hence
       LEST lest,
@@ -144,7 +144,7 @@ load transpiler
   = Active (
       RULE ruleName
       PARTY actorName
-      deontic DO actionName
+      deontic actionName
       WITHIN time DAY
       HENCE hence
       LEST lest
@@ -154,7 +154,7 @@ load transpiler
     Active (
       RULE ruleName
       PARTY actorName
-      deontic DO actionName
+      deontic actionName
       WITHIN 0 DAY
       HENCE hence
       LEST lest,
@@ -172,7 +172,7 @@ load transpiler
     Active (
       RULE ruleName
       PARTY actorName
-      SHANT DO actionName
+      SHANT actionName
       WITHIN 0 DAY
       HENCE hence
       LEST lest,
@@ -203,7 +203,7 @@ load transpiler
       contractState : Active (
         RULE ruleName
         PARTY actorName
-        deontic DO actionName
+        deontic actionName
         WITHIN time DAY
         HENCE hence
         LEST lest,
@@ -220,7 +220,7 @@ load transpiler
           Active (
             RULE ruleName
             PARTY actorName
-            deontic DO actionName
+            deontic actionName
             WITHIN time DAY
             HENCE hence
             LEST lest,

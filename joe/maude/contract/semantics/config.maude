@@ -99,7 +99,7 @@ load full-maude
     (
       RULE ruleName
       PARTY actorName
-      deontic DO actionName
+      deontic actionName
       deadline
       HENCE hence
       LEST lest,
@@ -108,7 +108,7 @@ load full-maude
     (ruleName, ruleNames)
   = RULE ruleName
     PARTY actorName
-    deontic DO actionName
+    deontic actionName
     deadline
     HENCE hence
     LEST lest,

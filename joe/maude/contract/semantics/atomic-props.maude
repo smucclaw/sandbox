@@ -38,7 +38,7 @@ load semantics
       contractState : Active (
         RULE ruleName
         PARTY actorName
-        MUST DO actionName
+        MUST actionName
         WITHIN time DAY
         HENCE hence
         LEST lest,
@@ -52,7 +52,7 @@ load semantics
       contractState : Active (
         RULE ruleName
         PARTY actorName
-        MAY DO actionName
+        MAY actionName
         WITHIN time DAY
         HENCE hence
         LEST lest,
@@ -70,7 +70,7 @@ load semantics
       contractState : Active (
         RULE ruleName
         PARTY actorName
-        SHANT DO actionName
+        SHANT actionName
         WITHIN time DAY
         HENCE hence
         LEST lest,

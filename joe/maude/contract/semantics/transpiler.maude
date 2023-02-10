@@ -38,7 +38,7 @@ load config
     (
       RULE ruleName
       PARTY actorName
-      deontic DO actionName
+      deontic actionName
       deadline
       HENCE hence
       LEST lest,

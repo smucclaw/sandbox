@@ -31,11 +31,12 @@ fmod RULE is
   protecting NAMES .
 
   sorts
-    Rule RuleName ActorName Deadline ActionName Deontic Date Duration
+    Rule Deadline Action Deontic Date Duration
     Situation ActorDeonticActionDeadline HenceLest .
 
   --- Dynamic subtyping/subsorting.
   subsorts Qid Bool < Situation .
+  subsorts Qid < Action .
 
 ---(
   MUST -- obligation
@@ -43,15 +44,16 @@ fmod RULE is
   SHANT -- prohibition
 )
   ops MUST MAY SHANT : -> Deontic [ctor] .
+  ops DO_ : Qid -> Action [ctor] .
 
   --- Yep we have operator overloading too.
-  ops PARTY___DO_ : Qid Deontic Deadline Qid -> ActorDeonticActionDeadline
+  ops PARTY____ : Qid Deontic Deadline Action -> ActorDeonticActionDeadline
     [ctor] .
-  ops PARTY___DO_ : Qid Deadline Deontic Qid -> ActorDeonticActionDeadline
+  ops PARTY____ : Qid Deadline Deontic Action -> ActorDeonticActionDeadline
     [ctor] .
-  ops _PARTY__DO_ : Deadline Qid Deontic Qid -> ActorDeonticActionDeadline
+  ops _PARTY___ : Deadline Qid Deontic Action -> ActorDeonticActionDeadline
     [ctor] .
-  ops PARTY__DO__ : Qid Deontic Qid Deadline -> ActorDeonticActionDeadline
+  ops PARTY____ : Qid Deontic Action Deadline -> ActorDeonticActionDeadline
     [ctor] .
 
 ---(
@@ -91,21 +93,23 @@ fmod RULE is
   which all our semantics is defined:
     RULE ruleName
     PARTY actorName
-    deontic DO actionName
+    deontic actionName
     deadline
     HENCE hence
     LEST lest
   In other words, we always pattern match against this normal form when doing
   primitive recursion aka folding.
 )
-  eq PARTY actorName deontic deadline DO actionName
-  = PARTY actorName deontic DO actionName deadline .
+  eq DO actionName = actionName .
 
-  eq PARTY actorName deadline deontic DO actionName
-  = PARTY actorName deontic DO actionName deadline .
+  eq PARTY actorName deontic deadline actionName
+  = PARTY actorName deontic actionName deadline .
 
-  eq deadline PARTY actorName deontic DO actionName
-  = PARTY actorName deontic DO actionName deadline .
+  eq PARTY actorName deadline deontic actionName
+  = PARTY actorName deontic actionName deadline .
+
+  eq deadline PARTY actorName deontic actionName
+  = PARTY actorName deontic actionName deadline .
 
   eq HENCE hence = HENCE hence LEST NOTHING .
   eq LEST lest = HENCE NOTHING LEST lest . 
@@ -114,11 +118,11 @@ fmod RULE is
   eq
     RULE ruleName
     PARTY actorName
-    deontic DO actionName
+    deontic actionName
     deadline
   = RULE ruleName
     PARTY actorName
-    deontic DO actionName
+    deontic actionName
     deadline
     HENCE NOTHING
     LEST NOTHING .

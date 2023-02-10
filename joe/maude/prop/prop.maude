@@ -14,8 +14,8 @@ fmod WFF is
   sort Wff .
   subsort Qid < Prop < Wff .
 
-  op _→_ : Wff Wff -> Wff [ctor assoc prec 30] .
-  op ¬_ : Wff -> Wff [prec 25] .
+  ops _→_ _∧_ _∨_ : Wff Wff -> Wff [ctor prec 30] .
+  op ¬_ : Wff -> Wff [ctor prec 25] .
 
 endfm
 
@@ -37,11 +37,11 @@ fmod Sequent is
   sorts Sequent Sequents .
   subsort Sequent < Sequents .
 
-  op Nil : -> Sequent [ctor] .
+  op Done : -> Sequent [ctor] .
   op _⊢_ : Ctx Ctx -> Sequent [ctor prec 122] .
 
   *** Meta-theoretic conjunction of judgement forms.
-  op _ _ : Sequents Sequents -> Sequents [ctor comm assoc id: Nil] .
+  op _ _ : Sequents Sequents -> Sequents [ctor comm assoc id: Done] .
 endfm
 
 ***(
@@ -62,7 +62,7 @@ mod LK is
   rl [axiom] :
     Γ, φ ⊢ φ, Δ
   =>
-    Nil .
+    Done .
 
   rl [impl-left] :
     Γ, φ → ψ ⊢ Δ
@@ -84,10 +84,49 @@ mod LK is
   =>
     Γ, φ ⊢ Δ .
 
+  rl [and-left-1] :
+    Γ, φ ∧ ψ ⊢ Δ
+  =>
+    Γ, φ ⊢ Δ .
+
+  rl [and-left-2] :
+    Γ, φ ∧ ψ ⊢ Δ
+  =>
+    Γ, ψ ⊢ Δ .
+
+  rl [and-right] :
+    Γ ⊢ φ ∧ ψ, Δ
+  =>
+    (Γ ⊢ φ, Δ) (Γ ⊢ ψ, Δ) .
+
+  rl [or-left] :
+    Γ, φ ∨ ψ ⊢ Δ
+  =>
+    (Γ, φ ⊢ Δ) (Γ, ψ ⊢ Δ) .
+
+  rl [or-right-1] :
+    Γ ⊢ φ ∨ ψ, Δ
+  =>
+    Γ ⊢ φ, Δ .
+
+  rl [or-right-2] :
+    Γ ⊢ φ ∨ ψ, Δ
+  =>
+    Γ ⊢ ψ, Δ .
+
 endm
+
+smod PROOF-SEARCH-STRAT is
+  protecting LK .
+
+  strat proofSearch @ Sequent .
+
+  sd proofSearch := all * ; match Done .
+
+endsm
 
 eof
 
 set trace rl on .
 
-rewrite ¬ 'P → ¬ 'Q ⊢ 'Q → 'P .
+rewrite ⊢ ¬ ('P ∧ 'Q) → (¬ 'P ∨ ¬ 'Q) .

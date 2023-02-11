@@ -193,8 +193,9 @@ load transpiler
   - actorNames refers to the set of actor names in the abstract machine.
   - The "O[x := y]" notation means update the field x in the object/record O to y.
   - deltaAction is a function that when given a set of active rules,
-    activeRules, it returns the new set of active rules, namely:
-      { R \in activeRules | R does mentions the event (actorName does actionName)}
+    activeRules, it returns the new set of active rules, ie it:
+    - Removes all rule instances that mention the event (actorName does actionName)
+    - Triggers new rule instances based on the deontic and hence/lest. 
 )
   rl [action] :
     < actorName : Actor | >
@@ -237,6 +238,7 @@ load transpiler
   Here deltaTick is a function that:
   - removes all active rule instances with a timer of 0
   - decrements all active rule instances with a positive timer
+  - triggers new rules based on the deontic and hence/lest.
 )
   rl [tick] :
     < coordinator : Coordinator |

@@ -22,17 +22,41 @@ rules = '''
 
 transpiled = "transpile (" + rules + ")"
 
-# term = main_mod.parseTerm("initialConfig")
-
-rules_term = main_mod.parseTerm(rules)
+# rules_term = main_mod.parseTerm(rules)
 transpiled_term = main_mod.parseTerm(transpiled)
 
-def eval_trace(trace_str):
-      strat = "rewriteTrace(" + trace_str + ")"
-      strat_parsed = main_mod.parseStrategy(strat)
-      return transpiled_term.srewrite(main_mod.parseStrategy())
 
-result = transpiled_term.srewrite(main_mod.parseStrategy("rewriteTrace(tick)"))
-# for i in result: print(i)
+def trace_to_strat(trace_str):
+  strat = "rewriteTrace(" + trace_str + ")"
+  strat_parsed = main_mod.parseStrategy(strat)
+  return strat_parsed
 
-print(transpiled_term)
+
+trace_strat = trace_to_strat("tick ++ tick")
+
+# for x in transpiled_term.srewrite(trace_strat):
+#     print(x)
+
+# https://github.com/fadoss/maude-bindings/blob/master/tests/python/graph.py
+def exploreAndGraph(graph, stateNr):
+	print(stateNr, '[label="' + str(graph.getStateTerm(stateNr)) + '"];')
+
+	index = 0
+	nextState = graph.getNextState(stateNr, index)
+	
+	while nextState >= 0:
+		if stateNr != nextState:
+			print(stateNr, '->', nextState, ';')
+			
+		if nextState > stateNr:
+			exploreAndGraph(graph, nextState)
+
+		index = index + 1
+		nextState = graph.getNextState(stateNr, index)
+
+graph = maude.StrategyRewriteGraph(transpiled_term, trace_strat)
+
+print(exploreAndGraph(graph, 0))
+
+# for x in trace:
+#   print(x)

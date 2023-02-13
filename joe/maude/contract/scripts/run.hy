@@ -43,21 +43,23 @@
 ;     None
 ;     #((get queue 0) (.popleft queue))))
 
-(defn rewrite-graph->edges [rewrite-graph]
+(defn rewrite-graph->graph [rewrite-graph]
   (setv vertex-queue (.pdeque pyrs [0])
-        edges(.pset pyrs))
+        vertices (.pset pyrs)
+        edges (.pset pyrs))
   (while (> (len vertex-queue) 0)
     (setv curr-vertex (-> vertex-queue (get 0))
+          vertices (.add vertices curr-vertex)
           vertex-queue (.popleft vertex-queue)
           succ-index 0)
     (while True
       (let [new-vertex (.getNextState rewrite-graph curr-vertex succ-index)]
-        (if (in new-vertex #{curr-vertex -1})
+        (if (or (= new-vertex -1) (in new-vertex vertices))
           (break)
           (setv succ-index (+ 1 succ-index)
                 vertex-queue (.append vertex-queue new-vertex)
                 edges (.add edges #(curr-vertex new-vertex)))))))
-  edges)
+  (.pmap pyrs {:vertices vertices :edges edges}))
 
 ; (defn -strat-graph->edges
 ;   [strat-graph vertex-queue edges]
@@ -84,15 +86,15 @@
 ; (defn strat-graph->edges [strat-graph]
 ;   (-strat-graph->edges strat-graph (.pdeque pyrs [0]) (.pset pyrs)))
 
-(defn term-strat->edges [term strat]
+(defn term-strat->graph [term strat]
   (-> maude
       (.StrategyRewriteGraph term strat)
-      rewrite-graph->edges))
+      rewrite-graph->graph))
 
 (defn edges->graph [edges]
   (-> (.Graph nx)))
 
-(print (term-strat->edges transpiled-term (.parseStrategy main-mod "all ; all")))
+(print (term-strat->graph transpiled-term (.parseStrategy main-mod "all ; all")))
 
 ; (as-> "all" it
 ;   ; (trace-str->strat main-mod it)

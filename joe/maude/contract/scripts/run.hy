@@ -4,7 +4,7 @@
  networkx :as nx
  pyrsistent :as pyrs)
 
-(require hyrule [-> as-> ->> branch case defseq])
+(require hyrule [-> as-> ->> branch case loop])
 
 (do
   (.init maude)
@@ -43,19 +43,20 @@
 ;     None
 ;     #((get queue 0) (.popleft queue))))
 
-(defn strat-graph->edges [graph]
+(defn rewrite-graph->edges [rewrite-graph]
   (setv vertex-queue (.pdeque pyrs [0])
-        edges (.pset pyrs))
+        edges(.pset pyrs))
   (while (> (len vertex-queue) 0)
     (setv curr-vertex (-> vertex-queue (get 0))
           vertex-queue (.popleft vertex-queue)
-          succ-index 0
-          new-vertex (.getNextState graph curr-vertex succ-index))
-    (while (not (in new-vertex #{curr-vertex -1}))
-      (setv succ-index (+ succ-index 1)
-            vertex-queue (.append vertex-queue new-vertex)
-            edges (.add edges #(curr-vertex new-vertex))
-            new-vertex (.getNextState graph curr-vertex succ-index))))
+          succ-index 0)
+    (while True
+      (let [new-vertex (.getNextState rewrite-graph curr-vertex succ-index)]
+        (if (in new-vertex #{curr-vertex -1})
+          (break)
+          (setv succ-index (+ 1 succ-index)
+                vertex-queue (.append vertex-queue new-vertex)
+                edges (.add edges #(curr-vertex new-vertex)))))))
   edges)
 
 ; (defn -strat-graph->edges
@@ -86,7 +87,7 @@
 (defn term-strat->edges [term strat]
   (-> maude
       (.StrategyRewriteGraph term strat)
-      strat-graph->edges))
+      rewrite-graph->edges))
 
 (defn edges->graph [edges]
   (-> (.Graph nx)))

@@ -15,19 +15,19 @@
 
  rules
  "
-  RULE 'START
-  WITHIN 1 DAY PARTY 'party0 MUST DO 'action0
-  LEST 'rule2
-  HENCE ('rule0 AND 'rule1),
+ RULE 'START
+ WITHIN 1 DAY PARTY 'party0 MUST DO 'action0
+ LEST 'rule2
+ HENCE ('rule0 AND 'rule1),
 
-  RULE 'rule0 PARTY 'party0 SHANT WITHIN 1 DAY 'action0,
+ RULE 'rule0 PARTY 'party0 SHANT WITHIN 1 DAY 'action0,
 
-  RULE 'rule1 PARTY 'party1 MUST DO 'action1 WITHIN 2 DAY HENCE 'rule3,
+ RULE 'rule1 PARTY 'party1 MUST DO 'action1 WITHIN 2 DAY HENCE 'rule3,
 
-  RULE 'rule2 WITHIN 2 DAY PARTY 'party2 MUST 'action2 LEST 'rule3,
+ RULE 'rule2 WITHIN 2 DAY PARTY 'party2 MUST 'action2 LEST 'rule3,
 
-  RULE 'rule3 PARTY 'party3 MUST WITHIN 4 DAY DO 'action3
-  "
+ RULE 'rule3 PARTY 'party3 MUST WITHIN 4 DAY DO 'action3
+ "
 
  transpiled f"transpile({rules})"
 
@@ -35,7 +35,7 @@
  transpiled-term (.parseTerm main-mod transpiled))
 
 (defn trace-str->strat [mod trace-str]
-  (->> f "rewriteTrace({trace-str})"
+  (->> f"rewriteTrace({trace-str})"
        (.parseStrategy mod)))
 
 ; (defn split-pdeque [queue]
@@ -46,7 +46,7 @@
 (defn rewrite-graph->graph [rewrite-graph]
   (setv vertex-queue (.pdeque pyrs [0])
         vertices (.pset pyrs)
-        edges (.pset pyrs))
+        nx-graph (.Graph nx))
   (while (> (len vertex-queue) 0)
     (setv curr-vertex (-> vertex-queue (get 0))
           vertices (.add vertices curr-vertex)
@@ -58,8 +58,10 @@
           (break)
           (setv succ-index (+ 1 succ-index)
                 vertex-queue (.append vertex-queue new-vertex)
-                edges (.add edges #(curr-vertex new-vertex)))))))
-  (.pmap pyrs {:vertices vertices :edges edges}))
+                nx-graph (.add-edge nx-graph curr-vertex new-vertex))))))
+  (do
+    (for [vertex vertices]
+      (assoc ))))
 
 ; (defn -strat-graph->edges
 ;   [strat-graph vertex-queue edges]

@@ -38,29 +38,25 @@ trace_strat = trace_to_strat("tick ++ tick")
 # for x in transpiled_term.srewrite(trace_strat):
 #     print(x)
 
-g = gt.Graph()
-states = g.new_vertex_property("string")
-
-for i in g.add_vertex():
-	print(i)
+# g = gt.Graph()
+# states = g.new_vertex_property("string")
 
 # https://github.com/fadoss/maude-bindings/blob/master/tests/python/graph.py
 def exploreAndGraph(graph, stateNr):
-  g.add_vertex()
-  states[stateNr] = '[label="' + str(graph.getStateTerm(stateNr)) + '"];'
-  index = 0
-  nextState = graph.getNextState(stateNr, index)
+	print(stateNr, '[label="' + str(graph.getStateTerm(stateNr)) + '"];')
 
-  while nextState >= 0:
-    if stateNr != nextState:
-      print(stateNr, '->', nextState, ';')
-      
-    if nextState > stateNr:
-      exploreAndGraph(graph, nextState)
+	index = 0
+	nextState = graph.getNextState(stateNr, index)
 
-    index = index + 1
-    nextState = graph.getNextState(stateNr, index)
+	while nextState >= 0:
+		print(stateNr, '->', nextState, ';')
+
+		if nextState > stateNr:
+			exploreAndGraph(graph, nextState)
+
+		index = index + 1
+		nextState = graph.getNextState(stateNr, index)
 
 graph = maude.StrategyRewriteGraph(transpiled_term, trace_strat)
 
-# print(exploreAndGraph(graph, 0))
+print(exploreAndGraph(graph, 0))

@@ -6,13 +6,15 @@
 
 (require hyrule [-> as-> ->>])
 
-(setv main-mod
-  (do (.init maude)
-      (.load maude "../.workdir/main.maude")
-      (.getModule maude "MAIN")))
+(do
+  (.init maude)
+  (.load maude "../.workdir/main.maude"))
 
-(setv rules
-  "
+(setv
+ main-mod (.getModule maude "MAIN")
+
+ rules
+ "
   RULE 'START
   WITHIN 1 DAY PARTY 'party0 MUST DO 'action0
   LEST 'rule2
@@ -25,23 +27,31 @@
   RULE 'rule2 WITHIN 2 DAY PARTY 'party2 MUST 'action2 LEST 'rule3,
 
   RULE 'rule3 PARTY 'party3 MUST WITHIN 4 DAY DO 'action3
-  ")
+  "
 
-(setv transpiled
-  (+ "transpile (" rules ")"))
+ transpiled f"transpile({rules})"
 
-(defn eval-trace [trace-str]
-  (as-> trace-str x
-      (+ "rewriteTrace(" x ")")
-      (.parseStrategy main-mod x)))
+ rules-term (.parseTerm main-mod rules)
+ transpiled-term (.parseTerm main-mod transpiled))
 
-(setv rules-term
-  (.parseTerm main-mod rules))
+(defn trace-str->strat [mod trace-str]
+  (->> f"rewriteTrace({trace-str})"
+      (.parseStrategy mod)))
 
-(setv transpiled-term
-  (.parseTerm main-mod transpiled))
-
-(let [strat (.parseStrategy main-mod "idle")]
-  (as-> transpiled-term x
-        (.StrategyRewriteGraph maude x strat)
-        (print x)))
+(as-> "all" it
+  ; (trace-str->strat main-mod it)
+  (.parseStrategy main-mod it)
+  (.StrategyRewriteGraph maude transpiled-term it)
+  (do (.getNextState it 0 0) it)
+  (do (.getNextState it 0 1) it)
+  ; (.getNextState it 1 0)
+  (.getTransition it 1 1)
+  ; (.getNrRealStates it)
+  ; (.getStateTerm it 0)
+  ; (do
+  ;   (for [index (range 2)]
+  ;     (.getNextState it index (+ index 1)))
+  ;   it)
+  ; (.getStateTerm it 1)
+  ; (.getNrStates it)
+  (print it))

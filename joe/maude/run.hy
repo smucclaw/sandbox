@@ -46,7 +46,7 @@
 (defn rewrite-graph->graph [rewrite-graph]
   (setv vertex-queue (.pdeque pyrs [0])
         vertices (.pset pyrs)
-        nx-graph (.Graph nx))
+        edges (.pset pyrs))
   (while (> (len vertex-queue) 0)
     (setv curr-vertex (-> vertex-queue (get 0))
           vertices (.add vertices curr-vertex)
@@ -58,10 +58,8 @@
           (break)
           (setv succ-index (+ 1 succ-index)
                 vertex-queue (.append vertex-queue new-vertex)
-                nx-graph (.add-edge nx-graph curr-vertex new-vertex))))))
-  (do
-    (for [vertex vertices]
-      (assoc ))))
+                edges (.add edges #(curr-vertex new-vertex)))))))
+  edges) 
 
 ; (defn -strat-graph->edges
 ;   [strat-graph vertex-queue edges]

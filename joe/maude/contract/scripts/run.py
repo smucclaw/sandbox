@@ -60,7 +60,7 @@ def escape_ansi(line):
 # https://github.com/fadoss/maude-bindings/blob/master/tests/python/graph.py
 def rewrite_graph_to_graph(rewrite_graph):
   vertex_queue = pyrs.pdeque([0])
-  vertices = pyrs.pset()
+  vertices = pyrs.pset([0])
   edges = pyrs.pset()
   while len(vertex_queue) > 0:
     curr_vertex = vertex_queue.left
@@ -69,27 +69,28 @@ def rewrite_graph_to_graph(rewrite_graph):
     succ_index = 0
     while True:
       new_vertex = rewrite_graph.getNextState(curr_vertex, succ_index)
-      # It's ok to add -1 here because all our data structures are persistent.
-      if new_vertex in vertices.add(-1):
-        break
-      else:
-        succ_index += 1
-        vertex_queue = vertex_queue.append(new_vertex)
-        edge = (curr_vertex, new_vertex)
-        rule = rewrite_graph.getTransition(*edge).getRule()
-        if rule:
-          rule_label = rule.getLabel()
-          edge = map(rewrite_graph.getStateTerm, edge)
-          # Probably want to apply more post-processing beyond escaping ansi
-          # chars to terms to make them more readable.
-          edge = map(str, edge)
-          edge = map(escape_ansi, edge)
-          edge = list(edge)
-          edges = edges.add(pyrs.pmap({
-            'from': edge[0],
-            'to': edge[1],
-            'rule_label': rule_label
-          }))
+      if new_vertex in vertices.add(-1): break
+      # vertices = vertices.add(new_vertex)
+      vertex_queue = vertex_queue.append(new_vertex)
+      edge = (curr_vertex, new_vertex)
+      # Do we need to handle transitions that don't have a rule label?
+      # What do they correspond to? Things like strategy applications?
+      # If so, then we should hide those details and not expose them.
+      rule = rewrite_graph.getTransition(*edge).getRule()
+      if rule:
+        rule_label = rule.getLabel()
+        edge = map(rewrite_graph.getStateTerm, edge)
+        # Probably want to apply more post-processing beyond escaping ansi
+        # chars to terms to make them more readable.
+        edge = map(str, edge)
+        edge = map(escape_ansi, edge)
+        edge = list(edge)
+        edges = edges.add(pyrs.pmap({
+          'from': edge[0],
+          'to': edge[1],
+          'rule_label': rule_label
+        }))
+      succ_index += 1
   return edges
 
   # vertices1 = pyrs.pset()

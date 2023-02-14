@@ -14,8 +14,11 @@ Dependencies:
 
 import maude
 import umaudemc.api
+
+from jaal import Jaal
 import networkx as nx
 import os
+import pandas as pd
 from pathlib import Path
 # from pipetools import pipe, where, X 
 import pyrsistent as pyrs
@@ -55,12 +58,10 @@ def escape_ansi(line):
 
 # Based on:
 # https://github.com/fadoss/maude-bindings/blob/master/tests/python/graph.py
-# This is essentially a breadth-first traversal of the rewrite graph to construct a
-# # networkx graph
 def rewrite_graph_to_graph(rewrite_graph):
   vertex_queue = pyrs.pdeque([0])
   vertices = pyrs.pset()
-  nx_graph = nx.DiGraph()
+  edges = pyrs.pset()
   while len(vertex_queue) > 0:
     curr_vertex = vertex_queue.left
     vertices = vertices.add(curr_vertex)
@@ -83,8 +84,52 @@ def rewrite_graph_to_graph(rewrite_graph):
           # chars to terms to make them more readable.
           edge = map(str, edge)
           edge = map(escape_ansi, edge)
-          nx_graph.add_edge(*edge, rule_label = rule_label)
-  return nx_graph
+          edge = list(edge)
+          edges = edges.add(pyrs.pmap({
+            'from': edge[0],
+            'to': edge[1],
+            'rule_label': rule_label
+          }))
+  return edges
+
+  # vertices1 = pyrs.pset()
+  # for edge in edges:
+  #   for vertex in [edge['from'], edge['to']]:
+  #     term = escape_ansi(str(rewrite_graph.getStateTerm(vertex)))
+  #     vertices1 = vertices1.add(pyrs.pmap({'id': vertex, 'term': term}))
+
+  # return pyrs.pmap({'vertices': vertices1, 'edges': edges})
+
+# This is essentially a breadth-first traversal of the rewrite graph to construct a
+# # networkx graph
+# def rewrite_graph_to_graph(rewrite_graph):
+#   vertex_queue = pyrs.pdeque([0])
+#   vertices = pyrs.pset()
+#   nx_graph = nx.DiGraph()
+#   while len(vertex_queue) > 0:
+#     curr_vertex = vertex_queue.left
+#     vertices = vertices.add(curr_vertex)
+#     vertex_queue = vertex_queue.popleft()
+#     succ_index = 0
+#     while True:
+#       new_vertex = rewrite_graph.getNextState(curr_vertex, succ_index)
+#       # It's ok to add -1 here because all our data structures are persistent.
+#       if new_vertex in vertices.add(-1):
+#         break
+#       else:
+#         succ_index += 1
+#         vertex_queue = vertex_queue.append(new_vertex)
+#         edge = (curr_vertex, new_vertex)
+#         rule = rewrite_graph.getTransition(*edge).getRule()
+#         if rule:
+#           rule_label = rule.getLabel()
+#           edge = map(rewrite_graph.getStateTerm, edge)
+#           # Probably want to apply more post-processing beyond escaping ansi
+#           # chars to terms to make them more readable.
+#           edge = map(str, edge)
+#           edge = map(escape_ansi, edge)
+#           nx_graph.add_edge(*edge, rule_label = rule_label)
+#   return nx_graph
 
 def term_strat_to_graph(term, strat):
   graph = maude.StrategyRewriteGraph(term, strat)
@@ -94,14 +139,32 @@ def term_strat_to_graph(term, strat):
 if __name__ == '__main__':
   test_strat = main_mod.parseStrategy('all *')
 
-  nx_graph = term_strat_to_graph(transpiled_term, test_strat)
+  graph = term_strat_to_graph(transpiled_term, test_strat)
+  edge_df = pd.DataFrame(graph)
+  edge_df.to_csv("edges.csv")
+  # print(len(graph['edges']))
+  Jaal(edge_df).plot(
+    directed = True,
+    vis_opts = {
+      'physics': {
+        'barnesHut': {
+          'centralGravity': 0.2,
+          'springLength': 200,
+          'springStrength': 0.05,
+          'damping': 0.09,
+          'gravitationalConstant' : -8000
+        }
+      }
+    }
+  )
+  # print(vertex_df)
 
-  pyvis_graph = Network(height = '800px', directed=True)
-  pyvis_graph.from_nx(nx_graph)
-  pyvis_graph.barnes_hut()
-  pyvis_graph.show_buttons(['physics', 'interaction'])
-  # pyvis_graph.show_buttons(filter_=['physics'])
-  pyvis_graph.show('graph.html')
+  # pyvis_graph = Network(height = '800px', directed=True)
+  # pyvis_graph.from_nx(nx_graph)
+  # pyvis_graph.barnes_hut()
+  # pyvis_graph.show_buttons(['physics', 'interaction'])
+  # # pyvis_graph.show_buttons(filter_=['physics'])
+  # pyvis_graph.show('graph.html')
 
   # print(graph.edges.data())
 

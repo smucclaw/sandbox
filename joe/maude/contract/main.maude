@@ -36,24 +36,24 @@ load ./semantics/verification/race-cond-strat
 (smod MAIN is
   protecting RACE-COND-STRAT .
 
-  --- ops rules : -> Set{Rule} .
-  --- ops initialConfig : -> Configuration .
+  ops rules : -> Set{Rule} .
+  ops initialConfig : -> Configuration .
 
-  --- eq rules
-  --- = RULE 'START
-  ---   WITHIN 1 DAY PARTY 'party0 MUST DO 'action0
-  ---   LEST 'rule2
-  ---   HENCE ('rule0 AND 'rule1),
+  eq rules
+  = RULE 'START
+    WITHIN 1 DAY PARTY 'party0 MUST DO 'action0
+    LEST 'rule2
+    HENCE ('rule0 AND 'rule1),
 
-  ---   RULE 'rule0 PARTY 'party0 SHANT WITHIN 1 DAY 'action0,
+    RULE 'rule0 PARTY 'party0 SHANT WITHIN 1 DAY 'action0,
 
-  ---   RULE 'rule1 PARTY 'party1 MUST DO 'action1 WITHIN 2 DAY HENCE 'rule3,
+    RULE 'rule1 PARTY 'party1 MUST DO 'action1 WITHIN 2 DAY HENCE 'rule3,
 
-  ---   RULE 'rule2 WITHIN 2 DAY PARTY 'party2 MUST 'action2 LEST 'rule3,
+    RULE 'rule2 WITHIN 2 DAY PARTY 'party2 MUST 'action2 LEST 'rule3,
 
-  ---   RULE 'rule3 PARTY 'party3 MUST WITHIN 4 DAY DO 'action3 .
+    RULE 'rule3 PARTY 'party3 MUST WITHIN 4 DAY DO 'action3 .
 
-  --- eq initialConfig = transpile rules .
+  eq initialConfig = transpile rules .
 
 endsm)
 

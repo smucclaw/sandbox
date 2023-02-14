@@ -315,6 +315,7 @@ load full-maude
 
   vars activeRules activeRules' : Set{Rule} .
   vars actorNames actorNames' : Set{Qid} .
+  vars contractState : ContractState .
 
   eq Active empty = Fulfilled .
 
@@ -326,6 +327,11 @@ load full-maude
 
   eq Breached actorNames ^ Breached actorNames'
   = Breached (actorNames, actorNames') .
+
+  ops isActive_ : ContractState -> Bool .
+
+  eq isActive Active activeRules = true .
+  eq isActive contractState = false [owise] .
 
   --- class Situation .
 

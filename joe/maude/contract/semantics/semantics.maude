@@ -20,6 +20,7 @@ load transpiler
   --- vars allowedEvents allowedEvents' : AllowedEvent .
   vars deontic : Deontic .
   vars time time' : Nat .
+  vars contractState : ContractState .
 
 ---(
   AC-unification allows us to recurse on sets as if they were lists.
@@ -45,7 +46,7 @@ load transpiler
     (actorName does actionName)
   = true .
 
-  eq activeRules containsRuleWithEvent actionEvent = false [owise].
+  eq activeRules containsRuleWithEvent actionEvent = false [owise] .
 
   --- ops _containsRuleWithZeroTimer : Set{ActiveRule} -> Bool .
 
@@ -233,21 +234,28 @@ load transpiler
   ----------------------------------- [tick]
   { coordinator } \/ actorNames
   -- tick -->
-  { coordinator[activeRules := deltaTick activeRules, time := time + 1] } \/ actorNames
+  { coordinator[activeRules := deltaTick activeRules, time := time'] } \/ actorNames
 
   Here deltaTick is a function that:
   - removes all active rule instances with a timer of 0
   - decrements all active rule instances with a positive timer
   - triggers new rules based on the deontic and hence/lest.
+
+  time' = time + 1 if contractState in coordinator is active.
+  time' = time otherwise.
+
+  Note that deltaTick is invariant on Breached and Fulfilled states so that
+  an application of this rule doesn't produce any new states if the contract
+  is already breached or fulfilled.
 )
   rl [tick] :
     < coordinator : Coordinator |
       rules : rules,
       time : time,
-      contractState : Active (activeRule, activeRules) >
+      contractState : contractState >
   =>
     < coordinator : Coordinator |
-      time : time + 1,
-      contractState : deltaTick rules Active (activeRule, activeRules) > .
+      time : if isActive contractState then time + 1 else time fi,
+      contractState : deltaTick rules contractState > .
 
 endom)

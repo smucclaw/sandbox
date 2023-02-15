@@ -177,19 +177,22 @@ def graph_to_nx_graph(graph):
 def nx_graph_to_pyvis_netwk(nx_graph):
   netwk = Network(
     height = "800px", directed = True,
-    select_menu = True, filter_menu = True
+    select_menu = True, filter_menu = True,
+    cdn_resources = 'remote',
+    layout = 'hierarchical'
   )
   netwk.from_nx(nx_graph)
+  netwk.options.layout.hierarchical.sortMethod = 'directed'
   return netwk
  
 if __name__ == '__main__':
   contract_dir = Path(__file__).parent.parent
 
   rules = ""
-  with open(contract_dir / "natural4" / "rules.natural4") as f:
+  with open(contract_dir / 'natural4' / 'rules.natural4') as f:
     rules = f.read()
 
-  workdir = contract_dir / ".workdir"
+  workdir = contract_dir / '.workdir'
   os.chdir(workdir)
 
   maude.init(loadPrelude = False)
@@ -197,7 +200,7 @@ if __name__ == '__main__':
   with open("main.maude") as f:
     maude.input(f.read())
 
-  main_mod = maude.getModule("MAIN")
+  main_mod = maude.getModule('MAIN')
 
   transpiled = f"transpile({rules})"
 
@@ -208,7 +211,7 @@ if __name__ == '__main__':
   graph = term_strat_to_graph(main_mod, transpiled_term, strat)
   nx_graph = graph_to_nx_graph(graph)
   netwk = nx_graph_to_pyvis_netwk(nx_graph)
-  netwk.barnes_hut()
+  # netwk.barnes_hut()
   netwk.show_buttons()
   netwk.show('graph.html')
 

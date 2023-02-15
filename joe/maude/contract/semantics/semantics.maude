@@ -255,7 +255,11 @@ load transpiler
       contractState : contractState >
   =>
     < coordinator : Coordinator |
-      time : if isActive contractState then time + 1 else time fi,
+      time :
+        if contractStateToStatus contractState == Active
+        then s time
+        else time
+        fi,
       contractState : deltaTick rules contractState > .
 
 endom)

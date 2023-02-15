@@ -304,15 +304,13 @@ load full-maude
 )
 
   ops Active_ : Set{Rule} -> ContractState [ctor] .
-  --- subsorts Set{Rule} < ContractState .
-  --- subsorts Set{Qid} < ContractState .
-
   ops Breached_ : Set{Qid} -> ContractState [ctor] .
   ops Fulfilled : -> ContractState [ctor] .
 
   ops _^_ : ContractState ContractState -> ContractState
     [assoc comm id: Fulfilled] .
 
+  vars activeRule : Rule .
   vars activeRules activeRules' : Set{Rule} .
   vars actorNames actorNames' : Set{Qid} .
   vars contractState : ContractState .
@@ -332,10 +330,30 @@ load full-maude
   eq Breached actorNames ^ Breached actorNames'
   = Breached (actorNames, actorNames') .
 
-  ops isActive_ : ContractState -> Bool .
+  sorts ContractStatus .
+  ops Active : -> ContractStatus [ctor] .
+  ops Breached : -> ContractStatus [ctor] .
+  ops Fulfilled : -> ContractStatus [ctor] .
 
-  eq isActive Active activeRules = true .
-  eq isActive contractState = false [owise] .
+  ops contractStateToStatus_ : ContractState -> ContractStatus .
+
+  eq contractStateToStatus Active (activeRule, activeRules) = Active .
+  eq contractStateToStatus Breached actorNames = Breached .
+  eq contractStateToStatus Fulfilled = Fulfilled .
+
+  ops configToStatus_ : Configuration -> ContractStatus .
+
+  eq configToStatus
+    (
+      config
+      < coordinator : Coordinator |
+        contractState : contractState >
+    )
+  = contractStateToStatus contractState .
+
+  --- ops isActive_ : ContractState -> Bool .
+  --- eq isActive Active activeRules = true .
+  --- eq isActive contractState = false [owise] .
 
   --- class Situation .
 

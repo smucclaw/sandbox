@@ -2,27 +2,31 @@
 Dependencies:
 - maude
   For loading Maude modules and basic Maude stuff.
+
 - umaudemc
   For model checking LTL, CTL, CTL*, mu-calc and probabilistic CTL using tools
   like ltsmin, Nusmv, Spin and PRISM.
+
+- pyrsistent
+  For persistent hash array mapped trie maps and sets.
+
 - networkx
   Used to create and manipulate graphs from traces and state spaces.
+
 - pyvis
   Used to generate interactive html/js visualizations from networkx graphs.
 '''
 
+import os
+from pathlib import Path
+import re
+
 import maude
 import umaudemc.api
 
-# from jaal import Jaal
-import networkx as nx
-import os
-# import pandas as pd
-from pathlib import Path
-# from pipetools import pipe, where, X 
 import pyrsistent as pyrs
+import networkx as nx
 from pyvis.network import Network
-import re
 
 def trace_to_strat(mod, trace_str):
   strat = f"rewriteTrace({trace_str})"
@@ -40,16 +44,34 @@ class Edge(pyrs.PRecord):
   dest_id = pyrs.field(int)
   rule_label = pyrs.field(str)
 
-# class Node(pyrs.PRecord):
-#   id = pyrs.field(int)
-#   label = pyrs.field(str)
+class Node(pyrs.PRecord):
+  term_str = pyrs.field(str)
+  contract_status = pyrs.field(str)
 
 class Graph(pyrs.PRecord):
-  nodes = pyrs.pmap_field(int, str)
+  nodes = pyrs.pmap_field(int, Node)
   edges = pyrs.pset_field(Edge)
 
-def eval_fn(mod, fn, term):
-  term = mod.parseTerm(f"{fn}({term})")
+def node_to_colour(node):
+  colour = None
+  match node.contract_status:
+    case 'Active': colour = 'blue'
+    case 'Fulfilled': colour = 'green'
+    case 'Breached': colour = 'red'
+  return colour
+
+def edge_to_colour(graph, edge):
+  dest_node = graph.nodes[edge.dest_id]
+  colour = node_to_colour(dest_node)
+  return colour
+
+def edge_to_next_state(graph, edge):
+  dest_node = graph.nodes[edge.dest_id]
+  next_state = dest_node.contract_status
+  return next_state
+
+def eval_fn(mod, fn_str, term_str):
+  term = mod.parseTerm(f"{fn_str}({term_str})")
   term.reduce()
   term = escape_ansi(term)
   return term
@@ -64,42 +86,43 @@ def edges_to_graph(mod, rewrite_graph, edges):
   for edge in edges:
     for node_id in [edge.src_id, edge.dest_id]:
       node_term = get_state_term_str(rewrite_graph, node_id)
+      contract_status = eval_fn(mod, "configToStatus", node_term)
+      match contract_status:
+        case '(Fulfilled).ContractStatus': contract_status = 'Fulfilled'
+        case _ : pass
       node_term = eval_fn(mod, "pretty", node_term)
-      nodes = nodes.set(node_id, node_term)
+      node = Node(term_str = node_term, contract_status = contract_status)
+      nodes = nodes.set(node_id, node)
   graph = Graph(nodes = nodes, edges = edges)
   return graph
 
-# def node_ids_to_edge(mod, graph, src_node_id, dest_node_id):
-#   rule = graph.getTransition(src_node_id, dest_node_id).getRule()
-#   edge = None
-#   if rule:
-#     rule_label = rule.getLabel()
-#     match rule_label:
-#       case 'tick':
-#         rule_label = 'tick'
-#       case 'action':
-#         new_node_term = get_state_term_str(graph, dest_node_id)
-#         rule_label = eval_fn(mod, "getAction", new_node_term)
-#     edges = edges.add(
-#       Edge(src_id = curr_node, dest_id = new_node, rule_label = rule_label)
-#     )
-
 # Based on:
 # https://github.com/fadoss/maude-bindings/blob/master/tests/python/graph.py
+# This is essentially a breadth-first traversal through the graph, covering all
+# edges.
+# We start with the root node that has a node_id, ie state number, of 0.
+# For each node in our queue, we start with the index succ_index = 0 and loop
+# until new_node = getNextState(curr_node, succ_index) is -1.
+# When that happens, we have exhausted all successors.
+# For each successor we encounter until that point, we add it to our queue
+# to visit if it's not already visited.
+# For each node we encounter, we look at the rule label corresponding to the
+# edge.
+# We leave 'tick' labels alone and convert 'action' labels to something of the
+# form 'actorName does actionName', depending on the destination node.
 def rewrite_graph_to_graph(mod, rewrite_graph):
   node_queue = pyrs.pdeque([0])
-  nodes = pyrs.pset([0])
+  visited_nodes = pyrs.pset()
   edges = pyrs.pset()
   while len(node_queue) > 0:
     curr_node = node_queue.left
     node_queue = node_queue.popleft()
+    visited_nodes = visited_nodes.add(curr_node)
     succ_index = 0
-    nodes = nodes.add(curr_node)
     while True:
       new_node = rewrite_graph.getNextState(curr_node, succ_index)
-      if new_node == -1:
-        break
-      if new_node not in nodes:
+      if new_node == -1: break
+      if new_node not in visited_nodes:
         node_queue = node_queue.append(new_node)
       # Do we need to handle transitions that don't have a rule label?
       # What do they correspond to? Things like strategy applications?
@@ -111,6 +134,8 @@ def rewrite_graph_to_graph(mod, rewrite_graph):
           case 'tick':
             rule_label = 'tick'
           case 'action':
+            # Get the term corresponding to the new node's id and get the
+            # action transition.
             new_node_term = get_state_term_str(rewrite_graph, new_node)
             rule_label = eval_fn(mod, "getAction", new_node_term)
         edges = edges.add(
@@ -120,14 +145,29 @@ def rewrite_graph_to_graph(mod, rewrite_graph):
   graph = edges_to_graph(mod, rewrite_graph, edges)
   return graph
 
+def term_strat_to_graph(mod, term, strat):
+  graph = maude.StrategyRewriteGraph(term, strat)
+  graph = rewrite_graph_to_graph(mod, graph)
+  return graph
+
 def graph_to_nx_graph(graph):
   nx_graph = nx.DiGraph()
-  for node_id, node_term in graph.nodes.items():
-    nx_graph.add_node(node_id, label = node_term)
+  for node_id, node in graph.nodes.items():
+    nx_graph.add_node(
+      node_id,
+      label = node.term_str,
+      contract_state = node.contract_status,
+      color = node_to_colour(node)
+    )
   for edge in graph.edges:
-    nx_graph.add_edge(edge.src_id, edge.dest_id, label = edge.rule_label)
+    nx_graph.add_edge(
+      edge.src_id, edge.dest_id,
+      label = edge.rule_label,
+      next_state = edge_to_next_state(graph, edge),
+      color = edge_to_colour(graph, edge)
+    )
 
-  # Ensure that the node labels the output graph are consecutive.
+  # Ensure that the node labels in the output graph are consecutive.
   nx_graph = nx.convert_node_labels_to_integers(nx_graph)
   return nx_graph
 
@@ -138,50 +178,6 @@ def nx_graph_to_pyvis_netwk(nx_graph):
   )
   netwk.from_nx(nx_graph)
   return netwk
-
-  # vertices1 = pyrs.pset()
-  # for edge in edges:
-  #   for vertex in [edge['from'], edge['to']]:
-  #     term = escape_ansi(str(rewrite_graph.getStateTerm(vertex)))
-  #     vertices1 = vertices1.add(pyrs.pmap({'id': vertex, 'term': term}))
-
-  # return pyrs.pmap({'vertices': vertices1, 'edges': edges})
-
-# This is essentially a breadth-first traversal of the rewrite graph to construct a
-# # networkx graph
-# def rewrite_graph_to_graph(rewrite_graph):
-#   vertex_queue = pyrs.pdeque([0])
-#   vertices = pyrs.pset()
-#   nx_graph = nx.DiGraph()
-#   while len(vertex_queue) > 0:
-#     curr_vertex = vertex_queue.left
-#     vertices = vertices.add(curr_vertex)
-#     vertex_queue = vertex_queue.popleft()
-#     succ_index = 0
-#     while True:
-#       new_vertex = rewrite_graph.getNextState(curr_vertex, succ_index)
-#       # It's ok to add -1 here because all our data structures are persistent.
-#       if new_vertex in vertices.add(-1):
-#         break
-#       else:
-#         succ_index += 1
-#         vertex_queue = vertex_queue.append(new_vertex)
-#         edge = (curr_vertex, new_vertex)
-#         rule = rewrite_graph.getTransition(*edge).getRule()
-#         if rule:
-#           rule_label = rule.getLabel()
-#           edge = map(rewrite_graph.getStateTerm, edge)
-#           # Probably want to apply more post-processing beyond escaping ansi
-#           # chars to terms to make them more readable.
-#           edge = map(str, edge)
-#           edge = map(escape_ansi, edge)
-#           nx_graph.add_edge(*edge, rule_label = rule_label)
-#   return nx_graph
-
-def term_strat_to_graph(mod, term, strat):
-  graph = maude.StrategyRewriteGraph(term, strat)
-  graph = rewrite_graph_to_graph(mod, graph)
-  return graph
  
 if __name__ == '__main__':
   contract_dir = Path(__file__).parent.parent
@@ -200,7 +196,7 @@ if __name__ == '__main__':
 
   main_mod = maude.getModule("MAIN")
 
-  transpiled = f"transpile ({rules})"
+  transpiled = f"transpile({rules})"
 
   rules_term = main_mod.parseTerm(rules)
   transpiled_term = main_mod.parseTerm(transpiled)
@@ -213,6 +209,7 @@ if __name__ == '__main__':
   netwk.show_buttons()
   netwk.show('graph.html')
 
+  # Experiments with Jaal.
   # edge_df = pd.DataFrame(graph)
   # edge_df.to_csv("edges.csv")
   # # print(len(graph['edges']))
@@ -230,23 +227,3 @@ if __name__ == '__main__':
   #     }
   #   }
   # )
-  # print(vertex_df)
-
-  # pyvis_graph = Network(height = '800px', directed=True)
-  # pyvis_graph.from_nx(nx_graph)
-  # pyvis_graph.barnes_hut()
-  # pyvis_graph.show_buttons(['physics', 'interaction'])
-  # # pyvis_graph.show_buttons(filter_=['physics'])
-  # pyvis_graph.show('graph.html')
-
-  # print(graph.edges.data())
-
-  # https://stackoverflow.com/questions/46244899/labeling-networkx-node-attributes-outside-of-nodes
-  # plt.figure()
-  # pos_nodes = nx.spring_layout(graph)
-  # nx.draw(graph, pos_nodes, with_labels=True)
-  # plt.show()
-
-  # print(graph.nodes.data())
-  # print(graph.edges)
-  # print(graph.edges.data())

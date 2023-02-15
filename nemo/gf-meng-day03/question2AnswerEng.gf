@@ -1,4 +1,4 @@
-concrete question2AnswerEng of question2Answer = open Prelude in {
+concrete Question2AnswerEng of Question2Answer = open Prelude in {
 
     lincat
       

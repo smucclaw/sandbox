@@ -4,6 +4,16 @@
 2. Export to PGF
 3. Write a Python/Haskell interpreter that uses the PGF and 'translates' one sentence to another
 
+## Latest Changelog
+
+Update: As of 10/02/2023, this grammar can parse all the sentences below, but with only one syntax tree, so it's no longer ambiguous.
+
+There was an attempt at creating a Haskell interpreter for this grammar. Following Inari's advice, I first played with the Foods grammar interpreter from the first part of [Lesson 7 of the GF tutorial](http://www.grammaticalframework.org/doc/tutorial/gf-tutorial.html#toc140), which you can find in foodsTranslator. I then tried playing with the question and answer system in the second part of lesson 7 in cannedQ2A but decided to jump straight into creating an interpreter for this day 03 challenge.
+
+The interpreter is called question2AnswerInter.hs
+
+## Previous Changelog
+
 As of 27/01/2023, this grammar can parse:
 
     X: Do you promise to serve ?

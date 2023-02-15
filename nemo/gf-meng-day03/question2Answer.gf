@@ -1,4 +1,4 @@
-abstract question2Answer = {
+abstract Question2Answer = {
     {-
     X: Do you promise to serve ?
     Y: I promise to serve .

@@ -57,6 +57,10 @@ load ./semantics/verification/race-cond-strat
 
 endsm)
 
+--- (reduce
+---   getAction (< 'p : Actor | none > ('p does 'a))
+--- .)
+
 (show all .)
 
 quit

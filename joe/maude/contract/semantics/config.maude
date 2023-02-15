@@ -316,6 +316,10 @@ load full-maude
   vars activeRules activeRules' : Set{Rule} .
   vars actorNames actorNames' : Set{Qid} .
   vars contractState : ContractState .
+  vars time : Nat .
+  vars coordinator : Qid .
+  vars config : Configuration .
+  vars event : Event .
 
   eq Active empty = Fulfilled .
 
@@ -335,10 +339,35 @@ load full-maude
 
   --- class Situation .
 
-  class Coordinator |
-    rules : Set{Rule},
+  class PreCoordinator |
     time : Nat,
-    --- activeRules : Set{ActiveRule},
     contractState : ContractState .
+
+  class Coordinator |
+    rules : Set{Rule} .
+
+  subclass Coordinator < PreCoordinator .
+
+  ops pretty_ : Configuration -> Configuration .
+  ops getAction_ : Configuration -> ActionEvent .
+
+  eq pretty
+    (
+      config
+      event
+      < coordinator : Coordinator |
+       time : time,
+       contractState : contractState >
+    )
+  = config
+    < coordinator : PreCoordinator |
+      time : time,
+      contractState : contractState > .
+
+  eq getAction
+    (
+      (actorName does actionName) config
+    )
+  = actorName does actionName .
 
 endom)

@@ -15,6 +15,14 @@ Dependencies:
 
 - pyvis
   Used to generate interactive html/js visualizations from networkx graphs.
+
+Usage:
+python visualise.py natural4_file [strategy]
+
+If strategy is not provided, we take the default value to be 'all *', which
+means generate all traces and hence traverse the whole state space.
+The strategy can also be a strategy describing a trace, say
+  rewriteTrace(tick ++ 'party0 does 'action0 ++ tick)
 '''
 
 from pathlib import Path
@@ -41,13 +49,13 @@ def escape_ansi(term):
   return ansi_escape.sub('', term)
 
 class Edge(pyrs.PRecord):
-  src_id = pyrs.field(int)
-  dest_id = pyrs.field(int)
-  rule_label = pyrs.field(str)
+  src_id = pyrs.field(int, mandatory = True)
+  dest_id = pyrs.field(int, mandatory = True)
+  rule_label = pyrs.field(str, mandatory = True)
 
 class Node(pyrs.PRecord):
-  term_str = pyrs.field(str)
-  contract_status = pyrs.field(str)
+  term_str = pyrs.field(str, mandatory = True)
+  contract_status = pyrs.field(str, mandatory = True)
 
 class Graph(pyrs.PRecord):
   nodes = pyrs.pmap_field(int, Node)

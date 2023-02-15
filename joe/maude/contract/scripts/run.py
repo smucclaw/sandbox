@@ -155,7 +155,10 @@ def graph_to_nx_graph(graph):
   for node_id, node in graph.nodes.items():
     nx_graph.add_node(
       node_id,
-      label = node.term_str,
+      # Do we want title or label?
+      # Title can contain html and only shows when hovering over the node.
+      # Label is visible all the time.
+      title = node.term_str,
       contract_state = node.contract_status,
       color = node_to_colour(node)
     )

@@ -24,7 +24,6 @@ load atomic-props
   sd rewriteTrace(emptyEventTrace) := idle .
 
   sd rewriteTrace(event ++ events) :=
-    rewriteEvent(event) ;
-    rewriteTrace(events) .
+    rewriteEvent(event) ? rewriteTrace(events) : idle .
 
 endsm)

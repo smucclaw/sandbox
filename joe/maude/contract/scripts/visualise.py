@@ -17,16 +17,17 @@ Dependencies:
   Used to generate interactive html/js visualizations from networkx graphs.
 '''
 
-import os
 from pathlib import Path
 import re
+import sys
 
 import maude
-import umaudemc.api
+from umaudemc.wrappers import FailFreeGraph
 
 import pyrsistent as pyrs
 import networkx as nx
 from pyvis.network import Network
+import subprocess
 
 def trace_to_strat(mod, trace_str):
   strat = f"rewriteTrace({trace_str})"
@@ -70,10 +71,11 @@ def edge_to_next_state(graph, edge):
   next_state = dest_node.contract_status
   return next_state
 
-def eval_fn(mod, fn_str, term_str):
+def eval_fn(mod, fn_str, term_str, output_as_str = True):
   term = mod.parseTerm(f"{fn_str}({term_str})")
   term.reduce()
-  term = escape_ansi(term)
+  if output_as_str:
+    term = escape_ansi(term)
   return term
 
 def get_state_term_str(graph, state_num):
@@ -100,28 +102,19 @@ def edges_to_graph(mod, rewrite_graph, edges):
 # https://github.com/fadoss/maude-bindings/blob/master/tests/python/graph.py
 # This is essentially a breadth-first traversal through the graph, covering all
 # edges.
-# We start with the root node that has a node_id, ie state number, of 0.
-# For each node in our queue, we start with the index succ_index = 0 and loop
-# until new_node = getNextState(curr_node, succ_index) is -1.
-# When that happens, we have exhausted all successors.
-# For each successor we encounter until that point, we add it to our queue
-# to visit if it's not already visited.
-# For each node we encounter, we look at the rule label corresponding to the
-# edge.
-# We leave 'tick' labels alone and convert 'action' labels to something of the
-# form 'actorName does actionName', depending on the destination node.
+# Here we assume that rewrite_graph is an expanded fail-free graph.
+# See: https://github.com/fadoss/umaudemc/blob/master/umaudemc/wrappers.py
 def rewrite_graph_to_graph(mod, rewrite_graph):
   node_queue = pyrs.pdeque([0])
   visited_nodes = pyrs.pset()
   edges = pyrs.pset()
+
   while len(node_queue) > 0:
     curr_node = node_queue.left
     node_queue = node_queue.popleft()
     visited_nodes = visited_nodes.add(curr_node)
     succ_index = 0
-    while True:
-      new_node = rewrite_graph.getNextState(curr_node, succ_index)
-      if new_node == -1: break
+    for new_node in rewrite_graph.getNextStates(curr_node):
       if new_node not in visited_nodes:
         node_queue = node_queue.append(new_node)
       # Do we need to handle transitions that don't have a rule label?
@@ -147,6 +140,8 @@ def rewrite_graph_to_graph(mod, rewrite_graph):
 
 def term_strat_to_graph(mod, term, strat):
   graph = maude.StrategyRewriteGraph(term, strat)
+  graph = FailFreeGraph(graph)
+  graph.expand()
   graph = rewrite_graph_to_graph(mod, graph)
   return graph
 
@@ -174,6 +169,51 @@ def graph_to_nx_graph(graph):
   nx_graph = nx.convert_node_labels_to_integers(nx_graph)
   return nx_graph
 
+# We start with the root node that has a node_id, ie state number, of 0.
+# For each node in our queue, we start with the index succ_index = 0 and loop
+# until new_node = getNextState(curr_node, succ_index) is -1.
+# When that happens, we have exhausted all successors.
+# For each successor we encounter until that point, we add it to our queue
+# to visit if it's not already visited.
+# For each node we encounter, we look at the rule label corresponding to the
+# edge.
+# We leave 'tick' labels alone and convert 'action' labels to something of the
+# form 'actorName does actionName', depending on the destination node.
+# def rewrite_graph_to_graph(mod, rewrite_graph):
+#   node_queue = pyrs.pdeque([0])
+#   visited_nodes = pyrs.pset()
+#   edges = pyrs.pset()
+#   while len(node_queue) > 0:
+#     curr_node = node_queue.left
+#     node_queue = node_queue.popleft()
+#     visited_nodes = visited_nodes.add(curr_node)
+#     succ_index = 0
+#     while True:
+#       new_node = rewrite_graph.getNextState(curr_node, succ_index)
+#       if new_node == -1: break
+#       if new_node not in visited_nodes:
+#         node_queue = node_queue.append(new_node)
+#       # Do we need to handle transitions that don't have a rule label?
+#       # What do they correspond to? Things like strategy applications?
+#       # If so, then we should continue to ignore them and not expose them.
+#       rule = rewrite_graph.getTransition(curr_node, new_node).getRule()
+#       if rule:
+#         rule_label = rule.getLabel()
+#         match rule_label:
+#           case 'tick':
+#             rule_label = 'tick'
+#           case 'action':
+#             # Get the term corresponding to the new node's id and get the
+#             # action transition.
+#             new_node_term = get_state_term_str(rewrite_graph, new_node)
+#             rule_label = eval_fn(mod, "getAction", new_node_term)
+#         edges = edges.add(
+#           Edge(src_id = curr_node, dest_id = new_node, rule_label = rule_label)
+#         )
+#       succ_index += 1
+#   graph = edges_to_graph(mod, rewrite_graph, edges)
+#   return graph
+
 def nx_graph_to_pyvis_netwk(nx_graph):
   netwk = Network(
     height = "800px", directed = True,
@@ -186,34 +226,40 @@ def nx_graph_to_pyvis_netwk(nx_graph):
   return netwk
  
 if __name__ == '__main__':
-  contract_dir = Path(__file__).parent.parent
+  natural4_file = Path(sys.argv[1])
+  strat = sys.argv[2] if len(sys.argv) >= 3 else 'all *'
 
-  rules = ""
-  with open(contract_dir / 'natural4' / 'rules.natural4') as f:
-    rules = f.read()
+  contract_dir = Path(__file__).parent.parent
+  
+  transpile_sh = contract_dir / 'scripts' / 'transpile-to-core-maude.sh'
+  subprocess.call([transpile_sh])
 
   workdir = contract_dir / '.workdir'
-  os.chdir(workdir)
+  natural4dir = contract_dir / 'natural4'
 
   maude.init(loadPrelude = False)
 
-  with open("main.maude") as f:
+  with open(workdir / 'main.maude') as f:
     maude.input(f.read())
 
   main_mod = maude.getModule('MAIN')
+  strat = main_mod.parseStrategy(strat)
 
-  transpiled = f"transpile({rules})"
+  rules = ''
+  with open(natural4_file) as f:
+    rules = f.read()
 
-  rules_term = main_mod.parseTerm(rules)
-  transpiled_term = main_mod.parseTerm(transpiled)
-  strat = main_mod.parseStrategy('all *')
+  transpiled_term = eval_fn(main_mod, 'transpile', rules, output_as_str = False)
 
   graph = term_strat_to_graph(main_mod, transpiled_term, strat)
   nx_graph = graph_to_nx_graph(graph)
   netwk = nx_graph_to_pyvis_netwk(nx_graph)
   # netwk.barnes_hut()
   netwk.show_buttons()
-  netwk.show('graph.html')
+
+  html_file = workdir / f'{natural4_file.stem}.html'
+  html_file = str(html_file)
+  netwk.show(html_file)
 
   # Experiments with Jaal.
   # edge_df = pd.DataFrame(graph)

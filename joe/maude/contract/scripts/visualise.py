@@ -19,6 +19,7 @@ Dependencies:
 
 from pathlib import Path
 import re
+import subprocess
 import sys
 
 import maude
@@ -27,7 +28,6 @@ from umaudemc.wrappers import FailFreeGraph
 import pyrsistent as pyrs
 import networkx as nx
 from pyvis.network import Network
-import subprocess
 
 def trace_to_strat(mod, trace_str):
   strat = f"rewriteTrace({trace_str})"

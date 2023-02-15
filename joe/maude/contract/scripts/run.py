@@ -25,7 +25,7 @@ from pyvis.network import Network
 import re
 
 def trace_to_strat(mod, trace_str):
-  strat = f"rewriteTrace{trace_str})"
+  strat = f"rewriteTrace({trace_str})"
   strat = mod.parseStrategy(strat)
   return strat
 
@@ -49,7 +49,7 @@ class Graph(pyrs.PRecord):
   edges = pyrs.pset_field(Edge)
 
 def eval_fn(mod, fn, term):
-  term = mod.parseTerm(f"{fn} ({term})")
+  term = mod.parseTerm(f"{fn}({term})")
   term.reduce()
   term = escape_ansi(term)
   return term
@@ -126,6 +126,9 @@ def graph_to_nx_graph(graph):
     nx_graph.add_node(node_id, label = node_term)
   for edge in graph.edges:
     nx_graph.add_edge(edge.src_id, edge.dest_id, label = edge.rule_label)
+
+  # Ensure that the node labels the output graph are consecutive.
+  nx_graph = nx.convert_node_labels_to_integers(nx_graph)
   return nx_graph
 
 def nx_graph_to_pyvis_netwk(nx_graph):

@@ -1,0 +1,47 @@
+load smt . 
+
+mod TEST is
+  pr BOOL .
+  pr NAT .
+  pr INT .
+
+  sorts A B C .
+  subsorts A < B .
+
+  ops pred0_ : A -> Bool .
+  ops pred1__ : A B -> Bool .
+  ops pred1__ : A A -> Bool .
+
+  ops rule0_ : A -> Bool .
+  ops rule1__ : A B -> Bool .
+
+  ops a0 : -> A [ctor] .
+  ops b0 : -> B [ctor] .
+
+  --- FACT pred0(a) .
+  --- forall a. pred0(a) <- true
+  vars a : A .
+  --- eq rule0 a = true implies pred0 a .
+  rl [rule0] : pred0 a => true .
+
+  --- DECIDE pred1(a, b)
+  --- IF pred0(a)
+  --- forall a : A, b : B. pred1(a, b) <- pred0(a) .
+  vars b : B .
+  --- eq rule1 a b = pred0 a implies pred1 a b .
+  crl [rule1] : pred1 a b => true
+  if pred0 a => true .
+
+  ops f_ : Nat -> Nat .
+  vars n : Nat .
+
+  ceq f n = 0 if n = 0 .
+  ceq f n = 1 if n = 1 .
+  eq f n = 200 [otherwise] .
+
+  --- rl [rule1] : pred1 a b => pred0 a .
+
+endm
+
+set trace on .
+rew pred1 a0 b0 .

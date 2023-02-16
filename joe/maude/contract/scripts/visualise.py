@@ -62,7 +62,7 @@ class Node(pyrs.PRecord):
   contract_status = pyrs.field(str, mandatory = True)
 
 class Graph(pyrs.PRecord):
-  nodes = pyrs.pmap_field(int, Node)
+  node_map = pyrs.pmap_field(int, Node)
   edges = pyrs.pset_field(Edge)
 
 def node_to_colour(node):
@@ -74,57 +74,58 @@ def node_to_colour(node):
   return colour
 
 def edge_to_colour(graph, edge):
-  dest_node = graph.nodes[edge.dest_id]
+  dest_node = graph.node_map[edge.dest_id]
   colour = node_to_colour(dest_node)
   return colour
 
 def edge_to_next_state(graph, edge):
-  dest_node = graph.nodes[edge.dest_id]
+  dest_node = graph.node_map[edge.dest_id]
   next_state = dest_node.contract_status
   return next_state
 
-def eval_fn(mod, fn_str, term_str, output_as_str = True):
-  term = mod.parseTerm(f"{fn_str}({term_str})")
-  term.reduce()
-  if output_as_str:
-    term = escape_ansi(term)
-  return term
+def apply_fn(mod, fn, arg):
+  result_term = mod.parseTerm(f'{fn}({arg})')
+  result_term.reduce()
+  return result_term
 
-def get_state_term_str(graph, state_num):
-  term = graph.getStateTerm(state_num)
+def apply_fn_to_str(mod, fn, arg):
+  result_term = apply_fn(mod, fn ,arg)
+  result_str = escape_ansi(result_term)
+  return result_str
+
+def get_state_term_str(graph, node_id):
+  term = graph.getStateTerm(node_id)
   term = escape_ansi(term)
   return term
 
-def edges_to_graph(mod, rewrite_graph, edges):
-  nodes = pyrs.pmap()
-  for edge in edges:
-    for node_id in [edge.src_id, edge.dest_id]:
-      node_term = get_state_term_str(rewrite_graph, node_id)
-      contract_status = eval_fn(mod, "configToStatus", node_term)
-      match contract_status:
-        case '(Fulfilled).ContractStatus': contract_status = 'Fulfilled'
-        case _ : pass
-      node_term = eval_fn(mod, "pretty", node_term)
-      node = Node(term_str = node_term, contract_status = contract_status)
-      nodes = nodes.set(node_id, node)
-  graph = Graph(nodes = nodes, edges = edges)
-  return graph
+def node_id_to_node(mod, rewrite_graph, node_id):
+  node_term = get_state_term_str(rewrite_graph, node_id)
+  contract_status = apply_fn_to_str(mod, 'configToStatus', node_term)
+  match contract_status:
+    case '(Fulfilled).ContractStatus': contract_status = 'Fulfilled'
+  node_term = apply_fn_to_str(mod, 'pretty', node_term)
+  node = Node(term_str = node_term, contract_status = contract_status)
+  return node
 
-# Based on:
-# https://github.com/fadoss/maude-bindings/blob/master/tests/python/graph.py
-# This is essentially a breadth-first traversal through the graph, covering all
-# edges.
+def edges_to_node_map(mod, rewrite_graph, edges):
+  node_map = pyrs.pmap()
+  for edge in edges:
+      for node_id in (edge.src_id, edge.dest_id):
+        node = node_id_to_node(mod, rewrite_graph, node_id)
+        node_map = node_map.set(node_id, node)
+  return node_map
+
 # Here we assume that rewrite_graph is an expanded fail-free graph.
 # See: https://github.com/fadoss/umaudemc/blob/master/umaudemc/wrappers.py
-def expanded_graph_to_graph(mod, expanded_graph):
+def rewrite_graph_to_graph(mod, rewrite_graph):
   edges = pyrs.pset()
-  for node_id in range(expanded_graph.getNrStates()):
-    succ_ids = expanded_graph.getNextStates(node_id)
+  for node_id in range(rewrite_graph.getNrStates()):
+    succ_ids = rewrite_graph.getNextStates(node_id)
     for succ_id in succ_ids:
       # Do we need to handle transitions that don't have a rule label?
       # What do they correspond to? Things like strategy applications?
       # If so, then we should continue to ignore them and not expose them.
-      rule = expanded_graph.getTransition(node_id, succ_id).getRule()
+      rule = rewrite_graph.getTransition(node_id, succ_id).getRule()
       if rule:
         rule_label = rule.getLabel()
         match rule_label:
@@ -133,26 +134,18 @@ def expanded_graph_to_graph(mod, expanded_graph):
           case 'action':
             # Get the term corresponding to the succ_id node and get the
             # action transition.
-            new_node_term = get_state_term_str(expanded_graph, succ_id)
-            rule_label = eval_fn(mod, 'getAction', new_node_term)
+            new_node_term = get_state_term_str(rewrite_graph, succ_id)
+            rule_label = apply_fn_to_str(mod, 'getAction', new_node_term)
         edges = edges.add(
           Edge(src_id = node_id, dest_id = succ_id, rule_label = rule_label)
         )
-  graph = edges_to_graph(mod, expanded_graph, edges)
-  return graph
-
-def term_strat_to_expanded_graph(mod, term, strat):
-  graph = create_graph(
-    term = term, strategy = strat,
-    purge_fails = 'yes',
-    logic = ''
-  )
-  graph = expanded_graph_to_graph(mod, graph)
+  node_map = edges_to_node_map(mod, rewrite_graph, edges)
+  graph = Graph(node_map = node_map, edges = edges)
   return graph
 
 def graph_to_nx_graph(graph):
   nx_graph = nx.DiGraph()
-  for node_id, node in graph.nodes.items():
+  for node_id, node in graph.node_map.items():
     nx_graph.add_node(
       node_id,
       # Do we want title or label?
@@ -219,9 +212,23 @@ def graph_to_nx_graph(graph):
 #   graph = edges_to_graph(mod, rewrite_graph, edges)
 #   return graph
 
+def rewrite_graph_to_nx_graph(mod, rewrite_graph):
+  graph = rewrite_graph_to_graph(mod, rewrite_graph)
+  nx_graph = graph_to_nx_graph(graph)
+  return nx_graph
+
+def term_strat_to_nx_graph(mod, term, strat):
+  graph = create_graph(
+    term = term, strategy = strat,
+    purge_fails = 'yes',
+    logic = ''
+  )
+  nx_graph = rewrite_graph_to_nx_graph(mod, graph)
+  return nx_graph
+
 def nx_graph_to_pyvis_netwk(nx_graph):
   netwk = Network(
-    height = "800px", directed = True,
+    height = '800px', directed = True,
     select_menu = True, filter_menu = True,
     cdn_resources = 'remote',
     layout = 'hierarchical'
@@ -229,36 +236,35 @@ def nx_graph_to_pyvis_netwk(nx_graph):
   netwk.from_nx(nx_graph)
   netwk.options.layout.hierarchical.sortMethod = 'directed'
   return netwk
- 
+
+def term_strat_to_pyvis_netwk(mod, term, strat):
+  nx_graph = term_strat_to_nx_graph(mod, term, strat)
+  pyvis_netwk = nx_graph_to_pyvis_netwk(nx_graph)
+  return pyvis_netwk
+
 if __name__ == '__main__':
   natural4_file = Path(sys.argv[1])
   strat = sys.argv[2] if len(sys.argv) >= 3 else 'all *'
 
-  contract_dir = Path(__file__).parent.parent
+  contractdir = Path(__file__).parent.parent
   
-  transpile_sh = contract_dir / 'scripts' / 'transpile-main.sh'
+  transpile_sh = contractdir / 'scripts' / 'transpile-main.sh'
   subprocess.call([transpile_sh])
 
-  workdir = contract_dir / '.workdir'
-  natural4dir = contract_dir / 'natural4'
+  workdir = contractdir / '.workdir'
 
   maude.init(loadPrelude = False)
-
   with open(workdir / 'main.maude') as f:
     maude.input(f.read())
-
   main_mod = maude.getModule('MAIN')
   strat = main_mod.parseStrategy(strat)
 
   rules = ''
   with open(natural4_file) as f:
     rules = f.read()
+  transpiled_term = apply_fn(main_mod, 'transpile', rules)
 
-  transpiled_term = eval_fn(main_mod, 'transpile', rules, output_as_str = False)
-
-  graph = term_strat_to_expanded_graph(main_mod, transpiled_term, strat)
-  nx_graph = graph_to_nx_graph(graph)
-  netwk = nx_graph_to_pyvis_netwk(nx_graph)
+  netwk = term_strat_to_pyvis_netwk(main_mod, transpiled_term, strat)
   # netwk.barnes_hut()
   netwk.show_buttons()
 

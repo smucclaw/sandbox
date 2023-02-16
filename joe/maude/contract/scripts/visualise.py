@@ -163,8 +163,33 @@ def graph_to_nx_graph(graph):
       color = edge_to_colour(graph, edge)
     )
 
+  # Quotient states by same title, to merge states that have different global time.
+  nx_node_titles = nx_graph.nodes(data = 'title')
+  equiv_rel = lambda node1, node2: (
+      nx_node_titles[node1] == nx_node_titles[node2]
+  )
+  node_data_fn = lambda nodes : (
+    nx_graph.nodes()[next(iter(nodes))]
+  )
+  # edge_data_fn = lambda edges : (
+  #   nx_graph.edges()[next(iter(edges))]
+  # )
+  nx_graph = nx.quotient_graph(
+    nx_graph, equiv_rel,
+    node_data = node_data_fn,
+    create_using = nx.MultiDiGraph
+    # edge_data = edge_data_fn
+  )
+
+  # for node, title in nx_node_titles:
+  #   for other_node, other_title in nx_node_titles:
+  #     if title == other_title:
+  #       nx_graph = nx.contracted_nodes(nx_graph, node, other_node, copy = False)
+  #       nx_node_titles = nx_graph.nodes(data = 'title')
+
   # Ensure that the node labels in the output graph are consecutive.
   nx_graph = nx.convert_node_labels_to_integers(nx_graph)
+  # print(nx_graph.nodes[0])
   return nx_graph
 
 # We start with the root node that has a node_id, ie state number, of 0.
@@ -235,6 +260,8 @@ def nx_graph_to_pyvis_netwk(nx_graph):
   )
   netwk.from_nx(nx_graph)
   netwk.options.layout.hierarchical.sortMethod = 'directed'
+  netwk.options.layout.hierarchical.direction = 'LR'
+  netwk.options.layout.hierarchical.nodeSpacing = 150
   return netwk
 
 def term_strat_to_pyvis_netwk(mod, term, strat):

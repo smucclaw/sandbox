@@ -358,10 +358,10 @@ load full-maude
   --- class Situation .
 
   class PreCoordinator |
-    time : Nat,
     contractState : ContractState .
 
   class Coordinator |
+    time : Nat,
     rules : Set{Rule} .
 
   subclass Coordinator < PreCoordinator .
@@ -374,12 +374,10 @@ load full-maude
       config
       event
       < coordinator : Coordinator |
-       time : time,
-       contractState : contractState >
+        contractState : contractState >
     )
   = config
     < coordinator : PreCoordinator |
-      time : time,
       contractState : contractState > .
 
   eq getAction

@@ -52,10 +52,17 @@ mod SMT-TEST is
   ops ltlFormula : -> Prop .
   eq ltlFormula = [] <> Success .
 
-  ops X Y Z : -> Integer [ctor] .
+  --- First order integer arithmetic with uninterpreted functions.
+  ops x y z : -> Integer [ctor] .
+
+  ops f : Integer -> Integer [ctor] .
 
   ops initialState : -> State .
   eq initialState
-  = Start (forall X . forall Y . (X < Y implies exists Z . (X < Z and Z < Y))) .
+  = Start
+    (
+      forall x . forall y .
+        (x < y implies exists z . (x < f(z) and f(z) < y))
+    ) .
 
 endm

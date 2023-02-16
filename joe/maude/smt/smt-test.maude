@@ -30,20 +30,21 @@ mod SMT-TEST is
   data State where
     Start :: Boolean -> State
     End :: SmtResult -> State
-  
-  - The Start state contains an arbitrary first-order formula.
-  - The Success and Failure states each carry SMT results, which in the former
-    case is SAT and in the latter case is UNSAT along with a string representing
-    the unsat core.
 )
   ops Start_ : Boolean -> State [ctor] .
   ops End_ : SmtResult -> State [ctor] .
 
   vars smtFormula : Boolean .
+  vars unsatCore : SmtResult .
 
   --- We transition from S0 smtFormula to S1 smtFormula if smtFormula is deemed
   --- satisfiable by smt solver.
-  rl [smtCheck] : Start smtFormula => End smtCheck(smtFormula) .
+  crl [smt-sat] : Start smtFormula => End Sat
+  if smtCheck(smtFormula) == Sat .
+
+  crl [smt-unsat] : Start smtFormula => End unsatCore
+  if unsatCore := smtCheck(smtFormula)
+  /\ unsatCore =/= Sat .
 
   ops Success : -> Prop .
   eq End Sat |= Success = true .
@@ -51,7 +52,7 @@ mod SMT-TEST is
   ops ltlFormula : -> Prop .
   eq ltlFormula = [] <> Success .
 
-  ops X Y Z : -> Real [ctor] .
+  ops X Y Z : -> Integer [ctor] .
 
   ops initialState : -> State .
   eq initialState

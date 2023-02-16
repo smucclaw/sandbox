@@ -23,6 +23,7 @@ class CheckSMTHook(maude.Hook):
         result = 'Sat'
       case z3.unsat:
         # print(f'Unsat core: {solver.unsat_core()}')
+        # This is sometimes empty for some reason :(
         result = f'Unsat "{solver.unsat_core()}"'
     result = module.parseTerm(result)
     return result
@@ -37,6 +38,8 @@ if __name__ == '__main__':
 
   term = 'initialState'
   term = mod.parseTerm(term)
+  term.rewrite()
+  print(term)
 
   # t = 'smtCheck(testPred)'
   # t = mod.parseTerm(t)
@@ -47,9 +50,9 @@ if __name__ == '__main__':
 
   graph = maude.RewriteGraph(term)
   model_check_result = graph.modelCheck(ltl_formula)
-  if model_check_result.holds:
-    print('Model checking succeeded!')
-  else:
-    print('Model checking failed. Here\'s a countereg: ')
-    print(model_check_result.leadIn)
-    print(model_check_result.cycle)
+  # if model_check_result.holds:
+  #   print('Model checking succeeded!')
+  # else:
+  #   print('Model checking failed. Here\'s a countereg: ')
+  #   print(model_check_result.leadIn)
+  #   print(model_check_result.cycle)

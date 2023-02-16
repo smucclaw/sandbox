@@ -31,7 +31,7 @@ import subprocess
 import sys
 
 import maude
-from umaudemc.wrappers import FailFreeGraph
+from umaudemc.wrappers import FailFreeGraph, create_graph
 
 import pyrsistent as pyrs
 import networkx as nx
@@ -112,48 +112,38 @@ def edges_to_graph(mod, rewrite_graph, edges):
 # edges.
 # Here we assume that rewrite_graph is an expanded fail-free graph.
 # See: https://github.com/fadoss/umaudemc/blob/master/umaudemc/wrappers.py
-def rewrite_graph_to_graph(mod, rewrite_graph):
-  node_queue = pyrs.pdeque([0])
-  visited_nodes = pyrs.pset()
+def expanded_graph_to_graph(mod, expanded_graph):
   edges = pyrs.pset()
-
-  while len(node_queue) > 0:
-    curr_node = node_queue.left
-    node_queue = node_queue.popleft()
-    visited_nodes = visited_nodes.add(curr_node)
-    succ_index = 0
-    for new_node in rewrite_graph.getNextStates(curr_node):
-      if new_node not in visited_nodes:
-        node_queue = node_queue.append(new_node)
+  for node_id in range(expanded_graph.getNrStates()):
+    succ_ids = expanded_graph.getNextStates(node_id)
+    for succ_id in succ_ids:
       # Do we need to handle transitions that don't have a rule label?
       # What do they correspond to? Things like strategy applications?
       # If so, then we should continue to ignore them and not expose them.
-      rule = rewrite_graph.getTransition(curr_node, new_node).getRule()
+      rule = expanded_graph.getTransition(node_id, succ_id).getRule()
       if rule:
         rule_label = rule.getLabel()
         match rule_label:
           case 'tick':
             rule_label = 'tick'
           case 'action':
-            # Get the term corresponding to the new node's id and get the
+            # Get the term corresponding to the succ_id node and get the
             # action transition.
-            new_node_term = get_state_term_str(rewrite_graph, new_node)
+            new_node_term = get_state_term_str(expanded_graph, succ_id)
             rule_label = eval_fn(mod, 'getAction', new_node_term)
         edges = edges.add(
-          Edge(src_id = curr_node, dest_id = new_node, rule_label = rule_label)
+          Edge(src_id = node_id, dest_id = succ_id, rule_label = rule_label)
         )
-      succ_index += 1
-  graph = edges_to_graph(mod, rewrite_graph, edges)
+  graph = edges_to_graph(mod, expanded_graph, edges)
   return graph
 
-def term_strat_to_graph(mod, term, strat):
-  graph = maude.StrategyRewriteGraph(term, strat)
-  graph = FailFreeGraph(graph)
-  graph.expand()
-  for i in range(graph.getNrStates()):
-    print((i, list(graph.getNextStates(i))))
-    # print(graph.transitions())
-  graph = rewrite_graph_to_graph(mod, graph)
+def term_strat_to_expanded_graph(mod, term, strat):
+  graph = create_graph(
+    term = term, strategy = strat,
+    purge_fails = 'yes',
+    logic = ''
+  )
+  graph = expanded_graph_to_graph(mod, graph)
   return graph
 
 def graph_to_nx_graph(graph):
@@ -242,7 +232,7 @@ if __name__ == '__main__':
 
   contract_dir = Path(__file__).parent.parent
   
-  transpile_sh = contract_dir / 'scripts' / 'transpile-to-core-maude.sh'
+  transpile_sh = contract_dir / 'scripts' / 'transpile-main.sh'
   subprocess.call([transpile_sh])
 
   workdir = contract_dir / '.workdir'
@@ -262,7 +252,7 @@ if __name__ == '__main__':
 
   transpiled_term = eval_fn(main_mod, 'transpile', rules, output_as_str = False)
 
-  graph = term_strat_to_graph(main_mod, transpiled_term, strat)
+  graph = term_strat_to_expanded_graph(main_mod, transpiled_term, strat)
   nx_graph = graph_to_nx_graph(graph)
   netwk = nx_graph_to_pyvis_netwk(nx_graph)
   # netwk.barnes_hut()

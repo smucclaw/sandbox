@@ -31,9 +31,10 @@ import subprocess
 import sys
 
 import maude
-from umaudemc.wrappers import FailFreeGraph, create_graph
+from umaudemc.wrappers import create_graph
 
 import pyrsistent as pyrs
+
 import networkx as nx
 from pyvis.network import Network
 

@@ -138,7 +138,7 @@ def rewrite_graph_to_graph(mod, rewrite_graph):
             # Get the term corresponding to the new node's id and get the
             # action transition.
             new_node_term = get_state_term_str(rewrite_graph, new_node)
-            rule_label = eval_fn(mod, "getAction", new_node_term)
+            rule_label = eval_fn(mod, 'getAction', new_node_term)
         edges = edges.add(
           Edge(src_id = curr_node, dest_id = new_node, rule_label = rule_label)
         )
@@ -150,6 +150,9 @@ def term_strat_to_graph(mod, term, strat):
   graph = maude.StrategyRewriteGraph(term, strat)
   graph = FailFreeGraph(graph)
   graph.expand()
+  for i in range(graph.getNrStates()):
+    print((i, list(graph.getNextStates(i))))
+    # print(graph.transitions())
   graph = rewrite_graph_to_graph(mod, graph)
   return graph
 

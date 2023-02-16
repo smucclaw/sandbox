@@ -1,0 +1,60 @@
+***
+*** Extension of the Maude SMT support for other theories
+***
+
+*** ===, =/==, y ?: cannot be defined as polymorphic operators because they
+*** are already defined for some sorts. It must be declared for each new sort.
+
+load smt
+
+fmod QUANTIFIER is
+	protecting BOOLEAN .
+
+	*** Polymorfic quantifiers
+	op forall_._ : Universal Boolean -> Boolean [ctor poly (1) prec 52] .
+	op exists_._ : Universal Boolean -> Boolean [ctor poly (1) prec 52] .
+endfm
+
+fmod SMT-ARRAY{X :: TRIV, Y :: TRIV} is
+	protecting BOOLEAN .
+
+	sort Array{X, Y} .
+
+	*** select
+	op _[_] : Array{X, Y} X$Elt -> Y$Elt [ctor] .
+	*** store
+	op _[_->_] : Array{X, Y} X$Elt Y$Elt -> Array{X, Y} [ctor] .
+
+	op _===_ : Array{X, Y} Array{X, Y} -> Boolean [ctor gather (e E) prec 51] .
+	op _=/==_ : Array{X, Y} Array{X, Y} -> Boolean [ctor gather (e E) prec 51] .
+	op _?_:_ : Boolean Array{X, Y} Array{X, Y} -> Array{X, Y} [ctor gather (e e e) prec 71] .
+endfm
+
+view Integer from TRIV to REAL-INTEGER is
+	sort Elt to Integer .
+endv
+
+view Real from TRIV to REAL-INTEGER is
+	sort Elt to Real .
+endv
+
+***
+***
+
+fmod TEST is
+	protecting QUANTIFIER .
+	protecting SMT-ARRAY{Integer, Integer} .
+
+	sort Being .
+
+	*** Constants can be used as variables
+	op C : -> Real [ctor] .
+
+	op log : Real -> Real [ctor] .
+
+	op human : Being -> Boolean [ctor] .
+	op mortal : Being -> Boolean [ctor] .
+	op socrate : -> Being [ctor] .
+
+	op length : Array{Integer, Integer} -> Integer [ctor] .
+endfm

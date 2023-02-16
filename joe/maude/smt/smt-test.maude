@@ -1,0 +1,60 @@
+load model-checker
+load smtex
+
+mod SMT-TEST is
+  protecting BOOL .
+  protecting BOOLEAN .
+  protecting QUANTIFIER .
+  protecting REAL-INTEGER .
+  protecting STRING .
+
+  including MODEL-CHECKER + SATISFACTION .
+  protecting LTL .
+
+  ops smtCheck : Boolean -> SmtResult [special (id-hook SpecialHubSymbol)].
+
+---(
+  data SmtResult where
+    Sat :: SmtResult
+    Unsat :: String -> SmtResult
+)
+  sort SmtResult .
+  ops Sat : -> SmtResult [ctor] .
+  ops Unsat_ : String -> SmtResult [ctor] .
+
+  --- sorts SmtFormulaResult .
+  --- subsorts Boolean < SmtFormulaResult .
+  --- subsorts SmtResult < SmtFormulaResult .
+
+---(
+  data State where
+    Start :: Boolean -> State
+    End :: SmtResult -> State
+  
+  - The Start state contains an arbitrary first-order formula.
+  - The Success and Failure states each carry SMT results, which in the former
+    case is SAT and in the latter case is UNSAT along with a string representing
+    the unsat core.
+)
+  ops Start_ : Boolean -> State [ctor] .
+  ops End_ : SmtResult -> State [ctor] .
+
+  vars smtFormula : Boolean .
+
+  --- We transition from S0 smtFormula to S1 smtFormula if smtFormula is deemed
+  --- satisfiable by smt solver.
+  rl [smtCheck] : Start smtFormula => End smtCheck(smtFormula) .
+
+  ops Success : -> Prop .
+  eq End Sat |= Success = true .
+
+  ops ltlFormula : -> Prop .
+  eq ltlFormula = [] <> Success .
+
+  ops X Y Z : -> Real [ctor] .
+
+  ops initialState : -> State .
+  eq initialState
+  = Start (forall X . forall Y . (X < Y implies exists Z . (X < Z and Z < Y))) .
+
+endm

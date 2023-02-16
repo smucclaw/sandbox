@@ -25,7 +25,8 @@ Here, natural4_filename is the file name of natural4_file without the extension.
 If strategy is not provided, we take the default value to be 'all *', which
 means generate all traces and hence traverse the whole state space.
 The strategy can also be a strategy describing a trace, say
-  rewriteTrace(tick ++ 'party0 does 'action0 ++ tick)
+  rewriteTrace(tick ++ ('party0 does 'action0) ++ tick)
+Note that it is important to put parens around "... does ..." actions.
 '''
 
 from pathlib import Path

@@ -19,6 +19,9 @@ Dependencies:
 Usage:
 python visualise.py natural4_file [strategy]
 
+This outputs a file called natural4_filename.html in contract/.workdir.
+Here, natural4_filename is the file name of natural4_file without the extension.
+
 If strategy is not provided, we take the default value to be 'all *', which
 means generate all traces and hence traverse the whole state space.
 The strategy can also be a strategy describing a trace, say

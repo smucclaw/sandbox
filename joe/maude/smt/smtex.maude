@@ -41,20 +41,20 @@ endv
 ***
 ***
 
-fmod TEST is
-	protecting QUANTIFIER .
-	protecting SMT-ARRAY{Integer, Integer} .
+--- fmod TEST is
+--- 	protecting QUANTIFIER .
+--- 	protecting SMT-ARRAY{Integer, Integer} .
 
-	sort Being .
+--- 	sort Being .
 
-	*** Constants can be used as variables
-	op C : -> Real [ctor] .
+--- 	*** Constants can be used as variables
+--- 	op C : -> Real [ctor] .
 
-	op log : Real -> Real [ctor] .
+--- 	op log : Real -> Real [ctor] .
 
-	op human : Being -> Boolean [ctor] .
-	op mortal : Being -> Boolean [ctor] .
-	op socrate : -> Being [ctor] .
+--- 	op human : Being -> Boolean [ctor] .
+--- 	op mortal : Being -> Boolean [ctor] .
+--- 	op socrate : -> Being [ctor] .
 
-	op length : Array{Integer, Integer} -> Integer [ctor] .
-endfm
+--- 	op length : Array{Integer, Integer} -> Integer [ctor] .
+--- endfm

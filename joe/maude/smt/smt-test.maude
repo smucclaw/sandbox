@@ -11,16 +11,16 @@ mod SMT-TEST is
   including MODEL-CHECKER + SATISFACTION .
   protecting LTL .
 
-  ops smtCheck : Boolean -> SmtResult [special (id-hook SpecialHubSymbol)].
-
 ---(
   data SmtResult where
-    Sat :: SmtResult
-    Unsat :: String -> SmtResult
+    Proved :: SmtResult
+    Disproved :: String -> SmtResult
 )
-  sort SmtResult .
-  ops Sat : -> SmtResult [ctor] .
-  ops Unsat_ : String -> SmtResult [ctor] .
+  sorts SmtResult .
+  ops Proved : -> SmtResult [ctor] .
+  ops Disproved_ : String -> SmtResult [ctor] .
+
+  ops smtCheck : Boolean -> SmtResult [special (id-hook SpecialHubSymbol)].
 
   --- sorts SmtFormulaResult .
   --- subsorts Boolean < SmtFormulaResult .
@@ -28,41 +28,35 @@ mod SMT-TEST is
 
 ---(
   data State where
-    Start :: Boolean -> State
-    End :: SmtResult -> State
+    Prove :: Boolean -> State
+    Proved :: State
+    Disproved :: String -> State
 )
-  ops Start_ : Boolean -> State [ctor] .
-  ops End_ : SmtResult -> State [ctor] .
+  ops Prove_ : Boolean -> State .
+  subsorts SmtResult < State .
 
   vars smtFormula : Boolean .
-  vars unsatCore : SmtResult .
+  vars counterEg : String .
 
-  --- We transition from S0 smtFormula to S1 smtFormula if smtFormula is deemed
-  --- satisfiable by smt solver.
-  crl [smt-sat] : Start smtFormula => End Sat
-  if smtCheck(smtFormula) == Sat .
+  rl [smt-result] : Prove smtFormula => smtCheck(smtFormula) .
 
-  crl [smt-unsat] : Start smtFormula => End unsatCore
-  if unsatCore := smtCheck(smtFormula)
-  /\ unsatCore =/= Sat .
+  ops Proved : -> Prop .
+  eq Proved |= Proved = true .
 
-  ops Success : -> Prop .
-  eq End Sat |= Success = true .
+  ops Disproved : -> Prop .
+  eq Disproved counterEg |= Disproved = true .
 
   ops ltlFormula : -> Prop .
-  eq ltlFormula = [] <> Success .
+  eq ltlFormula = [] <> Proved .
 
-  --- First order integer arithmetic with uninterpreted functions.
-  ops x y z : -> Integer [ctor] .
+  ops x y z : -> Real [ctor] .
 
-  ops f : Integer -> Integer [ctor] .
+  op f : Real -> Real .
+
+  --- eq f(x) = x .
 
   ops initialState : -> State .
   eq initialState
-  = Start
-    (
-      forall x . forall y .
-        (x < y implies exists z . (x < f(z) and f(z) < y))
-    ) .
+  = Prove (x < y implies exists z . (x < f(z) and f(z) < y)) .
 
 endm

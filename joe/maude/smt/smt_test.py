@@ -12,19 +12,19 @@ class CheckSMTHook(maude.Hook):
     smt_converter.load_real_integer()
 
     argument, = term.arguments()
+    argument.reduce()
+
     smt_formula = smt_converter.translate(argument)
-    print(f'Solving SMT formula: {smt_formula}')
+    print(f'Proving formula: {smt_formula}')
     solver = z3.Solver()
-    solver.add(smt_formula)
-    solver.set(unsat_core = True)
+    solver.add(z3.Not(smt_formula))
+    # solver.set(unsat_core = True)
     result = None
     match solver.check():
-      case z3.sat:
-        result = 'Sat'
       case z3.unsat:
-        # print(f'Unsat core: {solver.unsat_core()}')
-        # This is sometimes empty for some reason :(
-        result = f'Unsat "{solver.unsat_core()}"'
+        result = 'Proved'
+      case z3.sat:
+        result = f'Disproved "{solver.model()}"'
     result = module.parseTerm(result)
     return result
 
@@ -48,8 +48,9 @@ if __name__ == '__main__':
   ltl_formula = 'ltlFormula'
   ltl_formula = mod.parseTerm(ltl_formula)
 
-  graph = maude.RewriteGraph(term)
-  model_check_result = graph.modelCheck(ltl_formula)
+  # graph = maude.RewriteGraph(term)
+  # model_check_result = graph.modelCheck(ltl_formula)
+
   # if model_check_result.holds:
   #   print('Model checking succeeded!')
   # else:

@@ -98,8 +98,9 @@ mod DEFEAS-DYNAMICS is
   ops _____ : DefeasTheory Literals Literals Literals Literals -> State .
 
 ---(
-  These rewriting rules define a transition system which computes the fixed
-  point of the endofunctor.
+  These rewriting rules define a transition system which implements transfinite
+  fixpoint iteration.
+  For details, see page 10 of: https://arxiv.org/pdf/cs/0511055.pdf
 
   Can we bound the ordinal height by omega for computability purposes?
   According to Guido, we can for propositional logic.

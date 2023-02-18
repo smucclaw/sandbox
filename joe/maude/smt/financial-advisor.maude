@@ -77,14 +77,25 @@ sload full-maude
     [owise print O " should invest in savings."] .
 
 ---(
-  GIVEN person IS A Person
+  GIVEN person = {amtSaved, ..} IS A Person
   DEEM savingsAccStat IS A Status
   DECIDE
     savingsAccStat IS adequate
-    WHEN smtCheck(amtSaved > minSavings(person)) == Proved
+    WHEN QF-LIA |= amtSaved > minSavings(person)
 
     savingsAccStat IS inadequate
     OTHERWISE
+
+  More precisely, the semantics of Maude's equational logic says that these
+  equations correspond to the following proof rules:
+
+    QF-LIA |= person.amtSaved > minSavings(person)
+  -------------------------------------------
+    |- savingsAccStat(person) = adequate
+
+    QF-LIA |/= person.amtSaved > minSavings(person)
+  -------------------------------------------
+    |- savingsAccStat(person) = inadequate
 )
   ceq [savings-acc-ad] :
     savingsAccStat(< O : Person | amtSaved : amtSaved:Integer >) = adequate
@@ -102,26 +113,6 @@ sload full-maude
         "QF-LIA |= amtSaved <= minSavings \n"
         O "'s savings account is inadequate."
     ] .
-
----(
-  Note here that the function smtCheck : Boolean -> SmtCheck invokes the SMT
-  solver (which is currently z3) and behaves as follows:
-    smtCheck(formula) == Proved iff T |= formula
-    smtCheck(formula) == Disproved (counterexample string) iff T |/= formula
-  
-  Here we take the background theory T = QF-LIA, ie quantifier-free linear
-  integer arithmetic.
-
-  More precisely, the semantics of Maude's equational logic says that these
-  equations correspond to the following proof rules:
-    QF-LIA |= person.amtSaved > minSavings(person)
-  -------------------------------------------
-    |- savingsAccStat(person) = adequate
-
-    QF-LIA |/= person.amtSaved > minSavings(person)
-  -------------------------------------------
-    |- savingsAccStat(person) = inadequate
-)
 
   ceq [income-stat-ad] :
     incomeStat(

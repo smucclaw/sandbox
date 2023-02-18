@@ -1,0 +1,186 @@
+---(
+  Notes:
+  https://ssa2020.dmi.unipg.it/res/DefeasibleLogic.pdf
+)
+
+fmod LITERALS is
+  pr QID .
+  pr BOOL .
+
+  sorts Literal Literals .
+  subsorts Qid < Literal < Literals .
+
+  ops ~_ : Qid -> Literal [ctor] .
+  --- ops Literal < Bool .
+
+  ops emptyLiterals : -> Literals [ctor] .
+  ops _#_ : Literals Literals -> Literals
+    [ctor assoc comm id: emptyLiterals] .
+ 
+  vars q : Literal .
+  vars literals : Literals .
+  eq literals # literals = literals .
+
+  ops _notIn_ : Literal Literals -> Bool .
+  eq q notIn (q # literals) = false .
+  eq q notIn literals = true [owise] .
+
+endfm
+
+---(
+  A preference relation is the transitive closure of the one step evaluation
+  relation defined by a small-step operational semantics.
+)
+mod PREF-REL is
+  pr LITERALS .
+
+  --- rl [r1_r2] : 'r1 => 'r2 .
+
+endm
+
+fmod RULE is
+  pr BOOL .
+  pr LITERALS .
+  --- pr SET{Qid} .
+  --- protecting PREF-REL .
+  --- protecting META-LEVEL .
+
+  sorts UnnamedRule NamedRule NamedRules .
+
+  ops _==>_ _~>_ _->_ : Literals Literal -> UnnamedRule [ctor] .
+
+  ops _<_ : Literal Literal -> Bool .
+
+  ops _:_ : Qid UnnamedRule -> NamedRule [ctor] .
+
+  subsorts NamedRule < NamedRules .
+
+  ops emptyRules : -> NamedRules [ctor] .
+  ops _#_ : NamedRules NamedRules -> NamedRules
+    [ctor assoc comm id: emptyRules] .
+
+  vars namedRules : NamedRules .
+  eq namedRules # namedRules = namedRules .
+
+endfm
+
+--- red 'r : ('q | 'p) ==> 'p .
+
+--- view NamedRule from TRIV to RULE is
+---   sort Elt to NamedRule .
+--- endv
+
+--- view Set`{NamedRule`} from TRIV to SET{NamedRule} is
+---   sort Elt to Set`{NamedRule`} .
+--- endv
+
+mod DEFEAS-STATICS is
+  pr RULE .
+  pr META-LEVEL .
+
+  sorts DefeasTheory .
+
+  ops Atoms_Facts_Rules_PrefRel_ :
+    Literals Literals NamedRules Module -> DefeasTheory .
+
+endm
+
+mod DEFEAS-DYNAMICS is
+  pr DEFEAS-STATICS .
+
+  vars p q : Literal .
+  vars ruleName : Qid .
+  vars +∆ -∆ +∂ -∂ atoms facts literals : Literals .
+  vars rules : NamedRules .
+  vars prefRel : Module .
+
+  sorts State .
+  ops _____ : DefeasTheory Literals Literals Literals Literals -> State .
+
+---(
+  These rewriting rules define a transition system which computes the fixed
+  point of the endofunctor.
+
+  Can we bound the ordinal height by omega for computability purposes?
+  According to Guido, we can for propositional logic.
+  How much higher do we need to go for first-oder?
+)
+  crl [+∆] :
+    Atoms (q # atoms)
+    Facts (q # facts)
+    Rules rules
+    PrefRel prefRel
+    +∆ -∆ +∂ -∂
+  =>
+    Atoms (q # atoms)
+    Facts (q # facts)
+    Rules rules
+    PrefRel prefRel
+    (q # +∆) -∆ +∂ -∂
+  if q notIn +∆ .
+
+  crl [+∆] :
+    Atoms (q # atoms)
+    Facts facts
+    Rules ((ruleName : literals ==> q) # rules)
+    PrefRel prefRel
+    (literals # +∆) -∆ +∂ -∂
+  =>
+    Atoms (q # atoms)
+    Facts facts
+    Rules ((ruleName : literals ==> q) # rules)
+    PrefRel prefRel
+    (q # literals # +∆) -∆ +∂ -∂
+  if q notIn +∆ .
+
+ crl [-∆] :
+    Atoms (q # atoms)
+    Facts facts
+    Rules rules
+    PrefRel prefRel
+    +∆ -∆ +∂ -∂ 
+  =>
+    Atoms (q # atoms)
+    Facts facts
+    Rules rules
+    PrefRel prefRel
+    +∆ (q # -∆) +∂ -∂
+  if q notIn -∆
+  /\ q notIn facts
+  /\ q notProvableFrom rules -∆ .
+
+  ops _notProvableFrom__ : Qid NamedRules Literals -> Bool .
+
+  eq q notProvableFrom emptyRules -∆ = true .
+
+  eq q notProvableFrom ((ruleName : (p # literals) ==> q) # rules) (p # -∆)
+  = q notProvableFrom rules (p # -∆) .
+
+  eq q notProvableFrom rules -∆ = false [owise] .
+
+  --- vars r1 r2 : Qid .
+
+---(
+  Notes on metaSearch:
+  https://www.uio.no/studier/emner/matnat/ifi/INF5130/h15/lectures/lecture4.pdf
+)
+  --- ceq r1 < r2 = true
+  --- if metaSearchPath(upModule('PREF-REL, false), r1, r2, nil, '+, unbounded, 0) =/= failure .
+
+  --- crl [t] :
+  ---   true => false
+  --- if 'r1 < 'r2 .
+
+  --- ops _<_ : Qid Qid -> PrefRel .
+
+  --- ops _<[_]_ : Qid Set{Qid} Qid -> Bool .
+endm
+
+rew
+  Atoms ('p # 'q # 'r)
+  Facts ('p # 'q)
+  Rules ('r1 : 'p ==> 'r)
+  PrefRel upModule('PREF-REL, false)
+  emptyLiterals emptyLiterals emptyLiterals emptyLiterals .
+
+--- quit

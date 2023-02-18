@@ -26,6 +26,7 @@ smod FINANCIAL-ADVISOR is
   op minIncome : Person -> Integer .
   op minSavings : Person -> Integer .
   op savingsAccStat : Person -> Status .
+  op smtSat_ : Boolean -> Bool .
   op testPerson : -> Person .
   op unlabeled : -> RuleName .
   op -_ : Integer -> Integer
@@ -479,7 +480,7 @@ smod FINANCIAL-ADVISOR is
   none,
   V#5:AttributeSet >)
     = inadequate [label income-stat-inad-2 owise print O:Qid
-    "'s earning status is unsteady so his income status is inadequate."] .
+    "'s earning status is unsteady. \nHis income status is inadequate."] .
   eq investStrat(
 < O:Qid : V#6:Person |
   numDeps : V#10:Integer,
@@ -498,9 +499,10 @@ smod FINANCIAL-ADVISOR is
   amtSaved : V#23:Integer,
   none,
   V#27:AttributeSet >)
-    = inadequate [label savings-acc-inad owise print
-    "QF-LIA |= amtSaved <= minSavings \n" O:Qid
+    = inadequate [label savings-acc-inad owise print O:Qid
     "'s savings account is inadequate."] .
+  eq smtSat formula:Boolean
+    = (false).Bool [owise] .
   ceq incomeStat(
 < O:Qid : V#28:Person |
   numDeps : V#30:Integer,
@@ -510,13 +512,14 @@ smod FINANCIAL-ADVISOR is
   none,
   V#31:AttributeSet >)
     = adequate
-    if smtCheck(earningsAmt:Integer > minIncome(
+    if smtSat(earningsAmt:Integer > minIncome(
 < O:Qid : V#28:Person |
   amtSaved : V#29:Integer,
   earningsAmt : earningsAmt:Integer,
   earningsStat : steady,
   numDeps : V#30:Integer,
-  V#31:AttributeSet >))== Proved =(true).Bool [label income-stat-ad print O:Qid "'s earning status is steady and QF-LIA |= earningsAmt > minIncome so his income status is adequate."] .
+  V#31:AttributeSet >))=(true).Bool [label income-stat-ad print O:Qid
+    "'s earning status is steady. \nHis income status is adequate."] .
   ceq incomeStat(
 < O:Qid : V#32:Person |
   numDeps : V#34:Integer,
@@ -526,14 +529,14 @@ smod FINANCIAL-ADVISOR is
   none,
   V#35:AttributeSet >)
     = inadequate
-    if smtCheck(earningsAmt:Integer <= minIncome(
+    if smtSat(earningsAmt:Integer <= minIncome(
 < O:Qid : V#32:Person |
   amtSaved : V#33:Integer,
   earningsAmt : earningsAmt:Integer,
   earningsStat : steady,
   numDeps : V#34:Integer,
-  V#35:AttributeSet >))== Proved =(true).Bool [label income-stat-inad-1 print
-    O:Qid "'s earning status is steady and QF-LIA |= earningsAmt <= minIncome so his income status is inadequate."] .
+  V#35:AttributeSet >))=(true).Bool [label income-stat-inad-1 print O:Qid
+    "'s earning status is steady. \nHis income status is inadequate."] .
   ceq investStrat(
 < O:Qid : V#36:Person |
   numDeps : V#40:Integer,
@@ -589,13 +592,16 @@ smod FINANCIAL-ADVISOR is
   none,
   V#52:AttributeSet >)
     = adequate
-    if smtCheck(amtSaved:Integer > minSavings(
+    if smtSat(amtSaved:Integer > minSavings(
 < O:Qid : V#48:Person |
   amtSaved : amtSaved:Integer,
   earningsAmt : V#49:Integer,
   earningsStat : V#50:EarningsStatus,
   numDeps : V#51:Integer,
-  V#52:AttributeSet >))== Proved =(true).Bool [label savings-acc-ad print
-    "QF-LIA |= amtSaved > minSavings so " O:Qid
+  V#52:AttributeSet >))=(true).Bool [label savings-acc-ad print O:Qid
     "'s savings account is adequate."] .
+  ceq smtSat formula:Boolean
+    = (true).Bool
+    if smtCheck(formula:Boolean)== Proved =(true).Bool [print "SMT |= "
+    formula:Boolean] .
 endsm

@@ -39,6 +39,16 @@ sload full-maude
   ops smtCheck : Boolean -> SmtResult
     [special (id-hook SpecialHubSymbol)] .
 
+  ops smtSat_ : Boolean -> Bool .
+
+  vars formula : Boolean .
+
+  ceq smtSat formula = true
+  if smtCheck(formula) == Proved
+    [print "SMT |= " formula] .
+
+  eq smtSat formula = false [owise] .
+
   class Person |
     amtSaved : Integer,
     numDeps : Integer,
@@ -46,7 +56,8 @@ sload full-maude
     earningsStat : EarningsStatus .
 
   subsorts Person < Object .
-  cmb (Obj:Object) : Person if getClass(Obj:Object) = Person .
+  vars Obj : Object .
+  cmb Obj : Person if getClass(Obj) = Person .
 
   vars O : Qid .
 
@@ -99,39 +110,31 @@ sload full-maude
 )
   ceq [savings-acc-ad] :
     savingsAccStat(< O : Person | amtSaved : amtSaved:Integer >) = adequate
-  if smtCheck(amtSaved:Integer > minSavings(< O : Person | >)) == Proved
-    [
-      print
-        "QF-LIA |= amtSaved > minSavings so " O "'s savings account is adequate."
-    ] .
+  if smtSat (amtSaved:Integer > minSavings(< O : Person | >))
+    [print O "'s savings account is adequate."] .
 
   eq [savings-acc-inad] :
     savingsAccStat(< O : Person | >) = inadequate
-    [
-      owise
-      print
-        "QF-LIA |= amtSaved <= minSavings \n"
-        O "'s savings account is inadequate."
-    ] .
+    [owise print O "'s savings account is inadequate."] .
 
   ceq [income-stat-ad] :
     incomeStat(
       < O : Person | earningsStat : steady, earningsAmt : earningsAmt:Integer >
     ) = adequate
-  if smtCheck(earningsAmt:Integer > minIncome(< O : Person | >)) == Proved
+  if smtSat (earningsAmt:Integer > minIncome(< O : Person | >))
     [
       print
-        O "'s earning status is steady and QF-LIA |= earningsAmt > minIncome so his income status is adequate."
+        O "'s earning status is steady. \nHis income status is adequate."
     ] .
 
   ceq [income-stat-inad-1] :
     incomeStat(
       < O : Person | earningsStat : steady, earningsAmt : earningsAmt:Integer >
     ) = inadequate
-  if smtCheck(earningsAmt:Integer <= minIncome(< O : Person | >)) == Proved
+  if smtSat (earningsAmt:Integer <= minIncome(< O : Person | >))
     [
       print
-        O "'s earning status is steady and QF-LIA |= earningsAmt <= minIncome so his income status is inadequate."
+        O "'s earning status is steady. \nHis income status is inadequate."
     ] .
 
   eq [income-stat-inad-2] :
@@ -139,7 +142,7 @@ sload full-maude
     [
       owise
       print
-        O "'s earning status is unsteady so his income status is inadequate."
+        O "'s earning status is unsteady. \nHis income status is inadequate."
     ] .
 
   ops testPerson : -> Person .

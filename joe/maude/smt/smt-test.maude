@@ -1,5 +1,5 @@
-load model-checker
-load smtex
+sload model-checker
+sload smtex
 
 mod SMT-TEST is
   protecting BOOL .
@@ -20,7 +20,8 @@ mod SMT-TEST is
   ops Proved : -> SmtResult [ctor] .
   ops Disproved_ : String -> SmtResult [ctor] .
 
-  ops smtCheck : Boolean -> SmtResult [special (id-hook SpecialHubSymbol)].
+  ops smtCheck : Boolean -> SmtResult
+    [special (id-hook SpecialHubSymbol)] .
 
   --- sorts SmtFormulaResult .
   --- subsorts Boolean < SmtFormulaResult .
@@ -32,7 +33,7 @@ mod SMT-TEST is
     Proved :: State
     Disproved :: String -> State
 )
-  ops Prove_ : Boolean -> State .
+  ops Prove_ : Boolean -> State [ctor] .
   subsorts SmtResult < State .
 
   vars smtFormula : Boolean .
@@ -49,14 +50,17 @@ mod SMT-TEST is
   ops ltlFormula : -> Prop .
   eq ltlFormula = [] <> Proved .
 
-  ops x y z : -> Real [ctor] .
+  ops X Y Z : -> Real [ctor] .
 
-  op f : Real -> Real .
+  ops addOne : Real -> Real .
+  vars x : Real .
+  eq addOne(x) = x + toReal(1) .
 
-  --- eq f(x) = x .
+  ops uninterpFn : Real -> Real .
 
   ops initialState : -> State .
   eq initialState
-  = Prove (x < y implies exists z . (x < f(z) and f(z) < y)) .
+  = Prove
+    (X < Z implies exists Z . (X < addOne(Z) and uninterpFn(Z) < Y)) .
 
 endm

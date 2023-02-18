@@ -1,11 +1,13 @@
 import maude
+from umaudemc.grapher import DOTGrapher
+from umaudemc.wrappers import FailFreeGraph
+
 import z3
 
 from smt_converter import SMTConverter
 
 class CheckSMTHook(maude.Hook):
   def run(self, term, data):
-
     module = term.symbol().getModule()
     smt_converter = SMTConverter(module)
     smt_converter.load_boolean()
@@ -15,7 +17,7 @@ class CheckSMTHook(maude.Hook):
     argument.reduce()
 
     smt_formula = smt_converter.translate(argument)
-    print(f'Proving formula: {smt_formula}')
+    # print(f'Proving formula: {smt_formula}')
     solver = z3.Solver()
     solver.add(z3.Not(smt_formula))
     # solver.set(unsat_core = True)
@@ -29,24 +31,28 @@ class CheckSMTHook(maude.Hook):
     return result
 
 if __name__ == '__main__':
-  maude.init()
-  maude.load('smt-test')
-  mod = maude.getModule('SMT-TEST')
+  maude.init(loadPrelude = False)
+  # maude.load('smt-test')
+  # mod = maude.getModule('SMT-TEST')
+
+  maude.load('financial-advisor-core-maude.maude')
+  mod = maude.getModule('FINANCIAL-ADVISOR')
 
   check_smt_hook = CheckSMTHook()
   maude.connectEqHook('smtCheck',  check_smt_hook)
 
-  term = 'initialState'
+  maude.input('set print attribute on .')
+
+  # term = 'initialState'
+  term = 'investStrat(testPerson)'
   term = mod.parseTerm(term)
-  term.rewrite()
-  print(term)
+  term.reduce()
+  # rewrite_graph = maude.RewriteGraph(term)
+  # rewrite_graph = FailFreeGraph(rewrite_graph)
+  # DOTGrapher().graph(rewrite_graph)
 
-  # t = 'smtCheck(testPred)'
-  # t = mod.parseTerm(t)
-  # t.reduce()
-
-  ltl_formula = 'ltlFormula'
-  ltl_formula = mod.parseTerm(ltl_formula)
+  # ltl_formula = 'ltlFormula'
+  # ltl_formula = mod.parseTerm(ltl_formula)
 
   # graph = maude.RewriteGraph(term)
   # model_check_result = graph.modelCheck(ltl_formula)

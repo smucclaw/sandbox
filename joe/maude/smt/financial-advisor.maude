@@ -1,0 +1,172 @@
+sload model-checker
+sload smtex
+sload full-maude
+
+(omod FINANCIAL-ADVISOR is
+  protecting BOOL .
+  protecting BOOLEAN .
+  protecting REAL-INTEGER .
+  protecting QUANTIFIER .
+  protecting QID .
+  protecting STRING .
+
+  including MODEL-CHECKER + SATISFACTION .
+  protecting LTL .
+
+  subsorts Qid < Oid .
+
+  sorts Status EarningsStatus InvestStrat .
+  ops adequate inadequate : -> Status [ctor] .
+  ops steady unsteady : -> EarningsStatus [ctor] .
+  ops savings stocks combination : -> InvestStrat [ctor] .
+
+  --- subsorts Status EarningsStatus InvestStrat < Integer .
+
+  --- eq adequate = 0 .
+  --- eq inadequate = 1 .
+
+  --- eq steady = 0 .
+  --- eq unsteady = 1 .
+
+  --- eq savings = 0 .
+  --- eq stocks = 1 .
+  --- eq combination = 2 .
+
+  sorts SmtResult .
+  ops Proved : -> SmtResult [ctor] .
+  ops Disproved_ : String -> SmtResult [ctor] .
+
+  ops smtCheck : Boolean -> SmtResult
+    [special (id-hook SpecialHubSymbol)] .
+
+  class Person |
+    amtSaved : Integer,
+    numDeps : Integer,
+    earningsAmt : Integer,
+    earningsStat : EarningsStatus .
+
+  subsorts Person < Object .
+  cmb (Obj:Object) : Person if getClass(Obj:Object) = Person .
+
+  vars O : Qid .
+
+  ops minSavings minIncome : Person -> Integer . 
+  eq minSavings(< O : Person | numDeps : numDeps:Integer >)
+  = 5000 * numDeps:Integer .
+
+  eq minIncome(< O : Person | numDeps : numDeps:Integer >)
+  = 15000 + 4000 * numDeps:Integer .
+
+  ops investStrat : Person -> InvestStrat .
+  ops savingsAccStat incomeStat : Person -> Status  .
+
+  ceq [invest-strat-stocks] :
+    investStrat(< O : Person | >) = stocks
+  if savingsAccStat(< O : Person | >) = adequate
+  /\ incomeStat(< O : Person | >) = adequate
+    [print O " should invest in stocks."] .
+
+  ceq [invest-strat-combi] :
+    investStrat(< O : Person | >) = combination
+  if savingsAccStat(< O : Person | >) = adequate
+  /\ incomeStat(< O : Person | >) = inadequate
+    [print O " should invest in a combination."] .
+
+  eq [invest-strat-savings] :
+    investStrat(< O : Person | >) = savings
+    [owise print O " should invest in savings."] .
+
+---(
+  GIVEN person IS A Person
+  DEEM savingsAccStat IS A Status
+  DECIDE
+    savingsAccStat IS adequate
+    WHEN smtCheck(amtSaved > minSavings(person)) == Proved
+
+    savingsAccStat IS inadequate
+    OTHERWISE
+)
+  ceq [savings-acc-ad] :
+    savingsAccStat(< O : Person | amtSaved : amtSaved:Integer >) = adequate
+  if smtCheck(amtSaved:Integer > minSavings(< O : Person | >)) == Proved
+    [
+      print
+        "QF-LIA |= amtSaved > minSavings so " O "'s savings account is adequate."
+    ] .
+
+  eq [savings-acc-inad] :
+    savingsAccStat(< O : Person | >) = inadequate
+    [
+      owise
+      print
+        "QF-LIA |= amtSaved <= minSavings \n"
+        O "'s savings account is inadequate."
+    ] .
+
+---(
+  Note here that the function smtCheck : Boolean -> SmtCheck invokes the SMT
+  solver (which is currently z3) and behaves as follows:
+    smtCheck(formula) == Proved iff T |= formula
+    smtCheck(formula) == Disproved (counterexample string) iff T |/= formula
+  
+  Here we take the background theory T = QF-LIA, ie quantifier-free linear
+  integer arithmetic.
+
+  More precisely, the semantics of Maude's equational logic says that these
+  equations correspond to the following proof rules:
+    QF-LIA |= person.amtSaved > minSavings(person)
+  -------------------------------------------
+    |- savingsAccStat(person) = adequate
+
+    QF-LIA |/= person.amtSaved > minSavings(person)
+  -------------------------------------------
+    |- savingsAccStat(person) = inadequate
+)
+
+  ceq [income-stat-ad] :
+    incomeStat(
+      < O : Person | earningsStat : steady, earningsAmt : earningsAmt:Integer >
+    ) = adequate
+  if smtCheck(earningsAmt:Integer > minIncome(< O : Person | >)) == Proved
+    [
+      print
+        O "'s earning status is steady and QF-LIA |= earningsAmt > minIncome so his income status is adequate."
+    ] .
+
+  ceq [income-stat-inad-1] :
+    incomeStat(
+      < O : Person | earningsStat : steady, earningsAmt : earningsAmt:Integer >
+    ) = inadequate
+  if smtCheck(earningsAmt:Integer <= minIncome(< O : Person | >)) == Proved
+    [
+      print
+        O "'s earning status is steady and QF-LIA |= earningsAmt <= minIncome so his income status is inadequate."
+    ] .
+
+  eq [income-stat-inad-2] :
+    incomeStat(< O : Person | >) = inadequate
+    [
+      owise
+      print
+        O "'s earning status is unsteady so his income status is inadequate."
+    ] .
+
+  ops testPerson : -> Person .
+  eq testPerson
+  = < 'person : Person |
+      amtSaved : 22000,
+      numDeps : 3,
+      earningsAmt : 2500,
+      earningsStat : steady > .
+
+endom)
+
+--- (set print attribute on .)
+
+(show all .)
+
+---(search
+  incomeStat(testPerson) =>* (status:Status)
+.)
+
+quit

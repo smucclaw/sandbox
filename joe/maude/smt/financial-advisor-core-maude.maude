@@ -1,0 +1,601 @@
+smod FINANCIAL-ADVISOR is
+  sorts Attribute AttributeSet Bool Boolean Char Cid Configuration
+    EarningsStatus FindResult Formula Integer InvestStrat ModelCheckResult Msg
+    Nat NzNat Object Oid Person Portal Prop Qid Real RuleName SmtResult State
+    Status String Transition TransitionList Zero .
+  subsort Attribute < AttributeSet .
+  subsort Bool < ModelCheckResult .
+  subsort Char < String .
+  subsort Msg < Configuration .
+  subsort Nat < FindResult .
+  subsort NzNat < Nat .
+  subsort Object < Configuration .
+  subsort Person < Cid .
+  subsort Person < Object .
+  subsort Portal < Configuration .
+  subsort Prop < Formula .
+  subsort Qid < Oid .
+  subsort Qid < RuleName .
+  subsort Transition < TransitionList .
+  subsort Zero < Nat .
+  op Person : -> Person .
+  op deadlock : -> RuleName .
+  op getClass : Object -> Cid .
+  op incomeStat : Person -> Status .
+  op investStrat : Person -> InvestStrat .
+  op minIncome : Person -> Integer .
+  op minSavings : Person -> Integer .
+  op savingsAccStat : Person -> Status .
+  op testPerson : -> Person .
+  op unlabeled : -> RuleName .
+  op -_ : Integer -> Integer
+    [special(id-hook SMT_Symbol(-))] .
+  op -_ : Real -> Real
+    [special(id-hook SMT_Symbol(-))] .
+  op 0 : -> Zero
+    [ctor] .
+  op <> : -> Portal
+    [ctor] .
+  op <>_ : Formula -> Formula
+    [prec 53 format(r o d)] .
+  op <Integers> : -> Integer
+    [special(id-hook SMT_NumberSymbol(integers))] .
+  op <Qids> : -> Qid
+    [special(id-hook QuotedIdentifierSymbol)] .
+  op <Reals> : -> Real
+    [special(id-hook SMT_NumberSymbol(reals))] .
+  op <Strings> : -> Char
+    [special(id-hook StringSymbol)] .
+  op <Strings> : -> String
+    [special(id-hook StringSymbol)] .
+  op <_:_|_> : Oid Cid AttributeSet -> Object
+    [format(ni!r o !r o !r++ oni !r-- o)ctor object] .
+  op <_:_|`> : Oid Cid -> Object
+    [format(ni!r o !r o !r o o)] .
+  op Disproved_ : String -> SmtResult
+    [ctor] .
+  op False : -> Formula
+    [format(g o)ctor] .
+  op O_ : Formula -> Formula
+    [prec 53 format(r o d)ctor] .
+  op Proved : -> SmtResult
+    [ctor] .
+  op True : -> Formula
+    [format(g o)ctor] .
+  op _&_ : Nat Nat -> Nat
+    [assoc comm prec 53 special(id-hook ACU_NumberOpSymbol(&)op-hook
+    succSymbol(s_ : Nat ~> NzNat))] .
+  op _*_ : Integer Integer -> Integer
+    [prec 31 gather(E e)special(id-hook SMT_Symbol(*))] .
+  op _*_ : Nat Nat -> Nat
+    [assoc comm prec 31 special(id-hook ACU_NumberOpSymbol(*)op-hook
+    succSymbol(s_ : Nat ~> NzNat))] .
+  op _*_ : NzNat NzNat -> NzNat
+    [assoc comm prec 31 special(id-hook ACU_NumberOpSymbol(*)op-hook
+    succSymbol(s_ : Nat ~> NzNat))] .
+  op _*_ : Real Real -> Real
+    [prec 31 gather(E e)special(id-hook SMT_Symbol(*))] .
+  op _+_ : Integer Integer -> Integer
+    [prec 33 gather(E e)special(id-hook SMT_Symbol(+))] .
+  op _+_ : Nat Nat -> Nat
+    [assoc comm prec 33 special(id-hook ACU_NumberOpSymbol(+)op-hook
+    succSymbol(s_ : Nat ~> NzNat))] .
+  op _+_ : NzNat Nat -> NzNat
+    [assoc comm prec 33 special(id-hook ACU_NumberOpSymbol(+)op-hook
+    succSymbol(s_ : Nat ~> NzNat))] .
+  op _+_ : Real Real -> Real
+    [prec 33 gather(E e)special(id-hook SMT_Symbol(+))] .
+  op _+_ : String String -> String
+    [prec 33 gather(E e)special(id-hook StringOpSymbol(+)op-hook stringSymbol(
+    <Strings> : ~> Char))] .
+  op _->_ : Formula Formula -> Formula
+    [prec 65 gather(e E)format(d r o d)] .
+  op _-_ : Integer Integer -> Integer
+    [prec 33 gather(E e)special(id-hook SMT_Symbol(-))] .
+  op _-_ : Real Real -> Real
+    [prec 33 gather(E e)special(id-hook SMT_Symbol(-))] .
+  op _/\_ : Formula Formula -> Formula
+    [comm prec 55 gather(E e)format(d r o d)ctor] .
+  op _/_ : Real Real -> Real
+    [prec 31 gather(E e)special(id-hook SMT_Symbol(/))] .
+  op _<->_ : Formula Formula -> Formula
+    [prec 65 format(d r o d)] .
+  op _<<_ : Nat Nat -> Nat
+    [prec 35 gather(E e)special(id-hook NumberOpSymbol(<<)op-hook succSymbol(s_
+    : Nat ~> NzNat))] .
+  op _<=>_ : Formula Formula -> Formula
+    [prec 65 format(d r o d)] .
+  op _<=_ : Integer Integer -> Boolean
+    [prec 37 special(id-hook SMT_Symbol(<=))] .
+  op _<=_ : Nat Nat -> Bool
+    [prec 37 special(id-hook NumberOpSymbol(<=)op-hook succSymbol(s_ : Nat ~>
+    NzNat)term-hook trueTerm((true).Bool)term-hook falseTerm((false).Bool))] .
+  op _<=_ : Real Real -> Boolean
+    [prec 37 special(id-hook SMT_Symbol(<=))] .
+  op _<=_ : String String -> Bool
+    [prec 37 special(id-hook StringOpSymbol(<=)op-hook stringSymbol(<Strings> :
+    ~> Char)term-hook trueTerm((true).Bool)term-hook falseTerm((false).Bool))]
+    .
+  op _<_ : Integer Integer -> Boolean
+    [prec 37 special(id-hook SMT_Symbol(<))] .
+  op _<_ : Nat Nat -> Bool
+    [prec 37 special(id-hook NumberOpSymbol(<)op-hook succSymbol(s_ : Nat ~>
+    NzNat)term-hook trueTerm((true).Bool)term-hook falseTerm((false).Bool))] .
+  op _<_ : Real Real -> Boolean
+    [prec 37 special(id-hook SMT_Symbol(<))] .
+  op _<_ : String String -> Bool
+    [prec 37 special(id-hook StringOpSymbol(<)op-hook stringSymbol(<Strings> :
+    ~> Char)term-hook trueTerm((true).Bool)term-hook falseTerm((false).Bool))]
+    .
+  op _=/==_ : Boolean Boolean -> Boolean
+    [prec 51 gather(e E)special(id-hook SMT_Symbol(=/==))] .
+  op _=/==_ : Integer Integer -> Boolean
+    [prec 51 gather(e E)special(id-hook SMT_Symbol(=/==))] .
+  op _=/==_ : Real Real -> Boolean
+    [prec 51 gather(e E)special(id-hook SMT_Symbol(=/==))] .
+  op _=/=_ : Universal Universal -> Bool
+    [poly(1 2)prec 51 special(id-hook EqualitySymbol term-hook equalTerm((
+    false).Bool)term-hook notEqualTerm((true).Bool))] .
+  op _===_ : Boolean Boolean -> Boolean
+    [prec 51 gather(e E)special(id-hook SMT_Symbol(===))] .
+  op _===_ : Integer Integer -> Boolean
+    [prec 51 gather(e E)special(id-hook SMT_Symbol(===))] .
+  op _===_ : Real Real -> Boolean
+    [prec 51 gather(e E)special(id-hook SMT_Symbol(===))] .
+  op _==_ : Universal Universal -> Bool
+    [poly(1 2)prec 51 special(id-hook EqualitySymbol term-hook equalTerm((
+    true).Bool)term-hook notEqualTerm((false).Bool))] .
+  op _=>_ : Formula Formula -> Formula
+    [prec 65 gather(e E)format(d r o d)] .
+  op _>=_ : Integer Integer -> Boolean
+    [prec 37 special(id-hook SMT_Symbol(>=))] .
+  op _>=_ : Nat Nat -> Bool
+    [prec 37 special(id-hook NumberOpSymbol(>=)op-hook succSymbol(s_ : Nat ~>
+    NzNat)term-hook trueTerm((true).Bool)term-hook falseTerm((false).Bool))] .
+  op _>=_ : Real Real -> Boolean
+    [prec 37 special(id-hook SMT_Symbol(>=))] .
+  op _>=_ : String String -> Bool
+    [prec 37 special(id-hook StringOpSymbol(>=)op-hook stringSymbol(<Strings> :
+    ~> Char)term-hook trueTerm((true).Bool)term-hook falseTerm((false).Bool))]
+    .
+  op _>>_ : Nat Nat -> Nat
+    [prec 35 gather(E e)special(id-hook NumberOpSymbol(>>)op-hook succSymbol(s_
+    : Nat ~> NzNat))] .
+  op _>_ : Integer Integer -> Boolean
+    [prec 37 special(id-hook SMT_Symbol(>))] .
+  op _>_ : Nat Nat -> Bool
+    [prec 37 special(id-hook NumberOpSymbol(>)op-hook succSymbol(s_ : Nat ~>
+    NzNat)term-hook trueTerm((true).Bool)term-hook falseTerm((false).Bool))] .
+  op _>_ : Real Real -> Boolean
+    [prec 37 special(id-hook SMT_Symbol(>))] .
+  op _>_ : String String -> Bool
+    [prec 37 special(id-hook StringOpSymbol(>)op-hook stringSymbol(<Strings> :
+    ~> Char)term-hook trueTerm((true).Bool)term-hook falseTerm((false).Bool))]
+    .
+  op _?_:_ : Boolean Boolean Boolean -> Boolean
+    [prec 71 gather(e e e)special(id-hook SMT_Symbol(ite))] .
+  op _?_:_ : Boolean Integer Integer -> Integer
+    [prec 71 gather(e e e)special(id-hook SMT_Symbol(ite))] .
+  op _?_:_ : Boolean Real Real -> Real
+    [prec 71 gather(e e e)special(id-hook SMT_Symbol(ite))] .
+  op _R_ : Formula Formula -> Formula
+    [prec 63 format(d r o d)ctor] .
+  op _U_ : Formula Formula -> Formula
+    [prec 63 format(d r o d)ctor] .
+  op _W_ : Formula Formula -> Formula
+    [prec 63 format(d r o d)] .
+  op _\/_ : Formula Formula -> Formula
+    [comm prec 59 gather(E e)format(d r o d)ctor] .
+  op _^_ : Nat Nat -> Nat
+    [prec 29 gather(E e)special(id-hook NumberOpSymbol(^)op-hook succSymbol(s_
+    : Nat ~> NzNat))] .
+  op _^_ : NzNat Nat -> NzNat
+    [prec 29 gather(E e)special(id-hook NumberOpSymbol(^)op-hook succSymbol(s_
+    : Nat ~> NzNat))] .
+  op __ : Configuration Configuration -> Configuration
+    [assoc comm id:(none).Configuration ctor config] .
+  op __ : TransitionList TransitionList -> TransitionList
+    [assoc id: nil ctor] .
+  op _`,_ : AttributeSet AttributeSet -> AttributeSet
+    [assoc comm id:(none).AttributeSet format(o !r nio o)ctor] .
+  op _and_ : Bool Bool -> Bool
+    [assoc comm prec 55] .
+  op _and_ : Boolean Boolean -> Boolean
+    [prec 55 gather(E e)special(id-hook SMT_Symbol(and))] .
+  op _div_ : Integer Integer -> Integer
+    [prec 31 gather(E e)special(id-hook SMT_Symbol(div))] .
+  op _divides_ : NzNat Nat -> Bool
+    [prec 51 special(id-hook NumberOpSymbol(divides)op-hook succSymbol(s_ : Nat
+    ~> NzNat)term-hook trueTerm((true).Bool)term-hook falseTerm((false).Bool))]
+    .
+  op _divisible_ : Integer Integer -> Boolean
+    [prec 51 special(id-hook SMT_Symbol(divisible))] .
+  op _implies_ : Bool Bool -> Bool
+    [prec 61 gather(e E)] .
+  op _implies_ : Boolean Boolean -> Boolean
+    [prec 61 gather(e E)special(id-hook SMT_Symbol(implies))] .
+  op _mod_ : Integer Integer -> Integer
+    [prec 31 gather(E e)special(id-hook SMT_Symbol(mod))] .
+  op _or_ : Bool Bool -> Bool
+    [assoc comm prec 59] .
+  op _or_ : Boolean Boolean -> Boolean
+    [prec 59 gather(E e)special(id-hook SMT_Symbol(or))] .
+  op _quo_ : Nat NzNat -> Nat
+    [prec 31 gather(E e)special(id-hook NumberOpSymbol(quo)op-hook succSymbol(
+    s_ : Nat ~> NzNat))] .
+  op _rem_ : Nat NzNat -> Nat
+    [prec 31 gather(E e)special(id-hook NumberOpSymbol(rem)op-hook succSymbol(
+    s_ : Nat ~> NzNat))] .
+  op _xor_ : Bool Bool -> Bool
+    [assoc comm prec 57] .
+  op _xor_ : Boolean Boolean -> Boolean
+    [prec 57 gather(E e)special(id-hook SMT_Symbol(xor))] .
+  op _xor_ : Nat Nat -> Nat
+    [assoc comm prec 55 special(id-hook ACU_NumberOpSymbol(xor)op-hook
+    succSymbol(s_ : Nat ~> NzNat))] .
+  op _|->_ : Formula Formula -> Formula
+    [prec 63 format(d r o d)] .
+  op _|=_ : State Prop -> Bool
+    [frozen(1 2)] .
+  op _|_ : Nat Nat -> Nat
+    [assoc comm prec 57 special(id-hook ACU_NumberOpSymbol(|)op-hook
+    succSymbol(s_ : Nat ~> NzNat))] .
+  op _|_ : NzNat Nat -> NzNat
+    [assoc comm prec 57 special(id-hook ACU_NumberOpSymbol(|)op-hook
+    succSymbol(s_ : Nat ~> NzNat))] .
+  op `[`]_ : Formula -> Formula
+    [prec 53 format(r d o d)] .
+  op `{_`,_`} : State RuleName -> Transition
+    [ctor] .
+  op adequate : -> Status
+    [ctor] .
+  op amtSaved`:_ : Integer -> Attribute
+    [gather(&)] .
+  op ascii : Char -> Nat
+    [special(id-hook StringOpSymbol(ascii)op-hook stringSymbol(<Strings> : ~>
+    Char)op-hook succSymbol(s_ : Nat ~> NzNat))] .
+  op char :[FindResult]->[String]
+    [special(id-hook StringOpSymbol(char)op-hook stringSymbol(<Strings> : ~>
+    Char)op-hook succSymbol(s_ : Nat ~> NzNat))] .
+  op combination : -> InvestStrat
+    [ctor] .
+  op counterexample : TransitionList TransitionList -> ModelCheckResult
+    [ctor] .
+  op earningsAmt`:_ : Integer -> Attribute
+    [gather(&)] .
+  op earningsStat`:_ : EarningsStatus -> Attribute
+    [gather(&)] .
+  op exists_._ : Universal Boolean -> Boolean
+    [poly(1)prec 52 ctor] .
+  op false : -> Bool
+    [ctor special(id-hook SystemFalse)] .
+  op false : -> Boolean
+    [special(id-hook SMT_Symbol(false))] .
+  op find : String String Nat -> FindResult
+    [special(id-hook StringOpSymbol(find)op-hook stringSymbol(<Strings> : ~>
+    Char)op-hook succSymbol(s_ : Nat ~> NzNat)term-hook notFoundTerm(
+    notFound))] .
+  op forall_._ : Universal Boolean -> Boolean
+    [poly(1)prec 52 ctor] .
+  op gcd : Nat Nat -> Nat
+    [assoc comm special(id-hook ACU_NumberOpSymbol(gcd)op-hook succSymbol(s_ :
+    Nat ~> NzNat))] .
+  op gcd : NzNat Nat -> NzNat
+    [assoc comm special(id-hook ACU_NumberOpSymbol(gcd)op-hook succSymbol(s_ :
+    Nat ~> NzNat))] .
+  op if_then_else_fi : Bool Universal Universal -> Universal
+    [poly(2 3 0)special(id-hook BranchSymbol term-hook 1((true).Bool)term-hook
+    2((false).Bool))] .
+  op inadequate : -> Status
+    [ctor] .
+  op isInteger : Real -> Boolean
+    [special(id-hook SMT_Symbol(isInteger))] .
+  op lcm : Nat Nat -> Nat
+    [assoc comm special(id-hook ACU_NumberOpSymbol(lcm)op-hook succSymbol(s_ :
+    Nat ~> NzNat))] .
+  op lcm : NzNat NzNat -> NzNat
+    [assoc comm special(id-hook ACU_NumberOpSymbol(lcm)op-hook succSymbol(s_ :
+    Nat ~> NzNat))] .
+  op length : String -> Nat
+    [special(id-hook StringOpSymbol(length)op-hook stringSymbol(<Strings> : ~>
+    Char)op-hook succSymbol(s_ : Nat ~> NzNat))] .
+  op lowerCase : String -> String
+    [special(id-hook StringOpSymbol(lowerCase)op-hook stringSymbol(<Strings> :
+    ~> Char))] .
+  op max : Nat Nat -> Nat
+    [assoc comm special(id-hook ACU_NumberOpSymbol(max)op-hook succSymbol(s_ :
+    Nat ~> NzNat))] .
+  op max : NzNat Nat -> NzNat
+    [assoc comm special(id-hook ACU_NumberOpSymbol(max)op-hook succSymbol(s_ :
+    Nat ~> NzNat))] .
+  op min : Nat Nat -> Nat
+    [assoc comm special(id-hook ACU_NumberOpSymbol(min)op-hook succSymbol(s_ :
+    Nat ~> NzNat))] .
+  op min : NzNat NzNat -> NzNat
+    [assoc comm special(id-hook ACU_NumberOpSymbol(min)op-hook succSymbol(s_ :
+    Nat ~> NzNat))] .
+  op modExp :[Nat][Nat][Nat]->[Nat]
+    [special(id-hook NumberOpSymbol(modExp)op-hook succSymbol(s_ : Nat ~>
+    NzNat))] .
+  op modelCheck :[State][Formula]->[ModelCheckResult]
+    [special(id-hook ModelCheckerSymbol op-hook satisfiesSymbol(_|=_ : State
+    Prop ~> Bool)op-hook qidSymbol(<Qids> : ~> Qid)op-hook unlabeledSymbol(
+    unlabeled : ~> RuleName)op-hook deadlockSymbol(deadlock : ~>
+    RuleName)op-hook transitionSymbol(`{_`,_`} : State RuleName ~>
+    Transition)op-hook transitionListSymbol(__ : TransitionList TransitionList
+    ~> TransitionList)op-hook nilTransitionListSymbol(nil : ~>
+    TransitionList)op-hook counterexampleSymbol(counterexample : TransitionList
+    TransitionList ~> ModelCheckResult)op-hook trueSymbol(True : ~>
+    Formula)op-hook falseSymbol(False : ~> Formula)op-hook notSymbol(~_ :
+    Formula ~> Formula)op-hook nextSymbol(O_ : Formula ~> Formula)op-hook
+    andSymbol(_/\_ : Formula Formula ~> Formula)op-hook orSymbol(_\/_ : Formula
+    Formula ~> Formula)op-hook untilSymbol(_U_ : Formula Formula ~>
+    Formula)op-hook releaseSymbol(_R_ : Formula Formula ~> Formula)term-hook
+    trueTerm((true).Bool))] .
+  op nil : -> TransitionList
+    [ctor] .
+  op none : -> AttributeSet
+    [ctor] .
+  op none : -> Configuration
+    [ctor] .
+  op notFound : -> FindResult
+    [ctor] .
+  op not_ : Bool -> Bool
+    [prec 53] .
+  op not_ : Boolean -> Boolean
+    [prec 53 special(id-hook SMT_Symbol(not))] .
+  op numDeps`:_ : Integer -> Attribute
+    [gather(&)] .
+  op qid :[String]->[Qid]
+    [special(id-hook QuotedIdentifierOpSymbol(qid)op-hook
+    quotedIdentifierSymbol(<Qids> : ~> Qid)op-hook stringSymbol(<Strings> : ~>
+    Char))] .
+  op rfind : String String Nat -> FindResult
+    [special(id-hook StringOpSymbol(rfind)op-hook stringSymbol(<Strings> : ~>
+    Char)op-hook succSymbol(s_ : Nat ~> NzNat)term-hook notFoundTerm(
+    notFound))] .
+  op s_ : Nat -> NzNat
+    [ctor iter special(id-hook SuccSymbol term-hook zeroTerm((0).Zero))] .
+  op savings : -> InvestStrat
+    [ctor] .
+  op sd : Nat Nat -> Nat
+    [comm special(id-hook CUI_NumberOpSymbol(sd)op-hook succSymbol(s_ : Nat ~>
+    NzNat))] .
+  op smtCheck : Boolean -> SmtResult
+    [special(id-hook SpecialHubSymbol)] .
+  op steady : -> EarningsStatus
+    [ctor] .
+  op stocks : -> InvestStrat
+    [ctor] .
+  op string : Qid -> String
+    [special(id-hook QuotedIdentifierOpSymbol(string)op-hook
+    quotedIdentifierSymbol(<Qids> : ~> Qid)op-hook stringSymbol(<Strings> : ~>
+    Char))] .
+  op substr : String Nat Nat -> String
+    [special(id-hook StringOpSymbol(substr)op-hook stringSymbol(<Strings> : ~>
+    Char)op-hook succSymbol(s_ : Nat ~> NzNat))] .
+  op toInteger : Real -> Integer
+    [special(id-hook SMT_Symbol(toInteger))] .
+  op toReal : Integer -> Real
+    [special(id-hook SMT_Symbol(toReal))] .
+  op true : -> Bool
+    [ctor special(id-hook SystemTrue)] .
+  op true : -> Boolean
+    [special(id-hook SMT_Symbol(true))] .
+  op unsteady : -> EarningsStatus
+    [ctor] .
+  op upperCase : String -> String
+    [special(id-hook StringOpSymbol(upperCase)op-hook stringSymbol(<Strings> :
+    ~> Char))] .
+  op ~_ : Formula -> Formula
+    [prec 53 format(r o d)ctor] .
+  cmb Obj:Object : Person
+    if getClass(Obj:Object)= Person .
+  eq testPerson
+    = 
+< 'person : Person |
+  amtSaved : 22000,
+  numDeps : 3,
+  earningsAmt : 2500,
+  earningsStat : steady > .
+  eq <> f:Formula
+    = True U f:Formula .
+  eq f:Formula -> g:Formula
+    = g:Formula \/ ~ f:Formula .
+  eq f:Formula <-> g:Formula
+    = (g:Formula -> f:Formula)/\(f:Formula -> g:Formula) .
+  eq f:Formula <=> g:Formula
+    = [](f:Formula <-> g:Formula) .
+  eq f:Formula => g:Formula
+    = [](f:Formula -> g:Formula) .
+  eq f:Formula W g:Formula
+    = []f:Formula \/(f:Formula U g:Formula) .
+  eq A:Bool and A:Bool
+    = A:Bool .
+  eq A:Bool and(B:Bool xor C:Bool)
+    = A:Bool and B:Bool xor A:Bool and C:Bool .
+  eq (false).Bool and A:Bool
+    = (false).Bool .
+  eq (true).Bool and A:Bool
+    = A:Bool .
+  eq A:Bool implies B:Bool
+    = not(A:Bool xor A:Bool and B:Bool) .
+  eq A:Bool or B:Bool
+    = A:Bool and B:Bool xor A:Bool xor B:Bool .
+  eq A:Bool xor A:Bool
+    = (false).Bool .
+  eq (false).Bool xor A:Bool
+    = A:Bool .
+  eq f:Formula |-> g:Formula
+    = [](f:Formula -> <> g:Formula) .
+  eq []f:Formula
+    = False R f:Formula .
+  eq getClass(
+< O:Oid : C:Cid |
+  A:AttributeSet >)
+    = C:Cid .
+  eq minIncome(
+< O:Qid : V#12:Person |
+  earningsStat : V#15:EarningsStatus,
+  earningsAmt : V#14:Integer,
+  amtSaved : V#13:Integer,
+  numDeps : numDeps:Integer,
+  none,
+  V#16:AttributeSet >)
+    = (15000).Integer +(4000).Integer * numDeps:Integer .
+  eq minSavings(
+< O:Qid : V#17:Person |
+  earningsStat : V#20:EarningsStatus,
+  earningsAmt : V#19:Integer,
+  amtSaved : V#18:Integer,
+  numDeps : numDeps:Integer,
+  none,
+  V#21:AttributeSet >)
+    = (5000).Integer * numDeps:Integer .
+  eq not A:Bool
+    = (true).Bool xor A:Bool .
+  eq ~ False
+    = True .
+  eq ~ True
+    = False .
+  eq ~ O f:Formula
+    = O ~ f:Formula .
+  eq ~(g:Formula /\ f:Formula)
+    = ~ g:Formula \/ ~ f:Formula .
+  eq ~(f:Formula R g:Formula)
+    = ~ f:Formula U ~ g:Formula .
+  eq ~(f:Formula U g:Formula)
+    = ~ f:Formula R ~ g:Formula .
+  eq ~(g:Formula \/ f:Formula)
+    = ~ g:Formula /\ ~ f:Formula .
+  eq ~ ~ f:Formula
+    = f:Formula .
+  eq incomeStat(
+< O:Qid : V#0:Person |
+  numDeps : V#4:Integer,
+  earningsStat : V#3:EarningsStatus,
+  earningsAmt : V#2:Integer,
+  amtSaved : V#1:Integer,
+  none,
+  V#5:AttributeSet >)
+    = inadequate [label income-stat-inad-2 owise print O:Qid
+    "'s earning status is unsteady so his income status is inadequate."] .
+  eq investStrat(
+< O:Qid : V#6:Person |
+  numDeps : V#10:Integer,
+  earningsStat : V#9:EarningsStatus,
+  earningsAmt : V#8:Integer,
+  amtSaved : V#7:Integer,
+  none,
+  V#11:AttributeSet >)
+    = savings [label invest-strat-savings owise print O:Qid
+    " should invest in savings."] .
+  eq savingsAccStat(
+< O:Qid : V#22:Person |
+  numDeps : V#26:Integer,
+  earningsStat : V#25:EarningsStatus,
+  earningsAmt : V#24:Integer,
+  amtSaved : V#23:Integer,
+  none,
+  V#27:AttributeSet >)
+    = inadequate [label savings-acc-inad owise print
+    "QF-LIA |= amtSaved <= minSavings \n" O:Qid
+    "'s savings account is inadequate."] .
+  ceq incomeStat(
+< O:Qid : V#28:Person |
+  numDeps : V#30:Integer,
+  amtSaved : V#29:Integer,
+  earningsAmt : earningsAmt:Integer,
+  earningsStat : steady,
+  none,
+  V#31:AttributeSet >)
+    = adequate
+    if smtCheck(earningsAmt:Integer > minIncome(
+< O:Qid : V#28:Person |
+  amtSaved : V#29:Integer,
+  earningsAmt : earningsAmt:Integer,
+  earningsStat : steady,
+  numDeps : V#30:Integer,
+  V#31:AttributeSet >))== Proved =(true).Bool [label income-stat-ad print O:Qid "'s earning status is steady and QF-LIA |= earningsAmt > minIncome so his income status is adequate."] .
+  ceq incomeStat(
+< O:Qid : V#32:Person |
+  numDeps : V#34:Integer,
+  amtSaved : V#33:Integer,
+  earningsAmt : earningsAmt:Integer,
+  earningsStat : steady,
+  none,
+  V#35:AttributeSet >)
+    = inadequate
+    if smtCheck(earningsAmt:Integer <= minIncome(
+< O:Qid : V#32:Person |
+  amtSaved : V#33:Integer,
+  earningsAmt : earningsAmt:Integer,
+  earningsStat : steady,
+  numDeps : V#34:Integer,
+  V#35:AttributeSet >))== Proved =(true).Bool [label income-stat-inad-1 print
+    O:Qid "'s earning status is steady and QF-LIA |= earningsAmt <= minIncome so his income status is inadequate."] .
+  ceq investStrat(
+< O:Qid : V#36:Person |
+  numDeps : V#40:Integer,
+  earningsStat : V#39:EarningsStatus,
+  earningsAmt : V#38:Integer,
+  amtSaved : V#37:Integer,
+  none,
+  V#41:AttributeSet >)
+    = combination
+    if savingsAccStat(
+< O:Qid : V#36:Person |
+  amtSaved : V#37:Integer,
+  earningsAmt : V#38:Integer,
+  earningsStat : V#39:EarningsStatus,
+  numDeps : V#40:Integer,
+  V#41:AttributeSet >)= adequate /\ incomeStat(
+< O:Qid : V#36:Person |
+  amtSaved : V#37:Integer,
+  earningsAmt : V#38:Integer,
+  earningsStat : V#39:EarningsStatus,
+  numDeps : V#40:Integer,
+  V#41:AttributeSet >)= inadequate [label invest-strat-combi print O:Qid
+    " should invest in a combination."] .
+  ceq investStrat(
+< O:Qid : V#42:Person |
+  numDeps : V#46:Integer,
+  earningsStat : V#45:EarningsStatus,
+  earningsAmt : V#44:Integer,
+  amtSaved : V#43:Integer,
+  none,
+  V#47:AttributeSet >)
+    = stocks
+    if savingsAccStat(
+< O:Qid : V#42:Person |
+  amtSaved : V#43:Integer,
+  earningsAmt : V#44:Integer,
+  earningsStat : V#45:EarningsStatus,
+  numDeps : V#46:Integer,
+  V#47:AttributeSet >)= adequate /\ incomeStat(
+< O:Qid : V#42:Person |
+  amtSaved : V#43:Integer,
+  earningsAmt : V#44:Integer,
+  earningsStat : V#45:EarningsStatus,
+  numDeps : V#46:Integer,
+  V#47:AttributeSet >)= adequate [label invest-strat-stocks print O:Qid
+    " should invest in stocks."] .
+  ceq savingsAccStat(
+< O:Qid : V#48:Person |
+  numDeps : V#51:Integer,
+  earningsStat : V#50:EarningsStatus,
+  earningsAmt : V#49:Integer,
+  amtSaved : amtSaved:Integer,
+  none,
+  V#52:AttributeSet >)
+    = adequate
+    if smtCheck(amtSaved:Integer > minSavings(
+< O:Qid : V#48:Person |
+  amtSaved : amtSaved:Integer,
+  earningsAmt : V#49:Integer,
+  earningsStat : V#50:EarningsStatus,
+  numDeps : V#51:Integer,
+  V#52:AttributeSet >))== Proved =(true).Bool [label savings-acc-ad print
+    "QF-LIA |= amtSaved > minSavings so " O:Qid
+    "'s savings account is adequate."] .
+endsm

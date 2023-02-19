@@ -1,4 +1,7 @@
-* homework 1
+#+LATEX_HEADER: \usepackage{lineno}
+#+OPTIONS: toc:nil
+
+* homework 1 by mwwong@smu.edu.sg
 
 ** Exercise 1
 
@@ -8,7 +11,7 @@ code without altering the final postcondition? How does the
 “forgetting” of assertions correspond to a form of modularity?
 #+end_quote
 
-We could say:
+Answer: we could say:
 
 #+begin_src
   z = x ;
@@ -24,6 +27,8 @@ The modularity consists of only caring about certain aspects of the software; if
 
 If in practice x and y are asynchronous results from some API call against remote servers, we can proceed with the first to return, not needing both.
 
+This reminds me of how we could approximate Boolean $\top\ \lor \perp$ with $1+0$.
+
 ** Comment
 
 #+begin_quote
@@ -36,17 +41,17 @@ something logical without already having something logical.
 If we use the following definitions of deductive, abductive, and
 inductive reasoning:
 
-| facts | rules | outcome | reasoning |
-|-------+-------+---------+-----------|
-| ?     | input | input   | abductive |
-| input | ?     | input   | inductive |
-| input | input | ?       | deductive |
+| facts    | rules    | outcome  | reasoning |
+|----------+----------+----------+-----------|
+| /sought/ | input    | input    | abductive |
+| input    | /sought/ | input    | inductive |
+| input    | input    | /sought/ | deductive |
 
-Abductive reasoning proceeds from rules and outcomes to facts that satisfy.
+Abductive reasoning goes from rules and outcomes to facts that satisfy.
 
-Inductive reasoning proceeds from facts and outcomes to guess at rules.
+Inductive reasoning goes from facts and outcomes to guess at rules.
 
-Deductive reasoning proceeds from facts and rules to conclude outcomes.
+Deductive reasoning goes from facts and rules to conclude outcomes.
 
 We see a similar logic at work, substituting
 
@@ -54,4 +59,76 @@ We see a similar logic at work, substituting
 |--------------+-------+---------------|
 | precondition | code  | postcondition |
 
+
+** Exercise 2
+
+1. { $a = 0$ }
+2. $b := 2 - a$
+3. { $b = 2$ }
+4. $c := b * 2$
+5. { $c = 4$ }
+6. $d := c + 1$
+7. { $d = 5$ }
+
+** Exercise 3
+
+1. { $x \in \mathbb{N}$ }
+2. $y := (x / 2) * 2$
+3. { ($x$ odd $\Rightarrow$ $y = x - 1$) $\land$ ($x$ even $\Rightarrow$ $y = x$)  }
+4. $z := x - y$
+5. { ($x$ odd $\Rightarrow$ $z = 1$) $\land$ ($x$ even $\Rightarrow$ $z = 0$)  }
+6. $a := z * 5 + (1 - z) * 12$
+7. given
+
+** Exercise 4
+
+1. { true }
+2. $d := (2-(a+1)/a)/2$
+3. { $( a <= 0 \Rightarrow d = 1) \land ( a > 0 \Rightarrow d = 0 )$ }
+4. m := d * 2 + (1-d) * 3
+5. { $( a <= 0 \Rightarrow m = 2) \land ( a > 0 \Rightarrow m = 3 ) \land b \in \mathbb{Z}$ }
+6. x := b * 2
+7. { $( a <= 0 \Rightarrow m = 2) \land ( a > 0 \Rightarrow m = 3 ) \land (x = b * 2)$ }
+8. x := x * 2
+9. { $( a <= 0 \Rightarrow m = 2) \land ( a > 0 \Rightarrow m = 3 ) \land x = b * 4$ }
+10. x := m * x
+11. { $( a <= 0 \Rightarrow x = 8*b) \land ( a > 0 \Rightarrow x = 12*b)$ }
+12. x := x + 1
+13. given
+   
+*** comment:
+
+#+begin_quote
+/In this exercise, as before, assume all variables are integers/
+#+end_quote
+
+In the before exercise, all variables are naturals.
+
+** Comment on 4.4
+
+This is [[https://en.wikipedia.org/wiki/Robustness_principle][Postel's law]]! "be conservative in what you send, be liberal in what you accept"
+
+** Exercise 5
+
+We move the simpler business with the $x$ up above the complicated business with the $a$, $d$, and $m$.
+
+1. { true }
+2. x := b * 2
+3. { $x = b * 2$ }
+4. x := x * 2
+5. { $x = b * 4$ }
+6. x := x + 1
+7. { $x = b * 4 + 1$ }
+8. $d := (2-(a+1)/a)/2$
+9. { $x = b * 4 + 1 \land ( a <= 0 \Rightarrow d = 1) \land ( a > 0 \Rightarrow d = 0 )$ }
+10. m := d * 2 + (1-d) * 3
+11. { $x = b * 4 + 1 \land ( a <= 0 \Rightarrow m = 2) \land ( a > 0 \Rightarrow m = 3 )$  }
+12. x := m * x
+13. given
+
+** Exercise 6
+
+The possibility of concurrency makes me want to explicitly assume that the array is either immutable, or that we are guaranteed that no other code is going to change the parts of the array < i while we are in the loop.
+
+The loop invariant: given an array with $n$ slots, $i <= n$, and at the start of iteration $i$ of the loop, the desired $val$ is not found in the slots below $i$
 

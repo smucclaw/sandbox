@@ -10,7 +10,9 @@ fmod LITERALS is
   sorts Literal Literals .
   subsorts Qid < Literal < Literals .
 
-  ops ~_ : Qid -> Literal [ctor] .
+  ops not_ : Qid -> Literal [ctor] .
+  ops ~_ : Literal -> Literal .
+
   --- ops Literal < Bool .
 
   ops emptyLiterals : -> Literals [ctor] .
@@ -19,6 +21,10 @@ fmod LITERALS is
  
   vars q : Literal .
   vars literals : Literals .
+
+  eq ~ q = not q .
+  eq ~ (not q) = q .
+
   eq literals # literals = literals .
 
   ops _notIn_ : Literal Literals -> Bool .
@@ -26,17 +32,6 @@ fmod LITERALS is
   eq q notIn literals = true [owise] .
 
 endfm
-
----(
-  A preference relation is the transitive closure of the one step evaluation
-  relation defined by a small-step operational semantics.
-)
-mod PREF-REL is
-  pr LITERALS .
-
-  --- rl [r1_r2] : 'r1 => 'r2 .
-
-endm
 
 fmod RULE is
   pr BOOL .
@@ -85,6 +80,21 @@ mod DEFEAS-STATICS is
 
 endm
 
+---(
+  A preference relation is the transitive closure of the one step evaluation
+  relation defined by a small-step operational semantics.
+
+  In other words, a rewriting rule aka transition of the form
+  rl 'rl => 'r2
+  is interpreted as 'r1 < 'r2
+)
+mod PREF-REL is
+  pr LITERALS .
+
+  --- rl [r1_r2] : 'r1 => 'r2 .
+
+endm
+
 mod DEFEAS-DYNAMICS is
   pr DEFEAS-STATICS .
 
@@ -106,7 +116,7 @@ mod DEFEAS-DYNAMICS is
   According to Guido, we can for propositional logic.
   How much higher do we need to go for first-oder?
 )
-  crl [+∆] :
+  crl [+∆-fact] :
     Atoms (q # atoms)
     Facts (q # facts)
     Rules rules
@@ -120,7 +130,7 @@ mod DEFEAS-DYNAMICS is
     (q # +∆) -∆ +∂ -∂
   if q notIn +∆ .
 
-  crl [+∆] :
+  crl [+∆-strict-rule] :
     Atoms (q # atoms)
     Facts facts
     Rules ((ruleName : literals ==> q) # rules)
@@ -159,7 +169,43 @@ mod DEFEAS-DYNAMICS is
 
   eq q notProvableFrom rules -∆ = false [owise] .
 
-  --- vars r1 r2 : Qid .
+  crl [+∂-definitely-provable] :
+    Atoms (q # atoms)
+    Facts facts
+    Rules rules
+    PrefRel prefRel
+    (q # +∆) -∆ +∂ -∂
+  =>
+    Atoms (q # atoms)
+    Facts facts
+    Rules rules
+    PrefRel prefRel
+    (q # +∆) -∆ (q # +∂) -∂
+  if q notIn +∂ .
+
+  crl [+∂-defeasibly-provable-1] :
+    Atoms (q # atoms)
+    Facts facts
+    Rules ((ruleName : literals ==> q) # rules)
+    PrefRel prefRel
+    +∆ (~ q # -∆) (literals # +∂) -∂
+  =>
+    Atoms (q # atoms)
+    Facts facts
+    Rules rules
+    PrefRel prefRel
+    +∆ -∆ (q # literals # +∂) -∂
+  if q notIn +∂ 
+  /\ f rules q +∂ -∂ .
+
+  ops f____ : Literal Literals Literals NamedRules -> Bool .
+
+  eq f q +∂ -∂ emptyRules = true .
+
+  eq f q +∂ (p # -∂) ((ruleName : (p # literals) ==> ~ q) # rules)
+  = f q +∂ (p # -∂) rules .
+
+  --- eq f q +∂ (p # -∂) ((ruleName : (p # literals) ==> ~ q) # rules)
 
 ---(
   Notes on metaSearch:

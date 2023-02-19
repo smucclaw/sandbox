@@ -1,7 +1,4 @@
----(
-  Notes:
-  https://ssa2020.dmi.unipg.it/res/DefeasibleLogic.pdf
-)
+sload model-checker
 
 fmod LITERALS is
   pr QID .
@@ -20,16 +17,23 @@ fmod LITERALS is
     [ctor assoc comm id: emptyLiterals] .
  
   vars q : Literal .
+  vars atom : Qid .
   vars literals : Literals .
 
-  eq ~ q = not q .
-  eq ~ (not q) = q .
+  eq ~ atom = not atom .
+  eq ~ (not atom) = atom .
+
+  ops _isLiteralOfAtom_ : Literal Qid -> Bool .
+  eq q isLiteralOfAtom atom = q == atom or ~ q == atom .
 
   eq literals # literals = literals .
 
-  ops _notIn_ : Literal Literals -> Bool .
-  eq q notIn (q # literals) = false .
-  eq q notIn literals = true [owise] .
+  ops _elemOf_ _notElemOf_ : Literal Literals -> Bool .
+
+  eq q elemOf (q # literals) = true .
+  eq q elemOf literals = false [owise] .
+
+  eq q notElemOf literals = not (q elemOf literals) .
 
 endfm
 
@@ -40,9 +44,25 @@ fmod RULE is
   --- protecting PREF-REL .
   --- protecting META-LEVEL .
 
+  sorts DefeasRule StrictRule DefeatRule .
   sorts UnnamedRule NamedRule NamedRules .
+  sorts Arrow StrictArrow DefeasArrow DefeatArrow .
+  sorts DefeasDefeatArrow StrictDefeasArrow .
 
-  ops _==>_ _~>_ _->_ : Literals Literal -> UnnamedRule [ctor] .
+  subsorts StrictArrow DefeasArrow < StrictDefeasArrow .
+  subsorts DefeasArrow DefeatArrow < DefeasDefeatArrow .
+  subsorts DefeasDefeatArrow StrictDefeasArrow < Arrow .
+  subsorts DefeasRule StrictRule DefeatRule < UnnamedRule .
+
+  ops ==> : -> StrictArrow [ctor] .
+  ops -> : -> DefeasArrow [ctor] . 
+  ops ~> : -> DefeatArrow [ctor] .
+
+  ops ___ : Literal DefeasArrow Literal -> DefeasRule .
+  ops ___ : Literal StrictArrow Literal -> StrictRule .
+  ops ___ : Literal DefeatArrow Literal -> DefeatRule .
+
+  --- ops _==>_ _~>_ _->_ : Literals Literal -> UnnamedRule [ctor] .
 
   ops _<_ : Literal Literal -> Bool .
 
@@ -80,154 +100,360 @@ mod DEFEAS-STATICS is
 
 endm
 
----(
-  A preference relation is the transitive closure of the one step evaluation
-  relation defined by a small-step operational semantics.
-
-  In other words, a rewriting rule aka transition of the form
-  rl 'rl => 'r2
-  is interpreted as 'r1 < 'r2
-)
-mod PREF-REL is
-  pr LITERALS .
-
-  --- rl [r1_r2] : 'r1 => 'r2 .
-
-endm
-
 mod DEFEAS-DYNAMICS is
   pr DEFEAS-STATICS .
 
-  vars p q : Literal .
-  vars ruleName : Qid .
-  vars +∆ -∆ +∂ -∂ atoms facts literals : Literals .
+  vars p q q' : Literal .
+  vars atom ruleName ruleName' : Qid .
+  vars +∆ -∆ +∂ -∂ atoms facts literals literals' : Literals .
+  vars rule : NamedRule .
   vars rules : NamedRules .
   vars prefRel : Module .
-
-  sorts State .
-  ops _____ : DefeasTheory Literals Literals Literals Literals -> State .
+  vars arrow : Arrow .
+  vars =-> : StrictDefeasArrow .
+  vars -~> : DefeasDefeatArrow .
+  vars =-~> : Arrow .
+  vars defeasTheory : DefeasTheory .
 
 ---(
-  These rewriting rules define a transition system which implements transfinite
-  fixpoint iteration.
-  For details, see page 10 of: https://arxiv.org/pdf/cs/0511055.pdf
+  Transition system for transfinite iteration to compute the colimit of the
+  endofunctor F in page 10 of https://arxiv.org/pdf/cs/0511055.pdf
+
+  For details on fixpoint iteration, see:
+  https://core.ac.uk/download/pdf/82239173.pdf
 
   Can we bound the ordinal height by omega for computability purposes?
   According to Guido, we can for propositional logic.
   How much higher do we need to go for first-oder?
 )
-  crl [+∆-fact] :
-    Atoms (q # atoms)
-    Facts (q # facts)
-    Rules rules
-    PrefRel prefRel
-    +∆ -∆ +∂ -∂
-  =>
-    Atoms (q # atoms)
-    Facts (q # facts)
-    Rules rules
-    PrefRel prefRel
-    (q # +∆) -∆ +∂ -∂
-  if q notIn +∆ .
+  sorts FixptIterState .
+  subsorts DefeasTheory < FixptIterState .
 
-  crl [+∆-strict-rule] :
-    Atoms (q # atoms)
-    Facts facts
-    Rules ((ruleName : literals ==> q) # rules)
-    PrefRel prefRel
-    (literals # +∆) -∆ +∂ -∂
-  =>
-    Atoms (q # atoms)
-    Facts facts
-    Rules ((ruleName : literals ==> q) # rules)
-    PrefRel prefRel
-    (q # literals # +∆) -∆ +∂ -∂
-  if q notIn +∆ .
+  --- theory | +∆ | -∆ | +∂ | -∂
+  ops _|_|_|_|_ :
+    DefeasTheory Literals Literals Literals Literals -> FixptIterState .
 
- crl [-∆] :
-    Atoms (q # atoms)
-    Facts facts
-    Rules rules
-    PrefRel prefRel
-    +∆ -∆ +∂ -∂ 
-  =>
-    Atoms (q # atoms)
-    Facts facts
-    Rules rules
-    PrefRel prefRel
-    +∆ (q # -∆) +∂ -∂
-  if q notIn -∆
-  /\ q notIn facts
-  /\ q notProvableFrom rules -∆ .
-
-  ops _notProvableFrom__ : Qid NamedRules Literals -> Bool .
-
-  eq q notProvableFrom emptyRules -∆ = true .
-
-  eq q notProvableFrom ((ruleName : (p # literals) ==> q) # rules) (p # -∆)
-  = q notProvableFrom rules (p # -∆) .
-
-  eq q notProvableFrom rules -∆ = false [owise] .
-
-  crl [+∂-definitely-provable] :
-    Atoms (q # atoms)
-    Facts facts
-    Rules rules
-    PrefRel prefRel
-    (q # +∆) -∆ +∂ -∂
-  =>
-    Atoms (q # atoms)
-    Facts facts
-    Rules rules
-    PrefRel prefRel
-    (q # +∆) -∆ (q # +∂) -∂
-  if q notIn +∂ .
-
-  crl [+∂-defeasibly-provable-1] :
-    Atoms (q # atoms)
-    Facts facts
-    Rules ((ruleName : literals ==> q) # rules)
-    PrefRel prefRel
-    +∆ (~ q # -∆) (literals # +∂) -∂
-  =>
-    Atoms (q # atoms)
-    Facts facts
-    Rules rules
-    PrefRel prefRel
-    +∆ -∆ (q # literals # +∂) -∂
-  if q notIn +∂ 
-  /\ f rules q +∂ -∂ .
-
-  ops f____ : Literal Literals Literals NamedRules -> Bool .
-
-  eq f q +∂ -∂ emptyRules = true .
-
-  eq f q +∂ (p # -∂) ((ruleName : (p # literals) ==> ~ q) # rules)
-  = f q +∂ (p # -∂) rules .
-
-  --- eq f q +∂ (p # -∂) ((ruleName : (p # literals) ==> ~ q) # rules)
+  --- Fixpoint iteration begins at ⊥ = ({}, {}, {}, {})
+  ops initialize_ : DefeasTheory -> FixptIterState .
+  eq initialize defeasTheory
+  = defeasTheory
+    | emptyLiterals | emptyLiterals | emptyLiterals | emptyLiterals .
 
 ---(
   Notes on metaSearch:
   https://www.uio.no/studier/emner/matnat/ifi/INF5130/h15/lectures/lecture4.pdf
 )
-  --- ceq r1 < r2 = true
-  --- if metaSearchPath(upModule('PREF-REL, false), r1, r2, nil, '+, unbounded, 0) =/= failure .
+  ops _<`[_`]_ : Qid Module Qid -> Bool .
+  eq ruleName <[prefRel] ruleName'
+  = metaSearchPath(
+      prefRel, upTerm(ruleName), upTerm(ruleName'), nil, '+, unbounded, 0
+  ) =/= failure .
 
-  --- crl [t] :
-  ---   true => false
-  --- if 'r1 < 'r2 .
+  crl [+∆-fact] :
+    Atoms (atom # atoms)
+    Facts (q # facts)
+    Rules rules
+    PrefRel prefRel
+    | +∆ | -∆ | +∂ | -∂
+  =>
+    Atoms (atom # atoms)
+    Facts (q # facts)
+    Rules rules
+    PrefRel prefRel
+    | (q # +∆) | -∆ | +∂ | -∂
+  if q isLiteralOfAtom atom
+  /\ q notElemOf +∆ .
 
-  --- ops _<_ : Qid Qid -> PrefRel .
+  crl [+∆-strict-rule] :
+    Atoms (atom # atoms)
+    Facts facts
+    Rules ((ruleName : literals ==> q) # rules)
+    PrefRel prefRel
+    | (literals # +∆) | -∆ | +∂ | -∂
+  =>
+    Atoms (atom # atoms)
+    Facts facts
+    Rules ((ruleName : literals ==> q) # rules)
+    PrefRel prefRel
+    | (q # literals # +∆) | -∆ | +∂ | -∂
+  if q isLiteralOfAtom atom
+  /\ q notElemOf +∆ .
 
-  --- ops _<[_]_ : Qid Set{Qid} Qid -> Bool .
+ crl [-∆] :
+    Atoms (atom # atoms)
+    Facts facts
+    Rules rules
+    PrefRel prefRel
+    | +∆ | -∆ | +∂ | -∂ 
+  =>
+    Atoms (atom # atoms)
+    Facts facts
+    Rules rules
+    PrefRel prefRel
+    | +∆ | (q # -∆) | +∂ | -∂
+  if q := atom 
+  /\ q notElemOf -∆
+  /\ q notElemOf facts
+  /\ q notProvableFrom rules -∆ .
+
+ crl [-∆] :
+    Atoms (atom # atoms)
+    Facts facts
+    Rules rules
+    PrefRel prefRel
+    | +∆ | -∆ | +∂ | -∂ 
+  =>
+    Atoms (atom # atoms)
+    Facts facts
+    Rules rules
+    PrefRel prefRel
+    | +∆ | (q # -∆) | +∂ | -∂
+  if q := ~ atom
+  /\ q notElemOf -∆
+  /\ q notElemOf facts
+  /\ q notProvableFrom rules -∆ .
+
+  ops _notProvableFrom__ : Literal NamedRules Literals -> Bool .
+
+  eq q notProvableFrom emptyRules -∆ = true .
+  
+  eq q notProvableFrom ((ruleName : (p # literals) ==> q) # rules) (p # -∆)
+  = q notProvableFrom rules (p # -∆) .
+
+  ceq q notProvableFrom ((ruleName : literals =-~> p) # rules) -∆
+  = q notProvableFrom rules -∆
+  if =-~> =/= ==> or p =/= q .
+
+  --- eq q notProvableFrom ((rulename : literals -~> p) # rules) -∆
+  --- = q notProvableFrom rules -∆ .
+
+  crl [+∂-definitely-provable] :
+    Atoms (atom # atoms)
+    Facts facts
+    Rules rules
+    PrefRel prefRel
+    | (q # +∆) | -∆ | +∂ | -∂
+  =>
+    Atoms (atom # atoms)
+    Facts facts
+    Rules rules
+    PrefRel prefRel
+    | (q # +∆) | -∆ | (q # +∂) | -∂
+  if q isLiteralOfAtom atom
+  /\ q notElemOf +∂ .
+
+  crl [+∂-defeasibly-provable] :
+    Atoms (atom # atoms)
+    Facts facts
+    Rules ((ruleName : literals =-> q) # rules)
+    PrefRel prefRel
+    | +∆ | (q' # -∆) | (literals # +∂) | -∂
+  =>
+    Atoms (atom # atoms)
+    Facts facts
+    Rules ((ruleName : literals =-> q) # rules)
+    PrefRel prefRel
+    | +∆ | (q' # -∆) | (q # literals # +∂) | -∂
+  if q isLiteralOfAtom atom
+  /\ q' == ~ q
+  /\ q notElemOf +∂
+  /\ f q prefRel (literals # +∂) -∂ ((ruleName : literals =-> q) # rules) .
+
+---(
+  This function handles 2.3 in the definition of +∂
+  We perform recursion on the set of input rules to handle the universal quantifier.
+)
+  ops f_____ : Literal Module Literals Literals NamedRules -> Bool .
+
+  eq f q prefRel +∂ -∂ emptyRules = true .
+
+  --- Case 2.3.1
+  ceq f q prefRel +∂ (p # -∂) ((ruleName : (p # literals) =-~> q') # rules)
+  = f q prefRel +∂ -∂ rules
+  if q' == ~ q .
+
+  --- Case 2.3.2
+  ceq f q prefRel (literals' # +∂) -∂
+    (
+      (ruleName : (p # literals) =-~> q') #
+      (ruleName' : literals' =-> q) #
+      rules
+    )
+  = ruleName <[prefRel] ruleName'
+  and f q prefRel (literals' # +∂) -∂ ((ruleName' : literals' =-> q) # rules)
+  if q' == ~ q .
+
+  ceq f q prefRel +∂ -∂ ((ruleName : literals =-~> p) # rules)
+  = f q prefRel +∂ -∂ rules
+  if p =/= ~ q .
+
+  --- eq f q prefRel +∂ -∂ rules
+  --- = false [owise] .
+
+  crl [-∂-not-defeasibly-provable-2.1] :
+    Atoms (atom # atoms)
+    Facts facts
+    Rules rules
+    PrefRel prefRel
+    | +∆ | (q # -∆) | +∂ | -∂
+  =>
+    Atoms (atom # atoms)
+    Facts facts
+    Rules rules
+    PrefRel prefRel
+    | +∆ | (q # -∆) | +∂ | (q # -∂)
+  if q isLiteralOfAtom atom
+  /\ q notElemOf -∂
+  /\ g q -∂ rules .
+
+  ops g___ : Literal Literals NamedRules -> Bool .
+
+  eq g q -∂ emptyRules = true .
+
+  eq g q (p # -∂) ((ruleName : (p # literals) =-> q) # rules)
+  = g q -∂ rules .
+
+  ceq g q -∂ ((ruleName : literals =-~> p) # rules)
+  = g q -∂ rules
+  if =-~> == ~> or p =/= q .
+
+  crl [-∂-not-defeasibly-provable-2.2] :
+    Atoms (atom # atoms)
+    Facts facts
+    Rules rules
+    PrefRel prefRel
+    | (q' # +∆) | (q # -∆) | +∂ | -∂
+  =>
+    Atoms (atom # atoms)
+    Facts facts
+    Rules rules
+    PrefRel prefRel
+    | (q' # +∆) | (q # -∆) | +∂ | (q # -∂)
+  if q isLiteralOfAtom atom
+  /\ q' == ~ q
+  /\ q notElemOf -∂ .
+
+  crl [-∂-not-defeasibly-provable-2.3] :
+    Atoms (atom # atoms)
+    Facts facts
+    Rules ((ruleName : literals =-~> q') # rules)
+    PrefRel prefRel
+    | +∆ | (q # -∆) | (literals # +∂) | -∂
+  =>
+    Atoms (atom # atoms)
+    Facts facts
+    Rules ((ruleName : literals =-~> q') # rules)
+    PrefRel prefRel
+    | +∆ | (q # -∆) | (literals # +∂) | (q # -∂)
+  if q isLiteralOfAtom atom
+  /\ q' == ~ q
+  /\ q notElemOf -∂
+  /\ h prefRel ruleName q -∂ rules .
+
+  --- Case 2.3.2 of not defeasibly provable.
+  ops h_____ : Module Qid Literal Literals NamedRules -> Bool .
+
+---(
+  h
+    upModule('PREF-REL, false)
+    'r2
+    (not 'r)
+    ('q # 'r # not 'p # not 'q)
+    (('r1 : 'p -> 'r) # ('r2 : 'p -> not 'r))
+
+    'r1 < 'r2
+)
+  eq h prefRel ruleName q -∂ emptyRules = true .
+
+  eq h prefRel ruleName q (p # -∂) ((ruleName' : (p # literals) =-> q) # rules)
+  = h prefRel ruleName q (p # -∂) rules .
+
+  eq h prefRel ruleName q -∂ ((ruleName' : literals =-> q) # rules)
+  = not (ruleName <[prefRel] ruleName')
+  and h prefRel ruleName q -∂ rules .
+
+  ceq h prefRel ruleName q -∂ ((ruleName' : literals =-~> p) # rules)
+  = h prefRel ruleName q -∂ rules
+  if =-~> == ~> or p =/= q .
+
 endm
 
-rew
-  Atoms ('p # 'q # 'r)
-  Facts ('p # 'q)
-  Rules ('r1 : 'p ==> 'r)
-  PrefRel upModule('PREF-REL, false)
-  emptyLiterals emptyLiterals emptyLiterals emptyLiterals .
+mod PROVER is
+  pr DEFEAS-DYNAMICS .
+  inc MODEL-CHECKER + SATISFACTION + LTL .
 
---- quit
+  subsorts FixptIterState < State .
+
+  vars q : Literal .
+  vars +∆ -∆ +∂ -∂ : Literals .
+  vars defeasTheory : DefeasTheory .
+
+  ops _∈`+∆ _∈`-∆ _∈`+∂ _∈`-∂ : Literal -> Prop . 
+
+  eq defeasTheory | (q # +∆) | -∆ | +∂ | -∂ |= q ∈ +∆
+  = true .
+
+  eq defeasTheory | +∆ | (q # -∆) | +∂ | -∂ |= q ∈ -∆
+  = true .
+
+  eq defeasTheory | +∆ | -∆ | (q # +∂) | -∂ |= q ∈ +∂
+  = true .
+
+  eq defeasTheory | +∆ | -∆ | +∂ | (q # -∂) |= q ∈ -∂
+  = true .
+
+  ops _⊢`+∆_ _⊢`-∆_ _⊢`+∂_ _⊢`-∂_ : DefeasTheory Literal -> Bool .
+
+  eq defeasTheory ⊢ +∆ q
+  = true == modelCheck(initialize defeasTheory, <> q ∈ +∆) .
+
+  eq defeasTheory ⊢ -∆ q
+  = true == modelCheck(initialize defeasTheory, <> q ∈ -∆) .
+
+  eq defeasTheory ⊢ +∂ q
+  = true == modelCheck(initialize defeasTheory, <> q ∈ +∂) .
+
+  eq defeasTheory ⊢ -∂ q
+  = true == modelCheck(initialize defeasTheory, <> q ∈ -∂) .
+
+endm
+
+red
+  Atoms ('p # 'q # 'r)
+  Facts 'p
+  Rules (('r1 : 'p -> 'r) # ('r2 : 'p -> not 'r))
+---(
+  A preference relation is the transitive closure of a one-step reduction
+  relation given by a small-step operational semantics.
+  In other words, we view the state space of the defined transition system as
+  a thin category representing a poset.
+
+  In simpler terms, this means we define a transition system with rules
+  of the form 'r1 => 'r2, and we then take 'r3 < 'r4 to mean 'r4 is reachable
+  from 'r3 in one or more steps.
+)
+  PrefRel (
+    mod 'PREF-REL is
+      protecting 'META-LEVEL .
+      protecting 'QID .
+      sorts none .
+      none none none none
+      --- 'r1 < 'r2
+      rl ''r1.Sort => ''r2.Sort [none] . 
+    endm
+  )
+  ⊢ +∂ not 'r .
+
+--- rew in DEFEAS-DYNAMICS :
+---   initialize (
+---     Atoms ('p # 'q # 'r)
+---     Facts 'p
+---     Rules (('r1 : 'p -> 'r) # ('r2 : 'p -> not 'r))
+---     PrefRel testPrefRel
+---   ) .
+
+--- set print attribute on .
+--- set trace on .
+--- continue 1 .
+
+quit

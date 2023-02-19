@@ -1,3 +1,15 @@
+---(
+  Defeasibility logic theorem prover in Maude.
+
+  This work is largely based on Guido's paper:
+  https://arxiv.org/pdf/cs/0511055.pdf
+
+  We encode the endofunctor on page 10 into a transition system which performs
+  the same transfinite fixpoint iteration procedure.
+  With this, we use reachability analysis and LTL model checking to check
+  the provability of formulae in defeasible theories.
+)
+
 sload model-checker
 
 fmod LITERALS is
@@ -117,7 +129,7 @@ mod DEFEAS-DYNAMICS is
 
 ---(
   Transition system for transfinite iteration to compute the colimit of the
-  endofunctor F in page 10 of https://arxiv.org/pdf/cs/0511055.pdf
+  endofunctor F in page 10 of Guido's paper. 
 
   For details on fixpoint iteration, see:
   https://core.ac.uk/download/pdf/82239173.pdf

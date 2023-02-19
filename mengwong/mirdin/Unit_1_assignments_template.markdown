@@ -1,0 +1,110 @@
+# Hidden Layer of Logic: Readings
+
+## The Three Levels of Software.
+<Your answer goes here>
+
+
+## The Design of Software is a Thing Apart.
+<Your answer goes here>
+
+
+## Painless Functional Specifications Part 1.
+<Your answer goes here>
+
+
+## Modules Matters Most.
+<Your answer goes here>
+
+
+# Hoare Logic
+
+## 1.
+We could say any of the following:
+
+z = x;
+
+z = y;
+
+z = x * y;
+
+The modularity consists of only caring about certain aspects of the
+software; if we are certain that both x and y are sufficient
+conditions for z, we are comfortable discarding one or the other.
+
+If in practice x and y are asynchronous results from some API call
+against remote servers, we can proceed with the first to return, not
+needing both.
+
+This reminds me of approximating Boolean True \/ False with 1 + 0.
+
+
+
+## 2.
+1.  { a = 0 }
+2.  (b := 2 - a)
+3.  { b = 2 }
+4.  (c := b * 2)
+5.  { c = 4 }
+6.  (d := c + 1)
+7.  { d = 5 }
+
+
+
+## 3.
+1.  { true }
+2.  y := (x / 2) * 2
+3.  { ((x is odd) => y = x - 1) /\ ((x is even) => y = x) }
+4.  z := x - y
+5.  { ((x is odd) => z = 1) /\ (x is even => z = 0) }
+6.  a := z * 5 + (1 - z) * 12
+7.  { ((x is odd) => a = 5) /\ ((x is even) => a = 12) }
+
+
+
+## 4.1.
+1. { true }
+2. d := (2−(a+1)/a)/2
+3. {  ( a<=0 => d=1) /\ (a>0 => d=0) }
+4. m := d*2 + (1-d) * 3
+5. { (a <= 0 => m=2) /\ (a>0 => m=3) }
+6. x:=b*2
+7. { (a<=0 => m=2) /\ (a>0 => m=3) /\ (x= b * 2 ) }
+8. x := x * 2
+9. { (a<=0 => m=2) /\ (a>0 => m=3) /\ x= b * 4 }
+10. x := m * x
+11. { (a <= 0 => x = 8 * b) /\ (a>0 => x = 12 * b)}
+12. x:=x+1
+13. { ((a<=0) => x=8 * b+1) /\ ((a>0) => x=12 * b+1) }
+
+## 4.2.
+The definition of d is equivalent to a conditional
+  d = (a <= 0 ? 1 : 0)
+
+## 5.
+We move the simpler business with the x up above the complicated business with the a, d, and m.
+
+1. { true }
+2. x := b * 2
+3. { x = b ∗ 2 }
+4. x := x * 2
+5. { x = b ∗ 4 }
+6. x := x+1
+7. { x = b * 4 + 1 }
+8. d := (2−(a+1)/a)/2
+9. { x = b * 4 + 1 /\ (a<=0 => d=1) /\ (a>0 => d=0) }
+10. m := d * 2 + ( 1 - d ) * 3
+11. { x = b * 4 + 1 /\ (a<=0 => m=2) /\ (a>0 => m=3) }
+12. x := m*x
+13. { ((a<=0) => x= 8 * b + 1) /\ ((a>0) => x=12 * b + 1) }
+
+
+## 6.
+
+The possibility of concurrency makes me want to explicitly assume that
+either the array is immutable, or that we are guaranteed that no other
+code is going to change the parts of the array < i while we are in the
+loop.
+
+The loop invariant: the array has n slots; i <= n; at the start of
+iteration i of the loop, the desired val is not found in the slots
+below i.

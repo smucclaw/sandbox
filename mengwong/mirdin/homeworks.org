@@ -1,0 +1,57 @@
+* homework 1
+
+** Exercise 1
+
+#+begin_quote
+Conceptual question: In the latter example, how could we change the
+code without altering the final postcondition? How does the
+“forgetting” of assertions correspond to a form of modularity?
+#+end_quote
+
+We could say:
+
+#+begin_src
+  z = x ;
+#+end_src
+
+Or we could say:
+
+#+begin_src
+  z = y ;
+#+end_src
+
+The modularity consists of only caring about certain aspects of the software; if we are certain that both x and y are sufficient conditions for z, we are comfortable discarding one or the other.
+
+If in practice x and y are asynchronous results from some API call against remote servers, we can proceed with the first to return, not needing both.
+
+** Comment
+
+#+begin_quote
+So, in order to get a canonical weakest precondition, we need both the
+code and a postcondition. In order to get a canonical strongest
+postcondition, we need both the code and a precondition. We cannot get
+something logical without already having something logical.
+#+end_quote
+
+If we use the following definitions of deductive, abductive, and
+inductive reasoning:
+
+| facts | rules | outcome | reasoning |
+|-------+-------+---------+-----------|
+| ?     | input | input   | abductive |
+| input | ?     | input   | inductive |
+| input | input | ?       | deductive |
+
+Abductive reasoning proceeds from rules and outcomes to facts that satisfy.
+
+Inductive reasoning proceeds from facts and outcomes to guess at rules.
+
+Deductive reasoning proceeds from facts and rules to conclude outcomes.
+
+We see a similar logic at work, substituting
+
+| facts        | rules | outcome       |
+|--------------+-------+---------------|
+| precondition | code  | postcondition |
+
+

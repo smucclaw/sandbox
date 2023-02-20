@@ -66,8 +66,8 @@ fmod RULE is
   subsorts DefeasDefeatArrow StrictDefeasArrow < Arrow .
   subsorts DefeasRule StrictRule DefeatRule < UnnamedRule .
 
-  ops ==> : -> StrictArrow [ctor] .
-  ops -> : -> DefeasArrow [ctor] . 
+  ops ==> : -> DefeasArrow [ctor] .
+  ops -> : -> StrictArrow [ctor] . 
   ops ~> : -> DefeatArrow [ctor] .
 
   ops ___ : Literal DefeasArrow Literal -> DefeasRule .
@@ -122,9 +122,9 @@ mod DEFEAS-DYNAMICS is
   vars rules : NamedRules .
   vars prefRel : Module .
   vars arrow : Arrow .
-  vars =-> : StrictDefeasArrow .
-  vars -~> : DefeasDefeatArrow .
-  vars =-~> : Arrow .
+  vars -=> : StrictDefeasArrow .
+  vars =~> : DefeasDefeatArrow .
+  vars -=~> : Arrow .
   vars defeasTheory : DefeasTheory .
 
 ---(
@@ -156,8 +156,8 @@ mod DEFEAS-DYNAMICS is
   https://www.uio.no/studier/emner/matnat/ifi/INF5130/h15/lectures/lecture4.pdf
 )
   ops _<`[_`]_ : Qid Module Qid -> Bool .
-  eq ruleName <[prefRel] ruleName'
-  = metaSearchPath(
+  eq ruleName < [prefRel] ruleName'
+  = metaSearch(
       prefRel, upTerm(ruleName), upTerm(ruleName'), nil, '+, unbounded, 0
   ) =/= failure .
 
@@ -179,19 +179,19 @@ mod DEFEAS-DYNAMICS is
   crl [+∆-strict-rule] :
     Atoms (atom # atoms)
     Facts facts
-    Rules ((ruleName : literals ==> q) # rules)
+    Rules ((ruleName : literals -> q) # rules)
     PrefRel prefRel
     | (literals # +∆) | -∆ | +∂ | -∂
   =>
     Atoms (atom # atoms)
     Facts facts
-    Rules ((ruleName : literals ==> q) # rules)
+    Rules ((ruleName : literals -> q) # rules)
     PrefRel prefRel
     | (q # literals # +∆) | -∆ | +∂ | -∂
   if q isLiteralOfAtom atom
   /\ q notElemOf +∆ .
 
- crl [-∆] :
+ crl [-∆-positive-literal] :
     Atoms (atom # atoms)
     Facts facts
     Rules rules
@@ -202,13 +202,12 @@ mod DEFEAS-DYNAMICS is
     Facts facts
     Rules rules
     PrefRel prefRel
-    | +∆ | (q # -∆) | +∂ | -∂
-  if q := atom 
-  /\ q notElemOf -∆
-  /\ q notElemOf facts
-  /\ q notProvableFrom rules -∆ .
+    | +∆ | (atom # -∆) | +∂ | -∂
+  if atom notElemOf -∆
+  /\ atom notElemOf facts
+  /\ atom notProvableFrom rules -∆ .
 
- crl [-∆] :
+ crl [-∆-negative-literal] :
     Atoms (atom # atoms)
     Facts facts
     Rules rules
@@ -219,27 +218,26 @@ mod DEFEAS-DYNAMICS is
     Facts facts
     Rules rules
     PrefRel prefRel
-    | +∆ | (q # -∆) | +∂ | -∂
-  if q := ~ atom
-  /\ q notElemOf -∆
-  /\ q notElemOf facts
-  /\ q notProvableFrom rules -∆ .
+    | +∆ | (not atom # -∆) | +∂ | -∂
+  if (not atom)  notElemOf -∆
+  /\ (not atom) notElemOf facts
+  /\ (not atom) notProvableFrom rules -∆ .
 
   ops _notProvableFrom__ : Literal NamedRules Literals -> Bool .
 
   eq q notProvableFrom emptyRules -∆ = true .
   
-  eq q notProvableFrom ((ruleName : (p # literals) ==> q) # rules) (p # -∆)
+  eq q notProvableFrom ((ruleName : (p # literals) -> q) # rules) (p # -∆)
   = q notProvableFrom rules (p # -∆) .
 
-  ceq q notProvableFrom ((ruleName : literals =-~> p) # rules) -∆
+  ceq q notProvableFrom ((ruleName : literals -=~> p) # rules) -∆
   = q notProvableFrom rules -∆
-  if =-~> =/= ==> or p =/= q .
+  if -=~> =/= -> or p =/= q .
 
   --- eq q notProvableFrom ((rulename : literals -~> p) # rules) -∆
   --- = q notProvableFrom rules -∆ .
 
-  crl [+∂-definitely-provable] :
+  crl [+∂-definitely] :
     Atoms (atom # atoms)
     Facts facts
     Rules rules
@@ -254,22 +252,22 @@ mod DEFEAS-DYNAMICS is
   if q isLiteralOfAtom atom
   /\ q notElemOf +∂ .
 
-  crl [+∂-defeasibly-provable] :
+  crl [+∂-defeasibly] :
     Atoms (atom # atoms)
     Facts facts
-    Rules ((ruleName : literals =-> q) # rules)
+    Rules ((ruleName : literals -=> q) # rules)
     PrefRel prefRel
     | +∆ | (q' # -∆) | (literals # +∂) | -∂
   =>
     Atoms (atom # atoms)
     Facts facts
-    Rules ((ruleName : literals =-> q) # rules)
+    Rules ((ruleName : literals -=> q) # rules)
     PrefRel prefRel
     | +∆ | (q' # -∆) | (q # literals # +∂) | -∂
   if q isLiteralOfAtom atom
   /\ q' == ~ q
   /\ q notElemOf +∂
-  /\ f q prefRel (literals # +∂) -∂ ((ruleName : literals =-> q) # rules) .
+  /\ f q prefRel (literals # +∂) -∂ ((ruleName : literals -=> q) # rules) .
 
 ---(
   This function handles 2.3 in the definition of +∂
@@ -280,22 +278,22 @@ mod DEFEAS-DYNAMICS is
   eq f q prefRel +∂ -∂ emptyRules = true .
 
   --- Case 2.3.1
-  ceq f q prefRel +∂ (p # -∂) ((ruleName : (p # literals) =-~> q') # rules)
+  ceq f q prefRel +∂ (p # -∂) ((ruleName : (p # literals) -=~> q') # rules)
   = f q prefRel +∂ -∂ rules
   if q' == ~ q .
 
   --- Case 2.3.2
   ceq f q prefRel (literals' # +∂) -∂
     (
-      (ruleName : (p # literals) =-~> q') #
-      (ruleName' : literals' =-> q) #
+      (ruleName : (p # literals) -=~> q') #
+      (ruleName' : literals' -=> q) #
       rules
     )
   = ruleName <[prefRel] ruleName'
-  and f q prefRel (literals' # +∂) -∂ ((ruleName' : literals' =-> q) # rules)
+  and f q prefRel (literals' # +∂) -∂ ((ruleName' : literals' -=> q) # rules)
   if q' == ~ q .
 
-  ceq f q prefRel +∂ -∂ ((ruleName : literals =-~> p) # rules)
+  ceq f q prefRel +∂ -∂ ((ruleName : literals -=~> p) # rules)
   = f q prefRel +∂ -∂ rules
   if p =/= ~ q .
 
@@ -322,12 +320,12 @@ mod DEFEAS-DYNAMICS is
 
   eq g q -∂ emptyRules = true .
 
-  eq g q (p # -∂) ((ruleName : (p # literals) =-> q) # rules)
+  eq g q (p # -∂) ((ruleName : (p # literals) -=> q) # rules)
   = g q -∂ rules .
 
-  ceq g q -∂ ((ruleName : literals =-~> p) # rules)
+  ceq g q -∂ ((ruleName : literals -=~> p) # rules)
   = g q -∂ rules
-  if =-~> == ~> or p =/= q .
+  if -=~> == ~> or p =/= q .
 
   crl [-∂-not-defeasibly-provable-2.2] :
     Atoms (atom # atoms)
@@ -348,13 +346,13 @@ mod DEFEAS-DYNAMICS is
   crl [-∂-not-defeasibly-provable-2.3] :
     Atoms (atom # atoms)
     Facts facts
-    Rules ((ruleName : literals =-~> q') # rules)
+    Rules ((ruleName : literals -=~> q') # rules)
     PrefRel prefRel
     | +∆ | (q # -∆) | (literals # +∂) | -∂
   =>
     Atoms (atom # atoms)
     Facts facts
-    Rules ((ruleName : literals =-~> q') # rules)
+    Rules ((ruleName : literals -=~> q') # rules)
     PrefRel prefRel
     | +∆ | (q # -∆) | (literals # +∂) | (q # -∂)
   if q isLiteralOfAtom atom
@@ -377,16 +375,16 @@ mod DEFEAS-DYNAMICS is
 )
   eq h prefRel ruleName q -∂ emptyRules = true .
 
-  eq h prefRel ruleName q (p # -∂) ((ruleName' : (p # literals) =-> q) # rules)
+  eq h prefRel ruleName q (p # -∂) ((ruleName' : (p # literals) -=> q) # rules)
   = h prefRel ruleName q (p # -∂) rules .
 
-  eq h prefRel ruleName q -∂ ((ruleName' : literals =-> q) # rules)
+  eq h prefRel ruleName q -∂ ((ruleName' : literals -=> q) # rules)
   = not (ruleName <[prefRel] ruleName')
   and h prefRel ruleName q -∂ rules .
 
-  ceq h prefRel ruleName q -∂ ((ruleName' : literals =-~> p) # rules)
+  ceq h prefRel ruleName q -∂ ((ruleName' : literals -=~> p) # rules)
   = h prefRel ruleName q -∂ rules
-  if =-~> == ~> or p =/= q .
+  if -=~> == ~> or p =/= q .
 
 endm
 
@@ -399,41 +397,33 @@ mod PROVER is
   vars q : Literal .
   vars +∆ -∆ +∂ -∂ : Literals .
   vars defeasTheory : DefeasTheory .
+  vars prop : Prop .
 
   ops _∈`+∆ _∈`-∆ _∈`+∂ _∈`-∂ : Literal -> Prop . 
 
-  eq defeasTheory | (q # +∆) | -∆ | +∂ | -∂ |= q ∈ +∆
-  = true .
-
-  eq defeasTheory | +∆ | (q # -∆) | +∂ | -∂ |= q ∈ -∆
-  = true .
-
-  eq defeasTheory | +∆ | -∆ | (q # +∂) | -∂ |= q ∈ +∂
-  = true .
-
-  eq defeasTheory | +∆ | -∆ | +∂ | (q # -∂) |= q ∈ -∂
-  = true .
+  eq defeasTheory | (q # +∆) | -∆ | +∂ | -∂ |= q ∈ +∆ = true .
+  eq defeasTheory | +∆ | (q # -∆) | +∂ | -∂ |= q ∈ -∆ = true .
+  eq defeasTheory | +∆ | -∆ | (q # +∂) | -∂ |= q ∈ +∂ = true .
+  eq defeasTheory | +∆ | -∆ | +∂ | (q # -∂) |= q ∈ -∂ = true .
 
   ops _⊢`+∆_ _⊢`-∆_ _⊢`+∂_ _⊢`-∂_ : DefeasTheory Literal -> Bool .
 
-  eq defeasTheory ⊢ +∆ q
-  = true == modelCheck(initialize defeasTheory, <> q ∈ +∆) .
+  op _ ⊨ ◊ □ _ : DefeasTheory Prop -> Bool .
 
-  eq defeasTheory ⊢ -∆ q
-  = true == modelCheck(initialize defeasTheory, <> q ∈ -∆) .
+  eq defeasTheory ⊨ ◊ □ prop
+  = true == modelCheck(initialize defeasTheory, <> [] prop) .
 
-  eq defeasTheory ⊢ +∂ q
-  = true == modelCheck(initialize defeasTheory, <> q ∈ +∂) .
-
-  eq defeasTheory ⊢ -∂ q
-  = true == modelCheck(initialize defeasTheory, <> q ∈ -∂) .
+  eq defeasTheory ⊢ +∆ q = defeasTheory ⊨ ◊ □ q ∈ +∆ .
+  eq defeasTheory ⊢ -∆ q = defeasTheory ⊨ ◊ □ q ∈ -∆ .
+  eq defeasTheory ⊢ +∂ q = defeasTheory ⊨ ◊ □ q ∈ +∂ .
+  eq defeasTheory ⊢ -∂ q = defeasTheory ⊨ ◊ □ q ∈ -∂ .
 
 endm
 
 red
   Atoms ('p # 'q # 'r)
   Facts 'p
-  Rules (('r1 : 'p -> 'r) # ('r2 : 'p -> not 'r))
+  Rules (('r1 : 'p ==> 'r) # ('r2 : 'p ==> not 'r))
 ---(
   A preference relation is the transitive closure of a one-step reduction
   relation given by a small-step operational semantics.

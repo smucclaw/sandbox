@@ -1,0 +1,36 @@
+fmod LITERAL is
+  pr QID .
+  pr BOOL .
+
+  sorts Literal Literals .
+  subsorts Qid < Literal < Literals .
+
+  ops not_ : Qid -> Literal [ctor] .
+  ops ~_ : Literal -> Literal .
+
+  --- ops Literal < Bool .
+
+  ops emptyLiterals : -> Literals [ctor] .
+  ops _#_ : Literals Literals -> Literals
+    [ctor assoc comm id: emptyLiterals] .
+ 
+  vars q : Literal .
+  vars atom : Qid .
+  vars literals : Literals .
+
+  eq ~ atom = not atom .
+  eq ~ (not atom) = atom .
+
+  ops _isLiteralOfAtom_ : Literal Qid -> Bool .
+  eq q isLiteralOfAtom atom = q == atom or ~ q == atom .
+
+  eq literals # literals = literals .
+
+  ops _elemOf_ _notElemOf_ : Literal Literals -> Bool .
+
+  eq q elemOf (q # literals) = true .
+  eq q elemOf literals = false [owise] .
+
+  eq q notElemOf literals = not (q elemOf literals) .
+
+endfm

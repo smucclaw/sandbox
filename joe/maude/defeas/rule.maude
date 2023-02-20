@@ -1,0 +1,43 @@
+sload literal
+
+fmod RULE is
+  pr BOOL .
+  pr LITERAL .
+  --- pr SET{Qid} .
+  --- protecting PREF-REL .
+  --- protecting META-LEVEL .
+
+  sorts DefeasRule StrictRule DefeatRule .
+  sorts UnnamedRule NamedRule NamedRules .
+  sorts Arrow StrictArrow DefeasArrow DefeatArrow .
+  sorts DefeasDefeatArrow StrictDefeasArrow .
+
+  subsorts StrictArrow DefeasArrow < StrictDefeasArrow .
+  subsorts DefeasArrow DefeatArrow < DefeasDefeatArrow .
+  subsorts DefeasDefeatArrow StrictDefeasArrow < Arrow .
+  subsorts DefeasRule StrictRule DefeatRule < UnnamedRule .
+
+  ops ==> : -> DefeasArrow [ctor] .
+  ops -> : -> StrictArrow [ctor] . 
+  ops ~> : -> DefeatArrow [ctor] .
+
+  ops ___ : Literal DefeasArrow Literal -> DefeasRule .
+  ops ___ : Literal StrictArrow Literal -> StrictRule .
+  ops ___ : Literal DefeatArrow Literal -> DefeatRule .
+
+  --- ops _==>_ _~>_ _->_ : Literals Literal -> UnnamedRule [ctor] .
+
+  ops _<_ : Literal Literal -> Bool .
+
+  ops _:_ : Qid UnnamedRule -> NamedRule [ctor] .
+
+  subsorts NamedRule < NamedRules .
+
+  ops emptyRules : -> NamedRules [ctor] .
+  ops _#_ : NamedRules NamedRules -> NamedRules
+    [ctor assoc comm id: emptyRules] .
+
+  vars namedRules : NamedRules .
+  eq namedRules # namedRules = namedRules .
+
+endfm

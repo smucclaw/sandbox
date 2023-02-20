@@ -1,0 +1,34 @@
+sload model-checker
+sload defeas-dynamics
+
+mod PROVER is
+  pr DEFEAS-DYNAMICS .
+  inc MODEL-CHECKER + SATISFACTION + LTL .
+
+  subsorts FixptIterState < State .
+
+  vars q : Literal .
+  vars +∆ -∆ +∂ -∂ : Literals .
+  vars defeasTheory : DefeasTheory .
+  vars prop : Prop .
+
+  ops _∈`+∆ _∈`-∆ _∈`+∂ _∈`-∂ : Literal -> Prop . 
+
+  eq defeasTheory | (q # +∆) | -∆ | +∂ | -∂ |= q ∈ +∆ = true .
+  eq defeasTheory | +∆ | (q # -∆) | +∂ | -∂ |= q ∈ -∆ = true .
+  eq defeasTheory | +∆ | -∆ | (q # +∂) | -∂ |= q ∈ +∂ = true .
+  eq defeasTheory | +∆ | -∆ | +∂ | (q # -∂) |= q ∈ -∂ = true .
+
+  ops _⊢`+∆_ _⊢`-∆_ _⊢`+∂_ _⊢`-∂_ : DefeasTheory Literal -> Bool .
+
+  op _ ⊨ ◊ □ _ : DefeasTheory Prop -> Bool .
+
+  eq defeasTheory ⊨ ◊ □ prop
+  = true == modelCheck(initialize defeasTheory, <> [] prop) .
+
+  eq defeasTheory ⊢ +∆ q = defeasTheory ⊨ ◊ □ q ∈ +∆ .
+  eq defeasTheory ⊢ -∆ q = defeasTheory ⊨ ◊ □ q ∈ -∆ .
+  eq defeasTheory ⊢ +∂ q = defeasTheory ⊨ ◊ □ q ∈ +∂ .
+  eq defeasTheory ⊢ -∂ q = defeasTheory ⊨ ◊ □ q ∈ -∂ .
+
+endm

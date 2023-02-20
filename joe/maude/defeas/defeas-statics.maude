@@ -1,0 +1,12 @@
+sload rule
+
+fmod DEFEAS-STATICS is
+  pr RULE .
+  pr META-LEVEL .
+
+  sorts DefeasTheory .
+
+  ops Atoms_Facts_Rules_PrefRel_ :
+    Literals Literals NamedRules Module -> DefeasTheory .
+
+endfm

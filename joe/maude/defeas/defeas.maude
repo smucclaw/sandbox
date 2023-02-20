@@ -1,7 +1,6 @@
 sload prover
 
 mod DEFEAS is
-  pr DEFEAS-DYNAMICS .
   pr PROVER .
 
 endm
@@ -23,7 +22,6 @@ red
   PrefRel (
     mod 'PREF-REL is
       protecting 'META-LEVEL .
-      protecting 'QID .
       sorts none .
       none none none none
       --- 'r1 < 'r2

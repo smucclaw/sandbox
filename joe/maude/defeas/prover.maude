@@ -11,6 +11,7 @@ mod PROVER is
   vars +∆ -∆ +∂ -∂ : Literals .
   vars defeasTheory : DefeasTheory .
   vars prop : Prop .
+  vars state : State .
 
   ops _∈`+∆ _∈`-∆ _∈`+∂ _∈`-∂ : Literal -> Prop . 
 
@@ -21,14 +22,26 @@ mod PROVER is
 
   ops _⊢`+∆_ _⊢`-∆_ _⊢`+∂_ _⊢`-∂_ : DefeasTheory Literal -> Bool .
 
-  op _ ⊨ ◊ □ _ : DefeasTheory Prop -> Bool .
+  op _ ⊨ ◊ _ : State Prop -> Bool .
 
-  eq defeasTheory ⊨ ◊ □ prop
-  = true == modelCheck(initialize defeasTheory, <> [] prop) .
+  eq state ⊨ ◊ prop
+  = true == modelCheck(state, <> prop) .
 
-  eq defeasTheory ⊢ +∆ q = defeasTheory ⊨ ◊ □ q ∈ +∆ .
-  eq defeasTheory ⊢ -∆ q = defeasTheory ⊨ ◊ □ q ∈ -∆ .
-  eq defeasTheory ⊢ +∂ q = defeasTheory ⊨ ◊ □ q ∈ +∂ .
-  eq defeasTheory ⊢ -∂ q = defeasTheory ⊨ ◊ □ q ∈ -∂ .
+---(
+  See Proposition 2.2 and Theorem 2.2 of Guido's paper.
+  To check if a literal is defeasibly provable, we initialize the transition
+  system which performs transfinite fixpoint iteration.
+  This begins iteration from
+    ⊥ = (+∆, -∆, +∂, -∂) = ({}, {}, {}, {})
+  Note that due to the way the transition system is encoded, every trace
+  converges to the fixed point at omega (since we're working with propositional
+  theories with finitely many atoms).
+  Thus, q being defeasibly provable is equivalent to the liveness property
+  ◊ q ∈ +∂ . 
+)
+  eq defeasTheory ⊢ +∆ q = (defeasTheory | ⊥) ⊨ ◊ q ∈ +∆ .
+  eq defeasTheory ⊢ -∆ q = (defeasTheory | ⊥) ⊨ ◊ q ∈ -∆ .
+  eq defeasTheory ⊢ +∂ q = (defeasTheory | ⊥) ⊨ ◊ q ∈ +∂ .
+  eq defeasTheory ⊢ -∂ q = (defeasTheory | ⊥) ⊨ ◊ q ∈ -∂ .
 
 endm

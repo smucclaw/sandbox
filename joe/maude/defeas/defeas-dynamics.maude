@@ -1,15 +1,3 @@
----(
-  Defeasibility logic theorem prover in Maude.
-
-  This work is largely based on Guido's paper:
-  https://arxiv.org/pdf/cs/0511055.pdf
-
-  We encode the endofunctor on page 10 into a transition system which performs
-  the same transfinite fixpoint iteration procedure.
-  With this, we use reachability analysis and LTL model checking to check
-  the provability of formulae in defeasible theories.
-)
-
 sload defeas-statics
 
 mod DEFEAS-DYNAMICS is
@@ -46,8 +34,8 @@ mod DEFEAS-DYNAMICS is
     DefeasTheory Literals Literals Literals Literals -> FixptIterState .
 
   --- Fixpoint iteration begins at ⊥ = ({}, {}, {}, {})
-  ops initialize_ : DefeasTheory -> FixptIterState .
-  eq initialize defeasTheory
+  op _ | ⊥  : DefeasTheory -> FixptIterState .
+  eq defeasTheory | ⊥
   = defeasTheory
     | emptyLiterals | emptyLiterals | emptyLiterals | emptyLiterals .
 

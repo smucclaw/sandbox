@@ -1,4 +1,4 @@
-load ../syntax/rule
+sload ../syntax/rule
 
 fmod PRELUDE is
   protecting RULE .

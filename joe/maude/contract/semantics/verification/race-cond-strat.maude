@@ -2,7 +2,7 @@
   Strategy module for detecting PDPA race condition.
 )
 
-load ../rewrite-trace-strat
+sload ../rewrite-trace-strat
 
 (smod RACE-COND-STRAT is
   protecting RULE .

@@ -1,4 +1,4 @@
-load transpiler
+sload transpiler
 
 (omod SEMANTICS is
   protecting TRANSPILER .

@@ -1,4 +1,4 @@
-load atomic-props
+sload atomic-props
 
 (smod REWRITE-TRACE-STRAT is
   protecting ATOMIC-PROPS .

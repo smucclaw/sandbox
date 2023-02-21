@@ -1,4 +1,4 @@
-smod FINANCIAL-ADVISOR is
+mod FINANCIAL-ADVISOR is
   sorts Attribute AttributeSet Bool Boolean Char Cid Configuration
     EarningsStatus FindResult Formula Integer InvestStrat ModelCheckResult Msg
     Nat NzNat Object Oid Person Portal Prop Qid Real RuleName SmtResult State
@@ -63,6 +63,10 @@ smod FINANCIAL-ADVISOR is
     [ctor] .
   op True : -> Formula
     [format(g o)ctor] .
+  op X : -> Integer
+    [ctor] .
+  op Y : -> Integer
+    [ctor] .
   op _&_ : Nat Nat -> Nat
     [assoc comm prec 53 special(id-hook ACU_NumberOpSymbol(&)op-hook
     succSymbol(s_ : Nat ~> NzNat))] .
@@ -455,6 +459,8 @@ smod FINANCIAL-ADVISOR is
     = (5000).Integer * numDeps:Integer .
   eq not A:Bool
     = (true).Bool xor A:Bool .
+  eq smtSat formula:Boolean
+    = smtCheck(formula:Boolean)== Proved .
   eq ~ False
     = True .
   eq ~ True
@@ -501,8 +507,6 @@ smod FINANCIAL-ADVISOR is
   V#27:AttributeSet >)
     = inadequate [label savings-acc-inad owise print O:Qid
     "'s savings account is inadequate."] .
-  eq smtSat formula:Boolean
-    = (false).Bool [owise] .
   ceq incomeStat(
 < O:Qid : V#28:Person |
   numDeps : V#30:Integer,
@@ -598,10 +602,7 @@ smod FINANCIAL-ADVISOR is
   earningsAmt : V#49:Integer,
   earningsStat : V#50:EarningsStatus,
   numDeps : V#51:Integer,
-  V#52:AttributeSet >))=(true).Bool [label savings-acc-ad print O:Qid
+  V#52:AttributeSet >))=(true).Bool /\ smtSat(forall X . exists Y . Y > X)=(
+    true).Bool [label savings-acc-ad print O:Qid
     "'s savings account is adequate."] .
-  ceq smtSat formula:Boolean
-    = (true).Bool
-    if smtCheck(formula:Boolean)== Proved =(true).Bool [print "SMT |= "
-    formula:Boolean] .
-endsm
+endm

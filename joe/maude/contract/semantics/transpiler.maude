@@ -1,4 +1,4 @@
-load config
+sload config
 
 (omod TRANSPILER is
   protecting CONFIG .

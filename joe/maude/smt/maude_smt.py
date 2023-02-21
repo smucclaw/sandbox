@@ -17,7 +17,7 @@ class CheckSMTHook(maude.Hook):
     argument.reduce()
 
     smt_formula = smt_converter.translate(argument)
-    # print(f'Proving formula: {smt_formula}')
+    print(f'Proving formula: {smt_formula}')
     solver = z3.Solver()
     solver.add(z3.Not(smt_formula))
     # solver.set(unsat_core = True)

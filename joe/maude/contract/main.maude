@@ -1,5 +1,5 @@
---- load ./semantics/rewrite-trace-strat
-load ./semantics/verification/race-cond-strat
+--- sload ./semantics/rewrite-trace-strat
+sload ./semantics/verification/race-cond-strat
 
 ---(
   For a petri net representation, we take

@@ -1,8 +1,8 @@
 ---(
   Atomic propositions for model checking.
 )
-load model-checker
-load semantics
+sload model-checker
+sload semantics
 
 (omod ATOMIC-PROPS is
   protecting SEMANTICS .

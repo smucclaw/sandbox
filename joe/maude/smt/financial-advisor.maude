@@ -14,7 +14,7 @@ sload full-maude
   protecting LTL .
 
   subsorts Qid < Oid .
-
+ 
   sorts Status EarningsStatus InvestStrat .
   ops adequate inadequate : -> Status [ctor] .
   ops steady unsteady : -> EarningsStatus [ctor] .
@@ -43,11 +43,10 @@ sload full-maude
 
   vars formula : Boolean .
 
-  ceq smtSat formula = true
-  if smtCheck(formula) == Proved
-    [print "SMT |= " formula] .
+  eq smtSat formula = smtCheck(formula) == Proved .
+    --- [print "SMT |= " formula] .
 
-  eq smtSat formula = false [owise] .
+  --- eq smtSat formula = false [owise] .
 
   class Person |
     amtSaved : Integer,
@@ -108,9 +107,14 @@ sload full-maude
   -------------------------------------------
     |- savingsAccStat(person) = inadequate
 )
+
+  ops X Y : -> Integer [ctor] .
+  --- ops intVar : Qid -> Integer [ctor] .
+
   ceq [savings-acc-ad] :
     savingsAccStat(< O : Person | amtSaved : amtSaved:Integer >) = adequate
   if smtSat (amtSaved:Integer > minSavings(< O : Person | >))
+  --- /\ smtSat (forall X . exists Y . Y > X)
     [print O "'s savings account is adequate."] .
 
   eq [savings-acc-inad] :

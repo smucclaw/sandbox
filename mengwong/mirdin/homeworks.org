@@ -96,14 +96,6 @@ We see a similar logic at work, substituting
 12. x := x + 1
 13. given
    
-*** comment:
-
-#+begin_quote
-/In this exercise, as before, assume all variables are integers/
-#+end_quote
-
-In the before exercise, all variables are naturals.
-
 ** Comment on 4.4
 
 This is [[https://en.wikipedia.org/wiki/Robustness_principle][Postel's law]]! "be conservative in what you send, be liberal in what you accept"

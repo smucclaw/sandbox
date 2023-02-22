@@ -270,6 +270,34 @@ def term_strat_to_pyvis_netwk(mod, term, strat):
   pyvis_netwk = nx_graph_to_pyvis_netwk(nx_graph)
   return pyvis_netwk
 
+def init_maude_n_load_main_file(main_file):
+  maude.init(loadPrelude = False)
+  with open(main_file) as f:
+      maude.input(f.read())
+  main_mod = maude.getModule('MAIN')
+  return main_mod
+
+def natural4_file_to_transpiled_term(main_mod, natural4_file):
+  natural4_rules = ''
+  with open(natural4_file) as f:
+    natural4_rules = f.read()
+  transpiled_term = apply_fn(main_mod, 'transpile', natural4_rules)
+  return transpiled_term
+
+def transpiled_term_to_html_file(main_mod, transpiled_term, strat, html_file_path):
+  strat = main_mod.parseStrategy(strat)
+  netwk = term_strat_to_pyvis_netwk(main_mod, transpiled_term, strat)
+  netwk.show_buttons()
+
+  # html_file = workdir / f'{natural4_file.stem}.html'
+  html_file_path = str(html_file_path)
+  netwk.show(html_file_path)
+
+def main_file_term_strat_to_html_file(main_file, natural4_file, html_file_path, strat = 'all *'):
+  main_mod = init_maude_n_load_main_file(main_file)
+  transpiled_term = natural4_file_to_transpiled_term(main_mod, natural4_file)
+  transpiled_term_to_html_file(main_mod, transpiled_term, strat, html_file_path)
+
 if __name__ == '__main__':
   natural4_file = Path(sys.argv[1])
   strat = sys.argv[2] if len(sys.argv) >= 3 else 'all *'
@@ -281,24 +309,10 @@ if __name__ == '__main__':
 
   workdir = contractdir / '.workdir'
 
-  maude.init(loadPrelude = False)
-  with open(workdir / 'main.maude') as f:
-    maude.input(f.read())
-  main_mod = maude.getModule('MAIN')
-  strat = main_mod.parseStrategy(strat)
+  main_file = workdir / 'main.maude'
+  html_file_path = workdir /  f'{natural4_file.stem}.html'
 
-  rules = ''
-  with open(natural4_file) as f:
-    rules = f.read()
-  transpiled_term = apply_fn(main_mod, 'transpile', rules)
-
-  netwk = term_strat_to_pyvis_netwk(main_mod, transpiled_term, strat)
-  # netwk.barnes_hut()
-  netwk.show_buttons()
-
-  html_file = workdir / f'{natural4_file.stem}.html'
-  html_file = str(html_file)
-  netwk.show(html_file)
+  main_file_term_strat_to_html_file(main_file, natural4_file, html_file_path, strat)
 
   # Experiments with Jaal.
   # edge_df = pd.DataFrame(graph)

@@ -290,6 +290,20 @@ def config_to_html_file(main_mod, config, strat, html_file_path):
   html_file_path = str(html_file_path)
   netwk.write_html(html_file_path)
 
+def find_race_cond(main_mod, natural4_rules):
+  actions = apply_fn(main_mod, 'getAllActions', natural4_rules)
+  race_cond_strat = main_mod.parseStrategy('raceCondAux', actions)
+  target_config = 'config:Configuration'
+  config = apply_fn(main_mod, 'init', natural4_rules)
+  # race_cond_iter is a StrategySequenceSearch
+  race_cond_iter = config.search(0, target_config, strategy = race_cond_strat)
+  if not race_cond_iter:
+      return None
+  race_cond_soln = next(race_cond_iter)
+  # race_cond_path is a list of terms and transitions as in:
+  # https://fadoss.github.io/maude-bindings/#maude.StrategySequenceSearch.pathTo
+  race_cond_path = race_cond_soln[2]()
+
 def main_file_term_strat_to_html_file(main_file, natural4_file, html_file_path, strat = 'all *'):
   main_mod = init_maude_n_load_main_file(main_file)
   config = natural4_file_to_config(main_mod, natural4_file)

@@ -68,10 +68,9 @@ class Graph(pyrs.PRecord):
 
 def node_to_colour(node):
   colour = None
-  match node.contract_status:
-    case 'Active': colour = 'blue'
-    case 'Fulfilled': colour = 'green'
-    case 'Breached': colour = 'red'
+  if node.contract_status == 'Active': colour = 'blue'
+  if node.contract_status == 'Fulfilled': colour = 'green'
+  if node.contract_status == 'Breached': colour = 'red'
   return colour
 
 def edge_to_colour(graph, edge):
@@ -102,8 +101,8 @@ def get_state_term_str(graph, node_id):
 def node_id_to_node(mod, rewrite_graph, node_id):
   node_term = get_state_term_str(rewrite_graph, node_id)
   contract_status = apply_fn_to_str(mod, 'configToStatus', node_term)
-  match contract_status:
-    case '(Fulfilled).ContractStatus': contract_status = 'Fulfilled'
+  if contract_status == '(Fulfilled).ContractStatus':
+    contract_status = 'Fulfilled'
   node_term = apply_fn_to_str(mod, 'pretty', node_term)
   node = Node(term_str = node_term, contract_status = contract_status)
   return node
@@ -129,10 +128,8 @@ def rewrite_graph_to_graph(mod, rewrite_graph):
       rule = rewrite_graph.getTransition(node_id, succ_id).getRule()
       if rule:
         rule_label = rule.getLabel()
-        match rule_label:
-          case 'tick':
-            rule_label = 'tick'
-          case 'action':
+        if rule_label == 'tick': rule_label = 'tick'
+        if rule_label == 'action':
             # Get the term corresponding to the succ_id node and get the
             # action transition.
             new_node_term = get_state_term_str(rewrite_graph, succ_id)
@@ -273,7 +270,7 @@ def term_strat_to_pyvis_netwk(mod, term, strat):
 def init_maude_n_load_main_file(main_file):
   maude.init(loadPrelude = False)
   with open(main_file) as f:
-      maude.input(f.read())
+    maude.input(f.read())
   main_mod = maude.getModule('MAIN')
   return main_mod
 

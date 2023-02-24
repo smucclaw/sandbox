@@ -330,6 +330,7 @@ load full-maude
   eq Breached actorNames ^ Breached actorNames'
   = Breached (actorNames, actorNames') .
 
+
   sorts ContractStatus .
   ops Active : -> ContractStatus [ctor] .
   ops Breached : -> ContractStatus [ctor] .
@@ -357,6 +358,47 @@ load full-maude
 
   --- class Situation .
 
+  ops init_ : Set{Rule} -> Configuration .
+  ops initAux__ : Set{Rule} Configuration -> Configuration .
+  ops _containsActor_ : Configuration Qid -> Bool .
+
+---(
+  Initialize a set of rules to an initial abstract machine configuration for
+  execution and model checking.
+)
+  eq init rules
+  = initAux rules
+    < 'coordinator : Coordinator |
+      rules : rules,
+      time : 0,
+      contractState : Active (getRulesWithNames rules 'START) > .
+
+  eq initAux empty config = tau config .
+
+---(
+  During transpilation, we detect all actors and initialize one object for each
+  actor.
+)
+  eq initAux
+    (
+      RULE ruleName
+      PARTY actorName
+      deontic actionName
+      deadline
+      HENCE hence
+      LEST lest,
+      rules
+    )
+    config
+  = initAux rules config
+      if config containsActor actorName
+      then none
+      else < actorName : Actor | none >
+      fi .
+
+  eq (< actorName : Actor | > config) containsActor actorName = true .
+  eq config containsActor actorName = false [owise] .
+
   class PreCoordinator |
     contractState : ContractState .
 
@@ -365,6 +407,8 @@ load full-maude
     rules : Set{Rule} .
 
   subclass Coordinator < PreCoordinator .
+
+  --- Stuff for post-processing.
 
   ops pretty_ : Configuration -> Configuration .
   ops getAction_ : Configuration -> ActionEvent .

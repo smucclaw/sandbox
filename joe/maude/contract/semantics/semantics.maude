@@ -1,7 +1,7 @@
-sload transpiler
+sload config
 
 (omod SEMANTICS is
-  protecting TRANSPILER .
+  protecting CONFIG .
 
   subsorts Qid < Oid .
 

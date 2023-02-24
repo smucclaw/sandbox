@@ -274,26 +274,26 @@ def init_maude_n_load_main_file(main_file):
   main_mod = maude.getModule('MAIN')
   return main_mod
 
-def natural4_file_to_transpiled_term(main_mod, natural4_file):
+def natural4_file_to_config(main_mod, natural4_file):
   natural4_rules = ''
   with open(natural4_file) as f:
     natural4_rules = f.read()
-  transpiled_term = apply_fn(main_mod, 'transpile', natural4_rules)
+  transpiled_term = apply_fn(main_mod, 'init', natural4_rules)
   return transpiled_term
 
-def transpiled_term_to_html_file(main_mod, transpiled_term, strat, html_file_path):
+def config_to_html_file(main_mod, config, strat, html_file_path):
   strat = main_mod.parseStrategy(strat)
-  netwk = term_strat_to_pyvis_netwk(main_mod, transpiled_term, strat)
+  netwk = term_strat_to_pyvis_netwk(main_mod, config, strat)
   netwk.show_buttons()
 
   # html_file = workdir / f'{natural4_file.stem}.html'
   html_file_path = str(html_file_path)
-  netwk.show(html_file_path)
+  netwk.write_html(html_file_path)
 
 def main_file_term_strat_to_html_file(main_file, natural4_file, html_file_path, strat = 'all *'):
   main_mod = init_maude_n_load_main_file(main_file)
-  transpiled_term = natural4_file_to_transpiled_term(main_mod, natural4_file)
-  transpiled_term_to_html_file(main_mod, transpiled_term, strat, html_file_path)
+  config = natural4_file_to_config(main_mod, natural4_file)
+  config_to_html_file(main_mod, config, strat, html_file_path)
 
 if __name__ == '__main__':
   natural4_file = Path(sys.argv[1])

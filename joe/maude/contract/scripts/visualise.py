@@ -128,7 +128,7 @@ def rewrite_graph_to_graph(mod, rewrite_graph):
       rule = rewrite_graph.getTransition(node_id, succ_id).getRule()
       if rule:
         rule_label = rule.getLabel()
-        if rule_label == 'tick': rule_label = 'tick'
+        if rule_label == 'tick': rule_label = '1 day'
         if rule_label == 'action':
             # Get the term corresponding to the succ_id node and get the
             # action transition.

@@ -35,40 +35,58 @@
   loan agreement as a DFA.
 }
 
-In \cite{contract_as_automaton}, the authors explain that many financial
-contracts are inherently computational in nature.
-They argue that the computational structure of many such contracts
-can be formalized via deterministic finite automata (DFAs), with states
-representing various situations.
-% like ``borrower default'' and ``payment due''.
+% In \cite{contract_as_automaton}, Flood and Goodenough propose that many financial
+% contracts are inherently computational in nature.
+% They argue that the computational structure of many such contracts
+% can be formalized via deterministic finite automata (DFAs), with states
+% representing various situations.
+% % like ``borrower default'' and ``payment due''.
+% Transitions between these states then correspond to events triggering a change
+% in these situations.
+% This is demonstrated using a simple loan agreement
+% \cite[Table 1]{contract_as_automaton}, which they formalize
+% directly as a DFA.
+
+In \cite{contract_as_automaton}, Flood and Goodenough propose that many
+financial contracts are inherently computational in nature.
+They argue that the computational structure of many such contracts can be
+formalized via deterministic finite automata (DFAs), with states representing
+various situations.
 Transitions between these states then correspond to events triggering a change
 in these situations.
-This is demonstrated using a simple loan agreement
-\cite[Table 1]{contract_as_automaton}, which they formalize
-directly as a DFA.
+This is demonstrated using a simple loan agreement \cite{contract_as_automaton},
+which they formalize directly as a DFA.
 % Finally, they claim that such a formalism opens up the possibility of performing
 % automated analyses on contracts.
 
 \subsection{Shortcomings}
-While this approach is a nice proof of concept, there are various shortcomings
-with such a formalism, perhaps the most apparent being that the manual encoding
-of a contract as a DFA is a laborious process.
-One source of complexity arises from the fact that DFAs are a low level
+While this approach is a useful and important proof of concept, as the authors
+themselves recognize, there are some limitations with such a formalism, perhaps
+the most apparent being that the manual encoding of a contract as a DFA is a
+laborious process, and one that in itself does not produce a machine executable
+result
+One source of complexity arises from the fact that the DFA is a low level
 computational formalism that is arguably far removed from our intuitive
 understanding of a contract.
 While we can easily encode real-world events as transitions in a DFA, as done
-in \cite{contract_as_automaton}, we often reason about and specify contracts in
-terms of normative requirements that need to be fulfilled by various actors
-\cite{normative_compliance_guido}.
-These also come with some notion of time and deadline.
-These are examples of \textit{domain-specific concepts} which are an integral
+in \cite{contract_as_automaton}, some legal traditions reason about and specify
+contracts in terms of normative requirements that need to be fulfilled by
+various actors \cite{normative_compliance_guido}.
+The authors of this paper, representing different traditions, do not entirely
+agree on this point, but it remains true that a DFA is a relatively
+mechanistic chain of event and consequence, and is not adept at normative
+representation.
+
+Contracts also frequently embody some notion of time and deadline.
+These are examples of domain-specific concepts which are an integral
 part of contract drafting.
 Unfortunately, DFAs have no primitive notion of these, so that these must all
-be encoded manually, in a manner that is perhaps unnatural to many.
+be encoded manually, with the passage of time reflected as an achieved event,
+in a manner that is perhaps unnatural to many.
 
-Another source of complexity is the state explosion problem, namely that complex
-contracts have large DFA representations and are thus impractical for humans
-to specify manually.
+Another source of complexity is the state explosion problem.
+Complex contracts have large DFA representations and are thus impractical for
+humans to specify manually at scale.
 Observe that a simplified visual representation of the automaton
 \cite[Fig. 1]{contract_as_automaton}
 corresponding to this simple contract already contains more than 20 states and
@@ -101,9 +119,9 @@ corresponding to this simple contract already contains more than 20 states and
 % ``Payment\dots accelerating'' and ``Crisis\dots'' states.
 % The only difference between the transitions between these states is
 
-One of the main causes of this is the \textit{concurrent interleaving} of real
+One of the main causes of this is the concurrent interleaving of real
 world events.
-Maudey this, we mean that many real world events can occur in any order (including
+By this, we mean that many real world events can occur in any order (including
 at the same time) and
 perhaps for the sake of simplicity, this has not been accounted for in the DFA
 formalization.
@@ -123,10 +141,17 @@ Closer inspection of the DFA suggests that there is an
 implicit assumption being made that once an event of default occurs,
 the borrower will be notified by the lender soon after, with no other events
 like payments occurring in between.
+
 More formally, it is assumed that the default and notification events occur
-\textit{within the same atomic step}.
+within the same atomic step.
 Splitting this up into separate events would increase the number of states in
 the DFA, especially if we account for concurrency.
+In fairness, Flood and Goodenough understood some of these limits, and specified
+in \cite{contract_as_automaton}[Section 6] of their model agreement that:
+``In the event of multiple events of default, the first to occur shall take
+precedence for the purposes of specifying outcomes under this agreement''.
+This provision goes some way toward resolving competing defaults by the
+expedient of mandating that later events will simply be disregarded.
 
 \info{
   Other weaknesses to mention:

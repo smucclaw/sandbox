@@ -7,14 +7,17 @@ Dependencies:
   For model checking LTL, CTL, CTL*, mu-calc and probabilistic CTL using tools
   like ltsmin, Nusmv, Spin and PRISM.
 
-- pyrsistent
-  For persistent hash array mapped trie maps and sets.
-
 - networkx
   Used to create and manipulate graphs from traces and state spaces.
 
 - pyvis
   Used to generate interactive html/js visualizations from networkx graphs.
+
+- pyrsistent
+  For persistent hash array mapped trie maps and sets.
+
+- cytoolz
+  For functional forward piping.
 
 Usage:
 python visualise.py natural4_file [strategy]
@@ -31,13 +34,14 @@ Note that it is important to put parens around "... does ..." actions.
 
 from pathlib import Path
 import re
-import subprocess
 import sys
 
 import maude
 from umaudemc.wrappers import create_graph
 
 import pyrsistent as pyrs
+from cytoolz.functoolz import *
+from cytoolz.curried import *
 
 import networkx as nx
 from pyvis.network import Network
@@ -66,56 +70,81 @@ class Graph(pyrs.PRecord):
   node_map = pyrs.pmap_field(int, Node)
   edges = pyrs.pset_field(Edge)
 
+@curry
 def node_to_colour(node):
-  colour = None
   if node.contract_status == 'Active': colour = 'blue'
   if node.contract_status == 'Fulfilled': colour = 'green'
   if node.contract_status == 'Breached': colour = 'red'
   return colour
 
+@curry
 def edge_to_colour(graph, edge):
-  dest_node = graph.node_map[edge.dest_id]
-  colour = node_to_colour(dest_node)
-  return colour
+  return pipe(
+    edge,
+    lambda x: x.dest_id,
+    flip(get, graph.node_map),
+    node_to_colour
+  )
 
+@curry
 def edge_to_next_state(graph, edge):
-  dest_node = graph.node_map[edge.dest_id]
-  next_state = dest_node.contract_status
-  return next_state
+  return pipe(
+    edge,
+    lambda x: x.dest_id,
+    flip(get, graph.node_map),
+    lambda x: x.contract_status
+  )
 
+@curry
 def apply_fn(mod, fn, arg):
   # fn = escape_ansi(fn)
   # arg = escape_ansi(arg)
-  result_term = mod.parseTerm(f'{fn}({arg})')
-  result_term.reduce()
-  return result_term
+  return pipe(
+    f'{fn}({arg})',
+    mod.parseTerm,
+    do(lambda x: x.reduce())
+  )
 
+@curry
 def apply_fn_to_str(mod, fn, arg):
-  result_term = apply_fn(mod, fn ,arg)
-  result_str = escape_ansi(result_term)
-  return result_str
+  return pipe(
+    arg,
+    apply_fn(mod, fn),
+    escape_ansi
+  )
 
+@curry
 def get_state_term_str(graph, node_id):
-  term = graph.getStateTerm(node_id)
-  term = escape_ansi(term)
-  return term
+  return pipe(
+    node_id,
+    graph.getStateTerm,
+    escape_ansi
+  )
 
+@curry
 def node_id_to_node(mod, rewrite_graph, node_id):
-  node_term = get_state_term_str(rewrite_graph, node_id)
-  contract_status = apply_fn_to_str(mod, 'configToStatus', node_term)
-  if contract_status == '(Fulfilled).ContractStatus':
-    contract_status = 'Fulfilled'
-  node_term = apply_fn_to_str(mod, 'pretty', node_term)
-  node = Node(term_str = node_term, contract_status = contract_status)
-  return node
+  node_term_to_contract_status = compose_left(
+    apply_fn_to_str(mod, 'configToStatus'),
+    lambda x: 'Fulfilled' if x == '(Fulfilled).ContractStatus' else x
+  )
+
+  return pipe(
+    node_id,
+    get_state_term_str(rewrite_graph),
+    # Split the railway track
+    juxt(apply_fn_to_str(mod, 'pretty'), node_term_to_contract_status),
+    # Join the railway tracks
+    lambda x: Node(term_str = x[0], contract_status = x[1])
+  )
 
 def edges_to_node_map(mod, rewrite_graph, edges):
-  node_map = pyrs.pmap()
-  for edge in edges:
-      for node_id in (edge.src_id, edge.dest_id):
-        node = node_id_to_node(mod, rewrite_graph, node_id)
-        node_map = node_map.set(node_id, node)
-  return node_map
+  return pipe(
+    edges,
+    map(lambda edge: (edge.src_id, edge.dest_id)),
+    concat,
+    map(juxt(identity, node_id_to_node(mod, rewrite_graph))),
+    pyrs.pmap
+  )
 
 # Here we assume that rewrite_graph is an expanded fail-free graph.
 # See: https://github.com/fadoss/umaudemc/blob/master/umaudemc/wrappers.py
@@ -297,8 +326,11 @@ def config_to_html_file(main_mod, config, strat, html_file_path):
   netwk.write_html(html_file_path)
 
 def natural4_rules_to_race_cond_traces(main_mod, natural4_rules, max_traces = 1):
-  actions = apply_fn_to_str(main_mod, 'getAllActions', natural4_rules)
-  race_cond_strat = main_mod.parseStrategy(f'raceCondAux(({actions}))')
+  race_cond_strat = pipe(
+    natural4_rules,
+    escape_ansi,
+    lambda x: main_mod.parseStrategy(f'raceCond(({x}))')
+  )
 
   # action = main_mod.parseTerm("'party0 does 'action0")
   # action = escape_ansi(action)
@@ -306,24 +338,23 @@ def natural4_rules_to_race_cond_traces(main_mod, natural4_rules, max_traces = 1)
   # print(f'race_cond_strat: {race_cond_strat}')
 
   target_config = main_mod.parseTerm('config:Configuration')
-  config = apply_fn(main_mod, 'init', natural4_rules)
-  # print(f'Config: {config}')
-  # race_cond_iter is a StrategySequenceSearch
-  race_cond_solns_iter = config.search(
-    maude.NORMAL_FORM, target_config, strategy = race_cond_strat
+  race_cond_solns = pipe(
+    natural4_rules,
+    apply_fn(main_mod, 'init'),
+    lambda x: x.search(
+      maude.NORMAL_FORM, target_config, strategy = race_cond_strat
+    ),
+    take(max_traces),
+    list
   )
-
-  race_cond_solns = pyrs.pvector()
-  for _ in range(max_traces):
-    try:
-      soln = next(race_cond_solns_iter)
-    except StopIteration:
-      break
-    race_cond_solns = race_cond_solns.append(soln)
 
   # race_cond_path is a list of terms and transitions as in:
   # https://fadoss.github.io/maude-bindings/#maude.StrategySequenceSearch.pathTo
-  race_cond_paths = pyrs.pvector(map(lambda soln : soln[2](), race_cond_solns))
+  race_cond_paths = pipe(
+    race_cond_solns,
+    map(lambda soln : soln[2]()),
+    pyrs.pvector
+  )
   print(f'race_cond_paths: {race_cond_paths}')
   # curr_state = race_cond_path[0]
   # for index in range(1, len(race_cond_path) - 2):

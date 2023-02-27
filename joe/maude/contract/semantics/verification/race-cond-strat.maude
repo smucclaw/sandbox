@@ -9,7 +9,7 @@ sload ../rewrite-trace-strat
   --- protecting SEMANTICS .
   protecting REWRITE-TRACE-STRAT .
 
-  strat raceCond @ Configuration .
+  strat raceCond : Set{Rule} @ Configuration .
   strat raceCondAux : Set{ActionEvent} @ Configuration .
   strat raceCondActionEvent : ActionEvent @ Configuration .
 
@@ -28,12 +28,14 @@ sload ../rewrite-trace-strat
   pass that to raceCondAux so we don't have to do it ourselves.
   For the time being, use raceCondAux and explicitly pass in the set of rules.
 )
-  sd raceCond :=
-    matchrew
-      < coordinator : Coordinator |
-        rules : rules >
-      config
-    by rules using raceCondAux(getAllActions rules) .
+  --- sd raceCond :=
+  ---   matchrew
+  ---     < coordinator : Coordinator |
+  ---       rules : rules >
+  ---     config
+  ---   by rules using raceCondAux(getAllActions rules) .
+
+  sd raceCond(rules) := raceCondAux(getAllActions rules) .
 
   sd raceCondAux(empty) := idle .
 

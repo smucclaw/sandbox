@@ -84,6 +84,8 @@ def edge_to_next_state(graph, edge):
   return next_state
 
 def apply_fn(mod, fn, arg):
+  # fn = escape_ansi(fn)
+  # arg = escape_ansi(arg)
   result_term = mod.parseTerm(f'{fn}({arg})')
   result_term.reduce()
   return result_term
@@ -130,10 +132,10 @@ def rewrite_graph_to_graph(mod, rewrite_graph):
         rule_label = rule.getLabel()
         if rule_label == 'tick': rule_label = '1 day'
         if rule_label == 'action':
-            # Get the term corresponding to the succ_id node and get the
-            # action transition.
-            new_node_term = get_state_term_str(rewrite_graph, succ_id)
-            rule_label = apply_fn_to_str(mod, 'getAction', new_node_term)
+         # the term corresponding to the succ_id node and get the
+         # action transition.
+          new_node_term = get_state_term_str(rewrite_graph, succ_id)
+          rule_label = apply_fn_to_str(mod, 'getAction', new_node_term)
         edges = edges.add(
           Edge(src_id = node_id, dest_id = succ_id, rule_label = rule_label)
         )
@@ -274,10 +276,14 @@ def init_maude_n_load_main_file(main_file):
   main_mod = maude.getModule('MAIN')
   return main_mod
 
-def natural4_file_to_config(main_mod, natural4_file):
+def parse_natural4_file(main_mod, natural4_file):
   natural4_rules = ''
   with open(natural4_file) as f:
     natural4_rules = f.read()
+  natural4_rules = main_mod.parseTerm(natural4_rules)
+  return natural4_rules
+
+def natural4_rules_to_config(main_mod, natural4_rules):
   transpiled_term = apply_fn(main_mod, 'init', natural4_rules)
   return transpiled_term
 
@@ -290,40 +296,71 @@ def config_to_html_file(main_mod, config, strat, html_file_path):
   html_file_path = str(html_file_path)
   netwk.write_html(html_file_path)
 
-def find_race_cond(main_mod, natural4_rules):
-  actions = apply_fn(main_mod, 'getAllActions', natural4_rules)
-  race_cond_strat = main_mod.parseStrategy('raceCondAux', actions)
-  target_config = 'config:Configuration'
+def natural4_rules_to_race_cond_traces(main_mod, natural4_rules, max_traces = 1):
+  actions = apply_fn_to_str(main_mod, 'getAllActions', natural4_rules)
+  race_cond_strat = main_mod.parseStrategy(f'raceCondAux(({actions}))')
+
+  # action = main_mod.parseTerm("'party0 does 'action0")
+  # action = escape_ansi(action)
+  # race_cond_strat = main_mod.parseStrategy(f'raceCondActionEvent({action})')
+  # print(f'race_cond_strat: {race_cond_strat}')
+
+  target_config = main_mod.parseTerm('config:Configuration')
   config = apply_fn(main_mod, 'init', natural4_rules)
+  # print(f'Config: {config}')
   # race_cond_iter is a StrategySequenceSearch
-  race_cond_iter = config.search(0, target_config, strategy = race_cond_strat)
-  if not race_cond_iter:
-      return None
-  race_cond_soln = next(race_cond_iter)
+  race_cond_solns_iter = config.search(
+    maude.NORMAL_FORM, target_config, strategy = race_cond_strat
+  )
+
+  race_cond_solns = pyrs.pvector()
+  for _ in range(max_traces):
+    try:
+      soln = next(race_cond_solns_iter)
+    except StopIteration:
+      break
+    race_cond_solns = race_cond_solns.append(soln)
+
   # race_cond_path is a list of terms and transitions as in:
   # https://fadoss.github.io/maude-bindings/#maude.StrategySequenceSearch.pathTo
-  race_cond_path = race_cond_soln[2]()
+  race_cond_paths = pyrs.pvector(map(lambda soln : soln[2](), race_cond_solns))
+  print(f'race_cond_paths: {race_cond_paths}')
+  # curr_state = race_cond_path[0]
+  # for index in range(1, len(race_cond_path) - 2):
+  #   pass
+  return race_cond_paths
 
 def main_file_term_strat_to_html_file(main_file, natural4_file, html_file_path, strat = 'all *'):
   main_mod = init_maude_n_load_main_file(main_file)
-  config = natural4_file_to_config(main_mod, natural4_file)
+  natural4_rules = parse_natural4_file(main_mod, natural4_file)
+  natural4_rules = escape_ansi(natural4_rules)
+  config = natural4_rules_to_config(main_mod, natural4_rules)
   config_to_html_file(main_mod, config, strat, html_file_path)
 
 if __name__ == '__main__':
   natural4_file = Path(sys.argv[1])
-  strat = sys.argv[2] if len(sys.argv) >= 3 else 'all *'
+  # strat = sys.argv[2] if len(sys.argv) >= 3 else 'all *'
+  strat = 'all *'
 
   contractdir = Path(__file__).parent.parent
   
-  transpile_sh = contractdir / 'scripts' / 'transpile-main.sh'
-  subprocess.call([transpile_sh])
+  # transpile_sh = contractdir / 'scripts' / 'transpile-main.sh'
+  # subprocess.call([transpile_sh])
 
   workdir = contractdir / '.workdir'
 
   main_file = workdir / 'main.maude'
   html_file_path = workdir /  f'{natural4_file.stem}.html'
 
-  main_file_term_strat_to_html_file(main_file, natural4_file, html_file_path, strat)
+  main_mod = init_maude_n_load_main_file(main_file)
+  natural4_rules = parse_natural4_file(main_mod, natural4_file)
+  natural4_rules = escape_ansi(natural4_rules)
+  config = natural4_rules_to_config(main_mod, natural4_rules)
+  config_to_html_file(main_mod, config, strat, html_file_path)
+
+  race_cond_path = natural4_rules_to_race_cond_traces(main_mod, natural4_rules)
+
+  # main_file_term_strat_to_html_file(main_file, natural4_file, html_file_path, strat)
 
   # Experiments with Jaal.
   # edge_df = pd.DataFrame(graph)

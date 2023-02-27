@@ -15,7 +15,7 @@ sload atomic-props
 
   sd rewriteEvent(actorName does actionName) :=
     --- action[actorName <- actorName, actionName <- actionName] .
-    all ;
+    action ;
     match config s.t.
       config |= actorName does actionName .
 

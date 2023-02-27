@@ -149,10 +149,15 @@ def node_id_to_node(mod, rewrite_graph, node_id):
 def edges_to_node_map(mod, rewrite_graph, edges):
   return pipe(
     edges,
+    # [... edge ...]
     map(lambda edge: (edge.src_id, edge.dest_id)),
+    # [... (src_id, dest_id) ...]
     concat,
+    # [... src_id, dest_id ...]
     map(juxt(identity, node_id_to_node(mod, rewrite_graph))),
+    # [... (src_id, Node_src_id), (dest_id, Node_dest_id)]
     pyrs.pmap
+    # {... src_id: Node_src_id, dest_id: Node_dest_id ...}
   )
 
 # Here we assume that rewrite_graph is an expanded fail-free graph.
@@ -196,8 +201,12 @@ def to_rule_label(mod, rewrite_graph, dest_node_id, rule_label):
 def rewrite_graph_to_graph(mod, rewrite_graph):
   repeat = iterate(identity)
   return pipe(
-    range(rewrite_graph.getNrStates()),
-    # [... n ...]
+    rewrite_graph,
+    # graph
+    lambda x: x.getNrStates(),
+    # num_states
+    range,
+    # [0 ... n ... num_states]
     map(juxt(repeat, rewrite_graph.getNextStates)),
     # [... ((n, n, ...), (succ0, succ1, ..., succm)), ...]
     map(lambda x: zip(*x)),

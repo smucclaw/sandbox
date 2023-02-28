@@ -201,9 +201,7 @@ def to_rule_label(mod, rewrite_graph, dest_node_id, rule_label):
 def rewrite_graph_to_graph(mod, rewrite_graph):
   repeat = iterate(identity)
   return pipe(
-    rewrite_graph,
-    # graph
-    lambda x: x.getNrStates(),
+    rewrite_graph.getNrStates(),
     # num_states
     range,
     # [0 ... n ... num_states]
@@ -213,10 +211,13 @@ def rewrite_graph_to_graph(mod, rewrite_graph):
     # [... ((n, succ0), (n, succ1), ..., (n, succm)) ...]
     concat,
     # [... (n, succ0), (n, succ1), ..., (n, succm) ...]
-    map(lambda edge: (edge[0], edge[1], rewrite_graph.getTransition(*edge).getRule())),
+    map(lambda edge:
+        (edge[0], edge[1], rewrite_graph.getTransition(*edge).getRule())),
     # [... (n, succ, rule), ...]
     filter(lambda edge: edge[2] != None),
-    map(lambda edge: (edge[0], edge[1], to_rule_label(mod, rewrite_graph, edge[1], edge[2].getLabel()))),
+    map(lambda edge:
+        (edge[0], edge[1],
+         to_rule_label(mod, rewrite_graph, edge[1], edge[2].getLabel()))),
     # [... (n, succ, rule_label), ...]
     map(lambda edge: Edge(src_id = edge[0], dest_id = edge[1], rule_label = edge[2])),
     # [... Edge ...]

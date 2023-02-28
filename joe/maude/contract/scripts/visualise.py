@@ -79,7 +79,6 @@ class Graph(pyrs.PRecord):
   node_map = pyrs.pmap_field(int, Node)
   edges = pyrs.pset_field(Edge)
 
-@curry
 def node_to_colour(node):
   if node.contract_status == 'Active': return 'blue'
   if node.contract_status == 'Fulfilled': return 'green'

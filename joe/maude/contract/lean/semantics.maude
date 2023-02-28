@@ -1,0 +1,747 @@
+mod SEMANTICS is
+  sorts Action ActionEvent ActiveRule Actor ActorDeonticActionDeadline
+    ActorState Attribute AttributeSet Bool Char Cid Configuration ContractState
+    ContractStatus Coordinator Date Deadline Deontic Duration Event FindResult
+    HenceLest Id Message Msg Names Nat NeSet{ActionEvent}NeSet{Qid}NeSet{
+    Rule}NzNat Object Oid Portal PreCoordinator Qid Rule Set{ActionEvent}Set{
+    Qid}Set{Rule}Situation String TickEvent Zero .
+  subsort ActionEvent < Event .
+  subsort ActionEvent < NeSet{ActionEvent}.
+  subsort Actor < Cid .
+  subsort Attribute < AttributeSet .
+  subsort Bool < Situation .
+  subsort Char < String .
+  subsort Coordinator < Cid .
+  subsort Coordinator < PreCoordinator .
+  subsort Event < Message .
+  subsort Message < Msg .
+  subsort Msg < Configuration .
+  subsort Names < Set{Qid}.
+  subsort Nat < FindResult .
+  subsort NeSet{ActionEvent}< Set{ActionEvent}.
+  subsort NeSet{Qid}< Set{Qid}.
+  subsort NeSet{Rule}< Set{Rule}.
+  subsort NzNat < Nat .
+  subsort Object < Configuration .
+  subsort Oid < Id .
+  subsort Portal < Configuration .
+  subsort PreCoordinator < Cid .
+  subsort Qid < Action .
+  subsort Qid < Names .
+  subsort Qid < NeSet{Qid}.
+  subsort Qid < Oid .
+  subsort Qid < Situation .
+  subsort Rule < NeSet{Rule}.
+  subsort TickEvent < Event .
+  subsort Zero < Nat .
+  op $card : Set{ActionEvent}Nat -> Nat .
+  op $card : Set{Qid}Nat -> Nat .
+  op $card : Set{Rule}Nat -> Nat .
+  op $diff : Set{ActionEvent}Set{ActionEvent}Set{ActionEvent}-> Set{
+    ActionEvent}.
+  op $diff : Set{Qid}Set{Qid}Set{Qid}-> Set{Qid}.
+  op $diff : Set{Rule}Set{Rule}Set{Rule}-> Set{Rule}.
+  op $intersect : Set{ActionEvent}Set{ActionEvent}Set{ActionEvent}-> Set{
+    ActionEvent}.
+  op $intersect : Set{Qid}Set{Qid}Set{Qid}-> Set{Qid}.
+  op $intersect : Set{Rule}Set{Rule}Set{Rule}-> Set{Rule}.
+  op Actor : -> Actor .
+  op Coordinator : -> Coordinator .
+  op NOTHING : -> Names .
+  op PreCoordinator : -> PreCoordinator .
+  op _containsActor_ : Configuration Qid -> Bool .
+  op _containsRuleWithEvent_ : Set{Rule}ActionEvent -> Bool .
+  op _in_ : ActionEvent Set{ActionEvent}-> Bool .
+  op _in_ : Qid Set{Qid}-> Bool .
+  op _in_ : Rule Set{Rule}-> Bool .
+  op _psubset_ : Set{ActionEvent}Set{ActionEvent}-> Bool .
+  op _psubset_ : Set{Qid}Set{Qid}-> Bool .
+  op _psubset_ : Set{Rule}Set{Rule}-> Bool .
+  op _subset_ : Set{ActionEvent}Set{ActionEvent}-> Bool .
+  op _subset_ : Set{Qid}Set{Qid}-> Bool .
+  op _subset_ : Set{Rule}Set{Rule}-> Bool .
+  op configToStatus_ : Configuration -> ContractStatus .
+  op contractStateToStatus_ : ContractState -> ContractStatus .
+  op delete : ActionEvent Set{ActionEvent}-> Set{ActionEvent}.
+  op delete : Qid Set{Qid}-> Set{Qid}.
+  op delete : Rule Set{Rule}-> Set{Rule}.
+  op deltaAction___ : Set{Rule}ActionEvent ContractState -> ContractState .
+  op deltaTick__ : Set{Rule}ContractState -> ContractState .
+  op getAction_ : Configuration -> ActionEvent .
+  op getAllActions_ : Set{Rule}-> Set{ActionEvent}.
+  op getClass : Object -> Cid .
+  op getRulesWithNames__ : Set{Rule}Set{Qid}-> Set{Rule}.
+  op initAux__ : Set{Rule}Configuration -> Configuration .
+  op init_ : Set{Rule}-> Configuration .
+  op insert : ActionEvent Set{ActionEvent}-> Set{ActionEvent}.
+  op insert : Qid Set{Qid}-> Set{Qid}.
+  op insert : Rule Set{Rule}-> Set{Rule}.
+  op intersection : Set{ActionEvent}Set{ActionEvent}-> Set{ActionEvent}.
+  op intersection : Set{Qid}Set{Qid}-> Set{Qid}.
+  op intersection : Set{Rule}Set{Rule}-> Set{Rule}.
+  op pretty_ : Configuration -> Configuration .
+  op union : NeSet{ActionEvent}Set{ActionEvent}-> NeSet{ActionEvent}.
+  op union : NeSet{Qid}Set{Qid}-> NeSet{Qid}.
+  op union : NeSet{Rule}Set{Rule}-> NeSet{Rule}.
+  op union : Set{ActionEvent}NeSet{ActionEvent}-> NeSet{ActionEvent}.
+  op union : Set{ActionEvent}Set{ActionEvent}-> Set{ActionEvent}.
+  op union : Set{Qid}NeSet{Qid}-> NeSet{Qid}.
+  op union : Set{Qid}Set{Qid}-> Set{Qid}.
+  op union : Set{Rule}NeSet{Rule}-> NeSet{Rule}.
+  op union : Set{Rule}Set{Rule}-> Set{Rule}.
+  op |_| : NeSet{ActionEvent}-> NzNat .
+  op |_| : NeSet{Qid}-> NzNat .
+  op |_| : NeSet{Rule}-> NzNat .
+  op |_| : Set{ActionEvent}-> Nat .
+  op |_| : Set{Qid}-> Nat .
+  op |_| : Set{Rule}-> Nat .
+  op 0 : -> Zero
+    [ctor] .
+  op <> : -> Portal
+    [ctor] .
+  op <Qids> : -> Qid
+    [special(id-hook QuotedIdentifierSymbol)] .
+  op <Strings> : -> Char
+    [special(id-hook StringSymbol)] .
+  op <Strings> : -> String
+    [special(id-hook StringSymbol)] .
+  op <_:_|_> : Oid Cid AttributeSet -> Object
+    [format(ni!r o !r o !r++ oni !r-- o)ctor object] .
+  op <_:_|`> : Oid Cid -> Object
+    [format(ni!r o !r o !r o o)] .
+  op Active : -> ContractStatus
+    [ctor] .
+  op Active_ : Set{Rule}-> ContractState
+    [ctor] .
+  op BY_ : Nat -> Deadline
+    [ctor] .
+  op Breached : -> ContractStatus
+    [ctor] .
+  op Breached_ : Set{Qid}-> ContractState
+    [ctor] .
+  op DO_ : Qid -> Action
+    [ctor] .
+  op Fulfilled : -> ContractState
+    [ctor] .
+  op Fulfilled : -> ContractStatus
+    [ctor] .
+  op HENCE_ : Set{Qid}-> HenceLest
+    [ctor] .
+  op HENCE_LEST_ : Set{Qid}Set{Qid}-> HenceLest
+    [ctor] .
+  op LEST_ : Set{Qid}-> HenceLest
+    [ctor] .
+  op LEST_HENCE_ : Set{Qid}Set{Qid}-> HenceLest
+    [ctor] .
+  op MAY : -> Deontic
+    [ctor] .
+  op MUST : -> Deontic
+    [ctor] .
+  op PARTY____ : Qid Deadline Deontic Action -> ActorDeonticActionDeadline
+    [ctor] .
+  op PARTY____ : Qid Deontic Action Deadline -> ActorDeonticActionDeadline
+    [ctor] .
+  op PARTY____ : Qid Deontic Deadline Action -> ActorDeonticActionDeadline
+    [ctor] .
+  op RULE__ : Qid ActorDeonticActionDeadline -> Rule
+    [ctor] .
+  op RULE___ : Qid ActorDeonticActionDeadline HenceLest -> Rule
+    [ctor] .
+  op SHANT : -> Deontic
+    [ctor] .
+  op WITHIN_ : Duration -> Deadline
+    [ctor] .
+  op _&_ : Nat Nat -> Nat
+    [assoc comm prec 53 special(id-hook ACU_NumberOpSymbol(&)op-hook
+    succSymbol(s_ : Nat ~> NzNat))] .
+  op _*_ : Nat Nat -> Nat
+    [assoc comm prec 31 special(id-hook ACU_NumberOpSymbol(*)op-hook
+    succSymbol(s_ : Nat ~> NzNat))] .
+  op _*_ : NzNat NzNat -> NzNat
+    [assoc comm prec 31 special(id-hook ACU_NumberOpSymbol(*)op-hook
+    succSymbol(s_ : Nat ~> NzNat))] .
+  op _+_ : Nat Nat -> Nat
+    [assoc comm prec 33 special(id-hook ACU_NumberOpSymbol(+)op-hook
+    succSymbol(s_ : Nat ~> NzNat))] .
+  op _+_ : NzNat Nat -> NzNat
+    [assoc comm prec 33 special(id-hook ACU_NumberOpSymbol(+)op-hook
+    succSymbol(s_ : Nat ~> NzNat))] .
+  op _+_ : String String -> String
+    [prec 33 gather(E e)special(id-hook StringOpSymbol(+)op-hook stringSymbol(
+    <Strings> : ~> Char))] .
+  op _<<_ : Nat Nat -> Nat
+    [prec 35 gather(E e)special(id-hook NumberOpSymbol(<<)op-hook succSymbol(s_
+    : Nat ~> NzNat))] .
+  op _<=_ : Nat Nat -> Bool
+    [prec 37 special(id-hook NumberOpSymbol(<=)op-hook succSymbol(s_ : Nat ~>
+    NzNat)term-hook trueTerm(true)term-hook falseTerm(false))] .
+  op _<=_ : String String -> Bool
+    [prec 37 special(id-hook StringOpSymbol(<=)op-hook stringSymbol(<Strings> :
+    ~> Char)term-hook trueTerm(true)term-hook falseTerm(false))] .
+  op _<_ : Nat Nat -> Bool
+    [prec 37 special(id-hook NumberOpSymbol(<)op-hook succSymbol(s_ : Nat ~>
+    NzNat)term-hook trueTerm(true)term-hook falseTerm(false))] .
+  op _<_ : String String -> Bool
+    [prec 37 special(id-hook StringOpSymbol(<)op-hook stringSymbol(<Strings> :
+    ~> Char)term-hook trueTerm(true)term-hook falseTerm(false))] .
+  op _=/=_ : Universal Universal -> Bool
+    [poly(1 2)prec 51 special(id-hook EqualitySymbol term-hook equalTerm(
+    false)term-hook notEqualTerm(true))] .
+  op _==_ : Universal Universal -> Bool
+    [poly(1 2)prec 51 special(id-hook EqualitySymbol term-hook equalTerm(
+    true)term-hook notEqualTerm(false))] .
+  op _>=_ : Nat Nat -> Bool
+    [prec 37 special(id-hook NumberOpSymbol(>=)op-hook succSymbol(s_ : Nat ~>
+    NzNat)term-hook trueTerm(true)term-hook falseTerm(false))] .
+  op _>=_ : String String -> Bool
+    [prec 37 special(id-hook StringOpSymbol(>=)op-hook stringSymbol(<Strings> :
+    ~> Char)term-hook trueTerm(true)term-hook falseTerm(false))] .
+  op _>>_ : Nat Nat -> Nat
+    [prec 35 gather(E e)special(id-hook NumberOpSymbol(>>)op-hook succSymbol(s_
+    : Nat ~> NzNat))] .
+  op _>_ : Nat Nat -> Bool
+    [prec 37 special(id-hook NumberOpSymbol(>)op-hook succSymbol(s_ : Nat ~>
+    NzNat)term-hook trueTerm(true)term-hook falseTerm(false))] .
+  op _>_ : String String -> Bool
+    [prec 37 special(id-hook StringOpSymbol(>)op-hook stringSymbol(<Strings> :
+    ~> Char)term-hook trueTerm(true)term-hook falseTerm(false))] .
+  op _AND_ : Names Names -> Names
+    [assoc comm id:(empty).Set{Qid}prec 121 format(d r os d)] .
+  op _DAY : Nat -> Duration
+    [ctor] .
+  op _MONTH : Nat -> Duration
+    [ctor] .
+  op _PARTY___ : Deadline Qid Deontic Action -> ActorDeonticActionDeadline
+    [ctor] .
+  op _WEEK : Nat -> Duration
+    [ctor] .
+  op _YEAR : Nat -> Duration
+    [ctor] .
+  op _\_ : Set{ActionEvent}Set{ActionEvent}-> Set{ActionEvent}
+    [gather(E e)] .
+  op _\_ : Set{Qid}Set{Qid}-> Set{Qid}
+    [gather(E e)] .
+  op _\_ : Set{Rule}Set{Rule}-> Set{Rule}
+    [gather(E e)] .
+  op _^_ : ContractState ContractState -> ContractState
+    [assoc comm id:(Fulfilled).ContractState] .
+  op _^_ : Nat Nat -> Nat
+    [prec 29 gather(E e)special(id-hook NumberOpSymbol(^)op-hook succSymbol(s_
+    : Nat ~> NzNat))] .
+  op _^_ : NzNat Nat -> NzNat
+    [prec 29 gather(E e)special(id-hook NumberOpSymbol(^)op-hook succSymbol(s_
+    : Nat ~> NzNat))] .
+  op __ : Configuration Configuration -> Configuration
+    [assoc comm id:(none).Configuration ctor config] .
+  op _`,_ : AttributeSet AttributeSet -> AttributeSet
+    [assoc comm id:(none).AttributeSet format(o !r nio o)ctor] .
+  op _`,_ : NeSet{ActionEvent}Set{ActionEvent}-> NeSet{ActionEvent}
+    [assoc comm id:(empty).Set{ActionEvent}prec 121 format(d r os d)ctor] .
+  op _`,_ : NeSet{Qid}Set{Qid}-> NeSet{Qid}
+    [assoc comm id:(empty).Set{Qid}prec 121 format(d r os d)ctor] .
+  op _`,_ : NeSet{Rule}Set{Rule}-> NeSet{Rule}
+    [assoc comm id:(empty).Set{Rule}prec 121 format(d r os d)ctor] .
+  op _`,_ : Set{ActionEvent}Set{ActionEvent}-> Set{ActionEvent}
+    [assoc comm id:(empty).Set{ActionEvent}prec 121 format(d r os d)ctor] .
+  op _`,_ : Set{Qid}Set{Qid}-> Set{Qid}
+    [assoc comm id:(empty).Set{Qid}prec 121 format(d r os d)ctor] .
+  op _`,_ : Set{Rule}Set{Rule}-> Set{Rule}
+    [assoc comm id:(empty).Set{Rule}prec 121 format(d r os d)ctor] .
+  op _and-then_ : Bool Bool -> Bool
+    [strat(1 0)prec 55 gather(e E)] .
+  op _and_ : Bool Bool -> Bool
+    [assoc comm prec 55] .
+  op _did_ : Id Id -> ActionEvent
+    [msg] .
+  op _divides_ : NzNat Nat -> Bool
+    [prec 51 special(id-hook NumberOpSymbol(divides)op-hook succSymbol(s_ : Nat
+    ~> NzNat)term-hook trueTerm(true)term-hook falseTerm(false))] .
+  op _do_ : Id Id -> ActionEvent
+    [msg] .
+  op _does_ : Id Id -> ActionEvent
+    [msg] .
+  op _implies_ : Bool Bool -> Bool
+    [prec 61 gather(e E)] .
+  op _or-else_ : Bool Bool -> Bool
+    [strat(1 0)prec 59 gather(e E)] .
+  op _or_ : Bool Bool -> Bool
+    [assoc comm prec 59] .
+  op _quo_ : Nat NzNat -> Nat
+    [prec 31 gather(E e)special(id-hook NumberOpSymbol(quo)op-hook succSymbol(
+    s_ : Nat ~> NzNat))] .
+  op _rem_ : Nat NzNat -> Nat
+    [prec 31 gather(E e)special(id-hook NumberOpSymbol(rem)op-hook succSymbol(
+    s_ : Nat ~> NzNat))] .
+  op _xor_ : Bool Bool -> Bool
+    [assoc comm prec 57] .
+  op _xor_ : Nat Nat -> Nat
+    [assoc comm prec 55 special(id-hook ACU_NumberOpSymbol(xor)op-hook
+    succSymbol(s_ : Nat ~> NzNat))] .
+  op _|_ : Nat Nat -> Nat
+    [assoc comm prec 57 special(id-hook ACU_NumberOpSymbol(|)op-hook
+    succSymbol(s_ : Nat ~> NzNat))] .
+  op _|_ : NzNat Nat -> NzNat
+    [assoc comm prec 57 special(id-hook ACU_NumberOpSymbol(|)op-hook
+    succSymbol(s_ : Nat ~> NzNat))] .
+  op ascii : Char -> Nat
+    [special(id-hook StringOpSymbol(ascii)op-hook stringSymbol(<Strings> : ~>
+    Char)op-hook succSymbol(s_ : Nat ~> NzNat))] .
+  op char :[FindResult]->[String]
+    [special(id-hook StringOpSymbol(char)op-hook stringSymbol(<Strings> : ~>
+    Char)op-hook succSymbol(s_ : Nat ~> NzNat))] .
+  op contractState`:_ : ContractState -> Attribute
+    [gather(&)] .
+  op empty : -> Set{ActionEvent}
+    [ctor] .
+  op empty : -> Set{Qid}
+    [ctor] .
+  op empty : -> Set{Rule}
+    [ctor] .
+  op false : -> Bool
+    [ctor special(id-hook SystemFalse)] .
+  op find : String String Nat -> FindResult
+    [special(id-hook StringOpSymbol(find)op-hook stringSymbol(<Strings> : ~>
+    Char)op-hook succSymbol(s_ : Nat ~> NzNat)term-hook notFoundTerm(
+    notFound))] .
+  op gcd : Nat Nat -> Nat
+    [assoc comm special(id-hook ACU_NumberOpSymbol(gcd)op-hook succSymbol(s_ :
+    Nat ~> NzNat))] .
+  op gcd : NzNat Nat -> NzNat
+    [assoc comm special(id-hook ACU_NumberOpSymbol(gcd)op-hook succSymbol(s_ :
+    Nat ~> NzNat))] .
+  op if_then_else_fi : Bool Universal Universal -> Universal
+    [poly(2 3 0)special(id-hook BranchSymbol term-hook 1(true)term-hook 2(
+    false))] .
+  op lcm : Nat Nat -> Nat
+    [assoc comm special(id-hook ACU_NumberOpSymbol(lcm)op-hook succSymbol(s_ :
+    Nat ~> NzNat))] .
+  op lcm : NzNat NzNat -> NzNat
+    [assoc comm special(id-hook ACU_NumberOpSymbol(lcm)op-hook succSymbol(s_ :
+    Nat ~> NzNat))] .
+  op length : String -> Nat
+    [special(id-hook StringOpSymbol(length)op-hook stringSymbol(<Strings> : ~>
+    Char)op-hook succSymbol(s_ : Nat ~> NzNat))] .
+  op lowerCase : String -> String
+    [special(id-hook StringOpSymbol(lowerCase)op-hook stringSymbol(<Strings> :
+    ~> Char))] .
+  op max : Nat Nat -> Nat
+    [assoc comm special(id-hook ACU_NumberOpSymbol(max)op-hook succSymbol(s_ :
+    Nat ~> NzNat))] .
+  op max : NzNat Nat -> NzNat
+    [assoc comm special(id-hook ACU_NumberOpSymbol(max)op-hook succSymbol(s_ :
+    Nat ~> NzNat))] .
+  op min : Nat Nat -> Nat
+    [assoc comm special(id-hook ACU_NumberOpSymbol(min)op-hook succSymbol(s_ :
+    Nat ~> NzNat))] .
+  op min : NzNat NzNat -> NzNat
+    [assoc comm special(id-hook ACU_NumberOpSymbol(min)op-hook succSymbol(s_ :
+    Nat ~> NzNat))] .
+  op modExp :[Nat][Nat][Nat]->[Nat]
+    [special(id-hook NumberOpSymbol(modExp)op-hook succSymbol(s_ : Nat ~>
+    NzNat))] .
+  op none : -> AttributeSet
+    [ctor] .
+  op none : -> Configuration
+    [ctor] .
+  op notFound : -> FindResult
+    [ctor] .
+  op not_ : Bool -> Bool
+    [prec 53] .
+  op qid :[String]->[Qid]
+    [special(id-hook QuotedIdentifierOpSymbol(qid)op-hook
+    quotedIdentifierSymbol(<Qids> : ~> Qid)op-hook stringSymbol(<Strings> : ~>
+    Char))] .
+  op rfind : String String Nat -> FindResult
+    [special(id-hook StringOpSymbol(rfind)op-hook stringSymbol(<Strings> : ~>
+    Char)op-hook succSymbol(s_ : Nat ~> NzNat)term-hook notFoundTerm(
+    notFound))] .
+  op rules`:_ : Set{Rule}-> Attribute
+    [gather(&)] .
+  op s_ : Nat -> NzNat
+    [ctor iter special(id-hook SuccSymbol term-hook zeroTerm(0))] .
+  op sd : Nat Nat -> Nat
+    [comm special(id-hook CUI_NumberOpSymbol(sd)op-hook succSymbol(s_ : Nat ~>
+    NzNat))] .
+  op string : Qid -> String
+    [special(id-hook QuotedIdentifierOpSymbol(string)op-hook
+    quotedIdentifierSymbol(<Qids> : ~> Qid)op-hook stringSymbol(<Strings> : ~>
+    Char))] .
+  op substr : String Nat Nat -> String
+    [special(id-hook StringOpSymbol(substr)op-hook stringSymbol(<Strings> : ~>
+    Char)op-hook succSymbol(s_ : Nat ~> NzNat))] .
+  op tau : -> ActionEvent
+    [ctor] .
+  op tick : -> TickEvent
+    [ctor] .
+  op time`:_ : Nat -> Attribute
+    [gather(&)] .
+  op true : -> Bool
+    [ctor special(id-hook SystemTrue)] .
+  op upperCase : String -> String
+    [special(id-hook StringOpSymbol(upperCase)op-hook stringSymbol(<Strings> :
+    ~> Char))] .
+  eq NOTHING
+    = (empty).Set{Qid} .
+  eq $card((empty).Set{ActionEvent},C:Nat)
+    = C:Nat .
+  eq $card((empty).Set{Qid},C:Nat)
+    = C:Nat .
+  eq $card((empty).Set{Rule},C:Nat)
+    = C:Nat .
+  eq $card((N:NeSet{ActionEvent}, N:NeSet{ActionEvent}, S:Set{ActionEvent}),
+    C:Nat)
+    = $card((N:NeSet{ActionEvent}, S:Set{ActionEvent}),C:Nat) .
+  eq $card((N:NeSet{Qid}, N:NeSet{Qid}, S:Set{Qid}),C:Nat)
+    = $card((N:NeSet{Qid}, S:Set{Qid}),C:Nat) .
+  eq $card((N:NeSet{Rule}, N:NeSet{Rule}, S:Set{Rule}),C:Nat)
+    = $card((N:NeSet{Rule}, S:Set{Rule}),C:Nat) .
+  eq $diff((empty).Set{ActionEvent},S':Set{ActionEvent},A:Set{ActionEvent})
+    = A:Set{ActionEvent} .
+  eq $diff((empty).Set{Qid},S':Set{Qid},A:Set{Qid})
+    = A:Set{Qid} .
+  eq $diff((empty).Set{Rule},S':Set{Rule},A:Set{Rule})
+    = A:Set{Rule} .
+  eq $diff((E:ActionEvent, S:Set{ActionEvent}),S':Set{ActionEvent},A:Set{
+    ActionEvent})
+    = $diff(S:Set{ActionEvent},S':Set{ActionEvent},if E:ActionEvent in S':Set{
+    ActionEvent}then A:Set{ActionEvent}else E:ActionEvent, A:Set{
+    ActionEvent}fi) .
+  eq $diff((E:Qid, S:Set{Qid}),S':Set{Qid},A:Set{Qid})
+    = $diff(S:Set{Qid},S':Set{Qid},if E:Qid in S':Set{Qid}then A:Set{Qid}else
+    E:Qid, A:Set{Qid}fi) .
+  eq $diff((E:Rule, S:Set{Rule}),S':Set{Rule},A:Set{Rule})
+    = $diff(S:Set{Rule},S':Set{Rule},if E:Rule in S':Set{Rule}then A:Set{
+    Rule}else E:Rule, A:Set{Rule}fi) .
+  eq $intersect((empty).Set{ActionEvent},S':Set{ActionEvent},A:Set{
+    ActionEvent})
+    = A:Set{ActionEvent} .
+  eq $intersect((empty).Set{Qid},S':Set{Qid},A:Set{Qid})
+    = A:Set{Qid} .
+  eq $intersect((empty).Set{Rule},S':Set{Rule},A:Set{Rule})
+    = A:Set{Rule} .
+  eq $intersect((E:ActionEvent, S:Set{ActionEvent}),S':Set{ActionEvent},A:Set{
+    ActionEvent})
+    = $intersect(S:Set{ActionEvent},S':Set{ActionEvent},if E:ActionEvent in
+    S':Set{ActionEvent}then E:ActionEvent, A:Set{ActionEvent}else A:Set{
+    ActionEvent}fi) .
+  eq $intersect((E:Qid, S:Set{Qid}),S':Set{Qid},A:Set{Qid})
+    = $intersect(S:Set{Qid},S':Set{Qid},if E:Qid in S':Set{Qid}then E:Qid,
+    A:Set{Qid}else A:Set{Qid}fi) .
+  eq $intersect((E:Rule, S:Set{Rule}),S':Set{Rule},A:Set{Rule})
+    = $intersect(S:Set{Rule},S':Set{Rule},if E:Rule in S':Set{Rule}then E:Rule,
+    A:Set{Rule}else A:Set{Rule}fi) .
+  eq Active empty
+    = (Fulfilled).ContractState .
+  eq DO actionName:Qid
+    = actionName:Qid .
+  eq HENCE hence:Set{Qid}
+    = HENCE hence:Set{Qid}LEST NOTHING .
+  eq LEST lest:Set{Qid}
+    = HENCE NOTHING LEST lest:Set{Qid} .
+  eq LEST lest:Set{Qid}HENCE hence:Set{Qid}
+    = HENCE hence:Set{Qid}LEST lest:Set{Qid} .
+  eq PARTY actorName:Qid deadline:Deadline deontic:Deontic actionName:Qid
+    = PARTY actorName:Qid deontic:Deontic actionName:Qid deadline:Deadline .
+  eq PARTY actorName:Qid deontic:Deontic deadline:Deadline actionName:Qid
+    = PARTY actorName:Qid deontic:Deontic actionName:Qid deadline:Deadline .
+  eq RULE ruleName:Qid PARTY actorName:Qid deontic:Deontic actionName:Qid
+    deadline:Deadline
+    = RULE ruleName:Qid PARTY actorName:Qid deontic:Deontic actionName:Qid
+    deadline:Deadline HENCE NOTHING LEST NOTHING .
+  eq names:Names AND names':Names
+    = names:Names, names':Names .
+  eq deadline:Deadline PARTY actorName:Qid deontic:Deontic actionName:Qid
+    = PARTY actorName:Qid deontic:Deontic actionName:Qid deadline:Deadline .
+  eq S:Set{ActionEvent}\ N:NeSet{ActionEvent}
+    = $diff(S:Set{ActionEvent},N:NeSet{ActionEvent},(empty).Set{ActionEvent}) .
+  eq S:Set{ActionEvent}\(empty).Set{ActionEvent}
+    = S:Set{ActionEvent} .
+  eq S:Set{Qid}\ N:NeSet{Qid}
+    = $diff(S:Set{Qid},N:NeSet{Qid},(empty).Set{Qid}) .
+  eq S:Set{Qid}\(empty).Set{Qid}
+    = S:Set{Qid} .
+  eq S:Set{Rule}\ N:NeSet{Rule}
+    = $diff(S:Set{Rule},N:NeSet{Rule},(empty).Set{Rule}) .
+  eq S:Set{Rule}\(empty).Set{Rule}
+    = S:Set{Rule} .
+  eq Active activeRules:Set{Rule}^ Active activeRules':Set{Rule}
+    = Active(activeRules:Set{Rule}, activeRules':Set{Rule}) .
+  eq Breached actorNames:Set{Qid}^ Active activeRules:Set{Rule}
+    = Breached actorNames:Set{Qid} .
+  eq Breached actorNames:Set{Qid}^ Breached actorNames':Set{Qid}
+    = Breached(actorNames:Set{Qid}, actorNames':Set{Qid}) .
+  eq N:NeSet{ActionEvent}, N:NeSet{ActionEvent}
+    = N:NeSet{ActionEvent} .
+  eq N:NeSet{Qid}, N:NeSet{Qid}
+    = N:NeSet{Qid} .
+  eq N:NeSet{Rule}, N:NeSet{Rule}
+    = N:NeSet{Rule} .
+  eq false and-then B:[Set{Qid},Id,Situation,Action]
+    = false .
+  eq true and-then B:[Set{Qid},Id,Situation,Action]
+    = B:[Set{Qid},Id,Situation,Action] .
+  eq A:Bool and A:Bool
+    = A:Bool .
+  eq A:Bool and(B:Bool xor C:Bool)
+    = A:Bool and B:Bool xor A:Bool and C:Bool .
+  eq false and A:Bool
+    = false .
+  eq true and A:Bool
+    = A:Bool .
+  eq (
+< actorName:Qid : V#0:Actor |
+  none,
+  V#1:AttributeSet > config:Configuration)containsActor actorName:Qid
+    = true .
+  eq (RULE ruleName:Qid PARTY actorName:Qid deontic:Deontic actionName:Qid
+    WITHIN time:Nat DAY HENCE hence:Set{Qid}LEST lest:Set{Qid},
+    activeRules:Set{Rule})containsRuleWithEvent actorName:Qid does
+    actionName:Qid
+    = true .
+  eq actorName:Id did actionName:Id
+    = actorName:Id does actionName:Id .
+  eq actorName:Id do actionName:Id
+    = actorName:Id did actionName:Id .
+  eq A:Bool implies B:Bool
+    = not(A:Bool xor A:Bool and B:Bool) .
+  eq E:ActionEvent in(E:ActionEvent, S:Set{ActionEvent})
+    = true .
+  eq E:Qid in(E:Qid, S:Set{Qid})
+    = true .
+  eq E:Rule in(E:Rule, S:Set{Rule})
+    = true .
+  eq false or-else B:[Set{Qid},Id,Situation,Action]
+    = B:[Set{Qid},Id,Situation,Action] .
+  eq true or-else B:[Set{Qid},Id,Situation,Action]
+    = true .
+  eq A:Bool or B:Bool
+    = A:Bool and B:Bool xor A:Bool xor B:Bool .
+  eq S:Set{ActionEvent}psubset S':Set{ActionEvent}
+    = S:Set{ActionEvent}=/= S':Set{ActionEvent}and-then S:Set{
+    ActionEvent}subset S':Set{ActionEvent} .
+  eq S:Set{Qid}psubset S':Set{Qid}
+    = S:Set{Qid}=/= S':Set{Qid}and-then S:Set{Qid}subset S':Set{Qid} .
+  eq S:Set{Rule}psubset S':Set{Rule}
+    = S:Set{Rule}=/= S':Set{Rule}and-then S:Set{Rule}subset S':Set{Rule} .
+  eq (empty).Set{ActionEvent}subset S':Set{ActionEvent}
+    = true .
+  eq (empty).Set{Qid}subset S':Set{Qid}
+    = true .
+  eq (empty).Set{Rule}subset S':Set{Rule}
+    = true .
+  eq (E:ActionEvent, S:Set{ActionEvent})subset S':Set{ActionEvent}
+    = E:ActionEvent in S':Set{ActionEvent}and-then S:Set{ActionEvent}subset
+    S':Set{ActionEvent} .
+  eq (E:Qid, S:Set{Qid})subset S':Set{Qid}
+    = E:Qid in S':Set{Qid}and-then S:Set{Qid}subset S':Set{Qid} .
+  eq (E:Rule, S:Set{Rule})subset S':Set{Rule}
+    = E:Rule in S':Set{Rule}and-then S:Set{Rule}subset S':Set{Rule} .
+  eq A:Bool xor A:Bool
+    = false .
+  eq false xor A:Bool
+    = A:Bool .
+  eq configToStatus(config:Configuration
+< coordinator:Qid : V#2:Coordinator |
+  time : V#4:Nat,
+  rules : V#3:Set{Rule},
+  contractState : contractState:ContractState,
+  none,
+  V#5:AttributeSet >)
+    = contractStateToStatus contractState:ContractState .
+  eq contractStateToStatus Fulfilled
+    = (Fulfilled).ContractStatus .
+  eq contractStateToStatus Active(activeRule:Rule, activeRules:Set{Rule})
+    = Active .
+  eq contractStateToStatus Breached actorNames:Set{Qid}
+    = Breached .
+  eq delete(E:ActionEvent,(E:ActionEvent, S:Set{ActionEvent}))
+    = delete(E:ActionEvent,S:Set{ActionEvent}) .
+  eq delete(E:Qid,(E:Qid, S:Set{Qid}))
+    = delete(E:Qid,S:Set{Qid}) .
+  eq delete(E:Rule,(E:Rule, S:Set{Rule}))
+    = delete(E:Rule,S:Set{Rule}) .
+  eq deltaAction rules:Set{Rule}actionEvent:ActionEvent Fulfilled
+    = (Fulfilled).ContractState .
+  eq deltaAction rules:Set{Rule}actionEvent:ActionEvent Breached
+    actorNames:Set{Qid}
+    = Breached actorNames:Set{Qid} .
+  eq deltaAction rules:Set{Rule}actorName:Qid does actionName:Qid Active(RULE
+    ruleName:Qid PARTY actorName:Qid SHANT actionName:Qid WITHIN time:Nat DAY
+    HENCE hence:Set{Qid}LEST lest:Set{Qid}, activeRules:Set{Rule})
+    = if lest:Set{Qid}==(empty).Set{Qid}then Breached actorName:Qid else
+    Active(getRulesWithNames rules:Set{Rule}lest:Set{Qid})fi ^ deltaAction
+    rules:Set{Rule}actorName:Qid does actionName:Qid Active activeRules:Set{
+    Rule} .
+  eq deltaTick rules:Set{Rule}Fulfilled
+    = (Fulfilled).ContractState .
+  eq deltaTick rules:Set{Rule}Active(RULE ruleName:Qid PARTY actorName:Qid
+    SHANT actionName:Qid WITHIN 0 DAY HENCE hence:Set{Qid}LEST lest:Set{Qid},
+    activeRules:Set{Rule})
+    = Active(getRulesWithNames rules:Set{Rule}hence:Set{Qid})^ deltaTick
+    rules:Set{Rule}Active activeRules:Set{Rule} .
+  eq deltaTick rules:Set{Rule}Active(RULE ruleName:Qid PARTY actorName:Qid
+    deontic:Deontic actionName:Qid WITHIN(s time:Nat)DAY HENCE hence:Set{
+    Qid}LEST lest:Set{Qid}, activeRules:Set{Rule})
+    = Active(RULE ruleName:Qid PARTY actorName:Qid deontic:Deontic
+    actionName:Qid WITHIN time:Nat DAY HENCE hence:Set{Qid}LEST lest:Set{Qid})^
+    deltaTick rules:Set{Rule}Active activeRules:Set{Rule} .
+  eq deltaTick rules:Set{Rule}Breached actorName:Qid
+    = Breached actorName:Qid .
+  eq getAction((actorName:Qid does actionName:Qid)config:Configuration)
+    = actorName:Qid does actionName:Qid .
+  eq getAllActions empty
+    = (empty).Set{ActionEvent} .
+  eq getAllActions(RULE ruleName:Qid PARTY actorName:Qid deontic:Deontic
+    actionName:Qid deadline:Deadline HENCE hence:Set{Qid}LEST lest:Set{Qid},
+    rules:Set{Rule})
+    = actorName:Qid does actionName:Qid, getAllActions rules:Set{Rule} .
+  eq getClass(
+< O:Oid : C:Cid |
+  A:AttributeSet >)
+    = C:Cid .
+  eq getRulesWithNames rules:Set{Rule}empty
+    = (empty).Set{Rule} .
+  eq getRulesWithNames(RULE ruleName:Qid PARTY actorName:Qid deontic:Deontic
+    actionName:Qid deadline:Deadline HENCE hence:Set{Qid}LEST lest:Set{Qid},
+    rules:Set{Rule})(ruleName:Qid, ruleNames:Set{Qid})
+    = RULE ruleName:Qid PARTY actorName:Qid deontic:Deontic actionName:Qid
+    deadline:Deadline HENCE hence:Set{Qid}LEST lest:Set{Qid}, getRulesWithNames
+    rules:Set{Rule}ruleNames:Set{Qid} .
+  eq initAux empty config:Configuration
+    = tau config:Configuration .
+  eq initAux(RULE ruleName:Qid PARTY actorName:Qid deontic:Deontic
+    actionName:Qid deadline:Deadline HENCE hence:Set{Qid}LEST lest:Set{Qid},
+    rules:Set{Rule})config:Configuration
+    = initAux rules:Set{Rule}config:Configuration if config:Configuration
+    containsActor actorName:Qid then none else
+< actorName:Qid : Actor |
+  none > fi .
+  eq init rules:Set{Rule}
+    = initAux rules:Set{Rule}
+< 'coordinator : Coordinator |
+  rules : rules:Set{Rule},
+  time : 0,
+  contractState : Active(getRulesWithNames rules:Set{Rule}'START)> .
+  eq insert(E:ActionEvent,S:Set{ActionEvent})
+    = E:ActionEvent, S:Set{ActionEvent} .
+  eq insert(E:Qid,S:Set{Qid})
+    = E:Qid, S:Set{Qid} .
+  eq insert(E:Rule,S:Set{Rule})
+    = E:Rule, S:Set{Rule} .
+  eq intersection(S:Set{ActionEvent},N:NeSet{ActionEvent})
+    = $intersect(S:Set{ActionEvent},N:NeSet{ActionEvent},(empty).Set{
+    ActionEvent}) .
+  eq intersection(S:Set{ActionEvent},(empty).Set{ActionEvent})
+    = (empty).Set{ActionEvent} .
+  eq intersection(S:Set{Qid},N:NeSet{Qid})
+    = $intersect(S:Set{Qid},N:NeSet{Qid},(empty).Set{Qid}) .
+  eq intersection(S:Set{Qid},(empty).Set{Qid})
+    = (empty).Set{Qid} .
+  eq intersection(S:Set{Rule},N:NeSet{Rule})
+    = $intersect(S:Set{Rule},N:NeSet{Rule},(empty).Set{Rule}) .
+  eq intersection(S:Set{Rule},(empty).Set{Rule})
+    = (empty).Set{Rule} .
+  eq not A:Bool
+    = true xor A:Bool .
+  eq pretty(config:Configuration event:Event
+< coordinator:Qid : V#6:Coordinator |
+  time : V#8:Nat,
+  rules : V#7:Set{Rule},
+  contractState : contractState:ContractState,
+  none,
+  V#9:AttributeSet >)
+    = config:Configuration
+< coordinator:Qid : PreCoordinator |
+  contractState : contractState:ContractState > .
+  eq union(S:Set{ActionEvent},S':Set{ActionEvent})
+    = S:Set{ActionEvent}, S':Set{ActionEvent} .
+  eq union(S:Set{Qid},S':Set{Qid})
+    = S:Set{Qid}, S':Set{Qid} .
+  eq union(S:Set{Rule},S':Set{Rule})
+    = S:Set{Rule}, S':Set{Rule} .
+  eq | S:Set{ActionEvent}|
+    = $card(S:Set{ActionEvent},0) .
+  eq | S:Set{Qid}|
+    = $card(S:Set{Qid},0) .
+  eq | S:Set{Rule}|
+    = $card(S:Set{Rule},0) .
+  ceq deltaAction rules:Set{Rule}actorName:Qid does actionName:Qid Active(RULE
+    ruleName:Qid PARTY actorName:Qid deontic:Deontic actionName:Qid WITHIN
+    time:Nat DAY HENCE hence:Set{Qid}LEST lest:Set{Qid}, activeRules:Set{Rule})
+    = Active(getRulesWithNames rules:Set{Rule}hence:Set{Qid})^ deltaAction
+    rules:Set{Rule}actorName:Qid does actionName:Qid Active activeRules:Set{
+    Rule}
+    if deontic:Deontic == MUST or deontic:Deontic == MAY = true .
+  ceq deltaTick rules:Set{Rule}Active(RULE ruleName:Qid PARTY actorName:Qid
+    deontic:Deontic actionName:Qid WITHIN 0 DAY HENCE hence:Set{Qid}LEST
+    lest:Set{Qid}, activeRules:Set{Rule})
+    = if deontic:Deontic == MAY or lest:Set{Qid}=/=(empty).Set{Qid}then Active(
+    getRulesWithNames rules:Set{Rule}lest:Set{Qid})else Breached actorName:Qid
+    fi ^ deltaTick rules:Set{Rule}Active activeRules:Set{Rule}
+    if deontic:Deontic == MUST or deontic:Deontic == MAY = true .
+  eq $card((E:ActionEvent, S:Set{ActionEvent}),C:Nat)
+    = $card(S:Set{ActionEvent},C:Nat + 1) [owise] .
+  eq $card((E:Qid, S:Set{Qid}),C:Nat)
+    = $card(S:Set{Qid},C:Nat + 1) [owise] .
+  eq $card((E:Rule, S:Set{Rule}),C:Nat)
+    = $card(S:Set{Rule},C:Nat + 1) [owise] .
+  eq config:Configuration containsActor actorName:Qid
+    = false [owise] .
+  eq activeRules:Set{Rule}containsRuleWithEvent actionEvent:ActionEvent
+    = false [owise] .
+  eq E:ActionEvent in S:Set{ActionEvent}
+    = false [owise] .
+  eq E:Qid in S:Set{Qid}
+    = false [owise] .
+  eq E:Rule in S:Set{Rule}
+    = false [owise] .
+  eq delete(E:ActionEvent,S:Set{ActionEvent})
+    = S:Set{ActionEvent} [owise] .
+  eq delete(E:Qid,S:Set{Qid})
+    = S:Set{Qid} [owise] .
+  eq delete(E:Rule,S:Set{Rule})
+    = S:Set{Rule} [owise] .
+  eq deltaAction rules:Set{Rule}actionEvent:ActionEvent Active(activeRule:Rule,
+    activeRules:Set{Rule})
+    = Active activeRule:Rule ^ deltaAction rules:Set{
+    Rule}actionEvent:ActionEvent Active activeRules:Set{Rule} [owise] .
+  eq getRulesWithNames rules:Set{Rule}(ruleName:Qid, ruleNames:Set{Qid})
+    = getRulesWithNames rules:Set{Rule}ruleNames:Set{Qid} [owise] .
+  rl 
+< coordinator:Qid : V#0:Coordinator |
+  contractState : contractState:ContractState,
+  time : time:Nat,
+  rules : rules:Set{Rule},
+  none,
+  V#1:AttributeSet >
+    => 
+< coordinator:Qid : V#0:Coordinator |
+  time : if contractStateToStatus contractState:ContractState == Active then s
+    time:Nat else time:Nat fi,
+  contractState : deltaTick rules:Set{Rule}contractState:ContractState,
+  rules : rules:Set{Rule},
+  V#1:AttributeSet > [label tick] .
+  rl 
+< actorName:Qid : V#2:Actor |
+  none,
+  V#3:AttributeSet >
+< coordinator:Qid : V#4:Coordinator |
+  time : V#5:Nat,
+  contractState : Active(RULE ruleName:Qid PARTY actorName:Qid deontic:Deontic
+    actionName:Qid WITHIN time:Nat DAY HENCE hence:Set{Qid}LEST lest:Set{Qid},
+    activeRules:Set{Rule}),
+  rules : rules:Set{Rule},
+  none,
+  V#6:AttributeSet > event:Event
+    => 
+< actorName:Qid : V#2:Actor |
+  V#3:AttributeSet >
+< coordinator:Qid : V#4:Coordinator |
+  contractState : deltaAction rules:Set{Rule}actorName:Qid does actionName:Qid
+    Active(RULE ruleName:Qid PARTY actorName:Qid deontic:Deontic actionName:Qid
+    WITHIN time:Nat DAY HENCE hence:Set{Qid}LEST lest:Set{Qid},
+    activeRules:Set{Rule}),
+  rules : rules:Set{Rule},
+  time : V#5:Nat,
+  V#6:AttributeSet > actorName:Qid does actionName:Qid [label action] .
+endm

@@ -457,7 +457,11 @@ def race_cond_path_to_graph(mod, race_cond_path):
     pyrs.pmap
   )
 
-  node_term_to_id_map = itemmap(reversed, node_id_to_term_map)
+  node_term_to_id_map = pipe(
+    node_id_to_term_map.items(),
+    map(reversed),
+    pyrs.pmap
+  )
 
   edges = pipe(
     race_cond_path,
@@ -475,8 +479,9 @@ def race_cond_path_to_graph(mod, race_cond_path):
   )
 
   node_map = pipe(
-    node_id_to_term_map,
-    valmap(node_term_to_node(mod), factory=dict),
+    node_id_to_term_map.items(),
+    map(lambda kv: (kv[0], node_term_to_node(mod, kv[1]))),
+    # valmap(node_term_to_node(mod), factory=dict),
     pyrs.pmap
   )
 

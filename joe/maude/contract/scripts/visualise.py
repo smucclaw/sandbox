@@ -219,7 +219,8 @@ def rewrite_graph_to_graph(mod, rewrite_graph):
         (edge[0], edge[1],
          to_rule_label(mod, rewrite_graph, edge[1], edge[2].getLabel()))),
     # [... (n, succ, rule_label), ...]
-    map(lambda edge: Edge(src_id = edge[0], dest_id = edge[1], rule_label = edge[2])),
+    map(lambda edge:
+        Edge(src_id = edge[0], dest_id = edge[1], rule_label = edge[2])),
     # [... Edge ...]
     pyrs.pset,
     # {... Edge ...}
@@ -230,24 +231,59 @@ def rewrite_graph_to_graph(mod, rewrite_graph):
 
 @curry
 def graph_to_nx_graph(graph):
-  nx_graph = nx.DiGraph()
-  for node_id, node in graph.node_map.items():
-    nx_graph.add_node(
-      node_id,
-      # Do we want title or label?
-      # Title can contain html and only shows when hovering over the node.
-      # Label is visible all the time.
-      title = node.term_str,
-      contract_state = node.contract_status,
-      color = node_to_colour(node)
-    )
-  for edge in graph.edges:
-    nx_graph.add_edge(
-      edge.src_id, edge.dest_id,
-      label = edge.rule_label,
-      next_state = edge_to_next_state(graph, edge),
-      color = edge_to_colour(graph, edge)
-    )
+  node_to_nx_metadata = lambda node: {
+    'title': node.term_str,
+    'contract_state': node.contract_status,
+    'color': node_to_colour(node)
+  }
+
+  nodes = pipe(
+    graph.node_map,
+    # [... {node_id: Node} ...]
+    valmap(node_to_nx_metadata),
+    # [... {node_id: node_metadata} ...]
+    lambda node_map: node_map.items()
+    # [... (node_id, node_metadata) ...]
+  )
+
+  edge_to_nx_metadata = lambda edge: {
+    'label': edge.rule_label,
+    'next_state': edge_to_next_state(graph, edge),
+    'color': edge_to_colour(graph, edge)
+  }
+
+  edges = pipe(
+    graph.edges,
+    # [... Edge ...]
+    map(lambda edge:
+        (edge.src_id, edge.dest_id, edge_to_nx_metadata(edge))),
+    # [... (src_id, dest_id, edge_metadata) ...]
+  )
+
+  nx_graph = pipe(
+    nx.DiGraph(),
+    do(lambda nx_graph: nx_graph.add_nodes_from(nodes)),
+    do(lambda nx_graph: nx_graph.add_edges_from(edges))
+  )
+
+  # nx_graph = nx.DiGraph()
+  # for node_id, node in graph.node_map.items():
+  #   nx_graph.add_node(
+  #     node_id,
+  #     # Do we want title or label?
+  #     # Title can contain html and only shows when hovering over the node.
+  #     # Label is visible all the time.
+  #     title = node.term_str,
+  #     contract_state = node.contract_status,
+  #     color = node_to_colour(node)
+  #   )
+  # for edge in graph.edges:
+  #   nx_graph.add_edge(
+  #     edge.src_id, edge.dest_id,
+  #     label = edge.rule_label,
+  #     next_state = edge_to_next_state(graph, edge),
+  #     color = edge_to_colour(graph, edge)
+  #   )
 
   # Quotient states by same title, to merge states that have different global time.
   nx_node_titles = nx_graph.nodes(data = 'title')
@@ -361,8 +397,10 @@ def parse_natural4_file(main_mod, natural4_file):
   natural4_rules = ''
   with open(natural4_file) as f:
     natural4_rules = f.read()
-  natural4_rules = main_mod.parseTerm(natural4_rules)
-  return natural4_rules
+  return pipe(
+    natural4_rules,
+    main_mod.parseTerm
+  )
 
 @curry
 def natural4_rules_to_config(main_mod, natural4_rules):

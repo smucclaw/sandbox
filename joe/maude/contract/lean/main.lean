@@ -852,148 +852,287 @@ mutual
   inductive kModelCheckResult.has_sort: kModelCheckResult → MSort → Prop
     | subsort {t a b} : subsort a b → kModelCheckResult.has_sort t a → kModelCheckResult.has_sort t b
     -- Implicit membership axioms (operator declarations)
+    -- op true : -> Bool .
     | true_decl₀ : kModelCheckResult.has_sort kModelCheckResult.true MSort.Bool
+    -- op true : -> Bool .
     | true_decl₁ : kModelCheckResult.has_sort kModelCheckResult.true MSort.Bool
+    -- op false : -> Bool .
     | false_decl₀ : kModelCheckResult.has_sort kModelCheckResult.false MSort.Bool
+    -- op false : -> Bool .
     | false_decl₁ : kModelCheckResult.has_sort kModelCheckResult.false MSort.Bool
+    -- op _and_ : Bool Bool -> Bool .
     | and_decl₀ {a₀ a₁ : kModelCheckResult} : kModelCheckResult.has_sort a₀ MSort.Bool → kModelCheckResult.has_sort a₁ MSort.Bool → kModelCheckResult.has_sort (kModelCheckResult.and a₀ a₁) MSort.Bool
+    -- op _and_ : Bool Bool -> Bool .
     | and_decl₁ {a₀ a₁ : kModelCheckResult} : kModelCheckResult.has_sort a₀ MSort.Bool → kModelCheckResult.has_sort a₁ MSort.Bool → kModelCheckResult.has_sort (kModelCheckResult.and a₀ a₁) MSort.Bool
+    -- op _or_ : Bool Bool -> Bool .
     | or_decl₀ {a₀ a₁ : kModelCheckResult} : kModelCheckResult.has_sort a₀ MSort.Bool → kModelCheckResult.has_sort a₁ MSort.Bool → kModelCheckResult.has_sort (kModelCheckResult.or a₀ a₁) MSort.Bool
+    -- op _or_ : Bool Bool -> Bool .
     | or_decl₁ {a₀ a₁ : kModelCheckResult} : kModelCheckResult.has_sort a₀ MSort.Bool → kModelCheckResult.has_sort a₁ MSort.Bool → kModelCheckResult.has_sort (kModelCheckResult.or a₀ a₁) MSort.Bool
+    -- op _xor_ : Bool Bool -> Bool .
     | xor_decl₀ {a₀ a₁ : kModelCheckResult} : kModelCheckResult.has_sort a₀ MSort.Bool → kModelCheckResult.has_sort a₁ MSort.Bool → kModelCheckResult.has_sort (kModelCheckResult.xor a₀ a₁) MSort.Bool
+    -- op _xor_ : Bool Bool -> Bool .
     | xor_decl₁ {a₀ a₁ : kModelCheckResult} : kModelCheckResult.has_sort a₀ MSort.Bool → kModelCheckResult.has_sort a₁ MSort.Bool → kModelCheckResult.has_sort (kModelCheckResult.xor a₀ a₁) MSort.Bool
+    -- op not_ : Bool -> Bool .
     | not_decl₀ {a : kModelCheckResult} : kModelCheckResult.has_sort a MSort.Bool → kModelCheckResult.has_sort (kModelCheckResult.not a) MSort.Bool
+    -- op not_ : Bool -> Bool .
     | not_decl₁ {a : kModelCheckResult} : kModelCheckResult.has_sort a MSort.Bool → kModelCheckResult.has_sort (kModelCheckResult.not a) MSort.Bool
+    -- op _implies_ : Bool Bool -> Bool .
     | implies_decl₀ {a₀ a₁ : kModelCheckResult} : kModelCheckResult.has_sort a₀ MSort.Bool → kModelCheckResult.has_sort a₁ MSort.Bool → kModelCheckResult.has_sort (kModelCheckResult.implies a₀ a₁) MSort.Bool
+    -- op _implies_ : Bool Bool -> Bool .
     | implies_decl₁ {a₀ a₁ : kModelCheckResult} : kModelCheckResult.has_sort a₀ MSort.Bool → kModelCheckResult.has_sort a₁ MSort.Bool → kModelCheckResult.has_sort (kModelCheckResult.implies a₀ a₁) MSort.Bool
+    -- op $diff : Set{Qid} Set{Qid} Set{Qid} -> Set{Qid} .
     | «$diff»_decl {a₀ a₁ a₂ : kModelCheckResult} : kModelCheckResult.has_sort a₀ MSort.«Set{Qid}» → kModelCheckResult.has_sort a₁ MSort.«Set{Qid}» → kModelCheckResult.has_sort a₂ MSort.«Set{Qid}» → kModelCheckResult.has_sort (kModelCheckResult.«$diff» a₀ a₁ a₂) MSort.«Set{Qid}»
+    -- op $intersect : Set{Qid} Set{Qid} Set{Qid} -> Set{Qid} .
     | «$intersect»_decl {a₀ a₁ a₂ : kModelCheckResult} : kModelCheckResult.has_sort a₀ MSort.«Set{Qid}» → kModelCheckResult.has_sort a₁ MSort.«Set{Qid}» → kModelCheckResult.has_sort a₂ MSort.«Set{Qid}» → kModelCheckResult.has_sort (kModelCheckResult.«$intersect» a₀ a₁ a₂) MSort.«Set{Qid}»
+    -- op NOTHING : -> Names .
     | NOTHING_decl : kModelCheckResult.has_sort kModelCheckResult.NOTHING MSort.Names
+    -- op _containsActor_ : Configuration Qid -> Bool .
     | containsActor_decl {a₀ : kEventTrace} {a₁ : kModelCheckResult} : kEventTrace.has_sort a₀ MSort.Configuration → kModelCheckResult.has_sort a₁ MSort.Qid → kModelCheckResult.has_sort (kModelCheckResult.containsActor a₀ a₁) MSort.Bool
+    -- op _containsRuleWithEvent_ : Set{Rule} ActionEvent -> Bool .
     | containsRuleWithEvent_decl {a₀ : k«Set{Rule}»} {a₁ : kEventTrace} : k«Set{Rule}».has_sort a₀ MSort.«Set{Rule}» → kEventTrace.has_sort a₁ MSort.ActionEvent → kModelCheckResult.has_sort (kModelCheckResult.containsRuleWithEvent a₀ a₁) MSort.Bool
+    -- op _in_ : ActionEvent Set{ActionEvent} -> Bool .
     | «in»₀_decl {a₀ a₁ : kEventTrace} : kEventTrace.has_sort a₀ MSort.ActionEvent → kEventTrace.has_sort a₁ MSort.«Set{ActionEvent}» → kModelCheckResult.has_sort (kModelCheckResult.«in»₀ a₀ a₁) MSort.Bool
+    -- op _in_ : Qid Set{Qid} -> Bool .
     | «in»₁_decl {a₀ a₁ : kModelCheckResult} : kModelCheckResult.has_sort a₀ MSort.Qid → kModelCheckResult.has_sort a₁ MSort.«Set{Qid}» → kModelCheckResult.has_sort (kModelCheckResult.«in»₁ a₀ a₁) MSort.Bool
+    -- op _in_ : Rule Set{Rule} -> Bool .
     | «in»₂_decl {a₀ a₁ : k«Set{Rule}»} : k«Set{Rule}».has_sort a₀ MSort.Rule → k«Set{Rule}».has_sort a₁ MSort.«Set{Rule}» → kModelCheckResult.has_sort (kModelCheckResult.«in»₂ a₀ a₁) MSort.Bool
+    -- op _psubset_ : Set{ActionEvent} Set{ActionEvent} -> Bool .
     | psubset₀_decl {a₀ a₁ : kEventTrace} : kEventTrace.has_sort a₀ MSort.«Set{ActionEvent}» → kEventTrace.has_sort a₁ MSort.«Set{ActionEvent}» → kModelCheckResult.has_sort (kModelCheckResult.psubset₀ a₀ a₁) MSort.Bool
+    -- op _psubset_ : Set{Qid} Set{Qid} -> Bool .
     | psubset₁_decl {a₀ a₁ : kModelCheckResult} : kModelCheckResult.has_sort a₀ MSort.«Set{Qid}» → kModelCheckResult.has_sort a₁ MSort.«Set{Qid}» → kModelCheckResult.has_sort (kModelCheckResult.psubset₁ a₀ a₁) MSort.Bool
+    -- op _psubset_ : Set{Rule} Set{Rule} -> Bool .
     | psubset₂_decl {a₀ a₁ : k«Set{Rule}»} : k«Set{Rule}».has_sort a₀ MSort.«Set{Rule}» → k«Set{Rule}».has_sort a₁ MSort.«Set{Rule}» → kModelCheckResult.has_sort (kModelCheckResult.psubset₂ a₀ a₁) MSort.Bool
+    -- op _subset_ : Set{ActionEvent} Set{ActionEvent} -> Bool .
     | subset₀_decl {a₀ a₁ : kEventTrace} : kEventTrace.has_sort a₀ MSort.«Set{ActionEvent}» → kEventTrace.has_sort a₁ MSort.«Set{ActionEvent}» → kModelCheckResult.has_sort (kModelCheckResult.subset₀ a₀ a₁) MSort.Bool
+    -- op _subset_ : Set{Qid} Set{Qid} -> Bool .
     | subset₁_decl {a₀ a₁ : kModelCheckResult} : kModelCheckResult.has_sort a₀ MSort.«Set{Qid}» → kModelCheckResult.has_sort a₁ MSort.«Set{Qid}» → kModelCheckResult.has_sort (kModelCheckResult.subset₁ a₀ a₁) MSort.Bool
+    -- op _subset_ : Set{Rule} Set{Rule} -> Bool .
     | subset₂_decl {a₀ a₁ : k«Set{Rule}»} : k«Set{Rule}».has_sort a₀ MSort.«Set{Rule}» → k«Set{Rule}».has_sort a₁ MSort.«Set{Rule}» → kModelCheckResult.has_sort (kModelCheckResult.subset₂ a₀ a₁) MSort.Bool
+    -- op deadlock : -> RuleName .
     | deadlock_decl : kModelCheckResult.has_sort kModelCheckResult.deadlock MSort.RuleName
+    -- op delete : Qid Set{Qid} -> Set{Qid} .
     | delete_decl {a₀ a₁ : kModelCheckResult} : kModelCheckResult.has_sort a₀ MSort.Qid → kModelCheckResult.has_sort a₁ MSort.«Set{Qid}» → kModelCheckResult.has_sort (kModelCheckResult.delete a₀ a₁) MSort.«Set{Qid}»
+    -- op insert : Qid Set{Qid} -> Set{Qid} .
     | insert_decl {a₀ a₁ : kModelCheckResult} : kModelCheckResult.has_sort a₀ MSort.Qid → kModelCheckResult.has_sort a₁ MSort.«Set{Qid}» → kModelCheckResult.has_sort (kModelCheckResult.insert a₀ a₁) MSort.«Set{Qid}»
+    -- op intersection : Set{Qid} Set{Qid} -> Set{Qid} .
     | intersection_decl {a₀ a₁ : kModelCheckResult} : kModelCheckResult.has_sort a₀ MSort.«Set{Qid}» → kModelCheckResult.has_sort a₁ MSort.«Set{Qid}» → kModelCheckResult.has_sort (kModelCheckResult.intersection a₀ a₁) MSort.«Set{Qid}»
+    -- op union : NeSet{Qid} Set{Qid} -> NeSet{Qid} .
     | union_decl₀ {a₀ a₁ : kModelCheckResult} : kModelCheckResult.has_sort a₀ MSort.«NeSet{Qid}» → kModelCheckResult.has_sort a₁ MSort.«Set{Qid}» → kModelCheckResult.has_sort (kModelCheckResult.union a₀ a₁) MSort.«NeSet{Qid}»
+    -- op union : Set{Qid} NeSet{Qid} -> NeSet{Qid} .
     | union_decl₁ {a₀ a₁ : kModelCheckResult} : kModelCheckResult.has_sort a₀ MSort.«Set{Qid}» → kModelCheckResult.has_sort a₁ MSort.«NeSet{Qid}» → kModelCheckResult.has_sort (kModelCheckResult.union a₀ a₁) MSort.«NeSet{Qid}»
+    -- op union : Set{Qid} Set{Qid} -> Set{Qid} .
     | union_decl₂ {a₀ a₁ : kModelCheckResult} : kModelCheckResult.has_sort a₀ MSort.«Set{Qid}» → kModelCheckResult.has_sort a₁ MSort.«Set{Qid}» → kModelCheckResult.has_sort (kModelCheckResult.union a₀ a₁) MSort.«Set{Qid}»
+    -- op unlabeled : -> RuleName .
     | unlabeled_decl : kModelCheckResult.has_sort kModelCheckResult.unlabeled MSort.RuleName
+    -- op <Qids> : -> Qid .
     | ltQidsgt_decl : kModelCheckResult.has_sort kModelCheckResult.ltQidsgt MSort.Qid
+    -- op DO_ : Qid -> Action .
     | DO_decl {a : kModelCheckResult} : kModelCheckResult.has_sort a MSort.Qid → kModelCheckResult.has_sort (kModelCheckResult.DO a) MSort.Action
+    -- op _<=_ : Nat Nat -> Bool .
     | lteq₀_decl {a₀ a₁ : kFindResult} : kFindResult.has_sort a₀ MSort.Nat → kFindResult.has_sort a₁ MSort.Nat → kModelCheckResult.has_sort (kModelCheckResult.lteq₀ a₀ a₁) MSort.Bool
+    -- op _<=_ : String String -> Bool .
     | lteq₁_decl {a₀ a₁ : kString} : kString.has_sort a₀ MSort.String → kString.has_sort a₁ MSort.String → kModelCheckResult.has_sort (kModelCheckResult.lteq₁ a₀ a₁) MSort.Bool
+    -- op _<_ : Nat Nat -> Bool .
     | lt₀_decl {a₀ a₁ : kFindResult} : kFindResult.has_sort a₀ MSort.Nat → kFindResult.has_sort a₁ MSort.Nat → kModelCheckResult.has_sort (kModelCheckResult.lt₀ a₀ a₁) MSort.Bool
+    -- op _<_ : String String -> Bool .
     | lt₁_decl {a₀ a₁ : kString} : kString.has_sort a₀ MSort.String → kString.has_sort a₁ MSort.String → kModelCheckResult.has_sort (kModelCheckResult.lt₁ a₀ a₁) MSort.Bool
+    -- op _>=_ : Nat Nat -> Bool .
     | gteq₀_decl {a₀ a₁ : kFindResult} : kFindResult.has_sort a₀ MSort.Nat → kFindResult.has_sort a₁ MSort.Nat → kModelCheckResult.has_sort (kModelCheckResult.gteq₀ a₀ a₁) MSort.Bool
+    -- op _>=_ : String String -> Bool .
     | gteq₁_decl {a₀ a₁ : kString} : kString.has_sort a₀ MSort.String → kString.has_sort a₁ MSort.String → kModelCheckResult.has_sort (kModelCheckResult.gteq₁ a₀ a₁) MSort.Bool
+    -- op _>_ : Nat Nat -> Bool .
     | gt₀_decl {a₀ a₁ : kFindResult} : kFindResult.has_sort a₀ MSort.Nat → kFindResult.has_sort a₁ MSort.Nat → kModelCheckResult.has_sort (kModelCheckResult.gt₀ a₀ a₁) MSort.Bool
+    -- op _>_ : String String -> Bool .
     | gt₁_decl {a₀ a₁ : kString} : kString.has_sort a₀ MSort.String → kString.has_sort a₁ MSort.String → kModelCheckResult.has_sort (kModelCheckResult.gt₁ a₀ a₁) MSort.Bool
+    -- op _AND_ : Names Names -> Names .
     | AND_decl {a₀ a₁ : kModelCheckResult} : kModelCheckResult.has_sort a₀ MSort.Names → kModelCheckResult.has_sort a₁ MSort.Names → kModelCheckResult.has_sort (kModelCheckResult.AND a₀ a₁) MSort.Names
+    -- op _\_ : Set{Qid} Set{Qid} -> Set{Qid} .
     | bslash_decl {a₀ a₁ : kModelCheckResult} : kModelCheckResult.has_sort a₀ MSort.«Set{Qid}» → kModelCheckResult.has_sort a₁ MSort.«Set{Qid}» → kModelCheckResult.has_sort (kModelCheckResult.bslash a₀ a₁) MSort.«Set{Qid}»
+    -- op _`,_ : NeSet{Qid} Set{Qid} -> NeSet{Qid} .
     | «`,»_decl₀ {a₀ a₁ : kModelCheckResult} : kModelCheckResult.has_sort a₀ MSort.«NeSet{Qid}» → kModelCheckResult.has_sort a₁ MSort.«Set{Qid}» → kModelCheckResult.has_sort (kModelCheckResult.«`,» a₀ a₁) MSort.«NeSet{Qid}»
+    -- op _`,_ : Set{Qid} Set{Qid} -> Set{Qid} .
     | «`,»_decl₁ {a₀ a₁ : kModelCheckResult} : kModelCheckResult.has_sort a₀ MSort.«Set{Qid}» → kModelCheckResult.has_sort a₁ MSort.«Set{Qid}» → kModelCheckResult.has_sort (kModelCheckResult.«`,» a₀ a₁) MSort.«Set{Qid}»
+    -- op _`,_ : Set{Qid} NeSet{Qid} -> NeSet{Qid} .
     | «`,»_decl₂ {a₀ a₁ : kModelCheckResult} : kModelCheckResult.has_sort a₀ MSort.«Set{Qid}» → kModelCheckResult.has_sort a₁ MSort.«NeSet{Qid}» → kModelCheckResult.has_sort (kModelCheckResult.«`,» a₀ a₁) MSort.«NeSet{Qid}»
+    -- op _and-then_ : Bool Bool -> Bool .
     | andsubthen_decl {a₀ a₁ : kModelCheckResult} : kModelCheckResult.has_sort a₀ MSort.Bool → kModelCheckResult.has_sort a₁ MSort.Bool → kModelCheckResult.has_sort (kModelCheckResult.andsubthen a₀ a₁) MSort.Bool
+    -- op _divides_ : NzNat Nat -> Bool .
     | divides_decl {a₀ a₁ : kFindResult} : kFindResult.has_sort a₀ MSort.NzNat → kFindResult.has_sort a₁ MSort.Nat → kModelCheckResult.has_sort (kModelCheckResult.divides a₀ a₁) MSort.Bool
+    -- op _or-else_ : Bool Bool -> Bool .
     | orsubelse_decl {a₀ a₁ : kModelCheckResult} : kModelCheckResult.has_sort a₀ MSort.Bool → kModelCheckResult.has_sort a₁ MSort.Bool → kModelCheckResult.has_sort (kModelCheckResult.orsubelse a₀ a₁) MSort.Bool
+    -- op _|=_ : State Prop -> Bool .
     | bareq_decl {a₀ a₁ : kEventTrace} : kEventTrace.has_sort a₀ MSort.State → kEventTrace.has_sort a₁ MSort.Prop → kModelCheckResult.has_sort (kModelCheckResult.bareq a₀ a₁) MSort.Bool
+    -- op counterexample : TransitionList TransitionList -> ModelCheckResult .
     | counterexample_decl {a₀ a₁ : kTransitionList} : kTransitionList.has_sort a₀ MSort.TransitionList → kTransitionList.has_sort a₁ MSort.TransitionList → kModelCheckResult.has_sort (kModelCheckResult.counterexample a₀ a₁) MSort.ModelCheckResult
+    -- op empty : -> Set{Qid} .
     | empty_decl : kModelCheckResult.has_sort kModelCheckResult.empty MSort.«Set{Qid}»
+    -- op if_then_else_fi : Bool ModelCheckResult ModelCheckResult -> ModelCheckResult .
     | ifthenelsefi_decl₁ {a₀ a₁ a₂ : kModelCheckResult} : kModelCheckResult.has_sort a₀ MSort.Bool → kModelCheckResult.has_sort a₁ MSort.ModelCheckResult → kModelCheckResult.has_sort a₂ MSort.ModelCheckResult → kModelCheckResult.has_sort (kModelCheckResult.ifthenelsefi a₀ a₁ a₂) MSort.ModelCheckResult
+    -- op if_then_else_fi : Bool Action Action -> Action .
     | ifthenelsefi_decl₂ {a₀ a₁ a₂ : kModelCheckResult} : kModelCheckResult.has_sort a₀ MSort.Bool → kModelCheckResult.has_sort a₁ MSort.Action → kModelCheckResult.has_sort a₂ MSort.Action → kModelCheckResult.has_sort (kModelCheckResult.ifthenelsefi a₀ a₁ a₂) MSort.Action
+    -- op if_then_else_fi : Bool Set{Qid} Set{Qid} -> Set{Qid} .
     | ifthenelsefi_decl₃ {a₀ a₁ a₂ : kModelCheckResult} : kModelCheckResult.has_sort a₀ MSort.Bool → kModelCheckResult.has_sort a₁ MSort.«Set{Qid}» → kModelCheckResult.has_sort a₂ MSort.«Set{Qid}» → kModelCheckResult.has_sort (kModelCheckResult.ifthenelsefi a₀ a₁ a₂) MSort.«Set{Qid}»
+    -- op if_then_else_fi : Bool Id Id -> Id .
     | ifthenelsefi_decl₄ {a₀ a₁ a₂ : kModelCheckResult} : kModelCheckResult.has_sort a₀ MSort.Bool → kModelCheckResult.has_sort a₁ MSort.Id → kModelCheckResult.has_sort a₂ MSort.Id → kModelCheckResult.has_sort (kModelCheckResult.ifthenelsefi a₀ a₁ a₂) MSort.Id
+    -- op if_then_else_fi : Bool RuleName RuleName -> RuleName .
     | ifthenelsefi_decl₅ {a₀ a₁ a₂ : kModelCheckResult} : kModelCheckResult.has_sort a₀ MSort.Bool → kModelCheckResult.has_sort a₁ MSort.RuleName → kModelCheckResult.has_sort a₂ MSort.RuleName → kModelCheckResult.has_sort (kModelCheckResult.ifthenelsefi a₀ a₁ a₂) MSort.RuleName
+    -- op if_then_else_fi : Bool Situation Situation -> Situation .
     | ifthenelsefi_decl₆ {a₀ a₁ a₂ : kModelCheckResult} : kModelCheckResult.has_sort a₀ MSort.Bool → kModelCheckResult.has_sort a₁ MSort.Situation → kModelCheckResult.has_sort a₂ MSort.Situation → kModelCheckResult.has_sort (kModelCheckResult.ifthenelsefi a₀ a₁ a₂) MSort.Situation
+    -- op if_then_else_fi : Bool Names Names -> Names .
     | ifthenelsefi_decl₇ {a₀ a₁ a₂ : kModelCheckResult} : kModelCheckResult.has_sort a₀ MSort.Bool → kModelCheckResult.has_sort a₁ MSort.Names → kModelCheckResult.has_sort a₂ MSort.Names → kModelCheckResult.has_sort (kModelCheckResult.ifthenelsefi a₀ a₁ a₂) MSort.Names
+    -- op if_then_else_fi : Bool NeSet{Qid} NeSet{Qid} -> NeSet{Qid} .
     | ifthenelsefi_decl₈ {a₀ a₁ a₂ : kModelCheckResult} : kModelCheckResult.has_sort a₀ MSort.Bool → kModelCheckResult.has_sort a₁ MSort.«NeSet{Qid}» → kModelCheckResult.has_sort a₂ MSort.«NeSet{Qid}» → kModelCheckResult.has_sort (kModelCheckResult.ifthenelsefi a₀ a₁ a₂) MSort.«NeSet{Qid}»
+    -- op if_then_else_fi : Bool Oid Oid -> Oid .
     | ifthenelsefi_decl₉ {a₀ a₁ a₂ : kModelCheckResult} : kModelCheckResult.has_sort a₀ MSort.Bool → kModelCheckResult.has_sort a₁ MSort.Oid → kModelCheckResult.has_sort a₂ MSort.Oid → kModelCheckResult.has_sort (kModelCheckResult.ifthenelsefi a₀ a₁ a₂) MSort.Oid
+    -- op if_then_else_fi : Bool Bool Bool -> Bool .
     | ifthenelsefi_decl₁₀ {a₀ a₁ a₂ : kModelCheckResult} : kModelCheckResult.has_sort a₀ MSort.Bool → kModelCheckResult.has_sort a₁ MSort.Bool → kModelCheckResult.has_sort a₂ MSort.Bool → kModelCheckResult.has_sort (kModelCheckResult.ifthenelsefi a₀ a₁ a₂) MSort.Bool
+    -- op if_then_else_fi : Bool Qid Qid -> Qid .
     | ifthenelsefi_decl₁₁ {a₀ a₁ a₂ : kModelCheckResult} : kModelCheckResult.has_sort a₀ MSort.Bool → kModelCheckResult.has_sort a₁ MSort.Qid → kModelCheckResult.has_sort a₂ MSort.Qid → kModelCheckResult.has_sort (kModelCheckResult.ifthenelsefi a₀ a₁ a₂) MSort.Qid
+    -- op _=/=_ : [EventTrace,State,Set{ActionEvent},Formula] [EventTrace,State,Set{ActionEvent},Formula] -> Bool .
     | eqslasheq₀_decl {a₀ a₁ : kEventTrace} : kModelCheckResult.has_sort (kModelCheckResult.eqslasheq₀ a₀ a₁) MSort.Bool
+    -- op _=/=_ : [ModelCheckResult,Action,Set{Qid},Id,RuleName,Situation] [ModelCheckResult,Action,Set{Qid},Id,RuleName,Situation] -> Bool .
     | eqslasheq₁_decl {a₀ a₁ : kModelCheckResult} : kModelCheckResult.has_sort (kModelCheckResult.eqslasheq₁ a₀ a₁) MSort.Bool
+    -- op _=/=_ : [Set{Rule}] [Set{Rule}] -> Bool .
     | eqslasheq₂_decl {a₀ a₁ : k«Set{Rule}»} : kModelCheckResult.has_sort (kModelCheckResult.eqslasheq₂ a₀ a₁) MSort.Bool
+    -- op _==_ : [ModelCheckResult,Action,Set{Qid},Id,RuleName,Situation] [ModelCheckResult,Action,Set{Qid},Id,RuleName,Situation] -> Bool .
     | eqeq₀_decl {a₀ a₁ : kModelCheckResult} : kModelCheckResult.has_sort (kModelCheckResult.eqeq₀ a₀ a₁) MSort.Bool
+    -- op _==_ : [Deontic] [Deontic] -> Bool .
     | eqeq₁_decl {a₀ a₁ : kDeontic} : kModelCheckResult.has_sort (kModelCheckResult.eqeq₁ a₀ a₁) MSort.Bool
+    -- op _==_ : [ContractStatus] [ContractStatus] -> Bool .
     | eqeq₂_decl {a₀ a₁ : kContractStatus} : kModelCheckResult.has_sort (kModelCheckResult.eqeq₂ a₀ a₁) MSort.Bool
 
   inductive kEventTrace.has_sort: kEventTrace → MSort → Prop
     | subsort {t a b} : subsort a b → kEventTrace.has_sort t a → kEventTrace.has_sort t b
     -- Implicit membership axioms (operator declarations)
+    -- op $diff : Set{ActionEvent} Set{ActionEvent} Set{ActionEvent} -> Set{ActionEvent} .
     | «$diff»_decl {a₀ a₁ a₂ : kEventTrace} : kEventTrace.has_sort a₀ MSort.«Set{ActionEvent}» → kEventTrace.has_sort a₁ MSort.«Set{ActionEvent}» → kEventTrace.has_sort a₂ MSort.«Set{ActionEvent}» → kEventTrace.has_sort (kEventTrace.«$diff» a₀ a₁ a₂) MSort.«Set{ActionEvent}»
+    -- op $intersect : Set{ActionEvent} Set{ActionEvent} Set{ActionEvent} -> Set{ActionEvent} .
     | «$intersect»_decl {a₀ a₁ a₂ : kEventTrace} : kEventTrace.has_sort a₀ MSort.«Set{ActionEvent}» → kEventTrace.has_sort a₁ MSort.«Set{ActionEvent}» → kEventTrace.has_sort a₂ MSort.«Set{ActionEvent}» → kEventTrace.has_sort (kEventTrace.«$intersect» a₀ a₁ a₂) MSort.«Set{ActionEvent}»
+    -- op _allowedToDo_ : Qid Qid -> Prop .
     | allowedToDo_decl {a₀ a₁ : kModelCheckResult} : kModelCheckResult.has_sort a₀ MSort.Qid → kModelCheckResult.has_sort a₁ MSort.Qid → kEventTrace.has_sort (kEventTrace.allowedToDo a₀ a₁) MSort.Prop
+    -- op _mayDo_ : Qid Qid -> Prop .
     | mayDo_decl {a₀ a₁ : kModelCheckResult} : kModelCheckResult.has_sort a₀ MSort.Qid → kModelCheckResult.has_sort a₁ MSort.Qid → kEventTrace.has_sort (kEventTrace.mayDo a₀ a₁) MSort.Prop
+    -- op _mustDo_ : Qid Qid -> Prop .
     | mustDo_decl {a₀ a₁ : kModelCheckResult} : kModelCheckResult.has_sort a₀ MSort.Qid → kModelCheckResult.has_sort a₁ MSort.Qid → kEventTrace.has_sort (kEventTrace.mustDo a₀ a₁) MSort.Prop
+    -- op _prohibitedFromDoing_ : Qid Qid -> Prop .
     | prohibitedFromDoing_decl {a₀ a₁ : kModelCheckResult} : kModelCheckResult.has_sort a₀ MSort.Qid → kModelCheckResult.has_sort a₁ MSort.Qid → kEventTrace.has_sort (kEventTrace.prohibitedFromDoing a₀ a₁) MSort.Prop
+    -- op delete : ActionEvent Set{ActionEvent} -> Set{ActionEvent} .
     | delete_decl {a₀ a₁ : kEventTrace} : kEventTrace.has_sort a₀ MSort.ActionEvent → kEventTrace.has_sort a₁ MSort.«Set{ActionEvent}» → kEventTrace.has_sort (kEventTrace.delete a₀ a₁) MSort.«Set{ActionEvent}»
+    -- op getAction_ : Configuration -> ActionEvent .
     | getAction_decl {a : kEventTrace} : kEventTrace.has_sort a MSort.Configuration → kEventTrace.has_sort (kEventTrace.getAction a) MSort.ActionEvent
+    -- op getAllActions_ : Set{Rule} -> Set{ActionEvent} .
     | getAllActions_decl {a : k«Set{Rule}»} : k«Set{Rule}».has_sort a MSort.«Set{Rule}» → kEventTrace.has_sort (kEventTrace.getAllActions a) MSort.«Set{ActionEvent}»
+    -- op initAux__ : Set{Rule} Configuration -> Configuration .
     | initAux_decl {a₀ : k«Set{Rule}»} {a₁ : kEventTrace} : k«Set{Rule}».has_sort a₀ MSort.«Set{Rule}» → kEventTrace.has_sort a₁ MSort.Configuration → kEventTrace.has_sort (kEventTrace.initAux a₀ a₁) MSort.Configuration
+    -- op init_ : Set{Rule} -> Configuration .
     | init_decl {a : k«Set{Rule}»} : k«Set{Rule}».has_sort a MSort.«Set{Rule}» → kEventTrace.has_sort (kEventTrace.init a) MSort.Configuration
+    -- op initialConfig : -> Configuration .
     | initialConfig_decl : kEventTrace.has_sort kEventTrace.initialConfig MSort.Configuration
+    -- op insert : ActionEvent Set{ActionEvent} -> Set{ActionEvent} .
     | insert_decl {a₀ a₁ : kEventTrace} : kEventTrace.has_sort a₀ MSort.ActionEvent → kEventTrace.has_sort a₁ MSort.«Set{ActionEvent}» → kEventTrace.has_sort (kEventTrace.insert a₀ a₁) MSort.«Set{ActionEvent}»
+    -- op intersection : Set{ActionEvent} Set{ActionEvent} -> Set{ActionEvent} .
     | intersection_decl {a₀ a₁ : kEventTrace} : kEventTrace.has_sort a₀ MSort.«Set{ActionEvent}» → kEventTrace.has_sort a₁ MSort.«Set{ActionEvent}» → kEventTrace.has_sort (kEventTrace.intersection a₀ a₁) MSort.«Set{ActionEvent}»
+    -- op pretty_ : Configuration -> Configuration .
     | pretty_decl {a : kEventTrace} : kEventTrace.has_sort a MSort.Configuration → kEventTrace.has_sort (kEventTrace.pretty a) MSort.Configuration
+    -- op union : NeSet{ActionEvent} Set{ActionEvent} -> NeSet{ActionEvent} .
     | union_decl₀ {a₀ a₁ : kEventTrace} : kEventTrace.has_sort a₀ MSort.«NeSet{ActionEvent}» → kEventTrace.has_sort a₁ MSort.«Set{ActionEvent}» → kEventTrace.has_sort (kEventTrace.union a₀ a₁) MSort.«NeSet{ActionEvent}»
+    -- op union : Set{ActionEvent} NeSet{ActionEvent} -> NeSet{ActionEvent} .
     | union_decl₁ {a₀ a₁ : kEventTrace} : kEventTrace.has_sort a₀ MSort.«Set{ActionEvent}» → kEventTrace.has_sort a₁ MSort.«NeSet{ActionEvent}» → kEventTrace.has_sort (kEventTrace.union a₀ a₁) MSort.«NeSet{ActionEvent}»
+    -- op union : Set{ActionEvent} Set{ActionEvent} -> Set{ActionEvent} .
     | union_decl₂ {a₀ a₁ : kEventTrace} : kEventTrace.has_sort a₀ MSort.«Set{ActionEvent}» → kEventTrace.has_sort a₁ MSort.«Set{ActionEvent}» → kEventTrace.has_sort (kEventTrace.union a₀ a₁) MSort.«Set{ActionEvent}»
+    -- op <> : -> Portal .
     | ltgt₀_decl : kEventTrace.has_sort kEventTrace.ltgt₀ MSort.Portal
+    -- op <>_ : Formula -> Formula .
     | ltgt₁_decl {a : kEventTrace} : kEventTrace.has_sort a MSort.Formula → kEventTrace.has_sort (kEventTrace.ltgt₁ a) MSort.Formula
+    -- op <_:_|_> : Oid Cid AttributeSet -> Object .
     | ltcolonbargt_decl {a₀ : kModelCheckResult} {a₁ : kCid} {a₂ : kAttributeSet} : kModelCheckResult.has_sort a₀ MSort.Oid → kCid.has_sort a₁ MSort.Cid → kAttributeSet.has_sort a₂ MSort.AttributeSet → kEventTrace.has_sort (kEventTrace.ltcolonbargt a₀ a₁ a₂) MSort.Object
+    -- op <_:_|`> : Oid Cid -> Object .
     | «ltcolonbar`gt»_decl {a₀ : kModelCheckResult} {a₁ : kCid} : kModelCheckResult.has_sort a₀ MSort.Oid → kCid.has_sort a₁ MSort.Cid → kEventTrace.has_sort (kEventTrace.«ltcolonbar`gt» a₀ a₁) MSort.Object
+    -- op False : -> Formula .
     | False_decl : kEventTrace.has_sort kEventTrace.False MSort.Formula
+    -- op O_ : Formula -> Formula .
     | O_decl {a : kEventTrace} : kEventTrace.has_sort a MSort.Formula → kEventTrace.has_sort (kEventTrace.O a) MSort.Formula
+    -- op True : -> Formula .
     | True_decl : kEventTrace.has_sort kEventTrace.True MSort.Formula
+    -- op _++_ : EventTrace EventTrace -> EventTrace .
     | sumsum_decl {a₀ a₁ : kEventTrace} : kEventTrace.has_sort a₀ MSort.EventTrace → kEventTrace.has_sort a₁ MSort.EventTrace → kEventTrace.has_sort (kEventTrace.sumsum a₀ a₁) MSort.EventTrace
+    -- op _->_ : Formula Formula -> Formula .
     | subgt_decl {a₀ a₁ : kEventTrace} : kEventTrace.has_sort a₀ MSort.Formula → kEventTrace.has_sort a₁ MSort.Formula → kEventTrace.has_sort (kEventTrace.subgt a₀ a₁) MSort.Formula
+    -- op _/\_ : Formula Formula -> Formula .
     | slashbslash_decl {a₀ a₁ : kEventTrace} : kEventTrace.has_sort a₀ MSort.Formula → kEventTrace.has_sort a₁ MSort.Formula → kEventTrace.has_sort (kEventTrace.slashbslash a₀ a₁) MSort.Formula
+    -- op _<->_ : Formula Formula -> Formula .
     | ltsubgt_decl {a₀ a₁ : kEventTrace} : kEventTrace.has_sort a₀ MSort.Formula → kEventTrace.has_sort a₁ MSort.Formula → kEventTrace.has_sort (kEventTrace.ltsubgt a₀ a₁) MSort.Formula
+    -- op _<=>_ : Formula Formula -> Formula .
     | lteqgt_decl {a₀ a₁ : kEventTrace} : kEventTrace.has_sort a₀ MSort.Formula → kEventTrace.has_sort a₁ MSort.Formula → kEventTrace.has_sort (kEventTrace.lteqgt a₀ a₁) MSort.Formula
+    -- op _=>_ : Formula Formula -> Formula .
     | eqgt_decl {a₀ a₁ : kEventTrace} : kEventTrace.has_sort a₀ MSort.Formula → kEventTrace.has_sort a₁ MSort.Formula → kEventTrace.has_sort (kEventTrace.eqgt a₀ a₁) MSort.Formula
+    -- op _R_ : Formula Formula -> Formula .
     | R_decl {a₀ a₁ : kEventTrace} : kEventTrace.has_sort a₀ MSort.Formula → kEventTrace.has_sort a₁ MSort.Formula → kEventTrace.has_sort (kEventTrace.R a₀ a₁) MSort.Formula
+    -- op _U_ : Formula Formula -> Formula .
     | U_decl {a₀ a₁ : kEventTrace} : kEventTrace.has_sort a₀ MSort.Formula → kEventTrace.has_sort a₁ MSort.Formula → kEventTrace.has_sort (kEventTrace.U a₀ a₁) MSort.Formula
+    -- op _W_ : Formula Formula -> Formula .
     | W_decl {a₀ a₁ : kEventTrace} : kEventTrace.has_sort a₀ MSort.Formula → kEventTrace.has_sort a₁ MSort.Formula → kEventTrace.has_sort (kEventTrace.W a₀ a₁) MSort.Formula
+    -- op _\/_ : Formula Formula -> Formula .
     | bslashslash_decl {a₀ a₁ : kEventTrace} : kEventTrace.has_sort a₀ MSort.Formula → kEventTrace.has_sort a₁ MSort.Formula → kEventTrace.has_sort (kEventTrace.bslashslash a₀ a₁) MSort.Formula
+    -- op _\_ : Set{ActionEvent} Set{ActionEvent} -> Set{ActionEvent} .
     | bslash_decl {a₀ a₁ : kEventTrace} : kEventTrace.has_sort a₀ MSort.«Set{ActionEvent}» → kEventTrace.has_sort a₁ MSort.«Set{ActionEvent}» → kEventTrace.has_sort (kEventTrace.bslash a₀ a₁) MSort.«Set{ActionEvent}»
+    -- op __ : Configuration Configuration -> Configuration .
     | join_decl {a₀ a₁ : kEventTrace} : kEventTrace.has_sort a₀ MSort.Configuration → kEventTrace.has_sort a₁ MSort.Configuration → kEventTrace.has_sort (kEventTrace.join a₀ a₁) MSort.Configuration
+    -- op _`,_ : NeSet{ActionEvent} Set{ActionEvent} -> NeSet{ActionEvent} .
     | «`,»_decl₀ {a₀ a₁ : kEventTrace} : kEventTrace.has_sort a₀ MSort.«NeSet{ActionEvent}» → kEventTrace.has_sort a₁ MSort.«Set{ActionEvent}» → kEventTrace.has_sort (kEventTrace.«`,» a₀ a₁) MSort.«NeSet{ActionEvent}»
+    -- op _`,_ : Set{ActionEvent} Set{ActionEvent} -> Set{ActionEvent} .
     | «`,»_decl₁ {a₀ a₁ : kEventTrace} : kEventTrace.has_sort a₀ MSort.«Set{ActionEvent}» → kEventTrace.has_sort a₁ MSort.«Set{ActionEvent}» → kEventTrace.has_sort (kEventTrace.«`,» a₀ a₁) MSort.«Set{ActionEvent}»
+    -- op _`,_ : Set{ActionEvent} NeSet{ActionEvent} -> NeSet{ActionEvent} .
     | «`,»_decl₂ {a₀ a₁ : kEventTrace} : kEventTrace.has_sort a₀ MSort.«Set{ActionEvent}» → kEventTrace.has_sort a₁ MSort.«NeSet{ActionEvent}» → kEventTrace.has_sort (kEventTrace.«`,» a₀ a₁) MSort.«NeSet{ActionEvent}»
+    -- op _did_ : Id Id -> ActionEvent .
     | did_decl {a₀ a₁ : kModelCheckResult} : kModelCheckResult.has_sort a₀ MSort.Id → kModelCheckResult.has_sort a₁ MSort.Id → kEventTrace.has_sort (kEventTrace.did a₀ a₁) MSort.ActionEvent
+    -- op _do_ : Id Id -> ActionEvent .
     | do_decl {a₀ a₁ : kModelCheckResult} : kModelCheckResult.has_sort a₀ MSort.Id → kModelCheckResult.has_sort a₁ MSort.Id → kEventTrace.has_sort (kEventTrace.do a₀ a₁) MSort.ActionEvent
+    -- op _does_ : Id Id -> ActionEvent .
     | does_decl {a₀ a₁ : kModelCheckResult} : kModelCheckResult.has_sort a₀ MSort.Id → kModelCheckResult.has_sort a₁ MSort.Id → kEventTrace.has_sort (kEventTrace.does a₀ a₁) MSort.ActionEvent
+    -- op _|->_ : Formula Formula -> Formula .
     | barsubgt_decl {a₀ a₁ : kEventTrace} : kEventTrace.has_sort a₀ MSort.Formula → kEventTrace.has_sort a₁ MSort.Formula → kEventTrace.has_sort (kEventTrace.barsubgt a₀ a₁) MSort.Formula
+    -- op `[`]_ : Formula -> Formula .
     | «`lbrak`rbrack»_decl {a : kEventTrace} : kEventTrace.has_sort a MSort.Formula → kEventTrace.has_sort (kEventTrace.«`lbrak`rbrack» a) MSort.Formula
+    -- op empty : -> Set{ActionEvent} .
     | empty_decl : kEventTrace.has_sort kEventTrace.empty MSort.«Set{ActionEvent}»
+    -- op emptyEventTrace : -> EventTrace .
     | emptyEventTrace_decl : kEventTrace.has_sort kEventTrace.emptyEventTrace MSort.EventTrace
+    -- op none : -> Configuration .
     | none_decl : kEventTrace.has_sort kEventTrace.none MSort.Configuration
+    -- op tau : -> ActionEvent .
     | tau_decl : kEventTrace.has_sort kEventTrace.tau MSort.ActionEvent
+    -- op tick : -> TickEvent .
     | tick_decl : kEventTrace.has_sort kEventTrace.tick MSort.TickEvent
+    -- op ~_ : Formula -> Formula .
     | «~»_decl {a : kEventTrace} : kEventTrace.has_sort a MSort.Formula → kEventTrace.has_sort (kEventTrace.«~» a) MSort.Formula
+    -- op if_then_else_fi : Bool EventTrace EventTrace -> EventTrace .
     | ifthenelsefi_decl₁ {a₀ : kModelCheckResult} {a₁ a₂ : kEventTrace} : kModelCheckResult.has_sort a₀ MSort.Bool → kEventTrace.has_sort a₁ MSort.EventTrace → kEventTrace.has_sort a₂ MSort.EventTrace → kEventTrace.has_sort (kEventTrace.ifthenelsefi a₀ a₁ a₂) MSort.EventTrace
+    -- op if_then_else_fi : Bool State State -> State .
     | ifthenelsefi_decl₂ {a₀ : kModelCheckResult} {a₁ a₂ : kEventTrace} : kModelCheckResult.has_sort a₀ MSort.Bool → kEventTrace.has_sort a₁ MSort.State → kEventTrace.has_sort a₂ MSort.State → kEventTrace.has_sort (kEventTrace.ifthenelsefi a₀ a₁ a₂) MSort.State
+    -- op if_then_else_fi : Bool Set{ActionEvent} Set{ActionEvent} -> Set{ActionEvent} .
     | ifthenelsefi_decl₃ {a₀ : kModelCheckResult} {a₁ a₂ : kEventTrace} : kModelCheckResult.has_sort a₀ MSort.Bool → kEventTrace.has_sort a₁ MSort.«Set{ActionEvent}» → kEventTrace.has_sort a₂ MSort.«Set{ActionEvent}» → kEventTrace.has_sort (kEventTrace.ifthenelsefi a₀ a₁ a₂) MSort.«Set{ActionEvent}»
+    -- op if_then_else_fi : Bool Formula Formula -> Formula .
     | ifthenelsefi_decl₄ {a₀ : kModelCheckResult} {a₁ a₂ : kEventTrace} : kModelCheckResult.has_sort a₀ MSort.Bool → kEventTrace.has_sort a₁ MSort.Formula → kEventTrace.has_sort a₂ MSort.Formula → kEventTrace.has_sort (kEventTrace.ifthenelsefi a₀ a₁ a₂) MSort.Formula
+    -- op if_then_else_fi : Bool Configuration Configuration -> Configuration .
     | ifthenelsefi_decl₅ {a₀ : kModelCheckResult} {a₁ a₂ : kEventTrace} : kModelCheckResult.has_sort a₀ MSort.Bool → kEventTrace.has_sort a₁ MSort.Configuration → kEventTrace.has_sort a₂ MSort.Configuration → kEventTrace.has_sort (kEventTrace.ifthenelsefi a₀ a₁ a₂) MSort.Configuration
+    -- op if_then_else_fi : Bool NeSet{ActionEvent} NeSet{ActionEvent} -> NeSet{ActionEvent} .
     | ifthenelsefi_decl₆ {a₀ : kModelCheckResult} {a₁ a₂ : kEventTrace} : kModelCheckResult.has_sort a₀ MSort.Bool → kEventTrace.has_sort a₁ MSort.«NeSet{ActionEvent}» → kEventTrace.has_sort a₂ MSort.«NeSet{ActionEvent}» → kEventTrace.has_sort (kEventTrace.ifthenelsefi a₀ a₁ a₂) MSort.«NeSet{ActionEvent}»
+    -- op if_then_else_fi : Bool Prop Prop -> Prop .
     | ifthenelsefi_decl₇ {a₀ : kModelCheckResult} {a₁ a₂ : kEventTrace} : kModelCheckResult.has_sort a₀ MSort.Bool → kEventTrace.has_sort a₁ MSort.Prop → kEventTrace.has_sort a₂ MSort.Prop → kEventTrace.has_sort (kEventTrace.ifthenelsefi a₀ a₁ a₂) MSort.Prop
+    -- op if_then_else_fi : Bool Msg Msg -> Msg .
     | ifthenelsefi_decl₈ {a₀ : kModelCheckResult} {a₁ a₂ : kEventTrace} : kModelCheckResult.has_sort a₀ MSort.Bool → kEventTrace.has_sort a₁ MSort.Msg → kEventTrace.has_sort a₂ MSort.Msg → kEventTrace.has_sort (kEventTrace.ifthenelsefi a₀ a₁ a₂) MSort.Msg
+    -- op if_then_else_fi : Bool Object Object -> Object .
     | ifthenelsefi_decl₉ {a₀ : kModelCheckResult} {a₁ a₂ : kEventTrace} : kModelCheckResult.has_sort a₀ MSort.Bool → kEventTrace.has_sort a₁ MSort.Object → kEventTrace.has_sort a₂ MSort.Object → kEventTrace.has_sort (kEventTrace.ifthenelsefi a₀ a₁ a₂) MSort.Object
+    -- op if_then_else_fi : Bool Portal Portal -> Portal .
     | ifthenelsefi_decl₁₀ {a₀ : kModelCheckResult} {a₁ a₂ : kEventTrace} : kModelCheckResult.has_sort a₀ MSort.Bool → kEventTrace.has_sort a₁ MSort.Portal → kEventTrace.has_sort a₂ MSort.Portal → kEventTrace.has_sort (kEventTrace.ifthenelsefi a₀ a₁ a₂) MSort.Portal
+    -- op if_then_else_fi : Bool Message Message -> Message .
     | ifthenelsefi_decl₁₁ {a₀ : kModelCheckResult} {a₁ a₂ : kEventTrace} : kModelCheckResult.has_sort a₀ MSort.Bool → kEventTrace.has_sort a₁ MSort.Message → kEventTrace.has_sort a₂ MSort.Message → kEventTrace.has_sort (kEventTrace.ifthenelsefi a₀ a₁ a₂) MSort.Message
+    -- op if_then_else_fi : Bool Event Event -> Event .
     | ifthenelsefi_decl₁₂ {a₀ : kModelCheckResult} {a₁ a₂ : kEventTrace} : kModelCheckResult.has_sort a₀ MSort.Bool → kEventTrace.has_sort a₁ MSort.Event → kEventTrace.has_sort a₂ MSort.Event → kEventTrace.has_sort (kEventTrace.ifthenelsefi a₀ a₁ a₂) MSort.Event
+    -- op if_then_else_fi : Bool ActionEvent ActionEvent -> ActionEvent .
     | ifthenelsefi_decl₁₃ {a₀ : kModelCheckResult} {a₁ a₂ : kEventTrace} : kModelCheckResult.has_sort a₀ MSort.Bool → kEventTrace.has_sort a₁ MSort.ActionEvent → kEventTrace.has_sort a₂ MSort.ActionEvent → kEventTrace.has_sort (kEventTrace.ifthenelsefi a₀ a₁ a₂) MSort.ActionEvent
+    -- op if_then_else_fi : Bool TickEvent TickEvent -> TickEvent .
     | ifthenelsefi_decl₁₄ {a₀ : kModelCheckResult} {a₁ a₂ : kEventTrace} : kModelCheckResult.has_sort a₀ MSort.Bool → kEventTrace.has_sort a₁ MSort.TickEvent → kEventTrace.has_sort a₂ MSort.TickEvent → kEventTrace.has_sort (kEventTrace.ifthenelsefi a₀ a₁ a₂) MSort.TickEvent
 
   inductive kActiveRule.has_sort: kActiveRule → MSort → Prop
@@ -1003,17 +1142,25 @@ mutual
   inductive kCid.has_sort: kCid → MSort → Prop
     | subsort {t a b} : subsort a b → kCid.has_sort t a → kCid.has_sort t b
     -- Implicit membership axioms (operator declarations)
+    -- op Actor : -> Actor .
     | Actor_decl : kCid.has_sort kCid.Actor MSort.Actor
+    -- op Coordinator : -> Coordinator .
     | Coordinator_decl : kCid.has_sort kCid.Coordinator MSort.Coordinator
+    -- op PreCoordinator : -> PreCoordinator .
     | PreCoordinator_decl : kCid.has_sort kCid.PreCoordinator MSort.PreCoordinator
+    -- op getClass : Object -> Cid .
     | getClass_decl {a : kEventTrace} : kEventTrace.has_sort a MSort.Object → kCid.has_sort (kCid.getClass a) MSort.Cid
 
   inductive kActorDeonticActionDeadline.has_sort: kActorDeonticActionDeadline → MSort → Prop
     | subsort {t a b} : subsort a b → kActorDeonticActionDeadline.has_sort t a → kActorDeonticActionDeadline.has_sort t b
     -- Implicit membership axioms (operator declarations)
+    -- op PARTY____ : Qid Deadline Deontic Action -> ActorDeonticActionDeadline .
     | PARTY₀_decl {a₀ : kModelCheckResult} {a₁ : kDeadline} {a₂ : kDeontic} {a₃ : kModelCheckResult} : kModelCheckResult.has_sort a₀ MSort.Qid → kDeadline.has_sort a₁ MSort.Deadline → kDeontic.has_sort a₂ MSort.Deontic → kModelCheckResult.has_sort a₃ MSort.Action → kActorDeonticActionDeadline.has_sort (kActorDeonticActionDeadline.PARTY₀ a₀ a₁ a₂ a₃) MSort.ActorDeonticActionDeadline
+    -- op PARTY____ : Qid Deontic Action Deadline -> ActorDeonticActionDeadline .
     | PARTY₁_decl {a₀ : kModelCheckResult} {a₁ : kDeontic} {a₂ : kModelCheckResult} {a₃ : kDeadline} : kModelCheckResult.has_sort a₀ MSort.Qid → kDeontic.has_sort a₁ MSort.Deontic → kModelCheckResult.has_sort a₂ MSort.Action → kDeadline.has_sort a₃ MSort.Deadline → kActorDeonticActionDeadline.has_sort (kActorDeonticActionDeadline.PARTY₁ a₀ a₁ a₂ a₃) MSort.ActorDeonticActionDeadline
+    -- op PARTY____ : Qid Deontic Deadline Action -> ActorDeonticActionDeadline .
     | PARTY₂_decl {a₀ : kModelCheckResult} {a₁ : kDeontic} {a₂ : kDeadline} {a₃ : kModelCheckResult} : kModelCheckResult.has_sort a₀ MSort.Qid → kDeontic.has_sort a₁ MSort.Deontic → kDeadline.has_sort a₂ MSort.Deadline → kModelCheckResult.has_sort a₃ MSort.Action → kActorDeonticActionDeadline.has_sort (kActorDeonticActionDeadline.PARTY₂ a₀ a₁ a₂ a₃) MSort.ActorDeonticActionDeadline
+    -- op _PARTY___ : Deadline Qid Deontic Action -> ActorDeonticActionDeadline .
     | PARTY₃_decl {a₀ : kDeadline} {a₁ : kModelCheckResult} {a₂ : kDeontic} {a₃ : kModelCheckResult} : kDeadline.has_sort a₀ MSort.Deadline → kModelCheckResult.has_sort a₁ MSort.Qid → kDeontic.has_sort a₂ MSort.Deontic → kModelCheckResult.has_sort a₃ MSort.Action → kActorDeonticActionDeadline.has_sort (kActorDeonticActionDeadline.PARTY₃ a₀ a₁ a₂ a₃) MSort.ActorDeonticActionDeadline
 
   inductive kActorState.has_sort: kActorState → MSort → Prop
@@ -1023,41 +1170,65 @@ mutual
   inductive kAttributeSet.has_sort: kAttributeSet → MSort → Prop
     | subsort {t a b} : subsort a b → kAttributeSet.has_sort t a → kAttributeSet.has_sort t b
     -- Implicit membership axioms (operator declarations)
+    -- op _`,_ : AttributeSet AttributeSet -> AttributeSet .
     | «`,»_decl {a₀ a₁ : kAttributeSet} : kAttributeSet.has_sort a₀ MSort.AttributeSet → kAttributeSet.has_sort a₁ MSort.AttributeSet → kAttributeSet.has_sort (kAttributeSet.«`,» a₀ a₁) MSort.AttributeSet
+    -- op contractState`:_ : ContractState -> Attribute .
     | «contractState`colon»_decl {a : kContractState} : kContractState.has_sort a MSort.ContractState → kAttributeSet.has_sort (kAttributeSet.«contractState`colon» a) MSort.Attribute
+    -- op none : -> AttributeSet .
     | none_decl : kAttributeSet.has_sort kAttributeSet.none MSort.AttributeSet
+    -- op rules`:_ : Set{Rule} -> Attribute .
     | «rules`colon»_decl {a : k«Set{Rule}»} : k«Set{Rule}».has_sort a MSort.«Set{Rule}» → kAttributeSet.has_sort (kAttributeSet.«rules`colon» a) MSort.Attribute
+    -- op time`:_ : Nat -> Attribute .
     | «time`colon»_decl {a : kFindResult} : kFindResult.has_sort a MSort.Nat → kAttributeSet.has_sort (kAttributeSet.«time`colon» a) MSort.Attribute
 
   inductive kString.has_sort: kString → MSort → Prop
     | subsort {t a b} : subsort a b → kString.has_sort t a → kString.has_sort t b
     -- Implicit membership axioms (operator declarations)
+    -- op <Strings> : -> Char .
     | ltStringsgt_decl₀ : kString.has_sort kString.ltStringsgt MSort.Char
+    -- op <Strings> : -> String .
     | ltStringsgt_decl₁ : kString.has_sort kString.ltStringsgt MSort.String
+    -- op _+_ : String String -> String .
     | sum_decl {a₀ a₁ : kString} : kString.has_sort a₀ MSort.String → kString.has_sort a₁ MSort.String → kString.has_sort (kString.sum a₀ a₁) MSort.String
+    -- op lowerCase : String -> String .
     | lowerCase_decl {a : kString} : kString.has_sort a MSort.String → kString.has_sort (kString.lowerCase a) MSort.String
+    -- op string : Qid -> String .
     | string_decl {a : kModelCheckResult} : kModelCheckResult.has_sort a MSort.Qid → kString.has_sort (kString.string a) MSort.String
+    -- op substr : String Nat Nat -> String .
     | substr_decl {a₀ : kString} {a₁ a₂ : kFindResult} : kString.has_sort a₀ MSort.String → kFindResult.has_sort a₁ MSort.Nat → kFindResult.has_sort a₂ MSort.Nat → kString.has_sort (kString.substr a₀ a₁ a₂) MSort.String
+    -- op upperCase : String -> String .
     | upperCase_decl {a : kString} : kString.has_sort a MSort.String → kString.has_sort (kString.upperCase a) MSort.String
 
   inductive kContractState.has_sort: kContractState → MSort → Prop
     | subsort {t a b} : subsort a b → kContractState.has_sort t a → kContractState.has_sort t b
     -- Implicit membership axioms (operator declarations)
+    -- op deltaAction___ : Set{Rule} ActionEvent ContractState -> ContractState .
     | deltaAction_decl {a₀ : k«Set{Rule}»} {a₁ : kEventTrace} {a₂ : kContractState} : k«Set{Rule}».has_sort a₀ MSort.«Set{Rule}» → kEventTrace.has_sort a₁ MSort.ActionEvent → kContractState.has_sort a₂ MSort.ContractState → kContractState.has_sort (kContractState.deltaAction a₀ a₁ a₂) MSort.ContractState
+    -- op deltaTick__ : Set{Rule} ContractState -> ContractState .
     | deltaTick_decl {a₀ : k«Set{Rule}»} {a₁ : kContractState} : k«Set{Rule}».has_sort a₀ MSort.«Set{Rule}» → kContractState.has_sort a₁ MSort.ContractState → kContractState.has_sort (kContractState.deltaTick a₀ a₁) MSort.ContractState
+    -- op Active_ : Set{Rule} -> ContractState .
     | Active_decl {a : k«Set{Rule}»} : k«Set{Rule}».has_sort a MSort.«Set{Rule}» → kContractState.has_sort (kContractState.Active a) MSort.ContractState
+    -- op Breached_ : Set{Qid} -> ContractState .
     | Breached_decl {a : kModelCheckResult} : kModelCheckResult.has_sort a MSort.«Set{Qid}» → kContractState.has_sort (kContractState.Breached a) MSort.ContractState
+    -- op Fulfilled : -> ContractState .
     | Fulfilled_decl : kContractState.has_sort kContractState.Fulfilled MSort.ContractState
+    -- op _^_ : ContractState ContractState -> ContractState .
     | pow_decl {a₀ a₁ : kContractState} : kContractState.has_sort a₀ MSort.ContractState → kContractState.has_sort a₁ MSort.ContractState → kContractState.has_sort (kContractState.pow a₀ a₁) MSort.ContractState
+    -- op if_then_else_fi : Bool ContractState ContractState -> ContractState .
     | ifthenelsefi_decl₁ {a₀ : kModelCheckResult} {a₁ a₂ : kContractState} : kModelCheckResult.has_sort a₀ MSort.Bool → kContractState.has_sort a₁ MSort.ContractState → kContractState.has_sort a₂ MSort.ContractState → kContractState.has_sort (kContractState.ifthenelsefi a₀ a₁ a₂) MSort.ContractState
 
   inductive kContractStatus.has_sort: kContractStatus → MSort → Prop
     | subsort {t a b} : subsort a b → kContractStatus.has_sort t a → kContractStatus.has_sort t b
     -- Implicit membership axioms (operator declarations)
+    -- op configToStatus_ : Configuration -> ContractStatus .
     | configToStatus_decl {a : kEventTrace} : kEventTrace.has_sort a MSort.Configuration → kContractStatus.has_sort (kContractStatus.configToStatus a) MSort.ContractStatus
+    -- op contractStateToStatus_ : ContractState -> ContractStatus .
     | contractStateToStatus_decl {a : kContractState} : kContractState.has_sort a MSort.ContractState → kContractStatus.has_sort (kContractStatus.contractStateToStatus a) MSort.ContractStatus
+    -- op Active : -> ContractStatus .
     | Active_decl : kContractStatus.has_sort kContractStatus.Active MSort.ContractStatus
+    -- op Breached : -> ContractStatus .
     | Breached_decl : kContractStatus.has_sort kContractStatus.Breached MSort.ContractStatus
+    -- op Fulfilled : -> ContractStatus .
     | Fulfilled_decl : kContractStatus.has_sort kContractStatus.Fulfilled MSort.ContractStatus
 
   inductive kDate.has_sort: kDate → MSort → Prop
@@ -1067,112 +1238,195 @@ mutual
   inductive kDeadline.has_sort: kDeadline → MSort → Prop
     | subsort {t a b} : subsort a b → kDeadline.has_sort t a → kDeadline.has_sort t b
     -- Implicit membership axioms (operator declarations)
+    -- op BY_ : Nat -> Deadline .
     | BY_decl {a : kFindResult} : kFindResult.has_sort a MSort.Nat → kDeadline.has_sort (kDeadline.BY a) MSort.Deadline
+    -- op WITHIN_ : Duration -> Deadline .
     | WITHIN_decl {a : kDuration} : kDuration.has_sort a MSort.Duration → kDeadline.has_sort (kDeadline.WITHIN a) MSort.Deadline
 
   inductive kDeontic.has_sort: kDeontic → MSort → Prop
     | subsort {t a b} : subsort a b → kDeontic.has_sort t a → kDeontic.has_sort t b
     -- Implicit membership axioms (operator declarations)
+    -- op MAY : -> Deontic .
     | MAY_decl : kDeontic.has_sort kDeontic.MAY MSort.Deontic
+    -- op MUST : -> Deontic .
     | MUST_decl : kDeontic.has_sort kDeontic.MUST MSort.Deontic
+    -- op SHANT : -> Deontic .
     | SHANT_decl : kDeontic.has_sort kDeontic.SHANT MSort.Deontic
 
   inductive kDuration.has_sort: kDuration → MSort → Prop
     | subsort {t a b} : subsort a b → kDuration.has_sort t a → kDuration.has_sort t b
     -- Implicit membership axioms (operator declarations)
+    -- op _DAY : Nat -> Duration .
     | DAY_decl {a : kFindResult} : kFindResult.has_sort a MSort.Nat → kDuration.has_sort (kDuration.DAY a) MSort.Duration
+    -- op _MONTH : Nat -> Duration .
     | MONTH_decl {a : kFindResult} : kFindResult.has_sort a MSort.Nat → kDuration.has_sort (kDuration.MONTH a) MSort.Duration
+    -- op _WEEK : Nat -> Duration .
     | WEEK_decl {a : kFindResult} : kFindResult.has_sort a MSort.Nat → kDuration.has_sort (kDuration.WEEK a) MSort.Duration
+    -- op _YEAR : Nat -> Duration .
     | YEAR_decl {a : kFindResult} : kFindResult.has_sort a MSort.Nat → kDuration.has_sort (kDuration.YEAR a) MSort.Duration
 
   inductive kFindResult.has_sort: kFindResult → MSort → Prop
     | subsort {t a b} : subsort a b → kFindResult.has_sort t a → kFindResult.has_sort t b
     -- Implicit membership axioms (operator declarations)
+    -- op $card : Set{ActionEvent} Nat -> Nat .
     | «$card»₀_decl {a₀ : kEventTrace} {a₁ : kFindResult} : kEventTrace.has_sort a₀ MSort.«Set{ActionEvent}» → kFindResult.has_sort a₁ MSort.Nat → kFindResult.has_sort (kFindResult.«$card»₀ a₀ a₁) MSort.Nat
+    -- op $card : Set{Qid} Nat -> Nat .
     | «$card»₁_decl {a₀ : kModelCheckResult} {a₁ : kFindResult} : kModelCheckResult.has_sort a₀ MSort.«Set{Qid}» → kFindResult.has_sort a₁ MSort.Nat → kFindResult.has_sort (kFindResult.«$card»₁ a₀ a₁) MSort.Nat
+    -- op $card : Set{Rule} Nat -> Nat .
     | «$card»₂_decl {a₀ : k«Set{Rule}»} {a₁ : kFindResult} : k«Set{Rule}».has_sort a₀ MSort.«Set{Rule}» → kFindResult.has_sort a₁ MSort.Nat → kFindResult.has_sort (kFindResult.«$card»₂ a₀ a₁) MSort.Nat
+    -- op |_| : NeSet{ActionEvent} -> NzNat .
     | barbar₀_decl₀ {a : kEventTrace} : kEventTrace.has_sort a MSort.«NeSet{ActionEvent}» → kFindResult.has_sort (kFindResult.barbar₀ a) MSort.NzNat
+    -- op |_| : Set{ActionEvent} -> Nat .
     | barbar₀_decl₁ {a : kEventTrace} : kEventTrace.has_sort a MSort.«Set{ActionEvent}» → kFindResult.has_sort (kFindResult.barbar₀ a) MSort.Nat
+    -- op |_| : NeSet{Qid} -> NzNat .
     | barbar₁_decl₀ {a : kModelCheckResult} : kModelCheckResult.has_sort a MSort.«NeSet{Qid}» → kFindResult.has_sort (kFindResult.barbar₁ a) MSort.NzNat
+    -- op |_| : Set{Qid} -> Nat .
     | barbar₁_decl₁ {a : kModelCheckResult} : kModelCheckResult.has_sort a MSort.«Set{Qid}» → kFindResult.has_sort (kFindResult.barbar₁ a) MSort.Nat
+    -- op |_| : NeSet{Rule} -> NzNat .
     | barbar₂_decl₀ {a : k«Set{Rule}»} : k«Set{Rule}».has_sort a MSort.«NeSet{Rule}» → kFindResult.has_sort (kFindResult.barbar₂ a) MSort.NzNat
+    -- op |_| : Set{Rule} -> Nat .
     | barbar₂_decl₁ {a : k«Set{Rule}»} : k«Set{Rule}».has_sort a MSort.«Set{Rule}» → kFindResult.has_sort (kFindResult.barbar₂ a) MSort.Nat
+    -- op 0 : -> Zero .
     | zero_decl : kFindResult.has_sort kFindResult.zero MSort.Zero
+    -- op _&_ : Nat Nat -> Nat .
     | amp_decl {a₀ a₁ : kFindResult} : kFindResult.has_sort a₀ MSort.Nat → kFindResult.has_sort a₁ MSort.Nat → kFindResult.has_sort (kFindResult.amp a₀ a₁) MSort.Nat
+    -- op _*_ : Nat Nat -> Nat .
     | mul_decl₀ {a₀ a₁ : kFindResult} : kFindResult.has_sort a₀ MSort.Nat → kFindResult.has_sort a₁ MSort.Nat → kFindResult.has_sort (kFindResult.mul a₀ a₁) MSort.Nat
+    -- op _*_ : NzNat NzNat -> NzNat .
     | mul_decl₁ {a₀ a₁ : kFindResult} : kFindResult.has_sort a₀ MSort.NzNat → kFindResult.has_sort a₁ MSort.NzNat → kFindResult.has_sort (kFindResult.mul a₀ a₁) MSort.NzNat
+    -- op _+_ : Nat Nat -> Nat .
     | sum_decl₀ {a₀ a₁ : kFindResult} : kFindResult.has_sort a₀ MSort.Nat → kFindResult.has_sort a₁ MSort.Nat → kFindResult.has_sort (kFindResult.sum a₀ a₁) MSort.Nat
+    -- op _+_ : NzNat Nat -> NzNat .
     | sum_decl₁ {a₀ a₁ : kFindResult} : kFindResult.has_sort a₀ MSort.NzNat → kFindResult.has_sort a₁ MSort.Nat → kFindResult.has_sort (kFindResult.sum a₀ a₁) MSort.NzNat
+    -- op _+_ : Nat NzNat -> NzNat .
     | sum_decl₂ {a₀ a₁ : kFindResult} : kFindResult.has_sort a₀ MSort.Nat → kFindResult.has_sort a₁ MSort.NzNat → kFindResult.has_sort (kFindResult.sum a₀ a₁) MSort.NzNat
+    -- op _<<_ : Nat Nat -> Nat .
     | ltlt_decl {a₀ a₁ : kFindResult} : kFindResult.has_sort a₀ MSort.Nat → kFindResult.has_sort a₁ MSort.Nat → kFindResult.has_sort (kFindResult.ltlt a₀ a₁) MSort.Nat
+    -- op _>>_ : Nat Nat -> Nat .
     | gtgt_decl {a₀ a₁ : kFindResult} : kFindResult.has_sort a₀ MSort.Nat → kFindResult.has_sort a₁ MSort.Nat → kFindResult.has_sort (kFindResult.gtgt a₀ a₁) MSort.Nat
+    -- op _^_ : Nat Nat -> Nat .
     | pow_decl₀ {a₀ a₁ : kFindResult} : kFindResult.has_sort a₀ MSort.Nat → kFindResult.has_sort a₁ MSort.Nat → kFindResult.has_sort (kFindResult.pow a₀ a₁) MSort.Nat
+    -- op _^_ : NzNat Nat -> NzNat .
     | pow_decl₁ {a₀ a₁ : kFindResult} : kFindResult.has_sort a₀ MSort.NzNat → kFindResult.has_sort a₁ MSort.Nat → kFindResult.has_sort (kFindResult.pow a₀ a₁) MSort.NzNat
+    -- op _quo_ : Nat NzNat -> Nat .
     | quo_decl {a₀ a₁ : kFindResult} : kFindResult.has_sort a₀ MSort.Nat → kFindResult.has_sort a₁ MSort.NzNat → kFindResult.has_sort (kFindResult.quo a₀ a₁) MSort.Nat
+    -- op _rem_ : Nat NzNat -> Nat .
     | rem_decl {a₀ a₁ : kFindResult} : kFindResult.has_sort a₀ MSort.Nat → kFindResult.has_sort a₁ MSort.NzNat → kFindResult.has_sort (kFindResult.rem a₀ a₁) MSort.Nat
+    -- op _xor_ : Nat Nat -> Nat .
     | xor_decl {a₀ a₁ : kFindResult} : kFindResult.has_sort a₀ MSort.Nat → kFindResult.has_sort a₁ MSort.Nat → kFindResult.has_sort (kFindResult.xor a₀ a₁) MSort.Nat
+    -- op _|_ : Nat Nat -> Nat .
     | bar_decl₀ {a₀ a₁ : kFindResult} : kFindResult.has_sort a₀ MSort.Nat → kFindResult.has_sort a₁ MSort.Nat → kFindResult.has_sort (kFindResult.bar a₀ a₁) MSort.Nat
+    -- op _|_ : NzNat Nat -> NzNat .
     | bar_decl₁ {a₀ a₁ : kFindResult} : kFindResult.has_sort a₀ MSort.NzNat → kFindResult.has_sort a₁ MSort.Nat → kFindResult.has_sort (kFindResult.bar a₀ a₁) MSort.NzNat
+    -- op _|_ : Nat NzNat -> NzNat .
     | bar_decl₂ {a₀ a₁ : kFindResult} : kFindResult.has_sort a₀ MSort.Nat → kFindResult.has_sort a₁ MSort.NzNat → kFindResult.has_sort (kFindResult.bar a₀ a₁) MSort.NzNat
+    -- op ascii : Char -> Nat .
     | ascii_decl {a : kString} : kString.has_sort a MSort.Char → kFindResult.has_sort (kFindResult.ascii a) MSort.Nat
+    -- op find : String String Nat -> FindResult .
     | find_decl {a₀ a₁ : kString} {a₂ : kFindResult} : kString.has_sort a₀ MSort.String → kString.has_sort a₁ MSort.String → kFindResult.has_sort a₂ MSort.Nat → kFindResult.has_sort (kFindResult.find a₀ a₁ a₂) MSort.FindResult
+    -- op gcd : Nat Nat -> Nat .
     | gcd_decl₀ {a₀ a₁ : kFindResult} : kFindResult.has_sort a₀ MSort.Nat → kFindResult.has_sort a₁ MSort.Nat → kFindResult.has_sort (kFindResult.gcd a₀ a₁) MSort.Nat
+    -- op gcd : NzNat Nat -> NzNat .
     | gcd_decl₁ {a₀ a₁ : kFindResult} : kFindResult.has_sort a₀ MSort.NzNat → kFindResult.has_sort a₁ MSort.Nat → kFindResult.has_sort (kFindResult.gcd a₀ a₁) MSort.NzNat
+    -- op gcd : Nat NzNat -> NzNat .
     | gcd_decl₂ {a₀ a₁ : kFindResult} : kFindResult.has_sort a₀ MSort.Nat → kFindResult.has_sort a₁ MSort.NzNat → kFindResult.has_sort (kFindResult.gcd a₀ a₁) MSort.NzNat
+    -- op lcm : Nat Nat -> Nat .
     | lcm_decl₀ {a₀ a₁ : kFindResult} : kFindResult.has_sort a₀ MSort.Nat → kFindResult.has_sort a₁ MSort.Nat → kFindResult.has_sort (kFindResult.lcm a₀ a₁) MSort.Nat
+    -- op lcm : NzNat NzNat -> NzNat .
     | lcm_decl₁ {a₀ a₁ : kFindResult} : kFindResult.has_sort a₀ MSort.NzNat → kFindResult.has_sort a₁ MSort.NzNat → kFindResult.has_sort (kFindResult.lcm a₀ a₁) MSort.NzNat
+    -- op length : String -> Nat .
     | length_decl {a : kString} : kString.has_sort a MSort.String → kFindResult.has_sort (kFindResult.length a) MSort.Nat
+    -- op max : Nat Nat -> Nat .
     | max_decl₀ {a₀ a₁ : kFindResult} : kFindResult.has_sort a₀ MSort.Nat → kFindResult.has_sort a₁ MSort.Nat → kFindResult.has_sort (kFindResult.max a₀ a₁) MSort.Nat
+    -- op max : NzNat Nat -> NzNat .
     | max_decl₁ {a₀ a₁ : kFindResult} : kFindResult.has_sort a₀ MSort.NzNat → kFindResult.has_sort a₁ MSort.Nat → kFindResult.has_sort (kFindResult.max a₀ a₁) MSort.NzNat
+    -- op max : Nat NzNat -> NzNat .
     | max_decl₂ {a₀ a₁ : kFindResult} : kFindResult.has_sort a₀ MSort.Nat → kFindResult.has_sort a₁ MSort.NzNat → kFindResult.has_sort (kFindResult.max a₀ a₁) MSort.NzNat
+    -- op min : Nat Nat -> Nat .
     | min_decl₀ {a₀ a₁ : kFindResult} : kFindResult.has_sort a₀ MSort.Nat → kFindResult.has_sort a₁ MSort.Nat → kFindResult.has_sort (kFindResult.min a₀ a₁) MSort.Nat
+    -- op min : NzNat NzNat -> NzNat .
     | min_decl₁ {a₀ a₁ : kFindResult} : kFindResult.has_sort a₀ MSort.NzNat → kFindResult.has_sort a₁ MSort.NzNat → kFindResult.has_sort (kFindResult.min a₀ a₁) MSort.NzNat
+    -- op notFound : -> FindResult .
     | notFound_decl : kFindResult.has_sort kFindResult.notFound MSort.FindResult
+    -- op rfind : String String Nat -> FindResult .
     | rfind_decl {a₀ a₁ : kString} {a₂ : kFindResult} : kString.has_sort a₀ MSort.String → kString.has_sort a₁ MSort.String → kFindResult.has_sort a₂ MSort.Nat → kFindResult.has_sort (kFindResult.rfind a₀ a₁ a₂) MSort.FindResult
+    -- op s_ : Nat -> NzNat .
     | s_decl {a : kFindResult} : kFindResult.has_sort a MSort.Nat → kFindResult.has_sort (kFindResult.s a) MSort.NzNat
+    -- op sd : Nat Nat -> Nat .
     | sd_decl {a₀ a₁ : kFindResult} : kFindResult.has_sort a₀ MSort.Nat → kFindResult.has_sort a₁ MSort.Nat → kFindResult.has_sort (kFindResult.sd a₀ a₁) MSort.Nat
+    -- op if_then_else_fi : Bool FindResult FindResult -> FindResult .
     | ifthenelsefi_decl₁ {a₀ : kModelCheckResult} {a₁ a₂ : kFindResult} : kModelCheckResult.has_sort a₀ MSort.Bool → kFindResult.has_sort a₁ MSort.FindResult → kFindResult.has_sort a₂ MSort.FindResult → kFindResult.has_sort (kFindResult.ifthenelsefi a₀ a₁ a₂) MSort.FindResult
+    -- op if_then_else_fi : Bool Nat Nat -> Nat .
     | ifthenelsefi_decl₂ {a₀ : kModelCheckResult} {a₁ a₂ : kFindResult} : kModelCheckResult.has_sort a₀ MSort.Bool → kFindResult.has_sort a₁ MSort.Nat → kFindResult.has_sort a₂ MSort.Nat → kFindResult.has_sort (kFindResult.ifthenelsefi a₀ a₁ a₂) MSort.Nat
+    -- op if_then_else_fi : Bool NzNat NzNat -> NzNat .
     | ifthenelsefi_decl₃ {a₀ : kModelCheckResult} {a₁ a₂ : kFindResult} : kModelCheckResult.has_sort a₀ MSort.Bool → kFindResult.has_sort a₁ MSort.NzNat → kFindResult.has_sort a₂ MSort.NzNat → kFindResult.has_sort (kFindResult.ifthenelsefi a₀ a₁ a₂) MSort.NzNat
+    -- op if_then_else_fi : Bool Zero Zero -> Zero .
     | ifthenelsefi_decl₄ {a₀ : kModelCheckResult} {a₁ a₂ : kFindResult} : kModelCheckResult.has_sort a₀ MSort.Bool → kFindResult.has_sort a₁ MSort.Zero → kFindResult.has_sort a₂ MSort.Zero → kFindResult.has_sort (kFindResult.ifthenelsefi a₀ a₁ a₂) MSort.Zero
 
   inductive kHenceLest.has_sort: kHenceLest → MSort → Prop
     | subsort {t a b} : subsort a b → kHenceLest.has_sort t a → kHenceLest.has_sort t b
     -- Implicit membership axioms (operator declarations)
+    -- op HENCE_ : Set{Qid} -> HenceLest .
     | HENCE_decl {a : kModelCheckResult} : kModelCheckResult.has_sort a MSort.«Set{Qid}» → kHenceLest.has_sort (kHenceLest.HENCE a) MSort.HenceLest
+    -- op HENCE_LEST_ : Set{Qid} Set{Qid} -> HenceLest .
     | HENCELEST_decl {a₀ a₁ : kModelCheckResult} : kModelCheckResult.has_sort a₀ MSort.«Set{Qid}» → kModelCheckResult.has_sort a₁ MSort.«Set{Qid}» → kHenceLest.has_sort (kHenceLest.HENCELEST a₀ a₁) MSort.HenceLest
+    -- op LEST_ : Set{Qid} -> HenceLest .
     | LEST_decl {a : kModelCheckResult} : kModelCheckResult.has_sort a MSort.«Set{Qid}» → kHenceLest.has_sort (kHenceLest.LEST a) MSort.HenceLest
+    -- op LEST_HENCE_ : Set{Qid} Set{Qid} -> HenceLest .
     | LESTHENCE_decl {a₀ a₁ : kModelCheckResult} : kModelCheckResult.has_sort a₀ MSort.«Set{Qid}» → kModelCheckResult.has_sort a₁ MSort.«Set{Qid}» → kHenceLest.has_sort (kHenceLest.LESTHENCE a₀ a₁) MSort.HenceLest
 
   inductive k«Set{Rule}».has_sort: k«Set{Rule}» → MSort → Prop
     | subsort {t a b} : subsort a b → k«Set{Rule}».has_sort t a → k«Set{Rule}».has_sort t b
     -- Implicit membership axioms (operator declarations)
+    -- op $diff : Set{Rule} Set{Rule} Set{Rule} -> Set{Rule} .
     | «$diff»_decl {a₀ a₁ a₂ : k«Set{Rule}»} : k«Set{Rule}».has_sort a₀ MSort.«Set{Rule}» → k«Set{Rule}».has_sort a₁ MSort.«Set{Rule}» → k«Set{Rule}».has_sort a₂ MSort.«Set{Rule}» → k«Set{Rule}».has_sort (k«Set{Rule}».«$diff» a₀ a₁ a₂) MSort.«Set{Rule}»
+    -- op $intersect : Set{Rule} Set{Rule} Set{Rule} -> Set{Rule} .
     | «$intersect»_decl {a₀ a₁ a₂ : k«Set{Rule}»} : k«Set{Rule}».has_sort a₀ MSort.«Set{Rule}» → k«Set{Rule}».has_sort a₁ MSort.«Set{Rule}» → k«Set{Rule}».has_sort a₂ MSort.«Set{Rule}» → k«Set{Rule}».has_sort (k«Set{Rule}».«$intersect» a₀ a₁ a₂) MSort.«Set{Rule}»
+    -- op delete : Rule Set{Rule} -> Set{Rule} .
     | delete_decl {a₀ a₁ : k«Set{Rule}»} : k«Set{Rule}».has_sort a₀ MSort.Rule → k«Set{Rule}».has_sort a₁ MSort.«Set{Rule}» → k«Set{Rule}».has_sort (k«Set{Rule}».delete a₀ a₁) MSort.«Set{Rule}»
+    -- op getRulesWithNames__ : Set{Rule} Set{Qid} -> Set{Rule} .
     | getRulesWithNames_decl {a₀ : k«Set{Rule}»} {a₁ : kModelCheckResult} : k«Set{Rule}».has_sort a₀ MSort.«Set{Rule}» → kModelCheckResult.has_sort a₁ MSort.«Set{Qid}» → k«Set{Rule}».has_sort (k«Set{Rule}».getRulesWithNames a₀ a₁) MSort.«Set{Rule}»
+    -- op insert : Rule Set{Rule} -> Set{Rule} .
     | insert_decl {a₀ a₁ : k«Set{Rule}»} : k«Set{Rule}».has_sort a₀ MSort.Rule → k«Set{Rule}».has_sort a₁ MSort.«Set{Rule}» → k«Set{Rule}».has_sort (k«Set{Rule}».insert a₀ a₁) MSort.«Set{Rule}»
+    -- op intersection : Set{Rule} Set{Rule} -> Set{Rule} .
     | intersection_decl {a₀ a₁ : k«Set{Rule}»} : k«Set{Rule}».has_sort a₀ MSort.«Set{Rule}» → k«Set{Rule}».has_sort a₁ MSort.«Set{Rule}» → k«Set{Rule}».has_sort (k«Set{Rule}».intersection a₀ a₁) MSort.«Set{Rule}»
+    -- op rules : -> Set{Rule} .
     | rules_decl : k«Set{Rule}».has_sort k«Set{Rule}».rules MSort.«Set{Rule}»
+    -- op union : NeSet{Rule} Set{Rule} -> NeSet{Rule} .
     | union_decl₀ {a₀ a₁ : k«Set{Rule}»} : k«Set{Rule}».has_sort a₀ MSort.«NeSet{Rule}» → k«Set{Rule}».has_sort a₁ MSort.«Set{Rule}» → k«Set{Rule}».has_sort (k«Set{Rule}».union a₀ a₁) MSort.«NeSet{Rule}»
+    -- op union : Set{Rule} NeSet{Rule} -> NeSet{Rule} .
     | union_decl₁ {a₀ a₁ : k«Set{Rule}»} : k«Set{Rule}».has_sort a₀ MSort.«Set{Rule}» → k«Set{Rule}».has_sort a₁ MSort.«NeSet{Rule}» → k«Set{Rule}».has_sort (k«Set{Rule}».union a₀ a₁) MSort.«NeSet{Rule}»
+    -- op union : Set{Rule} Set{Rule} -> Set{Rule} .
     | union_decl₂ {a₀ a₁ : k«Set{Rule}»} : k«Set{Rule}».has_sort a₀ MSort.«Set{Rule}» → k«Set{Rule}».has_sort a₁ MSort.«Set{Rule}» → k«Set{Rule}».has_sort (k«Set{Rule}».union a₀ a₁) MSort.«Set{Rule}»
+    -- op RULE__ : Qid ActorDeonticActionDeadline -> Rule .
     | RULE₀_decl {a₀ : kModelCheckResult} {a₁ : kActorDeonticActionDeadline} : kModelCheckResult.has_sort a₀ MSort.Qid → kActorDeonticActionDeadline.has_sort a₁ MSort.ActorDeonticActionDeadline → k«Set{Rule}».has_sort (k«Set{Rule}».RULE₀ a₀ a₁) MSort.Rule
+    -- op RULE___ : Qid ActorDeonticActionDeadline HenceLest -> Rule .
     | RULE₁_decl {a₀ : kModelCheckResult} {a₁ : kActorDeonticActionDeadline} {a₂ : kHenceLest} : kModelCheckResult.has_sort a₀ MSort.Qid → kActorDeonticActionDeadline.has_sort a₁ MSort.ActorDeonticActionDeadline → kHenceLest.has_sort a₂ MSort.HenceLest → k«Set{Rule}».has_sort (k«Set{Rule}».RULE₁ a₀ a₁ a₂) MSort.Rule
+    -- op _\_ : Set{Rule} Set{Rule} -> Set{Rule} .
     | bslash_decl {a₀ a₁ : k«Set{Rule}»} : k«Set{Rule}».has_sort a₀ MSort.«Set{Rule}» → k«Set{Rule}».has_sort a₁ MSort.«Set{Rule}» → k«Set{Rule}».has_sort (k«Set{Rule}».bslash a₀ a₁) MSort.«Set{Rule}»
+    -- op _`,_ : NeSet{Rule} Set{Rule} -> NeSet{Rule} .
     | «`,»_decl₀ {a₀ a₁ : k«Set{Rule}»} : k«Set{Rule}».has_sort a₀ MSort.«NeSet{Rule}» → k«Set{Rule}».has_sort a₁ MSort.«Set{Rule}» → k«Set{Rule}».has_sort (k«Set{Rule}».«`,» a₀ a₁) MSort.«NeSet{Rule}»
+    -- op _`,_ : Set{Rule} Set{Rule} -> Set{Rule} .
     | «`,»_decl₁ {a₀ a₁ : k«Set{Rule}»} : k«Set{Rule}».has_sort a₀ MSort.«Set{Rule}» → k«Set{Rule}».has_sort a₁ MSort.«Set{Rule}» → k«Set{Rule}».has_sort (k«Set{Rule}».«`,» a₀ a₁) MSort.«Set{Rule}»
+    -- op _`,_ : Set{Rule} NeSet{Rule} -> NeSet{Rule} .
     | «`,»_decl₂ {a₀ a₁ : k«Set{Rule}»} : k«Set{Rule}».has_sort a₀ MSort.«Set{Rule}» → k«Set{Rule}».has_sort a₁ MSort.«NeSet{Rule}» → k«Set{Rule}».has_sort (k«Set{Rule}».«`,» a₀ a₁) MSort.«NeSet{Rule}»
+    -- op empty : -> Set{Rule} .
     | empty_decl : k«Set{Rule}».has_sort k«Set{Rule}».empty MSort.«Set{Rule}»
+    -- op if_then_else_fi : Bool Set{Rule} Set{Rule} -> Set{Rule} .
     | ifthenelsefi_decl₁ {a₀ : kModelCheckResult} {a₁ a₂ : k«Set{Rule}»} : kModelCheckResult.has_sort a₀ MSort.Bool → k«Set{Rule}».has_sort a₁ MSort.«Set{Rule}» → k«Set{Rule}».has_sort a₂ MSort.«Set{Rule}» → k«Set{Rule}».has_sort (k«Set{Rule}».ifthenelsefi a₀ a₁ a₂) MSort.«Set{Rule}»
+    -- op if_then_else_fi : Bool NeSet{Rule} NeSet{Rule} -> NeSet{Rule} .
     | ifthenelsefi_decl₂ {a₀ : kModelCheckResult} {a₁ a₂ : k«Set{Rule}»} : kModelCheckResult.has_sort a₀ MSort.Bool → k«Set{Rule}».has_sort a₁ MSort.«NeSet{Rule}» → k«Set{Rule}».has_sort a₂ MSort.«NeSet{Rule}» → k«Set{Rule}».has_sort (k«Set{Rule}».ifthenelsefi a₀ a₁ a₂) MSort.«NeSet{Rule}»
+    -- op if_then_else_fi : Bool Rule Rule -> Rule .
     | ifthenelsefi_decl₃ {a₀ : kModelCheckResult} {a₁ a₂ : k«Set{Rule}»} : kModelCheckResult.has_sort a₀ MSort.Bool → k«Set{Rule}».has_sort a₁ MSort.Rule → k«Set{Rule}».has_sort a₂ MSort.Rule → k«Set{Rule}».has_sort (k«Set{Rule}».ifthenelsefi a₀ a₁ a₂) MSort.Rule
 
   inductive kTransitionList.has_sort: kTransitionList → MSort → Prop
     | subsort {t a b} : subsort a b → kTransitionList.has_sort t a → kTransitionList.has_sort t b
     -- Implicit membership axioms (operator declarations)
+    -- op __ : TransitionList TransitionList -> TransitionList .
     | join_decl {a₀ a₁ : kTransitionList} : kTransitionList.has_sort a₀ MSort.TransitionList → kTransitionList.has_sort a₁ MSort.TransitionList → kTransitionList.has_sort (kTransitionList.join a₀ a₁) MSort.TransitionList
+    -- op `{_`,_`} : State RuleName -> Transition .
     | «`{`,`}»_decl {a₀ : kEventTrace} {a₁ : kModelCheckResult} : kEventTrace.has_sort a₀ MSort.State → kModelCheckResult.has_sort a₁ MSort.RuleName → kTransitionList.has_sort (kTransitionList.«`{`,`}» a₀ a₁) MSort.Transition
+    -- op nil : -> TransitionList .
     | nil_decl : kTransitionList.has_sort kTransitionList.nil MSort.TransitionList
 
   inductive kstrategylbrakinternalrbrack.has_sort: kstrategylbrakinternalrbrack → MSort → Prop
@@ -1233,75 +1487,162 @@ mutual
     | eqe_eqeq₁ {a₀ b₀ a₁ b₁ : kDeontic} : kDeontic.eqe a₀ b₀ → kDeontic.eqe a₁ b₁ → kModelCheckResult.eqe (kModelCheckResult.eqeq₁ a₀ a₁) (kModelCheckResult.eqeq₁ b₀ b₁)
     | eqe_eqeq₂ {a₀ b₀ a₁ b₁ : kContractStatus} : kContractStatus.eqe a₀ b₀ → kContractStatus.eqe a₁ b₁ → kModelCheckResult.eqe (kModelCheckResult.eqeq₂ a₀ a₁) (kModelCheckResult.eqeq₂ b₀ b₁)
     -- Equations
+    -- eq NOTHING = (empty).Set{Qid} .
     | eq_NOTHING : kModelCheckResult.eqe kModelCheckResult.NOTHING kModelCheckResult.empty
+    -- eq $diff((empty).Set{Qid}, S':Set{Qid}, A:Set{Qid}) = A:Set{Qid} .
     | eq_«$diff»₀ {s' a} : kModelCheckResult.has_sort s' MSort.«Set{Qid}» → kModelCheckResult.has_sort a MSort.«Set{Qid}» → kModelCheckResult.eqe (kModelCheckResult.«$diff» kModelCheckResult.empty s' a) a
+    -- eq $diff((S:Set{Qid}[31m,[0m E:Qid), S':Set{Qid}, A:Set{Qid})[0m = $diff(S:Set{Qid}, S':Set{Qid}, if E:Qid in S':Set{Qid} then A:Set{Qid} else A:Set{Qid}[31m,[0m E:Qid fi)[0m .
     | eq_«$diff»₁ {s e s' a} : kModelCheckResult.has_sort s MSort.«Set{Qid}» → kModelCheckResult.has_sort e MSort.Qid → kModelCheckResult.has_sort s' MSort.«Set{Qid}» → kModelCheckResult.has_sort a MSort.«Set{Qid}» → kModelCheckResult.eqe (kModelCheckResult.«$diff» (kModelCheckResult.«`,» s e) s' a) (kModelCheckResult.«$diff» s s' (kModelCheckResult.ifthenelsefi (kModelCheckResult.«in»₁ e s') a (kModelCheckResult.«`,» a e)))
+    -- eq $intersect((empty).Set{Qid}, S':Set{Qid}, A:Set{Qid}) = A:Set{Qid} .
     | eq_«$intersect»₀ {s' a} : kModelCheckResult.has_sort s' MSort.«Set{Qid}» → kModelCheckResult.has_sort a MSort.«Set{Qid}» → kModelCheckResult.eqe (kModelCheckResult.«$intersect» kModelCheckResult.empty s' a) a
+    -- eq $intersect((S:Set{Qid}[31m,[0m E:Qid), S':Set{Qid}, A:Set{Qid})[0m = $intersect(S:Set{Qid}, S':Set{Qid}, if E:Qid in S':Set{Qid} then A:Set{Qid}[31m,[0m E:Qid else A:Set{Qid} fi)[0m .
     | eq_«$intersect»₁ {s e s' a} : kModelCheckResult.has_sort s MSort.«Set{Qid}» → kModelCheckResult.has_sort e MSort.Qid → kModelCheckResult.has_sort s' MSort.«Set{Qid}» → kModelCheckResult.has_sort a MSort.«Set{Qid}» → kModelCheckResult.eqe (kModelCheckResult.«$intersect» (kModelCheckResult.«`,» s e) s' a) (kModelCheckResult.«$intersect» s s' (kModelCheckResult.ifthenelsefi (kModelCheckResult.«in»₁ e s') (kModelCheckResult.«`,» a e) a))
+    -- eq DO actionName:Qid = actionName:Qid .
     | eq_DO {actionname} : kModelCheckResult.has_sort actionname MSort.Qid → kModelCheckResult.eqe (kModelCheckResult.DO actionname) actionname
+    -- eq names:Names[31m AND[0m names':Names[0m = names:Names[31m,[0m names':Names[0m .
     | eq_AND {names names'} : kModelCheckResult.has_sort names MSort.Names → kModelCheckResult.has_sort names' MSort.Names → kModelCheckResult.eqe (kModelCheckResult.AND names names') (kModelCheckResult.«`,» names names')
+    -- eq S:Set{Qid} \ N:NeSet{Qid} = $diff(S:Set{Qid}, N:NeSet{Qid}, (empty).Set{Qid}) .
     | eq_bslash₀ {s n} : kModelCheckResult.has_sort s MSort.«Set{Qid}» → kModelCheckResult.has_sort n MSort.«NeSet{Qid}» → kModelCheckResult.eqe (kModelCheckResult.bslash s n) (kModelCheckResult.«$diff» s n kModelCheckResult.empty)
+    -- eq S:Set{Qid} \ (empty).Set{Qid} = S:Set{Qid} .
     | eq_bslash₁ {s} : kModelCheckResult.has_sort s MSort.«Set{Qid}» → kModelCheckResult.eqe (kModelCheckResult.bslash s kModelCheckResult.empty) s
+    -- eq N:NeSet{Qid}[31m,[0m N:NeSet{Qid}[0m = N:NeSet{Qid} .
     | eq_«`,» {n} : kModelCheckResult.has_sort n MSort.«NeSet{Qid}» → kModelCheckResult.eqe (kModelCheckResult.«`,» n n) n
+    -- eq false and-then B:[ModelCheckResult,Action,Set{Qid},Id,RuleName,Situation] = false .
     | eq_andsubthen₀ {b} : kModelCheckResult.eqe (kModelCheckResult.andsubthen kModelCheckResult.false b) kModelCheckResult.false
+    -- eq true and-then B:[ModelCheckResult,Action,Set{Qid},Id,RuleName,Situation] = B:[ModelCheckResult,Action,Set{Qid},Id,RuleName,Situation] .
     | eq_andsubthen₁ {b} : kModelCheckResult.eqe (kModelCheckResult.andsubthen kModelCheckResult.true b) b
+    -- eq A:Bool and A:Bool = A:Bool .
     | eq_and₀ {a} : kModelCheckResult.has_sort a MSort.Bool → kModelCheckResult.eqe (kModelCheckResult.and a a) a
+    -- eq A:Bool and (B:Bool xor C:Bool) = A:Bool and B:Bool xor A:Bool and C:Bool .
     | eq_and₁ {a b c} : kModelCheckResult.has_sort a MSort.Bool → kModelCheckResult.has_sort b MSort.Bool → kModelCheckResult.has_sort c MSort.Bool → kModelCheckResult.eqe (kModelCheckResult.and a (kModelCheckResult.xor b c)) (kModelCheckResult.xor (kModelCheckResult.and a b) (kModelCheckResult.and a c))
+    -- eq false and A:Bool = false .
     | eq_and₂ {a} : kModelCheckResult.has_sort a MSort.Bool → kModelCheckResult.eqe (kModelCheckResult.and kModelCheckResult.false a) kModelCheckResult.false
+    -- eq true and A:Bool = A:Bool .
     | eq_and₃ {a} : kModelCheckResult.has_sort a MSort.Bool → kModelCheckResult.eqe (kModelCheckResult.and kModelCheckResult.true a) a
+    -- eq (config:Configuration 
+  -- [1m[31m<[0m actorName:Qid[1m[31m :[0m V#0:Actor[1m[31m |[0m
+  --   V#1:AttributeSet[1m[31m >[0m) containsActor actorName:Qid[0m = true .
     | eq_containsActor₀ {config actorname v#0 v#1} : kEventTrace.has_sort config MSort.Configuration → kModelCheckResult.has_sort actorname MSort.Qid → kCid.has_sort v#0 MSort.Actor → kAttributeSet.has_sort v#1 MSort.AttributeSet → kModelCheckResult.eqe (kModelCheckResult.containsActor (kEventTrace.join config (kEventTrace.ltcolonbargt actorname v#0 v#1)) actorname) kModelCheckResult.true
-    | eq_containsRuleWithEvent₀ {activerules rulename actorname deontic actionname time hence lest} : k«Set{Rule}».has_sort activerules MSort.«Set{Rule}» → kModelCheckResult.has_sort rulename MSort.Qid → kModelCheckResult.has_sort actorname MSort.Qid → kDeontic.has_sort deontic MSort.Deontic → kModelCheckResult.has_sort actionname MSort.Qid → kFindResult.has_sort time MSort.Nat → kModelCheckResult.has_sort hence MSort.«Set{Qid}» → kModelCheckResult.has_sort lest MSort.«Set{Qid}» → kModelCheckResult.eqe (kModelCheckResult.containsRuleWithEvent (k«Set{Rule}».«`,» activerules (k«Set{Rule}».RULE₁ rulename (kActorDeonticActionDeadline.PARTY₁ actorname deontic actionname (kDeadline.WITHIN (kDuration.DAY time))) (kHenceLest.HENCELEST hence lest))) (kEventTrace.does actorname actionname)) kModelCheckResult.true
+    -- eq (activeRules:Set{Rule}[31m,[0m RULE ruleName:Qid PARTY actorName:Qid deontic:Deontic actionName:Qid WITHIN time:Nat DAY HENCE hence:Set{Qid} LEST lest:Set{Qid}) containsRuleWithEvent actorName:Qid does actionName:Qid[0m = true .
+    | eq_containsRuleWithEvent₀ {activerules rulename actorname deontic actionname time hence lest} : k«Set{Rule}».has_sort activerules MSort.«Set{Rule}» → kModelCheckResult.has_sort rulename MSort.Qid → kModelCheckResult.has_sort actorname MSort.Qid → kModelCheckResult.has_sort actionname MSort.Qid → kFindResult.has_sort time MSort.Nat → kModelCheckResult.has_sort hence MSort.«Set{Qid}» → kModelCheckResult.has_sort lest MSort.«Set{Qid}» → kModelCheckResult.eqe (kModelCheckResult.containsRuleWithEvent (k«Set{Rule}».«`,» activerules (k«Set{Rule}».RULE₁ rulename (kActorDeonticActionDeadline.PARTY₁ actorname deontic actionname (kDeadline.WITHIN (kDuration.DAY time))) (kHenceLest.HENCELEST hence lest))) (kEventTrace.does actorname actionname)) kModelCheckResult.true
+    -- eq A:Bool implies B:Bool = not (A:Bool xor A:Bool and B:Bool) .
     | eq_implies₀ {a b} : kModelCheckResult.has_sort a MSort.Bool → kModelCheckResult.has_sort b MSort.Bool → kModelCheckResult.eqe (kModelCheckResult.implies a b) (kModelCheckResult.not (kModelCheckResult.xor a (kModelCheckResult.and a b)))
+    -- eq E:ActionEvent in (S:Set{ActionEvent}[31m,[0m E:ActionEvent)[0m = true .
     | eq_«in»₀₀ {e s} : kEventTrace.has_sort e MSort.ActionEvent → kEventTrace.has_sort s MSort.«Set{ActionEvent}» → kModelCheckResult.eqe (kModelCheckResult.«in»₀ e (kEventTrace.«`,» s e)) kModelCheckResult.true
+    -- eq E:Qid in (S:Set{Qid}[31m,[0m E:Qid)[0m = true .
     | eq_«in»₁₀ {e s} : kModelCheckResult.has_sort e MSort.Qid → kModelCheckResult.has_sort s MSort.«Set{Qid}» → kModelCheckResult.eqe (kModelCheckResult.«in»₁ e (kModelCheckResult.«`,» s e)) kModelCheckResult.true
+    -- eq E:Rule in (S:Set{Rule}[31m,[0m E:Rule)[0m = true .
     | eq_«in»₂₀ {e s} : k«Set{Rule}».has_sort e MSort.Rule → k«Set{Rule}».has_sort s MSort.«Set{Rule}» → kModelCheckResult.eqe (kModelCheckResult.«in»₂ e (k«Set{Rule}».«`,» s e)) kModelCheckResult.true
+    -- eq false or-else B:[ModelCheckResult,Action,Set{Qid},Id,RuleName,Situation] = B:[ModelCheckResult,Action,Set{Qid},Id,RuleName,Situation] .
     | eq_orsubelse₀ {b} : kModelCheckResult.eqe (kModelCheckResult.orsubelse kModelCheckResult.false b) b
+    -- eq true or-else B:[ModelCheckResult,Action,Set{Qid},Id,RuleName,Situation] = true .
     | eq_orsubelse₁ {b} : kModelCheckResult.eqe (kModelCheckResult.orsubelse kModelCheckResult.true b) kModelCheckResult.true
+    -- eq A:Bool or B:Bool = A:Bool and B:Bool xor A:Bool xor B:Bool .
     | eq_or₀ {a b} : kModelCheckResult.has_sort a MSort.Bool → kModelCheckResult.has_sort b MSort.Bool → kModelCheckResult.eqe (kModelCheckResult.or a b) (kModelCheckResult.xor (kModelCheckResult.and a b) (kModelCheckResult.xor a b))
+    -- eq S:Set{ActionEvent} psubset S':Set{ActionEvent} = S:Set{ActionEvent} =/= S':Set{ActionEvent} and-then S:Set{ActionEvent} subset S':Set{ActionEvent} .
     | eq_psubset₀ {s s'} : kEventTrace.has_sort s MSort.«Set{ActionEvent}» → kEventTrace.has_sort s' MSort.«Set{ActionEvent}» → kModelCheckResult.eqe (kModelCheckResult.psubset₀ s s') (kModelCheckResult.andsubthen (kModelCheckResult.eqslasheq₀ s s') (kModelCheckResult.subset₀ s s'))
+    -- eq S:Set{Qid} psubset S':Set{Qid} = S:Set{Qid} =/= S':Set{Qid} and-then S:Set{Qid} subset S':Set{Qid} .
     | eq_psubset₁ {s s'} : kModelCheckResult.has_sort s MSort.«Set{Qid}» → kModelCheckResult.has_sort s' MSort.«Set{Qid}» → kModelCheckResult.eqe (kModelCheckResult.psubset₁ s s') (kModelCheckResult.andsubthen (kModelCheckResult.eqslasheq₁ s s') (kModelCheckResult.subset₁ s s'))
+    -- eq S:Set{Rule} psubset S':Set{Rule} = S:Set{Rule} =/= S':Set{Rule} and-then S:Set{Rule} subset S':Set{Rule} .
     | eq_psubset₂ {s s'} : k«Set{Rule}».has_sort s MSort.«Set{Rule}» → k«Set{Rule}».has_sort s' MSort.«Set{Rule}» → kModelCheckResult.eqe (kModelCheckResult.psubset₂ s s') (kModelCheckResult.andsubthen (kModelCheckResult.eqslasheq₂ s s') (kModelCheckResult.subset₂ s s'))
+    -- eq (empty).Set{ActionEvent} subset S':Set{ActionEvent} = true .
     | eq_subset₀₀ {s'} : kEventTrace.has_sort s' MSort.«Set{ActionEvent}» → kModelCheckResult.eqe (kModelCheckResult.subset₀ kEventTrace.empty s') kModelCheckResult.true
+    -- eq (empty).Set{Qid} subset S':Set{Qid} = true .
     | eq_subset₁₀ {s'} : kModelCheckResult.has_sort s' MSort.«Set{Qid}» → kModelCheckResult.eqe (kModelCheckResult.subset₁ kModelCheckResult.empty s') kModelCheckResult.true
+    -- eq (empty).Set{Rule} subset S':Set{Rule} = true .
     | eq_subset₂₀ {s'} : k«Set{Rule}».has_sort s' MSort.«Set{Rule}» → kModelCheckResult.eqe (kModelCheckResult.subset₂ k«Set{Rule}».empty s') kModelCheckResult.true
+    -- eq (S:Set{ActionEvent}[31m,[0m E:ActionEvent) subset S':Set{ActionEvent}[0m = E:ActionEvent in S':Set{ActionEvent} and-then S:Set{ActionEvent} subset S':Set{ActionEvent} .
     | eq_subset₀₁ {s e s'} : kEventTrace.has_sort s MSort.«Set{ActionEvent}» → kEventTrace.has_sort e MSort.ActionEvent → kEventTrace.has_sort s' MSort.«Set{ActionEvent}» → kModelCheckResult.eqe (kModelCheckResult.subset₀ (kEventTrace.«`,» s e) s') (kModelCheckResult.andsubthen (kModelCheckResult.«in»₀ e s') (kModelCheckResult.subset₀ s s'))
+    -- eq (S:Set{Qid}[31m,[0m E:Qid) subset S':Set{Qid}[0m = E:Qid in S':Set{Qid} and-then S:Set{Qid} subset S':Set{Qid} .
     | eq_subset₁₁ {s e s'} : kModelCheckResult.has_sort s MSort.«Set{Qid}» → kModelCheckResult.has_sort e MSort.Qid → kModelCheckResult.has_sort s' MSort.«Set{Qid}» → kModelCheckResult.eqe (kModelCheckResult.subset₁ (kModelCheckResult.«`,» s e) s') (kModelCheckResult.andsubthen (kModelCheckResult.«in»₁ e s') (kModelCheckResult.subset₁ s s'))
+    -- eq (S:Set{Rule}[31m,[0m E:Rule) subset S':Set{Rule}[0m = E:Rule in S':Set{Rule} and-then S:Set{Rule} subset S':Set{Rule} .
     | eq_subset₂₁ {s e s'} : k«Set{Rule}».has_sort s MSort.«Set{Rule}» → k«Set{Rule}».has_sort e MSort.Rule → k«Set{Rule}».has_sort s' MSort.«Set{Rule}» → kModelCheckResult.eqe (kModelCheckResult.subset₂ (k«Set{Rule}».«`,» s e) s') (kModelCheckResult.andsubthen (kModelCheckResult.«in»₂ e s') (kModelCheckResult.subset₂ s s'))
+    -- eq A:Bool xor A:Bool = false .
     | eq_xor₀ {a} : kModelCheckResult.has_sort a MSort.Bool → kModelCheckResult.eqe (kModelCheckResult.xor a a) kModelCheckResult.false
+    -- eq false xor A:Bool = A:Bool .
     | eq_xor₁ {a} : kModelCheckResult.has_sort a MSort.Bool → kModelCheckResult.eqe (kModelCheckResult.xor kModelCheckResult.false a) a
+    -- eq config:Configuration |= actorName:Qid allowedToDo actionName:Qid = config:Configuration |= actorName:Qid mayDo actionName:Qid or config:Configuration |= actorName:Qid mustDo actionName:Qid .
     | eq_bareq₀ {config actorname actionname} : kEventTrace.has_sort config MSort.Configuration → kModelCheckResult.has_sort actorname MSort.Qid → kModelCheckResult.has_sort actionname MSort.Qid → kModelCheckResult.eqe (kModelCheckResult.bareq config (kEventTrace.allowedToDo actorname actionname)) (kModelCheckResult.or (kModelCheckResult.bareq config (kEventTrace.mayDo actorname actionname)) (kModelCheckResult.bareq config (kEventTrace.mustDo actorname actionname)))
+    -- eq (config:Configuration 
+  -- [1m[31m<[0m coordinator:Qid[1m[31m :[0m V#0:Coordinator[1m[31m |[0m
+  --   [0mV#3:AttributeSet[1m[31m,
+  --   [0m[0mcontractState : Active (activeRules:Set{Rule}[31m,[0m RULE ruleName:Qid PARTY actorName:Qid MAY actionName:Qid WITHIN time:Nat DAY HENCE hence:Set{Qid} LEST lest:Set{Qid})[1m[31m,
+  --   [0m[0mrules : V#1:Set{Rule}[1m[31m,
+  --   [0mtime : V#2:Nat[0m[0m[0m[1m[31m >[0m) |= actorName:Qid mayDo actionName:Qid[0m = true .
     | eq_bareq₁ {config coordinator v#0 v#3 activerules rulename actorname actionname time hence lest v#1 v#2} : kEventTrace.has_sort config MSort.Configuration → kModelCheckResult.has_sort coordinator MSort.Qid → kCid.has_sort v#0 MSort.Coordinator → kAttributeSet.has_sort v#3 MSort.AttributeSet → k«Set{Rule}».has_sort activerules MSort.«Set{Rule}» → kModelCheckResult.has_sort rulename MSort.Qid → kModelCheckResult.has_sort actorname MSort.Qid → kModelCheckResult.has_sort actionname MSort.Qid → kFindResult.has_sort time MSort.Nat → kModelCheckResult.has_sort hence MSort.«Set{Qid}» → kModelCheckResult.has_sort lest MSort.«Set{Qid}» → k«Set{Rule}».has_sort v#1 MSort.«Set{Rule}» → kFindResult.has_sort v#2 MSort.Nat → kModelCheckResult.eqe (kModelCheckResult.bareq (kEventTrace.join config (kEventTrace.ltcolonbargt coordinator v#0 (kAttributeSet.«`,» v#3 (kAttributeSet.«`,» (kAttributeSet.«contractState`colon» (kContractState.Active (k«Set{Rule}».«`,» activerules (k«Set{Rule}».RULE₁ rulename (kActorDeonticActionDeadline.PARTY₁ actorname kDeontic.MAY actionname (kDeadline.WITHIN (kDuration.DAY time))) (kHenceLest.HENCELEST hence lest))))) (kAttributeSet.«`,» (kAttributeSet.«rules`colon» v#1) (kAttributeSet.«time`colon» v#2)))))) (kEventTrace.mayDo actorname actionname)) kModelCheckResult.true
+    -- eq (config:Configuration 
+  -- [1m[31m<[0m coordinator:Qid[1m[31m :[0m V#4:Coordinator[1m[31m |[0m
+  --   [0mV#7:AttributeSet[1m[31m,
+  --   [0m[0mcontractState : Active (activeRules:Set{Rule}[31m,[0m RULE ruleName:Qid PARTY actorName:Qid MUST actionName:Qid WITHIN time:Nat DAY HENCE hence:Set{Qid} LEST lest:Set{Qid})[1m[31m,
+  --   [0m[0mrules : V#5:Set{Rule}[1m[31m,
+  --   [0mtime : V#6:Nat[0m[0m[0m[1m[31m >[0m) |= actorName:Qid mustDo actionName:Qid[0m = true .
     | eq_bareq₂ {config coordinator v#4 v#7 activerules rulename actorname actionname time hence lest v#5 v#6} : kEventTrace.has_sort config MSort.Configuration → kModelCheckResult.has_sort coordinator MSort.Qid → kCid.has_sort v#4 MSort.Coordinator → kAttributeSet.has_sort v#7 MSort.AttributeSet → k«Set{Rule}».has_sort activerules MSort.«Set{Rule}» → kModelCheckResult.has_sort rulename MSort.Qid → kModelCheckResult.has_sort actorname MSort.Qid → kModelCheckResult.has_sort actionname MSort.Qid → kFindResult.has_sort time MSort.Nat → kModelCheckResult.has_sort hence MSort.«Set{Qid}» → kModelCheckResult.has_sort lest MSort.«Set{Qid}» → k«Set{Rule}».has_sort v#5 MSort.«Set{Rule}» → kFindResult.has_sort v#6 MSort.Nat → kModelCheckResult.eqe (kModelCheckResult.bareq (kEventTrace.join config (kEventTrace.ltcolonbargt coordinator v#4 (kAttributeSet.«`,» v#7 (kAttributeSet.«`,» (kAttributeSet.«contractState`colon» (kContractState.Active (k«Set{Rule}».«`,» activerules (k«Set{Rule}».RULE₁ rulename (kActorDeonticActionDeadline.PARTY₁ actorname kDeontic.MUST actionname (kDeadline.WITHIN (kDuration.DAY time))) (kHenceLest.HENCELEST hence lest))))) (kAttributeSet.«`,» (kAttributeSet.«rules`colon» v#5) (kAttributeSet.«time`colon» v#6)))))) (kEventTrace.mustDo actorname actionname)) kModelCheckResult.true
+    -- eq (config:Configuration 
+  -- [1m[31m<[0m coordinator:Qid[1m[31m :[0m V#8:Coordinator[1m[31m |[0m
+  --   [0mV#11:AttributeSet[1m[31m,
+  --   [0m[0mcontractState : Active (activeRules:Set{Rule}[31m,[0m RULE ruleName:Qid PARTY actorName:Qid SHANT actionName:Qid WITHIN time:Nat DAY HENCE hence:Set{Qid} LEST lest:Set{Qid})[1m[31m,
+  --   [0m[0mrules : V#9:Set{Rule}[1m[31m,
+  --   [0mtime : V#10:Nat[0m[0m[0m[1m[31m >[0m) |= actorName:Qid prohibitedFromDoing actionName:Qid[0m = true .
     | eq_bareq₃ {config coordinator v#8 v#11 activerules rulename actorname actionname time hence lest v#9 v#10} : kEventTrace.has_sort config MSort.Configuration → kModelCheckResult.has_sort coordinator MSort.Qid → kCid.has_sort v#8 MSort.Coordinator → kAttributeSet.has_sort v#11 MSort.AttributeSet → k«Set{Rule}».has_sort activerules MSort.«Set{Rule}» → kModelCheckResult.has_sort rulename MSort.Qid → kModelCheckResult.has_sort actorname MSort.Qid → kModelCheckResult.has_sort actionname MSort.Qid → kFindResult.has_sort time MSort.Nat → kModelCheckResult.has_sort hence MSort.«Set{Qid}» → kModelCheckResult.has_sort lest MSort.«Set{Qid}» → k«Set{Rule}».has_sort v#9 MSort.«Set{Rule}» → kFindResult.has_sort v#10 MSort.Nat → kModelCheckResult.eqe (kModelCheckResult.bareq (kEventTrace.join config (kEventTrace.ltcolonbargt coordinator v#8 (kAttributeSet.«`,» v#11 (kAttributeSet.«`,» (kAttributeSet.«contractState`colon» (kContractState.Active (k«Set{Rule}».«`,» activerules (k«Set{Rule}».RULE₁ rulename (kActorDeonticActionDeadline.PARTY₁ actorname kDeontic.SHANT actionname (kDeadline.WITHIN (kDuration.DAY time))) (kHenceLest.HENCELEST hence lest))))) (kAttributeSet.«`,» (kAttributeSet.«rules`colon» v#9) (kAttributeSet.«time`colon» v#10)))))) (kEventTrace.prohibitedFromDoing actorname actionname)) kModelCheckResult.true
+    -- eq (config:Configuration actorName:Qid does actionName:Qid) |= actorName:Qid does actionName:Qid = true .
     | eq_bareq₄ {config actorname actionname} : kEventTrace.has_sort config MSort.Configuration → kModelCheckResult.has_sort actorname MSort.Qid → kModelCheckResult.has_sort actionname MSort.Qid → kModelCheckResult.eqe (kModelCheckResult.bareq (kEventTrace.join config (kEventTrace.does actorname actionname)) (kEventTrace.does actorname actionname)) kModelCheckResult.true
+    -- eq delete(E:Qid, (S:Set{Qid}[31m,[0m E:Qid))[0m = delete(E:Qid, S:Set{Qid}) .
     | eq_delete₀ {e s} : kModelCheckResult.has_sort e MSort.Qid → kModelCheckResult.has_sort s MSort.«Set{Qid}» → kModelCheckResult.eqe (kModelCheckResult.delete e (kModelCheckResult.«`,» s e)) (kModelCheckResult.delete e s)
+    -- eq insert(E:Qid, S:Set{Qid}) = S:Set{Qid}[31m,[0m E:Qid[0m .
     | eq_insert {e s} : kModelCheckResult.has_sort e MSort.Qid → kModelCheckResult.has_sort s MSort.«Set{Qid}» → kModelCheckResult.eqe (kModelCheckResult.insert e s) (kModelCheckResult.«`,» s e)
+    -- eq intersection(S:Set{Qid}, N:NeSet{Qid}) = $intersect(S:Set{Qid}, N:NeSet{Qid}, (empty).Set{Qid}) .
     | eq_intersection₀ {s n} : kModelCheckResult.has_sort s MSort.«Set{Qid}» → kModelCheckResult.has_sort n MSort.«NeSet{Qid}» → kModelCheckResult.eqe (kModelCheckResult.intersection s n) (kModelCheckResult.«$intersect» s n kModelCheckResult.empty)
+    -- eq intersection(S:Set{Qid}, (empty).Set{Qid}) = (empty).Set{Qid} .
     | eq_intersection₁ {s} : kModelCheckResult.has_sort s MSort.«Set{Qid}» → kModelCheckResult.eqe (kModelCheckResult.intersection s kModelCheckResult.empty) kModelCheckResult.empty
+    -- eq not A:Bool = true xor A:Bool .
     | eq_not₀ {a} : kModelCheckResult.has_sort a MSort.Bool → kModelCheckResult.eqe (kModelCheckResult.not a) (kModelCheckResult.xor kModelCheckResult.true a)
+    -- eq union(S:Set{Qid}, S':Set{Qid}) = S:Set{Qid}[31m,[0m S':Set{Qid}[0m .
     | eq_union {s s'} : kModelCheckResult.has_sort s MSort.«Set{Qid}» → kModelCheckResult.has_sort s' MSort.«Set{Qid}» → kModelCheckResult.eqe (kModelCheckResult.union s s') (kModelCheckResult.«`,» s s')
+    -- eq config:Configuration containsActor actorName:Qid = false [owise] .
     | eq_containsActor₁ {config actorname} : kEventTrace.has_sort config MSort.Configuration → kModelCheckResult.has_sort actorname MSort.Qid → kModelCheckResult.eqe (kModelCheckResult.containsActor config actorname) kModelCheckResult.false
+    -- eq activeRules:Set{Rule} containsRuleWithEvent actionEvent:ActionEvent = false [owise] .
     | eq_containsRuleWithEvent₁ {activerules actionevent} : k«Set{Rule}».has_sort activerules MSort.«Set{Rule}» → kEventTrace.has_sort actionevent MSort.ActionEvent → kModelCheckResult.eqe (kModelCheckResult.containsRuleWithEvent activerules actionevent) kModelCheckResult.false
+    -- eq E:ActionEvent in S:Set{ActionEvent} = false [owise] .
     | eq_«in»₀₁ {e s} : kEventTrace.has_sort e MSort.ActionEvent → kEventTrace.has_sort s MSort.«Set{ActionEvent}» → kModelCheckResult.eqe (kModelCheckResult.«in»₀ e s) kModelCheckResult.false
+    -- eq E:Qid in S:Set{Qid} = false [owise] .
     | eq_«in»₁₁ {e s} : kModelCheckResult.has_sort e MSort.Qid → kModelCheckResult.has_sort s MSort.«Set{Qid}» → kModelCheckResult.eqe (kModelCheckResult.«in»₁ e s) kModelCheckResult.false
+    -- eq E:Rule in S:Set{Rule} = false [owise] .
     | eq_«in»₂₁ {e s} : k«Set{Rule}».has_sort e MSort.Rule → k«Set{Rule}».has_sort s MSort.«Set{Rule}» → kModelCheckResult.eqe (kModelCheckResult.«in»₂ e s) kModelCheckResult.false
+    -- eq delete(E:Qid, S:Set{Qid}) = S:Set{Qid} [owise] .
     | eq_delete₁ {e s} : kModelCheckResult.has_sort e MSort.Qid → kModelCheckResult.has_sort s MSort.«Set{Qid}» → kModelCheckResult.eqe (kModelCheckResult.delete e s) s
+    -- eq true and A:Bool = A:Bool .
     | eq_and₄ {a} : kModelCheckResult.has_sort a MSort.Bool → kModelCheckResult.eqe (kModelCheckResult.and kModelCheckResult.true a) a
+    -- eq false and A:Bool = false .
     | eq_and₅ {a} : kModelCheckResult.has_sort a MSort.Bool → kModelCheckResult.eqe (kModelCheckResult.and kModelCheckResult.false a) kModelCheckResult.false
+    -- eq A:Bool and A:Bool = A:Bool .
     | eq_and₆ {a} : kModelCheckResult.has_sort a MSort.Bool → kModelCheckResult.eqe (kModelCheckResult.and a a) a
+    -- eq false xor A:Bool = A:Bool .
     | eq_xor₂ {a} : kModelCheckResult.has_sort a MSort.Bool → kModelCheckResult.eqe (kModelCheckResult.xor kModelCheckResult.false a) a
+    -- eq A:Bool xor A:Bool = false .
     | eq_xor₃ {a} : kModelCheckResult.has_sort a MSort.Bool → kModelCheckResult.eqe (kModelCheckResult.xor a a) kModelCheckResult.false
+    -- eq A:Bool and (B:Bool xor C:Bool) = A:Bool and B:Bool xor A:Bool and C:Bool .
     | eq_and₇ {a b c} : kModelCheckResult.has_sort a MSort.Bool → kModelCheckResult.has_sort b MSort.Bool → kModelCheckResult.has_sort c MSort.Bool → kModelCheckResult.eqe (kModelCheckResult.and a (kModelCheckResult.xor b c)) (kModelCheckResult.xor (kModelCheckResult.and a b) (kModelCheckResult.and a c))
+    -- eq not A:Bool = true xor A:Bool .
     | eq_not₁ {a} : kModelCheckResult.has_sort a MSort.Bool → kModelCheckResult.eqe (kModelCheckResult.not a) (kModelCheckResult.xor kModelCheckResult.true a)
+    -- eq A:Bool or B:Bool = A:Bool and B:Bool xor A:Bool xor B:Bool .
     | eq_or₁ {a b} : kModelCheckResult.has_sort a MSort.Bool → kModelCheckResult.has_sort b MSort.Bool → kModelCheckResult.eqe (kModelCheckResult.or a b) (kModelCheckResult.xor (kModelCheckResult.and a b) (kModelCheckResult.xor a b))
+    -- eq A:Bool implies B:Bool = not (A:Bool xor A:Bool and B:Bool) .
     | eq_implies₁ {a b} : kModelCheckResult.has_sort a MSort.Bool → kModelCheckResult.has_sort b MSort.Bool → kModelCheckResult.eqe (kModelCheckResult.implies a b) (kModelCheckResult.not (kModelCheckResult.xor a (kModelCheckResult.and a b)))
+    -- eq if true then L:[ModelCheckResult,Action,Set{Qid},Id,RuleName,Situation] else R:[ModelCheckResult,Action,Set{Qid},Id,RuleName,Situation] fi = L:[ModelCheckResult,Action,Set{Qid},Id,RuleName,Situation] [fake] .
     | eq_itet {l r} : kModelCheckResult.eqe (kModelCheckResult.ifthenelsefi kModelCheckResult.true l r) l
+    -- eq if false then L:[ModelCheckResult,Action,Set{Qid},Id,RuleName,Situation] else R:[ModelCheckResult,Action,Set{Qid},Id,RuleName,Situation] fi = R:[ModelCheckResult,Action,Set{Qid},Id,RuleName,Situation] [fake] .
     | eq_itef {l r} : kModelCheckResult.eqe (kModelCheckResult.ifthenelsefi kModelCheckResult.false l r) r
+    -- ceq L:[ModelCheckResult,Action,Set{Qid},Id,RuleName,Situation] =/= R:[ModelCheckResult,Action,Set{Qid},Id,RuleName,Situation] = false if L:[ModelCheckResult,Action,Set{Qid},Id,RuleName,Situation] = R:[ModelCheckResult,Action,Set{Qid},Id,RuleName,Situation] [fake] .
     | eq_eqslasheq₀ {l r} : kModelCheckResult.eqe l r → kModelCheckResult.eqe (kModelCheckResult.eqslasheq₀ l r) kModelCheckResult.false
+    -- ceq L:[ModelCheckResult,Action,Set{Qid},Id,RuleName,Situation] =/= R:[ModelCheckResult,Action,Set{Qid},Id,RuleName,Situation] = false if L:[ModelCheckResult,Action,Set{Qid},Id,RuleName,Situation] = R:[ModelCheckResult,Action,Set{Qid},Id,RuleName,Situation] [fake] .
     | eq_eqslasheq₁ {l r} : kModelCheckResult.eqe l r → kModelCheckResult.eqe (kModelCheckResult.eqslasheq₁ l r) kModelCheckResult.false
+    -- ceq L:[ModelCheckResult,Action,Set{Qid},Id,RuleName,Situation] =/= R:[ModelCheckResult,Action,Set{Qid},Id,RuleName,Situation] = false if L:[ModelCheckResult,Action,Set{Qid},Id,RuleName,Situation] = R:[ModelCheckResult,Action,Set{Qid},Id,RuleName,Situation] [fake] .
     | eq_eqslasheq₂ {l r} : kModelCheckResult.eqe l r → kModelCheckResult.eqe (kModelCheckResult.eqslasheq₂ l r) kModelCheckResult.false
+    -- ceq L:[ModelCheckResult,Action,Set{Qid},Id,RuleName,Situation] == R:[ModelCheckResult,Action,Set{Qid},Id,RuleName,Situation] = true if L:[ModelCheckResult,Action,Set{Qid},Id,RuleName,Situation] = R:[ModelCheckResult,Action,Set{Qid},Id,RuleName,Situation] [fake] .
     | eq_eqeq₀ {l r} : kModelCheckResult.eqe l r → kModelCheckResult.eqe (kModelCheckResult.eqeq₀ l r) kModelCheckResult.true
+    -- ceq L:[ModelCheckResult,Action,Set{Qid},Id,RuleName,Situation] == R:[ModelCheckResult,Action,Set{Qid},Id,RuleName,Situation] = true if L:[ModelCheckResult,Action,Set{Qid},Id,RuleName,Situation] = R:[ModelCheckResult,Action,Set{Qid},Id,RuleName,Situation] [fake] .
     | eq_eqeq₁ {l r} : kModelCheckResult.eqe l r → kModelCheckResult.eqe (kModelCheckResult.eqeq₁ l r) kModelCheckResult.true
+    -- ceq L:[ModelCheckResult,Action,Set{Qid},Id,RuleName,Situation] == R:[ModelCheckResult,Action,Set{Qid},Id,RuleName,Situation] = true if L:[ModelCheckResult,Action,Set{Qid},Id,RuleName,Situation] = R:[ModelCheckResult,Action,Set{Qid},Id,RuleName,Situation] [fake] .
     | eq_eqeq₂ {l r} : kModelCheckResult.eqe l r → kModelCheckResult.eqe (kModelCheckResult.eqeq₂ l r) kModelCheckResult.true
 
   inductive kEventTrace.eqe: kEventTrace → kEventTrace → Prop
@@ -1349,46 +1690,100 @@ mutual
     | eqe_«~» {a b : kEventTrace} : kEventTrace.eqe a b → kEventTrace.eqe (kEventTrace.«~» a) (kEventTrace.«~» b)
     | eqe_ifthenelsefi {a₀ b₀ : kModelCheckResult} {a₁ b₁ a₂ b₂ : kEventTrace} : kModelCheckResult.eqe a₀ b₀ → kEventTrace.eqe a₁ b₁ → kEventTrace.eqe a₂ b₂ → kEventTrace.eqe (kEventTrace.ifthenelsefi a₀ a₁ a₂) (kEventTrace.ifthenelsefi b₀ b₁ b₂)
     -- Equations
+    -- eq initialConfig = init rules .
     | eq_initialConfig : kEventTrace.eqe kEventTrace.initialConfig (kEventTrace.init k«Set{Rule}».rules)
+    -- eq $diff((empty).Set{ActionEvent}, S':Set{ActionEvent}, A:Set{ActionEvent}) = A:Set{ActionEvent} .
     | eq_«$diff»₀ {s' a} : kEventTrace.has_sort s' MSort.«Set{ActionEvent}» → kEventTrace.has_sort a MSort.«Set{ActionEvent}» → kEventTrace.eqe (kEventTrace.«$diff» kEventTrace.empty s' a) a
+    -- eq $diff((S:Set{ActionEvent}[31m,[0m E:ActionEvent), S':Set{ActionEvent}, A:Set{ActionEvent})[0m = $diff(S:Set{ActionEvent}, S':Set{ActionEvent}, if E:ActionEvent in S':Set{ActionEvent} then A:Set{ActionEvent} else A:Set{ActionEvent}[31m,[0m E:ActionEvent fi)[0m .
     | eq_«$diff»₁ {s e s' a} : kEventTrace.has_sort s MSort.«Set{ActionEvent}» → kEventTrace.has_sort e MSort.ActionEvent → kEventTrace.has_sort s' MSort.«Set{ActionEvent}» → kEventTrace.has_sort a MSort.«Set{ActionEvent}» → kEventTrace.eqe (kEventTrace.«$diff» (kEventTrace.«`,» s e) s' a) (kEventTrace.«$diff» s s' (kEventTrace.ifthenelsefi (kModelCheckResult.«in»₀ e s') a (kEventTrace.«`,» a e)))
+    -- eq $intersect((empty).Set{ActionEvent}, S':Set{ActionEvent}, A:Set{ActionEvent}) = A:Set{ActionEvent} .
     | eq_«$intersect»₀ {s' a} : kEventTrace.has_sort s' MSort.«Set{ActionEvent}» → kEventTrace.has_sort a MSort.«Set{ActionEvent}» → kEventTrace.eqe (kEventTrace.«$intersect» kEventTrace.empty s' a) a
+    -- eq $intersect((S:Set{ActionEvent}[31m,[0m E:ActionEvent), S':Set{ActionEvent}, A:Set{ActionEvent})[0m = $intersect(S:Set{ActionEvent}, S':Set{ActionEvent}, if E:ActionEvent in S':Set{ActionEvent} then A:Set{ActionEvent}[31m,[0m E:ActionEvent else A:Set{ActionEvent} fi)[0m .
     | eq_«$intersect»₁ {s e s' a} : kEventTrace.has_sort s MSort.«Set{ActionEvent}» → kEventTrace.has_sort e MSort.ActionEvent → kEventTrace.has_sort s' MSort.«Set{ActionEvent}» → kEventTrace.has_sort a MSort.«Set{ActionEvent}» → kEventTrace.eqe (kEventTrace.«$intersect» (kEventTrace.«`,» s e) s' a) (kEventTrace.«$intersect» s s' (kEventTrace.ifthenelsefi (kModelCheckResult.«in»₀ e s') (kEventTrace.«`,» a e) a))
+    -- eq [31m<>[0m f:Formula[0m = [32mTrue[0m[31m U[0m f:Formula[0m .
     | eq_ltgt₁ {f} : kEventTrace.has_sort f MSort.Formula → kEventTrace.eqe (kEventTrace.ltgt₁ f) (kEventTrace.U kEventTrace.True f)
+    -- eq f:Formula[31m ->[0m g:Formula[0m = g:Formula[31m \/[0m [31m~[0m f:Formula[0m .
     | eq_subgt {f g} : kEventTrace.has_sort f MSort.Formula → kEventTrace.has_sort g MSort.Formula → kEventTrace.eqe (kEventTrace.subgt f g) (kEventTrace.bslashslash g (kEventTrace.«~» f))
+    -- eq f:Formula[31m <->[0m g:Formula[0m = (g:Formula[31m ->[0m f:Formula)[31m /\[0m (f:Formula[31m ->[0m g:Formula)[0m .
     | eq_ltsubgt {f g} : kEventTrace.has_sort f MSort.Formula → kEventTrace.has_sort g MSort.Formula → kEventTrace.eqe (kEventTrace.ltsubgt f g) (kEventTrace.slashbslash (kEventTrace.subgt g f) (kEventTrace.subgt f g))
+    -- eq f:Formula[31m <=>[0m g:Formula[0m = [31m[][0m(f:Formula[31m <->[0m g:Formula)[0m .
     | eq_lteqgt {f g} : kEventTrace.has_sort f MSort.Formula → kEventTrace.has_sort g MSort.Formula → kEventTrace.eqe (kEventTrace.lteqgt f g) (kEventTrace.«`lbrak`rbrack» (kEventTrace.ltsubgt f g))
+    -- eq f:Formula[31m =>[0m g:Formula[0m = [31m[][0m(f:Formula[31m ->[0m g:Formula)[0m .
     | eq_eqgt {f g} : kEventTrace.has_sort f MSort.Formula → kEventTrace.has_sort g MSort.Formula → kEventTrace.eqe (kEventTrace.eqgt f g) (kEventTrace.«`lbrak`rbrack» (kEventTrace.subgt f g))
+    -- eq f:Formula[31m W[0m g:Formula[0m = [31m[][0mf:Formula[31m \/[0m (f:Formula[31m U[0m g:Formula)[0m .
     | eq_W {f g} : kEventTrace.has_sort f MSort.Formula → kEventTrace.has_sort g MSort.Formula → kEventTrace.eqe (kEventTrace.W f g) (kEventTrace.bslashslash (kEventTrace.«`lbrak`rbrack» f) (kEventTrace.U f g))
+    -- eq S:Set{ActionEvent} \ N:NeSet{ActionEvent} = $diff(S:Set{ActionEvent}, N:NeSet{ActionEvent}, (empty).Set{ActionEvent}) .
     | eq_bslash₀ {s n} : kEventTrace.has_sort s MSort.«Set{ActionEvent}» → kEventTrace.has_sort n MSort.«NeSet{ActionEvent}» → kEventTrace.eqe (kEventTrace.bslash s n) (kEventTrace.«$diff» s n kEventTrace.empty)
+    -- eq S:Set{ActionEvent} \ (empty).Set{ActionEvent} = S:Set{ActionEvent} .
     | eq_bslash₁ {s} : kEventTrace.has_sort s MSort.«Set{ActionEvent}» → kEventTrace.eqe (kEventTrace.bslash s kEventTrace.empty) s
+    -- eq N:NeSet{ActionEvent}[31m,[0m N:NeSet{ActionEvent}[0m = N:NeSet{ActionEvent} .
     | eq_«`,» {n} : kEventTrace.has_sort n MSort.«NeSet{ActionEvent}» → kEventTrace.eqe (kEventTrace.«`,» n n) n
+    -- eq actorName:Id did actionName:Id = actorName:Id does actionName:Id .
     | eq_did {actorname actionname} : kModelCheckResult.has_sort actorname MSort.Id → kModelCheckResult.has_sort actionname MSort.Id → kEventTrace.eqe (kEventTrace.did actorname actionname) (kEventTrace.does actorname actionname)
+    -- eq actorName:Id do actionName:Id = actorName:Id did actionName:Id .
     | eq_do {actorname actionname} : kModelCheckResult.has_sort actorname MSort.Id → kModelCheckResult.has_sort actionname MSort.Id → kEventTrace.eqe (kEventTrace.do actorname actionname) (kEventTrace.did actorname actionname)
+    -- eq f:Formula[31m |->[0m g:Formula[0m = [31m[][0m(f:Formula[31m ->[0m [31m<>[0m g:Formula)[0m .
     | eq_barsubgt {f g} : kEventTrace.has_sort f MSort.Formula → kEventTrace.has_sort g MSort.Formula → kEventTrace.eqe (kEventTrace.barsubgt f g) (kEventTrace.«`lbrak`rbrack» (kEventTrace.subgt f (kEventTrace.ltgt₁ g)))
+    -- eq [31m[][0mf:Formula[0m = [32mFalse[0m[31m R[0m f:Formula[0m .
     | eq_«`lbrak`rbrack» {f} : kEventTrace.has_sort f MSort.Formula → kEventTrace.eqe (kEventTrace.«`lbrak`rbrack» f) (kEventTrace.R kEventTrace.False f)
+    -- eq delete(E:ActionEvent, (S:Set{ActionEvent}[31m,[0m E:ActionEvent))[0m = delete(E:ActionEvent, S:Set{ActionEvent}) .
     | eq_delete₀ {e s} : kEventTrace.has_sort e MSort.ActionEvent → kEventTrace.has_sort s MSort.«Set{ActionEvent}» → kEventTrace.eqe (kEventTrace.delete e (kEventTrace.«`,» s e)) (kEventTrace.delete e s)
+    -- eq getAction (config:Configuration actorName:Qid does actionName:Qid) = actorName:Qid does actionName:Qid .
     | eq_getAction {config actorname actionname} : kEventTrace.has_sort config MSort.Configuration → kModelCheckResult.has_sort actorname MSort.Qid → kModelCheckResult.has_sort actionname MSort.Qid → kEventTrace.eqe (kEventTrace.getAction (kEventTrace.join config (kEventTrace.does actorname actionname))) (kEventTrace.does actorname actionname)
+    -- eq getAllActions empty = (empty).Set{ActionEvent} .
     | eq_getAllActions₀ : kEventTrace.eqe (kEventTrace.getAllActions k«Set{Rule}».empty) kEventTrace.empty
-    | eq_getAllActions₁ {rules rulename actorname deontic actionname deadline hence lest} : k«Set{Rule}».has_sort rules MSort.«Set{Rule}» → kModelCheckResult.has_sort rulename MSort.Qid → kModelCheckResult.has_sort actorname MSort.Qid → kDeontic.has_sort deontic MSort.Deontic → kModelCheckResult.has_sort actionname MSort.Qid → kDeadline.has_sort deadline MSort.Deadline → kModelCheckResult.has_sort hence MSort.«Set{Qid}» → kModelCheckResult.has_sort lest MSort.«Set{Qid}» → kEventTrace.eqe (kEventTrace.getAllActions (k«Set{Rule}».«`,» rules (k«Set{Rule}».RULE₁ rulename (kActorDeonticActionDeadline.PARTY₁ actorname deontic actionname deadline) (kHenceLest.HENCELEST hence lest)))) (kEventTrace.«`,» (kEventTrace.getAllActions rules) (kEventTrace.does actorname actionname))
+    -- eq getAllActions (rules:Set{Rule}[31m,[0m RULE ruleName:Qid PARTY actorName:Qid deontic:Deontic actionName:Qid deadline:Deadline HENCE hence:Set{Qid} LEST lest:Set{Qid})[0m = getAllActions rules:Set{Rule}[31m,[0m actorName:Qid does actionName:Qid[0m .
+    | eq_getAllActions₁ {rules rulename actorname deontic actionname deadline hence lest} : k«Set{Rule}».has_sort rules MSort.«Set{Rule}» → kModelCheckResult.has_sort rulename MSort.Qid → kModelCheckResult.has_sort actorname MSort.Qid → kModelCheckResult.has_sort actionname MSort.Qid → kDeadline.has_sort deadline MSort.Deadline → kModelCheckResult.has_sort hence MSort.«Set{Qid}» → kModelCheckResult.has_sort lest MSort.«Set{Qid}» → kEventTrace.eqe (kEventTrace.getAllActions (k«Set{Rule}».«`,» rules (k«Set{Rule}».RULE₁ rulename (kActorDeonticActionDeadline.PARTY₁ actorname deontic actionname deadline) (kHenceLest.HENCELEST hence lest)))) (kEventTrace.«`,» (kEventTrace.getAllActions rules) (kEventTrace.does actorname actionname))
+    -- eq initAux empty config:Configuration = tau config:Configuration .
     | eq_initAux₀ {config} : kEventTrace.has_sort config MSort.Configuration → kEventTrace.eqe (kEventTrace.initAux k«Set{Rule}».empty config) (kEventTrace.join kEventTrace.tau config)
-    | eq_initAux₁ {rules rulename actorname deontic actionname deadline hence lest config} : k«Set{Rule}».has_sort rules MSort.«Set{Rule}» → kModelCheckResult.has_sort rulename MSort.Qid → kModelCheckResult.has_sort actorname MSort.Qid → kDeontic.has_sort deontic MSort.Deontic → kModelCheckResult.has_sort actionname MSort.Qid → kDeadline.has_sort deadline MSort.Deadline → kModelCheckResult.has_sort hence MSort.«Set{Qid}» → kModelCheckResult.has_sort lest MSort.«Set{Qid}» → kEventTrace.has_sort config MSort.Configuration → kEventTrace.eqe (kEventTrace.initAux (k«Set{Rule}».«`,» rules (k«Set{Rule}».RULE₁ rulename (kActorDeonticActionDeadline.PARTY₁ actorname deontic actionname deadline) (kHenceLest.HENCELEST hence lest))) config) (kEventTrace.initAux rules (kEventTrace.join config (kEventTrace.ifthenelsefi (kModelCheckResult.containsActor config actorname) kEventTrace.none (kEventTrace.ltcolonbargt actorname kCid.Actor kAttributeSet.none))))
+    -- eq initAux (rules:Set{Rule}[31m,[0m RULE ruleName:Qid PARTY actorName:Qid deontic:Deontic actionName:Qid deadline:Deadline HENCE hence:Set{Qid} LEST lest:Set{Qid}) config:Configuration[0m = initAux rules:Set{Rule} config:Configuration if config:Configuration containsActor actorName:Qid then none else 
+  -- [1m[31m<[0m actorName:Qid[1m[31m :[0m Actor[1m[31m |[0m
+  --   none[1m[31m >[0m fi[0m .
+    | eq_initAux₁ {rules rulename actorname deontic actionname deadline hence lest config} : k«Set{Rule}».has_sort rules MSort.«Set{Rule}» → kModelCheckResult.has_sort rulename MSort.Qid → kModelCheckResult.has_sort actorname MSort.Qid → kModelCheckResult.has_sort actionname MSort.Qid → kDeadline.has_sort deadline MSort.Deadline → kModelCheckResult.has_sort hence MSort.«Set{Qid}» → kModelCheckResult.has_sort lest MSort.«Set{Qid}» → kEventTrace.has_sort config MSort.Configuration → kEventTrace.eqe (kEventTrace.initAux (k«Set{Rule}».«`,» rules (k«Set{Rule}».RULE₁ rulename (kActorDeonticActionDeadline.PARTY₁ actorname deontic actionname deadline) (kHenceLest.HENCELEST hence lest))) config) (kEventTrace.initAux rules (kEventTrace.join config (kEventTrace.ifthenelsefi (kModelCheckResult.containsActor config actorname) kEventTrace.none (kEventTrace.ltcolonbargt actorname kCid.Actor kAttributeSet.none))))
+    -- eq init rules:Set{Rule} = initAux rules:Set{Rule} 
+  -- [1m[31m<[0m 'coordinator[1m[31m :[0m Coordinator[1m[31m |[0m
+  --   [0mrules : rules:Set{Rule}[1m[31m,
+  --   [0m[0mcontractState : Active (getRulesWithNames rules:Set{Rule} 'START)[1m[31m,
+  --   [0mtime : 0[0m[0m[1m[31m >[0m[0m .
     | eq_init {rules} : k«Set{Rule}».has_sort rules MSort.«Set{Rule}» → kEventTrace.eqe (kEventTrace.init rules) (kEventTrace.initAux rules (kEventTrace.ltcolonbargt kModelCheckResult.ltQidsgt kCid.Coordinator (kAttributeSet.«`,» (kAttributeSet.«rules`colon» rules) (kAttributeSet.«`,» (kAttributeSet.«contractState`colon» (kContractState.Active (k«Set{Rule}».getRulesWithNames rules kModelCheckResult.ltQidsgt))) (kAttributeSet.«time`colon» kFindResult.zero)))))
+    -- eq insert(E:ActionEvent, S:Set{ActionEvent}) = S:Set{ActionEvent}[31m,[0m E:ActionEvent[0m .
     | eq_insert {e s} : kEventTrace.has_sort e MSort.ActionEvent → kEventTrace.has_sort s MSort.«Set{ActionEvent}» → kEventTrace.eqe (kEventTrace.insert e s) (kEventTrace.«`,» s e)
+    -- eq intersection(S:Set{ActionEvent}, N:NeSet{ActionEvent}) = $intersect(S:Set{ActionEvent}, N:NeSet{ActionEvent}, (empty).Set{ActionEvent}) .
     | eq_intersection₀ {s n} : kEventTrace.has_sort s MSort.«Set{ActionEvent}» → kEventTrace.has_sort n MSort.«NeSet{ActionEvent}» → kEventTrace.eqe (kEventTrace.intersection s n) (kEventTrace.«$intersect» s n kEventTrace.empty)
+    -- eq intersection(S:Set{ActionEvent}, (empty).Set{ActionEvent}) = (empty).Set{ActionEvent} .
     | eq_intersection₁ {s} : kEventTrace.has_sort s MSort.«Set{ActionEvent}» → kEventTrace.eqe (kEventTrace.intersection s kEventTrace.empty) kEventTrace.empty
+    -- eq pretty (config:Configuration event:Event 
+  -- [1m[31m<[0m coordinator:Qid[1m[31m :[0m V#6:Coordinator[1m[31m |[0m
+  --   [0mV#9:AttributeSet[1m[31m,
+  --   [0m[0mcontractState : contractState:ContractState[1m[31m,
+  --   [0m[0mrules : V#7:Set{Rule}[1m[31m,
+  --   [0mtime : V#8:Nat[0m[0m[0m[1m[31m >[0m)[0m = config:Configuration 
+  -- [1m[31m<[0m coordinator:Qid[1m[31m :[0m PreCoordinator[1m[31m |[0m
+  --   contractState : contractState:ContractState[1m[31m >[0m[0m .
     | eq_pretty {config event coordinator v#6 v#9 contractstate v#7 v#8} : kEventTrace.has_sort config MSort.Configuration → kEventTrace.has_sort event MSort.Event → kModelCheckResult.has_sort coordinator MSort.Qid → kCid.has_sort v#6 MSort.Coordinator → kAttributeSet.has_sort v#9 MSort.AttributeSet → kContractState.has_sort contractstate MSort.ContractState → k«Set{Rule}».has_sort v#7 MSort.«Set{Rule}» → kFindResult.has_sort v#8 MSort.Nat → kEventTrace.eqe (kEventTrace.pretty (kEventTrace.join config (kEventTrace.join event (kEventTrace.ltcolonbargt coordinator v#6 (kAttributeSet.«`,» v#9 (kAttributeSet.«`,» (kAttributeSet.«contractState`colon» contractstate) (kAttributeSet.«`,» (kAttributeSet.«rules`colon» v#7) (kAttributeSet.«time`colon» v#8)))))))) (kEventTrace.join config (kEventTrace.ltcolonbargt coordinator kCid.PreCoordinator (kAttributeSet.«contractState`colon» contractstate)))
+    -- eq union(S:Set{ActionEvent}, S':Set{ActionEvent}) = S:Set{ActionEvent}[31m,[0m S':Set{ActionEvent}[0m .
     | eq_union {s s'} : kEventTrace.has_sort s MSort.«Set{ActionEvent}» → kEventTrace.has_sort s' MSort.«Set{ActionEvent}» → kEventTrace.eqe (kEventTrace.union s s') (kEventTrace.«`,» s s')
+    -- eq [31m~[0m [32mFalse[0m[0m = [32mTrue[0m[0m .
     | eq_«~»₀ : kEventTrace.eqe (kEventTrace.«~» kEventTrace.False) kEventTrace.True
+    -- eq [31m~[0m [32mTrue[0m[0m = [32mFalse[0m[0m .
     | eq_«~»₁ : kEventTrace.eqe (kEventTrace.«~» kEventTrace.True) kEventTrace.False
+    -- eq [31m~[0m [31mO[0m f:Formula[0m = [31mO[0m [31m~[0m f:Formula[0m .
     | eq_«~»₂ {f} : kEventTrace.has_sort f MSort.Formula → kEventTrace.eqe (kEventTrace.«~» (kEventTrace.O f)) (kEventTrace.O (kEventTrace.«~» f))
+    -- eq [31m~[0m (g:Formula[31m /\[0m f:Formula)[0m = [31m~[0m g:Formula[31m \/[0m [31m~[0m f:Formula[0m .
     | eq_«~»₃ {g f} : kEventTrace.has_sort g MSort.Formula → kEventTrace.has_sort f MSort.Formula → kEventTrace.eqe (kEventTrace.«~» (kEventTrace.slashbslash g f)) (kEventTrace.bslashslash (kEventTrace.«~» g) (kEventTrace.«~» f))
+    -- eq [31m~[0m (f:Formula[31m R[0m g:Formula)[0m = [31m~[0m f:Formula[31m U[0m [31m~[0m g:Formula[0m .
     | eq_«~»₄ {f g} : kEventTrace.has_sort f MSort.Formula → kEventTrace.has_sort g MSort.Formula → kEventTrace.eqe (kEventTrace.«~» (kEventTrace.R f g)) (kEventTrace.U (kEventTrace.«~» f) (kEventTrace.«~» g))
+    -- eq [31m~[0m (f:Formula[31m U[0m g:Formula)[0m = [31m~[0m f:Formula[31m R[0m [31m~[0m g:Formula[0m .
     | eq_«~»₅ {f g} : kEventTrace.has_sort f MSort.Formula → kEventTrace.has_sort g MSort.Formula → kEventTrace.eqe (kEventTrace.«~» (kEventTrace.U f g)) (kEventTrace.R (kEventTrace.«~» f) (kEventTrace.«~» g))
+    -- eq [31m~[0m (g:Formula[31m \/[0m f:Formula)[0m = [31m~[0m g:Formula[31m /\[0m [31m~[0m f:Formula[0m .
     | eq_«~»₆ {g f} : kEventTrace.has_sort g MSort.Formula → kEventTrace.has_sort f MSort.Formula → kEventTrace.eqe (kEventTrace.«~» (kEventTrace.bslashslash g f)) (kEventTrace.slashbslash (kEventTrace.«~» g) (kEventTrace.«~» f))
+    -- eq [31m~[0m [31m~[0m f:Formula[0m = f:Formula .
     | eq_«~»₇ {f} : kEventTrace.has_sort f MSort.Formula → kEventTrace.eqe (kEventTrace.«~» (kEventTrace.«~» f)) f
+    -- eq delete(E:ActionEvent, S:Set{ActionEvent}) = S:Set{ActionEvent} [owise] .
     | eq_delete₁ {e s} : kEventTrace.has_sort e MSort.ActionEvent → kEventTrace.has_sort s MSort.«Set{ActionEvent}» → kEventTrace.eqe (kEventTrace.delete e s) s
+    -- eq if true then L:[EventTrace,State,Set{ActionEvent},Formula] else R:[EventTrace,State,Set{ActionEvent},Formula] fi = L:[EventTrace,State,Set{ActionEvent},Formula] [fake] .
     | eq_itet {l r} : kEventTrace.eqe (kEventTrace.ifthenelsefi kModelCheckResult.true l r) l
+    -- eq if false then L:[EventTrace,State,Set{ActionEvent},Formula] else R:[EventTrace,State,Set{ActionEvent},Formula] fi = R:[EventTrace,State,Set{ActionEvent},Formula] [fake] .
     | eq_itef {l r} : kEventTrace.eqe (kEventTrace.ifthenelsefi kModelCheckResult.false l r) r
 
   inductive kActiveRule.eqe: kActiveRule → kActiveRule → Prop
@@ -1404,6 +1799,9 @@ mutual
     -- Congruence axioms for each operator
     | eqe_getClass {a b : kEventTrace} : kEventTrace.eqe a b → kCid.eqe (kCid.getClass a) (kCid.getClass b)
     -- Equations
+    -- eq getClass(
+  -- [1m[31m<[0m O:Oid[1m[31m :[0m C:Cid[1m[31m |[0m
+  --   A:AttributeSet[1m[31m >[0m)[0m = C:Cid .
     | eq_getClass {o c a} : kModelCheckResult.has_sort o MSort.Oid → kCid.has_sort c MSort.Cid → kAttributeSet.has_sort a MSort.AttributeSet → kCid.eqe (kCid.getClass (kEventTrace.ltcolonbargt o c a)) c
 
   inductive kActorDeonticActionDeadline.eqe: kActorDeonticActionDeadline → kActorDeonticActionDeadline → Prop
@@ -1416,9 +1814,12 @@ mutual
     | eqe_PARTY₂ {a₀ b₀ : kModelCheckResult} {a₁ b₁ : kDeontic} {a₂ b₂ : kDeadline} {a₃ b₃ : kModelCheckResult} : kModelCheckResult.eqe a₀ b₀ → kDeontic.eqe a₁ b₁ → kDeadline.eqe a₂ b₂ → kModelCheckResult.eqe a₃ b₃ → kActorDeonticActionDeadline.eqe (kActorDeonticActionDeadline.PARTY₂ a₀ a₁ a₂ a₃) (kActorDeonticActionDeadline.PARTY₂ b₀ b₁ b₂ b₃)
     | eqe_PARTY₃ {a₀ b₀ : kDeadline} {a₁ b₁ : kModelCheckResult} {a₂ b₂ : kDeontic} {a₃ b₃ : kModelCheckResult} : kDeadline.eqe a₀ b₀ → kModelCheckResult.eqe a₁ b₁ → kDeontic.eqe a₂ b₂ → kModelCheckResult.eqe a₃ b₃ → kActorDeonticActionDeadline.eqe (kActorDeonticActionDeadline.PARTY₃ a₀ a₁ a₂ a₃) (kActorDeonticActionDeadline.PARTY₃ b₀ b₁ b₂ b₃)
     -- Equations
-    | eq_PARTY₀ {actorname deadline deontic actionname} : kModelCheckResult.has_sort actorname MSort.Qid → kDeadline.has_sort deadline MSort.Deadline → kDeontic.has_sort deontic MSort.Deontic → kModelCheckResult.has_sort actionname MSort.Qid → kActorDeonticActionDeadline.eqe (kActorDeonticActionDeadline.PARTY₀ actorname deadline deontic actionname) (kActorDeonticActionDeadline.PARTY₁ actorname deontic actionname deadline)
-    | eq_PARTY₂ {actorname deontic deadline actionname} : kModelCheckResult.has_sort actorname MSort.Qid → kDeontic.has_sort deontic MSort.Deontic → kDeadline.has_sort deadline MSort.Deadline → kModelCheckResult.has_sort actionname MSort.Qid → kActorDeonticActionDeadline.eqe (kActorDeonticActionDeadline.PARTY₂ actorname deontic deadline actionname) (kActorDeonticActionDeadline.PARTY₁ actorname deontic actionname deadline)
-    | eq_PARTY₃ {deadline actorname deontic actionname} : kDeadline.has_sort deadline MSort.Deadline → kModelCheckResult.has_sort actorname MSort.Qid → kDeontic.has_sort deontic MSort.Deontic → kModelCheckResult.has_sort actionname MSort.Qid → kActorDeonticActionDeadline.eqe (kActorDeonticActionDeadline.PARTY₃ deadline actorname deontic actionname) (kActorDeonticActionDeadline.PARTY₁ actorname deontic actionname deadline)
+    -- eq PARTY actorName:Qid deadline:Deadline deontic:Deontic actionName:Qid = PARTY actorName:Qid deontic:Deontic actionName:Qid deadline:Deadline .
+    | eq_PARTY₀ {actorname deadline deontic actionname} : kModelCheckResult.has_sort actorname MSort.Qid → kDeadline.has_sort deadline MSort.Deadline → kModelCheckResult.has_sort actionname MSort.Qid → kActorDeonticActionDeadline.eqe (kActorDeonticActionDeadline.PARTY₀ actorname deadline deontic actionname) (kActorDeonticActionDeadline.PARTY₁ actorname deontic actionname deadline)
+    -- eq PARTY actorName:Qid deontic:Deontic deadline:Deadline actionName:Qid = PARTY actorName:Qid deontic:Deontic actionName:Qid deadline:Deadline .
+    | eq_PARTY₂ {actorname deontic deadline actionname} : kModelCheckResult.has_sort actorname MSort.Qid → kDeadline.has_sort deadline MSort.Deadline → kModelCheckResult.has_sort actionname MSort.Qid → kActorDeonticActionDeadline.eqe (kActorDeonticActionDeadline.PARTY₂ actorname deontic deadline actionname) (kActorDeonticActionDeadline.PARTY₁ actorname deontic actionname deadline)
+    -- eq deadline:Deadline PARTY actorName:Qid deontic:Deontic actionName:Qid = PARTY actorName:Qid deontic:Deontic actionName:Qid deadline:Deadline .
+    | eq_PARTY₃ {deadline actorname deontic actionname} : kDeadline.has_sort deadline MSort.Deadline → kModelCheckResult.has_sort actorname MSort.Qid → kModelCheckResult.has_sort actionname MSort.Qid → kActorDeonticActionDeadline.eqe (kActorDeonticActionDeadline.PARTY₃ deadline actorname deontic actionname) (kActorDeonticActionDeadline.PARTY₁ actorname deontic actionname deadline)
 
   inductive kActorState.eqe: kActorState → kActorState → Prop
     | from_eqa {a b} : kActorState.eqa a b → kActorState.eqe a b
@@ -1460,21 +1861,37 @@ mutual
     | eqe_pow {a₀ b₀ a₁ b₁ : kContractState} : kContractState.eqe a₀ b₀ → kContractState.eqe a₁ b₁ → kContractState.eqe (kContractState.pow a₀ a₁) (kContractState.pow b₀ b₁)
     | eqe_ifthenelsefi {a₀ b₀ : kModelCheckResult} {a₁ b₁ a₂ b₂ : kContractState} : kModelCheckResult.eqe a₀ b₀ → kContractState.eqe a₁ b₁ → kContractState.eqe a₂ b₂ → kContractState.eqe (kContractState.ifthenelsefi a₀ a₁ a₂) (kContractState.ifthenelsefi b₀ b₁ b₂)
     -- Equations
+    -- eq Active empty = (Fulfilled).ContractState .
     | eq_Active : kContractState.eqe (kContractState.Active k«Set{Rule}».empty) kContractState.Fulfilled
+    -- eq Active activeRules:Set{Rule} ^ Active activeRules':Set{Rule} = Active (activeRules:Set{Rule}[31m,[0m activeRules':Set{Rule})[0m .
     | eq_pow₀ {activerules activerules'} : k«Set{Rule}».has_sort activerules MSort.«Set{Rule}» → k«Set{Rule}».has_sort activerules' MSort.«Set{Rule}» → kContractState.eqe (kContractState.pow (kContractState.Active activerules) (kContractState.Active activerules')) (kContractState.Active (k«Set{Rule}».«`,» activerules activerules'))
+    -- eq Active activeRules:Set{Rule} ^ Breached actorNames:Set{Qid} = Breached actorNames:Set{Qid} .
     | eq_pow₁ {activerules actornames} : k«Set{Rule}».has_sort activerules MSort.«Set{Rule}» → kModelCheckResult.has_sort actornames MSort.«Set{Qid}» → kContractState.eqe (kContractState.pow (kContractState.Active activerules) (kContractState.Breached actornames)) (kContractState.Breached actornames)
+    -- eq Breached actorNames:Set{Qid} ^ Breached actorNames':Set{Qid} = Breached (actorNames:Set{Qid}[31m,[0m actorNames':Set{Qid})[0m .
     | eq_pow₂ {actornames actornames'} : kModelCheckResult.has_sort actornames MSort.«Set{Qid}» → kModelCheckResult.has_sort actornames' MSort.«Set{Qid}» → kContractState.eqe (kContractState.pow (kContractState.Breached actornames) (kContractState.Breached actornames')) (kContractState.Breached (kModelCheckResult.«`,» actornames actornames'))
+    -- eq deltaAction rules:Set{Rule} actionEvent:ActionEvent Fulfilled = (Fulfilled).ContractState .
     | eq_deltaAction₀ {rules actionevent} : k«Set{Rule}».has_sort rules MSort.«Set{Rule}» → kEventTrace.has_sort actionevent MSort.ActionEvent → kContractState.eqe (kContractState.deltaAction rules actionevent kContractState.Fulfilled) kContractState.Fulfilled
+    -- eq deltaAction rules:Set{Rule} actionEvent:ActionEvent Breached actorNames:Set{Qid} = Breached actorNames:Set{Qid} .
     | eq_deltaAction₁ {rules actionevent actornames} : k«Set{Rule}».has_sort rules MSort.«Set{Rule}» → kEventTrace.has_sort actionevent MSort.ActionEvent → kModelCheckResult.has_sort actornames MSort.«Set{Qid}» → kContractState.eqe (kContractState.deltaAction rules actionevent (kContractState.Breached actornames)) (kContractState.Breached actornames)
+    -- eq deltaAction rules:Set{Rule} actorName:Qid does actionName:Qid Active (activeRules:Set{Rule}[31m,[0m RULE ruleName:Qid PARTY actorName:Qid SHANT actionName:Qid WITHIN time:Nat DAY HENCE hence:Set{Qid} LEST lest:Set{Qid})[0m = (deltaAction rules:Set{Rule} actorName:Qid does actionName:Qid Active activeRules:Set{Rule}) ^ if lest:Set{Qid} == (empty).Set{Qid} then Breached actorName:Qid else Active (getRulesWithNames rules:Set{Rule} lest:Set{Qid}) fi .
     | eq_deltaAction₂ {rules actorname actionname activerules rulename time hence lest} : k«Set{Rule}».has_sort rules MSort.«Set{Rule}» → kModelCheckResult.has_sort actorname MSort.Qid → kModelCheckResult.has_sort actionname MSort.Qid → k«Set{Rule}».has_sort activerules MSort.«Set{Rule}» → kModelCheckResult.has_sort rulename MSort.Qid → kFindResult.has_sort time MSort.Nat → kModelCheckResult.has_sort hence MSort.«Set{Qid}» → kModelCheckResult.has_sort lest MSort.«Set{Qid}» → kContractState.eqe (kContractState.deltaAction rules (kEventTrace.does actorname actionname) (kContractState.Active (k«Set{Rule}».«`,» activerules (k«Set{Rule}».RULE₁ rulename (kActorDeonticActionDeadline.PARTY₁ actorname kDeontic.SHANT actionname (kDeadline.WITHIN (kDuration.DAY time))) (kHenceLest.HENCELEST hence lest))))) (kContractState.pow (kContractState.deltaAction rules (kEventTrace.does actorname actionname) (kContractState.Active activerules)) (kContractState.ifthenelsefi (kModelCheckResult.eqeq₀ lest kModelCheckResult.empty) (kContractState.Breached actorname) (kContractState.Active (k«Set{Rule}».getRulesWithNames rules lest))))
+    -- eq deltaTick rules:Set{Rule} Fulfilled = (Fulfilled).ContractState .
     | eq_deltaTick₀ {rules} : k«Set{Rule}».has_sort rules MSort.«Set{Rule}» → kContractState.eqe (kContractState.deltaTick rules kContractState.Fulfilled) kContractState.Fulfilled
+    -- eq deltaTick rules:Set{Rule} Active (activeRules:Set{Rule}[31m,[0m RULE ruleName:Qid PARTY actorName:Qid SHANT actionName:Qid WITHIN 0 DAY HENCE hence:Set{Qid} LEST lest:Set{Qid})[0m = Active (getRulesWithNames rules:Set{Rule} hence:Set{Qid}) ^ deltaTick rules:Set{Rule} Active activeRules:Set{Rule} .
     | eq_deltaTick₁ {rules activerules rulename actorname actionname hence lest} : k«Set{Rule}».has_sort rules MSort.«Set{Rule}» → k«Set{Rule}».has_sort activerules MSort.«Set{Rule}» → kModelCheckResult.has_sort rulename MSort.Qid → kModelCheckResult.has_sort actorname MSort.Qid → kModelCheckResult.has_sort actionname MSort.Qid → kModelCheckResult.has_sort hence MSort.«Set{Qid}» → kModelCheckResult.has_sort lest MSort.«Set{Qid}» → kContractState.eqe (kContractState.deltaTick rules (kContractState.Active (k«Set{Rule}».«`,» activerules (k«Set{Rule}».RULE₁ rulename (kActorDeonticActionDeadline.PARTY₁ actorname kDeontic.SHANT actionname (kDeadline.WITHIN (kDuration.DAY kFindResult.zero))) (kHenceLest.HENCELEST hence lest))))) (kContractState.pow (kContractState.Active (k«Set{Rule}».getRulesWithNames rules hence)) (kContractState.deltaTick rules (kContractState.Active activerules)))
-    | eq_deltaTick₂ {rules activerules rulename actorname deontic actionname time hence lest} : k«Set{Rule}».has_sort rules MSort.«Set{Rule}» → k«Set{Rule}».has_sort activerules MSort.«Set{Rule}» → kModelCheckResult.has_sort rulename MSort.Qid → kModelCheckResult.has_sort actorname MSort.Qid → kDeontic.has_sort deontic MSort.Deontic → kModelCheckResult.has_sort actionname MSort.Qid → kFindResult.has_sort time MSort.Nat → kModelCheckResult.has_sort hence MSort.«Set{Qid}» → kModelCheckResult.has_sort lest MSort.«Set{Qid}» → kContractState.eqe (kContractState.deltaTick rules (kContractState.Active (k«Set{Rule}».«`,» activerules (k«Set{Rule}».RULE₁ rulename (kActorDeonticActionDeadline.PARTY₁ actorname deontic actionname (kDeadline.WITHIN (kDuration.DAY (kFindResult.s time)))) (kHenceLest.HENCELEST hence lest))))) (kContractState.pow (kContractState.Active (k«Set{Rule}».RULE₁ rulename (kActorDeonticActionDeadline.PARTY₁ actorname deontic actionname (kDeadline.WITHIN (kDuration.DAY time))) (kHenceLest.HENCELEST hence lest))) (kContractState.deltaTick rules (kContractState.Active activerules)))
+    -- eq deltaTick rules:Set{Rule} Active (activeRules:Set{Rule}[31m,[0m RULE ruleName:Qid PARTY actorName:Qid deontic:Deontic actionName:Qid WITHIN (s time:Nat) DAY HENCE hence:Set{Qid} LEST lest:Set{Qid})[0m = Active (RULE ruleName:Qid PARTY actorName:Qid deontic:Deontic actionName:Qid WITHIN time:Nat DAY HENCE hence:Set{Qid} LEST lest:Set{Qid}) ^ deltaTick rules:Set{Rule} Active activeRules:Set{Rule} .
+    | eq_deltaTick₂ {rules activerules rulename actorname deontic actionname time hence lest} : k«Set{Rule}».has_sort rules MSort.«Set{Rule}» → k«Set{Rule}».has_sort activerules MSort.«Set{Rule}» → kModelCheckResult.has_sort rulename MSort.Qid → kModelCheckResult.has_sort actorname MSort.Qid → kModelCheckResult.has_sort actionname MSort.Qid → kFindResult.has_sort time MSort.Nat → kModelCheckResult.has_sort hence MSort.«Set{Qid}» → kModelCheckResult.has_sort lest MSort.«Set{Qid}» → kContractState.eqe (kContractState.deltaTick rules (kContractState.Active (k«Set{Rule}».«`,» activerules (k«Set{Rule}».RULE₁ rulename (kActorDeonticActionDeadline.PARTY₁ actorname deontic actionname (kDeadline.WITHIN (kDuration.DAY (kFindResult.s time)))) (kHenceLest.HENCELEST hence lest))))) (kContractState.pow (kContractState.Active (k«Set{Rule}».RULE₁ rulename (kActorDeonticActionDeadline.PARTY₁ actorname deontic actionname (kDeadline.WITHIN (kDuration.DAY time))) (kHenceLest.HENCELEST hence lest))) (kContractState.deltaTick rules (kContractState.Active activerules)))
+    -- eq deltaTick rules:Set{Rule} Breached actorName:Qid = Breached actorName:Qid .
     | eq_deltaTick₃ {rules actorname} : k«Set{Rule}».has_sort rules MSort.«Set{Rule}» → kModelCheckResult.has_sort actorname MSort.Qid → kContractState.eqe (kContractState.deltaTick rules (kContractState.Breached actorname)) (kContractState.Breached actorname)
-    | eq_deltaAction₃ {rules actorname actionname activerules rulename deontic time hence lest} : k«Set{Rule}».has_sort rules MSort.«Set{Rule}» → kModelCheckResult.has_sort actorname MSort.Qid → kModelCheckResult.has_sort actionname MSort.Qid → k«Set{Rule}».has_sort activerules MSort.«Set{Rule}» → kModelCheckResult.has_sort rulename MSort.Qid → kDeontic.has_sort deontic MSort.Deontic → kFindResult.has_sort time MSort.Nat → kModelCheckResult.has_sort hence MSort.«Set{Qid}» → kModelCheckResult.has_sort lest MSort.«Set{Qid}» → kModelCheckResult.eqe (kModelCheckResult.or (kModelCheckResult.eqeq₁ deontic kDeontic.MAY) (kModelCheckResult.eqeq₁ deontic kDeontic.MUST)) kModelCheckResult.true → kContractState.eqe (kContractState.deltaAction rules (kEventTrace.does actorname actionname) (kContractState.Active (k«Set{Rule}».«`,» activerules (k«Set{Rule}».RULE₁ rulename (kActorDeonticActionDeadline.PARTY₁ actorname deontic actionname (kDeadline.WITHIN (kDuration.DAY time))) (kHenceLest.HENCELEST hence lest))))) (kContractState.pow (kContractState.Active (k«Set{Rule}».getRulesWithNames rules hence)) (kContractState.deltaAction rules (kEventTrace.does actorname actionname) (kContractState.Active activerules)))
-    | eq_deltaTick₄ {rules activerules rulename actorname deontic actionname hence lest} : k«Set{Rule}».has_sort rules MSort.«Set{Rule}» → k«Set{Rule}».has_sort activerules MSort.«Set{Rule}» → kModelCheckResult.has_sort rulename MSort.Qid → kModelCheckResult.has_sort actorname MSort.Qid → kDeontic.has_sort deontic MSort.Deontic → kModelCheckResult.has_sort actionname MSort.Qid → kModelCheckResult.has_sort hence MSort.«Set{Qid}» → kModelCheckResult.has_sort lest MSort.«Set{Qid}» → kModelCheckResult.eqe (kModelCheckResult.or (kModelCheckResult.eqeq₁ deontic kDeontic.MAY) (kModelCheckResult.eqeq₁ deontic kDeontic.MUST)) kModelCheckResult.true → kContractState.eqe (kContractState.deltaTick rules (kContractState.Active (k«Set{Rule}».«`,» activerules (k«Set{Rule}».RULE₁ rulename (kActorDeonticActionDeadline.PARTY₁ actorname deontic actionname (kDeadline.WITHIN (kDuration.DAY kFindResult.zero))) (kHenceLest.HENCELEST hence lest))))) (kContractState.pow (kContractState.deltaTick rules (kContractState.Active activerules)) (kContractState.ifthenelsefi (kModelCheckResult.or (kModelCheckResult.eqslasheq₁ lest kModelCheckResult.empty) (kModelCheckResult.eqeq₁ deontic kDeontic.MAY)) (kContractState.Active (k«Set{Rule}».getRulesWithNames rules lest)) (kContractState.Breached actorname)))
+    -- ceq deltaAction rules:Set{Rule} actorName:Qid does actionName:Qid Active (activeRules:Set{Rule}[31m,[0m RULE ruleName:Qid PARTY actorName:Qid deontic:Deontic actionName:Qid WITHIN time:Nat DAY HENCE hence:Set{Qid} LEST lest:Set{Qid})[0m = Active (getRulesWithNames rules:Set{Rule} hence:Set{Qid}) ^ deltaAction rules:Set{Rule} actorName:Qid does actionName:Qid Active activeRules:Set{Rule} if deontic:Deontic == MAY or deontic:Deontic == MUST = true .
+    | eq_deltaAction₃ {rules actorname actionname activerules rulename deontic time hence lest} : k«Set{Rule}».has_sort rules MSort.«Set{Rule}» → kModelCheckResult.has_sort actorname MSort.Qid → kModelCheckResult.has_sort actionname MSort.Qid → k«Set{Rule}».has_sort activerules MSort.«Set{Rule}» → kModelCheckResult.has_sort rulename MSort.Qid → kFindResult.has_sort time MSort.Nat → kModelCheckResult.has_sort hence MSort.«Set{Qid}» → kModelCheckResult.has_sort lest MSort.«Set{Qid}» → kModelCheckResult.eqe (kModelCheckResult.or (kModelCheckResult.eqeq₁ deontic kDeontic.MAY) (kModelCheckResult.eqeq₁ deontic kDeontic.MUST)) kModelCheckResult.true → kContractState.eqe (kContractState.deltaAction rules (kEventTrace.does actorname actionname) (kContractState.Active (k«Set{Rule}».«`,» activerules (k«Set{Rule}».RULE₁ rulename (kActorDeonticActionDeadline.PARTY₁ actorname deontic actionname (kDeadline.WITHIN (kDuration.DAY time))) (kHenceLest.HENCELEST hence lest))))) (kContractState.pow (kContractState.Active (k«Set{Rule}».getRulesWithNames rules hence)) (kContractState.deltaAction rules (kEventTrace.does actorname actionname) (kContractState.Active activerules)))
+    -- ceq deltaTick rules:Set{Rule} Active (activeRules:Set{Rule}[31m,[0m RULE ruleName:Qid PARTY actorName:Qid deontic:Deontic actionName:Qid WITHIN 0 DAY HENCE hence:Set{Qid} LEST lest:Set{Qid})[0m = (deltaTick rules:Set{Rule} Active activeRules:Set{Rule}) ^ if lest:Set{Qid} =/= (empty).Set{Qid} or deontic:Deontic == MAY then Active (getRulesWithNames rules:Set{Rule} lest:Set{Qid}) else Breached actorName:Qid fi if deontic:Deontic == MAY or deontic:Deontic == MUST = true .
+    | eq_deltaTick₄ {rules activerules rulename actorname deontic actionname hence lest} : k«Set{Rule}».has_sort rules MSort.«Set{Rule}» → k«Set{Rule}».has_sort activerules MSort.«Set{Rule}» → kModelCheckResult.has_sort rulename MSort.Qid → kModelCheckResult.has_sort actorname MSort.Qid → kModelCheckResult.has_sort actionname MSort.Qid → kModelCheckResult.has_sort hence MSort.«Set{Qid}» → kModelCheckResult.has_sort lest MSort.«Set{Qid}» → kModelCheckResult.eqe (kModelCheckResult.or (kModelCheckResult.eqeq₁ deontic kDeontic.MAY) (kModelCheckResult.eqeq₁ deontic kDeontic.MUST)) kModelCheckResult.true → kContractState.eqe (kContractState.deltaTick rules (kContractState.Active (k«Set{Rule}».«`,» activerules (k«Set{Rule}».RULE₁ rulename (kActorDeonticActionDeadline.PARTY₁ actorname deontic actionname (kDeadline.WITHIN (kDuration.DAY kFindResult.zero))) (kHenceLest.HENCELEST hence lest))))) (kContractState.pow (kContractState.deltaTick rules (kContractState.Active activerules)) (kContractState.ifthenelsefi (kModelCheckResult.or (kModelCheckResult.eqslasheq₁ lest kModelCheckResult.empty) (kModelCheckResult.eqeq₁ deontic kDeontic.MAY)) (kContractState.Active (k«Set{Rule}».getRulesWithNames rules lest)) (kContractState.Breached actorname)))
+    -- eq deltaAction rules:Set{Rule} actionEvent:ActionEvent Active (activeRules:Set{Rule}[31m,[0m activeRule:Rule)[0m = Active activeRule:Rule ^ deltaAction rules:Set{Rule} actionEvent:ActionEvent Active activeRules:Set{Rule} [owise] .
     | eq_deltaAction₄ {rules actionevent activerules activerule} : k«Set{Rule}».has_sort rules MSort.«Set{Rule}» → kEventTrace.has_sort actionevent MSort.ActionEvent → k«Set{Rule}».has_sort activerules MSort.«Set{Rule}» → k«Set{Rule}».has_sort activerule MSort.Rule → kContractState.eqe (kContractState.deltaAction rules actionevent (kContractState.Active (k«Set{Rule}».«`,» activerules activerule))) (kContractState.pow (kContractState.Active activerule) (kContractState.deltaAction rules actionevent (kContractState.Active activerules)))
+    -- eq if true then L:[ContractState] else R:[ContractState] fi = L:[ContractState] [fake] .
     | eq_itet {l r} : kContractState.eqe (kContractState.ifthenelsefi kModelCheckResult.true l r) l
+    -- eq if false then L:[ContractState] else R:[ContractState] fi = R:[ContractState] [fake] .
     | eq_itef {l r} : kContractState.eqe (kContractState.ifthenelsefi kModelCheckResult.false l r) r
 
   inductive kContractStatus.eqe: kContractStatus → kContractStatus → Prop
@@ -1485,9 +1902,18 @@ mutual
     | eqe_configToStatus {a b : kEventTrace} : kEventTrace.eqe a b → kContractStatus.eqe (kContractStatus.configToStatus a) (kContractStatus.configToStatus b)
     | eqe_contractStateToStatus {a b : kContractState} : kContractState.eqe a b → kContractStatus.eqe (kContractStatus.contractStateToStatus a) (kContractStatus.contractStateToStatus b)
     -- Equations
+    -- eq configToStatus (config:Configuration 
+  -- [1m[31m<[0m coordinator:Qid[1m[31m :[0m V#2:Coordinator[1m[31m |[0m
+  --   [0mV#5:AttributeSet[1m[31m,
+  --   [0m[0mcontractState : contractState:ContractState[1m[31m,
+  --   [0m[0mrules : V#3:Set{Rule}[1m[31m,
+  --   [0mtime : V#4:Nat[0m[0m[0m[1m[31m >[0m)[0m = contractStateToStatus contractState:ContractState .
     | eq_configToStatus {config coordinator v#2 v#5 contractstate v#3 v#4} : kEventTrace.has_sort config MSort.Configuration → kModelCheckResult.has_sort coordinator MSort.Qid → kCid.has_sort v#2 MSort.Coordinator → kAttributeSet.has_sort v#5 MSort.AttributeSet → kContractState.has_sort contractstate MSort.ContractState → k«Set{Rule}».has_sort v#3 MSort.«Set{Rule}» → kFindResult.has_sort v#4 MSort.Nat → kContractStatus.eqe (kContractStatus.configToStatus (kEventTrace.join config (kEventTrace.ltcolonbargt coordinator v#2 (kAttributeSet.«`,» v#5 (kAttributeSet.«`,» (kAttributeSet.«contractState`colon» contractstate) (kAttributeSet.«`,» (kAttributeSet.«rules`colon» v#3) (kAttributeSet.«time`colon» v#4))))))) (kContractStatus.contractStateToStatus contractstate)
+    -- eq contractStateToStatus Fulfilled = (Fulfilled).ContractStatus .
     | eq_contractStateToStatus₀ : kContractStatus.eqe (kContractStatus.contractStateToStatus kContractState.Fulfilled) kContractStatus.Fulfilled
+    -- eq contractStateToStatus Active (activeRules:Set{Rule}[31m,[0m activeRule:Rule)[0m = Active .
     | eq_contractStateToStatus₁ {activerules activerule} : k«Set{Rule}».has_sort activerules MSort.«Set{Rule}» → k«Set{Rule}».has_sort activerule MSort.Rule → kContractStatus.eqe (kContractStatus.contractStateToStatus (kContractState.Active (k«Set{Rule}».«`,» activerules activerule))) kContractStatus.Active
+    -- eq contractStateToStatus Breached actorNames:Set{Qid} = Breached .
     | eq_contractStateToStatus₂ {actornames} : kModelCheckResult.has_sort actornames MSort.«Set{Qid}» → kContractStatus.eqe (kContractStatus.contractStateToStatus (kContractState.Breached actornames)) kContractStatus.Breached
 
   inductive kDate.eqe: kDate → kDate → Prop
@@ -1554,19 +1980,33 @@ mutual
     | eqe_sd {a₀ b₀ a₁ b₁ : kFindResult} : kFindResult.eqe a₀ b₀ → kFindResult.eqe a₁ b₁ → kFindResult.eqe (kFindResult.sd a₀ a₁) (kFindResult.sd b₀ b₁)
     | eqe_ifthenelsefi {a₀ b₀ : kModelCheckResult} {a₁ b₁ a₂ b₂ : kFindResult} : kModelCheckResult.eqe a₀ b₀ → kFindResult.eqe a₁ b₁ → kFindResult.eqe a₂ b₂ → kFindResult.eqe (kFindResult.ifthenelsefi a₀ a₁ a₂) (kFindResult.ifthenelsefi b₀ b₁ b₂)
     -- Equations
+    -- eq $card((empty).Set{ActionEvent}, C:Nat) = C:Nat .
     | eq_«$card»₀₀ {c} : kFindResult.has_sort c MSort.Nat → kFindResult.eqe (kFindResult.«$card»₀ kEventTrace.empty c) c
+    -- eq $card((empty).Set{Qid}, C:Nat) = C:Nat .
     | eq_«$card»₁₀ {c} : kFindResult.has_sort c MSort.Nat → kFindResult.eqe (kFindResult.«$card»₁ kModelCheckResult.empty c) c
+    -- eq $card((empty).Set{Rule}, C:Nat) = C:Nat .
     | eq_«$card»₂₀ {c} : kFindResult.has_sort c MSort.Nat → kFindResult.eqe (kFindResult.«$card»₂ k«Set{Rule}».empty c) c
+    -- eq $card((N:NeSet{ActionEvent}[31m,[0m N:NeSet{ActionEvent}[31m,[0m S:Set{ActionEvent}), C:Nat)[0m = $card((N:NeSet{ActionEvent}[31m,[0m S:Set{ActionEvent}), C:Nat)[0m .
     | eq_«$card»₀₁ {n s c} : kEventTrace.has_sort n MSort.«NeSet{ActionEvent}» → kEventTrace.has_sort s MSort.«Set{ActionEvent}» → kFindResult.has_sort c MSort.Nat → kFindResult.eqe (kFindResult.«$card»₀ (kEventTrace.«`,» n (kEventTrace.«`,» n s)) c) (kFindResult.«$card»₀ (kEventTrace.«`,» n s) c)
+    -- eq $card((N:NeSet{Qid}[31m,[0m N:NeSet{Qid}[31m,[0m S:Set{Qid}), C:Nat)[0m = $card((N:NeSet{Qid}[31m,[0m S:Set{Qid}), C:Nat)[0m .
     | eq_«$card»₁₁ {n s c} : kModelCheckResult.has_sort n MSort.«NeSet{Qid}» → kModelCheckResult.has_sort s MSort.«Set{Qid}» → kFindResult.has_sort c MSort.Nat → kFindResult.eqe (kFindResult.«$card»₁ (kModelCheckResult.«`,» n (kModelCheckResult.«`,» n s)) c) (kFindResult.«$card»₁ (kModelCheckResult.«`,» n s) c)
+    -- eq $card((N:NeSet{Rule}[31m,[0m N:NeSet{Rule}[31m,[0m S:Set{Rule}), C:Nat)[0m = $card((N:NeSet{Rule}[31m,[0m S:Set{Rule}), C:Nat)[0m .
     | eq_«$card»₂₁ {n s c} : k«Set{Rule}».has_sort n MSort.«NeSet{Rule}» → k«Set{Rule}».has_sort s MSort.«Set{Rule}» → kFindResult.has_sort c MSort.Nat → kFindResult.eqe (kFindResult.«$card»₂ (k«Set{Rule}».«`,» n (k«Set{Rule}».«`,» n s)) c) (kFindResult.«$card»₂ (k«Set{Rule}».«`,» n s) c)
+    -- eq | S:Set{ActionEvent} | = $card(S:Set{ActionEvent}, 0) .
     | eq_barbar₀ {s} : kEventTrace.has_sort s MSort.«Set{ActionEvent}» → kFindResult.eqe (kFindResult.barbar₀ s) (kFindResult.«$card»₀ s kFindResult.zero)
+    -- eq | S:Set{Qid} | = $card(S:Set{Qid}, 0) .
     | eq_barbar₁ {s} : kModelCheckResult.has_sort s MSort.«Set{Qid}» → kFindResult.eqe (kFindResult.barbar₁ s) (kFindResult.«$card»₁ s kFindResult.zero)
+    -- eq | S:Set{Rule} | = $card(S:Set{Rule}, 0) .
     | eq_barbar₂ {s} : k«Set{Rule}».has_sort s MSort.«Set{Rule}» → kFindResult.eqe (kFindResult.barbar₂ s) (kFindResult.«$card»₂ s kFindResult.zero)
+    -- eq $card((S:Set{ActionEvent}[31m,[0m E:ActionEvent), C:Nat)[0m = $card(S:Set{ActionEvent}, C:Nat + 1) [owise] .
     | eq_«$card»₀₂ {s e c} : kEventTrace.has_sort s MSort.«Set{ActionEvent}» → kEventTrace.has_sort e MSort.ActionEvent → kFindResult.has_sort c MSort.Nat → kFindResult.eqe (kFindResult.«$card»₀ (kEventTrace.«`,» s e) c) (kFindResult.«$card»₀ s (kFindResult.sum c (kFindResult.s kFindResult.zero)))
+    -- eq $card((S:Set{Qid}[31m,[0m E:Qid), C:Nat)[0m = $card(S:Set{Qid}, C:Nat + 1) [owise] .
     | eq_«$card»₁₂ {s e c} : kModelCheckResult.has_sort s MSort.«Set{Qid}» → kModelCheckResult.has_sort e MSort.Qid → kFindResult.has_sort c MSort.Nat → kFindResult.eqe (kFindResult.«$card»₁ (kModelCheckResult.«`,» s e) c) (kFindResult.«$card»₁ s (kFindResult.sum c (kFindResult.s kFindResult.zero)))
+    -- eq $card((S:Set{Rule}[31m,[0m E:Rule), C:Nat)[0m = $card(S:Set{Rule}, C:Nat + 1) [owise] .
     | eq_«$card»₂₂ {s e c} : k«Set{Rule}».has_sort s MSort.«Set{Rule}» → k«Set{Rule}».has_sort e MSort.Rule → kFindResult.has_sort c MSort.Nat → kFindResult.eqe (kFindResult.«$card»₂ (k«Set{Rule}».«`,» s e) c) (kFindResult.«$card»₂ s (kFindResult.sum c (kFindResult.s kFindResult.zero)))
+    -- eq if true then L:[FindResult] else R:[FindResult] fi = L:[FindResult] [fake] .
     | eq_itet {l r} : kFindResult.eqe (kFindResult.ifthenelsefi kModelCheckResult.true l r) l
+    -- eq if false then L:[FindResult] else R:[FindResult] fi = R:[FindResult] [fake] .
     | eq_itef {l r} : kFindResult.eqe (kFindResult.ifthenelsefi kModelCheckResult.false l r) r
 
   inductive kHenceLest.eqe: kHenceLest → kHenceLest → Prop
@@ -1579,8 +2019,11 @@ mutual
     | eqe_LEST {a b : kModelCheckResult} : kModelCheckResult.eqe a b → kHenceLest.eqe (kHenceLest.LEST a) (kHenceLest.LEST b)
     | eqe_LESTHENCE {a₀ b₀ a₁ b₁ : kModelCheckResult} : kModelCheckResult.eqe a₀ b₀ → kModelCheckResult.eqe a₁ b₁ → kHenceLest.eqe (kHenceLest.LESTHENCE a₀ a₁) (kHenceLest.LESTHENCE b₀ b₁)
     -- Equations
+    -- eq HENCE hence:Set{Qid} = HENCE hence:Set{Qid} LEST NOTHING .
     | eq_HENCE {hence} : kModelCheckResult.has_sort hence MSort.«Set{Qid}» → kHenceLest.eqe (kHenceLest.HENCE hence) (kHenceLest.HENCELEST hence kModelCheckResult.NOTHING)
+    -- eq LEST lest:Set{Qid} = HENCE NOTHING LEST lest:Set{Qid} .
     | eq_LEST {lest} : kModelCheckResult.has_sort lest MSort.«Set{Qid}» → kHenceLest.eqe (kHenceLest.LEST lest) (kHenceLest.HENCELEST kModelCheckResult.NOTHING lest)
+    -- eq LEST lest:Set{Qid} HENCE hence:Set{Qid} = HENCE hence:Set{Qid} LEST lest:Set{Qid} .
     | eq_LESTHENCE {lest hence} : kModelCheckResult.has_sort lest MSort.«Set{Qid}» → kModelCheckResult.has_sort hence MSort.«Set{Qid}» → kHenceLest.eqe (kHenceLest.LESTHENCE lest hence) (kHenceLest.HENCELEST hence lest)
 
   inductive k«Set{Rule}».eqe: k«Set{Rule}» → k«Set{Rule}» → Prop
@@ -1601,25 +2044,45 @@ mutual
     | eqe_«`,» {a₀ b₀ a₁ b₁ : k«Set{Rule}»} : k«Set{Rule}».eqe a₀ b₀ → k«Set{Rule}».eqe a₁ b₁ → k«Set{Rule}».eqe (k«Set{Rule}».«`,» a₀ a₁) (k«Set{Rule}».«`,» b₀ b₁)
     | eqe_ifthenelsefi {a₀ b₀ : kModelCheckResult} {a₁ b₁ a₂ b₂ : k«Set{Rule}»} : kModelCheckResult.eqe a₀ b₀ → k«Set{Rule}».eqe a₁ b₁ → k«Set{Rule}».eqe a₂ b₂ → k«Set{Rule}».eqe (k«Set{Rule}».ifthenelsefi a₀ a₁ a₂) (k«Set{Rule}».ifthenelsefi b₀ b₁ b₂)
     -- Equations
+    -- eq rules = (RULE 'rule0 PARTY 'party0 SHANT WITHIN 1 DAY 'action0[31m,[0m (RULE 'rule3 PARTY 'party3 MUST WITHIN 4 DAY DO 'action3[31m,[0m RULE 'rule2 WITHIN 2 DAY PARTY 'party2 MUST 'action2 LEST 'rule0)[31m,[0m RULE 'rule1 PARTY 'party1 MUST DO 'action1 WITHIN 2 DAY HENCE 'rule0)[31m,[0m RULE 'START WITHIN 1 DAY PARTY 'party0 SHANT DO 'action0 LEST 'rule2 HENCE ('rule1[31m AND[0m 'rule3)[0m .
     | eq_rules : k«Set{Rule}».eqe k«Set{Rule}».rules (k«Set{Rule}».«`,» (k«Set{Rule}».«`,» (k«Set{Rule}».RULE₀ kModelCheckResult.ltQidsgt (kActorDeonticActionDeadline.PARTY₂ kModelCheckResult.ltQidsgt kDeontic.SHANT (kDeadline.WITHIN (kDuration.DAY (kFindResult.s kFindResult.zero))) kModelCheckResult.ltQidsgt)) (k«Set{Rule}».«`,» (k«Set{Rule}».«`,» (k«Set{Rule}».RULE₀ kModelCheckResult.ltQidsgt (kActorDeonticActionDeadline.PARTY₂ kModelCheckResult.ltQidsgt kDeontic.MUST (kDeadline.WITHIN (kDuration.DAY (kFindResult.s kFindResult.zero))) (kModelCheckResult.DO kModelCheckResult.ltQidsgt))) (k«Set{Rule}».RULE₁ kModelCheckResult.ltQidsgt (kActorDeonticActionDeadline.PARTY₃ (kDeadline.WITHIN (kDuration.DAY (kFindResult.s kFindResult.zero))) kModelCheckResult.ltQidsgt kDeontic.MUST kModelCheckResult.ltQidsgt) (kHenceLest.LEST kModelCheckResult.ltQidsgt))) (k«Set{Rule}».RULE₁ kModelCheckResult.ltQidsgt (kActorDeonticActionDeadline.PARTY₁ kModelCheckResult.ltQidsgt kDeontic.MUST (kModelCheckResult.DO kModelCheckResult.ltQidsgt) (kDeadline.WITHIN (kDuration.DAY (kFindResult.s kFindResult.zero)))) (kHenceLest.HENCE kModelCheckResult.ltQidsgt)))) (k«Set{Rule}».RULE₁ kModelCheckResult.ltQidsgt (kActorDeonticActionDeadline.PARTY₃ (kDeadline.WITHIN (kDuration.DAY (kFindResult.s kFindResult.zero))) kModelCheckResult.ltQidsgt kDeontic.SHANT (kModelCheckResult.DO kModelCheckResult.ltQidsgt)) (kHenceLest.LESTHENCE kModelCheckResult.ltQidsgt (kModelCheckResult.AND kModelCheckResult.ltQidsgt kModelCheckResult.ltQidsgt))))
+    -- eq $diff((empty).Set{Rule}, S':Set{Rule}, A:Set{Rule}) = A:Set{Rule} .
     | eq_«$diff»₀ {s' a} : k«Set{Rule}».has_sort s' MSort.«Set{Rule}» → k«Set{Rule}».has_sort a MSort.«Set{Rule}» → k«Set{Rule}».eqe (k«Set{Rule}».«$diff» k«Set{Rule}».empty s' a) a
+    -- eq $diff((S:Set{Rule}[31m,[0m E:Rule), S':Set{Rule}, A:Set{Rule})[0m = $diff(S:Set{Rule}, S':Set{Rule}, if E:Rule in S':Set{Rule} then A:Set{Rule} else A:Set{Rule}[31m,[0m E:Rule fi)[0m .
     | eq_«$diff»₁ {s e s' a} : k«Set{Rule}».has_sort s MSort.«Set{Rule}» → k«Set{Rule}».has_sort e MSort.Rule → k«Set{Rule}».has_sort s' MSort.«Set{Rule}» → k«Set{Rule}».has_sort a MSort.«Set{Rule}» → k«Set{Rule}».eqe (k«Set{Rule}».«$diff» (k«Set{Rule}».«`,» s e) s' a) (k«Set{Rule}».«$diff» s s' (k«Set{Rule}».ifthenelsefi (kModelCheckResult.«in»₂ e s') a (k«Set{Rule}».«`,» a e)))
+    -- eq $intersect((empty).Set{Rule}, S':Set{Rule}, A:Set{Rule}) = A:Set{Rule} .
     | eq_«$intersect»₀ {s' a} : k«Set{Rule}».has_sort s' MSort.«Set{Rule}» → k«Set{Rule}».has_sort a MSort.«Set{Rule}» → k«Set{Rule}».eqe (k«Set{Rule}».«$intersect» k«Set{Rule}».empty s' a) a
+    -- eq $intersect((S:Set{Rule}[31m,[0m E:Rule), S':Set{Rule}, A:Set{Rule})[0m = $intersect(S:Set{Rule}, S':Set{Rule}, if E:Rule in S':Set{Rule} then A:Set{Rule}[31m,[0m E:Rule else A:Set{Rule} fi)[0m .
     | eq_«$intersect»₁ {s e s' a} : k«Set{Rule}».has_sort s MSort.«Set{Rule}» → k«Set{Rule}».has_sort e MSort.Rule → k«Set{Rule}».has_sort s' MSort.«Set{Rule}» → k«Set{Rule}».has_sort a MSort.«Set{Rule}» → k«Set{Rule}».eqe (k«Set{Rule}».«$intersect» (k«Set{Rule}».«`,» s e) s' a) (k«Set{Rule}».«$intersect» s s' (k«Set{Rule}».ifthenelsefi (kModelCheckResult.«in»₂ e s') (k«Set{Rule}».«`,» a e) a))
-    | eq_RULE₀ {rulename actorname deontic actionname deadline} : kModelCheckResult.has_sort rulename MSort.Qid → kModelCheckResult.has_sort actorname MSort.Qid → kDeontic.has_sort deontic MSort.Deontic → kModelCheckResult.has_sort actionname MSort.Qid → kDeadline.has_sort deadline MSort.Deadline → k«Set{Rule}».eqe (k«Set{Rule}».RULE₀ rulename (kActorDeonticActionDeadline.PARTY₁ actorname deontic actionname deadline)) (k«Set{Rule}».RULE₁ rulename (kActorDeonticActionDeadline.PARTY₁ actorname deontic actionname deadline) (kHenceLest.HENCELEST kModelCheckResult.NOTHING kModelCheckResult.NOTHING))
+    -- eq RULE ruleName:Qid PARTY actorName:Qid deontic:Deontic actionName:Qid deadline:Deadline = RULE ruleName:Qid PARTY actorName:Qid deontic:Deontic actionName:Qid deadline:Deadline HENCE NOTHING LEST NOTHING .
+    | eq_RULE₀ {rulename actorname deontic actionname deadline} : kModelCheckResult.has_sort rulename MSort.Qid → kModelCheckResult.has_sort actorname MSort.Qid → kModelCheckResult.has_sort actionname MSort.Qid → kDeadline.has_sort deadline MSort.Deadline → k«Set{Rule}».eqe (k«Set{Rule}».RULE₀ rulename (kActorDeonticActionDeadline.PARTY₁ actorname deontic actionname deadline)) (k«Set{Rule}».RULE₁ rulename (kActorDeonticActionDeadline.PARTY₁ actorname deontic actionname deadline) (kHenceLest.HENCELEST kModelCheckResult.NOTHING kModelCheckResult.NOTHING))
+    -- eq S:Set{Rule} \ N:NeSet{Rule} = $diff(S:Set{Rule}, N:NeSet{Rule}, (empty).Set{Rule}) .
     | eq_bslash₀ {s n} : k«Set{Rule}».has_sort s MSort.«Set{Rule}» → k«Set{Rule}».has_sort n MSort.«NeSet{Rule}» → k«Set{Rule}».eqe (k«Set{Rule}».bslash s n) (k«Set{Rule}».«$diff» s n k«Set{Rule}».empty)
+    -- eq S:Set{Rule} \ (empty).Set{Rule} = S:Set{Rule} .
     | eq_bslash₁ {s} : k«Set{Rule}».has_sort s MSort.«Set{Rule}» → k«Set{Rule}».eqe (k«Set{Rule}».bslash s k«Set{Rule}».empty) s
+    -- eq N:NeSet{Rule}[31m,[0m N:NeSet{Rule}[0m = N:NeSet{Rule} .
     | eq_«`,» {n} : k«Set{Rule}».has_sort n MSort.«NeSet{Rule}» → k«Set{Rule}».eqe (k«Set{Rule}».«`,» n n) n
+    -- eq delete(E:Rule, (S:Set{Rule}[31m,[0m E:Rule))[0m = delete(E:Rule, S:Set{Rule}) .
     | eq_delete₀ {e s} : k«Set{Rule}».has_sort e MSort.Rule → k«Set{Rule}».has_sort s MSort.«Set{Rule}» → k«Set{Rule}».eqe (k«Set{Rule}».delete e (k«Set{Rule}».«`,» s e)) (k«Set{Rule}».delete e s)
+    -- eq getRulesWithNames rules:Set{Rule} empty = (empty).Set{Rule} .
     | eq_getRulesWithNames₀ {rules} : k«Set{Rule}».has_sort rules MSort.«Set{Rule}» → k«Set{Rule}».eqe (k«Set{Rule}».getRulesWithNames rules kModelCheckResult.empty) k«Set{Rule}».empty
-    | eq_getRulesWithNames₁ {rules rulename actorname deontic actionname deadline hence lest rulenames} : k«Set{Rule}».has_sort rules MSort.«Set{Rule}» → kModelCheckResult.has_sort rulename MSort.Qid → kModelCheckResult.has_sort actorname MSort.Qid → kDeontic.has_sort deontic MSort.Deontic → kModelCheckResult.has_sort actionname MSort.Qid → kDeadline.has_sort deadline MSort.Deadline → kModelCheckResult.has_sort hence MSort.«Set{Qid}» → kModelCheckResult.has_sort lest MSort.«Set{Qid}» → kModelCheckResult.has_sort rulenames MSort.«Set{Qid}» → k«Set{Rule}».eqe (k«Set{Rule}».getRulesWithNames (k«Set{Rule}».«`,» rules (k«Set{Rule}».RULE₁ rulename (kActorDeonticActionDeadline.PARTY₁ actorname deontic actionname deadline) (kHenceLest.HENCELEST hence lest))) (kModelCheckResult.«`,» rulenames rulename)) (k«Set{Rule}».«`,» (k«Set{Rule}».getRulesWithNames rules rulenames) (k«Set{Rule}».RULE₁ rulename (kActorDeonticActionDeadline.PARTY₁ actorname deontic actionname deadline) (kHenceLest.HENCELEST hence lest)))
+    -- eq getRulesWithNames (rules:Set{Rule}[31m,[0m RULE ruleName:Qid PARTY actorName:Qid deontic:Deontic actionName:Qid deadline:Deadline HENCE hence:Set{Qid} LEST lest:Set{Qid}) (ruleNames:Set{Qid}[31m,[0m ruleName:Qid)[0m = getRulesWithNames rules:Set{Rule} ruleNames:Set{Qid}[31m,[0m RULE ruleName:Qid PARTY actorName:Qid deontic:Deontic actionName:Qid deadline:Deadline HENCE hence:Set{Qid} LEST lest:Set{Qid}[0m .
+    | eq_getRulesWithNames₁ {rules rulename actorname deontic actionname deadline hence lest rulenames} : k«Set{Rule}».has_sort rules MSort.«Set{Rule}» → kModelCheckResult.has_sort rulename MSort.Qid → kModelCheckResult.has_sort actorname MSort.Qid → kModelCheckResult.has_sort actionname MSort.Qid → kDeadline.has_sort deadline MSort.Deadline → kModelCheckResult.has_sort hence MSort.«Set{Qid}» → kModelCheckResult.has_sort lest MSort.«Set{Qid}» → kModelCheckResult.has_sort rulenames MSort.«Set{Qid}» → k«Set{Rule}».eqe (k«Set{Rule}».getRulesWithNames (k«Set{Rule}».«`,» rules (k«Set{Rule}».RULE₁ rulename (kActorDeonticActionDeadline.PARTY₁ actorname deontic actionname deadline) (kHenceLest.HENCELEST hence lest))) (kModelCheckResult.«`,» rulenames rulename)) (k«Set{Rule}».«`,» (k«Set{Rule}».getRulesWithNames rules rulenames) (k«Set{Rule}».RULE₁ rulename (kActorDeonticActionDeadline.PARTY₁ actorname deontic actionname deadline) (kHenceLest.HENCELEST hence lest)))
+    -- eq insert(E:Rule, S:Set{Rule}) = S:Set{Rule}[31m,[0m E:Rule[0m .
     | eq_insert {e s} : k«Set{Rule}».has_sort e MSort.Rule → k«Set{Rule}».has_sort s MSort.«Set{Rule}» → k«Set{Rule}».eqe (k«Set{Rule}».insert e s) (k«Set{Rule}».«`,» s e)
+    -- eq intersection(S:Set{Rule}, N:NeSet{Rule}) = $intersect(S:Set{Rule}, N:NeSet{Rule}, (empty).Set{Rule}) .
     | eq_intersection₀ {s n} : k«Set{Rule}».has_sort s MSort.«Set{Rule}» → k«Set{Rule}».has_sort n MSort.«NeSet{Rule}» → k«Set{Rule}».eqe (k«Set{Rule}».intersection s n) (k«Set{Rule}».«$intersect» s n k«Set{Rule}».empty)
+    -- eq intersection(S:Set{Rule}, (empty).Set{Rule}) = (empty).Set{Rule} .
     | eq_intersection₁ {s} : k«Set{Rule}».has_sort s MSort.«Set{Rule}» → k«Set{Rule}».eqe (k«Set{Rule}».intersection s k«Set{Rule}».empty) k«Set{Rule}».empty
+    -- eq union(S:Set{Rule}, S':Set{Rule}) = S:Set{Rule}[31m,[0m S':Set{Rule}[0m .
     | eq_union {s s'} : k«Set{Rule}».has_sort s MSort.«Set{Rule}» → k«Set{Rule}».has_sort s' MSort.«Set{Rule}» → k«Set{Rule}».eqe (k«Set{Rule}».union s s') (k«Set{Rule}».«`,» s s')
+    -- eq delete(E:Rule, S:Set{Rule}) = S:Set{Rule} [owise] .
     | eq_delete₁ {e s} : k«Set{Rule}».has_sort e MSort.Rule → k«Set{Rule}».has_sort s MSort.«Set{Rule}» → k«Set{Rule}».eqe (k«Set{Rule}».delete e s) s
+    -- eq getRulesWithNames rules:Set{Rule} (ruleNames:Set{Qid}[31m,[0m ruleName:Qid)[0m = getRulesWithNames rules:Set{Rule} ruleNames:Set{Qid} [owise] .
     | eq_getRulesWithNames₂ {rules rulenames rulename} : k«Set{Rule}».has_sort rules MSort.«Set{Rule}» → kModelCheckResult.has_sort rulenames MSort.«Set{Qid}» → kModelCheckResult.has_sort rulename MSort.Qid → k«Set{Rule}».eqe (k«Set{Rule}».getRulesWithNames rules (kModelCheckResult.«`,» rulenames rulename)) (k«Set{Rule}».getRulesWithNames rules rulenames)
+    -- eq if true then L:[Set{Rule}] else R:[Set{Rule}] fi = L:[Set{Rule}] [fake] .
     | eq_itet {l r} : k«Set{Rule}».eqe (k«Set{Rule}».ifthenelsefi kModelCheckResult.true l r) l
+    -- eq if false then L:[Set{Rule}] else R:[Set{Rule}] fi = R:[Set{Rule}] [fake] .
     | eq_itef {l r} : k«Set{Rule}».eqe (k«Set{Rule}».ifthenelsefi kModelCheckResult.false l r) r
 
   inductive kTransitionList.eqe: kTransitionList → kTransitionList → Prop
@@ -1637,12 +2100,72 @@ mutual
     -- Congruence axioms for each operator
 
 end
+infix:40 " ⊳ " => kModelCheckResult.has_sort
+infix:40 " ⊳ " => kEventTrace.has_sort
+infix:40 " ⊳ " => kActiveRule.has_sort
+infix:40 " ⊳ " => kCid.has_sort
+infix:40 " ⊳ " => kActorDeonticActionDeadline.has_sort
+infix:40 " ⊳ " => kActorState.has_sort
+infix:40 " ⊳ " => kAttributeSet.has_sort
+infix:40 " ⊳ " => kString.has_sort
+infix:40 " ⊳ " => kContractState.has_sort
+infix:40 " ⊳ " => kContractStatus.has_sort
+infix:40 " ⊳ " => kDate.has_sort
+infix:40 " ⊳ " => kDeadline.has_sort
+infix:40 " ⊳ " => kDeontic.has_sort
+infix:40 " ⊳ " => kDuration.has_sort
+infix:40 " ⊳ " => kFindResult.has_sort
+infix:40 " ⊳ " => kHenceLest.has_sort
+infix:40 " ⊳ " => k«Set{Rule}».has_sort
+infix:40 " ⊳ " => kTransitionList.has_sort
+infix:40 " ⊳ " => kstrategylbrakinternalrbrack.has_sort
+
+infix:40 " =A " => kModelCheckResult.eqa
+infix:40 " =A " => kEventTrace.eqa
+infix:40 " =A " => kActiveRule.eqa
+infix:40 " =A " => kCid.eqa
+infix:40 " =A " => kActorDeonticActionDeadline.eqa
+infix:40 " =A " => kActorState.eqa
+infix:40 " =A " => kAttributeSet.eqa
+infix:40 " =A " => kString.eqa
+infix:40 " =A " => kContractState.eqa
+infix:40 " =A " => kContractStatus.eqa
+infix:40 " =A " => kDate.eqa
+infix:40 " =A " => kDeadline.eqa
+infix:40 " =A " => kDeontic.eqa
+infix:40 " =A " => kDuration.eqa
+infix:40 " =A " => kFindResult.eqa
+infix:40 " =A " => kHenceLest.eqa
+infix:40 " =A " => k«Set{Rule}».eqa
+infix:40 " =A " => kTransitionList.eqa
+infix:40 " =A " => kstrategylbrakinternalrbrack.eqa
+
+infix:40 " =E " => kModelCheckResult.eqe
+infix:40 " =E " => kEventTrace.eqe
+infix:40 " =E " => kActiveRule.eqe
+infix:40 " =E " => kCid.eqe
+infix:40 " =E " => kActorDeonticActionDeadline.eqe
+infix:40 " =E " => kActorState.eqe
+infix:40 " =E " => kAttributeSet.eqe
+infix:40 " =E " => kString.eqe
+infix:40 " =E " => kContractState.eqe
+infix:40 " =E " => kContractStatus.eqe
+infix:40 " =E " => kDate.eqe
+infix:40 " =E " => kDeadline.eqe
+infix:40 " =E " => kDeontic.eqe
+infix:40 " =E " => kDuration.eqe
+infix:40 " =E " => kFindResult.eqe
+infix:40 " =E " => kHenceLest.eqe
+infix:40 " =E " => k«Set{Rule}».eqe
+infix:40 " =E " => kTransitionList.eqe
+infix:40 " =E " => kstrategylbrakinternalrbrack.eqe
+
 -- Rewriting relations
 
 mutual
   inductive kModelCheckResult.rw_one: kModelCheckResult → kModelCheckResult → Prop
-    | eqe_left {a b c : kModelCheckResult} : a.eqe b → kModelCheckResult.rw_one b c → kModelCheckResult.rw_one a c
-    | eqe_right {a b c : kModelCheckResult} : kModelCheckResult.rw_one a b → b.eqe c → kModelCheckResult.rw_one a c
+    | eqe_left {a b c : kModelCheckResult} : a =E b → kModelCheckResult.rw_one b c → kModelCheckResult.rw_one a c
+    | eqe_right {a b c : kModelCheckResult} : kModelCheckResult.rw_one a b → b =E c → kModelCheckResult.rw_one a c
     -- Axioms for rewriting inside subterms
     | sub_and₀ {a₁ a b} : kModelCheckResult.rw_one a b →
     kModelCheckResult.rw_one (kModelCheckResult.and a a₁) (kModelCheckResult.and b a₁)
@@ -1834,8 +2357,8 @@ mutual
     kModelCheckResult.rw_one (kModelCheckResult.eqeq₂ a₀ a) (kModelCheckResult.eqeq₂ a₀ b)
 
   inductive kEventTrace.rw_one: kEventTrace → kEventTrace → Prop
-    | eqe_left {a b c : kEventTrace} : a.eqe b → kEventTrace.rw_one b c → kEventTrace.rw_one a c
-    | eqe_right {a b c : kEventTrace} : kEventTrace.rw_one a b → b.eqe c → kEventTrace.rw_one a c
+    | eqe_left {a b c : kEventTrace} : a =E b → kEventTrace.rw_one b c → kEventTrace.rw_one a c
+    | eqe_right {a b c : kEventTrace} : kEventTrace.rw_one a b → b =E c → kEventTrace.rw_one a c
     -- Axioms for rewriting inside subterms
     | sub_«$diff»₀ {a₁ a₂ a b} : kEventTrace.rw_one a b →
     kEventTrace.rw_one (kEventTrace.«$diff» a a₁ a₂) (kEventTrace.«$diff» b a₁ a₂)
@@ -1986,24 +2509,50 @@ mutual
     | sub_ifthenelsefi₂ {a₀ a₁ a b} : kEventTrace.rw_one a b →
     kEventTrace.rw_one (kEventTrace.ifthenelsefi a₀ a₁ a) (kEventTrace.ifthenelsefi a₀ a₁ b)
     -- Rewrite rules
-    | rl_tick {coordinator : kModelCheckResult} {v#0 : kCid} {v#1 : kAttributeSet} {contractstate : kContractState} {rules : k«Set{Rule}»} {time : kFindResult} : coordinator.has_sort MSort.Qid → v#0.has_sort MSort.Coordinator → v#1.has_sort MSort.AttributeSet → contractstate.has_sort MSort.ContractState → rules.has_sort MSort.«Set{Rule}» → time.has_sort MSort.Nat → kEventTrace.rw_one (kEventTrace.ltcolonbargt coordinator v#0 (kAttributeSet.«`,» v#1 (kAttributeSet.«`,» (kAttributeSet.«contractState`colon» contractstate) (kAttributeSet.«`,» (kAttributeSet.«rules`colon» rules) (kAttributeSet.«time`colon» time))))) (kEventTrace.ltcolonbargt coordinator v#0 (kAttributeSet.«`,» (kAttributeSet.«time`colon» (kFindResult.ifthenelsefi (kModelCheckResult.eqeq₂ (kContractStatus.contractStateToStatus contractstate) kContractStatus.Active) (kFindResult.s time) time)) (kAttributeSet.«`,» (kAttributeSet.«contractState`colon» (kContractState.deltaTick rules contractstate)) (kAttributeSet.«`,» v#1 (kAttributeSet.«rules`colon» rules)))))
-    | rl_action {event : kEventTrace} {actorname : kModelCheckResult} {v#2 : kCid} {v#3 : kAttributeSet} {coordinator : kModelCheckResult} {v#4 : kCid} {v#6 : kAttributeSet} {activerules : k«Set{Rule}»} {rulename : kModelCheckResult} {deontic : kDeontic} {actionname : kModelCheckResult} {time : kFindResult} {hence lest : kModelCheckResult} {rules : k«Set{Rule}»} {v#5 : kFindResult} : event.has_sort MSort.Event → actorname.has_sort MSort.Qid → v#2.has_sort MSort.Actor → v#3.has_sort MSort.AttributeSet → coordinator.has_sort MSort.Qid → v#4.has_sort MSort.Coordinator → v#6.has_sort MSort.AttributeSet → activerules.has_sort MSort.«Set{Rule}» → rulename.has_sort MSort.Qid → deontic.has_sort MSort.Deontic → actionname.has_sort MSort.Qid → time.has_sort MSort.Nat → hence.has_sort MSort.«Set{Qid}» → lest.has_sort MSort.«Set{Qid}» → rules.has_sort MSort.«Set{Rule}» → v#5.has_sort MSort.Nat → kEventTrace.rw_one (kEventTrace.join event (kEventTrace.join (kEventTrace.ltcolonbargt actorname v#2 v#3) (kEventTrace.ltcolonbargt coordinator v#4 (kAttributeSet.«`,» v#6 (kAttributeSet.«`,» (kAttributeSet.«contractState`colon» (kContractState.Active (k«Set{Rule}».«`,» activerules (k«Set{Rule}».RULE₁ rulename (kActorDeonticActionDeadline.PARTY₁ actorname deontic actionname (kDeadline.WITHIN (kDuration.DAY time))) (kHenceLest.HENCELEST hence lest))))) (kAttributeSet.«`,» (kAttributeSet.«rules`colon» rules) (kAttributeSet.«time`colon» v#5))))))) (kEventTrace.join (kEventTrace.join (kEventTrace.does actorname actionname) (kEventTrace.ltcolonbargt coordinator v#4 (kAttributeSet.«`,» (kAttributeSet.«contractState`colon» (kContractState.deltaAction rules (kEventTrace.does actorname actionname) (kContractState.Active (k«Set{Rule}».«`,» activerules (k«Set{Rule}».RULE₁ rulename (kActorDeonticActionDeadline.PARTY₁ actorname deontic actionname (kDeadline.WITHIN (kDuration.DAY time))) (kHenceLest.HENCELEST hence lest)))))) (kAttributeSet.«`,» (kAttributeSet.«rules`colon» rules) (kAttributeSet.«`,» v#6 (kAttributeSet.«time`colon» v#5)))))) (kEventTrace.ltcolonbargt actorname v#2 v#3))
+    -- rl 
+  -- [1m[31m<[0m coordinator:Qid[1m[31m :[0m V#0:Coordinator[1m[31m |[0m
+  --   [0mV#1:AttributeSet[1m[31m,
+  --   [0m[0mcontractState : contractState:ContractState[1m[31m,
+  --   [0m[0mrules : rules:Set{Rule}[1m[31m,
+  --   [0mtime : time:Nat[0m[0m[0m[1m[31m >[0m[0m => 
+  -- [1m[31m<[0m coordinator:Qid[1m[31m :[0m V#0:Coordinator[1m[31m |[0m
+  --   [0mtime : if contractStateToStatus contractState:ContractState == Active then s time:Nat else time:Nat fi[1m[31m,
+  --   [0m[0mcontractState : deltaTick rules:Set{Rule} contractState:ContractState[1m[31m,
+  --   [0m[0mV#1:AttributeSet[1m[31m,
+  --   [0mrules : rules:Set{Rule}[0m[0m[0m[1m[31m >[0m[0m [label tick] .
+    | rl_tick {coordinator : kModelCheckResult} {v#0 : kCid} {v#1 : kAttributeSet} {contractstate : kContractState} {rules : k«Set{Rule}»} {time : kFindResult} : coordinator ⊳ MSort.Qid → v#0 ⊳ MSort.Coordinator → v#1 ⊳ MSort.AttributeSet → contractstate ⊳ MSort.ContractState → rules ⊳ MSort.«Set{Rule}» → time ⊳ MSort.Nat → kEventTrace.rw_one (kEventTrace.ltcolonbargt coordinator v#0 (kAttributeSet.«`,» v#1 (kAttributeSet.«`,» (kAttributeSet.«contractState`colon» contractstate) (kAttributeSet.«`,» (kAttributeSet.«rules`colon» rules) (kAttributeSet.«time`colon» time))))) (kEventTrace.ltcolonbargt coordinator v#0 (kAttributeSet.«`,» (kAttributeSet.«time`colon» (kFindResult.ifthenelsefi (kModelCheckResult.eqeq₂ (kContractStatus.contractStateToStatus contractstate) kContractStatus.Active) (kFindResult.s time) time)) (kAttributeSet.«`,» (kAttributeSet.«contractState`colon» (kContractState.deltaTick rules contractstate)) (kAttributeSet.«`,» v#1 (kAttributeSet.«rules`colon» rules)))))
+    -- rl event:Event 
+  -- [1m[31m<[0m actorName:Qid[1m[31m :[0m V#2:Actor[1m[31m |[0m
+  --   V#3:AttributeSet[1m[31m >[0m 
+  -- [1m[31m<[0m coordinator:Qid[1m[31m :[0m V#4:Coordinator[1m[31m |[0m
+  --   [0mV#6:AttributeSet[1m[31m,
+  --   [0m[0mcontractState : Active (activeRules:Set{Rule}[31m,[0m RULE ruleName:Qid PARTY actorName:Qid deontic:Deontic actionName:Qid WITHIN time:Nat DAY HENCE hence:Set{Qid} LEST lest:Set{Qid})[1m[31m,
+  --   [0m[0mrules : rules:Set{Rule}[1m[31m,
+  --   [0mtime : V#5:Nat[0m[0m[0m[1m[31m >[0m[0m => ((actorName:Qid does actionName:Qid) 
+  -- [1m[31m<[0m coordinator:Qid[1m[31m :[0m V#4:Coordinator[1m[31m |[0m
+  --   [0mcontractState : deltaAction rules:Set{Rule} actorName:Qid does actionName:Qid Active (activeRules:Set{Rule}[31m,[0m RULE ruleName:Qid PARTY actorName:Qid deontic:Deontic actionName:Qid WITHIN time:Nat DAY HENCE hence:Set{Qid} LEST lest:Set{Qid})[1m[31m,
+  --   [0m[0mrules : rules:Set{Rule}[1m[31m,
+  --   [0m[0mV#6:AttributeSet[1m[31m,
+  --   [0mtime : V#5:Nat[0m[0m[0m[1m[31m >[0m) 
+  -- [1m[31m<[0m actorName:Qid[1m[31m :[0m V#2:Actor[1m[31m |[0m
+  --   V#3:AttributeSet[1m[31m >[0m[0m [label action] .
+    | rl_action {event : kEventTrace} {actorname : kModelCheckResult} {v#2 : kCid} {v#3 : kAttributeSet} {coordinator : kModelCheckResult} {v#4 : kCid} {v#6 : kAttributeSet} {activerules : k«Set{Rule}»} {rulename : kModelCheckResult} {deontic : kDeontic} {actionname : kModelCheckResult} {time : kFindResult} {hence lest : kModelCheckResult} {rules : k«Set{Rule}»} {v#5 : kFindResult} : event ⊳ MSort.Event → actorname ⊳ MSort.Qid → v#2 ⊳ MSort.Actor → v#3 ⊳ MSort.AttributeSet → coordinator ⊳ MSort.Qid → v#4 ⊳ MSort.Coordinator → v#6 ⊳ MSort.AttributeSet → activerules ⊳ MSort.«Set{Rule}» → rulename ⊳ MSort.Qid → actionname ⊳ MSort.Qid → time ⊳ MSort.Nat → hence ⊳ MSort.«Set{Qid}» → lest ⊳ MSort.«Set{Qid}» → rules ⊳ MSort.«Set{Rule}» → v#5 ⊳ MSort.Nat → kEventTrace.rw_one (kEventTrace.join event (kEventTrace.join (kEventTrace.ltcolonbargt actorname v#2 v#3) (kEventTrace.ltcolonbargt coordinator v#4 (kAttributeSet.«`,» v#6 (kAttributeSet.«`,» (kAttributeSet.«contractState`colon» (kContractState.Active (k«Set{Rule}».«`,» activerules (k«Set{Rule}».RULE₁ rulename (kActorDeonticActionDeadline.PARTY₁ actorname deontic actionname (kDeadline.WITHIN (kDuration.DAY time))) (kHenceLest.HENCELEST hence lest))))) (kAttributeSet.«`,» (kAttributeSet.«rules`colon» rules) (kAttributeSet.«time`colon» v#5))))))) (kEventTrace.join (kEventTrace.join (kEventTrace.does actorname actionname) (kEventTrace.ltcolonbargt coordinator v#4 (kAttributeSet.«`,» (kAttributeSet.«contractState`colon» (kContractState.deltaAction rules (kEventTrace.does actorname actionname) (kContractState.Active (k«Set{Rule}».«`,» activerules (k«Set{Rule}».RULE₁ rulename (kActorDeonticActionDeadline.PARTY₁ actorname deontic actionname (kDeadline.WITHIN (kDuration.DAY time))) (kHenceLest.HENCELEST hence lest)))))) (kAttributeSet.«`,» (kAttributeSet.«rules`colon» rules) (kAttributeSet.«`,» v#6 (kAttributeSet.«time`colon» v#5)))))) (kEventTrace.ltcolonbargt actorname v#2 v#3))
 
   inductive kActiveRule.rw_one: kActiveRule → kActiveRule → Prop
-    | eqe_left {a b c : kActiveRule} : a.eqe b → kActiveRule.rw_one b c → kActiveRule.rw_one a c
-    | eqe_right {a b c : kActiveRule} : kActiveRule.rw_one a b → b.eqe c → kActiveRule.rw_one a c
+    | eqe_left {a b c : kActiveRule} : a =E b → kActiveRule.rw_one b c → kActiveRule.rw_one a c
+    | eqe_right {a b c : kActiveRule} : kActiveRule.rw_one a b → b =E c → kActiveRule.rw_one a c
     -- Axioms for rewriting inside subterms
 
   inductive kCid.rw_one: kCid → kCid → Prop
-    | eqe_left {a b c : kCid} : a.eqe b → kCid.rw_one b c → kCid.rw_one a c
-    | eqe_right {a b c : kCid} : kCid.rw_one a b → b.eqe c → kCid.rw_one a c
+    | eqe_left {a b c : kCid} : a =E b → kCid.rw_one b c → kCid.rw_one a c
+    | eqe_right {a b c : kCid} : kCid.rw_one a b → b =E c → kCid.rw_one a c
     -- Axioms for rewriting inside subterms
     | sub_getClass {a b} : kEventTrace.rw_one a b →
     kCid.rw_one (kCid.getClass a) (kCid.getClass b)
 
   inductive kActorDeonticActionDeadline.rw_one: kActorDeonticActionDeadline → kActorDeonticActionDeadline → Prop
-    | eqe_left {a b c : kActorDeonticActionDeadline} : a.eqe b → kActorDeonticActionDeadline.rw_one b c → kActorDeonticActionDeadline.rw_one a c
-    | eqe_right {a b c : kActorDeonticActionDeadline} : kActorDeonticActionDeadline.rw_one a b → b.eqe c → kActorDeonticActionDeadline.rw_one a c
+    | eqe_left {a b c : kActorDeonticActionDeadline} : a =E b → kActorDeonticActionDeadline.rw_one b c → kActorDeonticActionDeadline.rw_one a c
+    | eqe_right {a b c : kActorDeonticActionDeadline} : kActorDeonticActionDeadline.rw_one a b → b =E c → kActorDeonticActionDeadline.rw_one a c
     -- Axioms for rewriting inside subterms
     | sub_PARTY₀₀ {a₁ a₂ a₃ a b} : kModelCheckResult.rw_one a b →
     kActorDeonticActionDeadline.rw_one (kActorDeonticActionDeadline.PARTY₀ a a₁ a₂ a₃) (kActorDeonticActionDeadline.PARTY₀ b a₁ a₂ a₃)
@@ -2039,13 +2588,13 @@ mutual
     kActorDeonticActionDeadline.rw_one (kActorDeonticActionDeadline.PARTY₃ a₀ a₁ a₂ a) (kActorDeonticActionDeadline.PARTY₃ a₀ a₁ a₂ b)
 
   inductive kActorState.rw_one: kActorState → kActorState → Prop
-    | eqe_left {a b c : kActorState} : a.eqe b → kActorState.rw_one b c → kActorState.rw_one a c
-    | eqe_right {a b c : kActorState} : kActorState.rw_one a b → b.eqe c → kActorState.rw_one a c
+    | eqe_left {a b c : kActorState} : a =E b → kActorState.rw_one b c → kActorState.rw_one a c
+    | eqe_right {a b c : kActorState} : kActorState.rw_one a b → b =E c → kActorState.rw_one a c
     -- Axioms for rewriting inside subterms
 
   inductive kAttributeSet.rw_one: kAttributeSet → kAttributeSet → Prop
-    | eqe_left {a b c : kAttributeSet} : a.eqe b → kAttributeSet.rw_one b c → kAttributeSet.rw_one a c
-    | eqe_right {a b c : kAttributeSet} : kAttributeSet.rw_one a b → b.eqe c → kAttributeSet.rw_one a c
+    | eqe_left {a b c : kAttributeSet} : a =E b → kAttributeSet.rw_one b c → kAttributeSet.rw_one a c
+    | eqe_right {a b c : kAttributeSet} : kAttributeSet.rw_one a b → b =E c → kAttributeSet.rw_one a c
     -- Axioms for rewriting inside subterms
     | sub_«`,»₀ {a₁ a b} : kAttributeSet.rw_one a b →
     kAttributeSet.rw_one (kAttributeSet.«`,» a a₁) (kAttributeSet.«`,» b a₁)
@@ -2059,8 +2608,8 @@ mutual
     kAttributeSet.rw_one (kAttributeSet.«time`colon» a) (kAttributeSet.«time`colon» b)
 
   inductive kString.rw_one: kString → kString → Prop
-    | eqe_left {a b c : kString} : a.eqe b → kString.rw_one b c → kString.rw_one a c
-    | eqe_right {a b c : kString} : kString.rw_one a b → b.eqe c → kString.rw_one a c
+    | eqe_left {a b c : kString} : a =E b → kString.rw_one b c → kString.rw_one a c
+    | eqe_right {a b c : kString} : kString.rw_one a b → b =E c → kString.rw_one a c
     -- Axioms for rewriting inside subterms
     | sub_sum₀ {a₁ a b} : kString.rw_one a b →
     kString.rw_one (kString.sum a a₁) (kString.sum b a₁)
@@ -2082,8 +2631,8 @@ mutual
     kString.rw_one (kString.upperCase a) (kString.upperCase b)
 
   inductive kContractState.rw_one: kContractState → kContractState → Prop
-    | eqe_left {a b c : kContractState} : a.eqe b → kContractState.rw_one b c → kContractState.rw_one a c
-    | eqe_right {a b c : kContractState} : kContractState.rw_one a b → b.eqe c → kContractState.rw_one a c
+    | eqe_left {a b c : kContractState} : a =E b → kContractState.rw_one b c → kContractState.rw_one a c
+    | eqe_right {a b c : kContractState} : kContractState.rw_one a b → b =E c → kContractState.rw_one a c
     -- Axioms for rewriting inside subterms
     | sub_deltaAction₀ {a₁ a₂ a b} : k«Set{Rule}».rw_one a b →
     kContractState.rw_one (kContractState.deltaAction a a₁ a₂) (kContractState.deltaAction b a₁ a₂)
@@ -2111,8 +2660,8 @@ mutual
     kContractState.rw_one (kContractState.ifthenelsefi a₀ a₁ a) (kContractState.ifthenelsefi a₀ a₁ b)
 
   inductive kContractStatus.rw_one: kContractStatus → kContractStatus → Prop
-    | eqe_left {a b c : kContractStatus} : a.eqe b → kContractStatus.rw_one b c → kContractStatus.rw_one a c
-    | eqe_right {a b c : kContractStatus} : kContractStatus.rw_one a b → b.eqe c → kContractStatus.rw_one a c
+    | eqe_left {a b c : kContractStatus} : a =E b → kContractStatus.rw_one b c → kContractStatus.rw_one a c
+    | eqe_right {a b c : kContractStatus} : kContractStatus.rw_one a b → b =E c → kContractStatus.rw_one a c
     -- Axioms for rewriting inside subterms
     | sub_configToStatus {a b} : kEventTrace.rw_one a b →
     kContractStatus.rw_one (kContractStatus.configToStatus a) (kContractStatus.configToStatus b)
@@ -2120,13 +2669,13 @@ mutual
     kContractStatus.rw_one (kContractStatus.contractStateToStatus a) (kContractStatus.contractStateToStatus b)
 
   inductive kDate.rw_one: kDate → kDate → Prop
-    | eqe_left {a b c : kDate} : a.eqe b → kDate.rw_one b c → kDate.rw_one a c
-    | eqe_right {a b c : kDate} : kDate.rw_one a b → b.eqe c → kDate.rw_one a c
+    | eqe_left {a b c : kDate} : a =E b → kDate.rw_one b c → kDate.rw_one a c
+    | eqe_right {a b c : kDate} : kDate.rw_one a b → b =E c → kDate.rw_one a c
     -- Axioms for rewriting inside subterms
 
   inductive kDeadline.rw_one: kDeadline → kDeadline → Prop
-    | eqe_left {a b c : kDeadline} : a.eqe b → kDeadline.rw_one b c → kDeadline.rw_one a c
-    | eqe_right {a b c : kDeadline} : kDeadline.rw_one a b → b.eqe c → kDeadline.rw_one a c
+    | eqe_left {a b c : kDeadline} : a =E b → kDeadline.rw_one b c → kDeadline.rw_one a c
+    | eqe_right {a b c : kDeadline} : kDeadline.rw_one a b → b =E c → kDeadline.rw_one a c
     -- Axioms for rewriting inside subterms
     | sub_BY {a b} : kFindResult.rw_one a b →
     kDeadline.rw_one (kDeadline.BY a) (kDeadline.BY b)
@@ -2134,13 +2683,13 @@ mutual
     kDeadline.rw_one (kDeadline.WITHIN a) (kDeadline.WITHIN b)
 
   inductive kDeontic.rw_one: kDeontic → kDeontic → Prop
-    | eqe_left {a b c : kDeontic} : a.eqe b → kDeontic.rw_one b c → kDeontic.rw_one a c
-    | eqe_right {a b c : kDeontic} : kDeontic.rw_one a b → b.eqe c → kDeontic.rw_one a c
+    | eqe_left {a b c : kDeontic} : a =E b → kDeontic.rw_one b c → kDeontic.rw_one a c
+    | eqe_right {a b c : kDeontic} : kDeontic.rw_one a b → b =E c → kDeontic.rw_one a c
     -- Axioms for rewriting inside subterms
 
   inductive kDuration.rw_one: kDuration → kDuration → Prop
-    | eqe_left {a b c : kDuration} : a.eqe b → kDuration.rw_one b c → kDuration.rw_one a c
-    | eqe_right {a b c : kDuration} : kDuration.rw_one a b → b.eqe c → kDuration.rw_one a c
+    | eqe_left {a b c : kDuration} : a =E b → kDuration.rw_one b c → kDuration.rw_one a c
+    | eqe_right {a b c : kDuration} : kDuration.rw_one a b → b =E c → kDuration.rw_one a c
     -- Axioms for rewriting inside subterms
     | sub_DAY {a b} : kFindResult.rw_one a b →
     kDuration.rw_one (kDuration.DAY a) (kDuration.DAY b)
@@ -2152,8 +2701,8 @@ mutual
     kDuration.rw_one (kDuration.YEAR a) (kDuration.YEAR b)
 
   inductive kFindResult.rw_one: kFindResult → kFindResult → Prop
-    | eqe_left {a b c : kFindResult} : a.eqe b → kFindResult.rw_one b c → kFindResult.rw_one a c
-    | eqe_right {a b c : kFindResult} : kFindResult.rw_one a b → b.eqe c → kFindResult.rw_one a c
+    | eqe_left {a b c : kFindResult} : a =E b → kFindResult.rw_one b c → kFindResult.rw_one a c
+    | eqe_right {a b c : kFindResult} : kFindResult.rw_one a b → b =E c → kFindResult.rw_one a c
     -- Axioms for rewriting inside subterms
     | sub_«$card»₀₀ {a₁ a b} : kEventTrace.rw_one a b →
     kFindResult.rw_one (kFindResult.«$card»₀ a a₁) (kFindResult.«$card»₀ b a₁)
@@ -2265,8 +2814,8 @@ mutual
     kFindResult.rw_one (kFindResult.ifthenelsefi a₀ a₁ a) (kFindResult.ifthenelsefi a₀ a₁ b)
 
   inductive kHenceLest.rw_one: kHenceLest → kHenceLest → Prop
-    | eqe_left {a b c : kHenceLest} : a.eqe b → kHenceLest.rw_one b c → kHenceLest.rw_one a c
-    | eqe_right {a b c : kHenceLest} : kHenceLest.rw_one a b → b.eqe c → kHenceLest.rw_one a c
+    | eqe_left {a b c : kHenceLest} : a =E b → kHenceLest.rw_one b c → kHenceLest.rw_one a c
+    | eqe_right {a b c : kHenceLest} : kHenceLest.rw_one a b → b =E c → kHenceLest.rw_one a c
     -- Axioms for rewriting inside subterms
     | sub_HENCE {a b} : kModelCheckResult.rw_one a b →
     kHenceLest.rw_one (kHenceLest.HENCE a) (kHenceLest.HENCE b)
@@ -2282,8 +2831,8 @@ mutual
     kHenceLest.rw_one (kHenceLest.LESTHENCE a₀ a) (kHenceLest.LESTHENCE a₀ b)
 
   inductive k«Set{Rule}».rw_one: k«Set{Rule}» → k«Set{Rule}» → Prop
-    | eqe_left {a b c : k«Set{Rule}»} : a.eqe b → k«Set{Rule}».rw_one b c → k«Set{Rule}».rw_one a c
-    | eqe_right {a b c : k«Set{Rule}»} : k«Set{Rule}».rw_one a b → b.eqe c → k«Set{Rule}».rw_one a c
+    | eqe_left {a b c : k«Set{Rule}»} : a =E b → k«Set{Rule}».rw_one b c → k«Set{Rule}».rw_one a c
+    | eqe_right {a b c : k«Set{Rule}»} : k«Set{Rule}».rw_one a b → b =E c → k«Set{Rule}».rw_one a c
     -- Axioms for rewriting inside subterms
     | sub_«$diff»₀ {a₁ a₂ a b} : k«Set{Rule}».rw_one a b →
     k«Set{Rule}».rw_one (k«Set{Rule}».«$diff» a a₁ a₂) (k«Set{Rule}».«$diff» b a₁ a₂)
@@ -2343,8 +2892,8 @@ mutual
     k«Set{Rule}».rw_one (k«Set{Rule}».ifthenelsefi a₀ a₁ a) (k«Set{Rule}».ifthenelsefi a₀ a₁ b)
 
   inductive kTransitionList.rw_one: kTransitionList → kTransitionList → Prop
-    | eqe_left {a b c : kTransitionList} : a.eqe b → kTransitionList.rw_one b c → kTransitionList.rw_one a c
-    | eqe_right {a b c : kTransitionList} : kTransitionList.rw_one a b → b.eqe c → kTransitionList.rw_one a c
+    | eqe_left {a b c : kTransitionList} : a =E b → kTransitionList.rw_one b c → kTransitionList.rw_one a c
+    | eqe_right {a b c : kTransitionList} : kTransitionList.rw_one a b → b =E c → kTransitionList.rw_one a c
     -- Axioms for rewriting inside subterms
     | sub_join₀ {a₁ a b} : kTransitionList.rw_one a b →
     kTransitionList.rw_one (kTransitionList.join a a₁) (kTransitionList.join b a₁)
@@ -2356,106 +2905,146 @@ mutual
     kTransitionList.rw_one (kTransitionList.«`{`,`}» a₀ a) (kTransitionList.«`{`,`}» a₀ b)
 
   inductive kstrategylbrakinternalrbrack.rw_one: kstrategylbrakinternalrbrack → kstrategylbrakinternalrbrack → Prop
-    | eqe_left {a b c : kstrategylbrakinternalrbrack} : a.eqe b → kstrategylbrakinternalrbrack.rw_one b c → kstrategylbrakinternalrbrack.rw_one a c
-    | eqe_right {a b c : kstrategylbrakinternalrbrack} : kstrategylbrakinternalrbrack.rw_one a b → b.eqe c → kstrategylbrakinternalrbrack.rw_one a c
+    | eqe_left {a b c : kstrategylbrakinternalrbrack} : a =E b → kstrategylbrakinternalrbrack.rw_one b c → kstrategylbrakinternalrbrack.rw_one a c
+    | eqe_right {a b c : kstrategylbrakinternalrbrack} : kstrategylbrakinternalrbrack.rw_one a b → b =E c → kstrategylbrakinternalrbrack.rw_one a c
     -- Axioms for rewriting inside subterms
 
   inductive kModelCheckResult.rw_star: kModelCheckResult → kModelCheckResult → Prop
     | step {a b} : kModelCheckResult.rw_one a b → kModelCheckResult.rw_star a b
-    | refl {a b : kModelCheckResult} : a.eqe b → kModelCheckResult.rw_star a b
+    | refl {a b : kModelCheckResult} : a =E b → kModelCheckResult.rw_star a b
     | trans {a b c} : kModelCheckResult.rw_star a b → kModelCheckResult.rw_star b c → kModelCheckResult.rw_star a c
 
   inductive kEventTrace.rw_star: kEventTrace → kEventTrace → Prop
     | step {a b} : kEventTrace.rw_one a b → kEventTrace.rw_star a b
-    | refl {a b : kEventTrace} : a.eqe b → kEventTrace.rw_star a b
+    | refl {a b : kEventTrace} : a =E b → kEventTrace.rw_star a b
     | trans {a b c} : kEventTrace.rw_star a b → kEventTrace.rw_star b c → kEventTrace.rw_star a c
 
   inductive kActiveRule.rw_star: kActiveRule → kActiveRule → Prop
     | step {a b} : kActiveRule.rw_one a b → kActiveRule.rw_star a b
-    | refl {a b : kActiveRule} : a.eqe b → kActiveRule.rw_star a b
+    | refl {a b : kActiveRule} : a =E b → kActiveRule.rw_star a b
     | trans {a b c} : kActiveRule.rw_star a b → kActiveRule.rw_star b c → kActiveRule.rw_star a c
 
   inductive kCid.rw_star: kCid → kCid → Prop
     | step {a b} : kCid.rw_one a b → kCid.rw_star a b
-    | refl {a b : kCid} : a.eqe b → kCid.rw_star a b
+    | refl {a b : kCid} : a =E b → kCid.rw_star a b
     | trans {a b c} : kCid.rw_star a b → kCid.rw_star b c → kCid.rw_star a c
 
   inductive kActorDeonticActionDeadline.rw_star: kActorDeonticActionDeadline → kActorDeonticActionDeadline → Prop
     | step {a b} : kActorDeonticActionDeadline.rw_one a b → kActorDeonticActionDeadline.rw_star a b
-    | refl {a b : kActorDeonticActionDeadline} : a.eqe b → kActorDeonticActionDeadline.rw_star a b
+    | refl {a b : kActorDeonticActionDeadline} : a =E b → kActorDeonticActionDeadline.rw_star a b
     | trans {a b c} : kActorDeonticActionDeadline.rw_star a b → kActorDeonticActionDeadline.rw_star b c → kActorDeonticActionDeadline.rw_star a c
 
   inductive kActorState.rw_star: kActorState → kActorState → Prop
     | step {a b} : kActorState.rw_one a b → kActorState.rw_star a b
-    | refl {a b : kActorState} : a.eqe b → kActorState.rw_star a b
+    | refl {a b : kActorState} : a =E b → kActorState.rw_star a b
     | trans {a b c} : kActorState.rw_star a b → kActorState.rw_star b c → kActorState.rw_star a c
 
   inductive kAttributeSet.rw_star: kAttributeSet → kAttributeSet → Prop
     | step {a b} : kAttributeSet.rw_one a b → kAttributeSet.rw_star a b
-    | refl {a b : kAttributeSet} : a.eqe b → kAttributeSet.rw_star a b
+    | refl {a b : kAttributeSet} : a =E b → kAttributeSet.rw_star a b
     | trans {a b c} : kAttributeSet.rw_star a b → kAttributeSet.rw_star b c → kAttributeSet.rw_star a c
 
   inductive kString.rw_star: kString → kString → Prop
     | step {a b} : kString.rw_one a b → kString.rw_star a b
-    | refl {a b : kString} : a.eqe b → kString.rw_star a b
+    | refl {a b : kString} : a =E b → kString.rw_star a b
     | trans {a b c} : kString.rw_star a b → kString.rw_star b c → kString.rw_star a c
 
   inductive kContractState.rw_star: kContractState → kContractState → Prop
     | step {a b} : kContractState.rw_one a b → kContractState.rw_star a b
-    | refl {a b : kContractState} : a.eqe b → kContractState.rw_star a b
+    | refl {a b : kContractState} : a =E b → kContractState.rw_star a b
     | trans {a b c} : kContractState.rw_star a b → kContractState.rw_star b c → kContractState.rw_star a c
 
   inductive kContractStatus.rw_star: kContractStatus → kContractStatus → Prop
     | step {a b} : kContractStatus.rw_one a b → kContractStatus.rw_star a b
-    | refl {a b : kContractStatus} : a.eqe b → kContractStatus.rw_star a b
+    | refl {a b : kContractStatus} : a =E b → kContractStatus.rw_star a b
     | trans {a b c} : kContractStatus.rw_star a b → kContractStatus.rw_star b c → kContractStatus.rw_star a c
 
   inductive kDate.rw_star: kDate → kDate → Prop
     | step {a b} : kDate.rw_one a b → kDate.rw_star a b
-    | refl {a b : kDate} : a.eqe b → kDate.rw_star a b
+    | refl {a b : kDate} : a =E b → kDate.rw_star a b
     | trans {a b c} : kDate.rw_star a b → kDate.rw_star b c → kDate.rw_star a c
 
   inductive kDeadline.rw_star: kDeadline → kDeadline → Prop
     | step {a b} : kDeadline.rw_one a b → kDeadline.rw_star a b
-    | refl {a b : kDeadline} : a.eqe b → kDeadline.rw_star a b
+    | refl {a b : kDeadline} : a =E b → kDeadline.rw_star a b
     | trans {a b c} : kDeadline.rw_star a b → kDeadline.rw_star b c → kDeadline.rw_star a c
 
   inductive kDeontic.rw_star: kDeontic → kDeontic → Prop
     | step {a b} : kDeontic.rw_one a b → kDeontic.rw_star a b
-    | refl {a b : kDeontic} : a.eqe b → kDeontic.rw_star a b
+    | refl {a b : kDeontic} : a =E b → kDeontic.rw_star a b
     | trans {a b c} : kDeontic.rw_star a b → kDeontic.rw_star b c → kDeontic.rw_star a c
 
   inductive kDuration.rw_star: kDuration → kDuration → Prop
     | step {a b} : kDuration.rw_one a b → kDuration.rw_star a b
-    | refl {a b : kDuration} : a.eqe b → kDuration.rw_star a b
+    | refl {a b : kDuration} : a =E b → kDuration.rw_star a b
     | trans {a b c} : kDuration.rw_star a b → kDuration.rw_star b c → kDuration.rw_star a c
 
   inductive kFindResult.rw_star: kFindResult → kFindResult → Prop
     | step {a b} : kFindResult.rw_one a b → kFindResult.rw_star a b
-    | refl {a b : kFindResult} : a.eqe b → kFindResult.rw_star a b
+    | refl {a b : kFindResult} : a =E b → kFindResult.rw_star a b
     | trans {a b c} : kFindResult.rw_star a b → kFindResult.rw_star b c → kFindResult.rw_star a c
 
   inductive kHenceLest.rw_star: kHenceLest → kHenceLest → Prop
     | step {a b} : kHenceLest.rw_one a b → kHenceLest.rw_star a b
-    | refl {a b : kHenceLest} : a.eqe b → kHenceLest.rw_star a b
+    | refl {a b : kHenceLest} : a =E b → kHenceLest.rw_star a b
     | trans {a b c} : kHenceLest.rw_star a b → kHenceLest.rw_star b c → kHenceLest.rw_star a c
 
   inductive k«Set{Rule}».rw_star: k«Set{Rule}» → k«Set{Rule}» → Prop
     | step {a b} : k«Set{Rule}».rw_one a b → k«Set{Rule}».rw_star a b
-    | refl {a b : k«Set{Rule}»} : a.eqe b → k«Set{Rule}».rw_star a b
+    | refl {a b : k«Set{Rule}»} : a =E b → k«Set{Rule}».rw_star a b
     | trans {a b c} : k«Set{Rule}».rw_star a b → k«Set{Rule}».rw_star b c → k«Set{Rule}».rw_star a c
 
   inductive kTransitionList.rw_star: kTransitionList → kTransitionList → Prop
     | step {a b} : kTransitionList.rw_one a b → kTransitionList.rw_star a b
-    | refl {a b : kTransitionList} : a.eqe b → kTransitionList.rw_star a b
+    | refl {a b : kTransitionList} : a =E b → kTransitionList.rw_star a b
     | trans {a b c} : kTransitionList.rw_star a b → kTransitionList.rw_star b c → kTransitionList.rw_star a c
 
   inductive kstrategylbrakinternalrbrack.rw_star: kstrategylbrakinternalrbrack → kstrategylbrakinternalrbrack → Prop
     | step {a b} : kstrategylbrakinternalrbrack.rw_one a b → kstrategylbrakinternalrbrack.rw_star a b
-    | refl {a b : kstrategylbrakinternalrbrack} : a.eqe b → kstrategylbrakinternalrbrack.rw_star a b
+    | refl {a b : kstrategylbrakinternalrbrack} : a =E b → kstrategylbrakinternalrbrack.rw_star a b
     | trans {a b c} : kstrategylbrakinternalrbrack.rw_star a b → kstrategylbrakinternalrbrack.rw_star b c → kstrategylbrakinternalrbrack.rw_star a c
 
 end
+infix:40 " =>1 " => kModelCheckResult.rw_one
+infix:40 " =>1 " => kEventTrace.rw_one
+infix:40 " =>1 " => kActiveRule.rw_one
+infix:40 " =>1 " => kCid.rw_one
+infix:40 " =>1 " => kActorDeonticActionDeadline.rw_one
+infix:40 " =>1 " => kActorState.rw_one
+infix:40 " =>1 " => kAttributeSet.rw_one
+infix:40 " =>1 " => kString.rw_one
+infix:40 " =>1 " => kContractState.rw_one
+infix:40 " =>1 " => kContractStatus.rw_one
+infix:40 " =>1 " => kDate.rw_one
+infix:40 " =>1 " => kDeadline.rw_one
+infix:40 " =>1 " => kDeontic.rw_one
+infix:40 " =>1 " => kDuration.rw_one
+infix:40 " =>1 " => kFindResult.rw_one
+infix:40 " =>1 " => kHenceLest.rw_one
+infix:40 " =>1 " => k«Set{Rule}».rw_one
+infix:40 " =>1 " => kTransitionList.rw_one
+infix:40 " =>1 " => kstrategylbrakinternalrbrack.rw_one
+
+infix:40 " =>* " => kModelCheckResult.rw_star
+infix:40 " =>* " => kEventTrace.rw_star
+infix:40 " =>* " => kActiveRule.rw_star
+infix:40 " =>* " => kCid.rw_star
+infix:40 " =>* " => kActorDeonticActionDeadline.rw_star
+infix:40 " =>* " => kActorState.rw_star
+infix:40 " =>* " => kAttributeSet.rw_star
+infix:40 " =>* " => kString.rw_star
+infix:40 " =>* " => kContractState.rw_star
+infix:40 " =>* " => kContractStatus.rw_star
+infix:40 " =>* " => kDate.rw_star
+infix:40 " =>* " => kDeadline.rw_star
+infix:40 " =>* " => kDeontic.rw_star
+infix:40 " =>* " => kDuration.rw_star
+infix:40 " =>* " => kFindResult.rw_star
+infix:40 " =>* " => kHenceLest.rw_star
+infix:40 " =>* " => k«Set{Rule}».rw_star
+infix:40 " =>* " => kTransitionList.rw_star
+infix:40 " =>* " => kstrategylbrakinternalrbrack.rw_star
+
 -- Lemmas and aliases
 
 /-- Congruence lemma for generic relations -/
@@ -2476,36 +3065,36 @@ by
 
 namespace kModelCheckResult
   -- Sort membership lemmas
-  theorem subsort_bool_modelcheckresult {t : kModelCheckResult} : t.has_sort MSort.Bool →
-    t.has_sort MSort.ModelCheckResult := by apply has_sort.subsort; simp [subsort]
-  theorem subsort_qid_action {t : kModelCheckResult} : t.has_sort MSort.Qid →
-    t.has_sort MSort.Action := by apply has_sort.subsort; simp [subsort]
-  theorem subsort_names_«set{qid}» {t : kModelCheckResult} : t.has_sort MSort.Names →
-    t.has_sort MSort.«Set{Qid}» := by apply has_sort.subsort; simp [subsort]
-  theorem subsort_«neset{qid}»_«set{qid}» {t : kModelCheckResult} : t.has_sort MSort.«NeSet{Qid}» →
-    t.has_sort MSort.«Set{Qid}» := by apply has_sort.subsort; simp [subsort]
-  theorem subsort_oid_id {t : kModelCheckResult} : t.has_sort MSort.Oid →
-    t.has_sort MSort.Id := by apply has_sort.subsort; simp [subsort]
-  theorem subsort_qid_rulename {t : kModelCheckResult} : t.has_sort MSort.Qid →
-    t.has_sort MSort.RuleName := by apply has_sort.subsort; simp [subsort]
-  theorem subsort_bool_situation {t : kModelCheckResult} : t.has_sort MSort.Bool →
-    t.has_sort MSort.Situation := by apply has_sort.subsort; simp [subsort]
-  theorem subsort_qid_situation {t : kModelCheckResult} : t.has_sort MSort.Qid →
-    t.has_sort MSort.Situation := by apply has_sort.subsort; simp [subsort]
-  theorem subsort_qid_names {t : kModelCheckResult} : t.has_sort MSort.Qid →
-    t.has_sort MSort.Names := by apply has_sort.subsort; simp [subsort]
-  theorem subsort_qid_«neset{qid}» {t : kModelCheckResult} : t.has_sort MSort.Qid →
-    t.has_sort MSort.«NeSet{Qid}» := by apply has_sort.subsort; simp [subsort]
-  theorem subsort_qid_oid {t : kModelCheckResult} : t.has_sort MSort.Qid →
-    t.has_sort MSort.Oid := by apply has_sort.subsort; simp [subsort]
+  theorem subsort_bool_modelcheckresult {t : kModelCheckResult} : t ⊳ MSort.Bool →
+    t ⊳ MSort.ModelCheckResult := by apply has_sort.subsort; simp [subsort]
+  theorem subsort_qid_action {t : kModelCheckResult} : t ⊳ MSort.Qid →
+    t ⊳ MSort.Action := by apply has_sort.subsort; simp [subsort]
+  theorem subsort_names_«set{qid}» {t : kModelCheckResult} : t ⊳ MSort.Names →
+    t ⊳ MSort.«Set{Qid}» := by apply has_sort.subsort; simp [subsort]
+  theorem subsort_«neset{qid}»_«set{qid}» {t : kModelCheckResult} : t ⊳ MSort.«NeSet{Qid}» →
+    t ⊳ MSort.«Set{Qid}» := by apply has_sort.subsort; simp [subsort]
+  theorem subsort_oid_id {t : kModelCheckResult} : t ⊳ MSort.Oid →
+    t ⊳ MSort.Id := by apply has_sort.subsort; simp [subsort]
+  theorem subsort_qid_rulename {t : kModelCheckResult} : t ⊳ MSort.Qid →
+    t ⊳ MSort.RuleName := by apply has_sort.subsort; simp [subsort]
+  theorem subsort_bool_situation {t : kModelCheckResult} : t ⊳ MSort.Bool →
+    t ⊳ MSort.Situation := by apply has_sort.subsort; simp [subsort]
+  theorem subsort_qid_situation {t : kModelCheckResult} : t ⊳ MSort.Qid →
+    t ⊳ MSort.Situation := by apply has_sort.subsort; simp [subsort]
+  theorem subsort_qid_names {t : kModelCheckResult} : t ⊳ MSort.Qid →
+    t ⊳ MSort.Names := by apply has_sort.subsort; simp [subsort]
+  theorem subsort_qid_«neset{qid}» {t : kModelCheckResult} : t ⊳ MSort.Qid →
+    t ⊳ MSort.«NeSet{Qid}» := by apply has_sort.subsort; simp [subsort]
+  theorem subsort_qid_oid {t : kModelCheckResult} : t ⊳ MSort.Qid →
+    t ⊳ MSort.Oid := by apply has_sort.subsort; simp [subsort]
 
   -- Reflexivity and congruence lemmas
-  theorem eqe_refl (a : kModelCheckResult) : a.eqe a := eqe.from_eqa eqa.refl
-  theorem eqa_congr {a b c d : kModelCheckResult} : a.eqa b → c.eqa d → (a.eqa c) = (b.eqa d)
+  theorem eqe_refl (a : kModelCheckResult) : a =E a := eqe.from_eqa eqa.refl
+  theorem eqa_congr {a b c d : kModelCheckResult} : a =A b → c =A d → (a =A c) = (b =A d)
     := generic_congr @eqa.trans @eqa.trans @eqa.symm
-  theorem eqe_congr {a b c d : kModelCheckResult} : a.eqe b → c.eqe d → (a.eqe c) = (b.eqe d)
+  theorem eqe_congr {a b c d : kModelCheckResult} : a =E b → c =E d → (a =E c) = (b =E d)
     := generic_congr @eqe.trans @eqe.trans @eqe.symm
-  theorem eqa_eqe_congr {a b c d : kModelCheckResult} : a.eqa b → c.eqa d → (a.eqe c) = (b.eqe d)
+  theorem eqa_eqe_congr {a b c d : kModelCheckResult} : a =A b → c =A d → (a =E c) = (b =E d)
     := generic_congr (λ {x y z} => (@eqe.trans x y z) ∘ (@eqe.from_eqa x y))
       (λ {x y z h} => (@eqe.trans x y z h) ∘ (@eqe.from_eqa y z)) @eqa.symm
 
@@ -2766,40 +3355,40 @@ end kModelCheckResult
 
 namespace kEventTrace
   -- Sort membership lemmas
-  theorem subsort_event_eventtrace {t : kEventTrace} : t.has_sort MSort.Event →
-    t.has_sort MSort.EventTrace := by apply has_sort.subsort; simp [subsort]
-  theorem subsort_configuration_state {t : kEventTrace} : t.has_sort MSort.Configuration →
-    t.has_sort MSort.State := by apply has_sort.subsort; simp [subsort]
-  theorem subsort_«neset{actionevent}»_«set{actionevent}» {t : kEventTrace} : t.has_sort MSort.«NeSet{ActionEvent}» →
-    t.has_sort MSort.«Set{ActionEvent}» := by apply has_sort.subsort; simp [subsort]
-  theorem subsort_prop_formula {t : kEventTrace} : t.has_sort MSort.Prop →
-    t.has_sort MSort.Formula := by apply has_sort.subsort; simp [subsort]
-  theorem subsort_msg_configuration {t : kEventTrace} : t.has_sort MSort.Msg →
-    t.has_sort MSort.Configuration := by apply has_sort.subsort; simp [subsort]
-  theorem subsort_object_configuration {t : kEventTrace} : t.has_sort MSort.Object →
-    t.has_sort MSort.Configuration := by apply has_sort.subsort; simp [subsort]
-  theorem subsort_portal_configuration {t : kEventTrace} : t.has_sort MSort.Portal →
-    t.has_sort MSort.Configuration := by apply has_sort.subsort; simp [subsort]
-  theorem subsort_actionevent_«neset{actionevent}» {t : kEventTrace} : t.has_sort MSort.ActionEvent →
-    t.has_sort MSort.«NeSet{ActionEvent}» := by apply has_sort.subsort; simp [subsort]
-  theorem subsort_actionevent_prop {t : kEventTrace} : t.has_sort MSort.ActionEvent →
-    t.has_sort MSort.Prop := by apply has_sort.subsort; simp [subsort]
-  theorem subsort_message_msg {t : kEventTrace} : t.has_sort MSort.Message →
-    t.has_sort MSort.Msg := by apply has_sort.subsort; simp [subsort]
-  theorem subsort_event_message {t : kEventTrace} : t.has_sort MSort.Event →
-    t.has_sort MSort.Message := by apply has_sort.subsort; simp [subsort]
-  theorem subsort_actionevent_event {t : kEventTrace} : t.has_sort MSort.ActionEvent →
-    t.has_sort MSort.Event := by apply has_sort.subsort; simp [subsort]
-  theorem subsort_tickevent_event {t : kEventTrace} : t.has_sort MSort.TickEvent →
-    t.has_sort MSort.Event := by apply has_sort.subsort; simp [subsort]
+  theorem subsort_event_eventtrace {t : kEventTrace} : t ⊳ MSort.Event →
+    t ⊳ MSort.EventTrace := by apply has_sort.subsort; simp [subsort]
+  theorem subsort_configuration_state {t : kEventTrace} : t ⊳ MSort.Configuration →
+    t ⊳ MSort.State := by apply has_sort.subsort; simp [subsort]
+  theorem subsort_«neset{actionevent}»_«set{actionevent}» {t : kEventTrace} : t ⊳ MSort.«NeSet{ActionEvent}» →
+    t ⊳ MSort.«Set{ActionEvent}» := by apply has_sort.subsort; simp [subsort]
+  theorem subsort_prop_formula {t : kEventTrace} : t ⊳ MSort.Prop →
+    t ⊳ MSort.Formula := by apply has_sort.subsort; simp [subsort]
+  theorem subsort_msg_configuration {t : kEventTrace} : t ⊳ MSort.Msg →
+    t ⊳ MSort.Configuration := by apply has_sort.subsort; simp [subsort]
+  theorem subsort_object_configuration {t : kEventTrace} : t ⊳ MSort.Object →
+    t ⊳ MSort.Configuration := by apply has_sort.subsort; simp [subsort]
+  theorem subsort_portal_configuration {t : kEventTrace} : t ⊳ MSort.Portal →
+    t ⊳ MSort.Configuration := by apply has_sort.subsort; simp [subsort]
+  theorem subsort_actionevent_«neset{actionevent}» {t : kEventTrace} : t ⊳ MSort.ActionEvent →
+    t ⊳ MSort.«NeSet{ActionEvent}» := by apply has_sort.subsort; simp [subsort]
+  theorem subsort_actionevent_prop {t : kEventTrace} : t ⊳ MSort.ActionEvent →
+    t ⊳ MSort.Prop := by apply has_sort.subsort; simp [subsort]
+  theorem subsort_message_msg {t : kEventTrace} : t ⊳ MSort.Message →
+    t ⊳ MSort.Msg := by apply has_sort.subsort; simp [subsort]
+  theorem subsort_event_message {t : kEventTrace} : t ⊳ MSort.Event →
+    t ⊳ MSort.Message := by apply has_sort.subsort; simp [subsort]
+  theorem subsort_actionevent_event {t : kEventTrace} : t ⊳ MSort.ActionEvent →
+    t ⊳ MSort.Event := by apply has_sort.subsort; simp [subsort]
+  theorem subsort_tickevent_event {t : kEventTrace} : t ⊳ MSort.TickEvent →
+    t ⊳ MSort.Event := by apply has_sort.subsort; simp [subsort]
 
   -- Reflexivity and congruence lemmas
-  theorem eqe_refl (a : kEventTrace) : a.eqe a := eqe.from_eqa eqa.refl
-  theorem eqa_congr {a b c d : kEventTrace} : a.eqa b → c.eqa d → (a.eqa c) = (b.eqa d)
+  theorem eqe_refl (a : kEventTrace) : a =E a := eqe.from_eqa eqa.refl
+  theorem eqa_congr {a b c d : kEventTrace} : a =A b → c =A d → (a =A c) = (b =A d)
     := generic_congr @eqa.trans @eqa.trans @eqa.symm
-  theorem eqe_congr {a b c d : kEventTrace} : a.eqe b → c.eqe d → (a.eqe c) = (b.eqe d)
+  theorem eqe_congr {a b c d : kEventTrace} : a =E b → c =E d → (a =E c) = (b =E d)
     := generic_congr @eqe.trans @eqe.trans @eqe.symm
-  theorem eqa_eqe_congr {a b c d : kEventTrace} : a.eqa b → c.eqa d → (a.eqe c) = (b.eqe d)
+  theorem eqa_eqe_congr {a b c d : kEventTrace} : a =A b → c =A d → (a =E c) = (b =E d)
     := generic_congr (λ {x y z} => (@eqe.trans x y z) ∘ (@eqe.from_eqa x y))
       (λ {x y z h} => (@eqe.trans x y z h) ∘ (@eqe.from_eqa y z)) @eqa.symm
 
@@ -3003,12 +3592,12 @@ namespace kActiveRule
   -- Sort membership lemmas
 
   -- Reflexivity and congruence lemmas
-  theorem eqe_refl (a : kActiveRule) : a.eqe a := eqe.from_eqa eqa.refl
-  theorem eqa_congr {a b c d : kActiveRule} : a.eqa b → c.eqa d → (a.eqa c) = (b.eqa d)
+  theorem eqe_refl (a : kActiveRule) : a =E a := eqe.from_eqa eqa.refl
+  theorem eqa_congr {a b c d : kActiveRule} : a =A b → c =A d → (a =A c) = (b =A d)
     := generic_congr @eqa.trans @eqa.trans @eqa.symm
-  theorem eqe_congr {a b c d : kActiveRule} : a.eqe b → c.eqe d → (a.eqe c) = (b.eqe d)
+  theorem eqe_congr {a b c d : kActiveRule} : a =E b → c =E d → (a =E c) = (b =E d)
     := generic_congr @eqe.trans @eqe.trans @eqe.symm
-  theorem eqa_eqe_congr {a b c d : kActiveRule} : a.eqa b → c.eqa d → (a.eqe c) = (b.eqe d)
+  theorem eqa_eqe_congr {a b c d : kActiveRule} : a =A b → c =A d → (a =E c) = (b =E d)
     := generic_congr (λ {x y z} => (@eqe.trans x y z) ∘ (@eqe.from_eqa x y))
       (λ {x y z h} => (@eqe.trans x y z h) ∘ (@eqe.from_eqa y z)) @eqa.symm
 
@@ -3018,22 +3607,22 @@ end kActiveRule
 
 namespace kCid
   -- Sort membership lemmas
-  theorem subsort_actor_cid {t : kCid} : t.has_sort MSort.Actor →
-    t.has_sort MSort.Cid := by apply has_sort.subsort; simp [subsort]
-  theorem subsort_coordinator_cid {t : kCid} : t.has_sort MSort.Coordinator →
-    t.has_sort MSort.Cid := by apply has_sort.subsort; simp [subsort]
-  theorem subsort_precoordinator_cid {t : kCid} : t.has_sort MSort.PreCoordinator →
-    t.has_sort MSort.Cid := by apply has_sort.subsort; simp [subsort]
-  theorem subsort_coordinator_precoordinator {t : kCid} : t.has_sort MSort.Coordinator →
-    t.has_sort MSort.PreCoordinator := by apply has_sort.subsort; simp [subsort]
+  theorem subsort_actor_cid {t : kCid} : t ⊳ MSort.Actor →
+    t ⊳ MSort.Cid := by apply has_sort.subsort; simp [subsort]
+  theorem subsort_coordinator_cid {t : kCid} : t ⊳ MSort.Coordinator →
+    t ⊳ MSort.Cid := by apply has_sort.subsort; simp [subsort]
+  theorem subsort_precoordinator_cid {t : kCid} : t ⊳ MSort.PreCoordinator →
+    t ⊳ MSort.Cid := by apply has_sort.subsort; simp [subsort]
+  theorem subsort_coordinator_precoordinator {t : kCid} : t ⊳ MSort.Coordinator →
+    t ⊳ MSort.PreCoordinator := by apply has_sort.subsort; simp [subsort]
 
   -- Reflexivity and congruence lemmas
-  theorem eqe_refl (a : kCid) : a.eqe a := eqe.from_eqa eqa.refl
-  theorem eqa_congr {a b c d : kCid} : a.eqa b → c.eqa d → (a.eqa c) = (b.eqa d)
+  theorem eqe_refl (a : kCid) : a =E a := eqe.from_eqa eqa.refl
+  theorem eqa_congr {a b c d : kCid} : a =A b → c =A d → (a =A c) = (b =A d)
     := generic_congr @eqa.trans @eqa.trans @eqa.symm
-  theorem eqe_congr {a b c d : kCid} : a.eqe b → c.eqe d → (a.eqe c) = (b.eqe d)
+  theorem eqe_congr {a b c d : kCid} : a =E b → c =E d → (a =E c) = (b =E d)
     := generic_congr @eqe.trans @eqe.trans @eqe.symm
-  theorem eqa_eqe_congr {a b c d : kCid} : a.eqa b → c.eqa d → (a.eqe c) = (b.eqe d)
+  theorem eqa_eqe_congr {a b c d : kCid} : a =A b → c =A d → (a =E c) = (b =E d)
     := generic_congr (λ {x y z} => (@eqe.trans x y z) ∘ (@eqe.from_eqa x y))
       (λ {x y z h} => (@eqe.trans x y z h) ∘ (@eqe.from_eqa y z)) @eqa.symm
 
@@ -3053,12 +3642,12 @@ namespace kActorDeonticActionDeadline
   -- Sort membership lemmas
 
   -- Reflexivity and congruence lemmas
-  theorem eqe_refl (a : kActorDeonticActionDeadline) : a.eqe a := eqe.from_eqa eqa.refl
-  theorem eqa_congr {a b c d : kActorDeonticActionDeadline} : a.eqa b → c.eqa d → (a.eqa c) = (b.eqa d)
+  theorem eqe_refl (a : kActorDeonticActionDeadline) : a =E a := eqe.from_eqa eqa.refl
+  theorem eqa_congr {a b c d : kActorDeonticActionDeadline} : a =A b → c =A d → (a =A c) = (b =A d)
     := generic_congr @eqa.trans @eqa.trans @eqa.symm
-  theorem eqe_congr {a b c d : kActorDeonticActionDeadline} : a.eqe b → c.eqe d → (a.eqe c) = (b.eqe d)
+  theorem eqe_congr {a b c d : kActorDeonticActionDeadline} : a =E b → c =E d → (a =E c) = (b =E d)
     := generic_congr @eqe.trans @eqe.trans @eqe.symm
-  theorem eqa_eqe_congr {a b c d : kActorDeonticActionDeadline} : a.eqa b → c.eqa d → (a.eqe c) = (b.eqe d)
+  theorem eqa_eqe_congr {a b c d : kActorDeonticActionDeadline} : a =A b → c =A d → (a =E c) = (b =E d)
     := generic_congr (λ {x y z} => (@eqe.trans x y z) ∘ (@eqe.from_eqa x y))
       (λ {x y z h} => (@eqe.trans x y z h) ∘ (@eqe.from_eqa y z)) @eqa.symm
 
@@ -3086,12 +3675,12 @@ namespace kActorState
   -- Sort membership lemmas
 
   -- Reflexivity and congruence lemmas
-  theorem eqe_refl (a : kActorState) : a.eqe a := eqe.from_eqa eqa.refl
-  theorem eqa_congr {a b c d : kActorState} : a.eqa b → c.eqa d → (a.eqa c) = (b.eqa d)
+  theorem eqe_refl (a : kActorState) : a =E a := eqe.from_eqa eqa.refl
+  theorem eqa_congr {a b c d : kActorState} : a =A b → c =A d → (a =A c) = (b =A d)
     := generic_congr @eqa.trans @eqa.trans @eqa.symm
-  theorem eqe_congr {a b c d : kActorState} : a.eqe b → c.eqe d → (a.eqe c) = (b.eqe d)
+  theorem eqe_congr {a b c d : kActorState} : a =E b → c =E d → (a =E c) = (b =E d)
     := generic_congr @eqe.trans @eqe.trans @eqe.symm
-  theorem eqa_eqe_congr {a b c d : kActorState} : a.eqa b → c.eqa d → (a.eqe c) = (b.eqe d)
+  theorem eqa_eqe_congr {a b c d : kActorState} : a =A b → c =A d → (a =E c) = (b =E d)
     := generic_congr (λ {x y z} => (@eqe.trans x y z) ∘ (@eqe.from_eqa x y))
       (λ {x y z h} => (@eqe.trans x y z h) ∘ (@eqe.from_eqa y z)) @eqa.symm
 
@@ -3101,16 +3690,16 @@ end kActorState
 
 namespace kAttributeSet
   -- Sort membership lemmas
-  theorem subsort_attribute_attributeset {t : kAttributeSet} : t.has_sort MSort.Attribute →
-    t.has_sort MSort.AttributeSet := by apply has_sort.subsort; simp [subsort]
+  theorem subsort_attribute_attributeset {t : kAttributeSet} : t ⊳ MSort.Attribute →
+    t ⊳ MSort.AttributeSet := by apply has_sort.subsort; simp [subsort]
 
   -- Reflexivity and congruence lemmas
-  theorem eqe_refl (a : kAttributeSet) : a.eqe a := eqe.from_eqa eqa.refl
-  theorem eqa_congr {a b c d : kAttributeSet} : a.eqa b → c.eqa d → (a.eqa c) = (b.eqa d)
+  theorem eqe_refl (a : kAttributeSet) : a =E a := eqe.from_eqa eqa.refl
+  theorem eqa_congr {a b c d : kAttributeSet} : a =A b → c =A d → (a =A c) = (b =A d)
     := generic_congr @eqa.trans @eqa.trans @eqa.symm
-  theorem eqe_congr {a b c d : kAttributeSet} : a.eqe b → c.eqe d → (a.eqe c) = (b.eqe d)
+  theorem eqe_congr {a b c d : kAttributeSet} : a =E b → c =E d → (a =E c) = (b =E d)
     := generic_congr @eqe.trans @eqe.trans @eqe.symm
-  theorem eqa_eqe_congr {a b c d : kAttributeSet} : a.eqa b → c.eqa d → (a.eqe c) = (b.eqe d)
+  theorem eqa_eqe_congr {a b c d : kAttributeSet} : a =A b → c =A d → (a =E c) = (b =E d)
     := generic_congr (λ {x y z} => (@eqe.trans x y z) ∘ (@eqe.from_eqa x y))
       (λ {x y z h} => (@eqe.trans x y z h) ∘ (@eqe.from_eqa y z)) @eqa.symm
 
@@ -3136,16 +3725,16 @@ end kAttributeSet
 
 namespace kString
   -- Sort membership lemmas
-  theorem subsort_char_string {t : kString} : t.has_sort MSort.Char →
-    t.has_sort MSort.String := by apply has_sort.subsort; simp [subsort]
+  theorem subsort_char_string {t : kString} : t ⊳ MSort.Char →
+    t ⊳ MSort.String := by apply has_sort.subsort; simp [subsort]
 
   -- Reflexivity and congruence lemmas
-  theorem eqe_refl (a : kString) : a.eqe a := eqe.from_eqa eqa.refl
-  theorem eqa_congr {a b c d : kString} : a.eqa b → c.eqa d → (a.eqa c) = (b.eqa d)
+  theorem eqe_refl (a : kString) : a =E a := eqe.from_eqa eqa.refl
+  theorem eqa_congr {a b c d : kString} : a =A b → c =A d → (a =A c) = (b =A d)
     := generic_congr @eqa.trans @eqa.trans @eqa.symm
-  theorem eqe_congr {a b c d : kString} : a.eqe b → c.eqe d → (a.eqe c) = (b.eqe d)
+  theorem eqe_congr {a b c d : kString} : a =E b → c =E d → (a =E c) = (b =E d)
     := generic_congr @eqe.trans @eqe.trans @eqe.symm
-  theorem eqa_eqe_congr {a b c d : kString} : a.eqa b → c.eqa d → (a.eqe c) = (b.eqe d)
+  theorem eqa_eqe_congr {a b c d : kString} : a =A b → c =A d → (a =E c) = (b =E d)
     := generic_congr (λ {x y z} => (@eqe.trans x y z) ∘ (@eqe.from_eqa x y))
       (λ {x y z h} => (@eqe.trans x y z h) ∘ (@eqe.from_eqa y z)) @eqa.symm
 
@@ -3177,12 +3766,12 @@ namespace kContractState
   -- Sort membership lemmas
 
   -- Reflexivity and congruence lemmas
-  theorem eqe_refl (a : kContractState) : a.eqe a := eqe.from_eqa eqa.refl
-  theorem eqa_congr {a b c d : kContractState} : a.eqa b → c.eqa d → (a.eqa c) = (b.eqa d)
+  theorem eqe_refl (a : kContractState) : a =E a := eqe.from_eqa eqa.refl
+  theorem eqa_congr {a b c d : kContractState} : a =A b → c =A d → (a =A c) = (b =A d)
     := generic_congr @eqa.trans @eqa.trans @eqa.symm
-  theorem eqe_congr {a b c d : kContractState} : a.eqe b → c.eqe d → (a.eqe c) = (b.eqe d)
+  theorem eqe_congr {a b c d : kContractState} : a =E b → c =E d → (a =E c) = (b =E d)
     := generic_congr @eqe.trans @eqe.trans @eqe.symm
-  theorem eqa_eqe_congr {a b c d : kContractState} : a.eqa b → c.eqa d → (a.eqe c) = (b.eqe d)
+  theorem eqa_eqe_congr {a b c d : kContractState} : a =A b → c =A d → (a =E c) = (b =E d)
     := generic_congr (λ {x y z} => (@eqe.trans x y z) ∘ (@eqe.from_eqa x y))
       (λ {x y z h} => (@eqe.trans x y z h) ∘ (@eqe.from_eqa y z)) @eqa.symm
 
@@ -3232,12 +3821,12 @@ namespace kContractStatus
   -- Sort membership lemmas
 
   -- Reflexivity and congruence lemmas
-  theorem eqe_refl (a : kContractStatus) : a.eqe a := eqe.from_eqa eqa.refl
-  theorem eqa_congr {a b c d : kContractStatus} : a.eqa b → c.eqa d → (a.eqa c) = (b.eqa d)
+  theorem eqe_refl (a : kContractStatus) : a =E a := eqe.from_eqa eqa.refl
+  theorem eqa_congr {a b c d : kContractStatus} : a =A b → c =A d → (a =A c) = (b =A d)
     := generic_congr @eqa.trans @eqa.trans @eqa.symm
-  theorem eqe_congr {a b c d : kContractStatus} : a.eqe b → c.eqe d → (a.eqe c) = (b.eqe d)
+  theorem eqe_congr {a b c d : kContractStatus} : a =E b → c =E d → (a =E c) = (b =E d)
     := generic_congr @eqe.trans @eqe.trans @eqe.symm
-  theorem eqa_eqe_congr {a b c d : kContractStatus} : a.eqa b → c.eqa d → (a.eqe c) = (b.eqe d)
+  theorem eqa_eqe_congr {a b c d : kContractStatus} : a =A b → c =A d → (a =E c) = (b =E d)
     := generic_congr (λ {x y z} => (@eqe.trans x y z) ∘ (@eqe.from_eqa x y))
       (λ {x y z h} => (@eqe.trans x y z h) ∘ (@eqe.from_eqa y z)) @eqa.symm
 
@@ -3263,12 +3852,12 @@ namespace kDate
   -- Sort membership lemmas
 
   -- Reflexivity and congruence lemmas
-  theorem eqe_refl (a : kDate) : a.eqe a := eqe.from_eqa eqa.refl
-  theorem eqa_congr {a b c d : kDate} : a.eqa b → c.eqa d → (a.eqa c) = (b.eqa d)
+  theorem eqe_refl (a : kDate) : a =E a := eqe.from_eqa eqa.refl
+  theorem eqa_congr {a b c d : kDate} : a =A b → c =A d → (a =A c) = (b =A d)
     := generic_congr @eqa.trans @eqa.trans @eqa.symm
-  theorem eqe_congr {a b c d : kDate} : a.eqe b → c.eqe d → (a.eqe c) = (b.eqe d)
+  theorem eqe_congr {a b c d : kDate} : a =E b → c =E d → (a =E c) = (b =E d)
     := generic_congr @eqe.trans @eqe.trans @eqe.symm
-  theorem eqa_eqe_congr {a b c d : kDate} : a.eqa b → c.eqa d → (a.eqe c) = (b.eqe d)
+  theorem eqa_eqe_congr {a b c d : kDate} : a =A b → c =A d → (a =E c) = (b =E d)
     := generic_congr (λ {x y z} => (@eqe.trans x y z) ∘ (@eqe.from_eqa x y))
       (λ {x y z h} => (@eqe.trans x y z h) ∘ (@eqe.from_eqa y z)) @eqa.symm
 
@@ -3280,12 +3869,12 @@ namespace kDeadline
   -- Sort membership lemmas
 
   -- Reflexivity and congruence lemmas
-  theorem eqe_refl (a : kDeadline) : a.eqe a := eqe.from_eqa eqa.refl
-  theorem eqa_congr {a b c d : kDeadline} : a.eqa b → c.eqa d → (a.eqa c) = (b.eqa d)
+  theorem eqe_refl (a : kDeadline) : a =E a := eqe.from_eqa eqa.refl
+  theorem eqa_congr {a b c d : kDeadline} : a =A b → c =A d → (a =A c) = (b =A d)
     := generic_congr @eqa.trans @eqa.trans @eqa.symm
-  theorem eqe_congr {a b c d : kDeadline} : a.eqe b → c.eqe d → (a.eqe c) = (b.eqe d)
+  theorem eqe_congr {a b c d : kDeadline} : a =E b → c =E d → (a =E c) = (b =E d)
     := generic_congr @eqe.trans @eqe.trans @eqe.symm
-  theorem eqa_eqe_congr {a b c d : kDeadline} : a.eqa b → c.eqa d → (a.eqe c) = (b.eqe d)
+  theorem eqa_eqe_congr {a b c d : kDeadline} : a =A b → c =A d → (a =E c) = (b =E d)
     := generic_congr (λ {x y z} => (@eqe.trans x y z) ∘ (@eqe.from_eqa x y))
       (λ {x y z h} => (@eqe.trans x y z h) ∘ (@eqe.from_eqa y z)) @eqa.symm
 
@@ -3304,12 +3893,12 @@ namespace kDeontic
   -- Sort membership lemmas
 
   -- Reflexivity and congruence lemmas
-  theorem eqe_refl (a : kDeontic) : a.eqe a := eqe.from_eqa eqa.refl
-  theorem eqa_congr {a b c d : kDeontic} : a.eqa b → c.eqa d → (a.eqa c) = (b.eqa d)
+  theorem eqe_refl (a : kDeontic) : a =E a := eqe.from_eqa eqa.refl
+  theorem eqa_congr {a b c d : kDeontic} : a =A b → c =A d → (a =A c) = (b =A d)
     := generic_congr @eqa.trans @eqa.trans @eqa.symm
-  theorem eqe_congr {a b c d : kDeontic} : a.eqe b → c.eqe d → (a.eqe c) = (b.eqe d)
+  theorem eqe_congr {a b c d : kDeontic} : a =E b → c =E d → (a =E c) = (b =E d)
     := generic_congr @eqe.trans @eqe.trans @eqe.symm
-  theorem eqa_eqe_congr {a b c d : kDeontic} : a.eqa b → c.eqa d → (a.eqe c) = (b.eqe d)
+  theorem eqa_eqe_congr {a b c d : kDeontic} : a =A b → c =A d → (a =E c) = (b =E d)
     := generic_congr (λ {x y z} => (@eqe.trans x y z) ∘ (@eqe.from_eqa x y))
       (λ {x y z h} => (@eqe.trans x y z h) ∘ (@eqe.from_eqa y z)) @eqa.symm
 
@@ -3325,12 +3914,12 @@ namespace kDuration
   -- Sort membership lemmas
 
   -- Reflexivity and congruence lemmas
-  theorem eqe_refl (a : kDuration) : a.eqe a := eqe.from_eqa eqa.refl
-  theorem eqa_congr {a b c d : kDuration} : a.eqa b → c.eqa d → (a.eqa c) = (b.eqa d)
+  theorem eqe_refl (a : kDuration) : a =E a := eqe.from_eqa eqa.refl
+  theorem eqa_congr {a b c d : kDuration} : a =A b → c =A d → (a =A c) = (b =A d)
     := generic_congr @eqa.trans @eqa.trans @eqa.symm
-  theorem eqe_congr {a b c d : kDuration} : a.eqe b → c.eqe d → (a.eqe c) = (b.eqe d)
+  theorem eqe_congr {a b c d : kDuration} : a =E b → c =E d → (a =E c) = (b =E d)
     := generic_congr @eqe.trans @eqe.trans @eqe.symm
-  theorem eqa_eqe_congr {a b c d : kDuration} : a.eqa b → c.eqa d → (a.eqe c) = (b.eqe d)
+  theorem eqa_eqe_congr {a b c d : kDuration} : a =A b → c =A d → (a =E c) = (b =E d)
     := generic_congr (λ {x y z} => (@eqe.trans x y z) ∘ (@eqe.from_eqa x y))
       (λ {x y z h} => (@eqe.trans x y z h) ∘ (@eqe.from_eqa y z)) @eqa.symm
 
@@ -3353,20 +3942,20 @@ end kDuration
 
 namespace kFindResult
   -- Sort membership lemmas
-  theorem subsort_nat_findresult {t : kFindResult} : t.has_sort MSort.Nat →
-    t.has_sort MSort.FindResult := by apply has_sort.subsort; simp [subsort]
-  theorem subsort_nznat_nat {t : kFindResult} : t.has_sort MSort.NzNat →
-    t.has_sort MSort.Nat := by apply has_sort.subsort; simp [subsort]
-  theorem subsort_zero_nat {t : kFindResult} : t.has_sort MSort.Zero →
-    t.has_sort MSort.Nat := by apply has_sort.subsort; simp [subsort]
+  theorem subsort_nat_findresult {t : kFindResult} : t ⊳ MSort.Nat →
+    t ⊳ MSort.FindResult := by apply has_sort.subsort; simp [subsort]
+  theorem subsort_nznat_nat {t : kFindResult} : t ⊳ MSort.NzNat →
+    t ⊳ MSort.Nat := by apply has_sort.subsort; simp [subsort]
+  theorem subsort_zero_nat {t : kFindResult} : t ⊳ MSort.Zero →
+    t ⊳ MSort.Nat := by apply has_sort.subsort; simp [subsort]
 
   -- Reflexivity and congruence lemmas
-  theorem eqe_refl (a : kFindResult) : a.eqe a := eqe.from_eqa eqa.refl
-  theorem eqa_congr {a b c d : kFindResult} : a.eqa b → c.eqa d → (a.eqa c) = (b.eqa d)
+  theorem eqe_refl (a : kFindResult) : a =E a := eqe.from_eqa eqa.refl
+  theorem eqa_congr {a b c d : kFindResult} : a =A b → c =A d → (a =A c) = (b =A d)
     := generic_congr @eqa.trans @eqa.trans @eqa.symm
-  theorem eqe_congr {a b c d : kFindResult} : a.eqe b → c.eqe d → (a.eqe c) = (b.eqe d)
+  theorem eqe_congr {a b c d : kFindResult} : a =E b → c =E d → (a =E c) = (b =E d)
     := generic_congr @eqe.trans @eqe.trans @eqe.symm
-  theorem eqa_eqe_congr {a b c d : kFindResult} : a.eqa b → c.eqa d → (a.eqe c) = (b.eqe d)
+  theorem eqa_eqe_congr {a b c d : kFindResult} : a =A b → c =A d → (a =E c) = (b =E d)
     := generic_congr (λ {x y z} => (@eqe.trans x y z) ∘ (@eqe.from_eqa x y))
       (λ {x y z h} => (@eqe.trans x y z h) ∘ (@eqe.from_eqa y z)) @eqa.symm
 
@@ -3515,12 +4104,12 @@ namespace kHenceLest
   -- Sort membership lemmas
 
   -- Reflexivity and congruence lemmas
-  theorem eqe_refl (a : kHenceLest) : a.eqe a := eqe.from_eqa eqa.refl
-  theorem eqa_congr {a b c d : kHenceLest} : a.eqa b → c.eqa d → (a.eqa c) = (b.eqa d)
+  theorem eqe_refl (a : kHenceLest) : a =E a := eqe.from_eqa eqa.refl
+  theorem eqa_congr {a b c d : kHenceLest} : a =A b → c =A d → (a =A c) = (b =A d)
     := generic_congr @eqa.trans @eqa.trans @eqa.symm
-  theorem eqe_congr {a b c d : kHenceLest} : a.eqe b → c.eqe d → (a.eqe c) = (b.eqe d)
+  theorem eqe_congr {a b c d : kHenceLest} : a =E b → c =E d → (a =E c) = (b =E d)
     := generic_congr @eqe.trans @eqe.trans @eqe.symm
-  theorem eqa_eqe_congr {a b c d : kHenceLest} : a.eqa b → c.eqa d → (a.eqe c) = (b.eqe d)
+  theorem eqa_eqe_congr {a b c d : kHenceLest} : a =A b → c =A d → (a =E c) = (b =E d)
     := generic_congr (λ {x y z} => (@eqe.trans x y z) ∘ (@eqe.from_eqa x y))
       (λ {x y z h} => (@eqe.trans x y z h) ∘ (@eqe.from_eqa y z)) @eqa.symm
 
@@ -3546,18 +4135,18 @@ end kHenceLest
 
 namespace k«Set{Rule}»
   -- Sort membership lemmas
-  theorem subsort_«neset{rule}»_«set{rule}» {t : k«Set{Rule}»} : t.has_sort MSort.«NeSet{Rule}» →
-    t.has_sort MSort.«Set{Rule}» := by apply has_sort.subsort; simp [subsort]
-  theorem subsort_rule_«neset{rule}» {t : k«Set{Rule}»} : t.has_sort MSort.Rule →
-    t.has_sort MSort.«NeSet{Rule}» := by apply has_sort.subsort; simp [subsort]
+  theorem subsort_«neset{rule}»_«set{rule}» {t : k«Set{Rule}»} : t ⊳ MSort.«NeSet{Rule}» →
+    t ⊳ MSort.«Set{Rule}» := by apply has_sort.subsort; simp [subsort]
+  theorem subsort_rule_«neset{rule}» {t : k«Set{Rule}»} : t ⊳ MSort.Rule →
+    t ⊳ MSort.«NeSet{Rule}» := by apply has_sort.subsort; simp [subsort]
 
   -- Reflexivity and congruence lemmas
-  theorem eqe_refl (a : k«Set{Rule}») : a.eqe a := eqe.from_eqa eqa.refl
-  theorem eqa_congr {a b c d : k«Set{Rule}»} : a.eqa b → c.eqa d → (a.eqa c) = (b.eqa d)
+  theorem eqe_refl (a : k«Set{Rule}») : a =E a := eqe.from_eqa eqa.refl
+  theorem eqa_congr {a b c d : k«Set{Rule}»} : a =A b → c =A d → (a =A c) = (b =A d)
     := generic_congr @eqa.trans @eqa.trans @eqa.symm
-  theorem eqe_congr {a b c d : k«Set{Rule}»} : a.eqe b → c.eqe d → (a.eqe c) = (b.eqe d)
+  theorem eqe_congr {a b c d : k«Set{Rule}»} : a =E b → c =E d → (a =E c) = (b =E d)
     := generic_congr @eqe.trans @eqe.trans @eqe.symm
-  theorem eqa_eqe_congr {a b c d : k«Set{Rule}»} : a.eqa b → c.eqa d → (a.eqe c) = (b.eqe d)
+  theorem eqa_eqe_congr {a b c d : k«Set{Rule}»} : a =A b → c =A d → (a =E c) = (b =E d)
     := generic_congr (λ {x y z} => (@eqe.trans x y z) ∘ (@eqe.from_eqa x y))
       (λ {x y z h} => (@eqe.trans x y z h) ∘ (@eqe.from_eqa y z)) @eqa.symm
 
@@ -3634,16 +4223,16 @@ end k«Set{Rule}»
 
 namespace kTransitionList
   -- Sort membership lemmas
-  theorem subsort_transition_transitionlist {t : kTransitionList} : t.has_sort MSort.Transition →
-    t.has_sort MSort.TransitionList := by apply has_sort.subsort; simp [subsort]
+  theorem subsort_transition_transitionlist {t : kTransitionList} : t ⊳ MSort.Transition →
+    t ⊳ MSort.TransitionList := by apply has_sort.subsort; simp [subsort]
 
   -- Reflexivity and congruence lemmas
-  theorem eqe_refl (a : kTransitionList) : a.eqe a := eqe.from_eqa eqa.refl
-  theorem eqa_congr {a b c d : kTransitionList} : a.eqa b → c.eqa d → (a.eqa c) = (b.eqa d)
+  theorem eqe_refl (a : kTransitionList) : a =E a := eqe.from_eqa eqa.refl
+  theorem eqa_congr {a b c d : kTransitionList} : a =A b → c =A d → (a =A c) = (b =A d)
     := generic_congr @eqa.trans @eqa.trans @eqa.symm
-  theorem eqe_congr {a b c d : kTransitionList} : a.eqe b → c.eqe d → (a.eqe c) = (b.eqe d)
+  theorem eqe_congr {a b c d : kTransitionList} : a =E b → c =E d → (a =E c) = (b =E d)
     := generic_congr @eqe.trans @eqe.trans @eqe.symm
-  theorem eqa_eqe_congr {a b c d : kTransitionList} : a.eqa b → c.eqa d → (a.eqe c) = (b.eqe d)
+  theorem eqa_eqe_congr {a b c d : kTransitionList} : a =A b → c =A d → (a =E c) = (b =E d)
     := generic_congr (λ {x y z} => (@eqe.trans x y z) ∘ (@eqe.from_eqa x y))
       (λ {x y z h} => (@eqe.trans x y z h) ∘ (@eqe.from_eqa y z)) @eqa.symm
 
@@ -3664,12 +4253,12 @@ namespace kstrategylbrakinternalrbrack
   -- Sort membership lemmas
 
   -- Reflexivity and congruence lemmas
-  theorem eqe_refl (a : kstrategylbrakinternalrbrack) : a.eqe a := eqe.from_eqa eqa.refl
-  theorem eqa_congr {a b c d : kstrategylbrakinternalrbrack} : a.eqa b → c.eqa d → (a.eqa c) = (b.eqa d)
+  theorem eqe_refl (a : kstrategylbrakinternalrbrack) : a =E a := eqe.from_eqa eqa.refl
+  theorem eqa_congr {a b c d : kstrategylbrakinternalrbrack} : a =A b → c =A d → (a =A c) = (b =A d)
     := generic_congr @eqa.trans @eqa.trans @eqa.symm
-  theorem eqe_congr {a b c d : kstrategylbrakinternalrbrack} : a.eqe b → c.eqe d → (a.eqe c) = (b.eqe d)
+  theorem eqe_congr {a b c d : kstrategylbrakinternalrbrack} : a =E b → c =E d → (a =E c) = (b =E d)
     := generic_congr @eqe.trans @eqe.trans @eqe.symm
-  theorem eqa_eqe_congr {a b c d : kstrategylbrakinternalrbrack} : a.eqa b → c.eqa d → (a.eqe c) = (b.eqe d)
+  theorem eqa_eqe_congr {a b c d : kstrategylbrakinternalrbrack} : a =A b → c =A d → (a =E c) = (b =E d)
     := generic_congr (λ {x y z} => (@eqe.trans x y z) ∘ (@eqe.from_eqa x y))
       (λ {x y z h} => (@eqe.trans x y z h) ∘ (@eqe.from_eqa y z)) @eqa.symm
 
@@ -3681,30 +4270,30 @@ end kstrategylbrakinternalrbrack
 
 namespace kModelCheckResult
   -- Congruence lemmas
-  theorem eqe_rw_one_congr {a b c d : kModelCheckResult} : a.eqe b → c.eqe d → (a.rw_one c) = (b.rw_one d)
+  theorem eqe_rw_one_congr {a b c d : kModelCheckResult} : a =E b → c =E d → (a =>1 c) = (b =>1 d)
     := generic_congr @rw_one.eqe_left @rw_one.eqe_right @eqe.symm
-  theorem eqa_rw_one_congr {a b c d : kModelCheckResult} : a.eqa b → c.eqa d → (a.rw_one c) = (b.rw_one d)
+  theorem eqa_rw_one_congr {a b c d : kModelCheckResult} : a =A b → c =A d → (a =>1 c) = (b =>1 d)
     := generic_congr (λ {x y z} => (@rw_one.eqe_left x y z) ∘ (@eqe.from_eqa x y))
       (λ {x y z h} => (@rw_one.eqe_right x y z h) ∘ (@eqe.from_eqa y z)) @eqa.symm
-  theorem eqe_rw_star_congr {a b c d : kModelCheckResult} : a.eqe b → c.eqe d → (a.rw_star c) = (b.rw_star d)
+  theorem eqe_rw_star_congr {a b c d : kModelCheckResult} : a =E b → c =E d → (a =>* c) = (b =>* d)
     := generic_congr (λ {x y z} => (@rw_star.trans x y z) ∘ (@rw_star.refl x y))
       (λ {x y z h} => (@rw_star.trans x y z h) ∘ (@rw_star.refl y z)) @eqe.symm
-  theorem eqa_rw_star_congr {a b c d : kModelCheckResult} : a.eqa b → c.eqa d → (a.rw_star c) = (b.rw_star d)
+  theorem eqa_rw_star_congr {a b c d : kModelCheckResult} : a =A b → c =A d → (a =>* c) = (b =>* d)
     := generic_congr (λ {x y z} => (@rw_star.trans x y z) ∘ (@rw_star.refl x y) ∘ (@eqe.from_eqa x y))
       (λ {x y z h} => (@rw_star.trans x y z h) ∘ (@rw_star.refl y z) ∘ (@eqe.from_eqa y z)) @eqa.symm
 end kModelCheckResult
 
 namespace kEventTrace
   -- Congruence lemmas
-  theorem eqe_rw_one_congr {a b c d : kEventTrace} : a.eqe b → c.eqe d → (a.rw_one c) = (b.rw_one d)
+  theorem eqe_rw_one_congr {a b c d : kEventTrace} : a =E b → c =E d → (a =>1 c) = (b =>1 d)
     := generic_congr @rw_one.eqe_left @rw_one.eqe_right @eqe.symm
-  theorem eqa_rw_one_congr {a b c d : kEventTrace} : a.eqa b → c.eqa d → (a.rw_one c) = (b.rw_one d)
+  theorem eqa_rw_one_congr {a b c d : kEventTrace} : a =A b → c =A d → (a =>1 c) = (b =>1 d)
     := generic_congr (λ {x y z} => (@rw_one.eqe_left x y z) ∘ (@eqe.from_eqa x y))
       (λ {x y z h} => (@rw_one.eqe_right x y z h) ∘ (@eqe.from_eqa y z)) @eqa.symm
-  theorem eqe_rw_star_congr {a b c d : kEventTrace} : a.eqe b → c.eqe d → (a.rw_star c) = (b.rw_star d)
+  theorem eqe_rw_star_congr {a b c d : kEventTrace} : a =E b → c =E d → (a =>* c) = (b =>* d)
     := generic_congr (λ {x y z} => (@rw_star.trans x y z) ∘ (@rw_star.refl x y))
       (λ {x y z h} => (@rw_star.trans x y z h) ∘ (@rw_star.refl y z)) @eqe.symm
-  theorem eqa_rw_star_congr {a b c d : kEventTrace} : a.eqa b → c.eqa d → (a.rw_star c) = (b.rw_star d)
+  theorem eqa_rw_star_congr {a b c d : kEventTrace} : a =A b → c =A d → (a =>* c) = (b =>* d)
     := generic_congr (λ {x y z} => (@rw_star.trans x y z) ∘ (@rw_star.refl x y) ∘ (@eqe.from_eqa x y))
       (λ {x y z h} => (@rw_star.trans x y z h) ∘ (@rw_star.refl y z) ∘ (@eqe.from_eqa y z)) @eqa.symm
 
@@ -3715,255 +4304,255 @@ end kEventTrace
 
 namespace kActiveRule
   -- Congruence lemmas
-  theorem eqe_rw_one_congr {a b c d : kActiveRule} : a.eqe b → c.eqe d → (a.rw_one c) = (b.rw_one d)
+  theorem eqe_rw_one_congr {a b c d : kActiveRule} : a =E b → c =E d → (a =>1 c) = (b =>1 d)
     := generic_congr @rw_one.eqe_left @rw_one.eqe_right @eqe.symm
-  theorem eqa_rw_one_congr {a b c d : kActiveRule} : a.eqa b → c.eqa d → (a.rw_one c) = (b.rw_one d)
+  theorem eqa_rw_one_congr {a b c d : kActiveRule} : a =A b → c =A d → (a =>1 c) = (b =>1 d)
     := generic_congr (λ {x y z} => (@rw_one.eqe_left x y z) ∘ (@eqe.from_eqa x y))
       (λ {x y z h} => (@rw_one.eqe_right x y z h) ∘ (@eqe.from_eqa y z)) @eqa.symm
-  theorem eqe_rw_star_congr {a b c d : kActiveRule} : a.eqe b → c.eqe d → (a.rw_star c) = (b.rw_star d)
+  theorem eqe_rw_star_congr {a b c d : kActiveRule} : a =E b → c =E d → (a =>* c) = (b =>* d)
     := generic_congr (λ {x y z} => (@rw_star.trans x y z) ∘ (@rw_star.refl x y))
       (λ {x y z h} => (@rw_star.trans x y z h) ∘ (@rw_star.refl y z)) @eqe.symm
-  theorem eqa_rw_star_congr {a b c d : kActiveRule} : a.eqa b → c.eqa d → (a.rw_star c) = (b.rw_star d)
+  theorem eqa_rw_star_congr {a b c d : kActiveRule} : a =A b → c =A d → (a =>* c) = (b =>* d)
     := generic_congr (λ {x y z} => (@rw_star.trans x y z) ∘ (@rw_star.refl x y) ∘ (@eqe.from_eqa x y))
       (λ {x y z h} => (@rw_star.trans x y z h) ∘ (@rw_star.refl y z) ∘ (@eqe.from_eqa y z)) @eqa.symm
 end kActiveRule
 
 namespace kCid
   -- Congruence lemmas
-  theorem eqe_rw_one_congr {a b c d : kCid} : a.eqe b → c.eqe d → (a.rw_one c) = (b.rw_one d)
+  theorem eqe_rw_one_congr {a b c d : kCid} : a =E b → c =E d → (a =>1 c) = (b =>1 d)
     := generic_congr @rw_one.eqe_left @rw_one.eqe_right @eqe.symm
-  theorem eqa_rw_one_congr {a b c d : kCid} : a.eqa b → c.eqa d → (a.rw_one c) = (b.rw_one d)
+  theorem eqa_rw_one_congr {a b c d : kCid} : a =A b → c =A d → (a =>1 c) = (b =>1 d)
     := generic_congr (λ {x y z} => (@rw_one.eqe_left x y z) ∘ (@eqe.from_eqa x y))
       (λ {x y z h} => (@rw_one.eqe_right x y z h) ∘ (@eqe.from_eqa y z)) @eqa.symm
-  theorem eqe_rw_star_congr {a b c d : kCid} : a.eqe b → c.eqe d → (a.rw_star c) = (b.rw_star d)
+  theorem eqe_rw_star_congr {a b c d : kCid} : a =E b → c =E d → (a =>* c) = (b =>* d)
     := generic_congr (λ {x y z} => (@rw_star.trans x y z) ∘ (@rw_star.refl x y))
       (λ {x y z h} => (@rw_star.trans x y z h) ∘ (@rw_star.refl y z)) @eqe.symm
-  theorem eqa_rw_star_congr {a b c d : kCid} : a.eqa b → c.eqa d → (a.rw_star c) = (b.rw_star d)
+  theorem eqa_rw_star_congr {a b c d : kCid} : a =A b → c =A d → (a =>* c) = (b =>* d)
     := generic_congr (λ {x y z} => (@rw_star.trans x y z) ∘ (@rw_star.refl x y) ∘ (@eqe.from_eqa x y))
       (λ {x y z h} => (@rw_star.trans x y z h) ∘ (@rw_star.refl y z) ∘ (@eqe.from_eqa y z)) @eqa.symm
 end kCid
 
 namespace kActorDeonticActionDeadline
   -- Congruence lemmas
-  theorem eqe_rw_one_congr {a b c d : kActorDeonticActionDeadline} : a.eqe b → c.eqe d → (a.rw_one c) = (b.rw_one d)
+  theorem eqe_rw_one_congr {a b c d : kActorDeonticActionDeadline} : a =E b → c =E d → (a =>1 c) = (b =>1 d)
     := generic_congr @rw_one.eqe_left @rw_one.eqe_right @eqe.symm
-  theorem eqa_rw_one_congr {a b c d : kActorDeonticActionDeadline} : a.eqa b → c.eqa d → (a.rw_one c) = (b.rw_one d)
+  theorem eqa_rw_one_congr {a b c d : kActorDeonticActionDeadline} : a =A b → c =A d → (a =>1 c) = (b =>1 d)
     := generic_congr (λ {x y z} => (@rw_one.eqe_left x y z) ∘ (@eqe.from_eqa x y))
       (λ {x y z h} => (@rw_one.eqe_right x y z h) ∘ (@eqe.from_eqa y z)) @eqa.symm
-  theorem eqe_rw_star_congr {a b c d : kActorDeonticActionDeadline} : a.eqe b → c.eqe d → (a.rw_star c) = (b.rw_star d)
+  theorem eqe_rw_star_congr {a b c d : kActorDeonticActionDeadline} : a =E b → c =E d → (a =>* c) = (b =>* d)
     := generic_congr (λ {x y z} => (@rw_star.trans x y z) ∘ (@rw_star.refl x y))
       (λ {x y z h} => (@rw_star.trans x y z h) ∘ (@rw_star.refl y z)) @eqe.symm
-  theorem eqa_rw_star_congr {a b c d : kActorDeonticActionDeadline} : a.eqa b → c.eqa d → (a.rw_star c) = (b.rw_star d)
+  theorem eqa_rw_star_congr {a b c d : kActorDeonticActionDeadline} : a =A b → c =A d → (a =>* c) = (b =>* d)
     := generic_congr (λ {x y z} => (@rw_star.trans x y z) ∘ (@rw_star.refl x y) ∘ (@eqe.from_eqa x y))
       (λ {x y z h} => (@rw_star.trans x y z h) ∘ (@rw_star.refl y z) ∘ (@eqe.from_eqa y z)) @eqa.symm
 end kActorDeonticActionDeadline
 
 namespace kActorState
   -- Congruence lemmas
-  theorem eqe_rw_one_congr {a b c d : kActorState} : a.eqe b → c.eqe d → (a.rw_one c) = (b.rw_one d)
+  theorem eqe_rw_one_congr {a b c d : kActorState} : a =E b → c =E d → (a =>1 c) = (b =>1 d)
     := generic_congr @rw_one.eqe_left @rw_one.eqe_right @eqe.symm
-  theorem eqa_rw_one_congr {a b c d : kActorState} : a.eqa b → c.eqa d → (a.rw_one c) = (b.rw_one d)
+  theorem eqa_rw_one_congr {a b c d : kActorState} : a =A b → c =A d → (a =>1 c) = (b =>1 d)
     := generic_congr (λ {x y z} => (@rw_one.eqe_left x y z) ∘ (@eqe.from_eqa x y))
       (λ {x y z h} => (@rw_one.eqe_right x y z h) ∘ (@eqe.from_eqa y z)) @eqa.symm
-  theorem eqe_rw_star_congr {a b c d : kActorState} : a.eqe b → c.eqe d → (a.rw_star c) = (b.rw_star d)
+  theorem eqe_rw_star_congr {a b c d : kActorState} : a =E b → c =E d → (a =>* c) = (b =>* d)
     := generic_congr (λ {x y z} => (@rw_star.trans x y z) ∘ (@rw_star.refl x y))
       (λ {x y z h} => (@rw_star.trans x y z h) ∘ (@rw_star.refl y z)) @eqe.symm
-  theorem eqa_rw_star_congr {a b c d : kActorState} : a.eqa b → c.eqa d → (a.rw_star c) = (b.rw_star d)
+  theorem eqa_rw_star_congr {a b c d : kActorState} : a =A b → c =A d → (a =>* c) = (b =>* d)
     := generic_congr (λ {x y z} => (@rw_star.trans x y z) ∘ (@rw_star.refl x y) ∘ (@eqe.from_eqa x y))
       (λ {x y z h} => (@rw_star.trans x y z h) ∘ (@rw_star.refl y z) ∘ (@eqe.from_eqa y z)) @eqa.symm
 end kActorState
 
 namespace kAttributeSet
   -- Congruence lemmas
-  theorem eqe_rw_one_congr {a b c d : kAttributeSet} : a.eqe b → c.eqe d → (a.rw_one c) = (b.rw_one d)
+  theorem eqe_rw_one_congr {a b c d : kAttributeSet} : a =E b → c =E d → (a =>1 c) = (b =>1 d)
     := generic_congr @rw_one.eqe_left @rw_one.eqe_right @eqe.symm
-  theorem eqa_rw_one_congr {a b c d : kAttributeSet} : a.eqa b → c.eqa d → (a.rw_one c) = (b.rw_one d)
+  theorem eqa_rw_one_congr {a b c d : kAttributeSet} : a =A b → c =A d → (a =>1 c) = (b =>1 d)
     := generic_congr (λ {x y z} => (@rw_one.eqe_left x y z) ∘ (@eqe.from_eqa x y))
       (λ {x y z h} => (@rw_one.eqe_right x y z h) ∘ (@eqe.from_eqa y z)) @eqa.symm
-  theorem eqe_rw_star_congr {a b c d : kAttributeSet} : a.eqe b → c.eqe d → (a.rw_star c) = (b.rw_star d)
+  theorem eqe_rw_star_congr {a b c d : kAttributeSet} : a =E b → c =E d → (a =>* c) = (b =>* d)
     := generic_congr (λ {x y z} => (@rw_star.trans x y z) ∘ (@rw_star.refl x y))
       (λ {x y z h} => (@rw_star.trans x y z h) ∘ (@rw_star.refl y z)) @eqe.symm
-  theorem eqa_rw_star_congr {a b c d : kAttributeSet} : a.eqa b → c.eqa d → (a.rw_star c) = (b.rw_star d)
+  theorem eqa_rw_star_congr {a b c d : kAttributeSet} : a =A b → c =A d → (a =>* c) = (b =>* d)
     := generic_congr (λ {x y z} => (@rw_star.trans x y z) ∘ (@rw_star.refl x y) ∘ (@eqe.from_eqa x y))
       (λ {x y z h} => (@rw_star.trans x y z h) ∘ (@rw_star.refl y z) ∘ (@eqe.from_eqa y z)) @eqa.symm
 end kAttributeSet
 
 namespace kString
   -- Congruence lemmas
-  theorem eqe_rw_one_congr {a b c d : kString} : a.eqe b → c.eqe d → (a.rw_one c) = (b.rw_one d)
+  theorem eqe_rw_one_congr {a b c d : kString} : a =E b → c =E d → (a =>1 c) = (b =>1 d)
     := generic_congr @rw_one.eqe_left @rw_one.eqe_right @eqe.symm
-  theorem eqa_rw_one_congr {a b c d : kString} : a.eqa b → c.eqa d → (a.rw_one c) = (b.rw_one d)
+  theorem eqa_rw_one_congr {a b c d : kString} : a =A b → c =A d → (a =>1 c) = (b =>1 d)
     := generic_congr (λ {x y z} => (@rw_one.eqe_left x y z) ∘ (@eqe.from_eqa x y))
       (λ {x y z h} => (@rw_one.eqe_right x y z h) ∘ (@eqe.from_eqa y z)) @eqa.symm
-  theorem eqe_rw_star_congr {a b c d : kString} : a.eqe b → c.eqe d → (a.rw_star c) = (b.rw_star d)
+  theorem eqe_rw_star_congr {a b c d : kString} : a =E b → c =E d → (a =>* c) = (b =>* d)
     := generic_congr (λ {x y z} => (@rw_star.trans x y z) ∘ (@rw_star.refl x y))
       (λ {x y z h} => (@rw_star.trans x y z h) ∘ (@rw_star.refl y z)) @eqe.symm
-  theorem eqa_rw_star_congr {a b c d : kString} : a.eqa b → c.eqa d → (a.rw_star c) = (b.rw_star d)
+  theorem eqa_rw_star_congr {a b c d : kString} : a =A b → c =A d → (a =>* c) = (b =>* d)
     := generic_congr (λ {x y z} => (@rw_star.trans x y z) ∘ (@rw_star.refl x y) ∘ (@eqe.from_eqa x y))
       (λ {x y z h} => (@rw_star.trans x y z h) ∘ (@rw_star.refl y z) ∘ (@eqe.from_eqa y z)) @eqa.symm
 end kString
 
 namespace kContractState
   -- Congruence lemmas
-  theorem eqe_rw_one_congr {a b c d : kContractState} : a.eqe b → c.eqe d → (a.rw_one c) = (b.rw_one d)
+  theorem eqe_rw_one_congr {a b c d : kContractState} : a =E b → c =E d → (a =>1 c) = (b =>1 d)
     := generic_congr @rw_one.eqe_left @rw_one.eqe_right @eqe.symm
-  theorem eqa_rw_one_congr {a b c d : kContractState} : a.eqa b → c.eqa d → (a.rw_one c) = (b.rw_one d)
+  theorem eqa_rw_one_congr {a b c d : kContractState} : a =A b → c =A d → (a =>1 c) = (b =>1 d)
     := generic_congr (λ {x y z} => (@rw_one.eqe_left x y z) ∘ (@eqe.from_eqa x y))
       (λ {x y z h} => (@rw_one.eqe_right x y z h) ∘ (@eqe.from_eqa y z)) @eqa.symm
-  theorem eqe_rw_star_congr {a b c d : kContractState} : a.eqe b → c.eqe d → (a.rw_star c) = (b.rw_star d)
+  theorem eqe_rw_star_congr {a b c d : kContractState} : a =E b → c =E d → (a =>* c) = (b =>* d)
     := generic_congr (λ {x y z} => (@rw_star.trans x y z) ∘ (@rw_star.refl x y))
       (λ {x y z h} => (@rw_star.trans x y z h) ∘ (@rw_star.refl y z)) @eqe.symm
-  theorem eqa_rw_star_congr {a b c d : kContractState} : a.eqa b → c.eqa d → (a.rw_star c) = (b.rw_star d)
+  theorem eqa_rw_star_congr {a b c d : kContractState} : a =A b → c =A d → (a =>* c) = (b =>* d)
     := generic_congr (λ {x y z} => (@rw_star.trans x y z) ∘ (@rw_star.refl x y) ∘ (@eqe.from_eqa x y))
       (λ {x y z h} => (@rw_star.trans x y z h) ∘ (@rw_star.refl y z) ∘ (@eqe.from_eqa y z)) @eqa.symm
 end kContractState
 
 namespace kContractStatus
   -- Congruence lemmas
-  theorem eqe_rw_one_congr {a b c d : kContractStatus} : a.eqe b → c.eqe d → (a.rw_one c) = (b.rw_one d)
+  theorem eqe_rw_one_congr {a b c d : kContractStatus} : a =E b → c =E d → (a =>1 c) = (b =>1 d)
     := generic_congr @rw_one.eqe_left @rw_one.eqe_right @eqe.symm
-  theorem eqa_rw_one_congr {a b c d : kContractStatus} : a.eqa b → c.eqa d → (a.rw_one c) = (b.rw_one d)
+  theorem eqa_rw_one_congr {a b c d : kContractStatus} : a =A b → c =A d → (a =>1 c) = (b =>1 d)
     := generic_congr (λ {x y z} => (@rw_one.eqe_left x y z) ∘ (@eqe.from_eqa x y))
       (λ {x y z h} => (@rw_one.eqe_right x y z h) ∘ (@eqe.from_eqa y z)) @eqa.symm
-  theorem eqe_rw_star_congr {a b c d : kContractStatus} : a.eqe b → c.eqe d → (a.rw_star c) = (b.rw_star d)
+  theorem eqe_rw_star_congr {a b c d : kContractStatus} : a =E b → c =E d → (a =>* c) = (b =>* d)
     := generic_congr (λ {x y z} => (@rw_star.trans x y z) ∘ (@rw_star.refl x y))
       (λ {x y z h} => (@rw_star.trans x y z h) ∘ (@rw_star.refl y z)) @eqe.symm
-  theorem eqa_rw_star_congr {a b c d : kContractStatus} : a.eqa b → c.eqa d → (a.rw_star c) = (b.rw_star d)
+  theorem eqa_rw_star_congr {a b c d : kContractStatus} : a =A b → c =A d → (a =>* c) = (b =>* d)
     := generic_congr (λ {x y z} => (@rw_star.trans x y z) ∘ (@rw_star.refl x y) ∘ (@eqe.from_eqa x y))
       (λ {x y z h} => (@rw_star.trans x y z h) ∘ (@rw_star.refl y z) ∘ (@eqe.from_eqa y z)) @eqa.symm
 end kContractStatus
 
 namespace kDate
   -- Congruence lemmas
-  theorem eqe_rw_one_congr {a b c d : kDate} : a.eqe b → c.eqe d → (a.rw_one c) = (b.rw_one d)
+  theorem eqe_rw_one_congr {a b c d : kDate} : a =E b → c =E d → (a =>1 c) = (b =>1 d)
     := generic_congr @rw_one.eqe_left @rw_one.eqe_right @eqe.symm
-  theorem eqa_rw_one_congr {a b c d : kDate} : a.eqa b → c.eqa d → (a.rw_one c) = (b.rw_one d)
+  theorem eqa_rw_one_congr {a b c d : kDate} : a =A b → c =A d → (a =>1 c) = (b =>1 d)
     := generic_congr (λ {x y z} => (@rw_one.eqe_left x y z) ∘ (@eqe.from_eqa x y))
       (λ {x y z h} => (@rw_one.eqe_right x y z h) ∘ (@eqe.from_eqa y z)) @eqa.symm
-  theorem eqe_rw_star_congr {a b c d : kDate} : a.eqe b → c.eqe d → (a.rw_star c) = (b.rw_star d)
+  theorem eqe_rw_star_congr {a b c d : kDate} : a =E b → c =E d → (a =>* c) = (b =>* d)
     := generic_congr (λ {x y z} => (@rw_star.trans x y z) ∘ (@rw_star.refl x y))
       (λ {x y z h} => (@rw_star.trans x y z h) ∘ (@rw_star.refl y z)) @eqe.symm
-  theorem eqa_rw_star_congr {a b c d : kDate} : a.eqa b → c.eqa d → (a.rw_star c) = (b.rw_star d)
+  theorem eqa_rw_star_congr {a b c d : kDate} : a =A b → c =A d → (a =>* c) = (b =>* d)
     := generic_congr (λ {x y z} => (@rw_star.trans x y z) ∘ (@rw_star.refl x y) ∘ (@eqe.from_eqa x y))
       (λ {x y z h} => (@rw_star.trans x y z h) ∘ (@rw_star.refl y z) ∘ (@eqe.from_eqa y z)) @eqa.symm
 end kDate
 
 namespace kDeadline
   -- Congruence lemmas
-  theorem eqe_rw_one_congr {a b c d : kDeadline} : a.eqe b → c.eqe d → (a.rw_one c) = (b.rw_one d)
+  theorem eqe_rw_one_congr {a b c d : kDeadline} : a =E b → c =E d → (a =>1 c) = (b =>1 d)
     := generic_congr @rw_one.eqe_left @rw_one.eqe_right @eqe.symm
-  theorem eqa_rw_one_congr {a b c d : kDeadline} : a.eqa b → c.eqa d → (a.rw_one c) = (b.rw_one d)
+  theorem eqa_rw_one_congr {a b c d : kDeadline} : a =A b → c =A d → (a =>1 c) = (b =>1 d)
     := generic_congr (λ {x y z} => (@rw_one.eqe_left x y z) ∘ (@eqe.from_eqa x y))
       (λ {x y z h} => (@rw_one.eqe_right x y z h) ∘ (@eqe.from_eqa y z)) @eqa.symm
-  theorem eqe_rw_star_congr {a b c d : kDeadline} : a.eqe b → c.eqe d → (a.rw_star c) = (b.rw_star d)
+  theorem eqe_rw_star_congr {a b c d : kDeadline} : a =E b → c =E d → (a =>* c) = (b =>* d)
     := generic_congr (λ {x y z} => (@rw_star.trans x y z) ∘ (@rw_star.refl x y))
       (λ {x y z h} => (@rw_star.trans x y z h) ∘ (@rw_star.refl y z)) @eqe.symm
-  theorem eqa_rw_star_congr {a b c d : kDeadline} : a.eqa b → c.eqa d → (a.rw_star c) = (b.rw_star d)
+  theorem eqa_rw_star_congr {a b c d : kDeadline} : a =A b → c =A d → (a =>* c) = (b =>* d)
     := generic_congr (λ {x y z} => (@rw_star.trans x y z) ∘ (@rw_star.refl x y) ∘ (@eqe.from_eqa x y))
       (λ {x y z h} => (@rw_star.trans x y z h) ∘ (@rw_star.refl y z) ∘ (@eqe.from_eqa y z)) @eqa.symm
 end kDeadline
 
 namespace kDeontic
   -- Congruence lemmas
-  theorem eqe_rw_one_congr {a b c d : kDeontic} : a.eqe b → c.eqe d → (a.rw_one c) = (b.rw_one d)
+  theorem eqe_rw_one_congr {a b c d : kDeontic} : a =E b → c =E d → (a =>1 c) = (b =>1 d)
     := generic_congr @rw_one.eqe_left @rw_one.eqe_right @eqe.symm
-  theorem eqa_rw_one_congr {a b c d : kDeontic} : a.eqa b → c.eqa d → (a.rw_one c) = (b.rw_one d)
+  theorem eqa_rw_one_congr {a b c d : kDeontic} : a =A b → c =A d → (a =>1 c) = (b =>1 d)
     := generic_congr (λ {x y z} => (@rw_one.eqe_left x y z) ∘ (@eqe.from_eqa x y))
       (λ {x y z h} => (@rw_one.eqe_right x y z h) ∘ (@eqe.from_eqa y z)) @eqa.symm
-  theorem eqe_rw_star_congr {a b c d : kDeontic} : a.eqe b → c.eqe d → (a.rw_star c) = (b.rw_star d)
+  theorem eqe_rw_star_congr {a b c d : kDeontic} : a =E b → c =E d → (a =>* c) = (b =>* d)
     := generic_congr (λ {x y z} => (@rw_star.trans x y z) ∘ (@rw_star.refl x y))
       (λ {x y z h} => (@rw_star.trans x y z h) ∘ (@rw_star.refl y z)) @eqe.symm
-  theorem eqa_rw_star_congr {a b c d : kDeontic} : a.eqa b → c.eqa d → (a.rw_star c) = (b.rw_star d)
+  theorem eqa_rw_star_congr {a b c d : kDeontic} : a =A b → c =A d → (a =>* c) = (b =>* d)
     := generic_congr (λ {x y z} => (@rw_star.trans x y z) ∘ (@rw_star.refl x y) ∘ (@eqe.from_eqa x y))
       (λ {x y z h} => (@rw_star.trans x y z h) ∘ (@rw_star.refl y z) ∘ (@eqe.from_eqa y z)) @eqa.symm
 end kDeontic
 
 namespace kDuration
   -- Congruence lemmas
-  theorem eqe_rw_one_congr {a b c d : kDuration} : a.eqe b → c.eqe d → (a.rw_one c) = (b.rw_one d)
+  theorem eqe_rw_one_congr {a b c d : kDuration} : a =E b → c =E d → (a =>1 c) = (b =>1 d)
     := generic_congr @rw_one.eqe_left @rw_one.eqe_right @eqe.symm
-  theorem eqa_rw_one_congr {a b c d : kDuration} : a.eqa b → c.eqa d → (a.rw_one c) = (b.rw_one d)
+  theorem eqa_rw_one_congr {a b c d : kDuration} : a =A b → c =A d → (a =>1 c) = (b =>1 d)
     := generic_congr (λ {x y z} => (@rw_one.eqe_left x y z) ∘ (@eqe.from_eqa x y))
       (λ {x y z h} => (@rw_one.eqe_right x y z h) ∘ (@eqe.from_eqa y z)) @eqa.symm
-  theorem eqe_rw_star_congr {a b c d : kDuration} : a.eqe b → c.eqe d → (a.rw_star c) = (b.rw_star d)
+  theorem eqe_rw_star_congr {a b c d : kDuration} : a =E b → c =E d → (a =>* c) = (b =>* d)
     := generic_congr (λ {x y z} => (@rw_star.trans x y z) ∘ (@rw_star.refl x y))
       (λ {x y z h} => (@rw_star.trans x y z h) ∘ (@rw_star.refl y z)) @eqe.symm
-  theorem eqa_rw_star_congr {a b c d : kDuration} : a.eqa b → c.eqa d → (a.rw_star c) = (b.rw_star d)
+  theorem eqa_rw_star_congr {a b c d : kDuration} : a =A b → c =A d → (a =>* c) = (b =>* d)
     := generic_congr (λ {x y z} => (@rw_star.trans x y z) ∘ (@rw_star.refl x y) ∘ (@eqe.from_eqa x y))
       (λ {x y z h} => (@rw_star.trans x y z h) ∘ (@rw_star.refl y z) ∘ (@eqe.from_eqa y z)) @eqa.symm
 end kDuration
 
 namespace kFindResult
   -- Congruence lemmas
-  theorem eqe_rw_one_congr {a b c d : kFindResult} : a.eqe b → c.eqe d → (a.rw_one c) = (b.rw_one d)
+  theorem eqe_rw_one_congr {a b c d : kFindResult} : a =E b → c =E d → (a =>1 c) = (b =>1 d)
     := generic_congr @rw_one.eqe_left @rw_one.eqe_right @eqe.symm
-  theorem eqa_rw_one_congr {a b c d : kFindResult} : a.eqa b → c.eqa d → (a.rw_one c) = (b.rw_one d)
+  theorem eqa_rw_one_congr {a b c d : kFindResult} : a =A b → c =A d → (a =>1 c) = (b =>1 d)
     := generic_congr (λ {x y z} => (@rw_one.eqe_left x y z) ∘ (@eqe.from_eqa x y))
       (λ {x y z h} => (@rw_one.eqe_right x y z h) ∘ (@eqe.from_eqa y z)) @eqa.symm
-  theorem eqe_rw_star_congr {a b c d : kFindResult} : a.eqe b → c.eqe d → (a.rw_star c) = (b.rw_star d)
+  theorem eqe_rw_star_congr {a b c d : kFindResult} : a =E b → c =E d → (a =>* c) = (b =>* d)
     := generic_congr (λ {x y z} => (@rw_star.trans x y z) ∘ (@rw_star.refl x y))
       (λ {x y z h} => (@rw_star.trans x y z h) ∘ (@rw_star.refl y z)) @eqe.symm
-  theorem eqa_rw_star_congr {a b c d : kFindResult} : a.eqa b → c.eqa d → (a.rw_star c) = (b.rw_star d)
+  theorem eqa_rw_star_congr {a b c d : kFindResult} : a =A b → c =A d → (a =>* c) = (b =>* d)
     := generic_congr (λ {x y z} => (@rw_star.trans x y z) ∘ (@rw_star.refl x y) ∘ (@eqe.from_eqa x y))
       (λ {x y z h} => (@rw_star.trans x y z h) ∘ (@rw_star.refl y z) ∘ (@eqe.from_eqa y z)) @eqa.symm
 end kFindResult
 
 namespace kHenceLest
   -- Congruence lemmas
-  theorem eqe_rw_one_congr {a b c d : kHenceLest} : a.eqe b → c.eqe d → (a.rw_one c) = (b.rw_one d)
+  theorem eqe_rw_one_congr {a b c d : kHenceLest} : a =E b → c =E d → (a =>1 c) = (b =>1 d)
     := generic_congr @rw_one.eqe_left @rw_one.eqe_right @eqe.symm
-  theorem eqa_rw_one_congr {a b c d : kHenceLest} : a.eqa b → c.eqa d → (a.rw_one c) = (b.rw_one d)
+  theorem eqa_rw_one_congr {a b c d : kHenceLest} : a =A b → c =A d → (a =>1 c) = (b =>1 d)
     := generic_congr (λ {x y z} => (@rw_one.eqe_left x y z) ∘ (@eqe.from_eqa x y))
       (λ {x y z h} => (@rw_one.eqe_right x y z h) ∘ (@eqe.from_eqa y z)) @eqa.symm
-  theorem eqe_rw_star_congr {a b c d : kHenceLest} : a.eqe b → c.eqe d → (a.rw_star c) = (b.rw_star d)
+  theorem eqe_rw_star_congr {a b c d : kHenceLest} : a =E b → c =E d → (a =>* c) = (b =>* d)
     := generic_congr (λ {x y z} => (@rw_star.trans x y z) ∘ (@rw_star.refl x y))
       (λ {x y z h} => (@rw_star.trans x y z h) ∘ (@rw_star.refl y z)) @eqe.symm
-  theorem eqa_rw_star_congr {a b c d : kHenceLest} : a.eqa b → c.eqa d → (a.rw_star c) = (b.rw_star d)
+  theorem eqa_rw_star_congr {a b c d : kHenceLest} : a =A b → c =A d → (a =>* c) = (b =>* d)
     := generic_congr (λ {x y z} => (@rw_star.trans x y z) ∘ (@rw_star.refl x y) ∘ (@eqe.from_eqa x y))
       (λ {x y z h} => (@rw_star.trans x y z h) ∘ (@rw_star.refl y z) ∘ (@eqe.from_eqa y z)) @eqa.symm
 end kHenceLest
 
 namespace k«Set{Rule}»
   -- Congruence lemmas
-  theorem eqe_rw_one_congr {a b c d : k«Set{Rule}»} : a.eqe b → c.eqe d → (a.rw_one c) = (b.rw_one d)
+  theorem eqe_rw_one_congr {a b c d : k«Set{Rule}»} : a =E b → c =E d → (a =>1 c) = (b =>1 d)
     := generic_congr @rw_one.eqe_left @rw_one.eqe_right @eqe.symm
-  theorem eqa_rw_one_congr {a b c d : k«Set{Rule}»} : a.eqa b → c.eqa d → (a.rw_one c) = (b.rw_one d)
+  theorem eqa_rw_one_congr {a b c d : k«Set{Rule}»} : a =A b → c =A d → (a =>1 c) = (b =>1 d)
     := generic_congr (λ {x y z} => (@rw_one.eqe_left x y z) ∘ (@eqe.from_eqa x y))
       (λ {x y z h} => (@rw_one.eqe_right x y z h) ∘ (@eqe.from_eqa y z)) @eqa.symm
-  theorem eqe_rw_star_congr {a b c d : k«Set{Rule}»} : a.eqe b → c.eqe d → (a.rw_star c) = (b.rw_star d)
+  theorem eqe_rw_star_congr {a b c d : k«Set{Rule}»} : a =E b → c =E d → (a =>* c) = (b =>* d)
     := generic_congr (λ {x y z} => (@rw_star.trans x y z) ∘ (@rw_star.refl x y))
       (λ {x y z h} => (@rw_star.trans x y z h) ∘ (@rw_star.refl y z)) @eqe.symm
-  theorem eqa_rw_star_congr {a b c d : k«Set{Rule}»} : a.eqa b → c.eqa d → (a.rw_star c) = (b.rw_star d)
+  theorem eqa_rw_star_congr {a b c d : k«Set{Rule}»} : a =A b → c =A d → (a =>* c) = (b =>* d)
     := generic_congr (λ {x y z} => (@rw_star.trans x y z) ∘ (@rw_star.refl x y) ∘ (@eqe.from_eqa x y))
       (λ {x y z h} => (@rw_star.trans x y z h) ∘ (@rw_star.refl y z) ∘ (@eqe.from_eqa y z)) @eqa.symm
 end k«Set{Rule}»
 
 namespace kTransitionList
   -- Congruence lemmas
-  theorem eqe_rw_one_congr {a b c d : kTransitionList} : a.eqe b → c.eqe d → (a.rw_one c) = (b.rw_one d)
+  theorem eqe_rw_one_congr {a b c d : kTransitionList} : a =E b → c =E d → (a =>1 c) = (b =>1 d)
     := generic_congr @rw_one.eqe_left @rw_one.eqe_right @eqe.symm
-  theorem eqa_rw_one_congr {a b c d : kTransitionList} : a.eqa b → c.eqa d → (a.rw_one c) = (b.rw_one d)
+  theorem eqa_rw_one_congr {a b c d : kTransitionList} : a =A b → c =A d → (a =>1 c) = (b =>1 d)
     := generic_congr (λ {x y z} => (@rw_one.eqe_left x y z) ∘ (@eqe.from_eqa x y))
       (λ {x y z h} => (@rw_one.eqe_right x y z h) ∘ (@eqe.from_eqa y z)) @eqa.symm
-  theorem eqe_rw_star_congr {a b c d : kTransitionList} : a.eqe b → c.eqe d → (a.rw_star c) = (b.rw_star d)
+  theorem eqe_rw_star_congr {a b c d : kTransitionList} : a =E b → c =E d → (a =>* c) = (b =>* d)
     := generic_congr (λ {x y z} => (@rw_star.trans x y z) ∘ (@rw_star.refl x y))
       (λ {x y z h} => (@rw_star.trans x y z h) ∘ (@rw_star.refl y z)) @eqe.symm
-  theorem eqa_rw_star_congr {a b c d : kTransitionList} : a.eqa b → c.eqa d → (a.rw_star c) = (b.rw_star d)
+  theorem eqa_rw_star_congr {a b c d : kTransitionList} : a =A b → c =A d → (a =>* c) = (b =>* d)
     := generic_congr (λ {x y z} => (@rw_star.trans x y z) ∘ (@rw_star.refl x y) ∘ (@eqe.from_eqa x y))
       (λ {x y z h} => (@rw_star.trans x y z h) ∘ (@rw_star.refl y z) ∘ (@eqe.from_eqa y z)) @eqa.symm
 end kTransitionList
 
 namespace kstrategylbrakinternalrbrack
   -- Congruence lemmas
-  theorem eqe_rw_one_congr {a b c d : kstrategylbrakinternalrbrack} : a.eqe b → c.eqe d → (a.rw_one c) = (b.rw_one d)
+  theorem eqe_rw_one_congr {a b c d : kstrategylbrakinternalrbrack} : a =E b → c =E d → (a =>1 c) = (b =>1 d)
     := generic_congr @rw_one.eqe_left @rw_one.eqe_right @eqe.symm
-  theorem eqa_rw_one_congr {a b c d : kstrategylbrakinternalrbrack} : a.eqa b → c.eqa d → (a.rw_one c) = (b.rw_one d)
+  theorem eqa_rw_one_congr {a b c d : kstrategylbrakinternalrbrack} : a =A b → c =A d → (a =>1 c) = (b =>1 d)
     := generic_congr (λ {x y z} => (@rw_one.eqe_left x y z) ∘ (@eqe.from_eqa x y))
       (λ {x y z h} => (@rw_one.eqe_right x y z h) ∘ (@eqe.from_eqa y z)) @eqa.symm
-  theorem eqe_rw_star_congr {a b c d : kstrategylbrakinternalrbrack} : a.eqe b → c.eqe d → (a.rw_star c) = (b.rw_star d)
+  theorem eqe_rw_star_congr {a b c d : kstrategylbrakinternalrbrack} : a =E b → c =E d → (a =>* c) = (b =>* d)
     := generic_congr (λ {x y z} => (@rw_star.trans x y z) ∘ (@rw_star.refl x y))
       (λ {x y z h} => (@rw_star.trans x y z h) ∘ (@rw_star.refl y z)) @eqe.symm
-  theorem eqa_rw_star_congr {a b c d : kstrategylbrakinternalrbrack} : a.eqa b → c.eqa d → (a.rw_star c) = (b.rw_star d)
+  theorem eqa_rw_star_congr {a b c d : kstrategylbrakinternalrbrack} : a =A b → c =A d → (a =>* c) = (b =>* d)
     := generic_congr (λ {x y z} => (@rw_star.trans x y z) ∘ (@rw_star.refl x y) ∘ (@eqe.from_eqa x y))
       (λ {x y z h} => (@rw_star.trans x y z h) ∘ (@rw_star.refl y z) ∘ (@eqe.from_eqa y z)) @eqa.symm
 end kstrategylbrakinternalrbrack

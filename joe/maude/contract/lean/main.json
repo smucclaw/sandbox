@@ -1,0 +1,7 @@
+{
+  "source": "../.workdir/main.maude",
+	"with-error-free-opt": true,
+	"use-notation": ["has_sort", "eqe", "eqa", "rw_one", "rw_star"],
+  "with-original-stmt": true,
+  "lean-version": 4
+}

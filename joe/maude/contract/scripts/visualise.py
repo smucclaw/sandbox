@@ -301,6 +301,8 @@ def graph_to_nx_graph(mod, graph):
   #   )
 
   # Quotient states by same title, to merge states that have different global time.
+  print(f'Original size of state space: ({len(nx_graph.nodes), len(nx_graph.edges)})')
+
   nx_node_titles = nx_graph.nodes(data = 'title')
   equiv_rel = lambda node1, node2: (
     nx_node_titles[node1] == nx_node_titles[node2]

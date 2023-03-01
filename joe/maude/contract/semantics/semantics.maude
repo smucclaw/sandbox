@@ -257,7 +257,7 @@ sload config
     < coordinator : Coordinator |
       time :
         if contractStateToStatus contractState == Active
-        then s time
+        then time --- Used to be time + 1
         else time
         fi,
       contractState : deltaTick rules contractState > .

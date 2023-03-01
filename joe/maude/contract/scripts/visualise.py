@@ -301,18 +301,19 @@ def graph_to_nx_graph(mod, graph):
   #   )
 
   # Quotient states by same title, to merge states that have different global time.
-  print(f'Original size of state space: ({len(nx_graph.nodes), len(nx_graph.edges)})')
+  print(f'Original size of state space: {len(nx_graph.nodes), len(nx_graph.edges)}')
 
   nx_node_titles = nx_graph.nodes(data = 'title')
   equiv_rel = lambda node1, node2: (
     nx_node_titles[node1] == nx_node_titles[node2]
   )
   node_data_fn = lambda nodes : nx_graph.nodes()[next(iter(nodes))]
+
   return pipe(
     nx_graph,
-    lambda x: nx.quotient_graph(
-      x, equiv_rel, node_data = node_data_fn, create_using = nx.MultiDiGraph
-    ),
+    # lambda x: nx.quotient_graph(
+    #   x, equiv_rel, node_data = node_data_fn, create_using = nx.MultiDiGraph
+    # ),
     # Ensure that the node labels in the output graph are consecutive.
     nx.convert_node_labels_to_integers
   )

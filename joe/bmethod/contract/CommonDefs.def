@@ -23,7 +23,7 @@ DEFINITIONS
       rule'deontic = deontic0 ∧
       rule'event'name = event_name
     );
-  
+
   // Option type as the initial algebra of the endofunctor F(T) = 1 + T
   Option(T) == {None} ∪ Some[T];
   None == ∅;

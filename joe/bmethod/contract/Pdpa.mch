@@ -129,6 +129,7 @@ OPERATIONS
 
   assess_timeout(actor) = VAR rule_names IN
     rule_names ← event_timeout(assess, actor);
+
     IF Assessment ∈ rule_names THEN
       breach(actor)
     END

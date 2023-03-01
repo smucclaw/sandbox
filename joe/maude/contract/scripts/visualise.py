@@ -492,41 +492,23 @@ def natural4_rules_to_race_cond_graphs(main_mod, natural4_rules, max_traces = 1)
   race_cond_strat = pipe(
     natural4_rules,
     escape_ansi,
-    lambda x: main_mod.parseStrategy(f'raceCond(({x}))')
+    lambda rules: main_mod.parseStrategy(f'raceCond(({rules}))')
   )
 
   target_config = main_mod.parseTerm('c:Configuration')
 
-  # race_cond_paths is a sequence, with each item being a list of terms and
-  # transitions as in:
   # https://fadoss.github.io/maude-bindings/#maude.StrategySequenceSearch.pathTo
-  race_cond_soln_fns = pipe(
+  return pipe(
     natural4_rules,
     apply_fn(main_mod, 'init'),
     lambda config: config.search(
       maude.NORMAL_FORM, target_config, strategy = race_cond_strat
     ),
     take(max_traces),
-    map(lambda soln: soln[2])
+    map(lambda soln: soln[2]()),
+    map(race_cond_path_to_graph(main_mod)),
+    pyrs.pvector
   )
-
-  # This for loop is necessary. Squishing it into the above pipee causes a
-  # segfault in Maude.
-  # This is likely because the Maude module is imperative in nature and so may
-  # have some kind of mutable, internal states that doesn't play nice with a
-  # functional pipeline / streaming style
-  race_cond_graphs = pyrs.pvector()
-  for soln_fn in race_cond_soln_fns:
-    race_cond_graphs = pipe(
-      soln_fn,
-      lambda soln_fn: soln_fn(),
-      race_cond_path_to_graph(main_mod),
-      race_cond_graphs.append
-    )
-
-  # print(race_cond_graphs)
-
-  return race_cond_graphs
 
 @curry
 def natural4_rules_to_race_cond_htmls(mod, dir, natural4_rules, max_traces = 1):

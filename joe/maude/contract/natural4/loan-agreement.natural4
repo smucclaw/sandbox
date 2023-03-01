@@ -1,0 +1,41 @@
+RULE 'START
+PARTY 'Borrower
+MAY 'RequestPrincipal
+WITHIN 1 DAY
+HENCE ('MustRepay1 AND 'ShantDefault),
+
+RULE 'MustRepay1
+PARTY 'Borrower
+MUST 'PayPayment1
+WITHIN 10 DAY
+HENCE 'MustRepay2
+LEST 'MayNotifyBorrower,
+
+RULE 'MustRepay2
+PARTY 'Borrower
+MUST 'PayPayment2
+WITHIN 10 DAY
+LEST 'MayNotifyBorrower,
+
+RULE 'ShantDefault
+PARTY 'Borrower
+SHANT 'Default
+WITHIN 30 DAY
+LEST 'MayNotifyBorrower,
+
+RULE 'MayNotifyBorrower
+PARTY 'Lender
+MAY 'NotifyBorrower
+WITHIN 3 DAY
+HENCE 'MustCureDefault,
+
+RULE 'MustCureDefault
+PARTY 'Borrower
+MUST 'CureDefault
+WITHIN 2 DAY
+LEST 'MustRepayOutstanding,
+
+RULE 'MustRepayOutstanding
+PARTY 'Borrower
+MUST 'RepayOutstanding
+WITHIN 1 DAY

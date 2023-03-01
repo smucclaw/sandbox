@@ -77,7 +77,7 @@ endv
 ---   ops allEvents : -> AllowedEvent [ctor] .
 --- endfm
 
-load full-maude
+sload full-maude
 
 (omod CONFIG is
   protecting PRELUDE .

@@ -2,25 +2,31 @@ RULE 'START
 PARTY 'Borrower
 MAY 'RequestPrincipal
 WITHIN 1 DAY
+HENCE 'MustSendPrincipal,
+
+RULE 'MustSendPrincipal
+PARTY 'Lender
+MUST 'PayPayment1
+WITHIN 1 DAY
 HENCE ('MustRepay1 AND 'ShantDefault),
 
 RULE 'MustRepay1
 PARTY 'Borrower
 MUST 'PayPayment1
-WITHIN 10 DAY
+WITHIN 365 DAY
 HENCE 'MustRepay2
 LEST 'MayNotifyBorrower,
 
 RULE 'MustRepay2
 PARTY 'Borrower
 MUST 'PayPayment2
-WITHIN 10 DAY
+WITHIN 365 DAY
 LEST 'MayNotifyBorrower,
 
 RULE 'ShantDefault
 PARTY 'Borrower
 SHANT 'Default
-WITHIN 30 DAY
+WITHIN 730 DAY
 LEST 'MayNotifyBorrower,
 
 RULE 'MayNotifyBorrower

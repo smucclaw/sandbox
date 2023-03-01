@@ -569,7 +569,7 @@ if __name__ == '__main__':
   config = natural4_rules_to_config(main_mod, natural4_rules)
   config_to_html_file(main_mod, config, strat, html_file_path)
 
-  natural4_rules_to_race_cond_htmls(main_mod, workdir, natural4_rules)
+  # natural4_rules_to_race_cond_htmls(main_mod, workdir, natural4_rules)
 
   # main_file_term_strat_to_html_file(main_file, natural4_file, html_file_path, strat)
 

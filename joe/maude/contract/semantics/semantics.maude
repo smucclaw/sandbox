@@ -94,22 +94,25 @@ sload config
       RULE ruleName
       PARTY actorName
       deontic actionName
-      WITHIN time DAY
+      deadline
+      --- WITHIN time DAY
       HENCE hence
       LEST lest,
       activeRules
     )
   = Active (getRulesWithNames rules hence) ^
     deltaAction rules (actorName does actionName) (Active activeRules)
-  if deontic == MUST or deontic == MAY .
+  if deadlineAllowsAction deadline
+  /\ deontic == MUST or deontic == MAY .
 
-  eq deltaAction rules
+  ceq deltaAction rules
     (actorName does actionName)
     Active (
       RULE ruleName
       PARTY actorName
       SHANT actionName
-      WITHIN time DAY
+      deadline
+      --- WITHIN time DAY
       HENCE hence
       LEST lest,
       activeRules
@@ -119,7 +122,8 @@ sload config
     then Breached actorName
     else Active (getRulesWithNames rules lest)
     fi
-  ) ^ deltaAction rules (actorName does actionName) (Active activeRules) .
+  ) ^ deltaAction rules (actorName does actionName) (Active activeRules)
+  if deadlineAllowsAction deadline .
 
   eq deltaAction rules actionEvent Active (activeRule, activeRules)
   = Active activeRule ^ deltaAction rules actionEvent (Active activeRules)
@@ -132,12 +136,13 @@ sload config
 
   eq deltaTick rules (Breached actorName) = Breached actorName .
 
-  eq deltaTick rules
+  ceq deltaTick rules
     Active (
       RULE ruleName
       PARTY actorName
       deontic actionName
-      WITHIN (s time) DAY
+      deadline
+      --- WITHIN (s time) DAY
       HENCE hence
       LEST lest,
       activeRules
@@ -146,17 +151,20 @@ sload config
       RULE ruleName
       PARTY actorName
       deontic actionName
-      WITHIN time DAY
+      (decTimer deadline)
+      --- WITHIN time DAY
       HENCE hence
       LEST lest
-    ) ^ deltaTick rules (Active activeRules) .
+    ) ^ deltaTick rules (Active activeRules)
+  if not isTimerZero deadline .
 
   ceq deltaTick rules
     Active (
       RULE ruleName
       PARTY actorName
       deontic actionName
-      WITHIN 0 DAY
+      deadline
+      --- WITHIN 0 DAY
       HENCE hence
       LEST lest,
       activeRules
@@ -167,20 +175,38 @@ sload config
     else Breached actorName
     fi
   ) ^ deltaTick rules (Active activeRules)
-  if deontic == MUST or deontic == MAY .
+  if isTimerZero deadline
+  /\ deontic == MUST or deontic == MAY .
 
-  eq deltaTick rules
+  ceq deltaTick rules
     Active (
       RULE ruleName
       PARTY actorName
       SHANT actionName
-      WITHIN 0 DAY
+      deadline
+      --- WITHIN 0 DAY
       HENCE hence
       LEST lest,
       activeRules
     )
   = Active (getRulesWithNames rules hence) ^
-    deltaTick rules (Active activeRules) .
+    deltaTick rules (Active activeRules)
+  if isTimerZero deadline .
+
+  ops deadlineAllowsAction_ : Deadline -> Bool .
+  eq deadlineAllowsAction ON THE 0 TH DAY = true .
+  eq deadlineAllowsAction WITHIN time DAY = true .
+  eq deadlineAllowsAction deadline = false [owise] .
+
+  ops isTimerZero_ : Deadline -> Bool .
+  eq isTimerZero ON THE 0 TH DAY = true .
+  eq isTimerZero WITHIN 0 DAY = true .
+  eq isTimerZero deadline = false [owise] .
+
+  ops decTimer_ : Deadline -> Deadline .
+  eq decTimer ON THE s time TH DAY = ON THE time TH DAY .
+  eq decTimer WITHIN s time DAY = WITHIN time DAY .
+  eq decTimer deadline = deadline [owise] .
 
 ---(
     there exists some active rule in coordinator that
@@ -206,7 +232,8 @@ sload config
         RULE ruleName
         PARTY actorName
         deontic actionName
-        WITHIN time DAY
+        --- WITHIN time DAY
+        deadline
         HENCE hence
         LEST lest,
         activeRules
@@ -223,7 +250,8 @@ sload config
             RULE ruleName
             PARTY actorName
             deontic actionName
-            WITHIN time DAY
+            --- WITHIN time DAY
+            deadline
             HENCE hence
             LEST lest,
             activeRules

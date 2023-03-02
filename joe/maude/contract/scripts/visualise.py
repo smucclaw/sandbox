@@ -39,6 +39,8 @@ import sys
 import maude
 from umaudemc.wrappers import create_graph
 
+import itertools as it
+
 import pyrsistent as pyrs
 from cytoolz.functoolz import *
 from cytoolz.curried import *
@@ -207,7 +209,8 @@ def edge_pair_to_edge(mod, rewrite_graph, edge_pair):
   return pipe(
     edge_pair,
     lambda edge:
-      (edge[0], edge[1], rewrite_graph.getTransition(*edge).getRule()),
+      # (edge[0], edge[1], rewrite_graph.getTransition(*edge).getRule()),
+      (edge[0], edge[1], rewrite_graph.getRule(*edge)),
     # [... (n, succ, rule), ...]
     lambda edge:
       (edge[0], edge[1],
@@ -220,19 +223,80 @@ def edge_pair_to_edge(mod, rewrite_graph, edge_pair):
     # [... Edge ...]
   )
 
+# Based on:
+# https://github.com/fadoss/umaudemc/blob/master/umaudemc/wrappers.py#L77
+# def expand_rewrite_graph(rewrite_graph, state=0):
+#   # Stack for the depth-first search
+#   # (state index, child index, whether the state is already valid)
+#   stack = [0]
+#   seen_states = []
+
+#   while stack:
+#     state = stack.pop()
+#     seen_states.append(state)
+
+#     index = 0
+#     next_state = rewrite_graph.getNextState(state, index)
+
+#     # No more successors
+#     if next_state == -1:
+#       # If no valid successor has been reached, the
+#       # state is not valid unless it is a solution
+#       valid_child = valid or self.graph.isSolutionState(state)
+#       self.valid_states[state] = valid_child
+
+#     # A new state, process it
+#     elif next_state >= len(self.valid_states):
+#       self.valid_states.append(True)
+#       stack.append((state, index + 1, valid))
+#       stack.append((next_state, 0, False))
+
+#     # The child is a known state
+#     # (if it is valid or in the path, then this state is valid)
+#     else:
+#       stack.append((state, index + 1, valid or self.valid_states[next_state]))
+
+repeat = iterate(identity)
+
+def rewrite_graph_to_edge_pairs(rewrite_graph):
+  seen_ids = pyrs.pset([0])
+  next_ids = pyrs.pdeque([0])
+
+  while next_ids:
+    curr_id = next_ids.left
+    seen_ids = seen_ids.add(curr_id)
+    next_ids = next_ids.popleft()
+    for succ_id in rewrite_graph.getNextStates(curr_id):
+      if succ_id not in seen_ids:
+        seen_ids = seen_ids.add(succ_id)
+        next_ids = next_ids.append(succ_id)
+      yield (curr_id, succ_id)
+
+    # next_ids = pipe(
+    #   next_ids,
+    #   lambda q: q.popleft(),
+    #   lambda q: q.extend(to_edge_pairs(seen_ids, curr_id))
+    # )
+
 @curry
 def rewrite_graph_to_graph(mod, rewrite_graph):
-  repeat = iterate(identity)
   return pipe(
-    rewrite_graph.getNrStates(),
+    # rewrite_graph.getNrStates(),
     # num_states
-    range,
-    # [0 ... n ... num_states]
-    map(juxt(repeat, rewrite_graph.getNextStates)),
+    # range,
+    # [0 ... n ...]
+    # map(juxt(repeat, rewrite_graph.getNextStates)),
     # [... ((n, n, ...), (succ0, succ1, ..., succm)) ...]
-    map(lambda x: zip(*x)),
+    # map(lambda x: zip(*x)),
     # [... ((n, succ0), (n, succ1), ..., (n, succm)) ...]
-    concat,
+    # concat,
+    # do(lambda x: print(list(take(57, x)))),
+    # do(lambda _: print(list(rewrite_graph.getNextStates(27)))),
+    # lambda iterable: it.takewhile(lambda xy: xy[1] >= 0, iterable),
+    rewrite_graph,
+    rewrite_graph_to_edge_pairs,
+    # iterate(compose_left(map(rewrite_graph.getNextStates), concat, list))),
+    # do(lambda x: print(list(take(2, x)))),
     # [... (n, succ0), (n, succ1), ..., (n, succm) ...]
     map(edge_pair_to_edge(mod, rewrite_graph)),
     # [... Edge ...]
@@ -241,7 +305,9 @@ def rewrite_graph_to_graph(mod, rewrite_graph):
     # {... Edge ...}
     juxt(identity, edges_to_node_map(mod, rewrite_graph)),
     # ({... Edge ...}, node_map)
-    lambda x: Graph(edges = x[0], node_map = x[1])
+    lambda x: Graph(edges = x[0], node_map = x[1]),
+    do(lambda g:
+       print(f'Size of state space before quotiening: {len(g.node_map), len(g.edges)}'))
   )
 
 @curry
@@ -301,8 +367,6 @@ def graph_to_nx_graph(mod, graph):
   #   )
 
   # Quotient states by same title, to merge states that have different global time.
-  print(f'Original size of state space: {len(nx_graph.nodes), len(nx_graph.edges)}')
-
   nx_node_titles = nx_graph.nodes(data = 'title')
   equiv_rel = lambda node1, node2: (
     nx_node_titles[node1] == nx_node_titles[node2]
@@ -311,9 +375,9 @@ def graph_to_nx_graph(mod, graph):
 
   return pipe(
     nx_graph,
-    # lambda x: nx.quotient_graph(
-    #   x, equiv_rel, node_data = node_data_fn, create_using = nx.MultiDiGraph
-    # ),
+    lambda x: nx.quotient_graph(
+      x, equiv_rel, node_data = node_data_fn, create_using = nx.MultiDiGraph
+    ),
     # Ensure that the node labels in the output graph are consecutive.
     nx.convert_node_labels_to_integers
   )
@@ -375,8 +439,8 @@ def rewrite_graph_to_nx_graph(mod, rewrite_graph):
 def term_strat_to_nx_graph(mod, term, strat):
   return pipe(
     create_graph(
-      term = term, strategy = strat,
-      purge_fails = 'yes',
+      term = term, # strategy = strat,
+      # purge_fails = 'yes',
       logic = ''
     ),
     rewrite_graph_to_nx_graph(mod)

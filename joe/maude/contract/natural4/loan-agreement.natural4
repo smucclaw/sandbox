@@ -13,20 +13,20 @@ HENCE ('MustRepay1 AND 'ShantDefault),
 RULE 'MustRepay1
 PARTY 'Borrower
 MUST 'PayPayment1
-WITHIN 100 DAY
+ON THE 365 TH DAY
 HENCE 'MustRepay2
 LEST 'MayNotifyBorrower,
 
 RULE 'MustRepay2
 PARTY 'Borrower
 MUST 'PayPayment2
-WITHIN 100 DAY
+ON THE 365 TH DAY
 LEST 'MayNotifyBorrower,
 
 RULE 'ShantDefault
 PARTY 'Borrower
 SHANT 'Default
-WITHIN 210 DAY
+WITHIN 730 DAY
 LEST 'MayNotifyBorrower,
 
 RULE 'MayNotifyBorrower

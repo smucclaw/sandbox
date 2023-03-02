@@ -65,6 +65,8 @@ fmod RULE is
 
   ops _DAY _WEEK _MONTH _YEAR : Nat -> Duration [ctor] .
 
+  ops ON`THE_TH`DAY : Nat -> Deadline [ctor] .
+
   --- op _ performs _ at _ : ActorName ActionName Date -> Event [ctor] .
 
   --- op RULE _ UPON _ WHILE _ PARTY _ _ DO _ _ HENCE _ LEST _ :

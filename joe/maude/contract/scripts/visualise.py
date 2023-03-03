@@ -256,15 +256,15 @@ def edge_pair_to_edge(mod, rewrite_graph, edge_pair):
 #     else:
 #       stack.append((state, index + 1, valid or self.valid_states[next_state]))
 
-repeat = iterate(identity)
+# repeat = iterate(identity)
 
+# BFS to explore all edges in a rewrite graph.
 def rewrite_graph_to_edge_pairs(rewrite_graph):
   seen_ids = pyrs.pset([0])
   next_ids = pyrs.pdeque([0])
 
   while next_ids:
     curr_id = next_ids.left
-    seen_ids = seen_ids.add(curr_id)
     next_ids = next_ids.popleft()
     for succ_id in rewrite_graph.getNextStates(curr_id):
       if succ_id not in seen_ids:
@@ -295,9 +295,7 @@ def rewrite_graph_to_graph(mod, rewrite_graph):
     # lambda iterable: it.takewhile(lambda xy: xy[1] >= 0, iterable),
     rewrite_graph,
     rewrite_graph_to_edge_pairs,
-    # iterate(compose_left(map(rewrite_graph.getNextStates), concat, list))),
-    # do(lambda x: print(list(take(2, x)))),
-    # [... (n, succ0), (n, succ1), ..., (n, succm) ...]
+    # [... (n, succ) ...]
     map(edge_pair_to_edge(mod, rewrite_graph)),
     # [... Edge ...]
     filter(lambda edge: edge != None),

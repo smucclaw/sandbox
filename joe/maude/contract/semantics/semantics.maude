@@ -193,18 +193,18 @@ sload config
     deltaTick rules (Active activeRules)
   if isTimerZero deadline .
 
-  ops deadlineAllowsAction_ : Deadline -> Bool .
-  eq deadlineAllowsAction ON THE 0 TH DAY = true .
+  ops deadlineAllowsAction_ isTimerZero_ : Deadline -> Bool .
+  ops decTimer_ : Deadline -> Deadline .
+
+  eq deadlineAllowsAction ON 0 DAY = true .
   eq deadlineAllowsAction WITHIN time DAY = true .
   eq deadlineAllowsAction deadline = false [owise] .
 
-  ops isTimerZero_ : Deadline -> Bool .
-  eq isTimerZero ON THE 0 TH DAY = true .
+  eq isTimerZero ON 0 DAY = true .
   eq isTimerZero WITHIN 0 DAY = true .
   eq isTimerZero deadline = false [owise] .
 
-  ops decTimer_ : Deadline -> Deadline .
-  eq decTimer ON THE s time TH DAY = ON THE time TH DAY .
+  eq decTimer ON s time DAY = ON time DAY .
   eq decTimer WITHIN s time DAY = WITHIN time DAY .
   eq decTimer deadline = deadline [owise] .
 

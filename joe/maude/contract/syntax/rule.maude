@@ -61,11 +61,11 @@ fmod RULE is
   WITHIN is for relative deadlines
 )
   ops BY_ : Nat -> Deadline [ctor].
-  ops WITHIN_ : Duration -> Deadline [ctor] .
+  ops ON_ WITHIN_ : Duration -> Deadline [ctor] .
 
   ops _DAY _WEEK _MONTH _YEAR : Nat -> Duration [ctor] .
 
-  ops ON`THE_TH`DAY : Nat -> Deadline [ctor] .
+  --- ops ON_DAY : Nat -> Deadline [ctor] .
 
   --- op _ performs _ at _ : ActorName ActionName Date -> Event [ctor] .
 

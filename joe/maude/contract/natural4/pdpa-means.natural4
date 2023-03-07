@@ -1,0 +1,29 @@
+RULE 'START
+PARTY 'Org
+MUST 'Assess
+WITHIN 30 DAY
+HENCE 'Notification,
+
+'Notification MEANS ('MustNotifyPdpc AND 'MustNotifyIndiv),
+
+RULE 'MustNotifyIndiv
+PARTY 'Org
+MUST 'NotifyIndiv
+WITHIN 3 DAY,
+
+RULE 'MustNotifyPdpc
+PARTY 'Org
+MUST 'NotifyPdpc
+WITHIN 3 DAY
+HENCE 'MayProhibitNotifyIndiv,
+
+RULE 'MayProhibitNotifyIndiv
+PARTY 'Pdpc
+MAY 'ProhibitNotifyIndiv
+WITHIN 5 DAY
+HENCE 'ShantNotifyIndiv,
+
+RULE 'ShantNotifyIndiv
+PARTY 'Org
+SHANT 'NotifyIndiv
+WITHIN 5 DAY

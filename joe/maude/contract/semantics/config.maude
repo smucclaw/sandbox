@@ -93,12 +93,78 @@ sload full-maude
 
   class Actor .
 
-  vars ruleName actorName actionName : Qid .
-  vars hence lest ruleNames : Set{Qid} .
+  vars ruleName ruleName' actorName actionName : Qid .
+  var rule : Rule .
+  vars hence lest ruleNames ruleNames' : Set{Qid} .
   vars deontic : Deontic .
-  vars rules : Set{Rule} .
+  vars rules rules' : Set{Rule} .
   vars deadline : Deadline .
   vars contractState : ContractState .
+
+  --- eq
+  ---   rules,
+  ---   ruleName MEANS ruleNames,
+  ---   rules',
+  ---   RULE ruleName
+  ---   PARTY actorName
+  ---   deontic actionName
+  ---   deadline
+  ---   HENCE hence
+  ---   LEST lest
+  --- =
+
+  eq
+    ruleName' MEANS ruleNames',
+    RULE ruleName
+    PARTY actorName
+    deontic actionName
+    deadline
+    HENCE (ruleName', ruleNames)
+    LEST lest
+  =
+    ruleName' MEANS ruleNames',
+    RULE ruleName
+    PARTY actorName
+    deontic actionName
+    deadline
+    HENCE (ruleNames', ruleNames)
+    LEST lest .
+
+  eq
+    ruleName' MEANS ruleNames',
+    RULE ruleName
+    PARTY actorName
+    deontic actionName
+    deadline
+    HENCE hence
+    LEST (ruleName', ruleNames)
+  =
+    ruleName' MEANS ruleNames',
+    RULE ruleName
+    PARTY actorName
+    deontic actionName
+    deadline
+    HENCE hence
+    LEST (ruleNames', ruleNames) .
+
+  --- eq
+  ---   ruleName' MEANS ruleNames',
+  ---   RULE ruleName
+  ---   PARTY actorName
+  ---   deontic actionName
+  ---   deadline
+  ---   HENCE hence
+  ---   LEST lest,
+  ---   rules
+  --- =
+  ---   RULE ruleName
+  ---   PARTY actorName
+  ---   deontic actionName
+  ---   deadline
+  ---   HENCE hence
+  ---   LEST lest,
+  ---   rules
+  --- [owise] .
 
   ops getRulesWithNames__ : Set{Rule} Set{Qid} -> Set{Rule} .
 
@@ -141,6 +207,8 @@ sload full-maude
       rules
     )
   = actorName does actionName, getAllActions rules .
+
+  eq getAllActions (rule, rules) = getAllActions rules [owise] .
 
   --- class StatefulActor |
   ---   state : ActorState .
@@ -330,7 +398,6 @@ sload full-maude
   eq Breached actorNames ^ Breached actorNames'
   = Breached (actorNames, actorNames') .
 
-
   sorts ContractStatus .
   ops Active : -> ContractStatus [ctor] .
   ops Breached : -> ContractStatus [ctor] .
@@ -360,6 +427,7 @@ sload full-maude
 
   ops init_ : Set{Rule} -> Configuration .
   ops initAux__ : Set{Rule} Configuration -> Configuration .
+  --- ops removeMeans_ : Set{Rule} -> Set{Rule} .
   ops _containsActor_ : Configuration Qid -> Bool .
 
 ---(
@@ -372,8 +440,6 @@ sload full-maude
       rules : rules,
       time : 0,
       contractState : Active (getRulesWithNames rules 'START) > .
-
-  eq initAux empty config = tau config .
 
 ---(
   During transpilation, we detect all actors and initialize one object for each
@@ -395,6 +461,11 @@ sload full-maude
       then none
       else < actorName : Actor | none >
       fi .
+
+  eq initAux rules config = tau config [owise] .
+
+  --- eq removeMeans (ruleName MEANS ruleNames, rules) = removeMeans rules .
+  --- eq removeMeans rules = rules [owise] .
 
   eq (< actorName : Actor | > config) containsActor actorName = true .
   eq config containsActor actorName = false [owise] .
@@ -431,3 +502,44 @@ sload full-maude
   = actorName does actionName .
 
 endom)
+
+---(red
+  RULE 'r1 PARTY 'actor MUST 'action WITHIN 5 DAY HENCE 'r2,
+  RULE 'r7 PARTY 'actor SHANT 'action WITHIN 10 DAY,
+  'r2 MEANS ('r3 AND 'r4)
+  'r3 MEANS ('r5 AND 'r6)
+.)
+
+---(red init (
+RULE 'START
+PARTY 'Org
+MUST 'Assess
+WITHIN 30 DAY
+HENCE 'Notification,
+
+'Notification MEANS ('MustNotifyPdpc AND 'MustNotifyIndiv),
+
+RULE 'MustNotifyIndiv
+PARTY 'Org
+MUST 'NotifyIndiv
+WITHIN 3 DAY,
+
+RULE 'MustNotifyPdpc
+PARTY 'Org
+MUST 'NotifyPdpc
+WITHIN 3 DAY
+HENCE 'MayProhibitNotifyIndiv,
+
+RULE 'MayProhibitNotifyIndiv
+PARTY 'Pdpc
+MAY 'ProhibitNotifyIndiv
+WITHIN 5 DAY
+HENCE 'ShantNotifyIndiv,
+
+RULE 'ShantNotifyIndiv
+PARTY 'Org
+SHANT 'NotifyIndiv
+WITHIN 5 DAY
+)
+
+.)

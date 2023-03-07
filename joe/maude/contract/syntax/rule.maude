@@ -38,6 +38,8 @@ fmod RULE is
   subsorts Qid Bool < Situation .
   subsorts Qid < Action .
 
+  ops _MEANS_ : Qid Set{Qid} -> Rule .
+
 ---(
   MUST -- obligation
   MAY -- permission
@@ -122,7 +124,8 @@ fmod RULE is
     PARTY actorName
     deontic actionName
     deadline
-  = RULE ruleName
+  =
+    RULE ruleName
     PARTY actorName
     deontic actionName
     deadline

@@ -1,0 +1,4 @@
+RULE qid("START")
+PARTY qid("Org")
+MUST qid("Assess")
+WITHIN 30 DAY

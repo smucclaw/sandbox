@@ -576,9 +576,10 @@ def natural4_rules_to_race_cond_graphs(main_mod, natural4_rules, max_traces = 1)
   )
 
 @curry
-def natural4_rules_to_race_cond_htmls(mod, dir, natural4_rules, max_traces = 1):
+def natural4_rules_to_race_cond_htmls(mod, html_file_path, natural4_rules, max_traces = 1):
   write_race_cond_netwk_to_html = lambda index, netwk: pipe(
-    dir / f'race_cond_{index}.html',
+    html_file_path,
+    lambda f: f.parent / f'{f.stem}_{index}.html',
     str,
     netwk.write_html
   )
@@ -634,7 +635,7 @@ if __name__ == '__main__':
   config = natural4_rules_to_config(main_mod, natural4_rules)
   config_to_html_file(main_mod, config, strat, html_file_path)
 
-  natural4_rules_to_race_cond_htmls(main_mod, workdir, natural4_rules)
+  natural4_rules_to_race_cond_htmls(main_mod, workdir / 'race_cond', natural4_rules)
 
   # main_file_term_strat_to_html_file(main_file, natural4_file, html_file_path, strat)
 

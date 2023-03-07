@@ -31,12 +31,14 @@ fmod RULE is
   protecting NAMES .
 
   sorts
-    Rule Deadline Action Deontic Date Duration RKeyword Aka
+    Rule Deadline Action Deontic Date Duration RKeyword Aka QidAka
     Situation ActorDeonticActionDeadline HenceLest .
 
   --- Dynamic subtyping/subsorting.
   subsorts Qid Bool < Situation .
-  subsorts Qid < Action Aka .
+  subsorts Qid < Action .
+  subsorts Qid Aka < QidAka .
+  --- subsorts Aka < Rule .
 
   ops EVERY PARTY : -> RKeyword .
 
@@ -53,10 +55,10 @@ fmod RULE is
   ops DO_ : Qid -> Action [ctor] .
 
   --- Yep we have operator overloading too.
-  ops _____ : RKeyword Aka Deontic Deadline Action -> ActorDeonticActionDeadline .
-  ops _____ : RKeyword Aka Deadline Deontic Action -> ActorDeonticActionDeadline .
-  ops _____ : Deadline RKeyword Aka Deontic Action -> ActorDeonticActionDeadline .
-  ops _____ : RKeyword Aka Deontic Action Deadline -> ActorDeonticActionDeadline .
+  ops _____ : RKeyword QidAka Deontic Deadline Action -> ActorDeonticActionDeadline .
+  ops _____ : RKeyword QidAka Deadline Deontic Action -> ActorDeonticActionDeadline .
+  ops _____ : Deadline RKeyword QidAka Deontic Action -> ActorDeonticActionDeadline .
+  ops _____ : RKeyword QidAka Deontic Action Deadline -> ActorDeonticActionDeadline .
 
 ---(
   BY is for dates, ie absolute deadlines
@@ -87,7 +89,7 @@ fmod RULE is
     Qid ActorDeonticActionDeadline -> Rule [ctor] .
 
   vars ruleName actionName : Qid .
-  vars actorName : Aka .
+  vars actorName : QidAka .
   vars deontic : Deontic .
   vars deadline : Deadline .
   vars hence lest : Set{Qid} .

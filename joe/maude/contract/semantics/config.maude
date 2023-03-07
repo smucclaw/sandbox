@@ -5,6 +5,7 @@ fmod PRELUDE is
   protecting SET{Qid} .
 
   sorts Id Message Event ActionEvent TickEvent ActiveRule .
+  --- subsorts Aka < Rule .
 
 ---(
   Event is an indexed family of sorts, ie a GADT with:
@@ -82,8 +83,8 @@ sload full-maude
 (omod CONFIG is
   protecting PRELUDE .
   protecting SET{Rule} .
-  protecting QID .
-  protecting SET{Qid} .
+  --- protecting QID .
+  --- protecting SET{Qid} .
   protecting SET{ActionEvent} .
 
   subsorts Qid < Oid < Id .
@@ -149,39 +150,36 @@ sload full-maude
 
   eq
     RULE ruleName
-    PARTY (actorName AKA actorName')
+    PARTY actorName AKA actorName'
     deontic actionName
     deadline
     HENCE hence
-    LEST lest,
-
-    RULE ruleName'
-    PARTY actorName'
-    deontic' actionName'
-    deadline'
-    HENCE hence'
-    LEST lest'
+    LEST lest
   =
-    RULE ruleName
-    PARTY (actorName AKA actorName')
-    deontic actionName
-    deadline
-    HENCE hence
-    LEST lest,
-
+    actorName' MEANS actorName,
     RULE ruleName
     PARTY actorName
     deontic actionName
     deadline
     HENCE hence
-    LEST lest,
+    LEST lest .
 
-    RULE ruleName'
+  eq
+    actorName' MEANS actorName,
+    RULE ruleName
+    PARTY actorName'
+    deontic actionName
+    deadline
+    HENCE hence
+    LEST lest
+  =
+    actorName' MEANS actorName,
+    RULE ruleName
     PARTY actorName
-    deontic' actionName'
-    deadline'
-    HENCE hence'
-    LEST lest' . 
+    deontic actionName
+    deadline
+    HENCE hence
+    LEST lest .
 
   --- eq
   ---   ruleName' MEANS ruleNames',

@@ -571,6 +571,8 @@ def natural4_rules_to_race_cond_graphs(main_mod, natural4_rules, max_traces = 1)
     take(max_traces),
     # https://fadoss.github.io/maude-bindings/#maude.StrategySequenceSearch.pathTo
     map(lambda soln: soln[2]()),
+    # If the length of the path is <= 1, then there is no race condition and so
+    # we don't generate a graph for it.
     filter(lambda path: len(path) > 1),
     map(race_cond_path_to_graph(main_mod)),
     pyrs.pvector

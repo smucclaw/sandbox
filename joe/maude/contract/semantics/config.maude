@@ -93,12 +93,12 @@ sload full-maude
 
   class Actor .
 
-  vars ruleName ruleName' actorName actionName : Qid .
+  vars ruleName ruleName' actorName actorName' actionName actionName' : Qid .
   var rule : Rule .
-  vars hence lest ruleNames ruleNames' : Set{Qid} .
-  vars deontic : Deontic .
+  vars hence hence' lest lest' ruleNames ruleNames' : Set{Qid} .
+  vars deontic deontic' : Deontic .
   vars rules rules' : Set{Rule} .
-  vars deadline : Deadline .
+  vars deadline deadline' : Deadline .
   vars contractState : ContractState .
 
   --- eq
@@ -146,6 +146,42 @@ sload full-maude
     deadline
     HENCE hence
     LEST (ruleNames', ruleNames) .
+
+  eq
+    RULE ruleName
+    PARTY (actorName AKA actorName')
+    deontic actionName
+    deadline
+    HENCE hence
+    LEST lest,
+
+    RULE ruleName'
+    PARTY actorName'
+    deontic' actionName'
+    deadline'
+    HENCE hence'
+    LEST lest'
+  =
+    RULE ruleName
+    PARTY (actorName AKA actorName')
+    deontic actionName
+    deadline
+    HENCE hence
+    LEST lest,
+
+    RULE ruleName
+    PARTY actorName
+    deontic actionName
+    deadline
+    HENCE hence
+    LEST lest,
+
+    RULE ruleName'
+    PARTY actorName
+    deontic' actionName'
+    deadline'
+    HENCE hence'
+    LEST lest' . 
 
   --- eq
   ---   ruleName' MEANS ruleNames',
@@ -378,7 +414,7 @@ sload full-maude
   ops _^_ : ContractState ContractState -> ContractState
     [assoc comm id: Fulfilled] .
 
-  vars activeRule : Rule .
+  vars activeRule rule : Rule .
   vars activeRules activeRules' : Set{Rule} .
   vars actorNames actorNames' : Set{Qid} .
   vars contractState : ContractState .
@@ -445,6 +481,9 @@ sload full-maude
   During transpilation, we detect all actors and initialize one object for each
   actor.
 )
+
+  eq initAux empty config = tau config .
+
   eq initAux
     (
       RULE ruleName
@@ -462,7 +501,7 @@ sload full-maude
       else < actorName : Actor | none >
       fi .
 
-  eq initAux rules config = tau config [owise] .
+  eq initAux (rule, rules) config = initAux rules config [owise] .
 
   --- eq removeMeans (ruleName MEANS ruleNames, rules) = removeMeans rules .
   --- eq removeMeans rules = rules [owise] .
@@ -512,7 +551,7 @@ endom)
 
 ---(red init (
 RULE 'START
-PARTY 'Org
+EVERY 'Org AKA 'You
 MUST 'Assess
 WITHIN 30 DAY
 HENCE 'Notification,
@@ -520,24 +559,24 @@ HENCE 'Notification,
 'Notification MEANS ('MustNotifyPdpc AND 'MustNotifyIndiv),
 
 RULE 'MustNotifyIndiv
-PARTY 'Org
-MUST 'NotifyIndiv
-WITHIN 3 DAY,
+WITHIN 3 DAY
+PARTY 'You
+MUST 'NotifyIndiv,
 
 RULE 'MustNotifyPdpc
-PARTY 'Org
-MUST 'NotifyPdpc
+PARTY 'You
 WITHIN 3 DAY
+MUST 'NotifyPdpc
 HENCE 'MayProhibitNotifyIndiv,
 
 RULE 'MayProhibitNotifyIndiv
 PARTY 'Pdpc
-MAY 'ProhibitNotifyIndiv
-WITHIN 5 DAY
+MAY WITHIN 5 DAY
+'ProhibitNotifyIndiv
 HENCE 'ShantNotifyIndiv,
 
 RULE 'ShantNotifyIndiv
-PARTY 'Org
+PARTY 'You
 SHANT 'NotifyIndiv
 WITHIN 5 DAY
 )

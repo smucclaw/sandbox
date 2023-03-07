@@ -31,14 +31,18 @@ fmod RULE is
   protecting NAMES .
 
   sorts
-    Rule Deadline Action Deontic Date Duration
+    Rule Deadline Action Deontic Date Duration RKeyword Aka
     Situation ActorDeonticActionDeadline HenceLest .
 
   --- Dynamic subtyping/subsorting.
   subsorts Qid Bool < Situation .
-  subsorts Qid < Action .
+  subsorts Qid < Action Aka .
+
+  ops EVERY PARTY : -> RKeyword .
 
   ops _MEANS_ : Qid Set{Qid} -> Rule .
+
+  ops _AKA_ : Qid Qid -> Aka .
 
 ---(
   MUST -- obligation
@@ -49,14 +53,10 @@ fmod RULE is
   ops DO_ : Qid -> Action [ctor] .
 
   --- Yep we have operator overloading too.
-  ops PARTY____ : Qid Deontic Deadline Action -> ActorDeonticActionDeadline
-    [ctor] .
-  ops PARTY____ : Qid Deadline Deontic Action -> ActorDeonticActionDeadline
-    [ctor] .
-  ops _PARTY___ : Deadline Qid Deontic Action -> ActorDeonticActionDeadline
-    [ctor] .
-  ops PARTY____ : Qid Deontic Action Deadline -> ActorDeonticActionDeadline
-    [ctor] .
+  ops _____ : RKeyword Aka Deontic Deadline Action -> ActorDeonticActionDeadline .
+  ops _____ : RKeyword Aka Deadline Deontic Action -> ActorDeonticActionDeadline .
+  ops _____ : Deadline RKeyword Aka Deontic Action -> ActorDeonticActionDeadline .
+  ops _____ : RKeyword Aka Deontic Action Deadline -> ActorDeonticActionDeadline .
 
 ---(
   BY is for dates, ie absolute deadlines
@@ -86,7 +86,8 @@ fmod RULE is
   ops RULE__ :
     Qid ActorDeonticActionDeadline -> Rule [ctor] .
 
-  vars ruleName actorName actionName : Qid .
+  vars ruleName actionName : Qid .
+  vars actorName : Aka .
   vars deontic : Deontic .
   vars deadline : Deadline .
   vars hence lest : Set{Qid} .
@@ -104,6 +105,9 @@ fmod RULE is
   In other words, we always pattern match against this normal form when doing
   primitive recursion aka folding.
 )
+
+  eq EVERY = PARTY .
+
   eq DO actionName = actionName .
 
   eq PARTY actorName deontic deadline actionName

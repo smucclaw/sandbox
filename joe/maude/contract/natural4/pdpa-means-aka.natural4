@@ -1,5 +1,5 @@
 RULE 'START
-EVERY 'Org AKA 'YOU
+EVERY 'Org AKA 'You
 MUST 'Assess
 WITHIN 30 DAY
 HENCE 'Notification,

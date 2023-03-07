@@ -444,18 +444,27 @@ def term_strat_to_nx_graph(mod, term, strat):
     rewrite_graph_to_nx_graph(mod)
   )
 
-def nx_graph_to_pyvis_netwk(nx_graph):
+def nx_graph_to_pyvis_network(nx_graph):
   netwk = Network(
     height = '800px', directed = True,
     select_menu = True, filter_menu = True,
     cdn_resources = 'remote',
     layout = 'hierarchical'
   )
-  netwk.from_nx(nx_graph)
   netwk.options.layout.hierarchical.sortMethod = 'directed'
-  netwk.options.layout.hierarchical.direction = 'LR'
   netwk.options.layout.hierarchical.nodeSpacing = 150
   netwk.show_buttons()
+  netwk.from_nx(nx_graph)
+  return netwk
+
+def nx_state_space_to_pyvis_netwk(nx_state_space):
+  netwk = nx_graph_to_pyvis_network(nx_state_space)
+  netwk.options.layout.hierarchical.direction = 'LR'
+  return netwk
+
+def nx_trace_to_pyvis_netwk(nx_trace):
+  netwk = nx_graph_to_pyvis_network(nx_trace)
+  netwk.options.layout.hierarchical.direction = 'UD'
   return netwk
 
 @curry
@@ -463,7 +472,7 @@ def term_strat_to_pyvis_netwk(mod, term, strat):
   return pipe(
     (mod, term, strat),
     lambda x: term_strat_to_nx_graph(*x),
-    nx_graph_to_pyvis_netwk
+    nx_state_space_to_pyvis_netwk
   )
 
 def init_maude_n_load_main_file(main_file):
@@ -593,7 +602,7 @@ def natural4_rules_to_race_cond_htmls(mod, html_file_path, natural4_rules, max_t
     # [... race_cond_graph ... ]
     map(graph_to_nx_graph(mod)),
     # [... race_cond_nx_graph ...]
-    map(nx_graph_to_pyvis_netwk),
+    map(nx_trace_to_pyvis_netwk),
     # [... race_cond_pyvis_netwk ...]
     enumerate,
     # [... (index, race_cond_pyvis_netwk) ...]

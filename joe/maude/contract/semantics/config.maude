@@ -562,7 +562,7 @@ sload full-maude
 
 endom)
 
-(red getStartRule (
+---(red getStartRule (
 RULE qid("Assessment")
 EVERY qid("Organisation")
 MUST qid("assess if it is a Notifiable Data Breach")

@@ -1,4 +1,4 @@
-RULE qid("START")
+RULE qid("Assessment")
 EVERY qid("Organisation") AKA qid("You")
 MUST qid("assess if it is a Notifiable Data Breach")
 WITHIN 30 DAY
@@ -48,4 +48,6 @@ WITHIN 7 DAY,
 
 qid("NDB") MEANS qid("it is a Notifiable Data Breach"),
 
-qid("the PDPC Exclusion List") MEANS qid("with a list of individuals to exclude from notification")
+qid("the PDPC Exclusion List") MEANS qid("with a list of individuals to exclude from notification"),
+
+START 'Assessment

@@ -86,6 +86,8 @@ fmod RULE is
 
   ops RULE__ :
     Qid ActorDeonticActionDeadline -> Rule [ctor] .
+  
+  ops START_ : Qid -> Rule [ctor] .
 
   vars ruleName actionName : Qid .
   vars actorName : Aka .

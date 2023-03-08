@@ -543,7 +543,7 @@ endom)
 ---(red
   RULE 'r1 PARTY 'actor MUST 'action WITHIN 5 DAY HENCE 'r2,
   RULE 'r7 PARTY 'actor SHANT 'action WITHIN 10 DAY,
-  'r2 MEANS ('r3 AND 'r4)
+  'r2 MEANS ('r3 AND 'r4),
   'r3 MEANS ('r5 AND 'r6)
 .)
 

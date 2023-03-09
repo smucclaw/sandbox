@@ -156,7 +156,7 @@ fmod RULE is
   eq pred INF = INF .
 
   eq PARTY actorName deontic actionName
-  = PARTY actorName deontic actionName WITHIN INF DAY .
+  = PARTY actorName deontic actionName WITHIN 7 DAY .
 
   --- eq
   ---   RULE ruleName

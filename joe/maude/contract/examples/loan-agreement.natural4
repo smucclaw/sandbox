@@ -14,7 +14,7 @@ HENCE qid("Repayment"),
 
 qid("Repayment") MEANS (qid("Repay in two halves") AND qid("Avoid default")),
 
-RULE qid("Main - Repay in two halves")
+RULE qid("Repay in two halves")
 PARTY qid("Borrower")
 MUST qid("repay first half")
 ON 30 DAY

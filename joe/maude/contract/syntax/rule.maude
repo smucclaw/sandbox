@@ -141,14 +141,18 @@ fmod RULE is
     HENCE NOTHING
     LEST NOTHING .
 
-  --- Nonstandard model go brrr.
   ops INF : -> Nat [ctor] .
+
+  eq INF < INF = false .
+  eq n < INF = true [owise] .
+
+  eq INF > n = n < INF .
 
   ops pred_ : Nat -> Nat .
 
   vars n : Nat .
 
-  eq pred (s n) = n .
+  eq pred s n = n .
   eq pred INF = INF .
 
   eq PARTY actorName deontic actionName

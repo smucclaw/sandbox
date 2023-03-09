@@ -59,6 +59,8 @@ fmod RULE is
   ops _____ : Deadline RKeyword Aka Deontic Action -> ActorDeonticActionDeadline .
   ops _____ : RKeyword Aka Deontic Action Deadline -> ActorDeonticActionDeadline .
 
+  ops ____ : RKeyword Aka Deontic Action -> ActorDeonticActionDeadline .
+
 ---(
   BY is for dates, ie absolute deadlines
   WITHIN is for relative deadlines
@@ -138,6 +140,19 @@ fmod RULE is
     deadline
     HENCE NOTHING
     LEST NOTHING .
+
+  --- Nonstandard model go brrr.
+  ops INF : -> Nat [ctor] .
+
+  ops pred_ : Nat -> Nat .
+
+  vars n : Nat .
+
+  eq pred (s n) = n .
+  eq pred INF = INF .
+
+  eq PARTY actorName deontic actionName
+  = PARTY actorName deontic actionName WITHIN INF DAY .
 
   --- eq
   ---   RULE ruleName

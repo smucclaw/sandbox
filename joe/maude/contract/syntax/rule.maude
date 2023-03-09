@@ -143,20 +143,21 @@ fmod RULE is
 
   ops INF : -> Nat [ctor] .
 
+  vars m n : Nat .
+
   eq INF < INF = false .
   eq n < INF = true [owise] .
 
-  eq INF > n = n < INF .
+  eq m > n = n < m .
 
   ops pred_ : Nat -> Nat .
-
-  vars n : Nat .
 
   eq pred s n = n .
   eq pred INF = INF .
 
-  eq PARTY actorName deontic actionName
-  = PARTY actorName deontic actionName WITHIN 7 DAY .
+  ceq PARTY actorName deontic actionName
+  = PARTY actorName deontic actionName WITHIN INF DAY
+  if deontic == MAY or deontic == SHANT .
 
   --- eq
   ---   RULE ruleName

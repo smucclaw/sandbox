@@ -1,47 +1,53 @@
-RULE 'START
-PARTY 'Borrower
-MAY 'RequestPrincipal
+START qid("Contract Commencement"),
+
+RULE qid("Contract Commencement")
+PARTY qid("Borrower")
+MAY qid("request funds")
+WITHIN 7 DAY
+HENCE qid("Remit principal"),
+
+RULE qid("Remit principal")
+PARTY qid("Lender")
+MUST qid("remit principal")
 WITHIN 1 DAY
-HENCE 'MustSendPrincipal,
+HENCE qid("Repayment"),
 
-RULE 'MustSendPrincipal
-PARTY 'Lender
-MUST 'PayPayment1
-WITHIN 1 DAY
-HENCE ('MustRepay1 AND 'ShantDefault),
+qid("Repayment") MEANS (qid("Main - Repay in two halves") AND qid("Side - Keep taxes paid")),
 
-RULE 'MustRepay1
-PARTY 'Borrower
-MUST 'PayPayment1
-ON 100 DAY
-HENCE 'MustRepay2
-LEST 'MayNotifyBorrower,
+RULE qid("Main - Repay in two halves")
+PARTY qid("Borrower")
+MUST qid("repay first half")
+WITHIN 7 DAY
+HENCE qid("second half")
+LEST qid("Payment default"),
 
-RULE 'MustRepay2
-PARTY 'Borrower
-MUST 'PayPayment2
-ON 100 DAY
-LEST 'MayNotifyBorrower,
+qid("second half") MEANS (qid("Main - Repay second half") AND qid("Side - Keep taxes paid")),
 
-RULE 'ShantDefault
-PARTY 'Borrower
-SHANT 'Default
-WITHIN 210 DAY
-LEST 'MayNotifyBorrower,
+RULE qid("Main - Repay second half")
+PARTY qid("Borrower")
+MUST qid("repay second half")
+WITHIN 7 DAY
+LEST qid("Payment default"),
 
-RULE 'MayNotifyBorrower
-PARTY 'Lender
-MAY 'NotifyBorrower
-WITHIN 3 DAY
-HENCE 'MustCureDefault,
+RULE qid("Side - Keep taxes paid")
+PARTY qid("Borrower")
+MUST qid("pay taxes and avoid general default")
+WITHIN 7 DAY
+LEST qid("Payment default"),
 
-RULE 'MustCureDefault
-PARTY 'Borrower
-MUST 'CureDefault
+RULE qid("Payment default")
+PARTY qid("Lender")
+MAY qid("notify Borrower")
+WITHIN 7 DAY
+HENCE qid("Cure default"),
+
+RULE qid("Cure default")
+PARTY qid("Borrower")
+MUST qid("resolve default condition")
 WITHIN 2 DAY
-LEST 'MustRepayOutstanding,
+LEST qid("Accelerate outstanding payments"),
 
-RULE 'MustRepayOutstanding
-PARTY 'Borrower
-MUST 'RepayOutstanding
+RULE qid("Accelerate outstanding payments")
+PARTY qid("Borrower")
+MUST qid("repay outstanding amount")
 WITHIN 1 DAY

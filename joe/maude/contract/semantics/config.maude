@@ -150,32 +150,32 @@ sload full-maude
 
   eq
     RULE ruleName
-    PARTY actorName AKA actorName'
+    PARTY actorName' AKA actorName
     deontic actionName
     deadline
     HENCE hence
     LEST lest
   =
-    actorName' MEANS actorName,
+    actorName MEANS actorName',
     RULE ruleName
-    PARTY actorName
+    PARTY actorName'
     deontic actionName
     deadline
     HENCE hence
     LEST lest .
 
   eq
-    actorName' MEANS actorName,
+    actorName MEANS actorName',
     RULE ruleName
-    PARTY actorName'
+    PARTY actorName
     deontic actionName
     deadline
     HENCE hence
     LEST lest
   =
-    actorName' MEANS actorName,
+    actorName MEANS actorName',
     RULE ruleName
-    PARTY actorName
+    PARTY actorName'
     deontic actionName
     deadline
     HENCE hence

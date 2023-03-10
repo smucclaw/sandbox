@@ -1,0 +1,17 @@
+fmod PARSING is
+  pr BOOL .
+  pr INT .
+  pr QID .
+  pr STRING .
+
+  sort Expr .
+  subsort Qid String < Expr .
+
+  op _:+:_ : Expr Expr -> Expr [assoc] .
+  op IF_THEN_ELSE_ : Bool Expr Expr -> Expr .
+
+endfm
+
+red ("a" :+: "b") :+: "c" == "a" :+: ("b" :+: "c") .
+
+parse IF 1 + 1 == 2 THEN ("a" :+: "b") ELSE "c" .

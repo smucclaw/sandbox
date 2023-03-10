@@ -3,6 +3,7 @@ fmod PARSING is
   pr INT .
   pr QID .
   pr STRING .
+  pr LIST{Int} .
 
   sort Expr .
   subsort Qid String < Expr .
@@ -10,8 +11,17 @@ fmod PARSING is
   op _:+:_ : Expr Expr -> Expr [assoc] .
   op IF_THEN_ELSE_ : Bool Expr Expr -> Expr .
 
+  vars x : Int .
+  vars xs ys zs : List{Int} .
+
+  op dedupe_ : List{Int} -> List{Int} .
+  eq dedupe (xs x ys x zs) = dedupe (xs x ys zs) .
+  eq dedupe xs = xs [owise] .
+
 endfm
 
 red ("a" :+: "b") :+: "c" == "a" :+: ("b" :+: "c") .
 
 parse IF 1 + 1 == 2 THEN ("a" :+: "b") ELSE "c" .
+
+red dedupe(1 2 1 3 4 1) .

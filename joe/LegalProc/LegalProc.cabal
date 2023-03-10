@@ -35,7 +35,8 @@ library
       src
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
   build-depends:
-      base >=4.7 && <5
+      SableCC2Hs
+    , base >=4.7 && <5
     , flow
     , hashable
     , tuple
@@ -51,6 +52,7 @@ executable LegalProc-exe
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       LegalProc
+    , SableCC2Hs
     , base >=4.7 && <5
     , flow
     , hashable
@@ -68,6 +70,7 @@ test-suite LegalProc-test
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       LegalProc
+    , SableCC2Hs
     , base >=4.7 && <5
     , flow
     , hashable

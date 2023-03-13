@@ -1,0 +1,20 @@
+lang Th[FOL]
+
+th PA is
+
+  sort N .
+
+  op 0 : () -> N .
+  op S : N -> N .
+  ops _+_ , _*_ : N N -> N [assoc] .
+
+  ax forall {n:N} not (0 = S(n)) .
+  ax forall {m:N, n:N} S(m) = S(n) implies m = n .
+
+  ax forall {m:N} m + 0 = m .
+  ax forall {m:N, n:N} m + S(n) = S(m + n) .
+
+  ax forall {m:N} m * 0 = 0 .
+  ax forall {m:N, n:N} m * S(n) = (m * n) + m .
+
+endth

@@ -1,0 +1,10 @@
+lang Th[FOL]
+
+th T is
+
+  sort A .
+  pred P : A .
+
+  ax forall { a : A } P a .
+
+endth

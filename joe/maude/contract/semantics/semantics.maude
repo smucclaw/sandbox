@@ -204,8 +204,8 @@ sload config
   eq isTimerZero WITHIN 0 DAY = true .
   eq isTimerZero deadline = false [owise] .
 
-  eq decTimer ON s time DAY = ON time DAY .
-  eq decTimer WITHIN s time DAY = WITHIN time DAY .
+  ceq decTimer ON time DAY = ON pred time DAY if time > 0 .
+  ceq decTimer WITHIN time DAY = WITHIN pred time DAY if time > 0 .
   eq decTimer deadline = deadline [owise] .
 
 ---(

@@ -40,8 +40,47 @@ main =
       HH.div [ HP.class_ $ HH.ClassName "container" ]
         [ HH.section (cs "section")
           [ HH.div (cs "columns is-desktop")
-            [ HH.div (cs "column is-12")
+            [ HH.form $ Interactive { }
+            , HH.div (cs "column is-12")
               [ HH.text "AGREEMENTS" ]
+            , HH.div (cs "column is-12")
+              [ HH.table (cs "table is-fullwidth")
+                [ HH.tbody_
+                  [ HH.tr_
+                    [ HH.th_
+                      [ HH.b_
+                        [ HH.text "BY TYPE" ]
+                      ]
+                    ]
+                  , HH.td_ [ HH.text "GOODS" ]
+                  , HH.td_ [ HH.text "SERVICES" ]
+                  , HH.td_ [ HH.text "INVESTMENT" ]
+                  , HH.td_ [ HH.text "DIGITAL ECONOMY" ]
+                  ]
+                  , HH.tr_
+                    [ HH.th_ [ HH.b_ [ HH.text "BY FTA" ] ]
+                    , HH.td_ [ HH.text "AANZFTA" ]
+                    , HH.td_ [ HH.text "ACFTA" ]
+                    , HH.td_ [ HH.text "AFTA" ]
+                    , HH.td_ [ HH.b_ [ HH.text "CSFTA" ] ]
+                    ]
+                  , HH.tr_
+                    [ HH.th_ []
+                    , HH.td_ [ HH.text "CPTPP" ]
+                    , HH.td_ [ HH.text "PeSFTA" ]
+                    , HH.td_ [ HH.b_ [ HH.text "SCRFTA" ] ]
+                    , HH.td_ [ HH.text "SJFTA" ]
+                    ]
+                  , HH.tr_
+                    [ HH.th_ []
+                    , HH.td_ [ HH.text "TPSEP" ]efnnn
+                    , HH.td_ [ HH.b_ [ HH.text "TRSFTA" ] ]
+                    , HH.td_ [ HH.text "UKSFTA" ]
+                    , HH.td_ [ HH.text "USSFTA" ]
+                    , HH.td_ [ HH.text " ... </td" ]
+                    ]
+                ]
+              ]
             ]
           ]
         , HH.div_
@@ -58,6 +97,9 @@ main =
     handleAction = case _ of
       Initialize -> do
         H.liftEffect $ window >>= Window.document >>= HTMLDocument.setTitle "Proof of Concept - Diff Viewer"
+        H.liftEffect $ window >>= Window.document >>= HTMLDocument.setTitle "POC 2"
+        H.liftEffect $ window >>= Window.document >>= HTMLDocument.setTitle "POC 2"
+--    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.3/css/bulma.min.css">
       HandleButton output -> case output of
         Clicked -> do
           H.modify_ \state -> state { clicked = state.clicked + 1 }

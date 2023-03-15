@@ -150,32 +150,32 @@ sload full-maude
 
   eq
     RULE ruleName
-    PARTY actorName AKA actorName'
+    PARTY actorName' AKA actorName
     deontic actionName
     deadline
     HENCE hence
     LEST lest
   =
-    actorName' MEANS actorName,
+    actorName MEANS actorName',
     RULE ruleName
-    PARTY actorName
+    PARTY actorName'
     deontic actionName
     deadline
     HENCE hence
     LEST lest .
 
   eq
-    actorName' MEANS actorName,
+    actorName MEANS actorName',
     RULE ruleName
-    PARTY actorName'
+    PARTY actorName
     deontic actionName
     deadline
     HENCE hence
     LEST lest
   =
-    actorName' MEANS actorName,
+    actorName MEANS actorName',
     RULE ruleName
-    PARTY actorName
+    PARTY actorName'
     deontic actionName
     deadline
     HENCE hence
@@ -463,6 +463,7 @@ sload full-maude
   ops initAux__ : Set{Rule} Configuration -> Configuration .
   --- ops removeMeans_ : Set{Rule} -> Set{Rule} .
   ops _containsActor_ : Configuration Qid -> Bool .
+  ops getStartRule_ : Set{Rule} -> Rule .
 
 ---(
   Initialize a set of rules to an initial abstract machine configuration for
@@ -473,7 +474,7 @@ sload full-maude
     < 'coordinator : Coordinator |
       rules : rules,
       time : 0,
-      contractState : Active (getRulesWithNames rules 'START) > .
+      contractState : Active (getStartRule rules) > .
 
 ---(
   During transpilation, we detect all actors and initialize one object for each
@@ -506,6 +507,27 @@ sload full-maude
 
   eq (< actorName : Actor | > config) containsActor actorName = true .
   eq config containsActor actorName = false [owise] .
+
+  eq getStartRule
+    (
+      START ruleName,
+
+      RULE ruleName
+      PARTY actorName
+      deontic actionName
+      deadline
+      HENCE hence
+      LEST lest,
+
+      rules
+    )
+  = 
+    RULE ruleName
+    PARTY actorName
+    deontic actionName
+    deadline
+    HENCE hence
+    LEST lest .
 
   class PreCoordinator |
     contractState : ContractState .
@@ -540,10 +562,22 @@ sload full-maude
 
 endom)
 
+---(red getStartRule (
+RULE qid("Assessment")
+EVERY qid("Organisation")
+MUST qid("assess if it is a Notifiable Data Breach")
+WITHIN 30 DAY
+HENCE qid("Notification")
+LEST qid("PDPC query with demand"),
+
+START qid("Assessment")
+)
+.)
+
 ---(red
   RULE 'r1 PARTY 'actor MUST 'action WITHIN 5 DAY HENCE 'r2,
   RULE 'r7 PARTY 'actor SHANT 'action WITHIN 10 DAY,
-  'r2 MEANS ('r3 AND 'r4)
+  'r2 MEANS ('r3 AND 'r4),
   'r3 MEANS ('r5 AND 'r6)
 .)
 

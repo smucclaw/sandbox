@@ -36,8 +36,7 @@ fmod RULE is
 
   --- Dynamic subtyping/subsorting.
   subsorts Qid Bool < Situation .
-  subsorts Qid < Action .
-  subsorts Qid Aka < QidAka .
+  subsorts Qid < Action Aka .
   --- subsorts Aka < Rule .
 
   ops EVERY PARTY : -> RKeyword .
@@ -55,10 +54,12 @@ fmod RULE is
   ops DO_ : Qid -> Action [ctor] .
 
   --- Yep we have operator overloading too.
-  ops _____ : RKeyword QidAka Deontic Deadline Action -> ActorDeonticActionDeadline .
-  ops _____ : RKeyword QidAka Deadline Deontic Action -> ActorDeonticActionDeadline .
-  ops _____ : Deadline RKeyword QidAka Deontic Action -> ActorDeonticActionDeadline .
-  ops _____ : RKeyword QidAka Deontic Action Deadline -> ActorDeonticActionDeadline .
+  ops _____ : RKeyword Aka Deontic Deadline Action -> ActorDeonticActionDeadline .
+  ops _____ : RKeyword Aka Deadline Deontic Action -> ActorDeonticActionDeadline .
+  ops _____ : Deadline RKeyword Aka Deontic Action -> ActorDeonticActionDeadline .
+  ops _____ : RKeyword Aka Deontic Action Deadline -> ActorDeonticActionDeadline .
+
+  ops ____ : RKeyword Aka Deontic Action -> ActorDeonticActionDeadline .
 
 ---(
   BY is for dates, ie absolute deadlines
@@ -87,9 +88,11 @@ fmod RULE is
 
   ops RULE__ :
     Qid ActorDeonticActionDeadline -> Rule [ctor] .
+  
+  ops START_ : Qid -> Rule [ctor] .
 
   vars ruleName actionName : Qid .
-  vars actorName : QidAka .
+  vars actorName : Aka .
   vars deontic : Deontic .
   vars deadline : Deadline .
   vars hence lest : Set{Qid} .
@@ -137,6 +140,24 @@ fmod RULE is
     deadline
     HENCE NOTHING
     LEST NOTHING .
+
+  ops INF : -> Nat [ctor] .
+
+  vars m n : Nat .
+
+  eq INF < INF = false .
+  eq n < INF = true [owise] .
+
+  eq m > n = n < m .
+
+  ops pred_ : Nat -> Nat .
+
+  eq pred s n = n .
+  eq pred INF = INF .
+
+  ceq PARTY actorName deontic actionName
+  = PARTY actorName deontic actionName WITHIN INF DAY
+  if deontic == MAY or deontic == SHANT .
 
   --- eq
   ---   RULE ruleName

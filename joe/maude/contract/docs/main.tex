@@ -26,28 +26,20 @@
 
 \subsection{Grammar reference}
 Here we describe the AST used in Maude.
-Each nonterminal on the LHS is modelled by an algebraic datatype in Maude, with
-constructors modelling the RHS of the production rules.
-In other words, we have designed our abstract syntax to look very much like
-the concrete syntax, which is in turn a form of Controlled Natural Language (CNL).
-
-Here we use the metavariables $s$ and $n$ to refer to strings and
-natural numbers respectively.
+We use the metavariables $s$ and $n$ to refer to strings and natural numbers
+respectively.
 
 \begin{ebnf}
-  <RuleSet> := [{<Rule> ","} Rule] \\
+  <RuleSet> := [{<Rule> ","} Rule]
+  \\
   <Rule> :=
-    "START" <Identifier>
-    | <Regulative>
-    | <Identifier> "MEANS" <Identifiers>
+    "START" <Identifier> \\
+    || <Regulative> \\
+    || <Identifier> "MEANS" <Identifiers>
   \\
   <Identifier> := "qid $\lparen$``s''$\rparen$"
   \\
-  <Identifiers> :=
-    <MaybeIdentifier>
-    | {<MaybeIdentifier> "AND"} <MaybeIdentifier>
-  \\
-  <MaybeIdentifier> := "NOTHING" | <Identifier>
+  <Identifiers> := {<Identifier> "AND"} <Identifiers>
   \\
   <Regulative> :=
     "RULE" <Identifier>
@@ -62,7 +54,7 @@ natural numbers respectively.
   \\
   <RKeyword> := "EVERY" | "PARTY"
   \\
-  <Aka> := Identifier ["AKA" Identifier]
+  <Aka> := <Identifier> ["AKA" <Identifier>]
   \\
   <Deontic> := "MUST" | "MAY" | "SHANT"
   \\
@@ -70,12 +62,52 @@ natural numbers respectively.
   \\
   <Deadline> := ("ON" | "WITHIN") n "DAY"
   \\
-  <HenceLest> := ["HENCE" Identifiers] ["LEST" Identifiers] \\
-    || ["LEST" Identifiers] ["HENCE" Identifiers]
+  <HenceLest> := ["HENCE" <MaybeIdentifiers>] ["LEST" <MaybeIdentifiers>] \\
+    || ["LEST" <MaybeIdentifiers>] ["HENCE" <MaybeIdentifiers>]
+  \\
+  <MaybeIdentifier> := "NOTHING" | <Identifier>
+  \\
+  <MaybeIdentifiers> := {<MaybeIdentifier> "AND"} <MaybeIdentifier>
 \end{ebnf}
 
-Note that \texttt{qid} is a Maude function meaning ``quoted identifier'', which
-takes a string and turns it into an identifier.
+\subsubsection{Some notes about the syntax}
+\begin{itemize}
+  \item
+  Each nonterminal on the LHS is modelled by an algebraic datatype in Maude, with
+  constructors modelling the RHS of the production rules.
+  In other words, we have designed our abstract syntax to look very much like
+  the concrete syntax, which is in turn a form of Controlled Natural Language (CNL).
+  \item
+  \texttt{qid} is a Maude function meaning ``quoted identifier'', which
+  takes a string and turns it into an identifier.
+
+  \item
+  There is no explicit syntax for \texttt{HENCE/LEST FULFILLED/BREACHED} as
+  those are inferred automatically from the deontic in the rule.
+  Missing \texttt{HENCE/LEST} clauses are interpreted as
+  \texttt{HENCE/LEST NOTHING}, which are in turn interpreted as
+  \texttt{HENCE/LEST Fulfilled/Breached} depending on the deontic used in the
+  rule, eg:
+  \begin{align*}
+    \begin{split}
+      & \texttt{PARTY actor MAY action} \\
+      = \, & \texttt{PARTY actor MAY action HENCE NOTHING LEST NOTHING} \\
+      = \, & \texttt{PARTY actor MAY action HENCE FULFILLED LEST FULFILLED}
+    \end{split}
+    \\
+    \begin{split}
+      & \texttt{PARTY actor MUST action} \\
+      = \, & \texttt{PARTY actor MUST action HENCE NOTHING LEST NOTHING} \\
+      = \, & \texttt{PARTY actor MUST action HENCE FULFILLED LEST BREACHED}
+    \end{split}
+    \\
+    \begin{split}
+      & \texttt{PARTY actor SHANT action} \\
+      = \, & \texttt{PARTY actor SHANT action HENCE NOTHING LEST NOTHING} \\
+      = \, & \texttt{PARTY actor SHANT action HENCE BREACHED LEST FULFILLED}
+    \end{split}
+  \end{align*}
+\end{itemize}
 
 \subsection{PDPA example}
 

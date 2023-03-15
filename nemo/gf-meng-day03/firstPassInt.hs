@@ -25,7 +25,7 @@ module Main where
             questions_parsed      = map (parse gr eng cat) questions
 
         -- loop (question)
-        mapM_ (putStrLn . createOuput gr eng) questions_parsed
+        mapM_ (putStrLn . createOutput gr eng) questions_parsed
 
     -- loop :: ([Tree]) -> IO ()
     -- loop trans = do
@@ -45,9 +45,22 @@ module Main where
     --             answer = mkApp (mkCId "mkAnswer") args
     --         mapM_ putStrLn $ linearize gr eng <$> [tree, answer]
 
-    createOuput :: PGF -> Language -> [Tree] -> String
-    createOuput _gr _eng []  = "Unrecognised" 
-    createOuput gr eng (tree:_) = unlines $ linearize gr eng <$> [tree, answer]
+    createOutput :: PGF.PGF -> PGF.Language -> [PGF.Tree] -> String
+    createOutput _gr _eng []  = "Unrecognised" 
+    createOutput gr eng (tree:_) = unlines $ linearize gr eng <$> [tree, answer] --linearize is from PGF
         where                 
-            Just (f, args) = unApp tree
-            answer = mkApp (mkCId "mkAnswer") args
+            Just (_f, args) = PGF.unApp tree 
+            answer = PGF.mkApp (PGF.mkCId "mkAnswer") args
+
+-- The below is what I'm supposed to translate the above createOutput to
+{-
+let
+  q:_ = parse … … … "do you swear ?"
+  questionAsHaskellDataType = fg q
+  aAsHaskellDataType = case questionAsHaskellDataType of 
+     GmkQuestion x -> GmkAnswer x
+     _ -> error "not a question"
+  aAsPGFExpr = gf aAsHaskellDataType
+  myLin = linearize … … aAsPGFExpr
+putStrLn myLin
+-}

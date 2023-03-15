@@ -17,11 +17,14 @@ concrete Question2AnswerEng of Question2Answer = open Prelude in {
       oath = ss "on oath" ;
       promiseQ = ss "Do you promise to serve" ;
       promiseA = ss "I promise to serve" ;
+      magazine = ss "upon this magazine" ;
 
       mkPredicate predicate adverbial = {s = \\pred => predicate.s ! pred ++ "," ++ adverbial.s} ;
 
       mkQuestion predicate = {s = predicate.s ! Question ++ "?"} ;
       mkAnswer predicate = {s = predicate.s ! Answer ++ "."} ;
+
+      mkAdverbial adverbial = {s = adverbial.s} ;
 
       -- Loyalty question and answer
       Loyalty you I= {

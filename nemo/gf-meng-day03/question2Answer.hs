@@ -43,6 +43,8 @@ instance Gf GFloat where
 
 data GAdverbial =
    Gbook 
+ | Gmagazine 
+ | GmkAdverbial GAdverbial 
  | Goath 
  | GpromiseA 
  | GpromiseQ 
@@ -66,6 +68,8 @@ data GS =
 
 instance Gf GAdverbial where
   gf Gbook = mkApp (mkCId "book") []
+  gf Gmagazine = mkApp (mkCId "magazine") []
+  gf (GmkAdverbial x1) = mkApp (mkCId "mkAdverbial") [gf x1]
   gf Goath = mkApp (mkCId "oath") []
   gf GpromiseA = mkApp (mkCId "promiseA") []
   gf GpromiseQ = mkApp (mkCId "promiseQ") []
@@ -73,6 +77,8 @@ instance Gf GAdverbial where
   fg t =
     case unApp t of
       Just (i,[]) | i == mkCId "book" -> Gbook 
+      Just (i,[]) | i == mkCId "magazine" -> Gmagazine 
+      Just (i,[x1]) | i == mkCId "mkAdverbial" -> GmkAdverbial (fg x1)
       Just (i,[]) | i == mkCId "oath" -> Goath 
       Just (i,[]) | i == mkCId "promiseA" -> GpromiseA 
       Just (i,[]) | i == mkCId "promiseQ" -> GpromiseQ 

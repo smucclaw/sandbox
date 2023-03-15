@@ -27,13 +27,16 @@ abstract Question2Answer = {
       I, you : Pronoun ;
 
       book : Adverbial ;
+      magazine : Adverbial ;
       oath : Adverbial ;
       promiseQ : Adverbial ; -- Do you promise to serve
       promiseA : Adverbial ; --I promise to serve
+    
 
       Loyalty : Pronoun -> Pronoun -> Predicate ;
 
       mkPredicate : Predicate -> Adverbial -> Predicate ;
+      mkAdverbial : Adverbial -> Adverbial ;
 
       -- mkPhrase : Phrase -> Phrase -> Phrase ;
       -- mkPredicate : Phrase -> Phrase -> Predicate ;

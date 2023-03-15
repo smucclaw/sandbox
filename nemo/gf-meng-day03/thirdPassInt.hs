@@ -46,7 +46,7 @@ book2mag Gbook = Gmagazine
 book2mag Gmagazine = Gbook
 
 transfer :: Expr -> Expr
-transfer = gf . book2magWrapperS . fg
+transfer = gf . book2magWrapperS . converter. fg
 
 loop :: (String -> String) -> IO ()
 loop trans = do

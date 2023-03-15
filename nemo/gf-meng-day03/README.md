@@ -8,6 +8,12 @@
 
 Update: As of 08/03/2023, this grammar now has wrapper functions and can convert from PGF to haskell abstract syntax (See secondPassInt and thirdPassInt).
 
+The relevant command to check that things work is "stack run thirdPass"
+
+question2AnswerGadt.hs was generated using the command: 
+"gf -make -f haskell --haskell=gadt Question2Answer.gf"
+Then the file name and module import names were renamed to Question2AnswerGadt
+
 
 ## Previous Changelog
 

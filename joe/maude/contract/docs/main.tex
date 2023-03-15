@@ -44,9 +44,9 @@ natural numbers respectively.
   \\
   <Identifiers> := "NOTHING" | {(<Identifier> | "NOTHING") "AND"} <Identifiers>
   \\
-  <Regulative> := \\
-    "RULE" Identifier \\
-    <ActorDeonticActionDeadline> \\
+  <Regulative> :=
+    "RULE" <Identifier>
+    <ActorDeonticActionDeadline>
     <HenceLest>
   \\
   <ActorDeonticActionDeadline> :=

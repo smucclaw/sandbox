@@ -25,24 +25,29 @@
 \section{Syntax}
 
 \subsection{Grammar reference}
-Here we describe the AST used in Maude, which gives us a concrete syntax
-resembling some controlled natural language (CNL).
-
+Here we describe the AST used in Maude.
 Each nonterminal on the LHS is modelled by an algebraic datatype in Maude, with
 constructors modelling the RHS of the production rules.
+In other words, we have designed our abstract syntax to look very much like
+the concrete syntax, which is in turn a form of Controlled Natural Language (CNL).
 
 Here we use the metavariables $s$ and $n$ to refer to strings and
 natural numbers respectively.
 
 \begin{ebnf}
   <RuleSet> := [{<Rule> ","} Rule] \\
-  <Rule> := "START" <Identifier> \\
-    || <Regulative> \\
-    || <Identifier> "MEANS" <Identifiers>
+  <Rule> :=
+    "START" <Identifier>
+    | <Regulative>
+    | <Identifier> "MEANS" <Identifiers>
   \\
   <Identifier> := "qid $\lparen$``s''$\rparen$"
   \\
-  <Identifiers> := "NOTHING" | {(<Identifier> | "NOTHING") "AND"} <Identifiers>
+  <Identifiers> :=
+    <MaybeIdentifier>
+    | {<MaybeIdentifier> "AND"} <MaybeIdentifier>
+  \\
+  <MaybeIdentifier> := "NOTHING" | <Identifier>
   \\
   <Regulative> :=
     "RULE" <Identifier>
@@ -50,7 +55,7 @@ natural numbers respectively.
     <HenceLest>
   \\
   <ActorDeonticActionDeadline> :=
-    <RKeyword> <Aka> <Deontic> <Deadline> <Action> \\
+  <RKeyword> <Aka> <Deontic> <Deadline> <Action> \\
     || <RKeyword> <Aka> <Deadline> <Deontic> <Action> \\
     || <Deadline> <RKeyword> <Aka> <Deontic> <Action> \\
     || <RKeyword> <Aka> <Deontic> <Action> [<Deadline>]

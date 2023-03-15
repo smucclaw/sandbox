@@ -1,6 +1,6 @@
 # Fdb version 3
-["pdflatex"] 1678857243 "/home/joe/dev/smucclaw/sandbox/joe/maude/contract/docs/main.tex" "main.pdf" "main" 1678857244
-  "/home/joe/dev/smucclaw/sandbox/joe/maude/contract/docs/main.tex" 1678857243 3084 4f37a1237afdd4052a4a7b98ffc5d72b ""
+["pdflatex"] 1678859420 "/home/joe/dev/smucclaw/sandbox/joe/maude/contract/docs/main.tex" "main.pdf" "main" 1678859422
+  "/home/joe/dev/smucclaw/sandbox/joe/maude/contract/docs/main.tex" 1678859420 3216 8dd4abc5af5e9627eba81c7b2a577c3f ""
   "/usr/local/share/texmf/tex/latex/naive-ebnf/naive-ebnf.sty" 1678853243 4322 b58d013aefd7fb57cd3a123fc94c4828 ""
   "/usr/share/texmf-dist/fonts/map/fontname/texfonts.map" 1650183167 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/share/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex7.tfm" 1650183167 1004 54797486969f23fa377b128694d548df ""
@@ -223,10 +223,10 @@
   "/usr/share/texmf-dist/web2c/texmf.cnf" 1650183167 39911 2da6c67557ec033436fe5418a70a8a61 ""
   "/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map" 1678848639 4276404 c85ee5114b0e5590ee79a1d1365a6f5a ""
   "/var/lib/texmf/web2c/pdftex/pdflatex.fmt" 1678848635 2927661 30ebe364996ca0d160a208e6a12f72fd ""
-  "main.aux" 1678857244 1185 c7ed369e1be512a7bf69ad30e1c8331e "pdflatex"
-  "main.out" 1678857244 338 5c5446442d78a47adf69e5ea9239c72e "pdflatex"
-  "main.tex" 1678857243 3084 4f37a1237afdd4052a4a7b98ffc5d72b ""
-  "main.toc" 1678857244 223 947e75a226cb34f7c8aeeaeb37acafa9 "pdflatex"
+  "main.aux" 1678859421 1185 c7ed369e1be512a7bf69ad30e1c8331e "pdflatex"
+  "main.out" 1678859421 338 5c5446442d78a47adf69e5ea9239c72e "pdflatex"
+  "main.tex" 1678859420 3216 8dd4abc5af5e9627eba81c7b2a577c3f ""
+  "main.toc" 1678859421 223 947e75a226cb34f7c8aeeaeb37acafa9 "pdflatex"
   "preamble.tex" 1678853319 2409 9f250c103b92b67f26ce48c2eef6662d ""
   (generated)
   "main.aux"

@@ -214,13 +214,16 @@ expedient of mandating that later events will simply be disregarded.
 
 \section{The L4 approach}
 
-\subsection{Intro to L4 as a language}
+\subsection{L4 and the CCLAW project}
 At CCLAW, we are developing one such domain specific language (DSL) for
 specifying legal contracts, called L4, which addresses these issues.
 Along with it, we are also developing an accompanying toolset which can be used
 to visualize and analyze contracts written in L4.
+Here we first give an introduction to our project and the L4 DSL that
+we are developing, before discussing our formalization of the loan agreement in
+the next section.
 
-As described in \texttt{placeholder}
+As described in
 \todo{Cite WAICOM 2022 and PROLALA 2022 papers},
 our focus is on rule-based reasoning, as opposed to case-based reasoning.
 Following LegalRuleML \todo{Cite LegalRuleML}, we distinguish between two kinds
@@ -230,9 +233,8 @@ The former encodes static decision logic, similar to Prolog-style
 \todo{Insert example, like the one in PROLALA paper}
 
 Our focus here is on the latter, namely regulative rules, which concern the
-norms, ie obligations, permissions and prohibitions, in a legal text.
-These are often expressed in normative language and
-tell us under which conditions an actor is allowed, permitted or
+norms in a legal text.
+These tell us under which conditions an actor is allowed, permitted or
 prohibited from performing an action, as well as the consequences of fulfilling
 and violating them.
 % Such consequences include new norms that come into effect, like
@@ -241,7 +243,28 @@ and violating them.
 While deontic logic approaches have been popular,
 \todo{Cite appropriately}
 our approach to regulative rules in L4 is closer in spirit to
-\cite{real_time_contract_automata, normative_diags_diogo}, in that we
+\cite{real_time_contract_automata, normative_diags_diogo},
+\todo{Cite the Maude paper as well}
+in that our treatment of the rules yields a state transition system,
+similar in spirit to the DFA found in \cite{contract_as_automaton}.
+
+In L4, users can encode regulative rules textually, using a syntax inspired by
+a highly restricted form of controlled natural language.
+For instance, the following rule is found in our encoding of the loan
+agreement.
+TODO: \href{https://docs.google.com/spreadsheets/d/1_k17mzk2hTyPY2egbEVqXzr8uYAdi6BVqeMYdBxKB_I/edit#gid=864296175}{Add a link})
+
+\begin{lstlisting}
+  RULE Contract Commencement
+  PARTY Borrower
+  MAY WITHIN 1 DAY
+  request funds
+  HENCE Remit principal
+\end{lstlisting}
+
+This rule signals the beginning of the contract and expresses that the
+borrower is permitted to request for the funds from the lender and has a one
+day
 
 % Regulative rules on the other hand, concern norms in a legal text, and are
 % traditionally expressed in normative language, utilizing deontic operators

@@ -220,6 +220,51 @@ specifying legal contracts, called L4, which addresses these issues.
 Along with it, we are also developing an accompanying toolset which can be used
 to visualize and analyze contracts written in L4.
 
+As described in \texttt{placeholder}
+\todo{Cite WAICOM 2022 and PROLALA 2022 papers},
+our focus is on rule-based reasoning, as opposed to case-based reasoning.
+Following LegalRuleML \todo{Cite LegalRuleML}, we distinguish between two kinds
+of rules, namely constitutive and regulative (or prescriptive) rules.
+The former encodes static decision logic, similar to Prolog-style
+\textit{if-then} rules, and is treated as such in our implementation.
+\todo{Insert example, like the one in PROLALA paper}
+
+Our focus here is on the latter, namely regulative rules, which concern the
+norms, ie obligations, permissions and prohibitions, in a legal text.
+These are often expressed in normative language and
+tell us under which conditions an actor is allowed, permitted or
+prohibited from performing an action, as well as the consequences of fulfilling
+and violating them.
+% Such consequences include new norms that come into effect, like
+% contrary-to-duty ones \todo{Cite something about CTD norms} which are triggered
+% upon the violation of other norms.
+While deontic logic approaches have been popular,
+\todo{Cite appropriately}
+our approach to regulative rules in L4 is closer in spirit to
+\cite{real_time_contract_automata, normative_diags_diogo}, in that we
+
+% Regulative rules on the other hand, concern norms in a legal text, and are
+% traditionally expressed in normative language, utilizing deontic operators
+% like must, may and shant.
+
+% Our focus here is on these regulative rules
+% which we argue can be seen as
+% defining a transition system -- a generalization of finite state automata,
+
+% Here, we adopt the view that these regulative rules define
+
+% we ascribe an operational interpretation to these rules,
+% similar
+
+% consider regulative rules as
+
+% Our focus here is on regulative rules and our view is that contracts can be
+% seen as a behaviour
+
+% structure of a legal
+% text, and can be viewed as defining a transition system -- a generalization
+% of nondeterministic automata.
+
 \inlinetodo{
   Talk about constitutive and regulative rules.
 

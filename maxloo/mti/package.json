@@ -39,7 +39,11 @@
   },
   "theiaPluginsDir": "plugins",
   "theiaPlugins": {
-    "vscode-builtin-extensions-pack": "https://open-vsx.org/api/eclipse-theia/builtin-extension-pack/1.50.1/file/eclipse-theia.builtin-extension-pack-1.50.1.vsix"
+    "vscode-builtin-extensions-pack": "https://open-vsx.org/api/eclipse-theia/builtin-extension-pack/1.50.1/file/eclipse-theia.builtin-extension-pack-1.50.1.vsix",
+    "vscode-gitlens": {
+      "version": "latest",
+      "scope": "all"
+    }
   },
   "theiaPluginsExcludeIds": [
     "ms-vscode.js-debug-companion",

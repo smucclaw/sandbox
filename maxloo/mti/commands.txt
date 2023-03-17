@@ -1,3 +1,5 @@
+nvm install 16.19.0
+nvm alias default 16.19.0
 yarn install
 NODE_OPTIONS=--max-old-space-size=6144 yarn theia build
 yarn start --hostname 127.0.0.1 --port 8080

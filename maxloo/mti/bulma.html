@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Proof of Concept - Key Outcomes (Visualisation of Prototype)</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.3/css/bulma.min.css">
+    <style>
+      iframe {
+        transform: scale(0.5);
+        transform-origin: 0 0;
+        width: 500px;
+        height: 1000px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Top quarter column -->
+      <section class="section">
+        <div class="columns is-desktop">
+          <div class="column is-12">
+            <b>AGREEMENTS</b>
+            <!-- create a table with 5 rows and 6 columns -->
+              <table class="table is-fullwidth">
+                <tbody>
+                  <tr>
+                    <th><b>BY TYPE</b></th>
+                    <td>GOODS</td>
+                    <td>SERVICES</td>
+                    <td>INVESTMENT</td>
+                    <td>DIGITAL ECONOMY</td>
+                    <td> </td>
+                  </tr>
+                  <tr>
+                    <th><b>BY FTA</b></th>
+                    <td>AANZFTA</td>
+                    <td>ACFTA</td>
+                    <td>AFTA</td>
+                    <td><b>ANZSCEP</b></td>
+                    <td>CSFTA</td>
+                  </tr>
+                  <tr>
+                    <th> </th>
+                    <td>CPTPP</td>
+                    <td>PeSFTA</td>
+                    <td><b>SAFTA</b></td>
+                    <td>SCRFTA</td>
+                    <td>SJFTA</td>
+                  </tr>
+                  <tr>
+                    <th> </th>
+                    <td>TPSEP</td>
+                    <td><b>TRSFTA</b></td>
+                    <td>UKSFTA</td>
+                    <td>USSFTA</td>
+                    <td> ... </td>
+                  </tr>
+                  <tr>
+                    <th><b>BY KEYWORD/KEY CONCEPTS</b></th>
+                    <td><input type="text" name="textbox" placeholder="Keyword Search"></td>
+                    <td> </td>
+                    <td> </td>
+                    <td> </td>
+                    <td> </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+        <div class="columns is-desktop">
+          <div class="column is-3">
+          <!-- First bottom quarter column -->
+          <section class="section">
+            <b>CHAPTERS</b>
+            <ol>
+              <li><input type="checkbox" id="item1" name="item1" value="item1"><label for="item1">PREAMBLE</label></li>
+              <li><input type="checkbox" id="item2" name="item2" value="item2"><label for="item2">INITIAL PROVISIONS</label></li>
+              <li><input type="checkbox" id="item3" name="item3" value="item3"><label for="item3">GENERAL DEFINITIONS</label></li>
+              <li><input type="checkbox" id="item4" name="item4" value="item4"><label for="item4">TRADE IN GOODS</label>
+                <ul class="ml-3">
+                  <li>
+                    <input type="checkbox" id="subitem1" name="subitem1">
+                    <label for="subitem1">DEFINITIONS</label>
+                  </li>
+                  <li>
+                    <input type="checkbox" id="subitem2" name="subitem2">
+                    <label for="subitem2">SCOPE</label>
+                  </li>
+                  <li>
+                    <input type="checkbox" id="subitem3" name="subitem3">
+                    <label for="subitem3">NATIONAL TREATMENT</label>
+                  </li>
+                  <li>
+                    <input type="checkbox" id="subitem4" name="subitem4">
+                    <label for="subitem4">CUSTOMS DUTIES</label>
+                  </li>
+                  <li>
+                    <input type="checkbox" id="subitem5" name="subitem5">
+                    <label for="subitem5">WAIVER OF CUSTOM DUTIES</label>
+                  </li>
+                  <li>
+                    <input type="checkbox" id="subitem6" name="subitem6">
+                    <label for="subitem6">TARIFF SCHEDULES</label>
+                  </li>
+                </ul>
+              </li>
+              <li><input type="checkbox" id="item5" name="item5" value="item5"><label for="item5">RULES OF ORIGIN</label></li>
+              <li><input type="checkbox" id="item6" name="item6" value="item6"><label for="item6">CUSTOM PROCEDURES</label></li>
+              <li><input type="checkbox" id="item7" name="item7" value="item7"><label for="item7">TRADE REMEDIES</label></li>
+              <li><input type="checkbox" id="item8" name="item8" value="item8"><label for="item8">SANITARY AND PHYTOSANITARY</label></li>
+            </ol>
+          </section>
+        </div>
+        <div class="column is-3">
+          <!-- Second bottom quarter column -->
+          <section class="section">
+            <b>ANZSCEP</b>
+            <br><br>
+            <p>CUSTOM DUTIES</p>
+            <iframe src="http://localhost:8080"></iframe>
+          </section>
+        </div>
+        <div class="column is-3">
+          <!-- Third bottom quarter column -->
+          <section class="section">
+            <b>SAFTA</b>
+            <br><br>
+            <p>CUSTOM DUTIES</p>
+            <iframe src="http://localhost:8080"></iframe>
+          </section>
+        </div>
+        <div class="column is-3">
+          <!-- Fourth bottom quarter column -->
+          <section class="section">
+            <b>TRSFTA</b>
+            <br><br>
+            <p>REDUCTION AND/OR ELIMINATION OF CUSTOMS DUTIES</p>
+            <iframe src="http://localhost:8080"></iframe>
+          </section>
+        </div>
+      </div>
+    </div>
+  </body>
+  </html>

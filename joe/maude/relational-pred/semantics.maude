@@ -9,37 +9,45 @@ sload syntax
 
 mod SEMANTICS is
   pr SYNTAX .
+  pr SYNTAX-EXAMPLES .
 
-  sorts Eqn EqnList .
-  subsort Eqn < EqnList .
+  --- pr META-LEVEL .
 
-  op _ _ : EqnList EqnList -> EqnList [assoc comm prec 25] .
+  --- sorts Eqn EqnList .
+  --- subsort Eqn < EqnList .
 
-  op ceq _ = _ if _ . : QidList Universal Bool -> Eqn [ctor poly (2)] .
-  op eq _ = _ [owise] . : QidList Universal -> Eqn [ctor poly (2)] .
+  --- op _ _ : EqnList EqnList -> EqnList [assoc comm prec 25] .
 
-  sort Types TypedTerm .
-  ops Rat_ Bool_ String_ : Universal -> Typed [poly (1)].
+  --- op ceq _ = _ if _ . : QidList Universal Bool -> Eqn [ctor poly (2)] .
+  --- op eq _ = _ [owise] . : QidList Universal -> Eqn [ctor poly (2)] .
 
-  var decideHead : QidList .
+  --- var decideHead : QidList .
+  --- var decideBodies : DecideBodies .
+  --- var bool : Bool .
+  --- var relPreds : RelPreds .
+  --- var result : Universal .
+
+  --- op transform_ : RelPred -> EqnList .
+
+  --- eq transform
+  ---   (
+  ---     DECIDE decideHead IS
+  ---       (result WHEN bool)
+  ---   )
+  --- = (
+  ---   ceq decideHead = result if bool .
+  --- ) .
+
+  var givens : IsAs .
+  var decideHead : IsA .
+  var decideBody : DecideBody .
   var decideBodies : DecideBodies .
-  var bool : Bool .
-  var relPreds : RelPreds .
 
-
-  op transform_ : RelPred -> EqnList .
-
-  --- eq transform (DECIDE 'positive 'x IS true WHEN 'x > 0)
-  --- = (ceq 'positive 'x = true if 'x > 0 .) .
-
-  eq transform
-    (
-      DECIDE decideHead IS
-        (result WHEN bool)
-    )
-  = (
-    ceq decideHead = result if bool .
-  ) .
+  eq
+    SUPPOSE givens THEN decideHead WHICH IS EQUAL TO
+    • decideBody • decideBodies
+  = SUPPOSE givens THEN decideHead WHICH IS EQUAL TO • decideBody ;;
+    SUPPOSE givens THEN decideHead WHICH IS EQUAL TO • decideBodies .
 
   --- pr META-LEVEL .
   --- pr SYNTAX .
@@ -74,11 +82,11 @@ mod SEMANTICS is
 
 endm
 
-red transform (
-  DECIDE ('positive 'x) IS
-  (true WHEN 'x > 0)
-) .
+red eg0 .
 
-quit
+--- red transform (
+---   DECIDE ('positive 'x) IS
+---   (true WHEN 'x > 0)
+--- ) .
 
 --- red metaReduce(test, 'relPreds.RelPreds) .

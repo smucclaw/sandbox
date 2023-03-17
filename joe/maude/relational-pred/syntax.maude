@@ -13,68 +13,123 @@ fmod SYNTAX is
   sort Universal .
   sorts Decide DecideBody DecideBodies .
   sorts IsA IsAs Given Giveth RelPred .
+  sort BoolList .
 
   subsort QidList < Rat .
   subsort IsA < IsAs .
+  subsort Bool < BoolList .
 
   ops _AND_ _OR_ : Bool Bool -> Bool .
+  --- sort AnyAll .
+  --- ops ANY ALL : -> AnyAll .
+
+  sort Qualifier .
+  ops AT`LEAST`ONE EXACTLY`ONE : -> Qualifier .
+  op ALL OF THE FOLLOWING ARE TRUE • _ : BoolList -> Bool .
+  op _ OF THE FOLLOWING IS TRUE • _ : Qualifier BoolList -> Bool .
+  op _ • _ : BoolList BoolList -> BoolList [assoc prec 25] .
+
   op NOT _ : Bool -> Bool .
-  op _ IS _ : QidList Universal -> Bool [poly (2)].
+  op _ IS _ : QidList Universal -> Bool [poly (2)] .
+  --- op _ IS _ : Universal Universal -> Bool [poly (1 2)] .
 
-  op IN _ : Universal -> Bool [poly(1)] .
+  op IN _ : Universal -> Bool [poly (1)] .
 
-  op DECIDE _ IS _ :  QidList DecideBodies -> Decide .
+  sort WhichIs .
+  op WHICH IS EQUAL TO : -> WhichIs .
 
-  op _ WHEN _ : Universal Bool -> DecideBody [poly(1)] .
-  op _ OTHERWISE : Universal -> DecideBody [poly(1)] . 
+  op _ THEN _ _ • _ : Given IsA WhichIs DecideBodies -> Decide .
+  op _ THEN _ _ _ : Given IsA WhichIs DecideBody -> Decide .
+
+  op _ THEN _ _ _ : Given IsA WhichIs Rat -> Decide .
+  op _ THEN _ _ _ : Given IsA WhichIs String -> Decide .
+  op _ THEN _ _ _ : Given IsA WhichIs Bool -> Decide .
+
+  sort TFAE .
+  op THE FOLLOWING ARE EQUIVALENT : -> TFAE .
+  op TFAE : -> TFAE .
+  op _ THEN _ • _ : Given TFAE BoolList -> Decide .
+  op _ THEN _ : Given BoolList -> Decide .
+
+  --- op _ THEN TFAE • _ : Given BoolList -> Decide .
+
+  --- op _ THEN _ WHICH IS ALWAYS EQUAL TO _ :
+  ---   Given IsA Universal -> Decide [poly (2)] .
+  op SUPPOSE _ IS A _ WHICH IS EQUAL TO _ :
+    Qid Qid Universal -> Decide [poly (3)] .
+
+  --- op ALWAYS _ : Universal -> DecideBody [poly (1)] .
+
+  op _ WHEN _ : Universal Bool -> DecideBody [poly (1)] .
+  op _ OTHERWISE : Universal -> DecideBody [poly (1)] . 
 
   subsort DecideBody < DecideBodies .
-  op _ _ : DecideBodies DecideBodies -> DecideBodies [assoc prec 25] .
+  op _ • _ : DecideBodies DecideBodies -> DecideBodies [assoc prec 25] .
 
   op _ IS A _ : Qid Qid -> IsA .
-  op _ IS AN _ : Qid Qid -> IsA .
+  op _ IS _ : Qid Universal -> IsA [poly (2)] .
   op _ AND _ : IsAs IsAs -> IsAs .
 
-  op GIVEN _ : IsAs -> Given .
-  op GIVETH _ : IsAs -> Giveth .
+  --- §
+  op SUPPOSE _ : IsAs -> Given .
+  --- op GIVETH _ : IsAs -> Giveth .
 
   subsort Decide < RelPred .
-  op _ _ _ : Given Giveth Decide -> RelPred .
+  op _ _ : Given Decide -> RelPred .
+  --- op _ _ _ : Given Giveth Decide -> RelPred .
 
   sort RelPreds .
   subsort RelPred < RelPreds .
-  op _, _ : RelPreds RelPreds -> RelPreds
+  op _ ;; _ : RelPreds RelPreds -> RelPreds
     [comm assoc prec 121 format (d r os d)] .
+  
+  var relPreds : RelPreds .
+  eq relPreds ;; relPreds = relPreds .
 
   sort Strings .
   subsort String < Strings .
-  op _, _ : Strings Strings -> Strings
-    [assoc prec 25] .
-  
-  vars relPreds : RelPreds .
-  eq relPreds, relPreds = relPreds .
+  op _ ; _ : Strings Strings -> Strings
+    [assoc comm prec 25] .
 
 endfm
 
-view RelPred from TRIV to SYNTAX is
-  sort Elt to RelPred .
-endv
+--- view RelPred from TRIV to SYNTAX is
+---   sort Elt to RelPred .
+--- endv
 
 fmod SYNTAX-EXAMPLES is
   pr SYNTAX .
 
-  op eg1 : -> RelPreds .
-  eq eg1
-  = --- GIVEN ('x IS A 'Int AND 'y IS AN 'STRING)
-    --- GIVETH ('z IS A 'Int)
-    DECIDE 'z IS
-      (2 WHEN (0 < 'x AND 'y IS "a"))
-      (3 WHEN 'x IS 0 OR 'y IS NOT IN ("b", "c", "d"))
-      0 OTHERWISE,
-
-    DECIDE 'positive 'x IS 
-      (true WHEN 'x > 0)
-      false OTHERWISE
+  op eg0 : -> RelPreds .
+  eq eg0
+  = SUPPOSE ('x IS A 'Int AND 'y IS A 'String)
+    THEN ('z IS A 'Int) WHICH IS EQUAL TO
+      • (2 WHEN ('x > 0 AND 'y IS "a"))
+      • (3 WHEN AT LEAST ONE OF THE FOLLOWING IS TRUE
+          • ('x IS 0)
+          • ('y IS NOT IN ("b" ; "c" ; "d")))
+      • 0 OTHERWISE
+    ;;
+    SUPPOSE ('x IS A 'Int AND 'a IS "a")
+    THEN ('b IS A 'Bool) WHICH IS EQUAL TO
+      • (true WHEN 'x > 0 AND 'z 'x 'a IS 1)
+      • false OTHERWISE
+    ;;
+    SUPPOSE ('x IS A 'Int)
+    THEN ('const IS A 'String) WHICH IS EQUAL TO "constant"
+    ;;
+    SUPPOSE 'one IS A 'Int WHICH IS EQUAL TO 1
+    ;;
+    SUPPOSE ('x IS A 'Int AND 'y IS A 'Int)
+    THEN THE FOLLOWING ARE EQUIVALENT
+      • ('x == 'y)
+      • ('x <= 'y AND 'x >= 'y)
+    ;;
+    SUPPOSE ('x IS A 'Int AND 'y IS A 'Int)
+    THEN EXACTLY ONE OF THE FOLLOWING IS TRUE
+      • ('x < 'y)
+      • ('x == 'y)
+      • ('x > 'y)
   .
 
   --- var qidList : QidList .

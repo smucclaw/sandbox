@@ -1,0 +1,105 @@
+fmod SYNTAX is
+  pr BOOL .
+  pr CONVERSION .
+  pr QID-LIST .
+  --- pr STRING * (
+  ---   op _+_ to _++_,
+  ---   op _<_ to _<str_,
+  ---   op _>_ to _>str_,
+  ---   op _<=_ to _<=str_,
+  ---   op _>=_ to _>=str_
+  --- ) .
+
+  sort Universal .
+  sorts Decide DecideBody DecideBodies .
+  sorts IsA IsAs Given Giveth RelPred .
+
+  subsort QidList < Rat .
+  subsort IsA < IsAs .
+
+  ops _AND_ _OR_ : Bool Bool -> Bool .
+  op NOT _ : Bool -> Bool .
+  op _ IS _ : QidList Universal -> Bool [poly (2)].
+
+  op IN _ : Universal -> Bool [poly(1)] .
+
+  op DECIDE _ IS _ :  QidList DecideBodies -> Decide .
+
+  op _ WHEN _ : Universal Bool -> DecideBody [poly(1)] .
+  op _ OTHERWISE : Universal -> DecideBody [poly(1)] . 
+
+  subsort DecideBody < DecideBodies .
+  op _ _ : DecideBodies DecideBodies -> DecideBodies [assoc prec 25] .
+
+  op _ IS A _ : Qid Qid -> IsA .
+  op _ IS AN _ : Qid Qid -> IsA .
+  op _ AND _ : IsAs IsAs -> IsAs .
+
+  op GIVEN _ : IsAs -> Given .
+  op GIVETH _ : IsAs -> Giveth .
+
+  subsort Decide < RelPred .
+  op _ _ _ : Given Giveth Decide -> RelPred .
+
+  sort RelPreds .
+  subsort RelPred < RelPreds .
+  op _, _ : RelPreds RelPreds -> RelPreds
+    [comm assoc prec 121 format (d r os d)] .
+
+  sort Strings .
+  subsort String < Strings .
+  op _, _ : Strings Strings -> Strings
+    [assoc prec 25] .
+  
+  vars relPreds : RelPreds .
+  eq relPreds, relPreds = relPreds .
+
+endfm
+
+view RelPred from TRIV to SYNTAX is
+  sort Elt to RelPred .
+endv
+
+fmod SYNTAX-EXAMPLES is
+  pr SYNTAX .
+
+  op eg1 : -> RelPreds .
+  eq eg1
+  = --- GIVEN ('x IS A 'Int AND 'y IS AN 'STRING)
+    --- GIVETH ('z IS A 'Int)
+    DECIDE 'z IS
+      (2 WHEN (0 < 'x AND 'y IS "a"))
+      (3 WHEN 'x IS 0 OR 'y IS NOT IN ("b", "c", "d"))
+      0 OTHERWISE,
+
+    DECIDE 'positive 'x IS 
+      (true WHEN 'x > 0)
+      false OTHERWISE
+  .
+
+  --- var qidList : QidList .
+  --- var result : Rat .
+
+  --- ceq qidList = result
+  --- if
+
+endfm
+
+--- red eg1 .
+
+--- parse
+---  
+--- .
+
+--- mod TEST is
+---   pr SYNTAX .
+
+---   ceq 'z IS 2 if 0 < 'x and 'y IS "a" .
+---   eq 'z IS 0 [owise] .
+
+---   --- eq 'y IS "a" = true .
+---   --- eq 0 < 'x = true .
+
+--- endm
+
+--- rew 'z .

@@ -1,0 +1,84 @@
+sload syntax
+
+--- mod TEST is
+---   protecting SYNTAX .
+---   op relPreds : -> RelPreds .
+---   eq relPreds
+---   = DECIDE 'z IS (0 WHEN 'x > 0) .
+--- endm
+
+mod SEMANTICS is
+  pr SYNTAX .
+
+  sorts Eqn EqnList .
+  subsort Eqn < EqnList .
+
+  op _ _ : EqnList EqnList -> EqnList [assoc comm prec 25] .
+
+  op ceq _ = _ if _ . : QidList Universal Bool -> Eqn [ctor poly (2)] .
+  op eq _ = _ [owise] . : QidList Universal -> Eqn [ctor poly (2)] .
+
+  sort Types TypedTerm .
+  ops Rat_ Bool_ String_ : Universal -> Typed [poly (1)].
+
+  var decideHead : QidList .
+  var decideBodies : DecideBodies .
+  var bool : Bool .
+  var relPreds : RelPreds .
+
+
+  op transform_ : RelPred -> EqnList .
+
+  --- eq transform (DECIDE 'positive 'x IS true WHEN 'x > 0)
+  --- = (ceq 'positive 'x = true if 'x > 0 .) .
+
+  eq transform
+    (
+      DECIDE decideHead IS
+        (result WHEN bool)
+    )
+  = (
+    ceq decideHead = result if bool .
+  ) .
+
+  --- pr META-LEVEL .
+  --- pr SYNTAX .
+
+  --- op test : -> Module .
+  --- eq test
+  --- = (
+  ---   mod 'TEST is
+  ---     protecting 'SYNTAX .
+  ---     sorts none .
+  ---     none
+  ---     op 'relPreds : nil -> 'RelPreds [none] .
+  ---     none none
+  ---     eq 'relPreds.RelPreds
+  ---     = 'DECIDE_IS_[''z.Qid,'_WHEN_['0.Zero,'_>_[''x.Qid,'0.Zero]]] [none] .
+  ---     none
+  ---   endm
+  --- ) .
+
+  --- subsort Qid < Oid .
+
+  --- sort BoolList .
+  --- subsort Bool < BoolList .
+  --- op nil : -> BoolList .
+  --- op _, _ : BoolList BoolList -> BoolList [assoc id: nil prec 25] .
+
+  --- class ProverState |
+  ---   rules : RelPreds,
+  ---   goals : BoolList .
+
+  --- op < _ | _ > : Set{RelPred} List{Bool} -> Configuration .
+
+endm
+
+red transform (
+  DECIDE ('positive 'x) IS
+  (true WHEN 'x > 0)
+) .
+
+quit
+
+--- red metaReduce(test, 'relPreds.RelPreds) .

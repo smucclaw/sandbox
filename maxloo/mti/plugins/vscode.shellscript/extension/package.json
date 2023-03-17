@@ -1,0 +1,94 @@
+{
+  "name": "shellscript",
+  "displayName": "Shell Script Language Basics (built-in)",
+  "description": "Provides syntax highlighting and bracket matching in Shell Script files.",
+  "version": "1.66.2",
+  "publisher": "vscode",
+  "license": "SEE LICENSE IN LICENSE-vscode.txt",
+  "engines": {
+    "vscode": "*"
+  },
+  "scripts": {},
+  "contributes": {
+    "languages": [
+      {
+        "id": "shellscript",
+        "aliases": [
+          "Shell Script",
+          "shellscript",
+          "bash",
+          "sh",
+          "zsh",
+          "ksh",
+          "csh"
+        ],
+        "extensions": [
+          ".sh",
+          ".bash",
+          ".bashrc",
+          ".bash_aliases",
+          ".bash_profile",
+          ".bash_login",
+          ".ebuild",
+          ".profile",
+          ".bash_logout",
+          ".xprofile",
+          ".xsession",
+          ".xsessionrc",
+          ".Xsession",
+          ".zsh",
+          ".zshrc",
+          ".zprofile",
+          ".zlogin",
+          ".zlogout",
+          ".zshenv",
+          ".zsh-theme",
+          ".ksh",
+          ".csh",
+          ".cshrc",
+          ".tcshrc",
+          ".yashrc",
+          ".yash_profile"
+        ],
+        "filenames": [
+          "APKBUILD",
+          "PKGBUILD",
+          ".envrc",
+          ".hushlogin",
+          "zshrc",
+          "zshenv",
+          "zlogin",
+          "zprofile",
+          "zlogout",
+          "bashrc_Apple_Terminal",
+          "zshrc_Apple_Terminal"
+        ],
+        "firstLine": "^#!.*\\b(bash|zsh|sh|ksh|dtksh|pdksh|mksh|ash|dash|yash|sh|csh|jcsh|tcsh|itcsh).*|^#\\s*-\\*-[^*]*mode:\\s*shell-script[^*]*-\\*-",
+        "configuration": "./language-configuration.json",
+        "mimetypes": [
+          "text/x-shellscript"
+        ]
+      }
+    ],
+    "grammars": [
+      {
+        "language": "shellscript",
+        "scopeName": "source.shell",
+        "path": "./syntaxes/shell-unix-bash.tmLanguage.json"
+      }
+    ],
+    "configurationDefaults": {
+      "[shellscript]": {
+        "files.eol": "\n"
+      }
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/eclipse-theia/vscode-builtin-extensions"
+  },
+  "keywords": [
+    "Built-in"
+  ],
+  "preview": false
+}

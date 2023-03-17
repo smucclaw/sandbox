@@ -5,3 +5,5 @@
 *.hi
 *.gfo
 .workdir
+node_modules/
+lib/

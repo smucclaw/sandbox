@@ -1,0 +1,52 @@
+{
+  "name": "fsharp",
+  "displayName": "F# Language Basics (built-in)",
+  "description": "Provides snippets, syntax highlighting, bracket matching and folding in F# files.",
+  "version": "1.66.2",
+  "publisher": "vscode",
+  "license": "SEE LICENSE IN LICENSE-vscode.txt",
+  "engines": {
+    "vscode": "*"
+  },
+  "scripts": {},
+  "contributes": {
+    "languages": [
+      {
+        "id": "fsharp",
+        "extensions": [
+          ".fs",
+          ".fsi",
+          ".fsx",
+          ".fsscript"
+        ],
+        "aliases": [
+          "F#",
+          "FSharp",
+          "fsharp"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "fsharp",
+        "scopeName": "source.fsharp",
+        "path": "./syntaxes/fsharp.tmLanguage.json"
+      }
+    ],
+    "snippets": [
+      {
+        "language": "fsharp",
+        "path": "./snippets/fsharp.code-snippets"
+      }
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/eclipse-theia/vscode-builtin-extensions"
+  },
+  "keywords": [
+    "Built-in"
+  ],
+  "preview": false
+}

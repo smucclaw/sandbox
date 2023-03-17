@@ -1,0 +1,23 @@
+{
+  "mergeConfigurations": {
+    "markdown.preview": {
+      "browser": "chrome"
+    }
+  },
+  "workspace": {
+    "folders": [
+      {
+        "name": "Project A",
+        "uri": "/root/src/sandbox/maxloo/mti/FTA/1. Goods/ANZSCEP/trade-in-goods.md"
+      },
+      {
+        "name": "Project B",
+        "uri": "/root/src/sandbox/maxloo/mti/FTA/1. Goods/ANZSCEP/Chapter 2 - Trade in Goods-html.html"
+      },
+      {
+        "name": "Project C",
+        "uri": "/root/src/sandbox/maxloo/mti/FTA/1. Goods/CSFTA/chap4.html"
+      }
+    ]
+  }
+}

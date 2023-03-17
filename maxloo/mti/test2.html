@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      iframe {
+        transform: scale(0.75);
+        transform-origin: 0 0;
+        width: 1000px;
+        height: 800px;
+      }
+    </style>
+  </head>
+  <body>
+    <div>
+      <iframe id="theia" src="http://localhost:8080"></iframe>
+    </div>
+    <script>
+      window.onload = function() {
+        const theiaFrame = document.getElementById('theia').contentWindow;
+
+        document.getElementById('theia').addEventListener('load', function() {
+          // send a message to open the first file in a new tab
+          theiaFrame.postMessage({command: 'open', path: '/root/src/sandbox/maxloo/mti/FTA/1. Goods/ANZSCEP/trade-in-goods.md'}, '*');
+
+          // send a message to open the second file in a new tab
+          theiaFrame.postMessage({command: 'open', path: '/root/src/sandbox/maxloo/mti/FTA/1. Goods/ANZSCEP/Chapter 2 - Trade in Goods-html.html'}, '*');
+
+          // send a message to open the third file in a new tab
+          theiaFrame.postMessage({command: 'open', path: '/root/src/sandbox/maxloo/mti/FTA/1. Goods/CSFTA/chap4.html'}, '*');
+        });
+      };
+    </script>
+  </body>
+</html>
+

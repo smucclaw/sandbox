@@ -7,8 +7,8 @@
       iframe {
         transform: scale(0.75);
         transform-origin: 0 0;
-        width: 500px;
-        height: 1000px;
+        width: 1000px;
+        height: 800px;
       }
     </style>
   </head>
@@ -20,55 +20,55 @@
           <div class="column is-12">
             <b>AGREEMENTS</b>
             <!-- create a table with 5 rows and 6 columns -->
-              <table class="table is-fullwidth">
-                <tbody>
-                  <tr>
-                    <th><b>BY TYPE</b></th>
-                    <td>GOODS</td>
-                    <td>SERVICES</td>
-                    <td>INVESTMENT</td>
-                    <td>DIGITAL ECONOMY</td>
-                    <td> </td>
-                  </tr>
-                  <tr>
-                    <th><b>BY FTA</b></th>
-                    <td>AANZFTA</td>
-                    <td>ACFTA</td>
-                    <td>AFTA</td>
-                    <td><b>ANZSCEP</b></td>
-                    <td>CSFTA</td>
-                  </tr>
-                  <tr>
-                    <th> </th>
-                    <td>CPTPP</td>
-                    <td>PeSFTA</td>
-                    <td><b>SAFTA</b></td>
-                    <td>SCRFTA</td>
-                    <td>SJFTA</td>
-                  </tr>
-                  <tr>
-                    <th> </th>
-                    <td>TPSEP</td>
-                    <td><b>TRSFTA</b></td>
-                    <td>UKSFTA</td>
-                    <td>USSFTA</td>
-                    <td> ... </td>
-                  </tr>
-                  <tr>
-                    <th><b>BY KEYWORD/KEY CONCEPTS</b></th>
-                    <td><input type="text" name="textbox" placeholder="Keyword Search"></td>
-                    <td> </td>
-                    <td> </td>
-                    <td> </td>
-                    <td> </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+            <table class="table is-fullwidth">
+              <tbody>
+                <tr>
+                  <th><b>BY TYPE</b></th>
+                  <td>GOODS</td>
+                  <td>SERVICES</td>
+                  <td>INVESTMENT</td>
+                  <td>DIGITAL ECONOMY</td>
+                  <td> </td>
+                </tr>
+                <tr>
+                  <th><b>BY FTA</b></th>
+                  <td>AANZFTA</td>
+                  <td>ACFTA</td>
+                  <td>AFTA</td>
+                  <td><b>ANZSCEP</b></td>
+                  <td>CSFTA</td>
+                </tr>
+                <tr>
+                  <th> </th>
+                  <td>CPTPP</td>
+                  <td>PeSFTA</td>
+                  <td><b>SAFTA</b></td>
+                  <td>SCRFTA</td>
+                  <td>SJFTA</td>
+                </tr>
+                <tr>
+                  <th> </th>
+                  <td>TPSEP</td>
+                  <td><b>TRSFTA</b></td>
+                  <td>UKSFTA</td>
+                  <td>USSFTA</td>
+                  <td> ... </td>
+                </tr>
+                <tr>
+                  <th><b>BY KEYWORD/KEY CONCEPTS</b></th>
+                  <td><input type="text" name="textbox" placeholder="Keyword Search"></td>
+                  <td> </td>
+                  <td> </td>
+                  <td> </td>
+                  <td> </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-        </section>
-        <div class="columns is-desktop">
-          <div class="column is-one-quarter">
+        </div>
+      </section>
+      <div class="columns is-desktop">
+        <div class="column is-one-quarter">
           <!-- First bottom quarter column -->
           <section class="section">
             <b>CHAPTERS</b>
@@ -112,9 +112,23 @@
           </section>
         </div>
         <div class="column">
-        <iframe id="theia" src="http://localhost:8080"></iframe>
+          <iframe id="theia" src="http://localhost:8080"></iframe>
         </div>
       </div>
     </div>
+    <script>
+      window.onload = function() {
+        const theiaFrame = document.getElementById('theia').contentWindow;
+
+        // send a message to open the first file in a new tab
+        theiaFrame.postMessage({command: 'open', path: '/root/src/sandbox/maxloo/mti/FTA/1. Goods/ANZSCEP/trade-in-goods.md'}, '*');
+
+        // send a message to open the second file in a new tab
+        theiaFrame.postMessage({command: 'open', path: '/root/src/sandbox/maxloo/mti/FTA/1. Goods/ANZSCEP/Chapter 2 - Trade in Goods-html.html'}, '*');
+
+        // send a message to open the third file in a new tab
+        theiaFrame.postMessage({command: 'open', path: '/root/src/sandbox/maxloo/mti/FTA/1. Goods/CSFTA/chap4.html'}, '*');
+      };
+    </script>
   </body>
-  </html>
+</html>

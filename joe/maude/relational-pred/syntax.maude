@@ -149,33 +149,33 @@ fmod SYNTAX-EXAMPLES is
               • "d"))
       • 0 otherwise .
 
-    Given that 'x is a number, 'b is a boolean which is equal to
-      • (true when all of the following are true
-          • ('x is greater than or equal to 0)
-          • (('z with 'x and ('y as "a")) is equal to 1))
-      • false otherwise .
+    --- Given that 'x is a number, 'b is a boolean which is equal to
+    ---   • (true when all of the following are true
+    ---       • ('x is greater than or equal to 0)
+    ---       • (('z with 'x and ('y as "a")) is equal to 1))
+    ---   • false otherwise .
 
-    Given that 'str is a string, 'const is a string which is equal to
-    "constant" .
+    --- Given that 'str is a string, 'const is a string which is equal to
+    --- "constant" .
 
-    Let 'one be a number which is equal to 1 .
+    --- Let 'one be a number which is equal to 1 .
 
-    --- This should normalize into a round robin of implications.
-    Given that 
-      • ('x is a number)
-      • ('y is a number),
-    the following are equivalent
-      • ('x is equal to 'y)
-      • ('x is less than or equal to 'y and 'x is greater than or equal to 'y) .
+    --- --- This should normalize into a round robin of implications.
+    --- Given that 
+    ---   • ('x is a number)
+    ---   • ('y is a number),
+    --- the following are equivalent
+    ---   • ('x is equal to 'y)
+    ---   • ('x is less than or equal to 'y and 'x is greater than or equal to 'y) .
 
-    --- This should normalize into xor.
-    Given that
-      • ('x is a number)
-      • ('y is a number),
-    exactly one of the following is true
-      • ('x is less than 'y)
-      • ('x is equal to 'y)
-      • ('x is greater than 'y) .
+    --- --- This should normalize into xor.
+    --- Given that
+    ---   • ('x is a number)
+    ---   • ('y is a number),
+    --- exactly one of the following is true
+    ---   • ('x is less than 'y)
+    ---   • ('x is equal to 'y)
+    ---   • ('x is greater than 'y) .
 
   --- var qidList : QidList .
   --- var result : Rat .

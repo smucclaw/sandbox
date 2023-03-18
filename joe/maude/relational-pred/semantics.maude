@@ -49,6 +49,86 @@ mod SEMANTICS is
   = given decideHead which is equal to • decideBody .
     given decideHead which is equal to • decideBodies .
 
+  var bool : Bool .
+  var bools : BoolList .
+
+  eq all of the following are true • bool
+  = bool .
+
+  eq all of the following are true • (bool • bools)
+  = bool and (all of the following are true • bools) .
+
+  eq at least one of the following is true • bool 
+  = bool .
+
+  eq at least one of the following is true • (bool • bools)
+  = bool or (at least one of the following is true • bools) .
+
+  eq exactly one of the following is true • bool 
+  = bool .
+
+  eq exactly one of the following is true • (bool • bools)
+  = bool xor (at least one of the following is true • bools) .
+
+  vars x y : Rat .
+
+  ceq x is equal to y
+  = x == y
+  if not (x :: Qid) /\ not (y :: Qid) .
+
+  eq x is less than y
+  = x < y .
+
+  eq x is less than or equal to y
+  = x <= y .
+
+  eq x is greater than y
+  = x > y .
+
+  eq x is greater than or equal to y
+  = x >= y .
+
+  op _ :: _ : Qid Datatype -> IsA .
+  --- op _ _ : IsAs IsAs -> IsAs [assoc prec 25] .
+
+  --- sort Lambda .
+  --- op λ _ :: _ ⇒ _ : IsAs Datatype Universal -> Lambda [poly (3)] .
+
+  op ceq _ _ = _ if _ : Qid IsAs Universal Bool -> RelPred
+    [poly (3)] .
+
+  var identifier : Qid .
+  var datatype : Datatype .
+
+  eq identifier is a datatype = identifier :: datatype .
+
+  var isAs : IsAs .
+
+  eq Given that • isAs , = Given that isAs , .
+
+  var value : Universal .
+
+  eq
+    Given that isAs,
+    identifier :: datatype which is equal to
+    • (x when bool)
+  = ceq identifier isAs = x if bool .
+
+  --- Still figuring out what to do with this.
+  sort Context Binding Judgment .
+  subsort Binding < Context .
+  subsort Judgment < RelPred .
+
+  --- < Identifier, type, binding >
+  --- Consider using http://maude.cs.uiuc.edu/tools/createcinni/
+  --- to ease the pain of working with de bruijn indices and explicit
+  --- substitutions.
+  op < _, _, _ > : Qid Datatype Universal -> Binding [poly (2)] .
+  op emptyContext : -> Context .
+  op _ _ : Context Context -> Context [assoc comm id: emptyContext] .
+
+  op _ ⊢ _ : Context Universal -> Judgment [poly (2)] .
+
   --- pr META-LEVEL .
   --- pr SYNTAX .
 

@@ -38,16 +38,16 @@ mod SEMANTICS is
   ---   ceq decideHead = result if bool .
   --- ) .
 
-  var givens : IsAs .
+  var given : Given .
   var decideHead : IsA .
   var decideBody : DecideBody .
   var decideBodies : DecideBodies .
 
   eq
-    SUPPOSE givens THEN decideHead WHICH IS EQUAL TO
-    • decideBody • decideBodies
-  = SUPPOSE givens THEN decideHead WHICH IS EQUAL TO • decideBody ;;
-    SUPPOSE givens THEN decideHead WHICH IS EQUAL TO • decideBodies .
+    given decideHead WHICH IS EQUAL TO
+    • (decideBody • decideBodies)
+  = given decideHead WHICH IS EQUAL TO • decideBody .
+    given decideHead WHICH IS EQUAL TO • decideBodies .
 
   --- pr META-LEVEL .
   --- pr SYNTAX .

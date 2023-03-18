@@ -94,25 +94,37 @@ mod SEMANTICS is
   --- sort Lambda .
   --- op λ _ :: _ ⇒ _ : IsAs Datatype Universal -> Lambda [poly (3)] .
 
-  op ceq _ _ = _ if _ : Qid IsAs Universal Bool -> RelPred
-    [poly (3)] .
+  --- Homoiconicity go brrr
+  op ceq _ _ = _ : Qid IsAs DecideBody -> RelPred .
+  op eq _ _ = _ : Qid IsAs DecideBody -> RelPred .
+
+  op [owise] : -> Otherwise .
 
   var identifier : Qid .
   var datatype : Datatype .
-
+  
   eq identifier is a datatype = identifier :: datatype .
 
   var isAs : IsAs .
 
   eq Given that • isAs , = Given that isAs , .
 
-  var value : Universal .
+  eq when = if .
+  eq otherwise = [owise] .
+
+  var decideOwise : DecideOwise .
 
   eq
     Given that isAs,
     identifier :: datatype which is equal to
-    • (x when bool)
-  = ceq identifier isAs = x if bool .
+    • decideOwise
+  = (eq identifier isAs = decideOwise) .
+
+  eq
+    Given that isAs,
+    identifier :: datatype which is equal to
+    • decideBody
+  = (ceq identifier isAs = decideBody) [owise] .
 
   --- Still figuring out what to do with this.
   sort Context Binding Judgment .

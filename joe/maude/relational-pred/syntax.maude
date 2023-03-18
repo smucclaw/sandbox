@@ -28,9 +28,10 @@ fmod SYNTAX is
   --- sort AnyAll .
   --- ops ANY ALL : -> AnyAll .
 
-  sort Qualifier .
+  sort Qualifier AllQualifier .
+  op all : -> AllQualifier .
   ops at`least`one exactly`one : -> Qualifier .
-  op all of the following are true • _ : BoolList -> Bool .
+  op _ of the following are true • _ : AllQualifier BoolList -> Bool .
   op _ of the following is true • _ : Qualifier BoolList -> Bool .
   op _ • _ : BoolList BoolList -> BoolList [assoc prec 25] .
 
@@ -87,8 +88,16 @@ fmod SYNTAX is
 
   --- op ALWAYS _ : Universal -> DecideBody [poly (1)] .
 
-  op _ when _ : Universal Bool -> DecideBody [poly (1)] .
-  op _ otherwise : Universal -> DecideBody [poly (1)] . 
+  sort WhenIf .
+  ops when if : -> WhenIf .
+
+  sort Otherwise .
+  op otherwise : -> Otherwise .
+
+  sort DecideOwise .
+  subsort DecideOwise < DecideBody .
+  op _ _ _ : Universal WhenIf Bool -> DecideBody [poly (1)] .
+  op _ _ : Universal Otherwise -> DecideOwise [poly (1)] . 
 
   subsort DecideBody < DecideBodies .
   op _ • _ : DecideBodies DecideBodies -> DecideBodies [assoc prec 25] .
@@ -147,13 +156,13 @@ fmod SYNTAX-EXAMPLES is
               • "b"
               • "c"
               • "d"))
-      • 0 otherwise .
+      • (0 otherwise) .
 
-    --- Given that 'x is a number, 'b is a boolean which is equal to
-    ---   • (true when all of the following are true
-    ---       • ('x is greater than or equal to 0)
-    ---       • (('z with 'x and ('y as "a")) is equal to 1))
-    ---   • false otherwise .
+    Given that 'x is a number, 'b is a boolean which is equal to
+      • (true when all of the following are true
+          • ('x is greater than or equal to 0)
+          • ('z with 'x and ('y as "a") is equal to 1))
+      • (false otherwise) .
 
     --- Given that 'str is a string, 'const is a string which is equal to
     --- "constant" .

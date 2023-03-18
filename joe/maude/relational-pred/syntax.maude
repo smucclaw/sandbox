@@ -131,7 +131,10 @@ fmod SYNTAX-EXAMPLES is
 
   op eg0 : -> RelPreds .
   eq eg0
-  = Given that
+  = --- AnyAll trees should normalize to a tree of nested and/or.
+    --- Once that happens, we can let Maude rewrite terms in every possible
+    --- evaluation context to simplify the formula.
+    Given that
       • ('x is a number)
       • ('y is a string),
     'z is a number which is equal to

@@ -44,10 +44,10 @@ mod SEMANTICS is
   var decideBodies : DecideBodies .
 
   eq
-    given decideHead WHICH IS EQUAL TO
+    given decideHead which is equal to
     • (decideBody • decideBodies)
-  = given decideHead WHICH IS EQUAL TO • decideBody .
-    given decideHead WHICH IS EQUAL TO • decideBodies .
+  = given decideHead which is equal to • decideBody .
+    given decideHead which is equal to • decideBodies .
 
   --- pr META-LEVEL .
   --- pr SYNTAX .

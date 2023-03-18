@@ -19,32 +19,51 @@ fmod SYNTAX is
   subsort IsA < IsAs .
   subsort Bool < BoolList .
 
-  ops _AND_ _OR_ : Bool Bool -> Bool [assoc comm] .
+  sort Datatype .
+  op number : -> Datatype .
+  op string : -> Datatype .
+  op boolean : -> Datatype .
+
+  --- ops _AND_ _OR_ : Bool Bool -> Bool [assoc comm] .
   --- sort AnyAll .
   --- ops ANY ALL : -> AnyAll .
 
   sort Qualifier .
-  ops AT`LEAST`ONE EXACTLY`ONE : -> Qualifier .
-  op ALL OF THE FOLLOWING ARE TRUE • _ : BoolList -> Bool .
-  op _ OF THE FOLLOWING IS TRUE • _ : Qualifier BoolList -> Bool .
+  ops at`least`one exactly`one : -> Qualifier .
+  op all of the following are true • _ : BoolList -> Bool .
+  op _ of the following is true • _ : Qualifier BoolList -> Bool .
   op _ • _ : BoolList BoolList -> BoolList [assoc prec 25] .
 
-  op NOT _ : Bool -> Bool .
+  --- op NOT _ : Bool -> Bool .
 
   --- op _ IS _ : Universal Universal -> Bool [poly (1 2)] .
 
-  op IN _ : Universal -> Bool [poly (1)] .
+  --- op in _ : Universal -> Bool [poly (1)] .
+  --- op not in _ : Universal -> Bool [poly (1)] .
 
   sort As AsList FnApp .
   subsorts As < AsList .
   subsort Qid < As FnApp .
-  op _ AS _ : Qid Universal -> As [poly (2)] .
-  op _ WITH _ : Qid AsList -> FnApp .
-  op _ AND _ : AsList AsList -> AsList [assoc comm prec 25] .
-  op _ IS _ : FnApp Universal -> Bool [poly (2)] .
+  op _ as _ : Qid Universal -> As [poly (2)] .
+  op _ with _ : Qid AsList -> FnApp .
+  op _ and  _ : AsList AsList -> AsList [assoc comm prec 25] .
+  op _ is equal to _ : FnApp Universal -> Bool [poly (2)] .
+
+  --- sort BulletList .
+  --- op _ • _ : BulletList BulletList -> BulletList [assoc prec 25] .
+
+  op _ is in the list given by • _ :
+    FnApp Universal -> Bool [poly (2)] .
+  op _ is not in the list given by • _ :
+    FnApp Universal -> Bool [poly (2)] .
+
+  ops _is`less`than_ _is`greater`than_ :
+    Rat Rat -> Bool [prec 37].
+  ops _is`less`than`or`equal`to_ _is`greater`than`or`equal`to_ :
+    Rat Rat -> Bool [prec 37] .
 
   sort WhichIs .
-  op WHICH IS EQUAL TO : -> WhichIs .
+  op which is equal to : -> WhichIs .
 
   op _ _ _ • _ : Given IsA WhichIs DecideBodies -> Decide .
   op _ _ _ _ : Given IsA WhichIs DecideBody -> Decide .
@@ -54,7 +73,7 @@ fmod SYNTAX is
   op _ _ _ _ : Given IsA WhichIs Bool -> Decide .
 
   sort TFAE .
-  op THE FOLLOWING ARE EQUIVALENT : -> TFAE .
+  op the following are equivalent : -> TFAE .
   op TFAE : -> TFAE .
   op _ _ • _ : Given TFAE BoolList -> Decide .
   op _ _ : Given BoolList -> Decide .
@@ -63,23 +82,25 @@ fmod SYNTAX is
 
   --- op _ THEN _ WHICH IS ALWAYS EQUAL TO _ :
   ---   Given IsA Universal -> Decide [poly (2)] .
-  op LET _ BE A _ WHICH IS EQUAL TO _ :
-    Qid Qid Universal -> Decide [poly (3)] .
+  op Let _ be a _ which is equal to _ :
+    Qid Datatype Universal -> Decide [poly (3)] .
 
   --- op ALWAYS _ : Universal -> DecideBody [poly (1)] .
 
-  op _ WHEN _ : Universal Bool -> DecideBody [poly (1)] .
-  op _ OTHERWISE : Universal -> DecideBody [poly (1)] . 
+  op _ when _ : Universal Bool -> DecideBody [poly (1)] .
+  op _ otherwise : Universal -> DecideBody [poly (1)] . 
 
   subsort DecideBody < DecideBodies .
   op _ • _ : DecideBodies DecideBodies -> DecideBodies [assoc prec 25] .
 
-  op _ IS A _ : Qid Qid -> IsA .
+  op _ is a  _ : Qid Datatype -> IsA .
   --- op _ IS _ : Qid Universal -> IsA [poly (2)] .
-  op _ AND _ : IsAs IsAs -> IsAs [assoc comm] .
+  op _ and _ : IsAs IsAs -> IsAs [assoc comm prec 25] .
+  op _ • _ : IsAs IsAs -> IsAs [assoc comm prec 25] .
 
   --- §
-  op GIVEN THAT _ , : IsAs -> Given .
+  op Given that _ , : IsAs -> Given .
+  op Given that • _ , : IsAs -> Given .
   --- op GIVETH _ : IsAs -> Giveth .
 
   subsort Decide < RelPred .
@@ -96,8 +117,8 @@ fmod SYNTAX is
 
   sort Strings .
   subsort String < Strings .
-  op _ ; _ : Strings Strings -> Strings
-    [assoc prec 25] .
+  op _ • _ : Strings Strings -> Strings
+    [assoc comm prec 25] .
 
 endfm
 
@@ -110,40 +131,48 @@ fmod SYNTAX-EXAMPLES is
 
   op eg0 : -> RelPreds .
   eq eg0
-  = GIVEN THAT ('x IS A 'Int) AND 'y IS A 'String, 'z IS A 'Int WHICH IS EQUAL
-    TO
-      • (2 WHEN ('x > 0 AND ('y IS "a")))
-      • (3 WHEN AT LEAST ONE OF THE FOLLOWING IS TRUE
-          • (ALL OF THE FOLLOWING ARE TRUE
-              • ('x IS 0)
-              • ('x < 0))
-          • ('y IS NOT IN ("b" ; "c" ; "d")))
-      • 0 OTHERWISE .
+  = Given that
+      • ('x is a number)
+      • ('y is a string),
+    'z is a number which is equal to
+      • (2 when ('x is greater than 10 or 'y is equal to "a"))
+      • (3 when at least one of the following is true
+          • (all of the following are true
+              • ('x is greater than or equal to 2)
+              • ('x is less than 5))
+          • ('y is not in the list given by
+              • "b"
+              • "c"
+              • "d"))
+      • 0 otherwise .
 
-    GIVEN THAT 'x IS A 'Int, 'b IS A 'Bool WHICH IS EQUAL TO
-      • (true WHEN ALL OF THE FOLLOWING ARE TRUE
-          • ('x > 0)
-          • (('z WITH 'x AND ('y AS "a")) IS 1))
-      • false OTHERWISE .
+    Given that 'x is a number, 'b is a boolean which is equal to
+      • (true when all of the following are true
+          • ('x is greater than or equal to 0)
+          • (('z with 'x and ('y as "a")) is equal to 1))
+      • false otherwise .
 
-    GIVEN THAT 'str IS A 'String, 'const IS A 'String WHICH IS EQUAL TO
+    Given that 'str is a string, 'const is a string which is equal to
     "constant" .
 
-    LET 'one BE A 'Int WHICH IS EQUAL TO 1 .
+    Let 'one be a number which is equal to 1 .
 
     --- This should normalize into a round robin of implications.
-    GIVEN THAT ('x IS A 'Int) AND 'y IS A 'Int, THE FOLLOWING ARE
-    EQUIVALENT
-      • ('x == 'y)
-      • ('x <= 'y AND 'x >= 'y) .
+    Given that 
+      • ('x is a number)
+      • ('y is a number),
+    the following are equivalent
+      • ('x is equal to 'y)
+      • ('x is less than or equal to 'y and 'x is greater than or equal to 'y) .
 
-    --- Either use second order propositional quantifier ala Haskell
-    --- or expand it out, which may result in an exponential blow-up in formula size
-    GIVEN THAT ('x IS A 'Int) AND 'y IS A 'Int, EXACTLY ONE OF THE FOLLOWING
-    IS TRUE
-      • ('x < 'y)
-      • ('x == 'y)
-      • ('x > 'y) .
+    --- This should normalize into xor.
+    Given that
+      • ('x is a number)
+      • ('y is a number),
+    exactly one of the following is true
+      • ('x is less than 'y)
+      • ('x is equal to 'y)
+      • ('x is greater than 'y) .
 
   --- var qidList : QidList .
   --- var result : Rat .

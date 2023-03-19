@@ -7,7 +7,7 @@ sload syntax
 ---   = DECIDE 'z IS (0 WHEN 'x > 0) .
 --- endm
 
-mod SEMANTICS is
+fmod SEMANTICS is
   pr SYNTAX .
   pr SYNTAX-EXAMPLES .
 
@@ -72,21 +72,21 @@ mod SEMANTICS is
 
   vars x y : Rat .
 
-  ceq x is equal to y
-  = x == y
-  if not (x :: Qid) /\ not (y :: Qid) .
+  --- ceq x is equal to y
+  --- = x == y
+  --- if not (x :: Qid) /\ not (y :: Qid) .
 
-  eq x is less than y
-  = x < y .
+  --- eq x is less than y
+  --- = x < y .
 
-  eq x is less than or equal to y
-  = x <= y .
+  --- eq x is less than or equal to y
+  --- = x <= y .
 
-  eq x is greater than y
-  = x > y .
+  --- eq x is greater than y
+  --- = x > y .
 
-  eq x is greater than or equal to y
-  = x >= y .
+  --- eq x is greater than or equal to y
+  --- = x >= y .
 
   op _ :: _ : Qid Datatype -> IsA .
   --- op _ _ : IsAs IsAs -> IsAs [assoc prec 25] .
@@ -172,7 +172,28 @@ mod SEMANTICS is
 
   --- op < _ | _ > : Set{RelPred} List{Bool} -> Configuration .
 
-endm
+  eq the amount by which x exceeds y
+  = the larger of (x subtracted by y) and 0 .
+
+endfm
+
+fmod QNA is
+  pr SEMANTICS . 
+
+  sort Answer .
+  ops Yes No : -> Answer .
+
+  op Is it true that _ ? : Bool -> Answer .
+
+  eq Is it true that true ? = Yes .
+  eq Is it true that false ? = No .
+
+endfm
+
+--- red
+---   Is it true that the length of (the concatenation of "a" and "b") is less
+---   than or equal to the amount by which 0 exceeds 2 ?
+---   .
 
 red eg0 .
 

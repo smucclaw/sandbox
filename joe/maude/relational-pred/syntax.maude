@@ -1,6 +1,25 @@
 fmod SYNTAX is
-  pr BOOL .
-  pr CONVERSION .
+  pr BOOL * (
+    --- op _xor_ to _or_`but`not`both
+  ) .
+  pr RAT * (
+    op _<_ to _is`less`than_,
+    op _>_ to _is`greater`than_,
+    op _<=_ to _is`less`than`or`equal`to_,
+    op _>=_ to _is`greater`than`or`equal`to_,
+    op _+_ to the`sum`of_and_,
+    op _-_ to _subtracted`by_,
+    op min to the`smaller`of_and_,
+    op max to the`larger`of_and_
+  ) .
+  pr STRING * (
+    op _+_ to the`concatenation`of_and_,
+    op length to the`length`of_,
+    op _<_ to _`is`lexicographically`less`than_,
+    op _>_ to _`is`lexicographically`greater`than_,
+    op _<=_ to _`is`lexicographically`less`than`or`equal`to_,
+    op _>=_ to _`is`lexicographically`greater`than`or`equal`to_
+  ) .
   pr QID-LIST .
   --- pr STRING * (
   ---   op _+_ to _++_,
@@ -58,10 +77,10 @@ fmod SYNTAX is
   op _ is not in the list given by • _ :
     FnApp Universal -> Bool [poly (2)] .
 
-  ops _is`less`than_ _is`greater`than_ :
-    Rat Rat -> Bool [prec 37].
-  ops _is`less`than`or`equal`to_ _is`greater`than`or`equal`to_ :
-    Rat Rat -> Bool [prec 37] .
+  --- ops _is`less`than_ _is`greater`than_ :
+  ---   Rat Rat -> Bool [prec 37].
+  --- ops _is`less`than`or`equal`to_ _is`greater`than`or`equal`to_ :
+  ---   Rat Rat -> Bool [prec 37] .
 
   sort WhichIs .
   op which is equal to : -> WhichIs .
@@ -129,7 +148,15 @@ fmod SYNTAX is
   op _ • _ : Strings Strings -> Strings
     [assoc comm prec 25] .
 
+  op the amount by which _ exceeds _ : Rat Rat -> Rat .
+
 endfm
+
+--- red
+---   the length of (the concatenation of "a" and "b")
+---   is greater than (the sum of 0 and 1) .
+
+--- eof
 
 --- view RelPred from TRIV to SYNTAX is
 ---   sort Elt to RelPred .
@@ -150,7 +177,8 @@ fmod SYNTAX-EXAMPLES is
       • (2 when ('x is greater than 10 or 'y is equal to "a"))
       • (3 when at least one of the following is true
           • (all of the following are true
-              • ('x is greater than or equal to 2)
+              • (the length of (the concatenation of "a" and "b") is less than
+                or equal to the amount by which 0 exceeds 2)
               • ('x is less than 5))
           • ('y is not in the list given by
               • "b"
@@ -158,11 +186,11 @@ fmod SYNTAX-EXAMPLES is
               • "d"))
       • (0 otherwise) .
 
-    Given that 'x is a number, 'b is a boolean which is equal to
-      • (true when all of the following are true
-          • ('x is greater than or equal to 0)
-          • ('z with 'x and ('y as "a") is equal to 1))
-      • (false otherwise) .
+    --- Given that 'x is a number, 'b is a boolean which is equal to
+    ---   • (true when all of the following are true
+    ---       • ('x is greater than or equal to 0)
+    ---       • ('z with 'x and ('y as "a") is equal to 1))
+    ---   • (false otherwise) .
 
     --- Given that 'str is a string, 'const is a string which is equal to
     --- "constant" .

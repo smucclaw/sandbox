@@ -183,19 +183,26 @@ fmod QNA is
   sort Answer .
   ops Yes No : -> Answer .
 
-  op Is it true that _ ? : Bool -> Answer .
+  ops correct`to`say wrong`to`say : -> Bool .
 
-  eq Is it true that true ? = Yes .
-  eq Is it true that false ? = No .
+  eq correct to say = true .
+  eq wrong to say = false .
+
+  op Is it _ that _ ? : Bool Bool -> Answer .
+
+  vars bool bool' : Bool .
+
+  eq Is it bool that bool ? = Yes .
+  eq Is it bool that bool' ? = No [owise] .
 
 endfm
 
---- red
----   Is it true that the length of (the concatenation of "a" and "b") is less
----   than or equal to the amount by which 0 exceeds 2 ?
----   .
+red
+  Is it correct to say that the length of (the concatenation of "a" and "b") is
+  less than or equal to the amount by which 0 exceeds 2 ?
+  .
 
-red eg0 .
+--- red eg0 .
 
 --- red transform (
 ---   DECIDE ('positive 'x) IS

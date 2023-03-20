@@ -1,0 +1,73 @@
+sload semantics
+sload qna
+
+fmod MAIN is
+  pr SEMANTICS .
+  pr QNA .
+
+  op eg0 : -> RelPreds .
+  eq eg0
+  = --- AnyAll trees normalize to a tree of nested and/or.
+    --- Thereafter, Maude rewrites terms in all possible evaluation context
+    --- to simplify the formula to full head normal form.
+    Given that
+      • ('x is a number)
+      • ('y is a string),
+    'z is a number which is equal to
+      • (2 when ('x is greater than 10 or 'y is equal to "a"))
+      • (3 when at least one of the following is true
+          • (all of the following are true
+              • (the length of (the concatenation of "a" and "b") is less than
+                or equal to the amount by which 0 exceeds 2)
+              • ('x is less than 5))
+          • ('y is not in the list given by
+              • "b"
+              • "c"
+              • "d"))
+      • (0 otherwise) .
+
+    --- Given that 'x is a number, 'b is a boolean which is equal to
+    ---   • (true when all of the following are true
+    ---       • ('x is greater than or equal to 0)
+    ---       • ('z with 'x and ('y as "a") is equal to 1))
+    ---   • (false otherwise) .
+
+    --- Given that 'str is a string, 'const is a string which is equal to
+    --- "constant" .
+
+    --- Let 'one be a number which is equal to 1 .
+
+    --- --- This should normalize into a round robin of implications.
+    --- Given that 
+    ---   • ('x is a number)
+    ---   • ('y is a number),
+    --- the following are equivalent
+    ---   • ('x is equal to 'y)
+    ---   • ('x is less than or equal to 'y and 'x is greater than or equal to 'y) .
+
+    --- --- This should normalize into xor.
+    --- Given that
+    ---   • ('x is a number)
+    ---   • ('y is a number),
+    --- exactly one of the following is true
+    ---   • ('x is less than 'y)
+    ---   • ('x is equal to 'y)
+    ---   • ('x is greater than 'y) .
+
+  --- var qidList : QidList .
+  --- var result : Rat .
+
+  --- ceq qidList = result
+  --- if
+endfm
+
+set trace on .
+
+search
+  Is it correct to say that the length of (the concatenation of "a" and "b") is
+  less than or equal to the amount by which 0 exceeds 2 ?
+  =>*
+  a:Answer
+  .
+
+--- red eg0 .

@@ -197,10 +197,16 @@ fmod QNA is
 
 endfm
 
-red
+set trace on .
+
+search
   Is it correct to say that the length of (the concatenation of "a" and "b") is
   less than or equal to the amount by which 0 exceeds 2 ?
+  =>*
+  a:Answer
   .
+
+--- show path 0 .
 
 --- red eg0 .
 

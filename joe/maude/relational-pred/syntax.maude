@@ -167,9 +167,9 @@ fmod SYNTAX-EXAMPLES is
 
   op eg0 : -> RelPreds .
   eq eg0
-  = --- AnyAll trees should normalize to a tree of nested and/or.
-    --- Once that happens, we can let Maude rewrite terms in every possible
-    --- evaluation context to simplify the formula.
+  = --- AnyAll trees normalize to a tree of nested and/or.
+    --- Thereafter, Maude rewrites terms in all possible evaluation context
+    --- to simplify the formula to full head normal form.
     Given that
       • ('x is a number)
       • ('y is a string),

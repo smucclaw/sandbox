@@ -63,11 +63,9 @@ endfm
 
 set trace on .
 
-search
+red
   Is it correct to say that the length of (the concatenation of "a" and "b") is
   less than or equal to the amount by which 0 exceeds 2 ?
-  =>*
-  a:Answer
   .
 
---- red eg0 .
+red eg0 .

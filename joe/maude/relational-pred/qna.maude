@@ -1,17 +1,20 @@
 fmod QNA is
-  --- pr SEMANTICS . 
-
   sort Answer .
   ops Yes No : -> Answer .
 
-  ops correct`to`say wrong`to`say : -> Bool .
+  ops correct wrong : -> CorrectWrong .
+  subsort CorrectWrong < Bool .
 
-  eq correct to say = true .
-  eq wrong to say = false .
+  op _ to say : CorrectWrong -> Bool .
 
-  op Is it _ that _ ? : Bool Bool -> Answer .
+  eq correct = true .
+  eq wrong = false .
 
   vars bool bool' : Bool .
+
+  eq bool to say = bool .
+
+  op Is it _ that _ ? : Bool Bool -> Answer .
 
   eq Is it bool that bool ? = Yes .
   eq Is it bool that bool' ? = No [owise] .

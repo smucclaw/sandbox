@@ -5,9 +5,8 @@
 \contentsline {subsection}{\numberline {2.1}L4 and the CCLAW project}{3}{subsection.2.1}%
 \contentsline {subsection}{\numberline {2.2}The loan agreement in L4}{5}{subsection.2.2}%
 \contentsline {section}{\numberline {3}L4 through Maude}{5}{section.3}%
-\contentsline {subsection}{\numberline {3.1}Background on Maude}{5}{subsection.3.1}%
-\contentsline {subsection}{\numberline {3.2}Translating from L4 to Maude}{5}{subsection.3.2}%
-\contentsline {subsection}{\numberline {3.3}Visualizing and simulating the contract}{5}{subsection.3.3}%
-\contentsline {subsection}{\numberline {3.4}Analyzing via model checking}{6}{subsection.3.4}%
+\contentsline {subsection}{\numberline {3.1}Background on Maude}{6}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}Translating from L4 to Maude}{6}{subsection.3.2}%
+\contentsline {subsection}{\numberline {3.3}Visualizing and simulating the contract}{6}{subsection.3.3}%
 \contentsline {section}{\numberline {4}Related work}{6}{section.4}%
 \contentsline {section}{\numberline {5}Limitations and future work}{6}{section.5}%

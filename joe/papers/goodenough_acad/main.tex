@@ -248,11 +248,26 @@ our approach to regulative rules in L4 is closer in spirit to
 in that our treatment of the rules yields a state transition system,
 similar in spirit to the DFA found in \cite{contract_as_automaton}.
 
-In L4, users can encode regulative rules textually, using a syntax inspired by
-a highly restricted form of controlled natural language.
+In L4, users can encode regulative rules textually, using a syntax that looks
+like a highly restricted form of controlled natural language.
+These have the following form:
+\begin{lstlisting}
+  RULE rule name
+  PARTY actor
+  deontic
+  deadline
+  action
+  HENCE hence_0 AND ... AND hence_n
+  LEST lest_0 AND ... AND lest_n
+\end{lstlisting}
+
 For instance, the following rule is found in our encoding of the loan
 agreement.
-TODO: \href{https://docs.google.com/spreadsheets/d/1_k17mzk2hTyPY2egbEVqXzr8uYAdi6BVqeMYdBxKB_I/edit#gid=864296175}{Add a link})
+It signals the beginning of the contract.
+TODO:
+\href{
+  https://docs.google.com/spreadsheets/d/1_k17mzk2hTyPY2egbEVqXzr8uYAdi6BVqeMYdBxKB_I/edit#gid=864296175
+}{Add link}
 
 \begin{lstlisting}
   RULE Contract Commencement
@@ -262,9 +277,39 @@ TODO: \href{https://docs.google.com/spreadsheets/d/1_k17mzk2hTyPY2egbEVqXzr8uYAd
   HENCE Remit principal
 \end{lstlisting}
 
-This rule signals the beginning of the contract and expresses that the
-borrower is permitted to request for the funds from the lender and has a one
-day
+These are based on the following key domain concepts which we identified:
+\begin{itemize}
+  \item \texttt{actor}
+  \item \texttt{action}
+
+  Actors and actions are currently plain strings with no special meaning
+  attached to them.
+  
+  \item \texttt{deontic}
+
+  There are 3 kinds of deontics:
+  \begin{itemize}
+    \item \texttt{MUST}: Achievement obligation
+    \item \texttt{MAY}: Permission
+    \item \texttt{SHANT}: Prohibition
+  \end{itemize}
+
+  \item \texttt{deadline}
+
+  This is optional and can take the form:
+  \begin{itemize}
+    \item \texttt{WITHIN} n \texttt{DAY}
+    \item \texttt{ON} n \texttt{DAY}
+  \end{itemize}
+
+  \item \texttt{hence\_i} (resp \texttt{lest\_i})
+
+  \texttt{hence\_i} (resp \texttt{lest\_i}) are rules that are triggered
+  when the rule is fulfilled (resp violated).
+\end{itemize}
+
+The intuitive meaning of such a rule is that \texttt{actor} must/may/shant
+perform \texttt{action} by \texttt{deadline}.
 
 % Regulative rules on the other hand, concern norms in a legal text, and are
 % traditionally expressed in normative language, utilizing deontic operators
@@ -390,18 +435,18 @@ Use the loan agreement as an example here.
 \subsection{Visualizing and simulating the contract}
 Insert DFA of state space here.
 
-\subsection{Analyzing via model checking}
-Here we should mention that in \cite{temporal_logic_norms_guido}, the author
-highlights an issue with using temporal logic to reason about deontics like
-obligations.
-We sidestep that issue due to the way we define rules as wrappers around
-events, and deontics, so that the violation of a rule corresponds directly to
-whether that event occured or not.
+% \subsection{Analyzing via model checking}
+% Here we should mention that in \cite{temporal_logic_norms_guido}, the author
+% highlights an issue with using temporal logic to reason about deontics like
+% obligations.
+% We sidestep that issue due to the way we define rules as wrappers around
+% events, and deontics, so that the violation of a rule corresponds directly to
+% whether that event occured or not.
 
-For instance, a rule of the form ``Party P must do A by D'' is an obligation
-that is violated if P does not perform A by the deadline D.
-In this way, we can reason about the violation of obligations by using
-temporal logic to talk about whether an event occurred or not.
+% For instance, a rule of the form ``Party P must do A by D'' is an obligation
+% that is violated if P does not perform A by the deadline D.
+% In this way, we can reason about the violation of obligations by using
+% temporal logic to talk about whether an event occurred or not.
 
 \section{Related work}
 

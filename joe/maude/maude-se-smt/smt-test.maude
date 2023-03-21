@@ -1,0 +1,22 @@
+sload smt
+sload smt-check
+
+fmod SMT-TEST is
+  pr QID .
+  pr INTEGER-EXPR .
+  pr REAL-EXPR .
+  pr SMT-CHECK .
+
+  subsort Qid < SMTVarId .
+
+  --- op x : -> IntegerExpr .
+  --- eq x = i('x) .
+
+  op formula : -> BooleanExpr .
+  eq formula = forall(i('y), i('y) < i('x)) .
+
+endfm
+
+reduce apply(formula, qe) .
+
+reduce smtCheck(not formula, true) .

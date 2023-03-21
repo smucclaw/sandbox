@@ -1,0 +1,34 @@
+sload syntax
+
+fmod SEMANTICS is
+  pr SEQUENT .
+
+  vars Γ Δ : Context .
+  vars φ ψ : Formula .
+
+  rl [assumption] :
+    Γ, φ ⊢ φ
+  =>
+    Done .
+
+  rl [and] :
+    Γ ⊢ (φ and ψ)
+  =>
+    (Γ ⊢ φ) (Γ ⊢ ψ) .
+
+  rl [or-1] :
+    Γ ⊢ (φ or ψ)
+  =>
+    (Γ ⊢ φ) .
+
+  rl [or-2] :
+    Γ ⊢ (φ or ψ)
+  =>
+    (Γ ⊢ ψ) .
+
+  rl [not] :
+    Γ ⊢ not φ
+  =>
+    (Γ, φ ⊢ false) .
+
+endfm

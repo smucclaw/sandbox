@@ -1,0 +1,41 @@
+sload semantics
+
+fmod META is
+  pr SEMANTICS .
+
+  sort Mod VarDecl Eqn VarList EqnList .
+  subsort VarDecl < VarDeclList .
+  subsort Eqn < EqnList .
+
+  --- var 'variable : 'datatype .
+  op var _ :: _ : Qid Datatype -> VarDecl .
+
+  subsort RelPred < EqnList .
+
+  --- op ceq _ _ = _ : Qid IsAs DecideBody -> Eqn .
+  --- op eq _ _ = _ : Qid IsAs DecideOwise -> Eqn .
+
+  op _ . _ : VarDecl VarDecl -> VarDecl [comm assoc] .
+  op _ _ : EqnList EqnList -> EqnList [comm assoc] .
+
+  op fmod _ is _ . _ endfm : Qid VarDeclList EqnList -> Mod .
+
+endfm
+
+--- parse in META :
+---   (fmod 'MODULE is
+---     var 'x :: number .
+---     ceq 'f ('x is a number) = 0 if true
+---   endfm)
+
+--- fmod A is
+---   pr B .
+---   sort A .
+---   op a : -> A .
+--- endfm
+
+--- fmod B is
+---   pr A .
+---   sort B .
+---   op b : -> B .
+--- endfm

@@ -1,0 +1,41 @@
+fmod RULE is
+  pr QID .
+  --- pr BOOL .
+  --- pr RAT .
+
+  sorts Formula Rule RuleName .
+  subsort Qid < Formula < Rule .
+
+  op _ :: if _ then _ : RuleName Formula Formula -> Rule .
+
+  ops true false : -> Formula .
+
+  ops _and_ _or_ : Formula Formula -> Formula [comm assoc] .
+  op not _ : Formula -> Formula .
+
+  op askable _ : Rule -> Rule .
+
+endfm
+
+fmod CONTEXT is
+  pr RULE .
+
+  sort Context .
+  subsort Rule < Context .
+  op empty : -> Context .
+  op _ , _ : Context Context -> Context [comm assoc id: empty] .
+
+endfm
+
+fmod SEQUENT is
+  pr RULE .
+
+  sort Sequent Sequents .
+  subsort Sequent < Sequents .
+
+  op Done : -> Sequent .
+  op _ ⊢ _ : Context Rule -> Sequent [prec 122] .
+
+  op _ _ : Sequents Sequents -> Sequents [comm assoc id: Done] .
+
+endfm

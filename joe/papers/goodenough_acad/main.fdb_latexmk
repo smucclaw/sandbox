@@ -1,13 +1,13 @@
 # Fdb version 3
-["bibtex main"] 1679455844 "main.aux" "main.bbl" "main" 1679456649
+["bibtex main"] 1679478709 "main.aux" "main.bbl" "main" 1679478760
   "/usr/share/texmf-dist/bibtex/bst/base/acm.bst" 1650183167 21064 c61a48664f3c347ce7f73c1a6a530506 ""
-  "main.aux" 1679456649 4525 cc7250514391c4d976066193fccd58a4 "pdflatex"
+  "main.aux" 1679478760 6882 97b593ff8cff885bee9d5744d54c1ce4 "pdflatex"
   "refs.bib" 1673422392 13297 cf5b10fdf654da66303daa8e35efdc32 ""
   (generated)
   "main.bbl"
   "main.blg"
-["pdflatex"] 1679456649 "/home/joe/dev/smucclaw/sandbox/joe/papers/goodenough_acad/main.tex" "main.pdf" "main" 1679456649
-  "/home/joe/dev/smucclaw/sandbox/joe/papers/goodenough_acad/main.tex" 1679456648 22674 da988c177d5ccf5571e8250a59a34dfc ""
+["pdflatex"] 1679478759 "/home/joe/dev/smucclaw/sandbox/joe/papers/goodenough_acad/main.tex" "main.pdf" "main" 1679478760
+  "/home/joe/dev/smucclaw/sandbox/joe/papers/goodenough_acad/main.tex" 1679478759 32914 7b9fb43bb2012f1906b603c46fd3714a ""
   "/usr/local/share/texmf/tex/latex/naive-ebnf/naive-ebnf.sty" 1678853243 4322 b58d013aefd7fb57cd3a123fc94c4828 ""
   "/usr/share/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc" 1650183167 2900 1537cc8184ad1792082cd229ecc269f4 ""
   "/usr/share/texmf-dist/fonts/map/fontname/texfonts.map" 1650183167 3524 cb3e574dea2d1052e39280babc910dc8 ""
@@ -55,9 +55,13 @@
   "/usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb" 1650183167 32080 340ef9bf63678554ee606688e7b5339d ""
   "/usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmcsc10.pfb" 1650183167 32001 6aeea3afe875097b1eb0da29acd61e28 ""
   "/usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb" 1650183167 36299 5f9df58c2139e7edcf37c8fca4bd384d ""
+  "/usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb" 1650183167 36281 c355509802a035cadc5f15869451dcee ""
   "/usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb" 1650183167 35752 024fb6c41858982481f6968b5fc26508 ""
   "/usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb" 1650183167 32722 d7379af29a190c3f453aba36302ff5a9 ""
   "/usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb" 1650183167 32362 179c33bbf43f19adbb3825bb4e36e57a ""
+  "/usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb" 1650183167 32762 224316ccc9ad3ca0423a14971cfa7fc1 ""
+  "/usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb" 1650183167 32569 5e5ddc8df908dea60932f3c484a54c0d ""
+  "/usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb" 1650183167 32716 08e384dc442464e7285e891af9f45947 ""
   "/usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb" 1650183167 37944 359e864bd06cde3b1cf57bb20757fb06 ""
   "/usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb" 1650183167 31099 c85edf1dd5b9e826d67c9c7293b6786c ""
   "/usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt9.pfb" 1650183167 29078 718ea4567ceff944262b0f5b0800e1d9 ""
@@ -234,12 +238,12 @@
   "/usr/share/texmf-dist/web2c/texmf.cnf" 1650183167 39911 2da6c67557ec033436fe5418a70a8a61 ""
   "/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map" 1678848639 4276404 c85ee5114b0e5590ee79a1d1365a6f5a ""
   "/var/lib/texmf/web2c/pdftex/pdflatex.fmt" 1678848635 2927661 30ebe364996ca0d160a208e6a12f72fd ""
-  "main.aux" 1679456649 4525 cc7250514391c4d976066193fccd58a4 "pdflatex"
-  "main.bbl" 1679455844 929 c20f71125fbf6afa3b564d89e0a45d0d "bibtex main"
-  "main.out" 1679456649 2237 862da91ebe7945c7b55ec818003e5c31 "pdflatex"
-  "main.tex" 1679456648 22674 da988c177d5ccf5571e8250a59a34dfc ""
-  "main.toc" 1679456649 1108 7bd45eef34bb3b1318824edb5601bd46 "pdflatex"
-  "preamble.tex" 1678944718 2253 0465ec7559f594ea7d0f2c2085e48af1 ""
+  "main.aux" 1679478760 6882 97b593ff8cff885bee9d5744d54c1ce4 "pdflatex"
+  "main.bbl" 1679478709 929 c20f71125fbf6afa3b564d89e0a45d0d "bibtex main"
+  "main.out" 1679478760 2302 c2f536fa5f1805c0dc4aa99d7e0e3e32 "pdflatex"
+  "main.tex" 1679478759 32914 7b9fb43bb2012f1906b603c46fd3714a ""
+  "main.toc" 1679478760 1043 457d506695bfb4c0918eee055085c4aa "pdflatex"
+  "preamble.tex" 1679471986 2391 a368bfcc0e4398d61799f5d15213462c ""
   (generated)
   "main.aux"
   "main.log"

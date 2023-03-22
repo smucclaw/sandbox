@@ -22,18 +22,17 @@
 \newpage
 
 % Main body.
-\section{Intro and shortcomings of DFA formalization}
 
-\subsection{Intro}
+\section{Introduction}
 
 % \inlinetodo{
 %   Write a better intro and provide more background on
 %   \cite{contract_as_automaton}.
 % }
-\inlinetodo{
-  Write a proper introduction to the original work on formalizing the simple
-  loan agreement as a DFA.
-}
+% \inlinetodo{
+%   Write a proper introduction to the original work on formalizing the simple
+%   loan agreement as a DFA.
+% }
 
 % In \cite{contract_as_automaton}, Flood and Goodenough propose that many financial
 % contracts are inherently computational in nature.
@@ -47,7 +46,7 @@
 % \cite[Table 1]{contract_as_automaton}, which they formalize
 % directly as a DFA.
 
-In \cite{contract_as_automaton}, Flood and Goodenough propose that many
+In \cite{contract_as_automaton}, Flood \& Goodenough propose that many
 financial contracts are inherently computational in nature.
 They argue that the computational structure of many such contracts can be
 formalized via deterministic finite automata (DFAs), with states representing
@@ -56,15 +55,33 @@ Transitions between these states then correspond to events triggering a change
 in these situations.
 This is demonstrated using a simple loan agreement \cite{contract_as_automaton},
 which they formalize directly as a DFA.
-% Finally, they claim that such a formalism opens up the possibility of performing
-% automated analyses on contracts.
 
-\subsection{Shortcomings}
-While this approach is a useful and important proof of concept, as the authors
+While the DFA approach is a useful and important proof of concept, as the authors
 themselves recognize, there are some limitations with such a formalism, perhaps
 the most apparent being that the manual encoding of a contract as a DFA is a
 laborious process, and one that in itself does not produce a machine executable
-result
+result.
+
+Our first demonstration in this paper is using the L4 language being developed
+at the Singapore Management University (SMU)
+to represent the bargain described by Flood \& Goodenough
+\cite{contract_as_automaton}.
+Through this, we show how L4 addresses some shortcomings of the DFA
+formalization.
+
+Next, we  discuss how we implemented an execution engine that allows us to
+execute contracts written in L4.
+For this, we designed a Structural Operational Semantics (SOS)
+\todo{Cite Plotkin's seminal paper} for L4, giving us a mathematical
+description of the execution behavior of contracts.
+To make this executable, we implemented this mathematical description in
+the Maude language, which in turn enables us to generate interactive
+visualizations of the resulting transition system.
+ 
+
+\section{Shortcomings of the DFA formalization}
+As aforementioned, DFAs quickly become cumbersome to work with directly when
+the contracts we are trying to encode grow larger.
 One source of complexity arises from the fact that the DFA is a low level
 computational formalism that is arguably far removed from our intuitive
 understanding of a contract.
@@ -213,57 +230,93 @@ expedient of mandating that later events will simply be disregarded.
 % infinitely \footnote{Possibly uncountably} many states and transitions.
 
 \section{The L4 approach}
+The L4 language for encoding legal texts is being developed at SMU which
+addresses some of these shortcomings.
+% At CCLAW, we are developing one such domain specific language (DSL) for
+% specifying legal contracts, called L4, which aims to address some of these
+% issues.
+As described by its developers,
+``L4 is a domain-specific specification language that facilitates semantically
+rigorous formalization of legal expressions found in legislation and
+contracts.''
+(Mahajan, Strecker \& Wong. 2022)
+\todo{cite properly}
 
-\subsection{L4 and the CCLAW project}
-At CCLAW, we are developing one such domain specific language (DSL) for
-specifying legal contracts, called L4, which addresses these issues.
-Along with it, we are also developing an accompanying toolset which can be used
-to visualize and analyze contracts written in L4.
-Here we first give an introduction to our project and the L4 DSL that
-we are developing, before discussing our formalization of the loan agreement in
-the next section.
+Its core approach utilizes a natural language-based structure and syntax which
+allows the detailed, if artificially structured, expression of the obligations
+and consequences that need to be set out in a legal specification.
+The programming language recognizes the logic embedded in these statements and
+then allows that logic to be represented in a number of different execution
+software approaches.
+(Id)
+\todo{cite properly}
+It is capable of representing both the private bargains of contract and the
+public prohibitions and requirements of statutes and regulations.
+Additional background on L4 and its applications is available at \_ \todo{Cite}. 
+
+% Along with L4, the developers are also developing an accompanying toolset
+% which can be used to visualize and analyze contracts written in L4.
+% Here we first give an introduction to our project and the L4 DSL that
+% we are developing, before discussing our formalization of the loan agreement in
+% the next section.
 
 As described in
 \todo{Cite WAICOM 2022 and PROLALA 2022 papers},
-our focus is on rule-based reasoning, as opposed to case-based reasoning.
-Following LegalRuleML \todo{Cite LegalRuleML}, we distinguish between two kinds
-of rules, namely constitutive and regulative (or prescriptive) rules.
+L4, as with LegalRuleML \todo{Cite LegalRuleML}, distinguishes between two
+kinds of rules, namely constitutive and regulative (or prescriptive) rules.
 The former encodes static decision logic, similar to Prolog-style
-\textit{if-then} rules, and is treated as such in our implementation.
+\textit{if-then} rules.
 \todo{Insert example, like the one in PROLALA paper}
 
-Our focus here is on the latter, namely regulative rules, which concern the
-norms in a legal text.
-These tell us under which conditions an actor is allowed, permitted or
-prohibited from performing an action, as well as the consequences of fulfilling
-and violating them.
+Our focus in this work is on the latter, namely regulative rules, which concern
+the norms in a legal text.
+These are a central component in the computational structure of contracts like
+the loan agreement.
+They govern under which conditions an actor is allowed,
+permitted or prohibited from performing an action, as well as the consequences
+of fulfilling and violating them.
+
 % Such consequences include new norms that come into effect, like
 % contrary-to-duty ones \todo{Cite something about CTD norms} which are triggered
 % upon the violation of other norms.
+
 While deontic logic approaches have been popular,
 \todo{Cite appropriately}
 our approach to regulative rules in L4 is closer in spirit to
 \cite{real_time_contract_automata, normative_diags_diogo},
-\todo{Cite the Maude paper as well}
-in that our treatment of the rules yields a state transition system,
-similar in spirit to the DFA found in \cite{contract_as_automaton}.
+\todo{Cite the Maude paper as well, and any others that are relevant}
+in that our treatment of the rules is operational in nature, grounded in the
+mathematical framework of SOS.
+This yields a state transition system, similar in spirit to the DFA found in
+the work of Flood \& Goodenough \cite{contract_as_automaton}.
+% Our operational treatment of these regulative rules, or more formally an
+% operational semantics, is implemented in the Maude language.
+% This is used to construct DFA visualizations of contracts specified in L4,
+% as well as simulate executions and perform various forms of analysis.
 
-\subsubsection{Syntax of regulative rules}
-In L4, users can encode regulative rules textually, using a syntax that looks
-like a highly restricted form of controlled natural language.
-These have the following form:
+\subsection{Syntax of regulative rules}
+Here we describe the natural-language like syntax for specifying regulative
+rules in L4, as well as a brief discussion of the relevant domain specific
+concepts.
+A more detailed discussion with some examples will be provided in the following
+section, in the context of our encoding of the loan agreement.
+
+Regulative rules in L4 have the following form, with special keywords given
+in all-caps:
 \begin{lstlisting}
   RULE rule name
   PARTY actor
   deontic
   [ deadline ]
-  action
+  [ DO ] action
   [ HENCE hence_0 AND ... AND hence_n ]
   [ LEST lest_0 AND ... AND lest_n ]
 \end{lstlisting}
 
-Note that the deadline, as well as the \texttt{HENCE} and \texttt{CLAUSES} are
-optional.
+Note that the \texttt{deadline}, \texttt{DO} keyword, as well as the
+\texttt{HENCE} and \texttt{CLAUSES} are optional.
+We also allow for some permutations of the \texttt{deontic}, \texttt{deadline}
+and \texttt{action} clauses.
 
 Each clause in the above rule corresponds to the following
 domain concepts that we have identified:
@@ -296,10 +349,20 @@ domain concepts that we have identified:
   time within the next $n$ days, while \texttt{ON} $n$ \texttt{DAY} means that it
   may only occur on the $n$-th day itself.
 
+  Note that we currently do not support weeks, months, years as well as fixed
+  dates, though we intend to add support for these in the future.
+
   \item \texttt{hence\_i} (resp \texttt{lest\_i})
 
-  \texttt{hence\_i} (resp \texttt{lest\_i}) are rules that are triggered
-  when the obligation or prohibition is fulfilled (resp violated).
+  \texttt{hence\_i} (resp \texttt{lest\_i}) are rule names denoting rules that
+  are triggered when the obligation or prohibition is fulfilled (resp violated).
+  We identify the fulfillment of an obligation with whether the actor performed
+  the prescribed action within the deadline, and violation is identified with
+  the deadline passing before the actor performs the action.
+  Fulfillment and violation for prohibitions are defined symmetrically.
+  % With this, one can encode \textit{contrary-to-duty} rules as
+  % \texttt{lest\_i} rules that appear in the \texttt{LEST} clause, as these come
+  % into effect on violation of an obligation/prohibition.
 
   In the case of permissions, the \texttt{hence\_i} are triggered when the
   permission is exercised, and the \texttt{lest\_i} are triggered when it
@@ -382,10 +445,21 @@ domain concepts that we have identified:
   https://docs.google.com/spreadsheets/d/1_k17mzk2hTyPY2egbEVqXzr8uYAdi6BVqeMYdBxKB_I/edit#gid=864296175
 }{Add link})
 
-The following rule is found at the beginning in our encoding of the loan
+Note that our encoding of the loan agreement is an approximation of the
+one in the original paper \cite{contract_as_automaton} as we currently lack
+certain features like fixed dates, which are used as deadlines in the original
+contract.
+To cope with this, we specify deadlines in terms of days relative to the
+time the rule triggers, in place of dates.
+Other limitations and inadequacies will be pointed out along the way.
+
+% To operationalize a contract, we assume that the first rule at the top of an
+% L4 encoding is the starting rule, which is triggered once we begin executing
+% the contract.
+The following rule is found at the beginning of our encoding of the loan
 agreement.
-In L4, we assume the first rule at the top of the specification to be
-the starting rule that is triggered once the contract begins.
+We assume that the first rule in an L4 encoding is the starting rule which is
+triggered at the beginning of the contract.
 
 \begin{lstlisting}
   RULE Contract Commencement
@@ -395,33 +469,176 @@ the starting rule that is triggered once the contract begins.
   HENCE Remit principal
 \end{lstlisting}
 
-The intuitive meaning of such a rule is that the actor, \texttt{Borrower},
+This starting rule says that the actor, \texttt{Borrower},
 may perform the \texttt{request principal} action any time from the time the
 rule comes into effect up til 1 day later.
-Note that for simplicity, we assume that permissions are one-off and is
-consumed once the action occurs, so that no repeated actions are allowed.
+Note that for simplicity, we assume that permissions are one-off and are
+used up once the action occurs, so that no repeated actions are allowed.
 This assumption mirrors that of \cite{real_time_contract_automata}, in which
 the author notes that one can also allow for permissions that may be exercised
 more than once.
-In the future, we hope to lift this restriction and add support for permissions
-that can be exercised more than once before the deadline.
+In the future, we hope to lift this restriction.
 
-The \texttt{HENCE} clause here indicates that if the permission is exercised,
-then another rule called \texttt{Remit Principal} comes into effect.
+The \texttt{HENCE} clause is then used to indicate that if the permission is
+exercised, then another rule called \texttt{Remit Principal} comes into effect.
 The lack of a \texttt{LEST} clause indicates that no new rule is triggered
 when the deadline passes without the permission being exercised.
 
 The \texttt{Remit principal} rule is then expressed as follows:
+
 \begin{lstlisting}
   RULE Remit principal		
   PARTY	Lender		
   MUST remit principal
        in the amount of 1000
-       to	Borrower
-  WITHIN	1	DAY
+       to Borrower
+  WITHIN 1 DAY
   HENCE	Repayment
 \end{lstlisting}
+
 This obliges the lender to send the principal amount to the borrower once
+the borrower has requested for it.
+The \texttt{Repayment} rule defines the main body of the contract and comes
+into effect when the \texttt{Remit principal} rule is fulfilled, ie when the
+lender sends the principal to the borrower.
+Note that L4 allows us to define a rule to be a conjunction of multiple rules
+so that \texttt{Repayment} is defined as:
+
+\begin{lstlisting}
+        Repayment
+  MEANS Repay in two halves
+  AND   Avoid default
+\end{lstlisting}
+
+Triggering the composite \texttt{Repayment} rule then has the effect of
+triggering the \texttt{Repay in two halves} and \texttt{Avoid default}
+rules in parallel.
+The former obliges the borrower to make the first repayment, followed by the
+second, and the latter prohibits him from defaulting on representations and
+warranties and so on.
+
+It should be noted here that as in \_
+\todo{
+  cite one of Guido's papers that talks about contrary to duty norms and
+  compensability
+},
+we distinguish between the violation of an obligation/prohibition, and the
+violation of the contract as a whole.
+Obligations and prohibitions like \texttt{Remit principal}, which do not have
+a \texttt{LEST} clauses are assumed to be non-reparable.
+This means that when this obligation is violated, we deem the contract to
+have been breached by the lender.
+Execution of the contract proceeds no further and to draw a parallel with
+computer programs, we can view this as the contract (seen as a program)
+throwing an unrecoverable exception during execution, causing it to terminate
+in a breach state (ie crash).
+
+% By viewing the, one can view the violation of a
+% non-reparable obligations as throwing an unrecoverable error that terminates
+% the execution of
+
+In contrast, some rules, like the \texttt{Repay in two halves} obligation below,
+have a nonempty \texttt{LEST} clause and so is deemed to be reparable, with
+reparation mechanisms, or \textit{contrary-to-duty} rules
+\todo{Cite a Guido paper on CTD norms and compensability}
+, being encoded in the
+\texttt{LEST} clause.
+In this case, the violation of the rule results in the rules in the
+\texttt{LEST} clause coming into effect, and the execution of the contract
+continues, as opposed to terminating in a breach state.
+Going back to the analogy with computer programs, one can view these
+contrary-to-duty norms as exception handling mechanisms that activate in an
+attempt to steer the execution of the contract back along the ``happy path''.
+
+\begin{lstlisting}
+  RULE Repay in two halves
+  PARTY	Borrower
+  MUST ON 30 DAY
+  DO repay first half
+     in the amount of 550
+     to Lender
+  HENCE	Repay second half
+  LEST Notify borrower of default
+\end{lstlisting}
+
+In this rule, the \texttt{ON 30 DAY} deadline is used to mean that early
+payments are not allowed, as in the original agreement.
+While we could have chosen to encode 1 year as 365 days, due to the way in which
+we handle time and deadlines under the hood, 365 days results in too large of a
+transition system for our system to handle.
+Thus, we have instead chosen a more modest deadline of 30 days.
+
+The \texttt{Notify borrower of default} grants the lender permission to notify
+the borrower and encodes the ``notice and cure'' reparation mechanism.
+As noted in \cite{contract_as_automaton}, this indicates the
+start of the reparation pathway, which gives the borrower a second chance, by
+obliging him to cure his default.
+Should he still not make amends, the execution of the contract has reached the
+point of no return and no further second chances are given.
+This is embodied by the activation of the
+\texttt{Accelerate outstanding payments} obligation.
+
+\begin{lstlisting}
+  RULE Accelerate outstanding payments			
+  PARTY Borrower
+  MUST WITHIN 1 DAY	
+  DO repay outstanding amount
+     to Lender	
+\end{lstlisting}
+
+Unfortunately, while encoding this rule in L4, we realized that our
+formalization does not faithfully implement the intuitive reading of its
+corresponding natural language counterpart.
+Intuitively, when the execution of the contract reaches this stage, no other
+obligations are relevant anymore, like the \texttt{Avoid default} prohibition.
+Consequently, one would like to be able to terminate
+all existing obligations when this comes into effect.
+While we would have liked to add support for this, we encountered various
+complications and hence decided to leave this for future work.
+
+\section{Operational semantics of Regulative Rules in L4}
+\info{
+  This section and the others after it are still heavily in progress.
+}
+
+In order to operationalize contracts for execution, we begin by formalizing a
+semantics for regulative rules in L4 using the framework of Structural
+Operational Semantics (SOS) \todo{Cite Plotkin}
+originating from the field of programming language theory.
+
+SOS is a mathematical framework which allows one to describe
+transition systems in terms of states, called configurations, and transition
+rules describing how one state can transition to another.
+These rules are expressed as logical inference rules of the form:
+
+\begin{align*}
+  \begin{prooftree}
+    \hypo{H_1}
+    \hypo{\dots}
+    \hypo{H_n}
+    \infer3{\smallstepsto{S}{E}{S'}}
+  \end{prooftree}
+\end{align*}
+
+Here $\smallstepsto{S}{E}{S'}$ is known as a judgement form which expresses that
+the configuration $S$ evaluates to $S'$ when an event $E$ occurs.
+With this, the above transition rule is then read as saying that given a
+configuration $S$, if all the hypotheses $H_i$ hold, then the event $E$ is
+allowed to occur, and $S$ is allowed to transition to $S'$ when it does.
+
+In the context of L4, our configurations are pairs of active rules and timers,
+to help us keep track of which rules are in effect, and their deadlines.
+Following timed transition systems \todo{Cite}, we define two kinds of events,
+namely action events and tick events.
+
+% We use $\smallstepstostar{S}{S'}$ to denote the reflexive, transitive closure
+
+% More formally, $\smallstepsto{S}{S'}$ is known as a judgement form expressing
+% that $S$ can transition to $S'$ and the $H_i$ are judgement forms
+
+% However, at this point, we do not have syntax for that in L4, nor is any
+% support for it implemented in Maude.
+% While we would have liked to implement
 
 % \subsection{From L4 to Maude}
 \section{L4 through Maude}
@@ -445,13 +662,13 @@ automatically analyze the behavior of computer systems.
 These often rely on first modelling these systems as
 \textit{labelled transition systems} (LTS), which can be seen as
 generalizations of nondeterministic finite automata).
-As with finite automata, LTSes can be seen as directed graphs, with nodes
-representing states that the system can be in, and labelled edges denoting
-transitions that change the state of a system.
-Where they differ from finite automata is that they are allowed to have an
-infinite (possibly uncountable) number of states and transitions
-between them.
-They are also not required to come with a notion of initial and final states.
+% As with finite automata, LTSes can be seen as directed graphs, with nodes
+% representing states that the system can be in, and labelled edges denoting
+% transitions that change the state of a system.
+% Where they differ from finite automata is that they are allowed to have an
+% infinite (possibly uncountable) number of states and transitions
+% between them.
+% They are also not required to come with a notion of initial and final states.
 
 While DFAs and LTSes in general are formalisms that are well suited for
 computers to analyze and reason about, they are cumbersome for humans to use
@@ -469,8 +686,18 @@ Maude is a language that allows us to model and analyze such concurrent systems.
 As with others like it, it comes equipped with a more sophisticated formalism
 that allow us to more conveniently specify these transition systems.
 
-\subsection{Translating from L4 to Maude}
-Use the loan agreement as an example here.
+\inlinetodo{
+  Introduce Maude syntax and give some examples of how it works.
+
+  Talk about how Maude makes for a good \textit{meta} language for designing
+  and modelling DSLs
+
+  Discuss the relationship between Maude and the mathematical notation used
+  in defining operational semantics for programming languages.
+}
+
+
+\subsection{Implementing the operational semantics in Maude}
 
 \subsection{Visualizing and simulating the contract}
 Insert DFA of state space here.

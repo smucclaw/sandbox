@@ -1,11 +1,5 @@
 \begin{thebibliography}{1}
 
-\bibitem{eventb_data_sharing_agreements}
-{\sc Arenas, A.~E., Aziz, B., Bicarregui, J., and Wilson, M.~D.}
-\newblock An event-b approach to data sharing agreements.
-\newblock In {\em Integrated Formal Methods\/} (Berlin, Heidelberg, 2010),
-  D.~M{\'e}ry and S.~Merz, Eds., Springer Berlin Heidelberg, pp.~28--42.
-
 \bibitem{real_time_contract_automata}
 {\sc Chircop, S., Pace, G., and Schneider, G.}
 \newblock {\em An Automata-Based Formalism for Normative Documents with
@@ -23,14 +17,6 @@
 \newblock Normative requirements for regulatory compliance: An abstract formal
   framework.
 \newblock {\em Information Systems Frontiers 18\/} (05 2015).
-
-\bibitem{symboleo_model_checking_contracts}
-{\sc Parvizimosaed, A., Roveri, M., Rasti, A., Amyot, D., Logrippo, L., and
-  Mylopoulos, J.}
-\newblock Model-checking legal contracts with symboleopc.
-\newblock In {\em Proceedings of the 25th International Conference on Model
-  Driven Engineering Languages and Systems\/} (New York, NY, USA, 2022), MODELS
-  '22, Association for Computing Machinery, pp.~278--288.
 
 \bibitem{normative_diags_diogo}
 {\sc Sasdelli, D.}

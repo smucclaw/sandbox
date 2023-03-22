@@ -5,45 +5,45 @@ The style file: acm.bst
 Database file #1: refs.bib
 Warning--empty publisher in real_time_contract_automata
 Warning--empty chapter and pages in real_time_contract_automata
-You've used 6 entries,
+You've used 4 entries,
             2253 wiz_defined-function locations,
-            567 strings with 5180 characters,
-and the built_in function-call counts, 2306 in all, are:
-= -- 211
-> -- 115
+            550 strings with 4545 characters,
+and the built_in function-call counts, 1210 in all, are:
+= -- 107
+> -- 53
 < -- 0
-+ -- 48
-- -- 40
-* -- 179
-:= -- 364
-add.period$ -- 18
-call.type$ -- 6
-change.case$ -- 36
++ -- 23
+- -- 18
+* -- 92
+:= -- 199
+add.period$ -- 12
+call.type$ -- 4
+change.case$ -- 20
 chr.to.int$ -- 0
-cite$ -- 8
-duplicate$ -- 100
-empty$ -- 185
-format.name$ -- 40
-if$ -- 488
+cite$ -- 6
+duplicate$ -- 54
+empty$ -- 104
+format.name$ -- 18
+if$ -- 250
 int.to.chr$ -- 0
-int.to.str$ -- 6
-missing$ -- 7
-newline$ -- 33
-num.names$ -- 14
-pop$ -- 49
+int.to.str$ -- 4
+missing$ -- 5
+newline$ -- 23
+num.names$ -- 8
+pop$ -- 30
 preamble$ -- 1
-purify$ -- 31
+purify$ -- 17
 quote$ -- 0
-skip$ -- 67
+skip$ -- 32
 stack$ -- 0
-substring$ -- 112
-swap$ -- 32
+substring$ -- 45
+swap$ -- 14
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 22
+type$ -- 14
 warning$ -- 2
-while$ -- 22
-width$ -- 7
-write$ -- 63
+while$ -- 11
+width$ -- 5
+write$ -- 39
 (There were 2 warnings)

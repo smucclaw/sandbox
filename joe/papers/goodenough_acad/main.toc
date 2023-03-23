@@ -8,5 +8,5 @@
 \contentsline {subsection}{\numberline {5.1}Background on Maude}{8}{subsection.5.1}%
 \contentsline {subsection}{\numberline {5.2}Implementing the operational semantics in Maude}{9}{subsection.5.2}%
 \contentsline {subsection}{\numberline {5.3}Visualizing and simulating the contract}{9}{subsection.5.3}%
-\contentsline {section}{\numberline {6}Related work}{9}{section.6}%
-\contentsline {section}{\numberline {7}Limitations and future work}{9}{section.7}%
+\contentsline {section}{\numberline {6}Limitations and future work}{9}{section.6}%
+\contentsline {section}{\numberline {7}Conclusions}{9}{section.7}%

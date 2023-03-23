@@ -6,36 +6,39 @@ fmod RULE is
   sorts Formula Rule RuleName .
   subsort Qid < Formula < Rule .
 
-  op _ :: if _ then _ : RuleName Formula Formula -> Rule .
+  --- op _ :: if _ then _ : RuleName Formula Formula -> Rule .
+
+  --- C :- H1 ... Hn
+  --- C => H1 ... Hn
 
   ops true false : -> Formula .
 
-  ops _and_ _or_ : Formula Formula -> Formula [comm assoc] .
+  ops _and_ _or_ : Formula Formula -> Formula [assoc] .
   op not _ : Formula -> Formula .
 
-  op askable _ : Rule -> Rule .
+  --- op askable _ : Rule -> Rule .
 
 endfm
 
-fmod CONTEXT is
-  pr RULE .
+--- fmod CONTEXT is
+---   pr RULE .
 
-  sort Context .
-  subsort Rule < Context .
-  op empty : -> Context .
-  op _ , _ : Context Context -> Context [comm assoc id: empty] .
+---   sort Context .
+---   subsort Rule < Context .
+---   op empty : -> Context .
+---   op _ , _ : Context Context -> Context [comm assoc id: empty] .
 
-endfm
+--- endfm
 
-fmod SEQUENT is
-  pr RULE .
+--- fmod SEQUENT is
+---   pr RULE .
 
-  sort Sequent Sequents .
-  subsort Sequent < Sequents .
+---   sort Sequent Sequents .
+---   subsort Sequent < Sequents .
 
-  op Done : -> Sequent .
-  op _ ⊢ _ : Context Rule -> Sequent [prec 122] .
+---   op Done : -> Sequent .
+---   op _ ⊢ _ : Context Rule -> Sequent [prec 122] .
 
-  op _ _ : Sequents Sequents -> Sequents [comm assoc id: Done] .
+---   op _ _ : Sequents Sequents -> Sequents [comm assoc id: Done] .
 
-endfm
+--- endfm

@@ -1,0 +1,56 @@
+mod TEST is
+  pr QID .
+  pr BOOL .
+  
+  sorts Relationship Person .
+  ops parent grandparent child : -> Relationship .
+  subsort Qid < Person .
+  
+  op _ is a _ of _ : Person Relationship Person -> Bool .
+
+  sort HornBody .
+  subsort Bool < HornBody .
+  op _ , _ : HornBody HornBody -> HornBody
+    [assoc id: true prec 121 format (d r os d)] .
+
+  sort Configuration .
+  op < _ > : HornBody -> Configuration .
+  
+  var hornBody : HornBody .
+
+  --- :- 'A is a parent of 'B
+  rl [fact-1] :
+    < 'A is a parent of 'B, hornBody >
+  =>
+    < hornBody >
+  [narrowing] .
+
+  --- :- 'B is a parent of 'C
+  rl [fact-2] :
+    < 'B is a parent of 'C, hornBody >
+  =>
+    < hornBody >
+  [narrowing] .
+
+  vars X Y Z : Qid .
+
+  --- X is a child of Y :- Y is a parent of X
+  rl [child] :
+    < X is a child of Y, hornBody >
+  =>
+    < Y is a parent of X, hornBody >
+  [narrowing] .
+
+  --- X is a gradparent of Y :- X is a parent of Z, Z is a parent of Y
+  rl [grandparent] :
+    < X is a grandparent of Y, hornBody >
+  =>
+    < X is a parent of Z, Z is a parent of Y, hornBody >
+  [narrowing nonexec] .
+
+endm
+
+vu-narrow
+  < p:Person is a grandparent of 'C, true >
+=>*
+  < true > .

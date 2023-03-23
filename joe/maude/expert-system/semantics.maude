@@ -1,34 +1,37 @@
 sload syntax
 
 fmod SEMANTICS is
-  pr SEQUENT .
+  pr SYNTAX .
 
-  vars Γ Δ : Context .
   vars φ ψ : Formula .
 
-  rl [assumption] :
-    Γ, φ ⊢ φ
-  =>
-    Done .
+  --- pr SEQUENT .
 
-  rl [and] :
-    Γ ⊢ (φ and ψ)
-  =>
-    (Γ ⊢ φ) (Γ ⊢ ψ) .
+  --- vars Γ Δ : Context .
 
-  rl [or-1] :
-    Γ ⊢ (φ or ψ)
-  =>
-    (Γ ⊢ φ) .
+  --- rl [assumption] :
+  ---   Γ, φ ⊢ φ
+  --- =>
+  ---   Done .
 
-  rl [or-2] :
-    Γ ⊢ (φ or ψ)
-  =>
-    (Γ ⊢ ψ) .
+  --- rl [and] :
+  ---   Γ ⊢ (φ and ψ)
+  --- =>
+  ---   (Γ ⊢ φ) (Γ ⊢ ψ) .
 
-  rl [not] :
-    Γ ⊢ not φ
-  =>
-    (Γ, φ ⊢ false) .
+  --- rl [or-1] :
+  ---   Γ ⊢ (φ or ψ)
+  --- =>
+  ---   (Γ ⊢ φ) .
+
+  --- rl [or-2] :
+  ---   Γ ⊢ (φ or ψ)
+  --- =>
+  ---   (Γ ⊢ ψ) .
+
+  --- rl [not] :
+  ---   Γ ⊢ not φ
+  --- =>
+  ---   (Γ, φ ⊢ false) .
 
 endfm

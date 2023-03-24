@@ -8,15 +8,15 @@ mod TEST is
   
   op _ is a _ of _ : Person Relationship Person -> Bool .
 
-  sort HornBody .
-  subsort Bool < HornBody .
-  op _ , _ : HornBody HornBody -> HornBody
+  sort Goal .
+  subsort Bool < Goal .
+  op _ , _ : Goal Goal -> Goal
     [assoc id: true prec 121 format (d r os d)] .
 
   sorts Configuration Explanation Explanations .
   subsort Explanation < Explanations .
 
-  op < _ | _ > : HornBody Explanations -> Configuration .
+  op < _ | _ > : Goal Explanations -> Configuration [ctor] .
 
   op _ because it is a fact : Bool -> Explanation .
   op _ because _ : Bool Bool -> Explanation .
@@ -24,51 +24,60 @@ mod TEST is
   op nil : -> Explanations [ctor] .
   op _ , _ : Explanations Explanations -> Explanations 
     [assoc id: nil prec 121 format (d r os d)] .
+
+  op < _ > : Goal -> Configuration .
+
+  var goal : Goal .
+
+  eq < goal > = < goal | nil > . 
+
+  --- class State |
+  ---   goal : Goal,
+  ---   explanations : Explanations .
   
-  var hornBody : HornBody .
   var explanations : Explanations .
 
   --- :- 'A is a parent of 'B
   rl [fact-1] :
-    < 'A is a parent of 'B, hornBody | explanations >
+    < 'A is a parent of 'B, goal | explanations >
   =>
-    < hornBody | ('A is a parent of 'B) because it is a fact, explanations >
+    < goal | explanations, ('A is a parent of 'B) because it is a fact >
   [narrowing] .
 
   --- :- 'B is a parent of 'C
   rl [fact-2] :
-    < 'B is a parent of 'C, hornBody | explanations >
+    < 'B is a parent of 'C, goal | explanations >
   =>
-    < hornBody | ('B is a parent of 'C) because it is a fact, explanations >
+    < goal | explanations, ('B is a parent of 'C) because it is a fact >
   [narrowing] .
 
   vars X Y Z : Qid .
 
   --- X is a child of Y :- Y is a parent of X
   rl [child] :
-    < X is a child of Y, hornBody | explanations >
+    < X is a child of Y, goal | explanations >
   =>
-    < Y is a parent of X, hornBody | (X is a child of Y) because (Y is a parent of X), explanations >
+    < Y is a parent of X, goal | explanations, (X is a child of Y) because (Y is a parent of X) >
   [narrowing] .
 
   --- X is a gradparent of Y :- X is a parent of Z, Z is a parent of Y
   rl [grandparent] :
-    < X is a grandparent of Y, hornBody | explanations >
+    < X is a grandparent of Y, goal | explanations >
   =>
-    < X is a parent of Z, Z is a parent of Y, hornBody | (X is a grandparent of Y) because (X is a parent of Z, Z is a parent of Y), explanations >
+    < X is a parent of Z, Z is a parent of Y, goal | explanations, (X is a grandparent of Y) because (X is a parent of Z and Z is a parent of Y) >
   [narrowing nonexec] .
 
-  --- vars hornBody' hornBody'' : HornBody .
+  --- vars goal' goal'' : Goal .
 
   --- crl [eval-and-explain] :
-  ---   < hornBody, hornBody' | explanations >
+  ---   < goal, goal' | explanations >
   --- =>
-  ---   < hornBody'', hornBody' | explanations >
-  --- if < hornBody > => < hornBody'' > .
+  ---   < goal'', goal' | explanations >
+  --- if < goal > => < goal'' > .
 
 endm
 
 vu-narrow
-  < p:Person is a grandparent of 'C, true | nil >
-=>*
+  < p1:Person is a grandparent of p2:Person >
+=>!
   < true | exps:Explanations > .

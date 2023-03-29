@@ -789,17 +789,151 @@ We then have the following transitions:
 
 \begin{gather*}
   \begin{prooftree}
-    \hypo{\text{if the (actor does action) event is allowed to occur}}
-    \infer1{C \longrightarrow \delta_\text{action}(\texttt{actor does action}, \, C)}
+    \hypo{\text{if the \texttt{actor does action} event is allowed to occur in the configuration } C}
+    \infer1[\text{action}]{C \overset{\texttt{actor does action}}{\longrightarrow} \delta_\text{action}(\texttt{actor does action}, \, C)}
   \end{prooftree}
   \\ \\
   \begin{prooftree}
-    \infer0{C \longrightarrow \delta_\text{tick}(C)}
+    \infer0[\text{tick}]{C \overset{\text{tick}}{\longrightarrow} \delta_\text{tick}(C)}
   \end{prooftree}
 \end{gather*}
 
 where $\delta_\text{action}$ and $\delta_\text{tick}$ are transition functions
-defined as:
+that compute the effect of action events and tick events on the current state
+of the contract.
+The use of the precondition for action transitions is to restrict actions so
+that we can only take that transition when there is an active rule mentioning it.
+
+More precisely, we say that an action event \texttt{actor does action} is allowed
+to occur in a configuration $C$ if either:
+
+\begin{itemize}
+  \item
+  There is a rule named $r$ with a deadline of the form
+  \texttt{WITHIN n DAY}
+  and $C$ contains an active rule instance of the form
+  $\pair{r}{m}$ where $m \leq n$.
+
+  \item
+  There is a rule named $r$ with a deadline of the form
+  \texttt{ON n DAY}
+  and $C$ contains an active rule instance of the form
+  $\pair{r}{0}$
+\end{itemize}
+
+The transition functions are defined via primitive recursion using the lattice
+meet $\wedge$, or in functional programming terms, a \texttt{foldMap}, viewing
+the meet operator as the binary operator of an (idempotent and commutative)
+monoid.
+
+% \info{
+%   Actually this is more like a traverse because the lattice structure
+%   implements a something like a Validation applicative, with breached states
+%   acting as failure states that short-circuit evaluation.
+% }
+
+\begin{align*}
+  & \delta_\text{action}(
+    \texttt{actor does action}, \,
+    \texttt{Fulfilled}
+  )
+  \\
+  = & \delta_\text{action}(
+    \texttt{actor does action}, \,
+    (\texttt{Active}, \, \emptyset)
+  )
+  \\
+  = & \texttt{Fulfilled}
+  \\
+  & \delta_\text{action}(
+    \texttt{actor does action}, \,
+    \pair{\texttt{Breached}}{A}
+  )
+  \\
+  = & \pair{\texttt{Breached}}{A}
+  \\
+  & \delta_\text{action}(
+    \texttt{actor does action}, \,
+    (
+      \texttt{Active}, \,
+      % \texttt{RULE ruleName PARTY actorName deontic actionName \_ n DAY HENCE \dots LEST \dots}
+      \{\pair{r}{t}\} \cup R
+    )
+  )
+  \\
+  = &
+  (
+    \texttt{Active}, \,
+    \text{hences}
+  )
+  \wedge
+  \delta_\text{action}(\texttt{actor does action}, \, \pair{\texttt{Active}}{R})
+  \\
+  & \text{if deontic}(r) \in \{\texttt{MUST}, \, \texttt{MAY}\}
+  \text{ and } \text{actor}(r) = \texttt{actor}
+  \text{ and } \text{action}(r) = \texttt{action}
+\end{align*}
+
+Here hences refers to all the \texttt{hence\_i} in the
+(\texttt{HENCE} hence\_1 \texttt{AND} \dots \texttt{AND} hence\_n)
+clause of the rule, along with their respective timers.
+Similarly, lests refers to those in the lest clause.
+
+\begin{align*}
+  & \delta_\text{action}(
+    \texttt{actor does action}, \,
+    (
+      \texttt{Active}, \,
+      % \texttt{RULE ruleName PARTY actorName deontic actionName \_ n DAY HENCE \dots LEST \dots}
+      \{\pair{r}{t}\} \cup R
+    )
+  )
+  \\
+  = &
+  (
+    \texttt{Breached}, \,
+    \{\texttt{actor}\}
+  )
+  \wedge
+  \delta_\text{action}(\texttt{actor does action}, \, \pair{\texttt{Active}}{R})
+  \\
+  & \text{if deontic}(r) = \texttt{SHANT} \text{ and lests} = \emptyset
+  \text{ and } \text{actor}(r) = \texttt{actor}
+  \text{ and } \text{action}(r) = \texttt{action}
+  \\
+  & \delta_\text{action}(
+    \texttt{actor does action}, \,
+    (
+      \texttt{Active}, \,
+      % \texttt{RULE ruleName PARTY actorName deontic actionName \_ n DAY HENCE \dots LEST \dots}
+      \{\pair{r}{t}\} \cup R
+    )
+  )
+  \\
+  = &
+  (
+    \texttt{Active}, \,
+    \text{lests}
+  )
+  \wedge
+  \delta_\text{action}(\texttt{actor does action}, \, \pair{\texttt{Active}}{R})
+  \\
+  & \text{if deontic}(r) = \texttt{SHANT} \text{ and lests} \neq \emptyset
+  \text{ and } \text{actor}(r) = \texttt{actor}
+  \text{ and } \text{action}(r) = \texttt{action}
+\end{align*}
+
+\info{
+  Fun fact:
+  This \texttt{foldMap} looking definition can be foramlized as
+  a \texttt{traverse} over an Either,
+  with $\texttt{Active} \cong \texttt{Right}$ and $\texttt{Breached} \cong \texttt{Left}$.
+  With this analogy, the absorption property of the lattice meet
+  ensures that lefts absorb rights, which in turn has the effect of
+  short-circuiting the \texttt{traverse} once a non-compensable rule is breached.
+}
+
+$\delta_\text{tick}$ is defined similarly.
 
 % We use $\smallstepstostar{S}{S'}$ to denote the reflexive, transitive closure
 
@@ -818,20 +952,114 @@ we have surveyed various approaches, using the simplified contract in
 \cite[Fig 1.]{contract_as_automaton} as an example.
 One of these which we explored is the Maude language and its associated tools.
 
-In this section, we begin by providing some background on Maude before
-we discuss our formalization of the simple loan agreement.
-Along the way, we explain how we addressed the aforementioned shortcomings.
-In particular, we show how we can generate an arguably more accurate DFA that
-accounts for the concurrent interleaving of real world events.
-Thereafter, we demonstrate how we can use Maude to help us
-visualize and reason about the contract.
+In this section, we discuss how we implement the above semantics in Maude in
+order to turn it into executable code.
+% Along the way, we explain how we addressed the aforementioned shortcomings.
+% In particular, we show how we can generate a DFA that
+% accounts for the concurrent interleaving of real world events.
+Thereafter, we demonstrate how we can use Maude to help generate a DFA
+representation of the state space of the contract and visualize it.
 
-\subsection{Background on Maude}
-Techniques originating from the field of formal methods have been devised to
-automatically analyze the behavior of computer systems.
-These often rely on first modelling these systems as
-\textit{labelled transition systems} (LTS), which can be seen as
-generalizations of nondeterministic finite automata).
+
+\inlinetodo{
+  Maybe elaborate more on Maude and talk about how Maude makes for a good
+  \textit{meta} language for designing and modelling DSLs
+
+  Discuss the relationship between Maude and the mathematical notation used
+  in defining operational semantics for programming languages.
+}
+
+Maude is a language grounded in rewriting logic, and in some ways resembles
+functional programming languages like Haskell.
+Programs in Maude are organized into modules, and we can define algebraic data
+types and equations that instruct the system on how to evaluate terms of these
+datatypes.
+
+For instance, we defined a sort for contract states, along with constructors
+for the various states:
+\begin{lstlisting}
+  sort ContractState .
+  op Active : Set{ActiveRule} -> ContractState .
+  op Breached : Set{ActorName} -> ContractState .
+  op Fulfilled : ContractState .
+\end{lstlisting}
+
+We can then define the signature for the lattice meet operator via:
+
+\begin{lstlisting}
+  op _^_ : ContractState ContractState -> ContractState
+    [assoc comm id: Fulfilled] .
+\end{lstlisting}
+
+using \texttt{assoc} and \texttt{comm} to indicate that this operator is
+associative and commutative.
+\texttt{id: Fulfilled} indicates that \texttt{Fulfilled}
+is to be treated as the identity element.
+
+The rest of the semantics of this operator is then specified using equations of
+the following form, with the comma \texttt{,} denoting set union.
+\begin{lstlisting}
+  eq Active empty = Fulfilled .
+
+  eq Active activeRules ^ Active activeRules'
+  = Active (activeRules, activeRules') .
+
+  --- Absorption properties.
+  eq Breached actorNames ^ Active activeRules]
+  = Breached actorNames .
+
+  eq Breached actorNames ^ Breached actorNames'
+  = Breached (actorNames, actorNames') .
+\end{lstlisting}
+
+With this, the transition functions $\delta_\text{action}$ and
+$\delta_\text{tick}$ are formalized with signature
+
+\begin{lstlisting}
+  op deltaAction : Set{Rule} ActionEvent ContractState -> ContractState .
+  op deltaTick : Set{Rule} ContractState -> ContractState .
+\end{lstlisting}
+
+and equations resembling those presented in the previous section.
+Note that these take an extra \texttt{Set$\{$Rule$\}$} parameter in our implementation,
+representing the set of all rules in the contract.
+
+Maude also allows us to define rewriting rules, which is what we used to encode
+the transition system semantics.
+In order to encode our transition rules of the form
+$\begin{prooftree}
+  \hypo{H_1 \dots H_n}
+  \infer1{C \overset{E}{\longrightarrow} C'} \end{prooftree}$
+in Maude, we first introduced a new datatype
+\texttt{Configuration} with constructor
+
+\begin{lstlisting}
+  op Config : ContractState Event -> Configuration .
+\end{lstlisting}
+
+and then encode the rules in the following form:
+\begin{lstlisting}
+  crl [action] :
+    Config contractState event
+  =>
+    Config
+      (deltaAction rules contractState (actor does action))
+      (actor does action)
+  if condition .
+
+  rl [tick] :
+    Config contractState event
+  =>
+    Config (deltaTick rules contractState) tick .
+\end{lstlisting}
+
+% \subsection{Background on Maude}
+% Techniques originating from the field of formal methods have been devised to
+% automatically analyze the behavior of computer systems.
+% These often rely on first modelling these systems as
+% \textit{labelled transition systems} (LTS), which can be seen as
+% generalizations of nondeterministic finite automata).
+
 % As with finite automata, LTSes can be seen as directed graphs, with nodes
 % representing states that the system can be in, and labelled edges denoting
 % transitions that change the state of a system.
@@ -840,36 +1068,25 @@ generalizations of nondeterministic finite automata).
 % between them.
 % They are also not required to come with a notion of initial and final states.
 
-While DFAs and LTSes in general are formalisms that are well suited for
-computers to analyze and reason about, they are cumbersome for humans to use
-to encode systems.
-This is especially so for systems like the simple loan agreement of
-\cite{contract_as_automaton} which involve concurrency, in that there are
-many possible ways in which events can be interleaved.
-Modelling concurrent systems like this directly as a transition system is
-often impractical as the interleaving of events gives rise to numerous states
-and transitions.
-Moreover, as previously discussed, they leave implicit many of the domain
-specific concepts that people directly reason about.
+% While DFAs and LTSes in general are formalisms that are well suited for
+% computers to analyze and reason about, they are cumbersome for humans to use
+% to encode systems.
+% This is especially so for systems like the simple loan agreement of
+% \cite{contract_as_automaton} which involve concurrency, in that there are
+% many possible ways in which events can be interleaved.
+% Modelling concurrent systems like this directly as a transition system is
+% often impractical as the interleaving of events gives rise to numerous states
+% and transitions.
+% Moreover, as previously discussed, they leave implicit many of the domain
+% specific concepts that people directly reason about.
 
-Maude is a language that allows us to model and analyze such concurrent systems.
-As with others like it, it comes equipped with a more sophisticated formalism
-that allow us to more conveniently specify these transition systems.
+% Maude is a language that allows us to model and analyze such concurrent systems.
+% As with others like it, it comes equipped with a more sophisticated formalism
+% that allow us to more conveniently specify these transition systems.
 
-\inlinetodo{
-  Introduce Maude syntax and give some examples of how it works.
+% \subsection{Implementing the operational semantics in Maude}
 
-  Talk about how Maude makes for a good \textit{meta} language for designing
-  and modelling DSLs
-
-  Discuss the relationship between Maude and the mathematical notation used
-  in defining operational semantics for programming languages.
-}
-
-
-\subsection{Implementing the operational semantics in Maude}
-
-\subsection{Visualizing and simulating the contract}
+\subsection{Executing and visualizing the loan agreement}
 Insert DFA of state space here.
 
 % \subsection{Analyzing via model checking}
@@ -888,16 +1105,32 @@ Insert DFA of state space here.
 % \section{Related work}
 
 \section{Limitations and future work}
+\inlinetodo{
+  Shift this discussion of time the previous section on visualizing the DFA
+  representation when that's ready.
+}
 The current Maude models are not very performant and have huge state spaces.
-One of the main reasons is that we model time naively, with a \texttt{tick}
-transition denoting the passage of 1 unit of time (which can be taken to be
-1 day, 1 month etc).
-We did this because Maude does not come with any built-in support for these notions,
-so we wanted an easy way to model these.
+One of the main reasons is that for simplicity, we chose a naive approach in
+which configurations in our state space keep track of timers that count down
+one day at a time as \texttt{tick} transitions occur.
+This means that an active rule instance arising from a rule with a large deadline
+like 365 days, can attain any value from 0 to 365 during the execution of the
+contract.
+Thus, the introduction of such a rule increases the number of possible states
+by at least 366, growing exponentially with the number of rules and possible
+timer values in the contract.
+
+\inlinetodo{
+  Mention that various shortcomings have already been mentioned along the
+  way in the previous sections and summarize them quickly, before listing a
+  few more general ones here.
+}
+
 Unfortunately, this considerably bloats up the state space.
 Again it must be emphasized that this is a proof of concept and these were
 designed to be as high-level and close to the syntax of L4 as possible.
 In the future, we intend to optimize this, among other things.
+
 % We could investigate the use of other formalisms that better support modeling
 % time and deadlines, or we could build our own abstractions to handle these more
 % efficiently in Maude.
@@ -910,6 +1143,23 @@ the borrower.
 Maude as a formalism supports these, but we currently do not support them in L4.
 For future work, we would like to provide syntax for these in L4 and translate
 them to Maude.
+
+Perhaps the biggest downside is that while we have primarily focused our efforts
+on the moving parts of a contract, ie regulative rules, we have yet to consider
+static decision logic, ie constitutive rules.
+What we would like to do is to allow users to define constitutive rules
+and use them as ``if conditions'' in regulative rules, so that they can
+write rules of the form:
+
+\begin{lstlisting}
+  RULE ruleName
+  PARTY actor
+  IF condition
+  MUST DO action
+  WITHIN n DAY
+\end{lstlisting}
+
+where the rule is only triggered if \texttt{condition} holds.
 
 \section{Conclusions}
 

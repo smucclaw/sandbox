@@ -307,7 +307,7 @@ in all-caps:
   RULE rule name
   PARTY actor
   deontic
-  [ deadline ]
+  deadline
   [ DO ] action
   [ HENCE hence_0 AND ... AND hence_n ]
   [ LEST lest_0 AND ... AND lest_n ]
@@ -351,6 +351,8 @@ domain concepts that we have identified:
 
   Note that we currently do not support weeks, months, years as well as fixed
   dates, though we intend to add support for these in the future.
+  Also, all rule are currently required to include a deadline.
+  We intend to relax this in the future.
 
   \item \texttt{hence\_i} (resp \texttt{lest\_i})
 
@@ -359,8 +361,10 @@ domain concepts that we have identified:
   We identify the fulfillment of an obligation with whether the actor performed
   the prescribed action within the deadline, and violation is identified with
   the deadline passing before the actor performs the action.
+
   Fulfillment and violation for prohibitions are defined symmetrically.
-  \todo{Looks a bit terse, break it up and explain more}
+
+  % \todo{Looks a bit terse, break it up and explain more}
   % With this, one can encode \textit{contrary-to-duty} rules as
   % \texttt{lest\_i} rules that appear in the \texttt{LEST} clause, as these come
   % into effect on violation of an obligation/prohibition.
@@ -369,6 +373,33 @@ domain concepts that we have identified:
   permission is exercised, and the \texttt{lest\_i} are triggered when it
   is not exercised by the deadline. 
 \end{itemize}
+
+For instance, consider an obligation of the form
+\begin{lstlisting}
+    RULE rule
+    PARTY actor
+    MUST DO action
+    WITHIN 3 DAY
+    HENCE hence
+    LEST lest0 AND lest1
+\end{lstlisting}
+
+% The idea is that when such a rule is triggered, we start a timer to keep track
+% of its deadline.
+% For the above rule, we start a timer which begins counting down 1 day at a time,
+% from 3 days.
+If \texttt{actor} performs \texttt{action} on days 0, 1 or 2, we deem the
+obligation to have been fulfilled, and the timer is stopped.
+In this case, the rule named \texttt{hence} now takes effect and a new timer
+begins.
+If instead, 3 days pass without the actor performing the action, we deem the
+rule to have been violated.
+Now, the two rules, \texttt{lest0} and \texttt{lest1}, in the
+\texttt{LEST} clause are triggered.
+
+% Note that when rules with missing deadlines are triggered, they are treated as
+% having a timer with an infinite value, which means that obligations with no
+% deadline can never be violated.
 
 % Regulative rules on the other hand, concern norms in a legal text, and are
 % traditionally expressed in normative language, utilizing deontic operators
@@ -446,7 +477,8 @@ domain concepts that we have identified:
   https://docs.google.com/spreadsheets/d/1_k17mzk2hTyPY2egbEVqXzr8uYAdi6BVqeMYdBxKB_I/edit#gid=864296175
 }{Add link})
 
-Note that our encoding of the loan agreement is an approximation of the
+It should be mentioned that our encoding of the loan agreement is an
+approximation of the
 one in the original paper \cite{contract_as_automaton} as we currently lack
 certain features like fixed dates, which are used as deadlines in the original
 contract.
@@ -602,6 +634,19 @@ complications and hence decided to leave this for future work.
   This section and the others after it are still heavily in progress.
 }
 
+% Informally, the runtime state of a contract is either:
+% \begin{enumerate}
+%   \item
+%   a set of rules that are active, along with their associated deadlines, which
+%   we keep track of in the form of a timer that starts counting down one day at
+%   a time, once the rule is triggered
+
+%   Note that we say that the contract is fulfilled if this set is empty, ie if
+%   there are no more active rules.
+
+%   \item
+% \end{enumerate}
+
 In order to operationalize contracts for execution, we begin by formalizing a
 semantics for regulative rules in L4 using the framework of Structural
 Operational Semantics (SOS) \todo{Cite Plotkin}
@@ -609,7 +654,7 @@ originating from the field of programming language theory.
 
 SOS is a mathematical framework which allows one to describe
 transition systems in terms of states, called configurations, and transition
-rules describing how one state can transition to another.
+rules that describe how one state can transition to another.
 These rules are expressed as logical inference rules of the form:
 
 \begin{align*}
@@ -627,10 +672,134 @@ With this, the above transition rule is then read as saying that given a
 configuration $S$, if all the hypotheses $H_i$ hold, then the event $E$ is
 allowed to occur, and $S$ is allowed to transition to $S'$ when it does.
 
-In the context of L4, our configurations are pairs of active rules and timers,
-to help us keep track of which rules are in effect, and their deadlines.
-Following timed transition systems \todo{Cite}, we define two kinds of events,
-namely action events and tick events.
+% \begin{lstlisting}
+%     RULE rule
+%     PARTY actor
+%     MUST DO action
+%     WITHIN 3 DAY
+%     HENCE hence
+%     LEST lest0 AND lest1
+% \end{lstlisting}
+
+% In the context of L4, the state of a configuration is either:
+% \begin{enumerate}
+%   \item Fulfilled 
+% \end{enumerate}
+
+Our configurations and transitions are parameterized over
+a set of rules, called \texttt{Rule}.
+Our semantics bears resemblance to that of timed arc petri nets (TAPNs), which
+are based on timed transition systems \todo{Cite}.
+As with markings in TAPNs, configurations in our semantics help us keep
+track of active rules and their respective deadlines via timers that count down
+when a rule is triggered and becomes active.
+
+The key difference is that we also allow for configurations to also be failure
+states, which we call \textit{breach states}.
+These breach states indicate the actors who breached the contract and are final
+in that they have no outgoing transitions.
+
+% configurations, ie runtime states, keep track of active rules and
+% their respective deadlines via timers that count down when a rule is triggered
+% and becomes active.
+
+% The notion of state in our system is similar to that of TAPNs, with
+
+To formalize this, we first define an \textit{active rule instance} to be a
+pair of the form $\pair{r}{t}$ where $r \in \texttt{RuleName}$ is a rule name
+and $t \in \N$ is the corresponding timer value of the rule.
+With this, a configuration $C$ is a pair that is either:
+
+\begin{enumerate}
+  \item
+  $\pair{\texttt{Active}}{R}$
+  
+  where $\texttt{Active}$ is used to indicate that the contract is still active
+  (ie not breached) and
+  $R \subseteq \texttt{RuleName} \times \N$
+  is a set of active rule instances.
+
+  We view a contract to be fulfilled if there are no active rule instances
+  remaining, and so we define
+  $\texttt{Fulfilled} = \pair{\texttt{Active}}{\emptyset}$.
+
+  Note that rules can be viewed as places in a TAPN, so that such a set of
+  active rule instances can then be seen as a marking, with each one being a
+  timed token with value $t$ on the place $r$.
+
+  % For simplicity and to restrict the size of our state space, we don't allow
+  % multiple instances of the same rule to be active at the same time, so that
+  % when we
+
+  % This is similar to the notion of \textit{markings} in TAPNs, with rules
+  % corresponding to places, so that a active rule instance can be seen as a
+  % marking
+
+  % rule instance functioning like a timed token 
+
+  \item
+  $\pair{\texttt{Breached}}{A}$
+
+  is a breach state where \texttt{Breached} indicates that the contract has
+  been breached, and $A \subseteq \texttt{Actor}$ identifies the actors who
+  breached it.
+\end{enumerate}
+
+Next, we equip configurations with the lattice obtained from the partial order
+given by:
+        % Breached actors ⊑ contractState
+        % Breached actors ⊑ Active activeRules
+        % contractState ⊑ Fulfilled (= Active empty)
+\begin{align*}
+    \pair{\texttt{Breached}}{A} & \leq
+    \pair{\texttt{Breached}}{A'}
+    & \text{if} \quad A' \subseteq A
+    \\
+    \pair{\texttt{Active}}{R} & \leq
+    \pair{\texttt{Active}}{R'}
+    & \text{if} \quad R' \subseteq R
+    \\ 
+    \pair{\texttt{Breached}}{A} & \leq
+    \pair{\texttt{Active}}{R}
+\end{align*}
+
+so that we have:
+\begin{align*}
+  \bot & = \pair{\texttt{Breached}}{\texttt{Actor}}
+  \\
+  \top & = \texttt{Fulfilled} \,\,  (= \pair{\texttt{Active}}{\emptyset})
+\end{align*}
+
+In particular, the lattice meet $\wedge$ is crucial for our semantics as we will
+explain later.
+This operator allows us to combine configurations by taking the union of the
+corresponding sets of actors (resp active rule instances) if both
+configurations are breached (resp active).
+Note that breach states absorb active states.
+
+\inlinetodo{
+  Probably best to shift this part on the transition rules up to the top
+  and then define $\delta_\text{action}$ and $\delta_\text{tick}$ properly
+  here.
+}
+Following timed transition systems, we define 2 kinds of events, namely action
+events of the form \texttt{actor does action} and discrete tick events
+indicating the passage of a day.
+We then have the following transitions:
+
+\begin{gather*}
+  \begin{prooftree}
+    \hypo{\text{if the (actor does action) event is allowed to occur}}
+    \infer1{C \longrightarrow \delta_\text{action}(\texttt{actor does action}, \, C)}
+  \end{prooftree}
+  \\ \\
+  \begin{prooftree}
+    \infer0{C \longrightarrow \delta_\text{tick}(C)}
+  \end{prooftree}
+\end{gather*}
+
+where $\delta_\text{action}$ and $\delta_\text{tick}$ are transition functions
+defined as:
 
 % We use $\smallstepstostar{S}{S'}$ to denote the reflexive, transitive closure
 

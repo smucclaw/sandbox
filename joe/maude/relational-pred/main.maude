@@ -61,11 +61,11 @@ fmod MAIN is
   --- if
 endfm
 
-set trace on .
+--- set trace on .
 
-reduce
-  Is it correct to say that the length of (the concatenation of "a" and "b") is
-  less than or equal to the amount by which 0 exceeds 2 ? .
+reduce eg0 .
+  --- Is it correct to say that the length of (the concatenation of "a" and "b") is
+  --- less than or equal to the amount by which 0 exceeds 2 ? .
 
 --- reduce Is it false that 1 is less than 1 ? .
 

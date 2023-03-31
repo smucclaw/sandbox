@@ -1,0 +1,83 @@
+sload syntax/rule
+
+fmod PETRI is
+  pr SET{Rule} .
+  pr QID .
+
+  sorts Place Trans DoneOrNot .
+
+  op done : -> DoneOrNot .
+  op not done : -> DoneOrNot . 
+
+  subsort Rule < Place .
+
+  op `( _ `) : Qid -> Place [ctor] .
+  op [ _ ] : DoneOrNot -> Trans [ctor] .
+
+  sorts Arrow PPath TPath Path .
+  subsort Place < PPath < Path .
+  subsort Trans < TPath < Path .
+
+  op -> : -> Arrow [ctor] .
+
+  op _ _ _ : Place Arrow TPath -> PPath .
+  op _ _ _ : Trans Arrow PPath -> TPath .
+
+  sort PetriNet .
+  subsort Path < PetriNet .
+  subsort Set{Rule} < PetriNet .
+
+  op _ , _ : PetriNet PetriNet -> PetriNet [ditto] .
+
+  vars ruleName actorName actionName hence lest : Qid .
+  var deontic : Deontic .
+  var deadline : Deadline .
+  vars hences lests : Set{Qid} .
+
+  ceq
+    RULE ruleName
+    PARTY actorName
+    deontic actionName
+    deadline
+    HENCE hence
+    LEST lest
+  = (
+      RULE ruleName
+      PARTY actorName
+      deontic actionName deadline
+      HENCE empty LEST empty
+    )
+    -> [done] -> (hence),
+    (
+      RULE ruleName
+      PARTY actorName
+      deontic actionName deadline
+      HENCE empty LEST empty
+    )
+    -> [not done] -> (lest)
+  if deontic == MUST or deontic == MAY .
+
+  eq
+    RULE ruleName
+    PARTY actorName
+    SHANT actionName
+    deadline
+    HENCE hence
+    LEST lest
+  = (
+      RULE ruleName
+      PARTY actorName
+      SHANT actionName deadline
+      HENCE empty LEST empty
+    ) -> [done] -> (lest),
+    (
+      RULE ruleName
+      PARTY actorName
+      SHANT actionName deadline
+      HENCE empty LEST empty
+    ) -> [not done] -> (hence) .
+
+endfm
+
+red
+  RULE 'rule PARTY 'actor MAY 'action HENCE 'hence LEST 'lest .

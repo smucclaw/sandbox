@@ -765,12 +765,27 @@ given by:
 
 so that we have:
 \begin{align*}
-  \bot & = \pair{\texttt{Breached}}{\texttt{Actor}}
+  % \bot & = \pair{\texttt{Breached}}{\texttt{Actor}}
+  % \\
+  % \top & = \texttt{Fulfilled} \,\,  (= \pair{\texttt{Active}}{\emptyset})
+  % \\
+  \pair{\texttt{Breached}}{A}
+  \wedge
+  \pair{\texttt{Breached}}{A'}
+  & = \pair{\texttt{Breached}}{{A \cup A'}}
   \\
-  \top & = \texttt{Fulfilled} \,\,  (= \pair{\texttt{Active}}{\emptyset})
+  \pair{\texttt{Breached}}{A}
+  \wedge
+  \pair{\texttt{Active}}{R}
+  & = \pair{\texttt{Breached}}{A}
+  \\
+  \pair{\texttt{Active}}{R}
+  \wedge
+  \pair{\texttt{Active}}{R'}
+  & = \pair{\texttt{Active}}{R \cup R'}
 \end{align*}
 
-In particular, the lattice meet $\wedge$ is crucial for our semantics as we will
+Note that the lattice meet $\wedge$ is crucial for our semantics as we will
 explain later.
 This operator allows us to combine configurations by taking the union of the
 corresponding sets of actors (resp active rule instances) if both

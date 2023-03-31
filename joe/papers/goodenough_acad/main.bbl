@@ -2,26 +2,22 @@
 
 \bibitem{real_time_contract_automata}
 {\sc Chircop, S., Pace, G., and Schneider, G.}
-\newblock {\em An Automata-Based Formalism for Normative Documents with
-  Real-Time}.
+\newblock {\em An Automata-Based Formalism for Normative Documents with Real-Time}.
 \newblock 12 2022.
 
 \bibitem{contract_as_automaton}
 {\sc Flood, M.~D., and Goodenough, O.~R.}
-\newblock Contract as automaton: representing a simple financial agreement in
-  computational form.
+\newblock Contract as automaton: representing a simple financial agreement in computational form.
 \newblock {\em Artificial Intelligence and Law\/} (Oct 2021).
 
 \bibitem{normative_compliance_guido}
 {\sc Hashmi, M., Governatori, G., and Wynn, M.}
-\newblock Normative requirements for regulatory compliance: An abstract formal
-  framework.
+\newblock Normative requirements for regulatory compliance: An abstract formal framework.
 \newblock {\em Information Systems Frontiers 18\/} (05 2015).
 
 \bibitem{normative_diags_diogo}
 {\sc Sasdelli, D.}
 \newblock Normative diagrams.
-\newblock In {\em Proceedings of the International Workshop on AI Compliance
-  Mechanism (WAICOM 2022)\/} (12 2022), pp.~39--49.
+\newblock In {\em Proceedings of the International Workshop on AI Compliance Mechanism (WAICOM 2022)\/} (12 2022), pp.~39--49.
 
 \end{thebibliography}

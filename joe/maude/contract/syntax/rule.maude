@@ -159,6 +159,10 @@ fmod RULE is
   = PARTY actorName deontic actionName WITHIN INF DAY
   if deontic == MAY or deontic == SHANT .
 
+  sort Comment .
+  subsort Comment < Rule .
+  op // _ : String -> Comment .
+
   --- eq
   ---   RULE ruleName
   ---   PARTY actorName

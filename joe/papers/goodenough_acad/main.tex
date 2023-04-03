@@ -662,15 +662,15 @@ These rules are expressed as logical inference rules of the form:
     \hypo{H_1}
     \hypo{\dots}
     \hypo{H_n}
-    \infer3{\smallstepsto{S}{E}{S'}}
+    \infer3{\smallstepsto{C}{E}{C'}}
   \end{prooftree}
 \end{align*}
 
-Here $\smallstepsto{S}{E}{S'}$ is known as a judgement form which expresses that
-the configuration $S$ evaluates to $S'$ when an event $E$ occurs.
+Here $\smallstepsto{C}{E}{C'}$ is known as a judgement form which expresses that
+the configuration $C$ evaluates to $C'$ when an event $E$ occurs.
 With this, the above transition rule is then read as saying that given a
-configuration $S$, if all the hypotheses $H_i$ hold, then the event $E$ is
-allowed to occur, and $S$ is allowed to transition to $S'$ when it does.
+configuration $C$, if all the hypotheses $H_i$ hold, then the event $E$ is
+allowed to occur, and $C$ is allowed to transition to $C'$ when it does.
 
 % \begin{lstlisting}
 %     RULE rule
@@ -688,8 +688,47 @@ allowed to occur, and $S$ is allowed to transition to $S'$ when it does.
 
 Our configurations and transitions are parameterized over
 a set of rules, called \texttt{Rule}.
-Our semantics bears resemblance to that of timed arc petri nets (TAPNs), which
-are based on timed transition systems \todo{Cite}.
+Following timed transition systems, we define 2 kinds of events, namely action
+events of the form \texttt{actor does action} and discrete tick events
+indicating the passage of a day.
+We then have the following transitions:
+
+\begin{gather*}
+  \begin{prooftree}
+    \hypo{\text{if the \texttt{actor does action} event is allowed to occur in the configuration } C}
+    \infer1[\text{action}]{C \overset{\texttt{actor does action}}{\longrightarrow} \delta_\text{action}(\texttt{actor does action}, \, C)}
+  \end{prooftree}
+  \\ \\
+  \begin{prooftree}
+    \infer0[\text{tick}]{C \overset{\text{tick}}{\longrightarrow} \delta_\text{tick}(C)}
+  \end{prooftree}
+\end{gather*}
+
+where $\delta_\text{action}$ and $\delta_\text{tick}$ are transition functions
+that compute the effect of action events and tick events on the current state
+of the contract.
+The use of the precondition for action transitions is to restrict actions so
+that we can only take that transition when there is an active rule mentioning it.
+
+More precisely, we say that an action event \texttt{actor does action} is allowed
+to occur in a configuration $C$ if either:
+
+\begin{itemize}
+  \item
+  There is a rule named $r$ with a deadline of the form
+  \texttt{WITHIN n DAY}
+  and $C$ contains an active rule instance of the form
+  $\pair{r}{m}$ where $m \leq n$.
+
+  \item
+  There is a rule named $r$ with a deadline of the form
+  \texttt{ON n DAY}
+  and $C$ contains an active rule instance of the form
+  $\pair{r}{0}$
+\end{itemize}
+
+Configurations $C$ bear resemblance to markings in timed arc petri nets
+(TAPNs), which are based on timed transition systems \todo{Cite}.
 As with markings in TAPNs, configurations in our semantics help us keep
 track of active rules and their respective deadlines via timers that count down
 when a rule is triggered and becomes active.
@@ -785,67 +824,53 @@ so that we have:
   & = \pair{\texttt{Active}}{R \cup R'}
 \end{align*}
 
-Note that the lattice meet $\wedge$ is crucial for our semantics as we will
-explain later.
+\inlinetodo{
+  Maybe mention the similarities between this lattice structure and the one used
+  in Hvitved's PHD thesis for blame assignment.
+}
+
+% Note that the lattice meet $\wedge$ is crucial for our semantics as we will
+% explain later.
 This operator allows us to combine configurations by taking the union of the
 corresponding sets of actors (resp active rule instances) if both
 configurations are breached (resp active).
 Note that breach states absorb active states.
 
-\inlinetodo{
-  Probably best to shift this part on the transition rules up to the top
-  and then define $\delta_\text{action}$ and $\delta_\text{tick}$ properly
-  here.
-}
-Following timed transition systems, we define 2 kinds of events, namely action
-events of the form \texttt{actor does action} and discrete tick events
-indicating the passage of a day.
-We then have the following transitions:
+% Following timed transition systems, we define 2 kinds of events, namely action
+% events of the form \texttt{actor does action} and discrete tick events
+% indicating the passage of a day.
+% We then have the following transitions:
 
-\begin{gather*}
-  \begin{prooftree}
-    \hypo{\text{if the \texttt{actor does action} event is allowed to occur in the configuration } C}
-    \infer1[\text{action}]{C \overset{\texttt{actor does action}}{\longrightarrow} \delta_\text{action}(\texttt{actor does action}, \, C)}
-  \end{prooftree}
-  \\ \\
-  \begin{prooftree}
-    \infer0[\text{tick}]{C \overset{\text{tick}}{\longrightarrow} \delta_\text{tick}(C)}
-  \end{prooftree}
-\end{gather*}
+% \begin{gather*}
+%   \begin{prooftree}
+%     \hypo{\text{if the \texttt{actor does action} event is allowed to occur in the configuration } C}
+%     \infer1[\text{action}]{C \overset{\texttt{actor does action}}{\longrightarrow} \delta_\text{action}(\texttt{actor does action}, \, C)}
+%   \end{prooftree}
+%   \\ \\
+%   \begin{prooftree}
+%     \infer0[\text{tick}]{C \overset{\text{tick}}{\longrightarrow} \delta_\text{tick}(C)}
+%   \end{prooftree}
+% \end{gather*}
 
-where $\delta_\text{action}$ and $\delta_\text{tick}$ are transition functions
-that compute the effect of action events and tick events on the current state
-of the contract.
-The use of the precondition for action transitions is to restrict actions so
-that we can only take that transition when there is an active rule mentioning it.
+% where $\delta_\text{action}$ and $\delta_\text{tick}$ are transition functions
+% that compute the effect of action events and tick events on the current state
+% of the contract.
+% The use of the precondition for action transitions is to restrict actions so
+% that we can only take that transition when there is an active rule mentioning it.
 
-More precisely, we say that an action event \texttt{actor does action} is allowed
-to occur in a configuration $C$ if either:
 
-\begin{itemize}
-  \item
-  There is a rule named $r$ with a deadline of the form
-  \texttt{WITHIN n DAY}
-  and $C$ contains an active rule instance of the form
-  $\pair{r}{m}$ where $m \leq n$.
-
-  \item
-  There is a rule named $r$ with a deadline of the form
-  \texttt{ON n DAY}
-  and $C$ contains an active rule instance of the form
-  $\pair{r}{0}$
-\end{itemize}
-
-The transition functions are defined via primitive recursion using the lattice
-meet $\wedge$, or in functional programming terms, a \texttt{foldMap}, viewing
-the meet operator as the binary operator of an (idempotent and commutative)
-monoid.
+% The transition functions are defined via primitive recursion using the lattice
+% meet $\wedge$, or in functional programming terms, a \texttt{foldMap}, viewing
+% the meet operator as the binary operator of an (idempotent and commutative)
+% monoid.
 
 % \info{
 %   Actually this is more like a traverse because the lattice structure
 %   implements a something like a Validation applicative, with breached states
 %   acting as failure states that short-circuit evaluation.
 % }
+
+We then define the transition functions as follows:
 
 \begin{align*}
   & \delta_\text{action}(
@@ -938,15 +963,15 @@ Similarly, lests refers to those in the lest clause.
   \text{ and } \text{action}(r) = \texttt{action}
 \end{align*}
 
-\info{
-  Fun fact:
-  This \texttt{foldMap} looking definition can be foramlized as
-  a \texttt{traverse} over an Either,
-  with $\texttt{Active} \cong \texttt{Right}$ and $\texttt{Breached} \cong \texttt{Left}$.
-  With this analogy, the absorption property of the lattice meet
-  ensures that lefts absorb rights, which in turn has the effect of
-  short-circuiting the \texttt{traverse} once a non-compensable rule is breached.
-}
+% \info{
+%   Fun fact:
+%   This \texttt{foldMap} looking definition can be foramlized as
+%   a \texttt{traverse} over an Either,
+%   with $\texttt{Active} \cong \texttt{Right}$ and $\texttt{Breached} \cong \texttt{Left}$.
+%   With this analogy, the absorption property of the lattice meet
+%   ensures that lefts absorb rights, which in turn has the effect of
+%   short-circuiting the \texttt{traverse} once a non-compensable rule is breached.
+% }
 
 $\delta_\text{tick}$ is defined similarly.
 
@@ -1046,7 +1071,7 @@ $\begin{prooftree}
   \hypo{H_1 \dots H_n}
   \infer1{C \overset{E}{\longrightarrow} C'} \end{prooftree}$
 in Maude, we first introduced a new datatype
-\texttt{Configuration} with constructor
+\texttt{Configuration} with constructor:
 
 \begin{lstlisting}
   op Config : ContractState Event -> Configuration .

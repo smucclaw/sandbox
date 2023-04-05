@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Arch Linux) (preloaded format=pdflatex 2023.4.4)  4 APR 2023 10:54
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Arch Linux) (preloaded format=pdflatex 2023.4.3)  5 APR 2023 18:37
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -677,24 +677,24 @@ File: pgflibraryarrows.code.tex 2023-01-15 v3.1.10 (3.1.10)
 ))) (./main.aux)
 \openout1 = `main.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 11.
-LaTeX Font Info:    ... okay on input line 11.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 11.
-LaTeX Font Info:    ... okay on input line 11.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 11.
-LaTeX Font Info:    ... okay on input line 11.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 11.
-LaTeX Font Info:    ... okay on input line 11.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 11.
-LaTeX Font Info:    ... okay on input line 11.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 11.
-LaTeX Font Info:    ... okay on input line 11.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 11.
-LaTeX Font Info:    ... okay on input line 11.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 11.
-LaTeX Font Info:    ... okay on input line 11.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 11.
-LaTeX Font Info:    ... okay on input line 11.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 15.
+LaTeX Font Info:    ... okay on input line 15.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 15.
+LaTeX Font Info:    ... okay on input line 15.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 15.
+LaTeX Font Info:    ... okay on input line 15.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 15.
+LaTeX Font Info:    ... okay on input line 15.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 15.
+LaTeX Font Info:    ... okay on input line 15.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 15.
+LaTeX Font Info:    ... okay on input line 15.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 15.
+LaTeX Font Info:    ... okay on input line 15.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 15.
+LaTeX Font Info:    ... okay on input line 15.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 15.
+LaTeX Font Info:    ... okay on input line 15.
  (/usr/share/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 \scratchcounter=\count326
@@ -714,31 +714,31 @@ Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 48
  (/usr/share/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
 File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Live
 ))
-Package hyperref Info: Link coloring OFF on input line 11.
+Package hyperref Info: Link coloring OFF on input line 15.
  (./main.out) (./main.out)
 \@outlinefile=\write5
 \openout5 = `main.out'.
 
 \c@lstlisting=\count332
-LaTeX Font Info:    Trying to load font information for U+msa on input line 15.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 19.
  (/usr/share/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 15.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 19.
  (/usr/share/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
-LaTeX Font Info:    Trying to load font information for U+stmry on input line 15.
+LaTeX Font Info:    Trying to load font information for U+stmry on input line 19.
  (/usr/share/texmf-dist/tex/latex/stmaryrd/Ustmry.fd)
-LaTeX Font Info:    Trying to load font information for U+rsfs on input line 15.
+LaTeX Font Info:    Trying to load font information for U+rsfs on input line 19.
  (/usr/share/texmf-dist/tex/latex/jknapltx/ursfs.fd
 File: ursfs.fd 1998/03/24 rsfs font definition file (jk)
 )
-LaTeX Font Info:    Trying to load font information for U+esvect on input line 15.
+LaTeX Font Info:    Trying to load font information for U+esvect on input line 19.
  (/usr/share/texmf-dist/tex/latex/esvect/uesvect.fd
 File: uesvect.fd 
 )
-Package hyperref Info: bookmark level for unknown todo defaults to 0 on input line 18.
+Package hyperref Info: bookmark level for unknown todo defaults to 0 on input line 22.
  (./main.toc)
 \tf@toc=\write6
 \openout6 = `main.toc'.
@@ -760,37 +760,106 @@ LaTeX Warning: Marginpar on page 4 moved.
 LaTeX Warning: Marginpar on page 4 moved.
 
 [4] [5] [6] [7]
-Overfull \hbox (14.1677pt too wide) detected at line 705
+Overfull \hbox (14.1677pt too wide) detected at line 709
 []
  []
 
 [8] [9]
-Overfull \hbox (19.61736pt too wide) detected at line 964
+Overfull \hbox (19.61736pt too wide) detected at line 996
 []
  []
 
-[10]
-Overfull \hbox (68.90875pt too wide) in paragraph at lines 1059--1060
+[10] [11]
+Overfull \hbox (68.90875pt too wide) in paragraph at lines 1094--1095
 [][][][][][][][][][][][][][][][][][][][][][][][] 
  []
 
-[11] [12] [13] (./main.bbl) [14] (./main.aux)
+[12]
+<./images//visualization/overview.png, id=254, 1088.26575pt x 442.65375pt>
+File: ./images//visualization/overview.png Graphic file (type png)
+<use ./images//visualization/overview.png>
+Package pdftex.def Info: ./images//visualization/overview.png  used on input line 1177.
+(pdftex.def)             Requested size: 457.0685pt x 185.9133pt.
+
+Overfull \hbox (127.0685pt too wide) in paragraph at lines 1177--1178
+[][] 
+ []
+
+<./images//visualization/zoom_start_of_contract.png, id=256, 490.83376pt x 325.215pt>
+File: ./images//visualization/zoom_start_of_contract.png Graphic file (type png)
+<use ./images//visualization/zoom_start_of_contract.png>
+Package pdftex.def Info: ./images//visualization/zoom_start_of_contract.png  used on input line 1198.
+(pdftex.def)             Requested size: 245.41628pt x 162.6071pt.
+[13 <./images//visualization/overview.png>]
+<./images//visualization/initial_state.png, id=265, 638.98724pt x 95.1555pt>
+File: ./images//visualization/initial_state.png Graphic file (type png)
+<use ./images//visualization/initial_state.png>
+Package pdftex.def Info: ./images//visualization/initial_state.png  used on input line 1205.
+(pdftex.def)             Requested size: 319.49284pt x 47.57762pt.
+<./images//visualization/initial_state_1_day_passes.png, id=266, 961.79324pt x 284.262pt>
+File: ./images//visualization/initial_state_1_day_passes.png Graphic file (type png)
+<use ./images//visualization/initial_state_1_day_passes.png>
+Package pdftex.def Info: ./images//visualization/initial_state_1_day_passes.png  used on input line 1222.
+(pdftex.def)             Requested size: 384.71048pt x 113.70277pt.
+
+Overfull \hbox (54.71048pt too wide) in paragraph at lines 1222--1223
+[][] 
+ []
+
+<./images//visualization/fulfilled_state.png, id=267, 324.0105pt x 136.71075pt>
+File: ./images//visualization/fulfilled_state.png Graphic file (type png)
+<use ./images//visualization/fulfilled_state.png>
+Package pdftex.def Info: ./images//visualization/fulfilled_state.png  used on input line 1230.
+(pdftex.def)             Requested size: 129.6019pt x 54.68332pt.
+[14 <./images//visualization/zoom_start_of_contract.png> <./images//visualization/initial_state.png> <./images//visualization/initial_state_1_day_passes.png>]
+<./images//visualization/state_lender_must_remit_principal.png, id=275, 881.09175pt x 169.23225pt>
+File: ./images//visualization/state_lender_must_remit_principal.png Graphic file (type png)
+<use ./images//visualization/state_lender_must_remit_principal.png>
+Package pdftex.def Info: ./images//visualization/state_lender_must_remit_principal.png  used on input line 1238.
+(pdftex.def)             Requested size: 352.43045pt x 67.6917pt.
+
+Overfull \hbox (22.43045pt too wide) in paragraph at lines 1238--1239
+[][] 
+ []
+
+<./images//visualization/state_lender_breach.png, id=276, 246.9225pt x 118.64325pt>
+File: ./images//visualization/state_lender_breach.png Graphic file (type png)
+<use ./images//visualization/state_lender_breach.png>
+Package pdftex.def Info: ./images//visualization/state_lender_breach.png  used on input line 1244.
+(pdftex.def)             Requested size: 98.76724pt x 47.45645pt.
+<./images//visualization/state_after_sending_principal.png, id=277, 1130.42325pt x 213.79875pt>
+File: ./images//visualization/state_after_sending_principal.png Graphic file (type png)
+<use ./images//visualization/state_after_sending_principal.png>
+Package pdftex.def Info: ./images//visualization/state_after_sending_principal.png  used on input line 1253.
+(pdftex.def)             Requested size: 452.1613pt x 85.51797pt.
+
+Overfull \hbox (122.1613pt too wide) in paragraph at lines 1253--1254
+[][] 
+ []
+
+[15 <./images//visualization/fulfilled_state.png> <./images//visualization/state_lender_must_remit_principal.png> <./images//visualization/state_lender_breach.png> <./images//visualization/state_after_sending_principal.png>] [16] (./main.bbl) [17] (./main.aux)
 Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: D2D9BA47DCD544E9516070572115BD7A;1855.
+(rerunfilecheck)             Checksum: AC827BC0A4EF3C4FD2BD1AD09AFAFD56;1833.
  ) 
 Here is how much of TeX's memory you used:
- 28984 strings out of 476025
- 552515 string characters out of 5796533
- 1897388 words of memory out of 5000000
- 48752 multiletter control sequences out of 15000+600000
- 524825 words of font info for 89 fonts, out of 8000000 for 9000
+ 29084 strings out of 476025
+ 557077 string characters out of 5796533
+ 1898388 words of memory out of 5000000
+ 48837 multiletter control sequences out of 15000+600000
+ 524993 words of font info for 90 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 107i,18n,107p,466b,1932s stack positions out of 5000i,500n,10000p,200000b,80000s
-</usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmcsc10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt8.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt9.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb></usr/share/texmf-dist/fonts/type1/public/cm-super/sfrm1000.pfb>
-Output written on main.pdf (14 pages, 252146 bytes).
+ 107i,18n,107p,466b,1066s stack positions out of 5000i,500n,10000p,200000b,80000s
+
+pdfTeX warning (dest): name{Hfootnote.2} has been referenced but does not exist, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{Hfootnote.1} has been referenced but does not exist, replaced by a fixed one
+
+</usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmcsc10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt8.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt9.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb></usr/share/texmf-dist/fonts/type1/public/cm-super/sfrm1000.pfb>
+Output written on main.pdf (17 pages, 726324 bytes).
 PDF statistics:
- 370 PDF objects out of 1000 (max. 8388607)
- 316 compressed objects within 4 object streams
- 141 named destinations out of 1000 (max. 500000)
- 93 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 413 PDF objects out of 1000 (max. 8388607)
+ 336 compressed objects within 4 object streams
+ 144 named destinations out of 1000 (max. 500000)
+ 133 words of extra memory for PDF output out of 10000 (max. 10000000)
 

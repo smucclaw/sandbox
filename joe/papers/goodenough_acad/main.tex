@@ -5,7 +5,11 @@
 
 % Title information
 \title{Formalizing a simple loan agreement in L4 and Maude}
-\author{Joe Watt}
+\author{
+  Joe Watt
+  \and
+  Oliver Goodenough
+}
 % \date{June 2022}
 
 \begin{document}
@@ -586,7 +590,7 @@ attempt to steer the execution of the contract back along the ``happy path''.
 \begin{lstlisting}
   RULE Repay in two halves
   PARTY	Borrower
-  MUST ON 30 DAY
+  MUST ON 10 DAY
   DO repay first half
      in the amount of 550
      to Lender
@@ -594,12 +598,12 @@ attempt to steer the execution of the contract back along the ``happy path''.
   LEST Notify borrower of default
 \end{lstlisting}
 
-In this rule, the \texttt{ON 30 DAY} deadline is used to mean that early
+In this rule, the \texttt{ON 10 DAY} deadline is used to mean that early
 payments are not allowed, as in the original agreement.
 While we could have chosen to encode 1 year as 365 days, due to the way in which
 we handle time and deadlines under the hood, 365 days results in too large of a
 transition system for our system to handle.
-Thus, we have instead chosen a more modest deadline of 30 days.
+Thus, we have instead chosen a more modest deadline of 10 days.
 
 The \texttt{Notify borrower of default} grants the lender permission to notify
 the borrower and encodes the ``notice and cure'' reparation mechanism.
@@ -706,7 +710,8 @@ We then have the following transitions:
 
 where $\delta_\text{action}$ and $\delta_\text{tick}$ are transition functions
 that compute the effect of action events and tick events on the current state
-of the contract.
+of the contract, by triggering rules found in the \texttt{HENCE} and
+\texttt{LEST} clauses of a rule.
 The use of the precondition for action transitions is to restrict actions so
 that we can only take that transition when there is an active rule mentioning it.
 
@@ -784,6 +789,11 @@ With this, a configuration $C$ is a pair that is either:
   breached it.
 \end{enumerate}
 
+The initial configuration, ie the starting state of the system has the form
+$\pair{\texttt{Active}}{\pair{r}{t}}$
+where $r$ is the name of the first regulative rule of the L4 program and $t$ is
+the deadline of the rule, in days.
+
 Next, we equip configurations with the lattice obtained from the partial order
 given by:
         % Breached actors ⊑ contractState
@@ -802,7 +812,13 @@ given by:
     \pair{\texttt{Active}}{R}
 \end{align*}
 
-so that we have:
+so that the meet $\wedge$ satisfies:
+\footnote{
+  The astute Haskell programmer may notice that this is essentially the same
+  monoid structure obtained by wrapping the \texttt{Validate} monad
+  (from the monad-validate library)
+  in the \texttt{Ap} monoid (from \texttt{Data.Monoid}).
+}
 \begin{align*}
   % \bot & = \pair{\texttt{Breached}}{\texttt{Actor}}
   % \\
@@ -870,7 +886,23 @@ Note that breach states absorb active states.
 %   acting as failure states that short-circuit evaluation.
 % }
 
-We then define the transition functions as follows:
+We then define the transition functions $\delta_\text{action}$ and
+$\delta_\text{tick}$ as follows.
+These compute the effect of the occurrence of events on the current state
+in the state space, with the former triggering rules in the \texttt{HENCE} and
+\texttt{LEST} clauses appropriately.
+The latter, $\delta_\text{tick}$, decrements the timer values of all active rule
+instances by 1.
+If any of these have a timer value of 0, it then triggers the rules in either
+the \texttt{HENCE} or \texttt{LEST} clauses.
+These functions are invariant on breach states, but for
+active states, they first individually compute the effect on each active rule
+instance, and then combine them using the lattice meet $\wedge$.
+\footnote{
+  This is essentially a
+  \texttt{foldMap}, or equivalently a \texttt{traverse} over the
+  \texttt{Validate} monad wrapped in the \texttt{Ap} monoid.
+}
 
 \begin{align*}
   & \delta_\text{action}(
@@ -916,7 +948,7 @@ We then define the transition functions as follows:
 
 Here hences refers to all the \texttt{hence\_i} in the
 (\texttt{HENCE} hence\_1 \texttt{AND} \dots \texttt{AND} hence\_n)
-clause of the rule, along with their respective timers.
+clause of the rule, along with their respective initial timers.
 Similarly, lests refers to those in the lest clause.
 
 \begin{align*}
@@ -973,7 +1005,8 @@ Similarly, lests refers to those in the lest clause.
 %   short-circuiting the \texttt{traverse} once a non-compensable rule is breached.
 % }
 
-$\delta_\text{tick}$ is defined similarly.
+$\delta_\text{tick}$ has the effect of decrementing the timer values of all
+active rule instances in an \texttt{Active} state.
 
 % We use $\smallstepstostar{S}{S'}$ to denote the reflexive, transitive closure
 
@@ -999,7 +1032,9 @@ order to turn it into executable code.
 % accounts for the concurrent interleaving of real world events.
 Thereafter, we demonstrate how we can use Maude to help generate a DFA
 representation of the state space of the contract and visualize it.
-
+Note that to simplify the discussion, we present a simplification of what is
+actually implemented in our backend, as we encode some extra metadata about
+configurations that otherwise does not affect execution.
 
 \inlinetodo{
   Maybe elaborate more on Maude and talk about how Maude makes for a good
@@ -1077,7 +1112,7 @@ in Maude, we first introduced a new datatype
   op Config : ContractState Event -> Configuration .
 \end{lstlisting}
 
-and then encode the rules in the following form:
+Finally, we encoded the transition rules in the following form:
 \begin{lstlisting}
   crl [action] :
     Config contractState event
@@ -1126,8 +1161,96 @@ and then encode the rules in the following form:
 
 % \subsection{Implementing the operational semantics in Maude}
 
-\subsection{Executing and visualizing the loan agreement}
-Insert DFA of state space here.
+\subsection{Visualizing the loan agreement as a DFA}
+
+Given the Maude implementation of the SOS, we can execute contracts and
+generate the state space.
+Assuming that this is finite, ie there are finitely many reachable configurations
+from the initial one, we can visualize it as a finite automaton.
+For this, we wrote a small Python script using the
+\href{https://github.com/fadoss/maude-bindings}{language bindings for Maude}
+that allows us to execute the Maude code from Python and generate interactive
+HTML + Js webpages of the state space.
+
+A zoomed out overview of the state space can be found below:
+
+\includegraphics[scale=0.42]{visualization/overview}
+
+States, as well as transitions leading into them, are color coded as follows:
+
+\begin{itemize}
+  \item
+  The green state denotes the \texttt{Fulfilled} state, ie the one where
+  there are no active rules and the contract is not breached.
+
+  \item
+  \texttt{Active} states with a nonempty set of active rules are colored blue.
+
+  \item
+  \texttt{Breached} states are colored red.
+\end{itemize}
+
+Zooming in on the start of the contract, we see that transitions are labelled
+with events which are either actions,
+eg \texttt{'Borrower does 'request`funds'},
+or tick transitions labelled \texttt{1 day}.
+
+\includegraphics[scale=0.5]{visualization/zoom_start_of_contract}
+
+Hovering over each state reveals more details about it, like the active rule
+instances in an active state.
+For instance, hovering over the initial state, ie the leftmost blue dot,
+yields the following:
+
+\includegraphics[scale=0.5]{visualization/initial_state}
+
+Note that as mentioned in the previous section, states encode more metadata
+than what we presented there.
+These include the actors in the contract, which in this case are the
+\texttt{Borrower} and \texttt{Lender}.
+The state of the contract is \texttt{Active}, with the
+\texttt{Contract Commencement} rule being active with an initial timer of
+\texttt{1 DAY}, corresponding to its deadline.
+Note that since the deadline of the rule is expressed using the \texttt{WITHIN}
+keyword instead of \texttt{ON}, the borrower is allowed to request for
+funds now or after 1 day.
+
+If one day passes, the Maude implementation uses the \texttt{deltaTick}
+transition function to compute the next state by decrementing the timer value
+of the \texttt{Contract Commencement} active rule instance to \texttt{0 DAY}.
+
+\includegraphics[scale=0.4]{visualization/initial_state_1_day_passes}
+
+If another day passes so that the permission expires, and the borrower still
+does not request for the principal, the \texttt{deltaTick} function is again
+called, yielding the green \texttt{Fulfilled} state.
+This is because the permission does not have a \texttt{LEST} clause, and so
+no new rules are triggered once the deadline passes.
+
+\includegraphics[scale=0.4]{visualization/fulfilled_state}
+
+If instead, the permission is exercised, then \texttt{deltaAction} computes
+the effect of that action on the current state, which is to trigger the
+\texttt{HENCE} clause, ie the \texttt{Remit principal} rule.
+This leads us to a state in which the lender is obliged to send the principal
+amount within a day.
+
+\includegraphics[scale=0.4]{visualization/state_lender_must_remit_principal}
+
+If 2 days pass without the lender sending the principal amount,
+\texttt{deltaTick} computes the resulting state to be a red breach state, with
+the lender being the one to blame.
+
+\includegraphics[scale=0.4]{visualization/state_lender_breach}
+
+Otherwise, the action occurs and \texttt{deltaAction} triggers the
+\texttt{HENCE} clause, resulting in 2
+active rule instances, one prohibiting the borrower from defaulting,
+and another obliging him to pay the first half.
+These have an initial timer of 20 and 10 days respectively, as per their
+deadlines.
+
+\includegraphics[scale=0.4]{visualization/state_after_sending_principal}
 
 % \subsection{Analyzing via model checking}
 % Here we should mention that in \cite{temporal_logic_norms_guido}, the author
@@ -1145,26 +1268,25 @@ Insert DFA of state space here.
 % \section{Related work}
 
 \section{Limitations and future work}
-\inlinetodo{
-  Shift this discussion of time the previous section on visualizing the DFA
-  representation when that's ready.
-}
-The current Maude models are not very performant and have huge state spaces.
-One of the main reasons is that for simplicity, we chose a naive approach in
-which configurations in our state space keep track of timers that count down
-one day at a time as \texttt{tick} transitions occur.
+
+Various shortcomings have been already mentioned in earlier sections, but
+there are still others that we should mention.
+
+Firstly, one may notice that the generated DFA is rather large, with over 100
+states.
+This is in spite of the fact that the loan agreement is a small contract,
+with our encoding only containing rather short deadlines, ranging
+up to 20 days.
+One of the main reasons is our naive approach to time which we opted for due to
+its simplicity.
+Recall that configurations (ie states) our state space keep track of timers
+that count down one day at a time as \texttt{tick} transitions occur.
 This means that an active rule instance arising from a rule with a large deadline
 like 365 days, can attain any value from 0 to 365 during the execution of the
 contract.
 Thus, the introduction of such a rule increases the number of possible states
 by at least 366, growing exponentially with the number of rules and possible
 timer values in the contract.
-
-\inlinetodo{
-  Mention that various shortcomings have already been mentioned along the
-  way in the previous sections and summarize them quickly, before listing a
-  few more general ones here.
-}
 
 Unfortunately, this considerably bloats up the state space.
 Again it must be emphasized that this is a proof of concept and these were
@@ -1175,14 +1297,15 @@ In the future, we intend to optimize this, among other things.
 % time and deadlines, or we could build our own abstractions to handle these more
 % efficiently in Maude.
 
-Currently, we don't yet support global variables and more sophisticated control
-structures like loops.
-Global variables would be useful to capture the notion of the outstanding amount
-in the loan agreement contract, which would then vary with the payments made by
-the borrower.
-Maude as a formalism supports these, but we currently do not support them in L4.
-For future work, we would like to provide syntax for these in L4 and translate
-them to Maude.
+% Another shortcoming is that
+% Currently, we don't yet support global variables and more sophisticated control
+% structures like loops.
+% Global variables would be useful to capture the notion of the outstanding amount
+% in the loan agreement contract, which would then vary with the payments made by
+% the borrower.
+% Maude as a formalism supports these, but we currently do not support them in L4.
+% For future work, we would like to provide syntax for these in L4 and translate
+% them to Maude.
 
 Perhaps the biggest downside is that while we have primarily focused our efforts
 on the moving parts of a contract, ie regulative rules, we have yet to consider
@@ -1202,6 +1325,19 @@ write rules of the form:
 where the rule is only triggered if \texttt{condition} holds.
 
 \section{Conclusions}
+
+This paper has presented a first attempt at equipping regulative rules in L4
+with an operational semantics.
+In doing so, we have identified the key domain concepts in these rules and
+opted for a timed transition system semantics.
+We then showed how this can be implemented in Maude so that we can execute
+contracts in L4 and visualize their state spaces.
+Along the way, we discussed some shortcomings like how large state spaces arise
+from our naive treatment of time.
+
+While our approach has several shortcomings and is unable to fully capture
+the loan agreement, we must emphasize that this is an initial attempt which
+we hope to improve upon going forward.
 
 \newpage
 

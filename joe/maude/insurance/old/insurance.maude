@@ -1,0 +1,30 @@
+sload full-maude
+
+(omod INSURANCE is
+  pr QID .
+  pr RAT .
+
+  class Actor .
+  class Action .
+
+  class Policy |
+    plan : Plan .
+
+  sort Plan .
+  ops A B C D E F : -> Plan [ctor] .
+
+  var O : Oid .
+
+  class Benefit .
+  sort Benefit .
+  subsort Benefit < Object .
+
+  mb (< O : Benefit | >) : Benefit .
+
+  op sum`assured_ : Benefit -> Rat .
+
+  --- sorts Benefit Benefits .
+  --- subsort Benefit < Benefits .
+  --- op _ , _ : Benefits Benefits -> Benefits .
+
+endom)

@@ -1,0 +1,37 @@
+sort
+  Tree = struct
+    Empty
+    | T(left : Tree, value : Nat, right : Tree);
+
+map
+	insert : Nat # Tree -> Tree;
+
+var
+  t, t' : Tree;
+  n, m : Nat;
+
+eqn
+  insert(n, Empty) = T(Empty, n, Empty);
+  (n < m) -> insert(n, T(t, m, t')) = insert(n, t);
+  (n > m) -> insert(n, T(t, m, t')) = insert(n, t');
+  (n == m) -> insert(n, T(t, m, t')) = T(t, m, t');
+
+act
+  insert : Nat;
+  empty, empty_r, empty_s;
+
+proc
+  Tree(t : Tree) =
+    sum n : Nat. (
+      insert(n) .
+      Tree(insert(n, t))
+    )
+    + empty_s . Tree(Empty);
+
+  Button =
+    empty_r . Button;
+
+init
+  allow({insert, empty},
+  comm({empty_r|empty_s -> empty},
+  Tree(Empty) || Button));

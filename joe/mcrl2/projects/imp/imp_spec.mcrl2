@@ -1,0 +1,81 @@
+sort Var_name = struct x | y | z;
+
+sort Expr = struct
+	variable(Var_name)
+	| num(Int)
+	| add(Expr, Expr)
+	| less_than(Expr, Expr);
+	% | tt | ff;
+
+sort Cmd = struct
+	skip
+	| assign(var_assigned : Var_name, value : Expr)?is_assign
+	| if_then_else(if_cond : Expr, then : Cmd, else : Cmd)?is_ite
+	| sequence(first_cmd : Cmd, rest_cmd : Cmd)?is_sequence
+	| while(while_cond : Expr, while_cmd : Cmd)?is_while;
+
+% Poor man's either monad.
+sort IntBool = struct int(Int) | bool(Bool);
+
+sort Prog = List(Cmd);
+
+sort Store = Var_name -> Int;
+
+map
+  eval_expr : Expr # Store -> IntBool;
+  eval_cmd : Cmd # Store -> Store;
+
+  to_int : IntBool -> Int;
+  to_bool : IntBool -> Bool;
+
+var
+  var_name : Var_name, store : Store, n : Int, b : Bool;
+  expr, expr1, expr2 : Expr;
+  cmd, cmd1, cmd2: Cmd;
+
+eqn
+  to_int(int(n)) = n;
+  to_int(bool(b)) = 0;
+
+  to_bool(int(n)) = true;
+  to_bool(bool(b)) = b;
+
+  eval_expr(variable(var_name), store) = store(var_name);
+  eval_expr(num(n), store) = n;
+
+  eval_expr(add(expr1, expr2), store) =
+    to_int(eval_expr(expr1), store) + to_int(eval_expr(expr2), store);
+
+  eval_expr(less_than(expr1, expr2), store) =
+    to_int(eval_expr(expr1), store) < to_int(eval_expr(expr2), store);
+
+  eval_cmd(skip, store) = store;
+  eval_cmd(assign(var_name, expr), store) =
+    store[var_name -> to_int(eval_expr(expr, store))]; 
+
+  eval_cmd(if_then_else(expr, expr1, expr2), store) =
+    to_bool(eval_expr(expr, store)) ->
+      eval_expr(expr1, store)
+    <>
+      eval_expr(expr2, store);
+
+  eval_cmd(sequence(cmd1, cmd2), store) =
+    eval_cmd(cmd2, new_store)
+  whr
+    new_store = eval_cmd(cmd1, store)
+  end;
+
+  eval_cmd(while(expr, cmd), store) =
+    to_bool(eval_cmd(expr, store)) ->
+      eval_cmd(cmd, store)
+    <>
+      store;
+
+act run_cmd : Cmd # Store;
+
+proc P(cmd : Cmd, store : Store) =
+  (is_sequence(cmd)) ->
+    run_cmd(first_cmd(cmd)) . P(rest_cmd(cmd), store);
+
+
+init P(skip, lambda x: Var_name. 0);

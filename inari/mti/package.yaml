@@ -24,6 +24,7 @@ dependencies:
 - gf
 - text
 - megaparsec
+- word-wrap
 
 ghc-options:
 - -Wall

@@ -44,7 +44,8 @@ instance Gf GFloat where
 newtype GListS = GListS [GS] deriving Show
 
 data GS =
-   GMEANS GString GString 
+   GINCLUDES GS GS 
+ | GMEANS GString GString 
  | G_ GString 
  | G__ GListS 
   deriving Show
@@ -63,12 +64,14 @@ instance Gf GListS where
       _ -> error ("no ListS " ++ show t)
 
 instance Gf GS where
+  gf (GINCLUDES x1 x2) = mkApp (mkCId "INCLUDES") [gf x1, gf x2]
   gf (GMEANS x1 x2) = mkApp (mkCId "MEANS") [gf x1, gf x2]
   gf (G_ x1) = mkApp (mkCId "_") [gf x1]
   gf (G__ x1) = mkApp (mkCId "__") [gf x1]
 
   fg t =
     case unApp t of
+      Just (i,[x1,x2]) | i == mkCId "INCLUDES" -> GINCLUDES (fg x1) (fg x2)
       Just (i,[x1,x2]) | i == mkCId "MEANS" -> GMEANS (fg x1) (fg x2)
       Just (i,[x1]) | i == mkCId "_" -> G_ (fg x1)
       Just (i,[x1]) | i == mkCId "__" -> G__ (fg x1)

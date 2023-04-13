@@ -5,6 +5,7 @@ abstract Diff = {
     fun
         '_' : String -> S ;
         MEANS : String -> String -> S ;
+        INCLUDES : S -> S -> S ;
         '__' : [S] -> S ;
 
 }

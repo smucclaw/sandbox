@@ -1,11 +1,9 @@
 START qid("Assessment"),
 
-// "Test comment",
-
 RULE qid("Assessment")
-EVERY qid("Organisation") AKA qid("You")
-MUST WITHIN 30 DAY
-DO qid("assess if it is a Notifiable Data Breach")
+EVERY qid("Organisation")
+MUST qid("assess if it is a Notifiable Data Breach")
+WITHIN 30 DAY
 HENCE qid("Notification")
 LEST qid("PDPC query with demand"),
 
@@ -16,7 +14,7 @@ HENCE qid("Respond to PDPC"),
 
 RULE qid("Respond to PDPC")
 PARTY qid("You")
-MUST DO qid("respond to the PDPC"),
+MUST qid("respond to the PDPC"),
 
 qid("Notification") MEANS (qid("Notify PDPC") AND qid("Notify Individuals")),
 
@@ -36,14 +34,16 @@ PARTY qid("You")
 SHANT qid("NOTIFY each of the Notifiable Individuals"),
 
 RULE qid("Notify Individuals")
-WITHIN 3 DAY
 PARTY qid("You")
 MUST qid("NOTIFY each of the Notifiable Individuals")
+WITHIN 3 DAY
 LEST qid("Notify and explain"),
 
 RULE qid("Notify and explain")
 PARTY qid("You")
 MUST qid("notify each of the Notifiable Individuals"),
+
+qid("You") MEANS qid("Organisation"),
 
 qid("NDB") MEANS qid("it is a Notifiable Data Breach"),
 

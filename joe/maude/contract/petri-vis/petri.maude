@@ -1,0 +1,263 @@
+--- sload syntax/rule
+sload ../semantics/prelude
+
+mod PETRI is
+  pr PRELUDE .
+
+  sorts Place Trans DoneOrNot .
+
+  op done : -> DoneOrNot .
+  op not done : -> DoneOrNot . 
+
+  subsort Rule < Place .
+
+  --- op `( _ `) : Qid -> Place [ctor] .
+  op [ _ ] : DoneOrNot -> Trans [ctor] .
+
+  sorts Arrow PPath TPath Path .
+  subsort Place < PPath < Path .
+  subsort Trans < TPath < Path .
+
+  op -> : -> Arrow [ctor] .
+
+  op _ _ _ : Place Arrow TPath -> PPath .
+  op _ _ _ : Trans Arrow PPath -> TPath .
+
+  sort PetriNet .
+  subsort Path Set{Rule} < PetriNet .
+
+  op _ , _ : PetriNet PetriNet -> PetriNet [ditto] .
+
+  vars ruleName actorName actionName hence lest : Qid .
+  vars ruleName' actorName' actionName' : Qid .
+  var deontic deontic' : Deontic .
+  var deadline deadline' : Deadline .
+  vars hences hences' lests lests' : Set{Qid} .
+  vars rule : Rule .
+  vars rules : Set{Rule} .
+  vars path : Path .
+  vars petriNet : PetriNet .
+
+  op filterPetri _ : PetriNet -> PetriNet .
+  eq filterPetri empty = empty .
+  eq filterPetri (path, petriNet) =
+    if path :: Rule then empty else path fi, filterPetri petriNet .
+
+  --- eq to petri (rule, rules) = (rule), to petri rules .
+
+  --- ceq to petri (rule, rules) = (to petri rule), (to petri rules)
+  --- if rules =/= empty .
+
+  rl
+    (
+      RULE ruleName
+      PARTY actorName
+      deontic actionName
+      deadline
+      HENCE (hence, hences)
+      LEST lests
+    ),
+    (
+      RULE hence
+      PARTY actorName'
+      deontic' actionName'
+      deadline'
+      HENCE hences'
+      LEST lests'
+    )
+  =>
+    (
+      RULE ruleName
+      PARTY actorName
+      deontic actionName
+      deadline
+      HENCE hences
+      LEST lests
+    ),
+    (
+      RULE ruleName
+      PARTY actorName
+      deontic actionName
+      deadline
+      HENCE empty
+      LEST empty
+    )
+    -> [if deontic == SHANT then not done else done fi] ->
+    (
+      RULE hence
+      PARTY actorName'
+      deontic' actionName'
+      deadline'
+      HENCE empty
+      LEST empty
+    ),
+    (
+      RULE hence
+      PARTY actorName'
+      deontic' actionName'
+      deadline'
+      HENCE hences'
+      LEST lests'
+    ) .
+
+  rl
+    (
+      RULE ruleName
+      PARTY actorName
+      deontic actionName
+      deadline
+      HENCE hences
+      LEST (lest, lests)
+    ),
+    (
+      RULE lest
+      PARTY actorName'
+      deontic' actionName'
+      deadline'
+      HENCE hences'
+      LEST lests'
+    )
+  =>
+    (
+      RULE ruleName
+      PARTY actorName
+      deontic actionName
+      deadline
+      HENCE hences
+      LEST lests
+    ),
+    (
+      RULE ruleName
+      PARTY actorName
+      deontic actionName deadline
+      HENCE empty
+      LEST empty
+    )
+    -> [if deontic == SHANT then done else not done fi] ->
+    (
+      RULE lest
+      PARTY actorName'
+      deontic' actionName'
+      deadline'
+      HENCE empty
+      LEST empty
+    ),
+    (
+      RULE lest
+      PARTY actorName'
+      deontic' actionName'
+      deadline'
+      HENCE hences'
+      LEST lests'
+    ) .
+
+  --- eq to petri rule = empty [owise] .
+
+  vars place place' : Place .
+  vars trans : Trans .
+  vars doneOrNot : DoneOrNot .
+
+  --- Utility functions for Python interop.
+  ops triple->src_ triple->dest : PPath -> Place .
+  eq triple->src (place -> trans -> place') = place .
+  eq triple->dest (place -> trans -> place') = place' .
+
+  op triple->doneOrNot_ : PPath -> DoneOrNot .
+  eq triple->doneOrNot (place -> [doneOrNot] -> place') = doneOrNot .
+
+endm
+
+--- red
+---   RULE 'rule PARTY 'actor MAY 'action HENCE 'hence LEST 'lest .
+
+--- set trace on .
+
+--- red
+---   RULE qid("Respond to PDPC")
+---   PARTY qid("You")
+---   MUST qid("respond to the PDPC")
+--- .
+
+--- rew (
+---     START qid("Assessment"),
+
+---     RULE qid("Assessment")
+---     EVERY qid("Organisation")
+---     MUST qid("assess if it is a Notifiable Data Breach")
+---     WITHIN 30 DAY
+---     HENCE qid("Notification")
+---     LEST qid("PDPC query with demand"),
+
+---     RULE qid("PDPC query with demand")
+---     PARTY qid("the PDPC")
+---     MAY qid("query You")
+---     HENCE qid("Respond to PDPC"),
+
+---     RULE qid("Respond to PDPC")
+---     PARTY qid("You")
+---     MUST qid("respond to the PDPC"),
+
+---     qid("Notification") MEANS (qid("Notify PDPC") AND qid("Notify Individuals")),
+
+---     RULE qid("Notify PDPC")
+---     PARTY qid("You")
+---     MUST qid("NOTIFY the PDPC")
+---     WITHIN 3 DAY
+---     HENCE qid("PDPC prohibit notify individuals"),
+
+---     RULE qid("PDPC prohibit notify individuals")
+---     PARTY qid("the PDPC")
+---     MAY qid("NOTIFY you")
+---     HENCE qid("Cannot notify individuals"),
+
+---     RULE qid("Cannot notify individuals")
+---     PARTY qid("You")
+---     SHANT qid("NOTIFY each of the Notifiable Individuals"),
+
+---     RULE qid("Notify Individuals")
+---     PARTY qid("You")
+---     MUST qid("NOTIFY each of the Notifiable Individuals")
+---     WITHIN 3 DAY
+---     LEST qid("Notify and explain"),
+
+---     RULE qid("Notify and explain")
+---     PARTY qid("You")
+---     MUST qid("notify each of the Notifiable Individuals"),
+
+---     qid("You") MEANS qid("Organisation"),
+
+---     qid("NDB") MEANS qid("it is a Notifiable Data Breach"),
+
+---     qid("the PDPC Exclusion List") MEANS qid("with a list of individuals to exclude from notification")
+---   ) .
+
+---(
+  Output:
+  (RULE 'Assessment PARTY 'Organisation MUST 'assess`if`it`is`a`Notifiable`Data`Breach WITHIN 30 DAY HENCE empty LEST empty)
+  -> [done] ->
+  RULE 'Notify`Individuals PARTY 'Organisation MUST 'NOTIFY`each`of`the`Notifiable`Individuals WITHIN 3 DAY HENCE empty LEST empty,
+  
+  (RULE 'Assessment PARTY 'Organisation MUST 'assess`if`it`is`a`Notifiable`Data`Breach WITHIN 30 DAY HENCE empty LEST empty)
+  -> [done] ->
+  RULE 'Notify`PDPC PARTY 'Organisation MUST 'NOTIFY`the`PDPC WITHIN 3 DAY HENCE empty LEST empty,
+  
+  (RULE 'Assessment PARTY 'Organisation MUST 'assess`if`it`is`a`Notifiable`Data`Breach WITHIN 30 DAY HENCE empty LEST empty)
+  -> [not done] ->
+  RULE 'PDPC`query`with`demand PARTY 'the`PDPC MAY 'query`You WITHIN INF DAY HENCE empty LEST empty,
+
+  (RULE 'Notify`Individuals PARTY 'You MUST 'NOTIFY`each`of`the`Notifiable`Individuals WITHIN 3 DAY HENCE empty LEST empty)
+  -> [not done] ->
+  RULE 'Notify`and`explain PARTY 'Organisation MUST 'notify`each`of`the`Notifiable`Individuals WITHIN INF DAY HENCE empty LEST empty,
+  
+  (RULE 'Notify`PDPC PARTY 'You MUST 'NOTIFY`the`PDPC WITHIN 3 DAY HENCE empty LEST empty)
+  -> [done] ->
+  RULE 'PDPC`prohibit`notify`individuals PARTY 'the`PDPC MAY 'NOTIFY`you WITHIN INF DAY HENCE empty LEST empty,
+  
+  (RULE 'PDPC`prohibit`notify`individuals PARTY 'the`PDPC MAY 'NOTIFY`you WITHIN INF DAY HENCE empty LEST empty)
+  -> [done] ->
+  RULE 'Cannot`notify`individuals PARTY 'Organisation SHANT 'NOTIFY`each`of`the`Notifiable`Individuals WITHIN INF DAY HENCE empty LEST empty,
+
+  (RULE 'PDPC`query`with`demand PARTY 'the`PDPC MAY 'query`You WITHIN INF DAY HENCE empty LEST empty)
+  -> [done] ->
+  RULE 'Respond`to`PDPC PARTY 'Organisation MUST 'respond`to`the`PDPC WITHIN INF DAY HENCE empty LEST empty
+)

@@ -1,0 +1,150 @@
+sload ../syntax/rule
+
+fmod PRELUDE is
+  protecting SET{Rule} .
+  protecting SET{Qid} .
+
+  sorts Message Event ActionEvent TickEvent ActiveRule .
+  --- subsorts Aka < Rule .
+
+---(
+  Event is an indexed family of sorts, ie a GADT with:
+  data Event :: Type -> Type where
+    tau :: Event Action
+    do :: Oid -> Oid -> Event Action
+    tick :: Event Tick
+)
+  subsorts ActionEvent TickEvent < Event < Message .
+
+  ops tau : -> ActionEvent [ctor] .
+  msgs _do_ _does_ _did_ : Qid Qid -> ActionEvent .
+  ops tick : -> TickEvent [ctor].
+
+  vars actorName actorName' actionName ruleName ruleName' : Qid .
+  vars ruleNames ruleNames' : Set{Qid} .
+  vars deontic : Deontic .
+  vars deadline : Deadline .
+  vars hence lest : Set{Qid} .
+
+  eq actorName do actionName = actorName did actionName .
+  eq actorName did actionName = actorName does actionName .
+
+  eq
+    ruleName' MEANS ruleNames',
+    RULE ruleName
+    PARTY actorName
+    deontic actionName
+    deadline
+    HENCE (ruleName', ruleNames)
+    LEST lest
+  =
+    ruleName' MEANS ruleNames',
+    RULE ruleName
+    PARTY actorName
+    deontic actionName
+    deadline
+    HENCE (ruleNames', ruleNames)
+    LEST lest .
+
+  eq
+    ruleName' MEANS ruleNames',
+    RULE ruleName
+    PARTY actorName
+    deontic actionName
+    deadline
+    HENCE hence
+    LEST (ruleName', ruleNames)
+  =
+    ruleName' MEANS ruleNames',
+    RULE ruleName
+    PARTY actorName
+    deontic actionName
+    deadline
+    HENCE hence
+    LEST (ruleNames', ruleNames) .
+
+  eq
+    RULE ruleName
+    PARTY actorName' AKA actorName
+    deontic actionName
+    deadline
+    HENCE hence
+    LEST lest
+  =
+    actorName MEANS actorName',
+    RULE ruleName
+    PARTY actorName'
+    deontic actionName
+    deadline
+    HENCE hence
+    LEST lest .
+
+  eq
+    actorName MEANS actorName',
+    RULE ruleName
+    PARTY actorName
+    deontic actionName
+    deadline
+    HENCE hence
+    LEST lest
+  =
+    actorName MEANS actorName',
+    RULE ruleName
+    PARTY actorName'
+    deontic actionName
+    deadline
+    HENCE hence
+    LEST lest .
+
+  --- ops PARTY__DO_WITHIN_HENCE_LEST_ :
+  ---   Id Deontic Id Nat Set{Qid} Set{Qid} -> ActiveRule [ctor] .
+
+endfm
+
+--- view Event from TRIV to PRE-SEMANTICS is
+---   sort Elt to Event .
+--- endv
+
+--- view List`{Event`} from TRIV to LIST{Event} is
+---   sort Elt to List`{Event`} .
+--- endv
+
+---(
+  The denotational/model-theoretic interpretation of this module is an intial
+  algebra isomorphic to that of List{Event}.
+  As before, initiality is used to disregard nonstandard models.
+)
+fmod EVENT-TRACE is
+  protecting PRELUDE .
+
+  sorts EventTrace .
+  subsorts Event < EventTrace .
+
+  ops emptyEventTrace : -> EventTrace [ctor] .
+  ops _++_ : EventTrace EventTrace -> EventTrace
+    [ctor assoc id: emptyEventTrace] .
+endfm
+
+view ActiveRule from TRIV to PRELUDE is
+  sort Elt to ActiveRule .
+endv
+
+view Set`{ActiveRule`} from TRIV to SET{ActiveRule} is
+  sort Elt to Set`{ActiveRule`} .
+endv
+
+view ActionEvent from TRIV to PRELUDE is
+  sort Elt to ActionEvent .
+endv
+
+view Set`{ActionEvent`} from TRIV to SET{ActionEvent} is
+  sort Elt to Set`{ActionEvent`} .
+endv
+
+--- fmod ALLOWED-EVENT is
+---   protecting EVENT-TRACE .
+
+---   sorts AllowedEvent .
+---   subsorts EventTrace < AllowedEvent .
+---   ops allEvents : -> AllowedEvent [ctor] .
+--- endfm

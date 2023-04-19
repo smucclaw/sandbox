@@ -155,9 +155,9 @@ fmod RULE is
   eq pred s n = n .
   eq pred INF = INF .
 
-  ceq PARTY actorName deontic actionName
-  = PARTY actorName deontic actionName WITHIN INF DAY
-  if deontic == MAY or deontic == SHANT .
+  eq PARTY actorName deontic actionName
+  = PARTY actorName deontic actionName WITHIN INF DAY .
+  --- if deontic == MAY or deontic == SHANT .
 
   sort Comment .
   subsort Comment < Rule .

@@ -90,9 +90,22 @@ if __name__ == '__main__':
       parse_term_containing_qids
     )
 
-    for place in [src, dest]:
-      if place not in snakes_net:
-        snakes_net.add_place(pn.Place(place))
+    if not snakes_net.has_transition(action_or_timeout):
+      pipe(
+        action_or_timeout,
+        lambda x: pn.Transition(x, None),
+        snakes_net.add_transition
+      )
+
+    places = [(src, snakes_net.add_input), (dest, snakes_net.add_output)]
+    for (place, add_arc_fn) in places:
+      if not snakes_net.has_place(place):
+          pipe(place, pn.Place, snakes_net.add_place)
+
+      try:
+        add_arc_fn(place, action_or_timeout, pn.Value(''))
+      except pn.ConstraintError:
+        pass
 
     # if src in trans and action_or_timeout in trans[src]:
     #   done_or_not_counter = trans[src][action_or_timeout]
@@ -101,19 +114,6 @@ if __name__ == '__main__':
     #   snakes_net.add_transition(pn.Transition(done_or_not_counter, None))
     #   snakes_net.add_input(src, done_or_not_counter, pn.Value(''))
     #   trans[src] = {action_or_timeout: done_or_not_counter}
-
-    if action_or_timeout not in snakes_net:
-      snakes_net.add_transition(pn.Transition(action_or_timeout, None))
-
-    try:
-      snakes_net.add_input(src, action_or_timeout, pn.Value(''))
-    except pn.ConstraintError:
-      pass
-
-    try:
-      snakes_net.add_output(dest, action_or_timeout, pn.Value(''))
-    except pn.ConstraintError:
-      pass
 
     # counter += 1
 

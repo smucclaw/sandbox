@@ -82,7 +82,7 @@ if __name__ == '__main__':
       triple,
       apply_fn(petri_mod, 'triple->dest'),
       parse_term_containing_qids,
-      lambda x: x.split('HENCE', 1)[0],
+      lambda x: x.split('HENCE', 1)[0]
     ) 
     action_or_timeout = pipe(
       triple,

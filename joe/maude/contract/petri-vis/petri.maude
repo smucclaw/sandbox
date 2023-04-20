@@ -4,15 +4,15 @@ sload ../semantics/prelude
 mod PETRI is
   pr PRELUDE .
 
-  sorts Place Trans DoneOrNot .
+  sorts Place Trans ActionOrTimeout .
 
-  op done : -> DoneOrNot .
-  op not done : -> DoneOrNot . 
+  subsort ActionEvent Duration < ActionOrTimeout .
+  --- op _ timeout : Qid -> ActionOrTimeout [ctor] . 
 
   subsort Rule < Place .
 
   --- op `( _ `) : Qid -> Place [ctor] .
-  op [ _ ] : DoneOrNot -> Trans [ctor] .
+  op [ _ ] : ActionOrTimeout -> Trans [ctor] .
 
   sorts Arrow PPath TPath Path .
   subsort Place < PPath < Path .
@@ -37,6 +37,8 @@ mod PETRI is
   vars rules : Set{Rule} .
   vars path : Path .
   vars petriNet : PetriNet .
+  vars onWithin : OnWithin .
+  vars n : Nat .
 
   op filterPetri _ : PetriNet -> PetriNet .
   eq filterPetri empty = empty .
@@ -53,7 +55,7 @@ mod PETRI is
       RULE ruleName
       PARTY actorName
       deontic actionName
-      deadline
+      onWithin n DAY
       HENCE (hence, hences)
       LEST lests
     ),
@@ -70,7 +72,7 @@ mod PETRI is
       RULE ruleName
       PARTY actorName
       deontic actionName
-      deadline
+      onWithin n DAY
       HENCE hences
       LEST lests
     ),
@@ -78,11 +80,11 @@ mod PETRI is
       RULE ruleName
       PARTY actorName
       deontic actionName
-      deadline
+      onWithin n DAY
       HENCE empty
       LEST empty
     )
-    -> [if deontic == SHANT then not done else done fi] ->
+    -> [if deontic == SHANT then s n DAY else actorName does actionName fi] ->
     (
       RULE hence
       PARTY actorName'
@@ -105,7 +107,7 @@ mod PETRI is
       RULE ruleName
       PARTY actorName
       deontic actionName
-      deadline
+      onWithin n DAY
       HENCE hences
       LEST (lest, lests)
     ),
@@ -122,18 +124,19 @@ mod PETRI is
       RULE ruleName
       PARTY actorName
       deontic actionName
-      deadline
+      onWithin n DAY
       HENCE hences
       LEST lests
     ),
     (
       RULE ruleName
       PARTY actorName
-      deontic actionName deadline
+      deontic actionName
+      onWithin n DAY
       HENCE empty
       LEST empty
     )
-    -> [if deontic == SHANT then done else not done fi] ->
+    -> [if deontic == SHANT then actorName does actionName else s n DAY fi] ->
     (
       RULE lest
       PARTY actorName'
@@ -155,15 +158,16 @@ mod PETRI is
 
   vars place place' : Place .
   vars trans : Trans .
-  vars doneOrNot : DoneOrNot .
+  vars actionOrTimeout : ActionOrTimeout .
 
   --- Utility functions for Python interop.
   ops triple->src_ triple->dest : PPath -> Place .
   eq triple->src (place -> trans -> place') = place .
   eq triple->dest (place -> trans -> place') = place' .
 
-  op triple->doneOrNot_ : PPath -> DoneOrNot .
-  eq triple->doneOrNot (place -> [doneOrNot] -> place') = doneOrNot .
+  op triple->actionOrTimeout_ : PPath -> ActionOrTimeout .
+  eq triple->actionOrTimeout (place -> [actionOrTimeout] -> place')
+  = actionOrTimeout .
 
 endm
 

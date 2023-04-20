@@ -43,6 +43,14 @@ def apply_fn(mod, fn, arg):
     do(lambda term: term.reduce())
   )
 
+def parse_term_containing_qids(term):
+  return pipe(
+    term,
+    str,
+    lambda x: x.replace('`', ' '),
+    lambda x: x.replace("'", '')
+  )
+
 if __name__ == '__main__':
   natural4_file = Path(sys.argv[1])
 
@@ -61,32 +69,52 @@ if __name__ == '__main__':
   )
 
   snakes_net = pn.PetriNet('Petri net')
-  counter = 0
-  trans = {}
+  # counter = 0
+  # trans = {}
   for triple in petri_net:
-    src = f'{apply_fn(petri_mod, "triple->src", triple)}'
-    dest = f'{apply_fn(petri_mod, "triple->dest", triple)}'
-    done_or_not = f'{apply_fn(petri_mod, "triple->doneOrNot", triple)}'
+    src = pipe(
+      triple,
+      apply_fn(petri_mod, 'triple->src'),
+      parse_term_containing_qids,
+      lambda x: x.split('HENCE', 1)[0]
+    )
+    dest = pipe(
+      triple,
+      apply_fn(petri_mod, 'triple->dest'),
+      parse_term_containing_qids,
+      lambda x: x.split('HENCE', 1)[0],
+    ) 
+    action_or_timeout = pipe(
+      triple,
+      apply_fn(petri_mod, 'triple->actionOrTimeout'),
+      parse_term_containing_qids
+    )
+
+    for place in [src, dest]:
+      if place not in snakes_net:
+        snakes_net.add_place(pn.Place(place))
+
+    # if src in trans and action_or_timeout in trans[src]:
+    #   done_or_not_counter = trans[src][action_or_timeout]
+    # else:
+    #   done_or_not_counter = f'{action_or_timeout} {counter}'
+    #   snakes_net.add_transition(pn.Transition(done_or_not_counter, None))
+    #   snakes_net.add_input(src, done_or_not_counter, pn.Value(''))
+    #   trans[src] = {action_or_timeout: done_or_not_counter}
+
+    if action_or_timeout not in snakes_net:
+      snakes_net.add_transition(pn.Transition(action_or_timeout, None))
 
     try:
-      snakes_net.add_place(pn.Place(src))
+      snakes_net.add_input(src, action_or_timeout, pn.Value(''))
     except pn.ConstraintError:
       pass
 
     try:
-      snakes_net.add_place(pn.Place(dest))
+      snakes_net.add_output(dest, action_or_timeout, pn.Value(''))
     except pn.ConstraintError:
       pass
 
-    if src in trans and done_or_not in trans[src]:
-      done_or_not_counter = trans[src][done_or_not]
-    else:
-      done_or_not_counter = f'{done_or_not} {counter}'
-      snakes_net.add_transition(pn.Transition(done_or_not_counter, None))
-      snakes_net.add_input(src, done_or_not_counter, pn.Value(''))
-      trans[src] = {done_or_not: done_or_not_counter}
-
-    snakes_net.add_output(dest, done_or_not_counter, pn.Value(''))
-    counter += 1
+    # counter += 1
 
   snakes_net.draw('out.svg')

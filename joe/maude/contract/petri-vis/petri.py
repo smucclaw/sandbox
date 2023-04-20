@@ -7,10 +7,10 @@ import snakes.plugins
 snakes.plugins.load('gv', 'snakes.nets', 'nets')
 import nets as pn
 
-import pyrsistent as pyrs
+# import pyrsistent as pyrs
 from cytoolz.functoolz import *
 from cytoolz.curried import *
-import itertools as it
+# import itertools as it
 
 
 @curry
@@ -117,4 +117,4 @@ if __name__ == '__main__':
 
     # counter += 1
 
-  snakes_net.draw('out.svg')
+  snakes_net.draw(f'{natural4_file.stem}.svg')

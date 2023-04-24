@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings, RankNTypes, GADTs #-}
 module Lib
     ( someFunc
     ) where
@@ -8,10 +8,11 @@ import Diff
 import Control.Applicative ( Alternative((<|>), empty) )
 import Control.Monad (void)
 import Data.Void ( Void )
-import Text.Megaparsec ( try, some, Parsec, parse, parseTest, eof, satisfy, notFollowedBy, lookAhead, someTill )
+import Text.Megaparsec ( try, some, Parsec, parse, eof, satisfy, notFollowedBy, lookAhead, someTill )
+--import Text.Megaparsec ( parseTest )
 import Text.Megaparsec.Char ( alphaNumChar, char, space1, string )
 import qualified Text.Megaparsec.Char.Lexer as L
-import Debug.Trace (trace)
+--import Debug.Trace (trace)
 import Text.Wrap (defaultWrapSettings, wrapTextToLines)
 import Data.Text (pack, unpack, unlines)
 import System.Environment (getArgs)
@@ -21,16 +22,17 @@ someFunc = do
     gr <- readPGF "grammars/Diff.pgf"
     f:_args <- getArgs
     testList <- readFile f
-    parseTest (some pItemList <* eof) testList -- to show the potential error msg
+    -- parseTest (some pItemList <* eof) testList -- to show the potential error msg
 
     let res = parse (some pItemList <* eof) "" testList
     let trees = case res of
                     Left _e -> error "failed :'("
                     Right t -> t
-    let gfTree = gf $ G__ $ GListS $ toGFTree <$> normaliseInclude trees
+    let gfTree = gf $ means2includes $ GConjS $ GListS $ toGFTree <$> normaliseInclude trees
 
-    let dotFile = toViz gr gfTree
-    writeFile "grammars/viz.dot"  dotFile
+    let dotFile = wrapStringToLines $ toViz gr gfTree
+    let dotName = init (init f) <> "dot"
+    writeFile dotName dotFile
 
 
 -----------------------------------------------------------------------------
@@ -39,7 +41,7 @@ someFunc = do
 data Item = ITEM String
           | MEANS String String
           | DNINCLUDE String
-          | INCLUDES ItemList ItemList
+          | MEANS_EXCEPT ItemList ItemList
            deriving (Show,Eq)
 data ItemList = IL {top :: Item, args :: [ItemList]}  deriving (Show,Eq)
 
@@ -48,25 +50,33 @@ item2list x = IL x []
 
 normaliseInclude :: [ItemList] -> [ItemList]
 normaliseInclude (x:y:xs) = case (top x, top y) of
-    (ITEM _a, DNINCLUDE _c) -> item2list (INCLUDES x y) : normaliseInclude xs
-    (MEANS _a _b, DNINCLUDE _c) -> item2list (INCLUDES x y) : normaliseInclude xs
+    (ITEM _a, DNINCLUDE _c) -> item2list (MEANS_EXCEPT x y) : normaliseInclude xs
+    (MEANS _a _b, DNINCLUDE _c) -> item2list (MEANS_EXCEPT x y) : normaliseInclude xs
     _ -> x : normaliseInclude (y:xs)
 normaliseInclude xs = xs
 
 toGFTree :: ItemList -> GS
 toGFTree il = case il of
     IL t [] -> i2S t
-    IL t as ->  G__ $ GListS [i2S t, argsS as]
+    IL t as ->  GConjS $ GListS [i2S t, argsS as]
   where
-    argsS = G__ . GListS . map toGFTree
+    argsS = GConjS . GListS . map toGFTree
 
-    i2S (ITEM a) = G_ (GString $ wrapStringToLines a)
-    i2S (MEANS a b) = GMEANS (GString a) (GString $ "MEANS " <> b)
-    i2S (DNINCLUDE a) = i2S (ITEM ("but DOES NOT INCLUDE " <> a))
-    i2S (INCLUDES a b) = trace "INCLUDES" $ GINCLUDES (toGFTree a) (toGFTree b)
+    i2S (ITEM a) = GmkS (GString a)
+    i2S (MEANS_EXCEPT a b) = GMEANS_EXCEPT (toGFTree a) (toGFTree b)
+    i2S (MEANS a b) = GMEANS (GString a) (GString b)
+    i2S (DNINCLUDE a) = GBUT_DOES_NOT_INCLUDE (GString a)
+    -- i2S (MEANS a b) = GMEANS (GString a) (GString $ "MEANS " <> b)
+    -- i2S (DNINCLUDE a) = i2S (ITEM ("but DOES NOT INCLUDE " <> a))
+
+means2includes :: forall a . Tree a -> Tree a
+means2includes x = case x of
+  GMEANS_EXCEPT (GConjS (GListS (GMEANS s t : rest))) (GConjS xs)
+    -> GMEANS_EXCEPT_  (GListS (GINCLUDES s t : rest )) xs
+  _ -> composOp means2includes x
 
 toViz :: PGF -> Expr -> String
-toViz gr = graphvizAbstractTree gr (False,False)
+toViz gr = graphvizAbstractTree gr (True,False)
 
 wrapStringToLines :: String -> String
 wrapStringToLines s = unpack $ Data.Text.unlines $ wrapTextToLines defaultWrapSettings 40 $ pack s
@@ -115,7 +125,7 @@ pKeyword :: String -> Parser String
 pKeyword keyword = lexeme (string keyword <* notFollowedBy alphaNumChar)
 
 pMeans :: Parser String
-pMeans = pKeyword "means" <|> pKeyword "includes"
+pMeans = pKeyword "means" <|> pKeyword "MEANS_EXCEPT"
 
 --  Parser (String, [String])
 pComplexItem :: Parser ItemList

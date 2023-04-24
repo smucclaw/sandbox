@@ -1,4 +1,6 @@
 {-# LANGUAGE OverloadedStrings, RankNTypes, GADTs #-}
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+{-# HLINT ignore "Use camelCase" #-}
 module Lib
     ( someFunc
     ) where
@@ -28,7 +30,7 @@ someFunc = do
     let trees = case res of
                     Left _e -> error "failed :'("
                     Right t -> t
-    let gfTree = gf $ means2includes $ GConjS $ GListS $ toGFTree <$> normaliseInclude trees
+    let gfTree = gf $ semanticTrees $ GConjS $ GListS $ toGFTree <$> normaliseInclude trees
 
     let dotFile = wrapStringToLines $ toViz gr gfTree
     let dotName = init (init f) <> "dot"
@@ -42,6 +44,7 @@ data Item = ITEM String
           | MEANS String String
           | DNINCLUDE String
           | MEANS_EXCEPT ItemList ItemList
+          | MEANS_WITH_RESPECT_TO String String
            deriving (Show,Eq)
 data ItemList = IL {top :: Item, args :: [ItemList]}  deriving (Show,Eq)
 
@@ -63,17 +66,20 @@ toGFTree il = case il of
     argsS = GConjS . GListS . map toGFTree
 
     i2S (ITEM a) = GmkS (GString a)
-    i2S (MEANS_EXCEPT a b) = GMEANS_EXCEPT (toGFTree a) (toGFTree b)
+    i2S (MEANS_EXCEPT a b) = GMEANS_EXCEPT_ (toGFTree a) (toGFTree b)
     i2S (MEANS a b) = GMEANS (GString a) (GString b)
+    i2S (MEANS_WITH_RESPECT_TO a b) = GMEANS_WITH_RESPECT_TO_ (GString a) (GString b)
     i2S (DNINCLUDE a) = GBUT_DOES_NOT_INCLUDE (GString a)
-    -- i2S (MEANS a b) = GMEANS (GString a) (GString $ "MEANS " <> b)
-    -- i2S (DNINCLUDE a) = i2S (ITEM ("but DOES NOT INCLUDE " <> a))
 
-means2includes :: forall a . Tree a -> Tree a
-means2includes x = case x of
-  GMEANS_EXCEPT (GConjS (GListS (GMEANS s t : rest))) (GConjS xs)
-    -> GMEANS_EXCEPT_  (GListS (GINCLUDES s t : rest )) xs
-  _ -> composOp means2includes x
+semanticTrees :: forall a . Tree a -> Tree a
+semanticTrees x = case x of
+  GMEANS_EXCEPT_ (GConjS (GListS (GMEANS s t : rest))) (GConjS xs)
+    -> GMEANS_EXCEPT  (GListS (GINCLUDES s t : rest )) xs
+  GConjS (GListS (GMEANS_WITH_RESPECT_TO_ consumed good : GConjS xs : _))
+    -> GMEANS_WITH_RESPECT_TO consumed good xs
+  GConjS (GListS (GMEANS x (GString ":") : GConjS xs : _))
+    -> GMEANS_FOR x xs
+  _ -> composOp semanticTrees x
 
 toViz :: PGF -> Expr -> String
 toViz gr = graphvizAbstractTree gr (True,False)
@@ -102,10 +108,18 @@ lexeme :: Parser a -> Parser a
 lexeme = L.lexeme sc
 
 pItem :: Parser Item
-pItem = try pDNINCLUDE <|> try pMEANS <|> pITEM
+pItem = try pDNINCLUDE <|> try pMEANS_WITH_RESPECT_TO <|> try pMEANS <|> pITEM
   where
     pITEM :: Parser Item
     pITEM = ITEM <$> lexeme (some anyChar)
+
+pMEANS_WITH_RESPECT_TO :: Parser Item
+pMEANS_WITH_RESPECT_TO = do
+    x <- someTill anyChar (lookAhead pMeans)
+    _ <- pMeans
+    _ <- pKeyword ", with respect to"
+    what <- lexeme (some anyChar)
+    pure $ MEANS_WITH_RESPECT_TO x what
 
 pMEANS :: Parser Item
 pMEANS = do
@@ -125,7 +139,7 @@ pKeyword :: String -> Parser String
 pKeyword keyword = lexeme (string keyword <* notFollowedBy alphaNumChar)
 
 pMeans :: Parser String
-pMeans = pKeyword "means" <|> pKeyword "MEANS_EXCEPT"
+pMeans = pKeyword "means" <|> pKeyword "includes"
 
 --  Parser (String, [String])
 pComplexItem :: Parser ItemList

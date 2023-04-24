@@ -55,8 +55,12 @@ data Tree :: * -> * where
   GConjS :: GListS -> Tree GS_
   GINCLUDES :: GString -> GString -> Tree GS_
   GMEANS :: GString -> GString -> Tree GS_
-  GMEANS_EXCEPT :: GS -> GS -> Tree GS_
-  GMEANS_EXCEPT_ :: GListS -> GListS -> Tree GS_
+  GMEANS_EXCEPT :: GListS -> GListS -> Tree GS_
+  GMEANS_EXCEPT_ :: GS -> GS -> Tree GS_
+  GMEANS_FOR :: GString -> GListS -> Tree GS_
+  GMEANS_FOR_ :: GString -> GString -> Tree GS_
+  GMEANS_WITH_RESPECT_TO :: GString -> GString -> GListS -> Tree GS_
+  GMEANS_WITH_RESPECT_TO_ :: GString -> GString -> Tree GS_
   GmkS :: GString -> Tree GS_
   GString :: String -> Tree GString_
   GInt :: Int -> Tree GInt_
@@ -71,6 +75,10 @@ instance Eq (Tree a) where
     (GMEANS x1 x2,GMEANS y1 y2) -> and [ x1 == y1 , x2 == y2 ]
     (GMEANS_EXCEPT x1 x2,GMEANS_EXCEPT y1 y2) -> and [ x1 == y1 , x2 == y2 ]
     (GMEANS_EXCEPT_ x1 x2,GMEANS_EXCEPT_ y1 y2) -> and [ x1 == y1 , x2 == y2 ]
+    (GMEANS_FOR x1 x2,GMEANS_FOR y1 y2) -> and [ x1 == y1 , x2 == y2 ]
+    (GMEANS_FOR_ x1 x2,GMEANS_FOR_ y1 y2) -> and [ x1 == y1 , x2 == y2 ]
+    (GMEANS_WITH_RESPECT_TO x1 x2 x3,GMEANS_WITH_RESPECT_TO y1 y2 y3) -> and [ x1 == y1 , x2 == y2 , x3 == y3 ]
+    (GMEANS_WITH_RESPECT_TO_ x1 x2,GMEANS_WITH_RESPECT_TO_ y1 y2) -> and [ x1 == y1 , x2 == y2 ]
     (GmkS x1,GmkS y1) -> and [ x1 == y1 ]
     (GString x, GString y) -> x == y
     (GInt x, GInt y) -> x == y
@@ -96,6 +104,10 @@ instance Gf GS where
   gf (GMEANS x1 x2) = mkApp (mkCId "MEANS") [gf x1, gf x2]
   gf (GMEANS_EXCEPT x1 x2) = mkApp (mkCId "MEANS_EXCEPT") [gf x1, gf x2]
   gf (GMEANS_EXCEPT_ x1 x2) = mkApp (mkCId "MEANS_EXCEPT_") [gf x1, gf x2]
+  gf (GMEANS_FOR x1 x2) = mkApp (mkCId "MEANS_FOR") [gf x1, gf x2]
+  gf (GMEANS_FOR_ x1 x2) = mkApp (mkCId "MEANS_FOR_") [gf x1, gf x2]
+  gf (GMEANS_WITH_RESPECT_TO x1 x2 x3) = mkApp (mkCId "MEANS_WITH_RESPECT_TO") [gf x1, gf x2, gf x3]
+  gf (GMEANS_WITH_RESPECT_TO_ x1 x2) = mkApp (mkCId "MEANS_WITH_RESPECT_TO_") [gf x1, gf x2]
   gf (GmkS x1) = mkApp (mkCId "mkS") [gf x1]
 
   fg t =
@@ -106,6 +118,10 @@ instance Gf GS where
       Just (i,[x1,x2]) | i == mkCId "MEANS" -> GMEANS (fg x1) (fg x2)
       Just (i,[x1,x2]) | i == mkCId "MEANS_EXCEPT" -> GMEANS_EXCEPT (fg x1) (fg x2)
       Just (i,[x1,x2]) | i == mkCId "MEANS_EXCEPT_" -> GMEANS_EXCEPT_ (fg x1) (fg x2)
+      Just (i,[x1,x2]) | i == mkCId "MEANS_FOR" -> GMEANS_FOR (fg x1) (fg x2)
+      Just (i,[x1,x2]) | i == mkCId "MEANS_FOR_" -> GMEANS_FOR_ (fg x1) (fg x2)
+      Just (i,[x1,x2,x3]) | i == mkCId "MEANS_WITH_RESPECT_TO" -> GMEANS_WITH_RESPECT_TO (fg x1) (fg x2) (fg x3)
+      Just (i,[x1,x2]) | i == mkCId "MEANS_WITH_RESPECT_TO_" -> GMEANS_WITH_RESPECT_TO_ (fg x1) (fg x2)
       Just (i,[x1]) | i == mkCId "mkS" -> GmkS (fg x1)
 
 
@@ -120,6 +136,10 @@ instance Compos Tree where
     GMEANS x1 x2 -> r GMEANS `a` f x1 `a` f x2
     GMEANS_EXCEPT x1 x2 -> r GMEANS_EXCEPT `a` f x1 `a` f x2
     GMEANS_EXCEPT_ x1 x2 -> r GMEANS_EXCEPT_ `a` f x1 `a` f x2
+    GMEANS_FOR x1 x2 -> r GMEANS_FOR `a` f x1 `a` f x2
+    GMEANS_FOR_ x1 x2 -> r GMEANS_FOR_ `a` f x1 `a` f x2
+    GMEANS_WITH_RESPECT_TO x1 x2 x3 -> r GMEANS_WITH_RESPECT_TO `a` f x1 `a` f x2 `a` f x3
+    GMEANS_WITH_RESPECT_TO_ x1 x2 -> r GMEANS_WITH_RESPECT_TO_ `a` f x1 `a` f x2
     GmkS x1 -> r GmkS `a` f x1
     GListS x1 -> r GListS `a` foldr (a . a (r (:)) . f) (r []) x1
     _ -> r t

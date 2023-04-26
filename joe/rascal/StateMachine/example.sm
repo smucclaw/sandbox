@@ -1,0 +1,12 @@
+state Init
+    buttonOn: Started
+
+state Started
+    buttonPause: Paused
+    buttonPrint: Printing
+
+state Printing
+    printingDone: Started
+
+state Failed
+    buttonReset: Init

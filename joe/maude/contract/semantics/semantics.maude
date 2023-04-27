@@ -196,16 +196,16 @@ sload config
   ops deadlineAllowsAction_ isTimerZero_ : Deadline -> Bool .
   ops decTimer_ : Deadline -> Deadline .
 
-  eq deadlineAllowsAction ON 0 DAY = true .
-  eq deadlineAllowsAction WITHIN time DAY = true .
+  eq deadlineAllowsAction (ON 0 DAY) = true .
+  eq deadlineAllowsAction (WITHIN time DAY) = true .
   eq deadlineAllowsAction deadline = false [owise] .
 
-  eq isTimerZero ON 0 DAY = true .
-  eq isTimerZero WITHIN 0 DAY = true .
+  eq isTimerZero (ON 0 DAY) = true .
+  eq isTimerZero (WITHIN 0 DAY) = true .
   eq isTimerZero deadline = false [owise] .
 
-  ceq decTimer ON time DAY = ON pred time DAY if time > 0 .
-  ceq decTimer WITHIN time DAY = WITHIN pred time DAY if time > 0 .
+  ceq decTimer (ON time DAY) = ON pred time DAY if time > 0 .
+  ceq decTimer (WITHIN time DAY) = WITHIN pred time DAY if time > 0 .
   eq decTimer deadline = deadline [owise] .
 
 ---(

@@ -32,7 +32,7 @@ someFunc = do
                     Right t -> t
     let gfTree = gf $ semanticTrees $ GConjS $ GListS $ toGFTree <$> normaliseInclude trees
 
-    let dotFile = wrapStringToLines $ toViz gr gfTree
+    let dotFile = toViz gr gfTree
     let dotName = init (init f) <> "dot"
     writeFile dotName dotFile
 
@@ -65,11 +65,11 @@ toGFTree il = case il of
   where
     argsS = GConjS . GListS . map toGFTree
 
-    i2S (ITEM a) = GmkS (GString a)
+    i2S (ITEM a) = GmkS (GString $ wrapStringToLines a)
     i2S (MEANS_EXCEPT a b) = GMEANS_EXCEPT_ (toGFTree a) (toGFTree b)
-    i2S (MEANS a b) = GMEANS (GString a) (GString b)
-    i2S (MEANS_WITH_RESPECT_TO a b) = GMEANS_WITH_RESPECT_TO_ (GString a) (GString b)
-    i2S (DNINCLUDE a) = GBUT_DOES_NOT_INCLUDE (GString a)
+    i2S (MEANS a b) = GMEANS (GString $ wrapStringToLines a) (GString $ wrapStringToLines b)
+    i2S (MEANS_WITH_RESPECT_TO a b) = GMEANS_WITH_RESPECT_TO_ (GString $ wrapStringToLines a) (GString $ wrapStringToLines b)
+    i2S (DNINCLUDE a) = GBUT_DOES_NOT_INCLUDE (GString $ wrapStringToLines a)
 
 semanticTrees :: forall a . Tree a -> Tree a
 semanticTrees x = case x of
@@ -85,7 +85,9 @@ toViz :: PGF -> Expr -> String
 toViz gr = graphvizAbstractTree gr (True,False)
 
 wrapStringToLines :: String -> String
-wrapStringToLines s = unpack $ Data.Text.unlines $ wrapTextToLines defaultWrapSettings 40 $ pack s
+wrapStringToLines s
+  | length s < 40 = s
+  | otherwise = unpack $ Data.Text.unlines $ wrapTextToLines defaultWrapSettings 40 $ pack s
 
 -----------------------------------------------------------------------------
 -- The parser

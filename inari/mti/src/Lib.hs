@@ -17,7 +17,10 @@ import qualified Text.Megaparsec.Char.Lexer as L
 --import Debug.Trace (trace)
 import Text.Wrap (defaultWrapSettings, wrapTextToLines)
 import Data.Text (pack, unpack, unlines)
+import Data.List.Split (wordsBy)
 import System.Environment (getArgs)
+
+import Debug.Trace (traceShow)
 
 someFunc :: IO ()
 someFunc = do
@@ -45,6 +48,8 @@ data Item = ITEM String
           | DNINCLUDE String
           | MEANS_EXCEPT ItemList ItemList
           | MEANS_WITH_RESPECT_TO String String
+          | MEANS_INCLUDING String Item
+          | PRE_POST String [String] String -- TODO: use AnyAll library and PrePost structure ?
            deriving (Show,Eq)
 data ItemList = IL {top :: Item, args :: [ItemList]}  deriving (Show,Eq)
 
@@ -65,11 +70,16 @@ toGFTree il = case il of
   where
     argsS = GConjS . GListS . map toGFTree
 
-    i2S (ITEM a) = GmkS (GString $ wrapStringToLines a)
-    i2S (MEANS_EXCEPT a b) = GMEANS_EXCEPT_ (toGFTree a) (toGFTree b)
-    i2S (MEANS a b) = GMEANS (GString $ wrapStringToLines a) (GString $ wrapStringToLines b)
-    i2S (MEANS_WITH_RESPECT_TO a b) = GMEANS_WITH_RESPECT_TO_ (GString $ wrapStringToLines a) (GString $ wrapStringToLines b)
-    i2S (DNINCLUDE a) = GBUT_DOES_NOT_INCLUDE (GString $ wrapStringToLines a)
+    gs :: String -> GString
+    gs = GString . wrapStringToLines
+
+    i2S (ITEM s) = GmkS (gs s)
+    i2S (MEANS_EXCEPT i j) = GMEANS_EXCEPT_ (toGFTree i) (toGFTree j)
+    i2S (MEANS s t) = GMEANS (gs s) (gs t)
+    i2S (MEANS_WITH_RESPECT_TO s t) = GMEANS_WITH_RESPECT_TO_ (gs s) (gs t)
+    i2S (DNINCLUDE s) = GBUT_DOES_NOT_INCLUDE (gs s)
+    i2S (PRE_POST s ts u) = GPRE_POST (gs s) (GINCLUDING $ GListString $ map gs ts) (gs u)
+    i2S (MEANS_INCLUDING s i) = GMEANS_INCLUDING (gs s) (i2S i)
 
 semanticTrees :: forall a . Tree a -> Tree a
 semanticTrees x = case x of
@@ -110,7 +120,7 @@ lexeme :: Parser a -> Parser a
 lexeme = L.lexeme sc
 
 pItem :: Parser Item
-pItem = try pDNINCLUDE <|> try pMEANS_WITH_RESPECT_TO <|> try pMEANS <|> pITEM
+pItem = try pDNINCLUDE <|> try pMEANS_WITH_RESPECT_TO <|> try pMEANS_INCLUDING <|> try pMEANS <|> pITEM
   where
     pITEM :: Parser Item
     pITEM = ITEM <$> lexeme (some anyChar)
@@ -136,6 +146,18 @@ pDNINCLUDE = do
     _ <- pKeyword "but does not include"
     DNINCLUDE <$> lexeme (some anyChar)
 
+-- MEANS_INCLUDING String [String] String
+pMEANS_INCLUDING :: Parser Item
+pMEANS_INCLUDING = do
+  definition <- someTill anyChar (lookAhead pMeans)
+  _ <- pMeans
+  prefix <- someTill anyChar (lookAhead $ string ", including")
+  _ <- pKeyword ", including"
+  content <- someTill anyChar (lookAhead $ string "that are")
+  postfix <- lexeme (some anyChar)
+  let contents = [x | x@(_:_) <- wordsBy (==',') content, not $ all (==' ') x]
+  let pre_post = PRE_POST prefix contents postfix
+  pure $ MEANS_INCLUDING definition pre_post
 
 pKeyword :: String -> Parser String
 pKeyword keyword = lexeme (string keyword <* notFollowedBy alphaNumChar)

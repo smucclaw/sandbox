@@ -37,6 +37,7 @@ library
     , gf
     , megaparsec
     , mtl
+    , split
     , text
     , word-wrap
   default-language: Haskell2010
@@ -54,6 +55,7 @@ executable mti-exe
     , megaparsec
     , mti
     , mtl
+    , split
     , text
     , word-wrap
   default-language: Haskell2010
@@ -72,6 +74,7 @@ test-suite mti-test
     , megaparsec
     , mti
     , mtl
+    , split
     , text
     , word-wrap
   default-language: Haskell2010

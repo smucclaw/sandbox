@@ -4,6 +4,7 @@ act(borrowBook,tom,1).
 %reject_obligation(1,(c1,1)).
 %reject_obligation(2,(c1,1)).
 %reject_obligation(1,(c2,2)).
+%act(send_thank_you_note_to,tom,3).
 
 trigger(c1,T):-act(borrowBook,tom,T).
 
@@ -37,7 +38,7 @@ sat(1,(c2,Ts),T1):-trigger(c2,Ts),act(send_thank_you_note_to,tom,T1),T1<Ts+2.
 
 sat_oblig(c2,T):-sat(N,(c2,T),Tj).
 
-contract_succeeds((c2,T),Ts):-trigger(c2,T), sat_oblig(c2,T),#min {Tq,1:sat(N,(c1,T),Tq)} = Ts.
+contract_succeeds((c2,T),Ts):-trigger(c2,T), sat_oblig(c2,T),#min {Tq,1:sat(N,(c2,T),Tq)} = Ts.
 
 contract_satisfied(c2,T):-contract_succeeds((c2,T),Ts).
 

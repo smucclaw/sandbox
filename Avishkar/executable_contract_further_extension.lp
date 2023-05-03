@@ -44,8 +44,14 @@ contract_satisfied(c2,T):-contract_succeeds((c2,T),Ts).
 
 contract_violated(c2,T,T+2):-not contract_satisfied(c2,T),reject_obligation(1,(c2,T)),trigger(c2,T).
 
+%Equational theory over actions
+act(send_thank_you_note_to,Person,Time):-act(print_thank_you_note_for,Person,Time),act(post_thank_you_note_to(Address),Person,Time),lives_at(Address,Person,Time).
 
-
+%The above rule parametrizes the following 'constitutive rule' over a time parameter
+%Sending a thank-you note to someone MEANS/IS priniting a thank-you note for that person and posting it to the right address. 
+%More generally constitutive rules of the form head:-body that are independent of state can be lifted over a state parameter S by simply carrying S as an extra
+%argument. holds(head,S):-holds(body,S). This possibly opens up a way to integrate constitutive and regulative rules. The above is perhaps not the best example of this
+%separation as a person's adress possibly is related to the time poont in question, but the intention is that constitutive rules are state independent.
 
 #show prompt/1.
 #show contract_succeeds/2.

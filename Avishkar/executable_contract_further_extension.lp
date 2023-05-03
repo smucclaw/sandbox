@@ -13,7 +13,7 @@ sat(1,(c1,T),T1):-trigger(c1,T),act(returnBook,tom,T1),T1<T+10.
 
 
 prompt(pay_fine_within_5_days):-reject_obligation(1,(c1,T)), trigger(c1,T),not contract_satisfied(c1,T).
-sat(2,(c1,1),T2):-trigger(c1,T),act(payFine,tom,T2),T2<T+15.
+sat(2,(c1,T),T2):-trigger(c1,T),act(payFine,tom,T2),T2<T+15.
 
 
 sat_oblig(c1,T):-sat(N,(c1,T),Tj).

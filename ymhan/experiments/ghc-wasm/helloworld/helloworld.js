@@ -12,7 +12,7 @@ https://github.com/tweag/ormolu/tree/master/ormolu-live
 import { WASI } from "@bjorn3/browser_wasi_shim"; 
 // https://github.com/bjorn3/browser_wasi_shim
 
-const wasmBinaryPath = "Plus.wasm";
+const wasmBinaryPath = "hello.wasm";
 const divToPrintID = "printHere";
 
 async function initWebAssembly(source) {
@@ -39,11 +39,11 @@ async function initHSfromWasm(wasmObj) {
   return hs;
 }
 
-function printToDiv(targetDivID, toPrint) {
+function printToDiv(targetDivID, stringToPrint) {
   const divToPrint = document.getElementById(targetDivID);
   const para = document.createElement("p");
 
-  para.textContent = (toPrint).toString();
+  para.textContent = stringToPrint;
 
   divToPrint.appendChild(element);
 }
@@ -52,6 +52,20 @@ async function main() {
     const wasm = await initWebAssembly(fetch(wasmBinaryPath));
     const hs = initHSfromWasm(wasm);
 
-    const result = hs.plus(23, 2);
-    printToDiv(divToPrintID, result);
-}
+    const resultPtr = hs.getHello(0);
+
+    try {
+      const outStrPtr = hs.getString(resultPtr);
+      const outStrLen = hs.getStringLen(resultPtr);
+      const outputBytes = new Uint8Array(hs.memory.buffer, outStrPtr, outStrLen);
+      const outStr = decoder.decode(outputBytes);
+
+      printToDiv(divToPrintID, outStr);
+
+    } finally {
+      hs.freeStrWithLen(resultPtr); // TO EDIT
+    }
+
+
+
+

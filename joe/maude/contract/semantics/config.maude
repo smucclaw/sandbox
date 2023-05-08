@@ -280,13 +280,17 @@ sload full-maude
 
   ops configToStatus_ : Configuration -> ContractStatus .
 
-  eq configToStatus
+  eq configToStatus config
+  = contractStateToStatus (configToState config) .
+
+  ops configToState_ : Configuration -> ContractState .
+  eq configToState
     (
       config
       < coordinator : Coordinator |
         contractState : contractState >
     )
-  = contractStateToStatus contractState .
+  = contractState .
 
   --- ops isActive_ : ContractState -> Bool .
   --- eq isActive Active activeRules = true .

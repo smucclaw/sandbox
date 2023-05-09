@@ -14,12 +14,12 @@ import qualified Foreign
 foreign export ccall 
     plus :: Int -> Int -> Int
 
--- foreign export ccall 
---     main :: IO ()
+foreign export ccall 
+    main :: IO ()
 
 
 plus :: Int -> Int -> Int
 plus = (+)
 
--- main :: IO ()
--- main = putStrLn "this is the Haskell main function"
+main :: IO ()
+main = putStrLn "this is the Haskell main function"

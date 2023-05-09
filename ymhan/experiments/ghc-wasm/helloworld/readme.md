@@ -1,0 +1,34 @@
+# Avoiding custom nix sheningans for now
+
+Ignore `flake.nix`.
+
+Instead
+
+```
+nix shell https://gitlab.haskell.org/ghc/ghc-wasm-meta/-/archive/master/ghc-wasm-meta-master.tar.gz
+```
+
+
+To compile
+
+```
+wasm32-wasi-ghc Plus.hs -o Plus.wasm -no-hs-main -optl-mexec-model=reactor -optl-Wl,--export=hs_init,--export=plus
+
+
+```
+
+# Resources
+
+
+https://book.realworldhaskell.org/read/interfacing-with-c-the-ffi.html
+
+https://www.haskell.org/onlinereport/haskell2010/haskellch8.html
+https://ghc.gitlab.haskell.org/ghc/doc/users_guide/exts/ffi.html
+https://downloads.haskell.org/ghc/9.0.1/docs/html/users_guide/exts/ffi.html?highlight=capiffi#extension-CApiFFI
+
+https://gitlab.haskell.org/ghc/ghc-wasm-meta
+https://github.com/charles37/haskell-wasm-snake/blob/main/src/Main.hs
+
+http://blog.haskell-exists.com/yuras/posts/malloc-free-and-ffi.html
+
+

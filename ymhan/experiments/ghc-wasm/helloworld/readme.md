@@ -15,6 +15,7 @@ To compile
 wasm32-wasi-ghc Plus.hs -o Plus.wasm -no-hs-main -optl-mexec-model=reactor -optl-Wl,--export=hs_init,--export=plus
 
 
+wasm32-wasi-ghc Hello.hs -o Hello.wasm -optl-mexec-model=reactor -optl-Wl,--export=hs_init,--export=plus,--export=main
 ```
 
 # Resources

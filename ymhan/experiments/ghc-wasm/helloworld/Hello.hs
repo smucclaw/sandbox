@@ -11,8 +11,9 @@ http://blog.haskell-exists.com/yuras/posts/malloc-free-and-ffi.html
 
 -- {-# LANGUAGE CApiFFI #-}
 {-# LANGUAGE ForeignFunctionInterface #-}
+{-# LANGUAGE LambdaCase #-}
 
-module Main where
+module Hello where
 
 import Foreign.C.String ( CString, CStringLen )
 import Foreign ( Ptr, StablePtr )
@@ -48,6 +49,12 @@ strToPrint = "hello world?"
 
 getHello :: Int -> IO (StablePtr CStringLen)
 getHello _ =  FCS.newCStringLen strToPrint >>= Foreign.newStablePtr
+
+getString :: StablePtr CStringLen -> IO (Ptr CChar)
+getString = undefined
+-- TO DO
+getStringLen :: StablePtr CStringLen -> IO Int
+getStringLen = undefined
 
 strPtrFromCSL :: CStringLen -> Ptr CChar -- aka CString
 strPtrFromCSL = fst

@@ -2,21 +2,28 @@
 
 Ignore `flake.nix`.
 
-Instead
+Instead do the following (it'll probably be easiest to do this in a linux environment):
 
 ```
 nix shell https://gitlab.haskell.org/ghc/ghc-wasm-meta/-/archive/master/ghc-wasm-meta-master.tar.gz
 ```
 
 
-To compile
+Compile the wasm by doing
 
 ```
 wasm32-wasi-ghc Plus.hs -o Plus.wasm -no-hs-main -optl-mexec-model=reactor -optl-Wl,--export=hs_init,--export=plus
-
-
-wasm32-wasi-ghc Hello.hs -o Hello.wasm -optl-mexec-model=reactor -optl-Wl,--export=hs_init,--export=plus,--export=main
 ```
+
+and put the wasm binary in the `dist` folder.
+
+Then 
+
+```
+npm run build
+```
+
+to build the js scripts, serve `plus.html`, and open it in your browser.
 
 # Resources
 

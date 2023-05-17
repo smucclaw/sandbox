@@ -9,6 +9,7 @@ nix shell https://gitlab.haskell.org/ghc/ghc-wasm-meta/-/archive/master/ghc-wasm
 ```
 
 
+
 Compile the wasm(s) you want:
 
 ```
@@ -19,13 +20,16 @@ wasm32-wasi-ghc Hello.hs -o Hello.wasm  -no-hs-main -optl-mexec-model=reactor -o
 
 and put the wasm binary / binaries in the `dist` folder.
 
+
 Then 
 
 ```
 npm run build
 ```
 
+
 to build the js scripts, serve the relevant html file, and open it in your browser.
+
 
 # Resources
 

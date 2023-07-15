@@ -24,10 +24,6 @@ import Foreign.C.Types ( CChar )
 import qualified Foreign.C.String as FCS
 import qualified Foreign
 
--- type CStringLen = (Ptr CChar, Int)
-
--- foreign export ccall 
---     hiCString :: IO CString
 
 -- to look into: what happens if we use capi instead of ccall?
 foreign export ccall

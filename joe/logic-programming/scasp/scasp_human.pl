@@ -1,2 +1,1 @@
-:- use_module(library(scasp)).
-:- use_module(library(scasp/human)).
+:- [library(scasp), library(scasp/human)].

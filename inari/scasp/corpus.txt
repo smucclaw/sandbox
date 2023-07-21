@@ -1,0 +1,78 @@
+it holds in accordance with @(Rule) that @(Y) is permitted to accept @(Z)
+it holds in accordance with @(Rule) that @(Y) is prohibited from accepting @(Z)
+@(A) accepts the position @(B) as a representative of @(C)
+according to @(X), @(Y) is described in section 1
+in accordance with @(X), @(Y) is permitted to accept @(Z)
+in accordance with @(X), @(Y) is prohibited from accepting @(Z)
+@(A) is provided as compensation in respect of @(B)
+@(A) is associated with @(B)
+@(X) is a beneficial owner of @(Y)
+as per 34(7)(b), @(X) is not a business entity for the purposes of section 34
+as per 34(7)(a) @(X) is a business entity for the purposes of section 34
+@(X) is a business trust
+@(X) is a business for the purposes of section 34
+@(X) is a calling
+@(X) carries on @(Y)
+@(X) is a company
+the conditions of the second schedule are satisfied
+@(X) is a corporation
+the conclusion from @(X) of @(Y) is defeated
+@(X) derogates from the dignity of the legal profession
+@(X) is set out in the first schedule
+@(B) is a business described in 34(1)
+@(X) detracts from the dignity of the legal profession
+@(X) is a director of @(Y)
+@(X) entitles the holder to perform executive functions
+@(X) is not an executive appointment for the purposes of section 34
+@(X) is an executive appointment for the purposes of section 34
+@(X) is an executive appointment associated with the business @(Y)
+@(X) is an executive appointment in the business entity @(Y)
+@(X) is an executive appointment in the law practice @(Y)
+@(X) is not for profit
+@(X) is for profit
+@(X) is a foreign law practice
+@(X) is a formal law alliance
+@(X) is listed in the fourth schedule
+@(X) is listed in the third schedule
+@(X) is in @(Y)
+@(X) is incompatible with the dignity of the legal profession
+@(X) is an independent directorship
+@(X) is an institution
+@(X) involves paying @(Y) to @(Z)
+@(X) involves sharing @(Y) with @(Z)
+@(X) is a joint law venture
+@(X) is located in @(Y)
+@(X) is a singapore law practice
+@(X) is a law practice
+@(X) is a law-related service for the purposes of section 34
+@(X) is a legal owner of @(Y)
+@(X) is a legal practitioner
+@(X) is a legal service
+@(X) is legal work
+@(X) is a limited liability partnership
+@(X) is a locum solicitor
+@(X) materially interferes with @(Y) with regard to @(Z)
+@(A) may accept an appoinment to @(B)
+@(A) is a member of @(B)
+@(A) must not accept @(B)
+@(A) is prohibited from participating in @(B)
+@(X) is a non-executive directorship
+someone who is a legal or beneficial owner of @(Y) is not a sole proprietor, partner, or director of @(Z)
+@(X) is the legal or beneficial owner of @(Y)
+@(X) is prohibited from participating in @(Y)
+@(X) is a partner of @(Y)
+@(X) is a partner, sole proprietor, or director of @(Y)
+@(X) is a partnership
+@(A) was performed by @(B)
+@(X) is a position
+@(Y) is the primary occupation of @(X)
+@(X) is a business which is prohibited as defined by section 34(1)(f)
+@(X) provides legal or law-related services
+@(A) provides @(B)
+@(X) is a service
+@(X) is the sole proprietor of @(Y)
+@(X) is a sole proprietorship
+@(X) is an institution listed in the third schedule
+@(X) is a trade
+@(X) is unauthorised to peform legal work
+@(X) is likely to unfairly attract business in the practice of law

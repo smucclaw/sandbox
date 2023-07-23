@@ -7,11 +7,12 @@ concrete DrinksKiwi of Drinks = {
        Milk,
        Thickness,
        Sweetness,
-       Temperature = Str ;
+       Temperature,
+       Location = Str ;
 
     lin
 
-       Kopi = "coffe" ;
+       Kopi = "coffee" ;
        Teh = "tea" ;
 
        Condensed = "with condensed milk" ;
@@ -32,10 +33,13 @@ concrete DrinksKiwi of Drinks = {
        Ice = "Cold" ;
        Lukewarm = "luke warm" ;
 
+       HaveHere = "" ;
+       TakeAway = "takeaway" ;
+
 
        ----
 
-       Order kopi o po kosong peng = kopi ++ o ++ po ++ kosong ++ peng ;
+       Order kopi o po kosong peng takeaway = kopi ++ o ++ po ++ kosong ++ peng ++ takeaway ;
 
 
 }

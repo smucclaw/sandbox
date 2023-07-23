@@ -8,6 +8,7 @@ abstract Drinks = {
        Thickness ;
        Sweetness ;
        Temperature ;
+       Location ;
 
     fun
 
@@ -21,10 +22,11 @@ abstract Drinks = {
 
        DefaultTemperature, Ice, Lukewarm : Temperature ;
 
+       HaveHere, TakeAway : Location ;
 
        ----
 
-       Order : BaseDrink -> Milk -> Thickness -> Sweetness -> Temperature -> Drink ;
+       Order : BaseDrink -> Milk -> Thickness -> Sweetness -> Temperature -> Location -> Drink ;
 
 
 }

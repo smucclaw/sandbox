@@ -1,0 +1,15 @@
+there is no evidence that s/he may obtain a school place , because
+    there is no evidence that a common requirement is met , because
+        there is no evidence that s/he is part of a large family , and
+        there is no evidence that s/he is a recipient of the RMI , and
+        there is no evidence that a parent or sibling has disability status .
+    there is no evidence that the criterion foreign_student is met , because
+        there is no evidence that s/he meets the criteria foreign_student , because
+            there is no evidence that s/he is a foreign student .
+    there is no evidence that the criterion specific_etnia is met , because
+        s/he meets the criteria specific_etnia , because
+            s/he belongs to a specific etnia .
+        specific_etnia follows the purpose of the procedure , because
+            specific_etnia promotes the diversity .
+        specific_etnia is illegal , because
+            specific_etnia discriminates based on race .

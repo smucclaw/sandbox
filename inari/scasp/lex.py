@@ -87,11 +87,11 @@ def get_toks(line):
             words.append(getBasic(doc[i]))
     return words
 
-absheader = "abstract MonoLex = Cat [A, N, CN, V, PN, AdA, Adv, Prep] ** {\n  fun\n"
+absheader = "abstract MonoLex = Cat [[A, N, CN, V, VV, V2, PN, AdA, Adv, Prep, Pron] ** {\n  fun\n"
 
 def cncheader(cnc):
     header = [
-        "concrete MonoLex%s of MonoLex = Cat%s [A, N, CN, V, PN, AdA, Adv, Prep] ** " % (cnc, cnc)
+        "concrete MonoLex%s of MonoLex = Cat%s [[A, N, CN, V, VV, V2, PN, AdA, Adv, Prep, Pron] ** " % (cnc, cnc)
       , "  open Paradigms%s, Prelude in {"  % (cnc)
       , ""
       , "  lin"
@@ -106,7 +106,7 @@ if __name__ == "__main__":
     absfile = absname + ".gf"
     cncfile = absname + cncname + ".gf"
 
-    with open("corpus.txt", "r") as corpusfile:
+    with open("school-corpus.txt", "r") as corpusfile:
         corpus = corpusfile.read().split("\n")
 
     words = []

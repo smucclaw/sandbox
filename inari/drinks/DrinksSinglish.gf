@@ -7,7 +7,8 @@ concrete DrinksSinglish of Drinks = {
        Milk,
        Thickness,
        Sweetness,
-       Temperature = Str ;
+       Temperature,
+       Location = Str ;
 
     lin
 
@@ -32,10 +33,12 @@ concrete DrinksSinglish of Drinks = {
        Ice = "peng" ;
        Lukewarm = "bua shio" ;
 
+       HaveHere = "" ;
+       TakeAway = "tabao" ;
 
        ----
 
-       Order kopi o po kosong peng = kopi ++ o ++ po ++ kosong ++ peng ;
+       Order kopi o po kosong peng tabao = kopi ++ o ++ po ++ kosong ++ peng ++ tabao ;
 
 
 }

@@ -1,18 +1,23 @@
-{-# LANGUAGE GADTs #-}
+{-# LANGUAGE GADTs, RankNTypes #-}
 
 module Main where
 
 import School
-import PGF
+import PGF hiding (Tree)
 import Data.List (groupBy)
--- import System.Environment (getArgs)
+import Data.Either (rights, lefts)
+import Debug.Trace (trace, traceShow)
+
 
 
 printGF gr lang tree = do
+    putStrLn "\n---------"
     putStrLn $ showExpr [] $ gf tree
-    putStrLn $ linearize gr lang $ gf tree
+    putStrLn "\n"
+    putStr $ linearize gr lang $ gf tree
+    putStrLn "."
 
--- showGF = showExpr [] . gf
+showGF = showExpr [] . gf
 
 main :: IO ()
 main = do
@@ -21,10 +26,6 @@ main = do
     let eng = head $ languages gr
         sent = startCat gr
         parses = [fg t | (t:_) <- parse gr eng sent <$> sentences]
-
-    -- print $ map showGF <$> groupFullStop parses
-
-    -- print $ map showGF <$> (groupAndBecause <$> groupFullStop parses)
     mapM_ (printGF gr eng) (transformSimple parses)
 
 
@@ -57,7 +58,9 @@ groupAndBecause sentences = mergeAnd <$> groupBy groupAnd sentences
     mergeAnd :: [GS] -> GS
     mergeAnd [] = error "mergeAnd: empty list"
     mergeAnd [s] = s
-    mergeAnd ss = GNoEvidenceThat_ $ GListS $ map removeConstructors ss
+    mergeAnd ss = case removeCommonSubject $ map removeConstructors ss of
+       [s] -> s
+       ss' -> GNoEvidenceThat_ $ GListS ss'
 
     groupAnd :: GS -> GS -> Bool
     groupAnd (Gand _) (Gand _) = True
@@ -71,8 +74,65 @@ removeConstructors s = case removeConstructor s of
     GNoEvidenceThat (GEmbedSC np vps) -> GPredVPS np vps
     x -> x
 
+flipPolarity :: forall a . Tree a -> Tree a
+flipPolarity GPOS = GNEG
+flipPolarity GNEG = GPOS
+flipPolarity x = composOp flipPolarity x
+
 removeConstructor :: GS -> GS
 removeConstructor (Gand s) = s
 removeConstructor (GfullStop s) = s
 removeConstructor (Gcondition s) = s
 removeConstructor s = s
+
+removeCommonSubject :: [GS] -> [GS]
+removeCommonSubject sentences@(s:ss) = case (getSubjPred s, getSubjPred <$> ss) of
+   (Nothing, _) -> sentences
+   (first@(Just (subj, _pred)), _rest) ->
+      let ssOrVPSs = breakEqSubjs subj sentences -- must include first one too!
+          (preds, unchangedSents) = (rights ssOrVPSs, lefts ssOrVPSs)
+      in case preds of
+            [] -> trace ("preds=" <> show (map showGF preds)) sentences
+            [_] -> trace ("preds=" <> show (map showGF preds)) sentences
+            _ -> trace ("preds=" <> show (map showGF preds)) $ GPredVPS subj (aggregatePreds preds) : unchangedSents
+  where
+    breakEqSubjs :: GNP -> [GS] -> [Either GS GVPS]
+    breakEqSubjs _subj [] = []
+    breakEqSubjs  subj (x@(GPredVPS subj' pred):xs)
+      | subj == subj' = Right pred : breakEqSubjs subj xs
+      | otherwise     = Left x : breakEqSubjs subj xs
+    breakEqSubjs subj (x:xs) = Left x : breakEqSubjs subj xs
+
+
+    getSubjPred :: GS -> Maybe (GNP, GVPS)
+    getSubjPred (GPredVPS np vps) = Just (np, vps)
+    getSubjPred _ = Nothing
+
+aggregatePreds :: [GVPS] -> GVPS
+aggregatePreds preds = newVPS
+  where
+    fallback = GConjVPS Gor_Conj (GListVPS preds)
+    (tempPols@((temp,pol):_), vpss) = unzip $ map peelTempPol preds
+    nps = aggregateCompNPs vpss
+    newVPS = if preserved nps vpss && allEq (temp,pol) tempPols
+                then GMkVPS temp pol (GUseComp (GCompNP (GConjNP Gor_Conj (GListNP nps))))
+                else fallback
+
+    peelTempPol :: GVPS -> ((GTemp, GPol), GVP)
+    peelTempPol (GMkVPS t p vp) = ((t,p), vp)
+
+
+    preserved :: [a] -> [b] -> Bool
+    preserved [] [] = True
+    preserved (x:xs) (y:ys) = preserved xs ys
+    preserved _ _ = False
+
+aggregateCompNPs :: [GVP] -> [GNP]
+aggregateCompNPs [] = []
+aggregateCompNPs (GUseComp (GCompNP np):rest) = np:aggregateCompNPs rest
+aggregateCompNPs _ = []
+
+allEq _ [] = True
+allEq x (x':xs)
+  | x == x'   = allEq x xs
+  | otherwise = False

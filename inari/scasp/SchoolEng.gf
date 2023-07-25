@@ -50,10 +50,12 @@ concrete SchoolEng of School =
                                 ( SentCN ( UseN _evidence_N ) sc )
                             ) ;
 
-    NoEvidenceThat_ ss = NoEvidenceThat (GrammarEng.EmbedS (ConjS and_Conj ss)) ;
+    NoEvidenceThat_ ss = NoEvidenceThat (GrammarEng.EmbedS (ConjS (mkConj ", and") ss)) ;
 
-    BecauseS s1 s2 = cc3 s1 (ss ", because") s2 ;
+    BecauseS s1 s2 = cc3 s1 (ss ", because ¶§") s2 ;
 
+  oper
+     pad : Str -> SS -> SS = \str -> cc2 (ss str) ;
 -----------------------------------------------------------------------------
 -- Misc shortcuts and extensions to RGL
 
@@ -65,7 +67,7 @@ concrete SchoolEng of School =
     and s = cc2 s (ss ", and") ;
     fullStop s = cc2 s (ss ".") ;
 
-    and_Conj = GrammarEng.and_Conj | mkConj ", and" ;
+    and_Conj = mkConj ", and" | GrammarEng.and_Conj ;
     because_Conj = mkConj ", because" ;
 
 

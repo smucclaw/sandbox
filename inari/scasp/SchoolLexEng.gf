@@ -5,7 +5,8 @@ concrete SchoolLexEng of SchoolLex = CatEng [A, N, CN, V, VV, V2, PN, N2, AdA, A
     s_he_Pron = she_Pron ** {s = \\_ => "s/he"} ;
     _foreign_A = mkA "foreign" ;
     _parent_N = mkN "parent" ;
-    _part_N = mkN "part" ;
+    _part_of_N2 = mkN2 (mkN "part") possess_Prep ;
+    _recipient_of_N2 = mkN2 (mkN "recipient") possess_Prep ;
     _criterion_N2 = mkN2 (mkN "criterion" "criteria") noPrep ;
     _foreign_student_N = mkN "foreign_student" ;
     _obtain_V2 = mkV2 "obtain" ;
@@ -22,7 +23,6 @@ concrete SchoolLexEng of SchoolLex = CatEng [A, N, CN, V, VV, V2, PN, N2, AdA, A
     _discriminate_V2 = mkV2 (mkV "discriminate") (mkPrep "based on") ;
     _race_N = mkN "race" ;
     _school_place_N = mkN "school place" ;
-    _recipient_N = mkN "recipient" ;
     _common_A = mkA "common" ;
     _sibling_N = mkN "sibling" ;
     _evidence_N = mkN "evidence" ;

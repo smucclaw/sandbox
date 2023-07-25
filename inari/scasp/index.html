@@ -1,0 +1,31 @@
+<html>
+</html>
+<script type="module">
+  import * as GF from './dist/index.js'
+
+
+
+
+  let xhr = new XMLHttpRequest()
+
+
+  xhr.open('GET', 'School.json')
+  xhr.onload = function () {
+    if (xhr.status === 200) {
+      let json = JSON.parse(xhr.responseText)
+      let grammar = GF.fromJSON(json)
+      console.log(grammar)
+      let s = "condition (UseCl pastSimul NEG (ExistCN (AdjCN (PositA _common_A) (UseN _procedure_N))))"
+      let tree = grammar.abstract.parseTree(s, "S")
+      console.log(tree)
+      let linTree = grammar.concretes.SchoolEng.linearize(tree)
+      console.log(linTree)
+      let foo = tree.args
+      console.log("args", grammar.concretes.SchoolEng.linearize(foo[0]))
+
+    }
+  }
+
+
+  xhr.send()
+</script>

@@ -2,7 +2,7 @@ abstract School =
     Numeral
   , Grammar [
           N, N2, CN, UseN, NP, Det, Quant, DetCN, MassNP, UsePron
-        , V, VV, V2, V2, VS, VP, ComplVV, PassV2
+        , V, VV, V2, V2, VS, VP, ComplVV-- , PassV2
         , A, A2, AP, AdjCN, PositA, SC, SentCN, ComplN2
         , Comp, Adv, VP, UseComp, CompNP, CompAP, CompAdv -- is a public agency
         , Prep, PrepNP, AdvVP
@@ -23,7 +23,7 @@ abstract School =
         , VPI, MkVPI --, [VPI], BaseVPI, ConsVPI, ConjVPI
         , VP, Tense, Ant, Temp, Pol, Conj -- for VPS
     --      , GenRP -- nice to have in the future?
-        , ByVP
+        , ByVP --, PassVPSlash
         , Cl, CN, ExistCN
         , S, PredVPS
         , NP, GerundNP
@@ -41,6 +41,16 @@ abstract School =
     BecauseS : S -> S -> S ;
 
     NoEvidenceThat_ : [S] -> S ;
+
+    MeetCriterion : NP -> MyCustomCat ;
+
+    Active : MyCustomCat -> NP -> SC ;
+    Passive : MyCustomCat -> SC ;
+  cat MyCustomCat ;
+
+  -- fun
+  --   Declarative,
+  --   Hypothetical : MyCustomCat -> S ;
 -----------------------------------------------------------------------------
 -- Misc shortcuts and extensions to RGL
   fun

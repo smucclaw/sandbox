@@ -5,7 +5,7 @@ abstract SchoolLex = Cat [A, N, CN, V, VV, V2, PN, N2, AdA, Adv, Prep, Pron] ** 
     _parent_N : N ;
     _part_of_N2 : N2 ;
     _recipient_of_N2 : N2 ;
-    _criterion_N2 : N2 ;
+   -- _criterion_N2 : N2 ;
     _foreign_student_N : N ;
     _obtain_V2 : V2 ;
     _specific_etnia_PN : PN ;

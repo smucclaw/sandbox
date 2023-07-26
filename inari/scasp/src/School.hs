@@ -70,6 +70,8 @@ type GListS = Tree GListS_
 data GListS_
 type GListVPS = Tree GListVPS_
 data GListVPS_
+type GMyCustomCat = Tree GMyCustomCat_
+data GMyCustomCat_
 type GN = Tree GN_
 data GN_
 type GN2 = Tree GN2_
@@ -186,6 +188,7 @@ data Tree :: * -> * where
   GListNP :: [GNP] -> Tree GListNP_
   GListS :: [GS] -> Tree GListS_
   GListVPS :: [GVPS] -> Tree GListVPS_
+  GMeetCriterion :: GNP -> Tree GMyCustomCat_
   LexN :: String -> Tree GN_
   LexN2 :: String -> Tree GN2_
   GConjNP :: GConj -> GListNP -> Tree GNP_
@@ -218,7 +221,9 @@ data Tree :: * -> * where
   Gand :: GS -> Tree GS_
   Gcondition :: GS -> Tree GS_
   GfullStop :: GS -> Tree GS_
+  GActive :: GMyCustomCat -> GNP -> Tree GSC_
   GEmbedSC :: GNP -> GVPS -> Tree GSC_
+  GPassive :: GMyCustomCat -> Tree GSC_
   Gpot0 :: GDigit -> Tree GSub10_
   Gpot01 :: Tree GSub10_
   Gpot0as1 :: GSub10 -> Tree GSub100_
@@ -253,7 +258,6 @@ data Tree :: * -> * where
   GAdvVP :: GVP -> GAdv -> Tree GVP_
   GComplV2 :: GV2 -> GNP -> Tree GVP_
   GComplVV :: GVV -> GVP -> Tree GVP_
-  GPassV2 :: GV2 -> Tree GVP_
   GUseComp :: GComp -> Tree GVP_
   GMkVPI :: GVP -> Tree GVPI_
   GConjVPS :: GConj -> GListVPS -> Tree GVPS_
@@ -315,6 +319,7 @@ instance Eq (Tree a) where
     (GListNP x1,GListNP y1) -> and [x == y | (x,y) <- zip x1 y1]
     (GListS x1,GListS y1) -> and [x == y | (x,y) <- zip x1 y1]
     (GListVPS x1,GListVPS y1) -> and [x == y | (x,y) <- zip x1 y1]
+    (GMeetCriterion x1,GMeetCriterion y1) -> and [ x1 == y1 ]
     (LexN x,LexN y) -> x == y
     (LexN2 x,LexN2 y) -> x == y
     (GConjNP x1 x2,GConjNP y1 y2) -> and [ x1 == y1 , x2 == y2 ]
@@ -347,7 +352,9 @@ instance Eq (Tree a) where
     (Gand x1,Gand y1) -> and [ x1 == y1 ]
     (Gcondition x1,Gcondition y1) -> and [ x1 == y1 ]
     (GfullStop x1,GfullStop y1) -> and [ x1 == y1 ]
+    (GActive x1 x2,GActive y1 y2) -> and [ x1 == y1 , x2 == y2 ]
     (GEmbedSC x1 x2,GEmbedSC y1 y2) -> and [ x1 == y1 , x2 == y2 ]
+    (GPassive x1,GPassive y1) -> and [ x1 == y1 ]
     (Gpot0 x1,Gpot0 y1) -> and [ x1 == y1 ]
     (Gpot01,Gpot01) -> and [ ]
     (Gpot0as1 x1,Gpot0as1 y1) -> and [ x1 == y1 ]
@@ -382,7 +389,6 @@ instance Eq (Tree a) where
     (GAdvVP x1 x2,GAdvVP y1 y2) -> and [ x1 == y1 , x2 == y2 ]
     (GComplV2 x1 x2,GComplV2 y1 y2) -> and [ x1 == y1 , x2 == y2 ]
     (GComplVV x1 x2,GComplVV y1 y2) -> and [ x1 == y1 , x2 == y2 ]
-    (GPassV2 x1,GPassV2 y1) -> and [ x1 == y1 ]
     (GUseComp x1,GUseComp y1) -> and [ x1 == y1 ]
     (GMkVPI x1,GMkVPI y1) -> and [ x1 == y1 ]
     (GConjVPS x1 x2,GConjVPS y1 y2) -> and [ x1 == y1 , x2 == y2 ]
@@ -628,6 +634,16 @@ instance Gf GListVPS where
 
       _ -> error ("no ListVPS " ++ show t)
 
+instance Gf GMyCustomCat where
+  gf (GMeetCriterion x1) = mkApp (mkCId "MeetCriterion") [gf x1]
+
+  fg t =
+    case unApp t of
+      Just (i,[x1]) | i == mkCId "MeetCriterion" -> GMeetCriterion (fg x1)
+
+
+      _ -> error ("no MyCustomCat " ++ show t)
+
 instance Gf GN where
   gf (LexN x) = mkApp (mkCId x) []
 
@@ -771,11 +787,15 @@ instance Gf GS where
       _ -> error ("no S " ++ show t)
 
 instance Gf GSC where
+  gf (GActive x1 x2) = mkApp (mkCId "Active") [gf x1, gf x2]
   gf (GEmbedSC x1 x2) = mkApp (mkCId "EmbedSC") [gf x1, gf x2]
+  gf (GPassive x1) = mkApp (mkCId "Passive") [gf x1]
 
   fg t =
     case unApp t of
+      Just (i,[x1,x2]) | i == mkCId "Active" -> GActive (fg x1) (fg x2)
       Just (i,[x1,x2]) | i == mkCId "EmbedSC" -> GEmbedSC (fg x1) (fg x2)
+      Just (i,[x1]) | i == mkCId "Passive" -> GPassive (fg x1)
 
 
       _ -> error ("no SC " ++ show t)
@@ -909,7 +929,6 @@ instance Gf GVP where
   gf (GAdvVP x1 x2) = mkApp (mkCId "AdvVP") [gf x1, gf x2]
   gf (GComplV2 x1 x2) = mkApp (mkCId "ComplV2") [gf x1, gf x2]
   gf (GComplVV x1 x2) = mkApp (mkCId "ComplVV") [gf x1, gf x2]
-  gf (GPassV2 x1) = mkApp (mkCId "PassV2") [gf x1]
   gf (GUseComp x1) = mkApp (mkCId "UseComp") [gf x1]
 
   fg t =
@@ -917,7 +936,6 @@ instance Gf GVP where
       Just (i,[x1,x2]) | i == mkCId "AdvVP" -> GAdvVP (fg x1) (fg x2)
       Just (i,[x1,x2]) | i == mkCId "ComplV2" -> GComplV2 (fg x1) (fg x2)
       Just (i,[x1,x2]) | i == mkCId "ComplVV" -> GComplVV (fg x1) (fg x2)
-      Just (i,[x1]) | i == mkCId "PassV2" -> GPassV2 (fg x1)
       Just (i,[x1]) | i == mkCId "UseComp" -> GUseComp (fg x1)
 
 
@@ -1030,6 +1048,7 @@ instance Compos Tree where
     GCompNP x1 -> r GCompNP `a` f x1
     GIDig x1 -> r GIDig `a` f x1
     GIIDig x1 x2 -> r GIIDig `a` f x1 `a` f x2
+    GMeetCriterion x1 -> r GMeetCriterion `a` f x1
     GConjNP x1 x2 -> r GConjNP `a` f x1 `a` f x2
     GDetCN x1 x2 -> r GDetCN `a` f x1 `a` f x2
     GGerundNP x1 -> r GGerundNP `a` f x1
@@ -1045,7 +1064,9 @@ instance Compos Tree where
     Gand x1 -> r Gand `a` f x1
     Gcondition x1 -> r Gcondition `a` f x1
     GfullStop x1 -> r GfullStop `a` f x1
+    GActive x1 x2 -> r GActive `a` f x1 `a` f x2
     GEmbedSC x1 x2 -> r GEmbedSC `a` f x1 `a` f x2
+    GPassive x1 -> r GPassive `a` f x1
     Gpot0 x1 -> r Gpot0 `a` f x1
     Gpot0as1 x1 -> r Gpot0as1 `a` f x1
     Gpot1 x1 -> r Gpot1 `a` f x1
@@ -1069,7 +1090,6 @@ instance Compos Tree where
     GAdvVP x1 x2 -> r GAdvVP `a` f x1 `a` f x2
     GComplV2 x1 x2 -> r GComplV2 `a` f x1 `a` f x2
     GComplVV x1 x2 -> r GComplVV `a` f x1 `a` f x2
-    GPassV2 x1 -> r GPassV2 `a` f x1
     GUseComp x1 -> r GUseComp `a` f x1
     GMkVPI x1 -> r GMkVPI `a` f x1
     GConjVPS x1 x2 -> r GConjVPS `a` f x1 `a` f x2

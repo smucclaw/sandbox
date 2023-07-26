@@ -2,7 +2,7 @@ concrete SchoolEng of School =
     NumeralEng
   , GrammarEng [
         N, N2, CN, UseN, NP, Det, Quant, DetCN, MassNP, UsePron
-      , V, VV, V2, V2, VS, VP, ComplVV, PassV2
+      , V, VV, V2, V2, VS, VP, ComplVV-- , PassV2
       , A, A2, AP, AdjCN, PositA, SC, ComplN2 -- , SentCN
       , Comp, Adv, VP, UseComp, CompAP, CompNP, CompAdv -- is a public agency
       , Prep, PrepNP, AdvVP
@@ -22,7 +22,7 @@ concrete SchoolEng of School =
         VPS, MkVPS, mkVPS, ListVPS, BaseVPS, ConsVPS, ConjVPS, baseVPS
       , VPI, MkVPI, mkVPI --, [VPI], BaseVPI, ConsVPI, ConjVPI
       , VP, Tense, Ant, Temp, Pol, Conj -- for VPS
-      , ByVP
+      , ByVP --, PassVPSlash
         , Cl, CN, ExistCN
       , S, PredVPS
       , NP, GerundNP -- by performing NDB qualification
@@ -54,7 +54,19 @@ concrete SchoolEng of School =
 
     BecauseS s1 s2 = cc3 s1 (ss ", because ¶§") s2 ;
 
+    MeetCriterion foreign_student = {
+      v2 = _meet_V2 ;
+      obj = let cn : CN = ComplN2 _criterion_N2 foreign_student
+             in mkNP theSg cn | mkNP thePl cn ;
+      } ;
+
+    Active pred subj = EmbedSC subj (MkVPS presSimul POS (ComplV2 pred.v2 pred.obj) ) ;
+    Passive pred = EmbedSC pred.obj (MkVPS presSimul POS (PassV2 pred.v2)) ;
+
+  lincat
+    MyCustomCat = {v2 : V2 ; obj : NP} ;
   oper
+
      pad : Str -> SS -> SS = \str -> cc2 (ss str) ;
 -----------------------------------------------------------------------------
 -- Misc shortcuts and extensions to RGL

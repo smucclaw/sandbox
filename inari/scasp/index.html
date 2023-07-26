@@ -1,4 +1,7 @@
 <html>
+  <div id="test">
+
+  </div>
 </html>
 <script type="module">
   import * as GF from './dist/index.js'
@@ -8,6 +11,45 @@
 
   let xhr = new XMLHttpRequest()
 
+  const peelTree = function(t) {
+    let a = t.args
+    if (a.length) {
+      return (a[0])
+    }
+  };
+
+  function getPred(tree, arr, grammar) {
+    let peeled = (peelTree(tree))
+    console.log("tree", peeled, tree)
+    if (["Passive", "Active"].includes(peeled.name)) {
+        console.log("getPred", (peeled.args[0]))
+        return arr.push(peeled.args[0]);
+    } else {
+        console.log("Expecting an argument of NoEvidenceThat");
+    }
+  }
+
+  function mergeRedundant(trees) {
+    const tree1 = trees[0]
+    const tree2 = trees[1]
+      if (getPred(tree1) === getPred(tree2)) {
+          return tree1;
+      } else {
+          return { name: "BecauseS", args: [tree1, tree2] };
+      }
+  }
+
+  function skipRedundantActive(trees) {
+    const tree1 = trees[0]
+    const tree2 = trees[0]
+    if (tree1.name === "NoEvidenceThat" && tree2.name === "NoEvidenceThat") {
+      return mergeRedundant([peelTree(tree1), peelTree(tree2)]);
+    } else {
+      throw new Error("Expecting trees that start with NoEvidenceThat");
+    }
+  }
+
+
 
   xhr.open('GET', 'School.json')
   xhr.onload = function () {
@@ -15,14 +57,22 @@
       let json = JSON.parse(xhr.responseText)
       let grammar = GF.fromJSON(json)
       console.log(grammar)
-      let s = "condition (UseCl pastSimul NEG (ExistCN (AdjCN (PositA _common_A) (UseN _procedure_N))))"
-      let tree = grammar.abstract.parseTree(s, "S")
-      console.log(tree)
-      let linTree = grammar.concretes.SchoolEng.linearize(tree)
+      let s = ["condition (NoEvidenceThat (Passive (MeetCriterion (MassNP (UseN _foreign_student_N)))))", "condition (NoEvidenceThat (Active (MeetCriterion (MassNP (UseN _foreign_student_N))) (UsePron s_he_Pron)))", "fullStop (NoEvidenceThat (EmbedSC (UsePron s_he_Pron) (MkVPS presSimul POS (UseComp (CompNP (DetCN aSg (AdjCN (PositA _foreign_A) (UseN _student_N))))))))"]
+      let tree = s.map(x => grammar.abstract.parseTree(x, "S"))
+      console.log("top trees", tree)
+      let linTree = tree.map(x => grammar.concretes.SchoolEng.linearize(x))
       console.log(linTree)
-      let foo = tree.args
-      console.log("args", grammar.concretes.SchoolEng.linearize(foo[0]))
-
+      let peeled = tree.map(x => (peelTree(x)))
+      console.log("peeled", peeled)
+      document.getElementById("test").innerHTML = linTree;
+      let noevidence = []
+      peeled.map(x => getPred(x, noevidence, grammar))
+      console.log("noevidence", noevidence)
+      let redundant = mergeRedundant(noevidence)
+      console.log(redundant)
+      console.log("lin", grammar.concretes.SchoolEng.linearize((redundant)))
+      let skip = skipRedundantActive(peeled)
+      console.log("skip", skip)
     }
   }
 

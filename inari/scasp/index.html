@@ -71,12 +71,19 @@
     document.getElementById("test").innerHTML = txt;
   }
 
+  function extractFirstElement(inputList) {
+    return inputList.map(arr => arr[0]);
+  }
+
   function getInput(id, grammar) {
     let txt = (document.getElementById(id).value.split('\n'))
-    console.log("single", grammar.concretes.SchoolEng.parseString("there is no evidence that the criterion foreign_student is met, because", "S"))
     if (txt.length > 1) {
-      let trees = txt.map(x => grammar.concretes.SchoolEng.parseString(x.trim(), "S"))
-      console.log("multiple", trees)
+      let s = txt.map(x => grammar.concretes.SchoolEng.parseString(x.trim(), "S"))
+      console.log(extractFirstElement(s))
+
+      let tree = skipRedundantActive(extractFirstElement(s))
+      console.log(tree)
+      printTest("<p> skipRedundantActive <p>" + tree.print() + "<p>" + prettyPrint(grammar.concretes.SchoolEng.linearize(tree)))
     }
     else {
       let t = txt[0].trim()
@@ -116,7 +123,7 @@
         "mergeRedundant <p>" + redundant.print() + "<p>" + prettyPrint(grammar.concretes.SchoolEng.linearize(redundant)) +
         "<p> skipRedundantActive <p>" + skip.print() + "<p>" + prettyPrint(grammar.concretes.SchoolEng.linearize(skip))
 
-      printTest(tests)
+      // printTest(tests)
 
       document.getElementById('txt').addEventListener("keydown", function(e){
         if (e.key == 'Enter') {

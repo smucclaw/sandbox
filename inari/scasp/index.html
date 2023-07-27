@@ -15,20 +15,21 @@
     }
   };
 
-  function getPred(tree, arr, grammar) {
-    let peeled = (peelTree(tree))
-    console.log("tree", peeled, tree)
-    if (["Passive", "Active"].includes(peeled.name)) {
-        console.log("getPred", (peeled.args[0]))
-        return arr.push(peeled.args[0]);
+  function getPred(tree) {
+    // console.log("getPred.tree", tree)
+    if (["Passive", "Active"].includes(tree.name)) {
+        console.log("getPred", tree, tree.args[0])
+        return tree.args[0]
     } else {
-        console.log("Expecting an argument of NoEvidenceThat");
+        return tree
+        console.log("Expecting an argument of NoEvidenceThat, got", tree);
     }
   }
 
   function mergeRedundant(trees) {
     const tree1 = trees[0]
     const tree2 = trees[1]
+      // console.log("mergeRedundant:", tree1, tree2)
       if (getPred(tree1) === getPred(tree2)) {
           return tree1;
       } else {
@@ -57,23 +58,28 @@
       let grammar = GF.fromJSON(json)
       console.log(grammar)
       let s = ["condition (NoEvidenceThat (Passive (MeetCriterion (MassNP (UseN _foreign_student_N)))))", "condition (NoEvidenceThat (Active (MeetCriterion (MassNP (UseN _foreign_student_N))) (UsePron s_he_Pron)))", "fullStop (NoEvidenceThat (EmbedSC (UsePron s_he_Pron) (MkVPS presSimul POS (UseComp (CompNP (DetCN aSg (AdjCN (PositA _foreign_A) (UseN _student_N))))))))"]
-      let tree = s.map(x => grammar.abstract.parseTree(x, "S"))
-      console.log("top trees", tree)
-      let linTree = tree.map(x => grammar.concretes.SchoolEng.linearize(x))
-      console.log(linTree)
-      let peeled = tree.map(x => (peelTree(x)))
-      console.log("peeled", peeled)
-      let noevidence = []
-      peeled.map(x => getPred(x, noevidence, grammar))
-      console.log("noevidence", noevidence)
-      let redundant = mergeRedundant(noevidence)
-      console.log("redundant", JSON.stringify(redundant))
+      let trees = s.map(x => grammar.abstract.parseTree(x, "S"))
+      console.log("trees:")
+      trees.map(x => console.log("   ", x.print()))
+      console.log("linearised:")
+      trees.map(x => console.log("   ", grammar.concretes.SchoolEng.linearize(x)))
+
+
+      let peeled = trees.map(x => (peelTree(x)))
+      console.log("peeled:", peeled.map(x => x.print()))
+
       let skip = skipRedundantActive(peeled)
-      console.log("skip", JSON.stringify(skip))
+      console.log("skip:", JSON.stringify(skip), skip.print()) // JSON.stringify(skip))
+
+      let redundant = mergeRedundant(peeled)
+      console.log(redundant.toString())
+      console.log(redundant.name, redundant.args)
+      console.log("redundant", JSON.stringify(redundant))
+
 
       let tests =
-        "mergeRedundant <p>" + JSON.stringify(redundant) + "<p>" + grammar.concretes.SchoolEng.linearize((redundant))
-        + "<p> skipRedundantActive <p>" + JSON.stringify(skip) + "<p>" + grammar.concretes.SchoolEng.linearize((skip))
+        "mergeRedundant <p>" + JSON.stringify(redundant) + "<p>" + grammar.concretes.SchoolEng.linearize((redundant)) +
+        "<p> skipRedundantActive <p>" + JSON.stringify(skip) + "<p>" + grammar.concretes.SchoolEng.linearize((skip))
 
       printTest(tests)
 

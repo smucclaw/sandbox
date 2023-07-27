@@ -67,13 +67,13 @@
       peeled.map(x => getPred(x, noevidence, grammar))
       console.log("noevidence", noevidence)
       let redundant = mergeRedundant(noevidence)
-      console.log(redundant)
+      console.log("redundant", JSON.stringify(redundant))
       let skip = skipRedundantActive(peeled)
-      console.log("skip", skip)
+      console.log("skip", JSON.stringify(skip))
 
       let tests =
-        grammar.concretes.SchoolEng.linearize((redundant))
-        + "<p>" + grammar.concretes.SchoolEng.linearize((skip))
+        "mergeRedundant <p>" + JSON.stringify(redundant) + "<p>" + grammar.concretes.SchoolEng.linearize((redundant))
+        + "<p> skipRedundantActive <p>" + JSON.stringify(skip) + "<p>" + grammar.concretes.SchoolEng.linearize((skip))
 
       printTest(tests)
 

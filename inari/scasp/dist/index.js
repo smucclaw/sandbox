@@ -962,12 +962,12 @@ class ParseState {
             acc = new Trie();
         this.process(
         // Items
-        this.items.value, 
+        this.items.value,
         // Deal with literal categories
         function (_fid) {
             // Always return null, as suggested by Krasimir
             return null;
-        }, 
+        },
         // Takes an array of tokens and populates the accumulator
         function (tokens, item) {
             if (currentToken == '' || tokens[0].indexOf(currentToken) == 0) { //if begins with...

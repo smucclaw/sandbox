@@ -1,6 +1,9 @@
 <html>
+  <div id="form">
+    <textarea id="txt" rows="5" cols="50">
+    </textarea>
+  </div>
   <div id="test">
-
   </div>
 </html>
 <script type="module">
@@ -68,6 +71,23 @@
     document.getElementById("test").innerHTML = txt;
   }
 
+  function getInput(id, grammar) {
+    let txt = (document.getElementById(id).value.split('\n'))
+    console.log("single", grammar.concretes.SchoolEng.parseString("there is no evidence that the criterion foreign_student is met, because", "S"))
+    if (txt.length > 1) {
+      let trees = txt.map(x => grammar.concretes.SchoolEng.parseString(x.trim(), "S"))
+      console.log("multiple", trees)
+    }
+    else {
+      let t = txt[0].trim()
+      console.log(t, typeof t)
+      console.log("single", grammar.concretes.SchoolEng.parseString(t, "S"))
+    }
+  }
+
+
+
+
   xhr.open('GET', 'School.json')
   xhr.onload = function () {
     if (xhr.status === 200) {
@@ -97,6 +117,12 @@
         "<p> skipRedundantActive <p>" + skip.print() + "<p>" + prettyPrint(grammar.concretes.SchoolEng.linearize(skip))
 
       printTest(tests)
+
+      document.getElementById('txt').addEventListener("keydown", function(e){
+        if (e.key == 'Enter') {
+          getInput('txt', grammar)
+      }
+});
 
 
     }

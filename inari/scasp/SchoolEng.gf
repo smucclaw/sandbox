@@ -102,4 +102,8 @@ concrete SchoolEng of School =
     emptyPlNP : NP = they_NP ** {s = \\_ => []} ;
 
     whoRP : RP = ExtraEng.who_RP ;
+  linref
+    MyCustomCat = \np -> np.v2.s ! R.VPres ++ np.obj.s ! R.npNom ;
+
+
 }

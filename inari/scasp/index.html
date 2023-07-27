@@ -6,9 +6,6 @@
 <script type="module">
   import * as GF from './dist/index.js'
 
-
-
-
   let xhr = new XMLHttpRequest()
 
   const peelTree = function(t) {
@@ -49,7 +46,9 @@
     }
   }
 
-
+  function printTest(txt) {
+    document.getElementById("test").innerHTML = txt;
+  }
 
   xhr.open('GET', 'School.json')
   xhr.onload = function () {
@@ -64,15 +63,21 @@
       console.log(linTree)
       let peeled = tree.map(x => (peelTree(x)))
       console.log("peeled", peeled)
-      document.getElementById("test").innerHTML = linTree;
       let noevidence = []
       peeled.map(x => getPred(x, noevidence, grammar))
       console.log("noevidence", noevidence)
       let redundant = mergeRedundant(noevidence)
       console.log(redundant)
-      console.log("lin", grammar.concretes.SchoolEng.linearize((redundant)))
       let skip = skipRedundantActive(peeled)
       console.log("skip", skip)
+
+      let tests =
+        grammar.concretes.SchoolEng.linearize((redundant))
+        + "<p>" + grammar.concretes.SchoolEng.linearize((skip))
+
+      printTest(tests)
+
+
     }
   }
 

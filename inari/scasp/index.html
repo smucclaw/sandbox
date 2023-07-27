@@ -15,10 +15,14 @@
     }
   };
 
+  const prettyPrint = function(s) {
+    return s.replaceAll('¶','<br>').replaceAll('§','&nbsp;&nbsp;&nbsp;&nbsp;')
+  }
+
   function getPred(tree) {
     // console.log("getPred.tree", tree)
     if (["Passive", "Active"].includes(tree.name)) {
-        console.log("getPred", tree, tree.args[0])
+        console.log("getPred", tree, tree.args[0].print())
         return tree.args[0]
     } else {
         return tree
@@ -29,19 +33,32 @@
   function mergeRedundant(trees) {
     const tree1 = trees[0]
     const tree2 = trees[1]
-      // console.log("mergeRedundant:", tree1, tree2)
-      if (getPred(tree1) === getPred(tree2)) {
+    const pred1 = getPred(peelTree(tree1))
+    const pred2 = getPred(peelTree(tree2))
+      console.log("mergeRedundant:", tree1, tree2)
+      if (pred1.print() === pred2.print()) {
           return tree1;
       } else {
-          return { name: "BecauseS", args: [tree1, tree2] };
+          console.log("mergeRedundant: not the same predicate\n", pred1.print(), "\n", pred2.print())
+          console.log(typeof(pred1), "---", typeof(pred2))
+          let newTree = new GF.Fun("BecauseS", [])
+          newTree.setArg(1,tree1)
+          newTree.setArg(2,tree2)
+          return newTree
       }
   }
 
   function skipRedundantActive(trees) {
     const tree1 = trees[0]
-    const tree2 = trees[0]
+    const tree2 = trees[1]
     if (tree1.name === "NoEvidenceThat" && tree2.name === "NoEvidenceThat") {
-      return mergeRedundant([peelTree(tree1), peelTree(tree2)]);
+      let nonredundantExplanation = mergeRedundant([tree1, tree2]);
+      console.log("nonredundantExplanation", nonredundantExplanation.print())
+      let newTree = new GF.Fun("BecauseS", [])
+      newTree.setArg(1,nonredundantExplanation)
+      newTree.setArg(2,trees[2])
+      return newTree
+
     } else {
       throw new Error("Expecting trees that start with NoEvidenceThat");
     }
@@ -71,15 +88,13 @@
       let skip = skipRedundantActive(peeled)
       console.log("skip:", JSON.stringify(skip), skip.print()) // JSON.stringify(skip))
 
-      let redundant = mergeRedundant(peeled)
-      console.log(redundant.toString())
-      console.log(redundant.name, redundant.args)
+      let redundant = mergeRedundant(trees)
       console.log("redundant", JSON.stringify(redundant))
 
 
       let tests =
-        "mergeRedundant <p>" + JSON.stringify(redundant) + "<p>" + grammar.concretes.SchoolEng.linearize((redundant)) +
-        "<p> skipRedundantActive <p>" + JSON.stringify(skip) + "<p>" + grammar.concretes.SchoolEng.linearize((skip))
+        "mergeRedundant <p>" + redundant.print() + "<p>" + prettyPrint(grammar.concretes.SchoolEng.linearize(redundant)) +
+        "<p> skipRedundantActive <p>" + skip.print() + "<p>" + prettyPrint(grammar.concretes.SchoolEng.linearize(skip))
 
       printTest(tests)
 

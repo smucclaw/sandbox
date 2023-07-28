@@ -11,10 +11,13 @@
 
   let xhr = new XMLHttpRequest()
 
-  const peelTree = function(t) {
+  const peelTopLevel = function(t) {
     let a = t.args
-    if (a.length) {
+    if (["condition", "and", "fullStop"].includes(t.name)) {
       return (a[0])
+    } else {
+      console.log("peelTopLevel: unexpected name", t.name)
+      return t
     }
   };
 
@@ -36,8 +39,8 @@
   function mergeRedundant(trees) {
     const tree1 = trees[0]
     const tree2 = trees[1]
-    const pred1 = getPred(peelTree(tree1))
-    const pred2 = getPred(peelTree(tree2))
+    const pred1 = getPred(tree1.args[0])
+    const pred2 = getPred(tree2.args[0])
       console.log("mergeRedundant:", tree1, tree2)
       if (pred1.print() === pred2.print()) {
           return tree1;
@@ -72,7 +75,7 @@
   }
 
   function extractFirstElement(inputList) {
-    return inputList.map(arr => arr[0]);
+    return inputList.map(arr => peelTopLevel(arr[0]));
   }
 
   function getInput(id, grammar) {
@@ -109,7 +112,7 @@
       trees.map(x => console.log("   ", grammar.concretes.SchoolEng.linearize(x)))
 
 
-      let peeled = trees.map(x => (peelTree(x)))
+      let peeled = trees.map(x => (peelTopLevel(x)))
       console.log("peeled:", peeled.map(x => x.print()))
 
       let skip = skipRedundantActive(peeled)

@@ -37,12 +37,20 @@ def get_words(line):
     return " ".join([replace_var(w) for w in line.split()])
 
 def getBasic(t):
+    return getVerb(t, posDict[t.pos_])
+
+def getVerb(t, pos, prep0='because'):
     lem0 = ''.join([l for l in t.lemma_ if l not in '()[]'])
-    lem = "_"+lem0
     linlem = t.lemma_
-    pos = posDict[t.pos_]
-    fun = lem + "_" + pos
-    lin = fun + " = " + "mk" + pos + ' "' + linlem + '"'
+    if prep0 == 'because':
+        lem = '_%s' % (lem0)
+        fun = '%s_%s' % (lem, pos)
+        lin = 'lin %s = mk%s "%s"' % (fun,pos,linlem)
+    else:
+        prep = '(mkPrep "%s")' % (prep0)
+        lem = '_%s_%s' % (lem0, prep0)
+        fun = '%s_%s' % (lem, pos)
+        lin = 'lin %s = mk%s (mkV "%s") %s' % (fun, pos, linlem, prep)
     return (pos, fun, lin)
 
 def getCmpnd(t1, t2):
@@ -55,6 +63,57 @@ def getCmpnd(t1, t2):
     lin = fun + " = " + "mk" + pos + ' "' + linlem + '"'
     return (pos, fun, lin)
 
+def checkSubChild(dep, ls):
+    return any(child[2] == dep for child in ls)
+
+def checkSubChildTwo(dep1, dep2, ls):
+    return all(any(child[2] == dep for child in ls) for dep in [dep1, dep2])
+
+def getSubChild(dep, ls):
+    return [child[0] for child in ls if child[2] == dep]
+
+def checkWhichVerb(t):
+    childList = [[child.lemma_, child.pos_, child.dep_] for child in t.children]
+    # print(t.lemma_, childList)
+    # dobj is obj in the spacy-udpipe
+    if t.lemma_ == "be":
+        pass
+    elif checkSubChildTwo("xcomp", "obj", childList):
+        print(t.lemma_, childList)
+        for child in childList:
+            if child[1] == "ADJ" and child[2] == "xcomp":
+                words.append(getVerb(t, "V2A"))
+            elif child[1] == "VERB" and child[2] == "xcomp":
+                words.append(getVerb(t, "V2V"))
+    elif checkSubChild("prep", childList):
+        print("***** FOUND PREP", t)
+        prep = getSubChild("prep", childList)[0]
+        words.append(getVerb(t, "V2", prep))
+
+    elif checkSubChildTwo("ccomp", "obj", childList):
+        words.append(wogetVerb(t, "V2S"))
+    elif checkSubChild("dobj", childList):
+        if checkSubChild("iobj", childList):
+            words.append(getVerb(t, "V3"))
+        else:
+            words.append(getVerb(t, "V2"))
+    # also for adjectival complement
+    # https://universaldependencies.org/fi/dep/xcomp.html
+    elif checkSubChild("xcomp", childList):
+        for child in childList:
+            if child[1] == "ADJ":
+                words.append(getVerb(t, "VA"))
+            elif child[1] == "VERB":
+                words.append(getVerb(t, "VV"))
+    elif checkSubChild("ccomp", childList):
+        words.append(getVerb(t, "VS"))
+    else:
+        print("*** VERB HAS CHILD BUT NOT LISTED", t, " :", t.lemma_, t.pos_, t.morph, childList)
+        getBasic(t)
+
+def hasChild(t):
+    return any(True for _ in t.children)
+
 def get_toks(line):
     txt = get_words(line)
     doc = nlp(txt)
@@ -64,14 +123,15 @@ def get_toks(line):
 
     for i, t in tok:
         print(t, " :", t.lemma_, t.pos_, t.morph, t.dep_)
-        if t.dep_ == "compound":
+        if t.pos_ == "VERB" and hasChild(t):
+            words.append(checkWhichVerb(t))
+        elif t.dep_ == "compound":
             words.append(getCmpnd(doc[i], doc[i + 1]))
             next(tok)
         elif t.lemma_ == "-":
             print("found hyphen")
             words.append(getCmpnd(doc[i-1], doc[i + 1]))
             next(tok)
-
         elif t.pos_ == "PART":
             if t.dep_ == "neg" or t.dep_ == "pos":
                 pass
@@ -85,16 +145,15 @@ def get_toks(line):
         else:
             print("word :", getBasic(doc[i]))
             words.append(getBasic(doc[i]))
-    return words
+    return [w for w in words if w]
 
-absheader = "abstract MonoLex = Cat [[A, N, CN, V, VV, V2, PN, AdA, Adv, Prep, Pron] ** {\n  fun\n"
+def absheader(name):
+    return "abstract %s = Cat [A, N, CN, V, VV, V2, PN, AdA, Adv, Prep, Pron] ** {\n  fun\n" % (name)
 
-def cncheader(cnc):
+def cncheader(name, cnc):
     header = [
-        "concrete MonoLex%s of MonoLex = Cat%s [[A, N, CN, V, VV, V2, PN, AdA, Adv, Prep, Pron] ** " % (cnc, cnc)
+        "concrete %s%s of %s = Cat%s [A, N, CN, V, VV, V2, PN, AdA, Adv, Prep, Pron] ** " % (name, cnc, name, cnc)
       , "  open Paradigms%s, Prelude in {"  % (cnc)
-      , ""
-      , "  lin"
       , ""
     ]
     return "\n".join(header)
@@ -115,9 +174,10 @@ if __name__ == "__main__":
 
     with open(absfile, "w") as abstract:
         with open(cncfile, "w") as concrete:
-            abstract.write(absheader)
-            concrete.write(cncheader(cncname))
+            abstract.write(absheader(absname))
+            concrete.write(cncheader(absname, cncname))
             for pos, fun, lin in set(words):
+                print("BEFORE FAILING", fun)
                 abstract.write("    %s : %s ;\n" % (fun, pos))
                 concrete.write("    %s ;\n" % (lin))
             abstract.write("}")

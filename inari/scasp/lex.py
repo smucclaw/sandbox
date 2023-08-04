@@ -3,30 +3,28 @@ import re
 import itertools
 import functools
 import sys
-import string
+from collections import defaultdict
 
 nlp = spacy.load("en_core_web_sm")
 
-posDict = {
-    "NOUN": "N",
-    "VERB": "V",
-    "AUX": "AUX",
-    "ADJ": "A",
-    "ADV": "Adv",
-    "DET": "Det",
-    "PRON": "Pron",
-    "CCONJ": "Conj",
-    "SCONJ": "Conj",
-    "PART": "PART",
-    "PUNCT": "PUNCT",
-    "ADP": "Prep",
-    "PROPN": "PN",
-    "SPACE": "",
-    "NUM": "Num",
-    "X": "X",
-    "INTJ": "INTJ",
-    "SYM": "SYM"
-}
+posDict = defaultdict(lambda: "NOT FOUND")
+posDict["NOUN"] = "N"
+posDict["VERB"] = "V"
+posDict["ADJ"] = "A"
+posDict["ADV"] = "Adv"
+# posDict["DET"] = "Det"
+# posDict["PRON"] = "Pron"
+posDict["CCONJ"] = "Conj"
+posDict["SCONJ"] = "Subj"
+posDict["PUNCT"] = "PN"
+posDict["ADP"] = "Prep"
+posDict["PROPN"] = "PN"
+
+def allowed_pos(pos):
+    return posDict[pos] not in ["NOT FOUND"]
+
+illegal = '!"#$%&\'()*+, -./:;<=>?@[\]^`{|}~\\§–'
+illegal_ = '!"#$%&\'()*+, -./:;<=>?@[\]^`{|}~\\§–_'
 
 def get_words(line):
     def replace_var(str):
@@ -38,7 +36,15 @@ def get_words(line):
     return " ".join([replace_var(w) for w in line.split()])
 
 def removeIllegal(str):
-    return ''.join([l for l in str if l not in '()[]><'])
+    return ''.join([l for l in str if l not in illegal])
+
+def mkConstructor(pos, linlem):
+    if pos in ['A', 'V', 'N', 'PN', 'Prep', 'Conj', 'Adv', 'Subj']:
+        return 'mk%s "%s"' % (pos, linlem)
+    else:
+        inner = '(mk%s "%s")' % (pos[0], linlem)
+        return 'mk%s %s' % (pos, inner)
+
 
 def getBasic(t):
     lemmas = [t.lemma_]
@@ -46,16 +52,27 @@ def getBasic(t):
 
 def getAny(lemmas, pos, prep0=None):
     linlem = ' '.join(lemmas) # if compound
+    if linlem == '"':
+        return None # TODO: why is this even getting this far?
     funlem = '_'.join([removeIllegal(l) for l in lemmas])
     if prep0:
         prep = '(mkPrep "%s")' % (prep0)
-        fun = '_%s_%s_%s' % (funlem, prep0, pos)
-        inner = 'mk%s "%s"' % (pos[0], linlem) # first character of POS = intransitive
-        lin = 'lin %s = mk%s (%s) %s' % (fun, pos, inner, prep)
+        fun = '_%s_%s_%s' % (funlem, removeIllegal(prep0), pos)
+        # inner = 'mk%s "%s"' % (pos[0], linlem) # first character of POS = intransitive
+        # lin = 'lin %s = mk%s (%s) %s' % (fun, pos, inner, prep)
     else:
+        prep = ''
         fun = '_%s_%s' % (funlem, pos)
-        lin = 'lin %s = mk%s "%s"' % (fun, pos, linlem)
-    return (pos, fun, lin)
+
+    lin = 'lin %s = %s %s' % (fun, mkConstructor(pos, linlem), prep)
+    # Result is the pos, fun and lin
+    # but in a list, because in case of PN, we try alternative version
+    result = [(pos, fun, lin)]
+    if pos=='PN':
+        alternative = getAny(lemmas, "N")
+        return result+alternative
+    else:
+        return result
 
 def getVerb(t, pos, prep0='because'):
     lemmas = [t.lemma_]
@@ -80,40 +97,38 @@ def getSubChild(dep, ls):
 def checkWhichVerb(t):
     childList = [[child.lemma_, child.pos_, child.dep_] for child in t.children]
     if t.lemma_ == "be":
-        pass
-    elif t.lemma_ in string.punctuation:
-        pass
+        return []
     elif checkSubChildTwo("xcomp", "obj", childList):
 #        print(t.lemma_, childList)
         for child in childList:
             if child[1] == "ADJ" and child[2] == "xcomp":
-                words.append(getVerb(t, "V2A"))
+                return (getVerb(t, "V2A"))
             elif child[1] == "VERB" and child[2] == "xcomp":
-                words.append(getVerb(t, "V2V"))
+                return (getVerb(t, "V2V"))
     elif checkSubChild("prep", childList):
         prep = getSubChild("prep", childList)[0]
-        words.append(getVerb(t, "V2", prep))
+        return (getVerb(t, "V2", prep))
 
     elif checkSubChildTwo("ccomp", "obj", childList):
-        words.append(wogetVerb(t, "V2S"))
+        return (wogetVerb(t, "V2S"))
     elif checkSubChild("dobj", childList):
         if checkSubChild("iobj", childList):
-            words.append(getVerb(t, "V3"))
+            return (getVerb(t, "V3"))
         else:
-            words.append(getVerb(t, "V2"))
+            return (getVerb(t, "V2"))
     # also for adjectival complement
     # https://universaldependencies.org/fi/dep/xcomp.html
     elif checkSubChild("xcomp", childList):
         for child in childList:
             if child[1] == "ADJ":
-                words.append(getVerb(t, "VA"))
+                return (getVerb(t, "VA"))
             elif child[1] == "VERB":
-                words.append(getVerb(t, "VV"))
+                return (getVerb(t, "VV"))
     elif checkSubChild("ccomp", childList):
-        words.append(getVerb(t, "VS"))
+        return (getVerb(t, "VS"))
     else:
         print("*** VERB HAS CHILD BUT NOT LISTED", t, " :", t.lemma_, t.pos_, t.morph, childList)
-        words.append(getBasic(t))
+        return (getBasic(t))
 
 def hasChild(t):
     return any(True for _ in t.children)
@@ -126,38 +141,43 @@ def get_toks(line):
     tok = enumerate(doc)
 
     for i, t in tok:
-        #print(t, " :", t.lemma_, t.pos_, t.morph, t.dep_)
-        if t.pos_ == "VERB" and hasChild(t):
-            words.append(checkWhichVerb(t))
-        elif t.dep_ == "compound":
-            words.append(getCmpnd(doc[i], doc[i + 1]))
-            next(tok)
-        elif t.lemma_ == "-":
-            words.append(getCmpnd(doc[i-1], doc[i + 1]))
-            next(tok)
-        elif t.pos_ == "PART":
-            if t.dep_ == "neg" or t.dep_ == "pos":
+        if allowed_pos(t.pos_):
+            #print(t, " :", t.lemma_, t.pos_, t.morph, t.dep_)
+            if t.pos_ == "VERB" and hasChild(t):
+                words += checkWhichVerb(t)
+            elif t.dep_ == "compound":
+                t2 = doc[i + 1]
+                if allowed_pos(posDict[t2.pos_]):
+                    words += getCmpnd(doc[i], doc[i + 1])
+                    next(tok)
+                else:
+                    pass
+            elif t.lemma_ == "-":
+                if allowed_pos(doc[i + 1]):
+                    words += getCmpnd(doc[i-1], doc[i + 1])
+                    next(tok)
+                else:
+                    pass
+            elif all([l in illegal_ for l in t.lemma_]):
+                print("Word is illegal", t)
                 pass
-            elif t.dep_ == "aux":
-                words.append(getBasic(doc[i + 1]))
-                next(tok)
             else:
-                print("IGNORING THE FOLLOWING:" , (t.lemma_, t.pos_, t.tag_, t.morph, t.dep_))
-        elif posDict[t.pos_] not in ["A", "N", "CN", "V", "PN", "AdA", "Adv", "Prep"]:
-            pass
+                #print("word :", getBasic(doc[i]))
+                words += getBasic(t)
         else:
-            #print("word :", getBasic(doc[i]))
-            words.append(getBasic(doc[i]))
+            print("ignored", t, ":", t.lemma_, t.pos_)
+            pass
     return [w for w in words if w]
 
 def absheader(name):
-    return "abstract %s = Cat [A, N, CN, V, VV, V2, PN, AdA, Adv, Prep, Pron] ** {\n  fun\n" % (name)
+    return "abstract %s = Cat [A, N, CN, V, VV, V2, VS, V2S, VA, V2A, PN, AdA, Adv, Prep, Pron, Conj, Subj] ** {\n  fun\n" % (name)
 
 def cncheader(name, cnc):
     header = [
-        "concrete %s%s of %s = Cat%s [A, N, CN, V, VV, V2, PN, AdA, Adv, Prep, Pron] ** " % (name, cnc, name, cnc)
+        "concrete %s%s of %s = Cat%s [A, N, CN, V, VV, V2, VS, V2S, VA, V2A, PN, AdA, Adv, Prep, Pron, Conj, Subj] ** " % (name, cnc, name, cnc)
       , "  open Paradigms%s, Prelude in {"  % (cnc)
       , ""
+      , "oper mkSubj : Str -> Subj = \s -> lin Subj (ss s) ;"
     ]
     return "\n".join(header)
 

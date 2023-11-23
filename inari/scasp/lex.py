@@ -26,6 +26,8 @@ def allowed_pos(pos):
 illegal = '!"#$%&\'()*+, -./:;<=>?@[\]^`{|}~\\§–'
 illegal_ = '!"#$%&\'()*+, -./:;<=>?@[\]^`{|}~\\§–_'
 
+stopwords = ["and", "or", "of", "NP", "np"]
+
 def get_words(line):
     def replace_var(str):
         if str[:2] == '@(':
@@ -74,12 +76,19 @@ def getAny(lemmas, pos, prep0=None):
     else:
         return result
 
-def getVerb(t, pos, prep0='because'):
+def getTransitive(t, pos, prep0='because'):
     lemmas = [t.lemma_]
     if prep0 == 'because':
         return getAny(lemmas,pos)
     else:
-        return getAny(lemmas, pos, prep0)
+        verb = getAny(lemmas, pos, prep0)
+        prep = []
+        adj = []
+        # if isGerund(t): # FOO involving BAR
+        #     prep = getAny([str(t)], "Prep")
+        if isParticiple(t):
+            adj = getAny([str(t)], "A")
+        return prep+adj+verb
 
 def getCmpnd(t1, t2):
     lemmas = [t1.lemma_, t2.lemma_]
@@ -102,36 +111,57 @@ def checkWhichVerb(t):
 #        print(t.lemma_, childList)
         for child in childList:
             if child[1] == "ADJ" and child[2] == "xcomp":
-                return (getVerb(t, "V2A"))
+                return (getTransitive(t, "V2A"))
             elif child[1] == "VERB" and child[2] == "xcomp":
-                return (getVerb(t, "V2V"))
+                return (getTransitive(t, "V2V"))
     elif checkSubChild("prep", childList):
         prep = getSubChild("prep", childList)[0]
-        return (getVerb(t, "V2", prep))
+        return (getTransitive(t, "V2", prep))
 
     elif checkSubChildTwo("ccomp", "obj", childList):
-        return (wogetVerb(t, "V2S"))
+        return (wogetTransitive(t, "V2S"))
     elif checkSubChild("dobj", childList):
         if checkSubChild("iobj", childList):
-            return (getVerb(t, "V3"))
+            return (getTransitive(t, "V3"))
         else:
-            return (getVerb(t, "V2"))
+            return (getTransitive(t, "V2"))
     # also for adjectival complement
     # https://universaldependencies.org/fi/dep/xcomp.html
     elif checkSubChild("xcomp", childList):
         for child in childList:
             if child[1] == "ADJ":
-                return (getVerb(t, "VA"))
+                return (getTransitive(t, "VA"))
             elif child[1] == "VERB":
-                return (getVerb(t, "VV"))
+                return (getTransitive(t, "VV"))
     elif checkSubChild("ccomp", childList):
-        return (getVerb(t, "VS"))
+        return (getTransitive(t, "VS"))
     else:
         print("*** VERB HAS CHILD BUT NOT LISTED", t, " :", t.lemma_, t.pos_, t.morph, childList)
         return (getBasic(t))
 
+def checkWhichNoun(t):
+    childList = [[child.lemma_, child.pos_, child.dep_] for child in t.children]
+    if checkSubChild("prep", childList):
+        prep = getSubChild("prep", childList)[0]
+        return (getTransitive(t, "N2", prep))
+    else:
+        print("*** NOUN HAS CHILD BUT NOT LISTED", t, " :", t.lemma_, t.pos_, t.morph, childList)
+        return (getBasic(t))
+
 def hasChild(t):
     return any(True for _ in t.children)
+
+def isParticiple(t):
+    print(str(t.morph))
+    if str(t.morph) == "Aspect=Perf|Tense=Past|VerbForm=Part":
+        print(f"{t} is past participle!")
+    else:
+        print(f"{t} is {t.morph}")
+    return any(map(lambda x: x in str(t.morph), ["VerbForm=Part", "Tense=Past|VerbForm=Fin"]))
+
+def isGerund(t):
+    print(t, t.morph)
+    return "Aspect=Prog" in str(t.morph)
 
 def get_toks(line):
     txt = get_words(line)
@@ -141,7 +171,7 @@ def get_toks(line):
     tok = enumerate(doc)
 
     for i, t in tok:
-        if allowed_pos(t.pos_):
+        if allowed_pos(t.pos_) and t.lemma_ not in stopwords:
             #print(t, " :", t.lemma_, t.pos_, t.morph, t.dep_)
             if t.pos_ == "VERB" and hasChild(t):
                 words += checkWhichVerb(t)
@@ -158,6 +188,8 @@ def get_toks(line):
                     next(tok)
                 else:
                     pass
+            elif t.pos_ == "NOUN" and hasChild(t):
+                words += checkWhichNoun(t)
             elif all([l in illegal_ for l in t.lemma_]):
                 print("Word is illegal", t)
                 pass
@@ -170,11 +202,11 @@ def get_toks(line):
     return [w for w in words if w]
 
 def absheader(name):
-    return "abstract %s = Cat [A, N, CN, V, VV, V2, VS, V2S, VA, V2A, PN, AdA, Adv, Prep, Pron, Conj, Subj] ** {\n  fun\n" % (name)
+    return "abstract %s = Cat [A, N, N2, CN, V, VV, V2, VS, V2S, VA, V2A, PN, AdA, Adv, Prep, Pron, Conj, Subj] ** {\n  fun\n" % (name)
 
 def cncheader(name, cnc):
     header = [
-        "concrete %s%s of %s = Cat%s [A, N, CN, V, VV, V2, VS, V2S, VA, V2A, PN, AdA, Adv, Prep, Pron, Conj, Subj] ** " % (name, cnc, name, cnc)
+        "concrete %s%s of %s = Cat%s [A, N, N2, CN, V, VV, V2, VS, V2S, VA, V2A, PN, AdA, Adv, Prep, Pron, Conj, Subj] ** " % (name, cnc, name, cnc)
       , "  open Paradigms%s, Prelude in {"  % (cnc)
       , ""
       , "oper mkSubj : Str -> Subj = \s -> lin Subj (ss s) ;"

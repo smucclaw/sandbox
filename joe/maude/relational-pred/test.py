@@ -94,12 +94,33 @@ if __name__ == '__main__':
     term,
     parse_term_containing_qids,
     lambda x: re.sub(r'•', '', x),
+    lambda x: re.sub(
+      r'\((\w+) : (\w+)\)',
+      lambda match : f'({match.group(1)}:{match.group(2)})',
+      x
+    ),
     lambda x: re.sub(r' +', ' ', x),
     lambda x: re.sub(r'\.', '.\n', x),
     lambda x: f'{x} .',
   )
 
   print(eqns)
+
+  maude.input(f'''
+    fmod MOD is
+      pr SEMANTICS .
+      pr QNA .
+
+      sorts number string .
+
+      op z _ _ : number string -> number .
+
+     var x : number .
+     var y : string .
+
+      {eqns}
+    endfm
+  ''')
 
   # term = test_mod.parseTerm('X is employed by Y')
   # print(term.symbol().getIdHooks())

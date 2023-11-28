@@ -1,0 +1,11 @@
+sload semantics
+sload qna
+
+fmod TEST is
+  pr SEMANTICS .
+  pr QNA .
+
+  sorts number string .
+
+  op z _ _ : number string -> number .
+endfm

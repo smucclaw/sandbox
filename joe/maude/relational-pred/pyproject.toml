@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "relational-pred"
+version = "0.1.0"
+description = ""
+authors = ["Joe Watt <joewatt95@u.nus.edu>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+maude = "^1.2.3"
+pyrsistent = "^0.20.0"
+cytoolz = "^0.12.2"
+
+[tool.poetry.dev-dependencies]
+ipython = "^8.18.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

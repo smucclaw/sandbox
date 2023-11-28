@@ -63,7 +63,7 @@ endfm
 
 --- set trace on .
 
-reduce eg0 .
+--- reduce eg0 .
   --- Is it correct to say that the length of (the concatenation of "a" and "b") is
   --- less than or equal to the amount by which 0 exceeds 2 ? .
 

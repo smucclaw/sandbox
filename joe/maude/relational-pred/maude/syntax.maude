@@ -15,10 +15,10 @@ fmod SYNTAX is
   pr STRING * (
     op _+_ to the`concatenation`of_and_,
     op length to the`length`of_,
-    op _<_ to _`is`lexicographically`less`than_,
-    op _>_ to _`is`lexicographically`greater`than_,
-    op _<=_ to _`is`lexicographically`less`than`or`equal`to_,
-    op _>=_ to _`is`lexicographically`greater`than`or`equal`to_
+    op _<_ to _is`lexicographically`less`than_,
+    op _>_ to _is`lexicographically`greater`than_,
+    op _<=_ to _is`lexicographically`less`than`or`equal`to_,
+    op _>=_ to _is`lexicographically`greater`than`or`equal`to_
   ) .
   pr QID-LIST .
   --- pr STRING * (
@@ -74,7 +74,11 @@ fmod SYNTAX is
 
   op _ is in the list given by • _ :
     FnApp Universal -> Bool [poly (2)] .
+  op _ is in the list given by _ :
+    FnApp Universal -> Bool [poly (2)] .
   op _ is not in the list given by • _ :
+    FnApp Universal -> Bool [poly (2)] .
+  op _ is not in the list given by _ :
     FnApp Universal -> Bool [poly (2)] .
 
   --- ops _is`less`than_ _is`greater`than_ :

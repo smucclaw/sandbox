@@ -1,5 +1,5 @@
 fmod QNA is
-  sort Answer .
+  sort Answer CorrectWrong .
   ops Yes No : -> Answer .
 
   ops correct wrong : -> CorrectWrong .

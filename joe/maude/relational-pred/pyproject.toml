@@ -6,7 +6,7 @@ authors = ["Joe Watt <joewatt95@u.nus.edu>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "^3.11.5"
 maude = "^1.2.3"
 pyrsistent = "^0.20.0"
 cytoolz = "^0.12.2"

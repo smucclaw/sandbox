@@ -1,0 +1,29 @@
+packages: .
+
+source-repository-package
+  type: git
+  location: https://github.com/smucclaw/dsl
+  subdir: lib/haskell/natural4
+  tag: 73325d282291f0ad5217f3ee323e3d7156c0636b
+
+source-repository-package
+  type: git
+  location: https://github.com/smucclaw/dsl
+  subdir: lib/haskell/explainable
+  tag: 73325d282291f0ad5217f3ee323e3d7156c0636b
+
+source-repository-package
+  type: git
+  location: https://github.com/smucclaw/dsl
+  subdir: lib/haskell/anyall
+  tag: 73325d282291f0ad5217f3ee323e3d7156c0636b
+
+source-repository-package
+  type: git
+  location: https://github.com/smucclaw/baby-l4
+  tag: e9c3bbcf701db8a4a69fae2671dcecc762395613
+
+source-repository-package
+  type: git
+  location: https://github.com/smucclaw/gf-core
+  tag: f85fbbaf41e804f1566cd914ef3986dda29978b3

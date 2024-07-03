@@ -1,0 +1,33 @@
+cabal-version:        2.4
+name:                 textual4
+version:              0.0
+
+executable textual4
+  main-is:            Main.hs
+  hs-source-dirs:     Textual
+  other-modules:
+    Textual.Transform
+    Textual.Abs
+    Textual.Lex
+    Textual.Par
+    Textual.Print
+
+  default-language:   Haskell2010
+  default-extensions:
+    LambdaCase
+    TupleSections
+
+  build-depends:
+      base       >= 4.9.1 && < 5
+    , array      >= 0.5.1 && < 0.6
+    , containers >= 0.5.7 && < 0.7
+    , mtl        >= 2.2.2 && < 2.3
+    , gf
+    , natural4
+    , baby-l4
+    , explainable
+    , anyall
+
+  ghc-options:
+    -Wall
+    -Wcompat

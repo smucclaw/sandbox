@@ -1,0 +1,846 @@
+\documentclass{beamer}
+
+
+\input{settings}
+\input{defs}
+
+\title{Overview of BabyL4}
+
+\author{Martin Strecker}
+\date{2024-07-23}
+
+
+%======================================================================
+
+\begin{document}
+
+
+%======================================================================
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+
+%======================================================================
+\section{BabyL4: Purpose and timeline}
+
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{BabyL4: Timeline}
+
+  \begin{itemize}
+  \item until end of 2020: BNFC-based parser, data structures imposed by BNFC
+  \item early 2021: redesign with
+    \begin{itemize}
+    \item very reduced abstract syntax
+    \item lexer and parser based on Alex / Happy
+    \item VSCode integration
+    \end{itemize}
+  \item development until end of 2022, then progressively abandoned after
+    adoption of NaturalL4 (spreadsheets)
+  \item until mid-2023 still used as intermediate language for transpilations (to DMN, Prolog
+    / ASP \dots)
+  \end{itemize}
+
+Essential contributions in language design and implementation by Andreas Källberg
+
+\end{frame}
+
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Purpose and principles}
+
+  \emph{Background:}
+  \begin{itemize}
+  \item Application scenarios initially not clearly defined
+  \item Not clear which language paradigm to adopt: rule-based,
+    object-oriented (ontologies), functional, state-based (automata, Petri nets)
+  \end{itemize}
+
+  \emph{Overarching goals and principles:}
+  \begin{itemize}
+  \item possibility to easily integrate new language features
+  \item consistency checking on several levels: syntax, typing, semantics
+    (deduction / proof)
+  \end{itemize}
+
+  \emph{Consequences:}
+  \begin{itemize}
+  \item language not very homogeneous
+  \item no well-defined semantics for whole languge\\ (but maybe for some fragments \dots)
+  \end{itemize}
+
+\end{frame}
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Intended user-facing interaction}
+
+  L4 as \textbf{language}
+  \begin{itemize}
+  \item \emph{Specification language} for formalizing law texts in a
+    computer-centric DSL \\
+    (not aimed at non-experts)
+  \item \emph{Source language} for compilation targets:
+    \begin{itemize}
+    \item Natural language texts as human-understandable rendering of L4
+    \item Programming languages for execution
+    \item Proof tools for verification
+    \end{itemize}
+  \end{itemize}
+
+
+  L4 as \textbf{environment}
+  \begin{itemize}
+  \item VSCode integration: immediate feedback about syntax / typing errors\\
+    (currently partly broken)
+  \item shell-based: run an L4 file for
+    \begin{itemize}
+    \item syntax / type checking (operational)
+    \item launching  provers (operational but no nice feedback)
+    \item launching transpilations\\
+      (experimental, developer- and not user-centric)
+    \end{itemize}
+  \end{itemize}
+
+\end{frame}
+
+
+%======================================================================
+\section{BabyL4: Language elements}
+
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Principles}
+
+  \begin{itemize}
+  \item L4 file a sequence of language elements: declarations, definitions,
+    rules, assertions \dots
+  \item Strong consistency checking: elements have to be declared to be used
+  \item Mostly file-global scope: elements can be used before their
+    declaration
+  \item Some local scoping (variables in rules, quantified variables in
+    formulas)
+  \end{itemize}
+  
+
+\end{frame}
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Type level: \texttt{class}}
+
+  \begin{itemize}
+  \item A few predefined types (in \texttt{Prelude.hs}):\\
+    \texttt{Boolean}, \texttt{Float}, \texttt{Integer}, \texttt{Class}
+  \item New types \texttt{T} can be introduced with: \texttt{class T}
+  \item Subtyping: \texttt{class SC extends C}
+  \item Type constructors:
+    \begin{itemize}
+    \item Function types \texttt{T1 -> T2}
+    \item Tuples \texttt{(T1, T2)}
+    \item Classes with fields
+    \end{itemize}
+  \end{itemize}
+
+  \emph{Example:} (file \texttt{l4/r34.l4})
+\small
+  \begin{verbatim}
+    class Person
+
+    class ExecutiveAppointment extends Position
+
+    class LegalPractitioner extends Person {
+    MustNotAccept: ExecutiveAppointment
+    MayAccept: ExecutiveAppointment
+    }
+\end{verbatim}
+\normalsize
+
+\end{frame}
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Declarations and definitions: \texttt{decl}/
+  \texttt{defn}}
+
+  Declaration of functions \texttt{f} / constants with:\\
+  \texttt{decl f : T}
+
+  Definitions with:\\
+  \texttt{defn f : T = e}
+
+  where
+  \begin{itemize}
+  \item \texttt{T} is a type
+  \item \emph{e} is an expression
+  \end{itemize}
+\end{frame}
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Expressions}
+
+  Typical functional language featuring:
+  \begin{itemize}
+  \item elementary arithmetic and Boolean operators,\\ \texttt{if .. then .. else}
+  \item application: \texttt{(f a)}\\
+    functions / predicates typically written in Curried form
+  \item explicitly typed abstraction: \verb|\x : T -> e|
+  \item quantified formulas:\\ \texttt{exists x : T. e} and \texttt{forall x : T. e}
+  \item tuples \texttt{(e1, e2)} and field access \texttt{e.fld}
+  \item (also lists in experimental status)
+  \end{itemize}
+
+\end{frame}
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Typing}
+
+  Essentially: simply-typed higher order lambda-calculus
+
+  \vspace{3mm}
+  What works: typed expressions, formulas of type \texttt{Boolean}
+
+  \vspace{3mm}
+  Not very user-friendly:
+  \begin{itemize}
+  \item all variables explicitely typed, no type inference 
+  \item no polymorphism 
+  \end{itemize}
+
+  \vspace{3mm}
+  What is ad-hoc and needs to be revised:
+  \begin{itemize}
+  \item class mecanism and subtyping\\
+    (current implementation seems type-sound, but loss of type precision)
+  \end{itemize}
+\end{frame}
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Evaluation}
+
+  \begin{itemize}
+  \item There must be a half-finished function evaluator in the code base
+  \item Not correctly integrated, for lack of ideas how to use it 
+  \end{itemize}
+
+\end{frame}
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{High-level language elements: Rules}
+
+  \begin{itemize}
+  \item Prolog-like rules:
+
+    \begin{verbatim}
+rule <accAdIncAd>
+for p: Person
+if savings_account p adequate && income p adequate
+then investment p stocks
+\end{verbatim}
+    
+  \item However:
+    \begin{itemize}
+    \item explicit typing of variables (local bindings)
+    \item arbitrarily complex pre- and postconditions (incl. disjunction,
+      quantified formulas)
+    \end{itemize}
+  \item Facts (= rules with pre-condition \texttt{True})
+  \end{itemize}
+
+\end{frame}
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{High-level language elements: Rules}
+
+  Manipulation of rules to derive other rules:
+  \begin{itemize}
+  \item Normalization, e.g.: pulling out internal quantifiers, conversion of $P
+    \OR Q \IMPL R$ to two rules $P \IMPL R$, $Q \IMPL R$
+  \item Inversion
+  \end{itemize}
+
+\begin{verbatim}
+rule <investmentInversion>
+     {derived: {apply: {inversion,
+     	          apply: {normalize, accInad},
+     	          apply: {normalize, accAdIncAd},
+     	          apply: {normalize, accAdIncInad}}}}
+\end{verbatim}
+  
+
+\end{frame}
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{High-level language elements: State machines}
+
+  \begin{itemize}
+  \item More or less identical to Uppaal state machines
+  \item Integration unfinished
+  \end{itemize}
+
+  \begin{verbatim}
+process AutA() {
+
+clock clock1, clock0;
+
+state
+    loc0 { clock1 <= 4 },
+    loc1 { clock1 <= 4 },
+    loc2;
+init
+    loc0;
+trans
+   loc0 -> loc1 { guard clock0<=3;  },
+   loc0 -> loc2 { guard clock1>=5; assign clock1 = 0;  };
+}
+\end{verbatim}
+  
+
+\end{frame}
+
+
+
+%======================================================================
+\section{BabyL4: Implementation and transpilation}
+
+
+
+
+%======================================================================
+\section{SMT: Basic Ideas}
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Satisfiability}
+
+
+The \blue{satisfiability} problem aims at determining whether a formula is
+satisfiable.
+
+\emph{Reminder:}
+\begin{itemize}
+\item A formula is \blue{satisfiable} if it can be made true under \emph{one}
+  possible interpretation: \emph{possibly true}
+\item (It is  \blue{unsatisfiable} if it can not.)
+\item A formula is \blue{valid} if it is true under \emph{every}
+  possible interpretation: \emph{necessarily true}
+\end{itemize}
+
+\vspace{3mm}
+Examples:
+\begin{itemize}
+\item $a \AND (\NOT a \OR b)$ is satisfiable but not valid:
+  \begin{itemize}
+  \item true for $a \mapsto True, b \mapsto True$
+  \item false for $a \mapsto False$ ($b$ indifferent)
+  \end{itemize}
+\item $a \OR \NOT a$ is valid  
+\end{itemize}
+
+\end{frame}
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Satisfiability}
+
+  \blue{Validity} and \blue{satisfiability} are related:\\
+  $F$ valid \hspace{5mm} iff \hspace{5mm} $\NOT F$ unsatisfiable
+
+  \vspace{5mm}
+  Thus: one of the notions suffices.
+  \vspace{5mm}
+  
+  The satisfiability checking problem (SAT)
+  \begin{itemize}
+  \item Concerns formulas of propositional logic\\
+    but not only (the notion extends to arbitrary logics)
+  \item In the propositional case:
+    \begin{itemize}
+    \item solutions (interpretations) can be checked efficiently
+      (\emph{polynomial} time)
+    \item solutions can be hard to find\\
+      worst-case: exponential time
+    \item current \blue{SAT solvers} can typically treat problems of thousands of
+      propositional variables
+    \end{itemize}
+  \end{itemize}
+
+\end{frame}
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Satisfiability Modulo Theories (SMT)}
+
+Typically, formulas have internal structure that pure SAT solvers cannot
+handle.
+
+\vspace{5mm}
+\emph{Example:}\\
+$(g(a) = g(b)) \AND (f(g(b), c) \neq f(g(a), c) \OR x = 2) \AND (\exists y:Int.\; 1 < y \AND y < x)$
+
+has the propositional form:\\
+$F_1 \AND (F_2 \OR F_3) \AND F_4$\\
+which is satisfiable. Is the original formula satisfiable?
+
+\vspace{5mm}
+\blue{SMT} solvers are brokers between SAT solvers and specialized reasoners
+for specific \blue{theories}.
+
+\vspace{5mm}
+In the example: uninterpreted functions and (quantified) arithmetic.
+
+
+\end{frame}
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Satisfiability Modulo Theories (SMT)}
+
+  \emph{Example:}\\
+$(g(a) = g(b)) \AND (f(g(b), c) \neq f(g(a), c) \OR x = 2) \AND (\exists y:Int.\; 1 < y \AND y < x)$
+
+\begin{enumerate}
+\item Project \emph{uninterpreted function} subformulas:\\
+  $(g(a) = g(b))$,  $f(g(b), c) \neq f(g(a), c)$
+\item Propagate information: Under condition $(g(a) = g(b))$:\\
+  $f(g(b), c) \neq f(g(a), c) \; \leadsto \; f(g(b), c) \neq f(g(b), c) \;
+  \leadsto \; False$
+\item Send information to SAT solver and propagate info:\\
+  $(g(a) = g(b)) \AND (False \OR x = 2) \AND (\exists y:Int.\; 1 < y \AND y < x)$ $\leadsto$\\
+  $(g(a) = g(b)) \AND (x = 2) \AND (\exists y:Int.\; 1 < y \AND y < x)$ 
+\item Project \emph{quantified arithmetic} subformulas:\\
+  $(x = 2)$, $\exists y:Int.\; 1 < y \AND y < x$
+\item Propagate information: Under condition $x = 2$:\\
+  $\exists y:Int.\; 1 < y \AND y < x$ \hspace{3mm} $\leadsto$ \hspace{3mm}
+  $\exists y:Int.\; 1 < y \AND y < 2$ \hspace{3mm} $\leadsto$ \hspace{3mm} $False$
+\item Send information to SAT solver and propagate info:\\
+  $(g(a) = g(b)) \AND (x = 2) \AND False$ \hspace{3mm} $\leadsto$ \hspace{3mm} $False$
+\end{enumerate}
+Formula not satisfiable
+
+\end{frame}
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Satisfiability Modulo Theories (SMT)}
+
+  Results may depend on the \blue{mathematical theory} under consideration:
+
+  \emph{Example:}
+  \begin{itemize}
+  \item $(\exists y:\textbf{Int}.\; 1 < y \AND y < 2) \; \leadsto \; False$
+  \item $(\exists y:\textbf{Real}.\; 1 < y \AND y < 2) \; \leadsto \; True$
+  \item $(\exists y:\textbf{Real}.\; 1 < y \AND y < 1 + \epsilon) \; \leadsto \; True$
+  \item $(\exists y:\textbf{Float}.\; 1 < y \AND y < 1 + \epsilon) \; \leadsto \; ???$
+  \end{itemize}
+
+  \vspace{5mm}
+Specific reasoners have specialized capabilities:
+\begin{itemize}
+\item Uninterpreted function symbols:
+  $f(x, 3) = f(3, y)$ cannot be simplified further
+\item In arithmetics:\\
+    $x + 3 = 3 + y$ $\; \leadsto \;$ [commutativity]\\
+    $x + 3 = y + 3$ $\; \leadsto \;$ [cancellation]\\
+    $x = y$
+\end{itemize}
+  
+\end{frame}
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Mathematical theory}
+
+  A mathematical theory is a signature (set of function and predicate symbols)
+  with associated properties.
+
+  \emph{Example:} Theory of Arrays (SMT Lib standard p. 39):
+
+\small
+\begin{verbatim}
+(theory ArraysEx
+:sorts ( (Array 2) )
+:funs ((par (X Y) (select (Array X Y) X Y))
+       (par (X Y) (store (Array X Y) X Y (Array X Y))) )
+:definition
+" - (forall ((a (Array s1 s2)) (i s1) (e s2))
+       (= (select (store a i e) i) e))
+  - (forall ((a (Array s1 s2)) (i s1) (j s1) (e s2))
+     (=> (distinct i j) 
+         (= (select (store a i e) j) (select a j))))
+  - (forall ((a (Array s1 s2)) (b (Array s1 s2)))
+     (=>
+      (forall ((i s1)) (= (select a i) (select b i))) 
+      (= a b))) "
+)
+\end{verbatim}
+\normalsize  
+
+\end{frame}
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Mathematical theory}
+
+  \begin{itemize}
+  \item QF for the restriction to quantifier free formulas
+  \item  A or AX for the theory ArraysEx
+  \item     BV for the theory FixedSizeBitVectors
+  \item     FP (forthcoming) for the theory FloatingPoint
+  \item     IA for the theory Ints (Integer Arithmetic)
+  \item     RA for the theory Reals (Real Arithmetic)
+  \item     IRA for the theory Reals-Ints (mixed Integer Real Arithmetic)
+  \item     IDL for Integer Difference Logic
+  \item     RDL for Rational Difference Logic
+  \item     L before IA, RA, or IRA for the linear fragment of those
+    arithmetics
+  \item     N before IA, RA, or IRA for the non-linear fragment of those
+    arithmetics
+  \item     UF for the extension allowing free sort and function symbols
+  \end{itemize}
+  
+\end{frame}
+
+
+
+%======================================================================
+\section{SMT-LIB: Interacting with an SMT solver}
+
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{SMT solvers}
+
+  Several solvers support these logics to varying degrees:
+
+  \begin{itemize}
+  \item Z3 (*) \url{https://github.com/Z3Prover/z3/wiki}
+  \item CVC4 (*) \url{https://cvc4.github.io/}\\
+    with CVC5 \url{https://cvc5.github.io/} under development
+  \item Boolector \url{https://github.com/Boolector}\\
+    specialized on byte arrays
+  \item Yices \url{https://yices.csl.sri.com/} (PVS)
+  \item Alt-Ergo \url{https://ocamlpro.github.io/alt-ergo/} (Frama-C)
+  \item Mathsat (*) \url{https://mathsat.fbk.eu/}
+  \end{itemize}
+
+(*): works at least partly with L4
+\end{frame}
+
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{SMT-LIB}
+
+  SMT-LIB is:
+  \begin{itemize}
+  \item a standardized common input format for describing proof problems
+  \item a partly standardized output format for retrieving proof results
+  \item a protocol for interacting with solvers
+  \end{itemize}
+
+  Purpose: 
+  \begin{itemize}
+  \item Make SMT solvers more easily accessible to third-party tools
+  \item Facilitate benchmarking / contests
+  \end{itemize}
+\end{frame}
+
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{SMT Input file}
+
+  \blue{Declarations of sorts and constants / predicates}
+\begin{verbatim}
+(set-option :print-success true )
+(set-option :produce-models true )
+(set-logic LIA )
+(declare-sort Class 0 )
+(declare-sort Animal 0 )
+(declare-sort Cat 0 )
+(declare-sort Mouse 0 )
+(declare-fun isCat (Animal ) Bool )
+(declare-fun isMouse (Animal ) Bool )
+(declare-fun Age (Animal Int ) Bool )
+(declare-fun garfield () Animal )
+(declare-fun mickey () Animal )
+\end{verbatim}
+\end{frame}
+
+  
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{SMT Input file}
+
+\blue{ Formula to be proved and call of checker}
+\begin{verbatim}
+(assert 
+(and (and (Age garfield 3 ) (Age mickey 2 ) ) 
+(and (forall ((a Animal ) ) 
+   (=> true (not (and (isCat a ) (isMouse a ) ) ) ) ) 
+   (and (=> true (isCat garfield ) ) 
+   (and (=> true (isMouse mickey ) ) (forall ((c Animal ) ) 
+   (forall ((m Animal ) ) (forall ((ac Int ) ) 
+   (forall ((am Int ) ) 
+   (=> (and (isCat c ) (and (isMouse m ) 
+         (and (Age c ac )
+         (and (>= ac 5 ) (Age m am ) ) ) ) ) 
+       (< am 1 ) ) ) ) ) ) ) ) ) ) )
+(check-sat )
+\end{verbatim}
+
+\end{frame}
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{SMT Output file}
+
+  \blue{Generated model} (not meant to be readable)
+  \small
+  \begin{verbatim}
+(model 
+(declare-fun Animal!val!1 () Animal ) 
+(declare-fun Animal!val!0 () Animal ) 
+(define-fun garfield () Animal Animal!val!0 ) 
+(define-fun mickey () Animal Animal!val!1 ) 
+(define-fun isMouse ((x!0 Animal ) ) Bool 
+  (= (ite(= x!0 Animal!val!0 ) Animal!val!0 Animal!val!1) 
+     Animal!val!1)) 
+
+(define-fun isCat ((x!0 Animal ) ) Bool 
+   (= (ite (= x!0 Animal!val!0 ) Animal!val!0 Animal!val!1)
+   Animal!val!0 ) ) 
+
+(define-fun Age ((x!0 Animal ) (x!1 Int ) ) Bool  ... ) )
+
+\end{verbatim}  
+\normalsize
+\end{frame}
+
+
+%======================================================================
+\section{L4 and SMT}
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Proving statements in L4}
+
+  \begin{itemize}
+  \item \texttt{assert} statements in L4 can lead to SMT prover calls
+  \item \dots{} using information some or parts of the facts / rules of a spec
+  \end{itemize}
+
+
+  \vspace{5mm}
+  \blue{ What is checked, based on which information?}
+  \vspace{5mm}
+  
+  Can in part be configured with \emph{instructions} accompanying
+  \texttt{assert} (and in the future: \texttt{rule}) statements.
+
+\end{frame}
+
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Configuring the reasoner}
+
+\begin{verbatim}
+assert {SMT: {...},
+        sCASP: {...},
+        foobar: {...}
+       }
+Goal
+\end{verbatim}
+
+  \begin{itemize}
+  \item All the registered reasoners will be invoked on the \texttt{Goal}
+    (see below).
+  \item Inexistent reasoners will be ignored
+  \end{itemize}
+
+\end{frame}
+
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{What will be proved?}
+
+  \blue{Prerequisites:} Each rule gives rise to a formula
+
+  \emph{Example:}
+
+\begin{alltt}  
+  \textbf{rule} <R>
+  \textbf{for} x : Integer
+  \textbf{if} P(x)
+  \textbf{then} Q(x)
+\end{alltt}
+generates the formula $\forall x: Integer.\; P(x) \IMPL Q(X)$
+
+\vspace{3mm}
+
+There is an \blue{active ruleset} $R_1, \dots,  R_n$ (configurable, see below).
+
+\begin{itemize}
+\item 
+\begin{verbatim}
+assert {SMT: {consistent, ...} }  Goal
+\end{verbatim}
+checks if $R_1 \AND \dots \AND R_n \AND Goal$ is \emph{satisfiable}
+
+\item 
+\begin{verbatim}
+assert {SMT: {valid, ...} } Goal
+\end{verbatim}
+checks if $R_1 \AND \dots \AND R_n \IMPL Goal$ is \emph{valid}\\
+(corresponds to: $R_1 \AND \dots \AND R_n \AND \NOT Goal$ unsatisfiable)
+  
+\end{itemize}
+
+\end{frame}
+
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{Which formulas are taken into
+    consideration?}
+
+  \blue{Prerequisites:} a \emph{default rule set}:
+  \begin{itemize}
+  \item currently the set of all rules of the spec
+  \item to be reconsidered \dots
+  \end{itemize}
+  
+  
+The \blue{active ruleset} is configurable by the \texttt{rules} section:
+\begin{verbatim}
+assert {SMT: { rules: {rulespec}, ...} }
+Goal
+\end{verbatim}
+
+where the \emph{rulespec} is a combination of:
+  \begin{itemize}
+  \item \verb|only: {list of rules}|: only take these rules
+  \item \verb|del:  {list of rules}|: rules to be removed from ruleset
+  \item \verb|add:  {list of rules}|: rules to be added to ruleset after
+    removing the \texttt{del}-rules (currently not useful)
+  \end{itemize}
+
+\end{frame}
+
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{How to configure the solver?}
+
+Configure the solver with the \texttt{config} clause
+\begin{verbatim}
+assert {SMT: { config: {solver: z3, 
+                        logic: LIA, 
+                        loglevel: 0}, ...} }
+Goal
+\end{verbatim}
+
+\begin{itemize}
+\item Solver:
+  \begin{itemize}
+  \item Has to be installed in advance, executable on execution path
+  \item Cannot be done on the fly (invocation parameters hard-wired)
+  \item Currently, only \texttt{z4}, \texttt{cvc3}, \texttt{mathsat} are configured
+  \end{itemize}
+\item Logic: Any of the SMT-LIB logics. 
+\item \texttt{loglevel}: Level of verbosity for tracing interaction with SMT solver
+\end{itemize}
+
+\end{frame}
+
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{L4 example model}
+
+  \blue{Declarations}
+
+  \begin{verbatim}
+class Animal
+class Cat extends Animal
+class Mouse extends Animal
+
+decl isCat: Animal -> Boolean
+decl isMouse: Animal -> Boolean
+
+decl Age : Animal -> Integer -> Boolean
+
+decl garfield: Animal
+decl mickey: Animal
+\end{verbatim}
+  
+\end{frame}
+
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{L4 example model}
+
+  \blue{Facts}
+
+\begin{verbatim}
+fact <CatNotMouse>
+for a: Animal
+not (isCat a && isMouse a)
+
+fact <GarfieldCat>
+isCat garfield
+
+fact <MickeyMouse>
+isMouse mickey
+\end{verbatim}
+  
+\end{frame}
+
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{L4 example model}
+
+  \blue{Main rule and assertions}
+
+\begin{verbatim}
+# no mice older than 1 year have a chance to survive 
+# being chased by cats older than 5 years
+rule <OldCatsChaseWell>
+for c: Animal, m: Animal, ac: Integer, am: Integer
+if isCat c && isMouse m && Age c ac 
+   && ac >= 5 && Age m am 
+then am < 1
+
+# inconsistent, proof fails
+assert {SMT: {consistent}}
+Age garfield 5  && Age mickey 2
+
+# consistent, model found
+assert {SMT: {consistent}} 
+Age garfield 3 && Age mickey 2
+
+\end{verbatim}
+
+\end{frame}
+
+
+
+%-------------------------------------------------------------
+\begin{frame}[fragile]\frametitle{L4 example model}
+
+  \blue{Run checker:}
+\texttt{stack run -- l4 smt l4/garfield.l4}
+
+\begin{itemize}
+\item First formula: \texttt{Formula unsatisfiable.}
+\item Second formula:
+\begin{verbatim}
+Formula satisfiable, found model.
+Predicates: 
+isMouse mickey = true
+isCat garfield = true
+Age mickey intArg1 = 
+   (and (<= 2 intArg1) (not (<= 3 intArg1)))
+Age garfield intArg1 = 
+  (and (<= 2 intArg1) 
+  (and (<= 3 intArg1) (not (<= 5 intArg1))))
+Remaining predicates: false
+\end{verbatim}
+\end{itemize}
+
+\end{frame}
+
+%-------------------------------------------------------------
+
+\end{document}
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% coding: utf-8
+%%% End: 

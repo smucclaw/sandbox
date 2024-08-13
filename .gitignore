@@ -7,3 +7,4 @@
 .workdir
 node_modules/
 lib/
+.stack-work/

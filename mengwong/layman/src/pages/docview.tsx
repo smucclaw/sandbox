@@ -21,7 +21,7 @@ const joinElements = (elements:any[]) => {
 
 
 const RenderSentences: React.FC<{vine:Vine}> = ({vine}) => {
-  console.log("RenderSentences", vine);
+  // console.log("RenderSentences", vine);
   if (vine.type === 'leaf') {
     return <>{vine.text} </>
   }

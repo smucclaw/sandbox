@@ -1,123 +1,201 @@
 import _ from "lodash"
 import 'lodash.product';
-export type Vine = Parent | Leaf | Linear;
+import { Node, Edge, XYPosition, Position } from 'reactflow'
 
-export interface Parent {
-  type: 'parent';
-  anyAll: AnyAll;
-  hideShow: HideShow;
-  children: Vine[];
-  bool?: boolean;
+// Expansion from a BoolStruct to a DNF (Disjunctive Normal Form):
+// We traverse the BoolStruct, depth-first, flattening the BoolStruct to a list of lists -- a sum of products.
+// A three-element OR list (a OR b OR c) looks like:
+// [ [ 'a' ], [ 'b' ], [ 'c' ] ]
+//
+// A three-element AND list (a AND b AND c) looks like:
+// [ [ 'a', 'b', 'c' ] ]
+//
+// Recursive expansion consists of combining child lists to always maintain a sum of products.
+// When ANDing, we take the cartesian product of the lists.
+// When ORing, we simply concatenate the sum of products.
+
+// this utility function uses the _.product function to achieve both of the above rewrites.
+// we use it for both AND and OR operations, tweaking the call syntax to produce the desired result.
+function xprod <T>(...l: T[][][]) : T[][] {                ; // console.log(`** xprod: `, JSON.stringify(l));
+  const product = _.product(...l);                         ; // console.log(`p2: `, JSON.stringify(product,null,2,));
+  const flattened = [product.map(s => s.flat(1))].flat(1)  ; // console.log(`f3: `, flattened);
+  return flattened
 }
 
-export interface Leaf {
-  type: 'leaf';
-  text: string;
-  bool?: boolean;
+let idMax = 1
+
+export class Vine { // your basic tree, with AnyAll leaves, and Leaf/Fill terminals.
+  constructor(
+    public viz  ?: HideShow,
+    public id   ?: number
+  ) {
+    this.id = id ?? idMax++;
+  }
+  expand(_fp: (v: Vine) => boolean, _fc: (v: Vine) => boolean): Vine[][] { return [[this]] }
+   // takes two filter functions; first applied to the parent, the second to be applied to the children.
+   // will exclude children where both functions return true.
+   // the sentence rendering code uses this to hide "and" fillers
+  getFlowNodes(_:XYPosition) : Node[] { return [] }
+  getFlowEdges() : Edge[] { return [] }
 }
 
-export interface Linear {
-  type: 'linear';
-  text?: string;
-  children?: Vine[];
-  bool?: boolean;
+
+export class AnyAll extends Vine {
+ constructor(
+   public c : Vine[],
+   public viz ?: HideShow,
+   public id  ?: number) { super(viz, id) };
+   expand(fParent: (v:Vine) => boolean,
+          fChild:  (v:Vine) => boolean) : Vine[][] {
+    if (this?.viz === HideShow.Collapsed) { return xprod(... this.c.map(x => x.expand(fParent, fChild))) }
+    const merged = this.merge(...(this.c
+                                    .filter(ch => ! (fParent(this) && fChild(ch)))
+                                    .map( c => c.expand(fParent, fChild))))
+    return merged
+   }
+  merge<T>(...l:Vine[][][]) : Vine[][] { return [] }
+ }
+
+export class All extends AnyAll {
+   merge (...l:Vine[][][]) : Vine[][] { // console.log("* doing All merge");
+    return xprod(...l)
+   }
+   getFlowNodes(relPos:XYPosition) : Node[] {
+    return [ {
+       id: `${this.id}`,
+       type: 'group',
+       data: { label: `all` },
+       position: relPos,
+       sourcePosition: Position.Right, targetPosition: Position.Left,
+      },
+      ...(this.c.flatMap((x,i) => x.getFlowNodes({ x: relPos.x + 100*i+1, y: relPos.y })))
+     ]
+   }
+  }
+
+export class Any extends AnyAll {
+  merge (...l:Vine[][][]) : Vine[][] {    // console.log("* doing Any merge");
+    // we use this mechanism to exclude any top-level elements which are only Fill nodes from the sentence rendering,
+    // but we don't want to exclude them from the flowchart rendering.
+    return xprod(l.flat(1))
+  }
+  getFlowNodes(relPos:XYPosition) : Node[] {
+    return [ {
+      id: `${this.id}`,
+      type: 'group',
+      data: { label: `any` },
+      position: relPos,
+      sourcePosition: Position.Right, targetPosition: Position.Left,
+    },
+      ...(this.c.flatMap((x,i) => x.getFlowNodes({ x: relPos.x, y: relPos.y + 50*(i+1) })))
+    ]
+  }
+}
+  
+// ground terms which can take boolean values
+export class Leaf extends Vine {
+  constructor(
+    public text     : string,
+    public value   ?: boolean,
+    public dflt    ?: boolean,
+  ) { super() }
+  getFlowNodes(relPos:XYPosition) : Node[] {
+    return [ {
+      id: `${this.id}`,
+      type: 'default',
+      data: { label: this.text },
+      position: relPos,
+      sourcePosition: Position.Right, targetPosition: Position.Left,
+     }
+    ]
+  }
 }
 
-export enum AnyAll { Any, // disjunctive list
-                     All  // conjunctive list
-                   }
+// non-ground-terms, just inert bits of text needed for grammatical comprehensibility. This replaces the Pre / PrePost from AnyAll
+export class Fill extends Vine {
+  constructor(
+    public fill     : string,
+    public id      ?: number
+  ) { super() }
+  getFlowNodes(relPos:XYPosition) : Node[] {
+    return [ {
+      id: `${this.id}`,
+      type: 'default',
+      data: { label: this.fill },
+      position: relPos,
+      sourcePosition: Position.Right, targetPosition: Position.Left,
+    }
+    ]
+  }
+}
+
+const isAll    = (v: Vine) => v instanceof All
+const isAny    = (v: Vine) => v instanceof Any
+const isLeaf   = (v: Vine) => v instanceof Leaf
+const isFill   = (v: Vine) => v instanceof Fill
+
+enum A {
+  ny, // disjunctive list
+  ll, // conjunctive list
+}
 
 export enum HideShow {
   Expanded = "expanded", Collapsed = "collapsed"
 }
 
-export interface Document {
-  id: string;
-  title: string;
-  content: Vine;
+export const mustSing = com(
+  say("Every person must sing who"),
+  ele("walks"),
+  say("and"),
+  any(
+    ele("drinks"),
+    say("or"),
+    ele("eats")
+  )
+);
+
+export function all (...l:Vine[]) : All { return new All(l) }
+export function any (...l:Vine[]) : All { return new Any(l) }
+export function com (...l:Vine[]) : All { return new All(l) }
+export function ele (l:string) : Leaf { return new Leaf(l) }
+export function say (l:string) : Fill { return new Fill(l) }
+
+export const narnia = com(
+  say('there is'),
+  all(
+    any(
+      ele('a grumpy head'),
+      say('or'),
+      ele('an unkind heart'),
+    ),
+    say('and'),
+    any(
+      ele('a bloody fist'),
+      say('or'),
+      all(
+        ele('a venomous'),
+        any(ele('claw'), ele('tooth'))
+      )
+    ),
+  ),
+)
+
+if (require.main === module) {
+  const expanded = narnia.expand();
+  console.log("* narnia")
+  console.log(expanded);
 }
 
-// canonicalization to disjunctive normal form.
-// postcondition: either the returned Vine is a leaf, or it is a parent node with AnyAll set to Any, or it is a linear with no children
-// linears are just filler terms; leaves can take values; parent nodes contain children.
-export function canonicalizeToDNF(vine:Vine): Vine {
-  if (vine.type === 'leaf') {
-    return vine;
-  }
 
-  if (vine.type === 'linear') { // we treat as an All
-    if (!vine.children || vine.children.length === 0) {
-      return vine;
-    }
-    return canonicalizeToDNF({
-      type: 'parent',
-      anyAll: AnyAll.All,
-      hideShow: HideShow.Collapsed,
-      children: vine.children,
-      bool: vine.bool
-    });
-  }
-
-  if (vine.type === 'parent') {
-    let children = vine.children.map(canonicalizeToDNF);
-    // each child is now in DNF
-
-    if (vine.anyAll === AnyAll.All) {
-      console.log(`(All) ${children.length} children before distribution:`, children)
-      const newChildren = _.product(children.map(c => convertVineToList(c)))
-      console.log(`(All) ${newChildren.length} newChildren after distributing and over or`, newChildren)
-
-      // now newChildren is a list of [ linear, or, leaf, linear, or ]
-      // rewrite it to a single or-list containing or [ ...or.children, leaf, linear, ...or.children ]
-      const reducedChildren = _.reduce(newChildren, (acc, c) => { 
-          acc.children.push(c)
-        } 
-
-      })
-
-      vine.children = reducedChildren
-      return vine
-
-    } else if (vine.anyAll === AnyAll.Any) {
-      let newChildren : Vine[] = [];
-
-      children.forEach(child => {
-        if ((child.type == 'linear' && child.children && child.children.length > 0 ) ||
-          child.type === 'parent' && (child.anyAll === AnyAll.All && child.hideShow === HideShow.Expanded)) {
-            console.log(`(child All) distributing OrOverAnd child.children = `, child.children)
-            newChildren = _.product(newChildren, child.children || []);
-            console.log(`(child All) distributing OrOverAnd newChildren = `, newChildren)
-        } else {
-          newChildren.push(child);
-        }
-      });
-      console.log(`(Any) newChildren`, newChildren)
-      return {
-        type: 'parent',
-        anyAll: AnyAll.Any,
-        hideShow: vine.hideShow,
-        children: newChildren,
-        bool: vine.bool
-      };
-    }
-  }
-
-  throw new Error('Unknown Vine type');
-}
-
-function convertVineToList(vine: Vine): Vine[] {
-  if (vine.type === 'leaf') {
-    return [vine];
-  }
-
-    if (vine.children && vine.children.length > 0) {
-    return vine.children;
-  }
-
-  if (vine.type === 'linear') {
-    return [vine];
-  }
-
-  throw new Error('Unknown Vine type');
-}
-
+// const c2s =
+// new All([
+//   new Leaf("c2a"),
+//   new Leaf("c2b"),
+//   new All([
+//     new Leaf("c2c"),
+//     new Leaf("c2d"),
+//     new Any([
+//       new Leaf("o3a"),
+//       new Leaf("o3b")])])])
+          
+// console.log(c2s.expand())

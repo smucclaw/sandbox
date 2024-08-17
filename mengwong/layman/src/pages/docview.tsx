@@ -1,9 +1,14 @@
 import React, { useState } from 'react';
-import { Vine, Document, HideShow, AnyAll, canonicalizeToDNF } from '@/woon';
-
+import { Vine, AnyAll, Any, All, Leaf, Fill, HideShow } from '@/woon';
+import { Flow } from '@/pages/flow';
 
 interface Props {
   doc: Document;
+}
+export interface Document {
+  id: string;
+  title: string;
+  content: Vine;
 }
 
 export const RenderVine: React.FC<Props> = ({ doc }) => {
@@ -15,28 +20,44 @@ export const RenderVine: React.FC<Props> = ({ doc }) => {
   return <div><p>tree render goes here</p></div>
 };
 
-const joinElements = (elements:any[]) => {
-  return elements.flatMap((el, index) => index === elements.length - 1 ? [el] : [el, " "]);
+export const RenderSentences: React.FC<Props> = ({ doc }) => {
+  const root = doc.content;
+  const expanded = doc.content.expand(
+    (s:Vine) => s instanceof Any,
+    (p:Vine) => p instanceof Fill)
+
+  const renderNode = (node: Vine) => {
+    if (node instanceof Leaf) {
+      return <li><b>{node.text}</b></li>;
+    } else if (node instanceof Fill) {
+      return <li>{node.fill}</li>;
+    } else if (node instanceof AnyAll) {
+      return <ul>
+        ({node.c.map(renderNode)})
+      </ul>;
+    }
+  };
+  return (
+    <div>
+      <ol>
+      {expanded.map((item: Vine[], itemIndex: number) => (
+        <li key={itemIndex}>
+          <ul className="inline-list">
+          {item.map((node: Vine, index: number) => (
+            <React.Fragment key={index}>
+              {renderNode(node)}
+            </React.Fragment>
+          ))}
+          </ul>
+        </li>
+      ))}
+      </ol>
+      <div>
+        <textarea className="expandedContent" value={JSON.stringify(expanded, null, 2)} readOnly />
+      </div>
+    </div>
+  );
 }
-
-
-const RenderSentences: React.FC<{vine:Vine}> = ({vine}) => {
-  // console.log("RenderSentences", vine);
-  if (vine.type === 'leaf') {
-    return <>{vine.text} </>
-  }
-  else if (vine.type == 'linear' && ! vine.children) {
-    return <>{vine.text}</>
-  }
-  else if ((vine.type === 'linear' && vine.children) || vine.type === 'parent' && vine.anyAll === AnyAll.All) {
-    return <>{vine.children?.map((child, index) => <RenderSentences key={index} vine={child} />)}</>
-    // todo -- use joinElements
-  }
-  else if (vine.type === 'parent' && vine.anyAll === AnyAll.Any) {
-    return <ul>{vine.children?.map((child, index) => <li key={index}> <RenderSentences key={index} vine={child} /></li>)}</ul>
-  }
-}
-
 
 export const DocView: React.FC<Props> = ({ doc }) => {
   const [expanded, setExpanded] = useState(false);
@@ -44,9 +65,9 @@ export const DocView: React.FC<Props> = ({ doc }) => {
 
   const toggleExpandAll = () => {
     const traverseAndExpand = (node: Vine) => {
-      if (node.type === 'parent') {
-        node.hideShow = HideShow.Expanded;
-        node.children.forEach(traverseAndExpand);
+      if (node instanceof AnyAll) {
+        node.viz = HideShow.Expanded;
+        node.c.forEach(traverseAndExpand);
       }
     };
 
@@ -55,12 +76,12 @@ export const DocView: React.FC<Props> = ({ doc }) => {
   };
   
   return <div>
-      <h1>{doc.title}</h1>
       <button onClick={toggleExpandAll}>{expanded ? 'Collapse All' : 'Expand All'}</button>
-
+      <h1>{doc.title}</h1>
+      <RenderSentences doc={doc} />
+      <div><Flow doc={doc} /></div>
       <textarea className="vineEditor" value={JSON.stringify(root, null, 2)} readOnly />
       <RenderVine doc={doc} />
-      <RenderSentences vine={canonicalizeToDNF(doc.content)} />
 
     </div>
 };

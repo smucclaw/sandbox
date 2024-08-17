@@ -26,6 +26,67 @@ body {
     rgb(var(--background-start-rgb));
 }
 
+h1 {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+h2 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 0.75rem;
+}
+
+p {
+  font-size: 1rem;
+  line-height: 1.5;
+  margin-bottom: 1rem;
+}
+
+button {
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0.25rem;
+  background-color: #f2f2f2;
+  color: #333;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #ddd;
+}
+
+button:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5);
+}
+
+ol { list-style-type: decimal; margin-left: 1.5rem; }ol { list-style-type: decimal; margin-left: 1.5rem; }
+
+ul.inline-list {
+  display: inline;
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+ul.inline-list li:not(:last-child)::after {
+  content: " \00B7 "; /* Unicode character for middle dot */
+}
+
+ul.inline-list li {
+  display: inline;
+  margin-right: 0.3rem;
+}
+em {
+  font-style: italic;
+}
+
+/* Add more styles for other elements as needed */
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;
@@ -40,12 +101,16 @@ body {
   top: 0;
 }
 
+.navbar button {
+  display: block;
+}
+
 .document-pane {
   margin-left: 200px;
   padding: 20px;
 }
 
-.vineEditor {
+.vineEditor , .expandedContent {
   width: 100%;
   height: auto;
   resize: both;

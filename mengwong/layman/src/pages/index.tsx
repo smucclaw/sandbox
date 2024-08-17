@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { Vine, Document, HideShow, AnyAll } from '@/woon';
-import { DocView } from '@/pages/docview';
+import { Vine, Any, All, Leaf, Fill, HideShow,
+        narnia } from '@/woon';
+import { DocView, Document } from '@/pages/docview';
+import { EssayContent1 } from '@/pages/essay';
 
 const App: React.FC = () => {
   const [documents, setDocuments] = useState<Document[]>([]);
@@ -9,23 +11,8 @@ const App: React.FC = () => {
   const createDocument = () => {
     const newDocument: Document = {
       id: Math.random().toString(),
-      title: 'Untitled Document',
-      content: { type: 'linear', children: [
-        { type: 'leaf', text: 'In Narnia, a crime requires' },
-        { type: 'parent', anyAll: AnyAll.All, hideShow: HideShow.Collapsed, children: [
-          { type: 'parent', anyAll: AnyAll.Any, hideShow: HideShow.Collapsed, children: [
-            { type: 'leaf', text: 'a grumpy head' },
-            { type: 'linear', text: 'or' },
-            { type: 'leaf', text: 'an unkind heart' }
-          ] },
-          { type: 'linear', text: 'and' },
-          { type: 'parent', anyAll: AnyAll.Any, hideShow: HideShow.Collapsed, children: [
-            { type: 'leaf', text: 'a bloody fist' },
-            { type: 'linear', text: 'or' },
-            { type: 'leaf', text: 'a venomous tooth' }
-          ] },
-        ] },
-      ] },
+      title: 'In Narnia, a crime is committed if',
+      content: narnia
     };
     setDocuments([...documents, newDocument]);
     setSelectedDocument(newDocument);
@@ -76,7 +63,8 @@ const App: React.FC = () => {
             </li>
           ))}
         </ul>
-        <a href="/help">Help</a>
+        <div><a href="/help">Help</a></div>
+        <div><a href="/about">About</a></div>
       </div>
       <div className="document-pane">
         {selectedDocument ? (
@@ -87,7 +75,7 @@ const App: React.FC = () => {
 
           </>
         ) : (
-          <p>No document selected</p>
+          <EssayContent1 />
         )}
       </div>
     </div>

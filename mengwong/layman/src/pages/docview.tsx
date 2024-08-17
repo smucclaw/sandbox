@@ -23,7 +23,7 @@ export const RenderVine: React.FC<Props> = ({ doc }) => {
 export const RenderSentences: React.FC<Props> = ({ doc }) => {
   const root = doc.content;
   const expanded = doc.content.expand(
-    (s:Vine) => s instanceof Any,
+    (s:Vine) => { return (s instanceof Any && s.viz !== HideShow.Collapsed) },
     (p:Vine) => p instanceof Fill)
 
   const renderNode = (node: Vine) => {

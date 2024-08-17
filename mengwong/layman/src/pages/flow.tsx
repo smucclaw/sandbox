@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useCallback } from 'react';
 import ReactFlow, {
   MiniMap,
@@ -16,17 +16,18 @@ type Props = {
   doc : Document
 }
 
-const initialNodes = [
-  { id: '1', position: { x: 0, y: 0 }, data: { label: '1' } },
-  { id: '2', position: { x: 0, y: 100 }, data: { label: '2' } },
-];
-
-const initialEdges = [{ id: 'e1-2', source: '1', target: '2' }];
-
 export const Flow : React.FC<Props> = ({doc}) => { //  : React.FC<Props> = ({ doc }) => {
-  const root = doc.content
-  const [nodes, setNodes, onNodesChange] = useNodesState(root.getFlowNodes({x:0, y:0}));
-  const [edges, setEdges, onEdgesChange] = useEdgesState(root.getFlowEdges());
+  const [nodes, setNodes, onNodesChange] = useNodesState(doc.content.getFlowNodes({x:0, y:0}));
+  const [edges, setEdges, onEdgesChange] = useEdgesState(doc.content.getFlowEdges());
+  useEffect(() => {
+    const root = doc.content
+    setNodes(root.getFlowNodes({x:0, y:0}));
+    setEdges(root.getFlowEdges());
+  }, [doc]);
+
+
+  console.log("nodes", nodes)
+  console.log("edges", edges)
 
   const onConnect = useCallback((params) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
 

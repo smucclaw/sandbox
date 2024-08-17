@@ -78,6 +78,7 @@ export const DocView: React.FC<Props> = ({ doc }) => {
   return <div>
       <button onClick={toggleExpandAll}>{expanded ? 'Collapse All' : 'Expand All'}</button>
       <h1>{doc.title}</h1>
+      <h2>Cases</h2>
       <RenderSentences doc={doc} />
       <div><Flow doc={doc} /></div>
       <textarea className="vineEditor" value={JSON.stringify(root, null, 2)} readOnly />

@@ -30,12 +30,14 @@ h1 {
   font-size: 2rem;
   font-weight: bold;
   margin-bottom: 1rem;
+  text-align: center;
 }
 
 h2 {
   font-size: 1.5rem;
   font-weight: bold;
   margin-bottom: 0.75rem;
+  font-style: italic;
 }
 
 p {

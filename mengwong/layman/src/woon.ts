@@ -27,15 +27,15 @@ let idMax = 1
 export class Vine { // your basic tree, with AnyAll leaves, and Leaf/Fill terminals.
   constructor(
     public viz  ?: HideShow,
-    public id   ?: number
+    public   id ?: number,
   ) {
     this.id = id ?? idMax++;
   }
   expand(_fp: (v: Vine) => boolean, _fc: (v: Vine) => boolean): Vine[][] { return [[this]] }
    // takes two filter functions; first applied to the parent, the second to be applied to the children.
    // will exclude children where both functions return true.
-   // the sentence rendering code uses this to hide "and" fillers
-  getFlowNodes(_:XYPosition) : Node[] { return [] }
+   // the sentence rendering code uses this to hide "or" fillers since those don't belong in the sentence.
+  getFlowNodes(_newPos:XYPosition) : Node[] { return [] }
   getFlowEdges() : Edge[] { return [] }
 }
 
@@ -43,8 +43,8 @@ export class Vine { // your basic tree, with AnyAll leaves, and Leaf/Fill termin
 export class AnyAll extends Vine {
  constructor(
    public c : Vine[],
-   public viz ?: HideShow,
-   public id  ?: number) { super(viz, id) };
+   viz ?: HideShow,
+   id  ?: number) { super(viz, id); console.log(`AnyAll constructed: ${this.id}`) }
    expand(fParent: (v:Vine) => boolean,
           fChild:  (v:Vine) => boolean) : Vine[][] {
     if (this?.viz === HideShow.Collapsed) { return xprod(... this.c.map(x => x.expand(fParent, fChild))) }
@@ -61,17 +61,29 @@ export class All extends AnyAll {
     return xprod(...l)
    }
    getFlowNodes(relPos:XYPosition) : Node[] {
+    console.log(`* All ${this.id} getFlowNodes`);
     return [ {
        id: `${this.id}`,
        type: 'group',
        data: { label: `all` },
        position: relPos,
-       sourcePosition: Position.Right, targetPosition: Position.Left,
+       sourcePosition: Position.Left, targetPosition: Position.Right,
       },
       ...(this.c.flatMap((x,i) => x.getFlowNodes({ x: relPos.x + 100*i+1, y: relPos.y })))
      ]
    }
+   getFlowEdges() : Edge[] {
+    // we connect ourselves to our first child, and the children to each other in sequence.
+    // this will probably change when we figure out subflows.
+    const edges = [
+      { id: `e${this.id}-${this.c[0].id}`, source: `${this.id}`, target: `${this.c[0].id}` },
+        ...(this.c.slice(-1).flatMap((n,i) => [{ id: `e${n.id}-${this.c[i+1].id}`, source: `${n.id}`, target:`${this.c[i+1].id}`},
+                                               ...n.getFlowEdges()]))
+    ]
+    return edges
+   }
   }
+// const initialEdges = [{ id: 'e1-2', source: '1', target: '2' }];
 
 export class Any extends AnyAll {
   merge (...l:Vine[][][]) : Vine[][] {    // console.log("* doing Any merge");
@@ -85,10 +97,17 @@ export class Any extends AnyAll {
       type: 'group',
       data: { label: `any` },
       position: relPos,
-      sourcePosition: Position.Right, targetPosition: Position.Left,
+      sourcePosition: Position.Left, targetPosition: Position.Right,
     },
-      ...(this.c.flatMap((x,i) => x.getFlowNodes({ x: relPos.x, y: relPos.y + 50*(i+1) })))
+      ...(this.c.flatMap((x,i) => x.getFlowNodes({ x: relPos.x, y: relPos.y + 50*(i+0) })))
     ]
+  }
+  getFlowEdges() : Edge[] {
+    // we connect ourselves to all the children in parallel
+    const edges = this.c.flatMap((n,i) => [{ id: `e${this.id}-${n.id}`, source: `${this.id}`, target: `${n.id}` },
+                                           ...n.getFlowEdges()])
+
+    return edges
   }
 }
   
@@ -98,7 +117,9 @@ export class Leaf extends Vine {
     public text     : string,
     public value   ?: boolean,
     public dflt    ?: boolean,
-  ) { super() }
+    viz  ?: HideShow,
+    id   ?: number,
+  ) { super(viz,id) }
   getFlowNodes(relPos:XYPosition) : Node[] {
     return [ {
       id: `${this.id}`,
@@ -115,8 +136,9 @@ export class Leaf extends Vine {
 export class Fill extends Vine {
   constructor(
     public fill     : string,
-    public id      ?: number
-  ) { super() }
+    viz  ?: HideShow,
+    id      ?: number
+  ) { super(viz,id) }
   getFlowNodes(relPos:XYPosition) : Node[] {
     return [ {
       id: `${this.id}`,
@@ -144,7 +166,7 @@ export enum HideShow {
 }
 
 export const mustSing = com(
-  say("Every person must sing who"),
+  say("... who"),
   ele("walks"),
   say("and"),
   any(
@@ -154,11 +176,11 @@ export const mustSing = com(
   )
 );
 
-export function all (...l:Vine[]) : All { return new All(l) }
-export function any (...l:Vine[]) : All { return new Any(l) }
-export function com (...l:Vine[]) : All { return new All(l) }
-export function ele (l:string) : Leaf { return new Leaf(l) }
-export function say (l:string) : Fill { return new Fill(l) }
+export function all (...l:Vine[]) : All { return new All(l) } // conjunction
+export function any (...l:Vine[]) : All { return new Any(l) } // disjunction
+export function com (...l:Vine[]) : All { return new All(l) } // compound
+export function ele (l:string) : Leaf { return new Leaf(l) }  // element
+export function say (l:string) : Fill { return new Fill(l) }  // filler
 
 export const narnia = com(
   say('there is'),
@@ -181,7 +203,7 @@ export const narnia = com(
 )
 
 if (require.main === module) {
-  const expanded = narnia.expand();
+  const expanded = narnia.expand(_.constant(false), _.constant(false));
   console.log("* narnia")
   console.log(expanded);
 }

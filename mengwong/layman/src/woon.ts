@@ -44,7 +44,7 @@ export class AnyAll extends Vine {
  constructor(
    public c : Vine[],
    viz ?: HideShow,
-   id  ?: number) { super(viz, id); console.log(`AnyAll constructed: ${this.id}`) }
+   id  ?: number) { super(viz, id); }
    expand(fParent: (v:Vine) => boolean,
           fChild:  (v:Vine) => boolean) : Vine[][] {
     if (this?.viz === HideShow.Collapsed) { return xprod(... this.c.map(x => x.expand(fParent, fChild))) }
@@ -69,7 +69,7 @@ export class All extends AnyAll {
        position: relPos,
        sourcePosition: Position.Left, targetPosition: Position.Right,
       },
-      ...(this.c.flatMap((x,i) => x.getFlowNodes({ x: relPos.x + 100*i+1, y: relPos.y })))
+      ...(this.c.flatMap((x,i) => x.getFlowNodes({ x: relPos.x + 120*(i+1), y: relPos.y })))
      ]
    }
    getFlowEdges() : Edge[] {

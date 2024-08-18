@@ -5,6 +5,7 @@ import _ from 'lodash';
 
 interface Props {
   doc: Document;
+  hideShowOverride ?: HideShow;
 }
 export interface Document {
   id: string;
@@ -21,37 +22,45 @@ export const RenderVine: React.FC<Props> = ({ doc }) => {
   return <div><p>tree render goes here</p></div>
 };
 
-export const RenderSentences: React.FC<Props> = ({ doc }) => {
+export const RenderSentences: React.FC<Props> = ({ doc, hideShowOverride }) => {
   const root = doc.content;
-  const expanded = doc.content.expand(
-    (s:Vine) => (s instanceof Any && s.viz !== HideShow.Collapsed),
-    (p:Vine) => (p instanceof Fill))
+  const excludeFill0 = {
+    fParent: (s: Vine) => s instanceof Any && s.viz !== HideShow.Collapsed,
+    fChild: (p: Vine) => p instanceof Fill
+  };
+  const excludeFill = hideShowOverride ? { ...excludeFill0, hideShowOverride: hideShowOverride } : excludeFill0
+
+  const [expanded, setExpanded] = useState(root.expand(excludeFill));
 
   const renderNode = (node: Vine) => {
     if (node instanceof Leaf) {
       return <li><b>{node.text}</b></li>;
     } else if (node instanceof Fill) {
-      return <li>{node.fill}</li>;
+      return <li onClick={() => {
+        node.toggleParent();
+        setExpanded(root.expand(excludeFill))
+      }}>{node.fill}</li>;
     } else if (node instanceof AnyAll) {
       return <ul>
-        ({node.c.map(renderNode)})
+        {node.c.map(renderNode)}
       </ul>;
     }
   };
+
   return (
     <div>
       <ol>
-      {expanded.map((item: Vine[], itemIndex: number) => (
-        <li key={itemIndex}>
-          <ul className="inline-list">
-          {item.map((node: Vine, index: number) => (
-            <React.Fragment key={index}>
-              {renderNode(node)}
-            </React.Fragment>
-          ))}
-          </ul>
-        </li>
-      ))}
+        {expanded.map((item: Vine[], itemIndex: number) => (
+          <li key={itemIndex}>
+            <ul className="inline-list">
+              {item.map((node: Vine, index: number) => (
+                <React.Fragment key={index}>
+                  {renderNode(node)}
+                </React.Fragment>
+              ))}
+            </ul>
+          </li>
+        ))}
       </ol>
     </div>
   );
@@ -83,18 +92,22 @@ export const DocView: React.FC<Props> = ({ doc }) => {
     setExpanded(!expanded);
   };
   
-  return <div>
-      <button onClick={toggleExpandAll}>{expanded ? 'Collapse All' : 'Expand All'}</button>
+  return (
+    <div style={{ marginTop: '20px' }}>
       <h1>{doc.title}</h1>
-      <h2>Original</h2>
-      <div className="original"><Original doc={doc} /></div>
-      <h2>Cases</h2>
+      <div className="original"><h2>Original</h2><Original doc={doc} /></div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <h2>Cases</h2>
+        <button id="expansion" onClick={toggleExpandAll} style={{ marginLeft: 'auto' }}>
+          {expanded ? 'Collapsed' : 'Expanded'}
+        </button>
+      </div>
       <RenderSentences doc={doc} />
-      <div><Flow doc={doc} /></div>
+      <div><h2>Circuit Diagram</h2><Flow doc={doc} /></div>
       <textarea className="vineEditor" value={JSON.stringify(root, null, 2)} readOnly />
       <RenderVine doc={doc} />
-
     </div>
+  );
 };
 
 export default DocView;

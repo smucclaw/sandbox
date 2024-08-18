@@ -23,15 +23,26 @@ function xprod <T>(...l: T[][][]) : T[][] {                ; // console.log(`** 
 }
 
 let idMax = 1
+interface ExpansionOpts {
+  fParent           : (_v:Vine) => boolean;
+  fChild            : (_v:Vine) => boolean;
+  hideShowOverride ?: HideShow;
+}
+
+const defaultExpansionOpts : ExpansionOpts = {
+  fParent: _.constant(false),
+  fChild:  _.constant(false)
+}
 
 export class Vine { // your basic tree, with AnyAll leaves, and Leaf/Fill terminals.
+  toggleParent () {}
   constructor(
     public viz  ?: HideShow,
     public   id ?: number,
   ) {
     this.id = id ?? idMax++;
   }
-  expand(_fp: (v: Vine) => boolean, _fc: (v: Vine) => boolean): Vine[][] { return [[this]] }
+  expand(_:ExpansionOpts): Vine[][] { return [[this]] } // runtime environment reader monad used by Original
    // takes two filter functions; first applied to the parent, the second to be applied to the children.
    // will exclude children where both functions return true.
    // the sentence rendering code uses this to hide "or" fillers since those don't belong in the sentence.
@@ -39,20 +50,27 @@ export class Vine { // your basic tree, with AnyAll leaves, and Leaf/Fill termin
   getFlowEdges() : Edge[] { return [] }
   hideAll() { this.viz = HideShow.Collapsed }
   showAll() { this.viz = HideShow.Expanded }
+  toggleViz() { this.viz = this.viz === HideShow.Collapsed ? HideShow.Expanded : HideShow.Collapsed; console.log("toggled!") }
+  recordParent(p:Vine) : Vine { this.toggleParent = () => { console.log(`${this.id} running toggleParent on ${p.id}`); p.toggleViz() }; return this }
 }
 
 
 export class AnyAll extends Vine {
- constructor(
-   public c : Vine[],
-   viz ?: HideShow,
-   id  ?: number) { super(viz, id); }
-   expand(fParent: (v:Vine) => boolean,
-          fChild:  (v:Vine) => boolean) : Vine[][] {
-    if (this?.viz === HideShow.Collapsed) { return xprod(... this.c.map(x => x.expand(fParent, fChild))) }
+constructor(
+  public c : Vine[],
+  viz ?: HideShow,
+  id  ?: number) {
+  super(viz, id);
+  for (const child of c) { child.recordParent(this) }
+}
+   expand(exOpts : ExpansionOpts) : Vine[][] {
+    if (this?.viz === HideShow.Collapsed
+      || exOpts.hideShowOverride === HideShow.Collapsed) {
+         return xprod(... this.c.map(x => x.expand(exOpts)))
+       }
     const merged = this.merge(...(this.c
-                                    .filter(ch => ! (fParent(this) && fChild(ch)))
-                                    .map( c => c.expand(fParent, fChild))))
+                                    .filter(ch => ! (exOpts.fParent(this) && exOpts.fChild(ch)))
+                                    .map( c => c.expand(exOpts))))
     return merged
    }
   merge<T>(...l:Vine[][][]) : Vine[][] { return [] }
@@ -73,7 +91,7 @@ export class All extends AnyAll {
        position: relPos,
        sourcePosition: Position.Left, targetPosition: Position.Right,
       },
-      ...(this.c.flatMap((x,i) => x.getFlowNodes({ x: relPos.x + 10*(i+1), y: relPos.y })))
+      ...(this.c.flatMap((x,i) => x.getFlowNodes({ x: relPos.x + 100*(i+1), y: relPos.y })))
      ]
    }
    getFlowEdges() : Edge[] {
@@ -165,11 +183,15 @@ enum A {
   ll, // conjunctive list
 }
 
+// this isn't really HideShow it's more of a fold / unfold, collapse / expand.
+// when an Any node is expanded, the DNF shows each of its children in parallel.
+// when an Any node is collapsed, the DNF shows the Any node on a single line, basically like an All node.
 export enum HideShow {
   Expanded = "expanded", Collapsed = "collapsed"
 }
 
-export const mustSing = com(
+export const mustSing =
+  com(
   say("... who"),
   ele("walks"),
   say("and"),
@@ -207,7 +229,7 @@ export const narnia = com(
 )
 
 if (require.main === module) {
-  const expanded = narnia.expand(_.constant(false), _.constant(false));
+  const expanded = narnia.expand(defaultExpansionOpts);
   console.log("* narnia")
   console.log(expanded);
 }

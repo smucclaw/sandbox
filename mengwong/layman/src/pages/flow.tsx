@@ -23,6 +23,7 @@ export const FlowInner : React.FC<Props> = ({doc}) => {
   const [nodes, setNodes, onNodesChange] = useNodesState<Node[]>(doc.content.getFlowNodes({x:0, y:0}));
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge[]>(doc.content.getFlowEdges());
   useEffect(() => {
+    // all this react stuff is madness
     console.log("doc has changed:", doc);
     console.log(`1: nodes has ${nodes.length} elements`);
     const freshNodes = doc.content.getFlowNodes({x:0, y:0})

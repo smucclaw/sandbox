@@ -48,10 +48,19 @@ export class Vine { // your basic tree, with AnyAll leaves, and Leaf/Fill termin
    // the sentence rendering code uses this to hide "or" fillers since those don't belong in the sentence.
   getFlowNodes(_newPos:XYPosition) : Node[] { return [] }
   getFlowEdges() : Edge[] { return [] }
-  hideAll() { this.viz = HideShow.Collapsed }
-  showAll() { this.viz = HideShow.Expanded }
-  toggleViz() { this.viz = this.viz === HideShow.Collapsed ? HideShow.Expanded : HideShow.Collapsed; console.log("toggled!") }
-  recordParent(p:Vine) : Vine { this.toggleParent = () => { console.log(`${this.id} running toggleParent on ${p.id}`); p.toggleViz() }; return this }
+  hideAll() { this.viz = HideShow.Collapsed; }
+  showAll() { this.viz = HideShow.Expanded;  }
+  toggleViz(newViz:HideShow) {
+    console.log(`${this.id} before toggle = ${this.viz}`)
+    this.viz = newViz
+    console.log(`${this.id} toggled to ${this.viz}`)
+   }
+  recordParent(p:Vine) : Vine {
+     this.toggleParent = () => { const newViz = p.viz === HideShow.Collapsed ? HideShow.Expanded : HideShow.Collapsed;
+     console.log(`${this.id} running toggleParent on ${p.id}, should set to ${newViz}`);
+      p.toggleViz(newViz) };
+      return this
+     }
 }
 
 
@@ -64,21 +73,21 @@ constructor(
   for (const child of c) { child.recordParent(this) }
 }
    expand(exOpts : ExpansionOpts) : Vine[][] {
-    console.log(`* ${this.id} expand() starting`, this);
+    // console.log(`* ${this.id} expand() starting`, this);
     if (exOpts.hideShowOverride !== undefined) {
       if (exOpts.hideShowOverride === HideShow.Collapsed) {
-        console.log(`overriding := collapse for ${this.id}`);
+        // console.log(`overriding := collapse for ${this.id}`);
         return xprod(... this.c.map(x => x.expand(exOpts)))         // All-style merge
       } else if (exOpts.hideShowOverride === HideShow.Expanded) {
-        console.log(`overriding := expanded for ${this.id}, calling native merge`);
+        // console.log(`overriding := expanded for ${this.id}, calling native merge`);
         return this.merge(... this.c.map(x => x.expand(exOpts)))    // Any-style merge
       }
     }
     if (this?.viz === HideShow.Collapsed) {
-      console.log(`${this.id} this.viz is collapsed, doing All-style merge`);
+      // console.log(`${this.id} this.viz is collapsed, doing All-style merge`);
          return xprod(... this.c.map(x => x.expand(exOpts)))        // All-style merge
        }
-    console.log(`${this.id} this.viz is not collapsed, so doing native merge`);
+    // console.log(`${this.id} this.viz is not collapsed, so doing native merge`);
     const merged = this.merge(...(this.c
                                     .filter(ch => ! (exOpts.fParent(this) && exOpts.fChild(ch)))
                                     .map( c => c.expand(exOpts))))
@@ -91,11 +100,11 @@ constructor(
 
 export class All extends AnyAll {
    merge (...l:Vine[][][]) : Vine[][] { // console.log("* doing All merge");
-    console.log(`** All ${this.id} merge, collapsed`);
+    // console.log(`** All ${this.id} merge, collapsed`);
     return xprod(...l)
    }
    getFlowNodes(relPos:XYPosition) : Node[] {
-    console.log(`** All ${this.id} getFlowNodes`);
+    // console.log(`** All ${this.id} getFlowNodes`);
     return [ {
        id: `${this.id}`,
        type: 'group',
@@ -123,7 +132,7 @@ export class Any extends AnyAll {
   merge (...l:Vine[][][]) : Vine[][] {    // console.log("* doing Any merge");
     // we use this mechanism to exclude any top-level elements which are only Fill nodes from the sentence rendering,
     // but we don't want to exclude them from the flowchart rendering.
-    console.log(`* Any ${this.id} merge, should be expanding`);
+    // console.log(`* Any ${this.id} merge, should be expanding`);
     return xprod(l.flat(1))
   }
   getFlowNodes(relPos:XYPosition) : Node[] {
@@ -243,8 +252,8 @@ export const narnia = com(
 
 if (require.main === module) {
   const expanded = narnia.expand(defaultExpansionOpts);
-  console.log("* narnia")
-  console.log(expanded);
+  // console.log("* narnia")
+  // console.log(expanded);
 }
 
 

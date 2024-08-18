@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Vine, AnyAll, Any, All, Leaf, Fill, HideShow } from '@/woon';
 import { Flow } from '@/pages/flow';
+import _ from 'lodash';
 
 interface Props {
   doc: Document;
@@ -52,11 +53,21 @@ export const RenderSentences: React.FC<Props> = ({ doc }) => {
         </li>
       ))}
       </ol>
-      <div>
-        <textarea className="expandedContent" value={JSON.stringify(expanded, null, 2)} readOnly />
-      </div>
     </div>
   );
+}
+
+export const Original: React.FC<Props> = ({ doc }) => {
+  const [expanded, setExpanded] = useState(false);
+  const root = doc.content;
+
+  // deepcopy the root to a version which is fully collapsed
+  const collapsed = _.cloneDeep(root);
+  // recursively collapse the tree
+  collapsed.hideAll();
+
+  // call the RenderSentences component with the collapsed version
+  return <RenderSentences doc={{ ...doc, content: collapsed }} />
 }
 
 export const DocView: React.FC<Props> = ({ doc }) => {
@@ -64,20 +75,19 @@ export const DocView: React.FC<Props> = ({ doc }) => {
   const root = doc.content;
 
   const toggleExpandAll = () => {
-    const traverseAndExpand = (node: Vine) => {
-      if (node instanceof AnyAll) {
-        node.viz = HideShow.Expanded;
-        node.c.forEach(traverseAndExpand);
-      }
-    };
-
-    traverseAndExpand(root);
+    if (root.viz === HideShow.Collapsed) {
+      root.showAll();
+    } else {
+      root.hideAll();
+    }
     setExpanded(!expanded);
   };
   
   return <div>
       <button onClick={toggleExpandAll}>{expanded ? 'Collapse All' : 'Expand All'}</button>
       <h1>{doc.title}</h1>
+      <h2>Original</h2>
+      <div className="original"><Original doc={doc} /></div>
       <h2>Cases</h2>
       <RenderSentences doc={doc} />
       <div><Flow doc={doc} /></div>

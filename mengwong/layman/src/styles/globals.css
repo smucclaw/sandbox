@@ -68,6 +68,10 @@ button:focus {
 
 ol { list-style-type: decimal; margin-left: 1.5rem; }ol { list-style-type: decimal; margin-left: 1.5rem; }
 
+.original ol {
+  list-style: none;
+}
+
 ul.inline-list {
   display: inline;
   list-style-type: none;

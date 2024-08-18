@@ -37,6 +37,8 @@ export class Vine { // your basic tree, with AnyAll leaves, and Leaf/Fill termin
    // the sentence rendering code uses this to hide "or" fillers since those don't belong in the sentence.
   getFlowNodes(_newPos:XYPosition) : Node[] { return [] }
   getFlowEdges() : Edge[] { return [] }
+  hideAll() { this.viz = HideShow.Collapsed }
+  showAll() { this.viz = HideShow.Expanded }
 }
 
 
@@ -54,6 +56,8 @@ export class AnyAll extends Vine {
     return merged
    }
   merge<T>(...l:Vine[][][]) : Vine[][] { return [] }
+  hideAll() { super.hideAll(); this.c.forEach(x => x.hideAll()) }
+  showAll() { super.showAll(); this.c.forEach(x => x.showAll()) }
  }
 
 export class All extends AnyAll {
@@ -69,7 +73,7 @@ export class All extends AnyAll {
        position: relPos,
        sourcePosition: Position.Left, targetPosition: Position.Right,
       },
-      ...(this.c.flatMap((x,i) => x.getFlowNodes({ x: relPos.x + 120*(i+1), y: relPos.y })))
+      ...(this.c.flatMap((x,i) => x.getFlowNodes({ x: relPos.x + 10*(i+1), y: relPos.y })))
      ]
    }
    getFlowEdges() : Edge[] {
@@ -196,7 +200,7 @@ export const narnia = com(
       say('or'),
       all(
         ele('a venomous'),
-        any(ele('claw'), ele('tooth'))
+        any(ele('claw'), say('or'), ele('tooth'))
       )
     ),
   ),

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Vine, AnyAll, Any, All, Leaf, Fill, HideShow } from '@/woon';
 import { Flow } from '@/pages/flow';
 import _ from 'lodash';
@@ -28,17 +28,20 @@ export const RenderSentences: React.FC<Props> = ({ doc, hideShowOverride }) => {
     fParent: (s: Vine) => s instanceof Any && s.viz !== HideShow.Collapsed,
     fChild: (p: Vine) => p instanceof Fill
   };
+  console.log(`RenderSentences: hideShowOverride = ${hideShowOverride}`);
   const excludeFill = hideShowOverride ? { ...excludeFill0, hideShowOverride: hideShowOverride } : excludeFill0
 
   const [expanded, setExpanded] = useState(root.expand(excludeFill));
-
+  useEffect(() => {
+    setExpanded(root.expand(excludeFill));
+  }, [root]);
   const renderNode = (node: Vine) => {
     if (node instanceof Leaf) {
       return <li><b>{node.text}</b></li>;
     } else if (node instanceof Fill) {
       return <li onClick={() => {
         node.toggleParent();
-        setExpanded(root.expand(excludeFill))
+        console.log(`after toggleParent(), root is now`, root)
       }}>{node.fill}</li>;
     } else if (node instanceof AnyAll) {
       return <ul>
@@ -46,6 +49,9 @@ export const RenderSentences: React.FC<Props> = ({ doc, hideShowOverride }) => {
       </ul>;
     }
   };
+
+  console.log("RenderSentences: root", root);
+  console.log("RenderSentences: expanded", expanded);
 
   return (
     <div>
@@ -69,14 +75,9 @@ export const RenderSentences: React.FC<Props> = ({ doc, hideShowOverride }) => {
 export const Original: React.FC<Props> = ({ doc }) => {
   const [expanded, setExpanded] = useState(false);
   const root = doc.content;
-
-  // deepcopy the root to a version which is fully collapsed
-  const collapsed = _.cloneDeep(root);
-  // recursively collapse the tree
-  collapsed.hideAll();
-
+  console.log("Original running");
   // call the RenderSentences component with the collapsed version
-  return <RenderSentences doc={{ ...doc, content: collapsed }} />
+  return <RenderSentences doc={{ ...doc, content: root}} hideShowOverride={HideShow.Collapsed} />
 }
 
 export const DocView: React.FC<Props> = ({ doc }) => {
@@ -89,7 +90,6 @@ export const DocView: React.FC<Props> = ({ doc }) => {
     } else {
       root.hideAll();
     }
-    setExpanded(!expanded);
   };
   
   return (
@@ -103,7 +103,7 @@ export const DocView: React.FC<Props> = ({ doc }) => {
         </button>
       </div>
       <RenderSentences doc={doc} />
-      <div><h2>Circuit Diagram</h2><Flow doc={doc} /></div>
+      <div><h2>Circuit Diagram</h2></div>
       <textarea className="vineEditor" value={JSON.stringify(root, null, 2)} readOnly />
       <RenderVine doc={doc} />
     </div>

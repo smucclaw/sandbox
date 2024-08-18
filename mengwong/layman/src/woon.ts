@@ -64,10 +64,21 @@ constructor(
   for (const child of c) { child.recordParent(this) }
 }
    expand(exOpts : ExpansionOpts) : Vine[][] {
-    if (this?.viz === HideShow.Collapsed
-      || exOpts.hideShowOverride === HideShow.Collapsed) {
-         return xprod(... this.c.map(x => x.expand(exOpts)))
+    console.log(`* ${this.id} expand() starting`, this);
+    if (exOpts.hideShowOverride !== undefined) {
+      if (exOpts.hideShowOverride === HideShow.Collapsed) {
+        console.log(`overriding := collapse for ${this.id}`);
+        return xprod(... this.c.map(x => x.expand(exOpts)))         // All-style merge
+      } else if (exOpts.hideShowOverride === HideShow.Expanded) {
+        console.log(`overriding := expanded for ${this.id}, calling native merge`);
+        return this.merge(... this.c.map(x => x.expand(exOpts)))    // Any-style merge
+      }
+    }
+    if (this?.viz === HideShow.Collapsed) {
+      console.log(`${this.id} this.viz is collapsed, doing All-style merge`);
+         return xprod(... this.c.map(x => x.expand(exOpts)))        // All-style merge
        }
+    console.log(`${this.id} this.viz is not collapsed, so doing native merge`);
     const merged = this.merge(...(this.c
                                     .filter(ch => ! (exOpts.fParent(this) && exOpts.fChild(ch)))
                                     .map( c => c.expand(exOpts))))
@@ -80,10 +91,11 @@ constructor(
 
 export class All extends AnyAll {
    merge (...l:Vine[][][]) : Vine[][] { // console.log("* doing All merge");
+    console.log(`** All ${this.id} merge, collapsed`);
     return xprod(...l)
    }
    getFlowNodes(relPos:XYPosition) : Node[] {
-    console.log(`* All ${this.id} getFlowNodes`);
+    console.log(`** All ${this.id} getFlowNodes`);
     return [ {
        id: `${this.id}`,
        type: 'group',
@@ -111,6 +123,7 @@ export class Any extends AnyAll {
   merge (...l:Vine[][][]) : Vine[][] {    // console.log("* doing Any merge");
     // we use this mechanism to exclude any top-level elements which are only Fill nodes from the sentence rendering,
     // but we don't want to exclude them from the flowchart rendering.
+    console.log(`* Any ${this.id} merge, should be expanding`);
     return xprod(l.flat(1))
   }
   getFlowNodes(relPos:XYPosition) : Node[] {

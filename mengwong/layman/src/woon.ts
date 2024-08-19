@@ -110,15 +110,32 @@ export class All extends AnyAll {
    }
    getFlowNodes(relPos:XYPosition) : Node[] {
     // console.log(`** All ${this.id} getFlowNodes`);
-    return [ {
-       id: `${this.id}`,
+    const nodes = [
+      { // the hypernode group
+       id: `${this.id}-group`,
        type: 'group',
        data: { label: `all` },
        position: relPos,
-       sourcePosition: Position.Left, targetPosition: Position.Right,
+       sourcePosition: Position.Right, targetPosition: Position.Left,
       },
-      ...(this.c.flatMap((x,i) => x.getFlowNodes({ x: relPos.x + 100*(i+1), y: relPos.y })))
+      { // a pseudo-node which is basically a tiny little circle which acts as a common source for the children in the group
+        id: `${this.id}`,
+        type: 'default',
+        data: { label: `all` },
+        position: relPos,
+        sourcePosition: Position.Right, targetPosition: Position.Left,
+        style: {
+          width: 20,
+          height: 20,
+          borderRadius: "50%",
+          backgroundColor: "grey"
+        },
+      },
+
+      ...(this.c.flatMap((x,i) => x.getFlowNodes({ x: relPos.x + 170*(i+1), y: relPos.y })))
      ]
+    console.log(`** All ${this.id} getFlowNodes`, nodes);
+    return nodes
    }
    getFlowEdges() : Edge[] {
     // we connect ourselves to our first child, and the children to each other in sequence.
@@ -128,6 +145,7 @@ export class All extends AnyAll {
         ...(this.c.slice(-1).flatMap((n,i) => [{ id: `e${n.id}-${this.c[i+1].id}`, source: `${n.id}`, target:`${this.c[i+1].id}`},
                                                ...n.getFlowEdges()]))
     ]
+    console.log(`** All ${this.id} getFlowEdges`, edges);
     return edges
    }
    clone() { return new All(this.c.map(x => x.clone()), this.viz, this.id) }
@@ -142,21 +160,38 @@ export class Any extends AnyAll {
     return xprod(l.flat(1))
   }
   getFlowNodes(relPos:XYPosition) : Node[] {
-    return [ {
-      id: `${this.id}`,
+    const nodes = [
+      { // this becomes the hypernode
+      id: `${this.id}-group`,
       type: 'group',
       data: { label: `any` },
       position: relPos,
-      sourcePosition: Position.Left, targetPosition: Position.Right,
+      sourcePosition: Position.Right, targetPosition: Position.Left,
+    },
+    { // a pseudo-node which is basically a tiny little circle which acts as a common source for the children in the group
+      id: `${this.id}`,
+      type: 'default', // this becomes the hypernode
+      data: { label: `any` },
+      position: relPos,
+      sourcePosition: Position.Right, targetPosition: Position.Left,
+      style: {
+        width: 20,
+        height: 20,
+        borderRadius: "50%",
+        backgroundColor: "grey"
+      },
     },
       ...(this.c.flatMap((x,i) => x.getFlowNodes({ x: relPos.x, y: relPos.y + 50*(i+0) })))
     ]
+    console.log(`** Any ${this.id} getFlowNodes`, nodes);
+    return nodes
   }
   getFlowEdges() : Edge[] {
     // we connect ourselves to all the children in parallel
     const edges = this.c.flatMap((n,i) => [{ id: `e${this.id}-${n.id}`, source: `${this.id}`, target: `${n.id}` },
                                            ...n.getFlowEdges()])
 
+    console.log(`** Any ${this.id} getFlowEdges`, edges);
     return edges
   }
   clone() { return new Any(this.c.map(x => x.clone()), this.viz, this.id) }

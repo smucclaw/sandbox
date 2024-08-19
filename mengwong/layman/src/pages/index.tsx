@@ -73,16 +73,16 @@ const App: React.FC = () => {
         </ul>
         <div><a href="/help">Help</a></div>
         <div><a href="/about">About</a></div>
+        <div style={{ position: 'fixed', bottom: 1, paddingLeft: 20 }}>
+          <p>L4: <a href="https://en.wikipedia.org/wiki/Mieza_(Macedonia)" target="mieza">Μίεζα</a> (<a href="https://github.com/smucclaw/sandbox/tree/default/mengwong/layman">GitHub</a>)</p>
+        </div>
       </div>
       <div className="document-pane">
         {selectedDocument ? (
-          <><p>rendering docview with {selectedDocument.id} {selectedDocument.title}</p>
             <DocView
               doc={selectedDocument}
               key={selectedDocument.id}
             />
-
-          </>
         ) : (
           <EssayContent1 />
         )}

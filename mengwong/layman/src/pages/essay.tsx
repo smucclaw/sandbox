@@ -152,6 +152,10 @@ export const EssayContent1: React.FC = () => {
       The legal rule against surplusage or the presumption against superfluity is a powerful tool in statutory interpretation that aligns with the logical principles you’re studying. It helps ensure that all parts of a statute are meaningful and effective, much like how Boolean minimization ensures that all terms in an expression contribute to its final value.
     </p>
 
+    <p>The Ancient Greeks had another word for "logic". They called it "dialectic". Hegel refigured "dialectic" to mean "overcoming internal contradictions" -- hence the thesis/anti-thesis/synthesis theory for which he is known.</p>
+
+    <p>In that vein we can focus on a very narrow, technical method for "overcoming internal contradictions". The substitution expansion of s.24 leads to a contradiction in s.415. This contradiction violates the principle of surplusage; it was the argument on which the case turned; and it is an argument that a computer can detect and articulate in milliseconds.</p>
+
     <h1>Tautology Detection with Espresso</h1>
 
     <h1>Colophon</h1>

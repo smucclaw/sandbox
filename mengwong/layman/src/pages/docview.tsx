@@ -9,7 +9,11 @@ export const DocView: React.FC<Props> = ({ doc }) => {
   const toggleExpandAll = () => {
     dispatch({type: root.viz !== HideShow.Collapsed ? 'COLLAPSE' : 'EXPAND'});
   };
-  console.log(`DocView: root`, root)
+  const flowNodes = root.getFlowNodes({x:0, y:0})
+  const flowEdges = root.getFlowEdges()
+  console.log(`DocView: flowNodes`, flowNodes)
+  console.log(`DocView: flowEdges`, flowEdges)
+  // console.log(`DocView: root`, root)
   return (
     <div style={{ marginTop: '20px' }}>
       <h1>{doc.title}</h1>
@@ -27,17 +31,17 @@ export const DocView: React.FC<Props> = ({ doc }) => {
       <RenderSentences key={`${doc.title}-topLevel`} root={root} dispatch={dispatch} />
       {root.viz === HideShow.Expanded && (
       <div>
-          <p className="pRight">
-            When fully expanded, these are said to be in{" "}
-            <a href="https://en.wikipedia.org/wiki/Disjunctive_normal_form" target="_new">disjunctive normal form.</a>
-          </p>
-        </div>
+        <p className="pRight">
+          When fully expanded, these are said to be in{" "}
+          <a href="https://en.wikipedia.org/wiki/Disjunctive_normal_form" target="_new">disjunctive normal form.</a>
+        </p>
+      </div>
       )}
 
-      <div><h2>Circuit Diagram</h2></div>
-      <Flow root={root} dispatch={dispatch} />
-      <textarea className="vineEditor" value={JSON.stringify(root, null, 2)} readOnly />
-      <RenderVine root={root} dispatch={dispatch} />
+      <h2>Circuit Diagram</h2>
+        <Flow root={root} nodes={flowNodes} edges={flowEdges} dispatch={dispatch} />
+        <textarea className="vineEditor" value={JSON.stringify(root, null, 2)} readOnly />
+        <RenderVine root={root} dispatch={dispatch} />
     </div>
   );
 };
@@ -83,7 +87,6 @@ const RenderNode: React.FC<{ node: Vine, dispatch: MyDispatch }> = ({ node, disp
       return <li><b>{node.text}</b></li>;
     } else if (node instanceof Fill) {
       return <li onClick={(e) => {
-        console.log(`fill clicked ${node.id}, current viz is ${node.viz}`);
         e.stopPropagation(); // Prevent event bubbling
         dispatch({type:"toggleParent", nodeID:node.id})
       }}>{node.fill}</li>;
@@ -115,7 +118,6 @@ const RenderExpanded: React.FC<{expanded: Vine[][], dispatch: MyDispatch}> = ({ 
 export const RenderOriginal: React.FC<JustRoot> = ({ root, dispatch }) => {
   const excludeFill = {...excludeFill0, ...{hideShowOverride: HideShow.Collapsed}}
   const expanded = root.expand(excludeFill);
-  console.log(`RenderOriginal: expanded`, expanded)
   return <RenderExpanded key="fromOriginal" expanded={expanded} dispatch={dispatch} />;
 }
 
@@ -129,7 +131,6 @@ export const RenderSentences: React.FC<JustRoot> = ({ root, dispatch }) => {
 function reducer(root: Vine, action: MyAction): Vine {
   const toggleParentNode = (nodeID:number, node: Vine) => {
     if (node.id === nodeID) {
-      console.log(`toggling parent of ${node.id}`);
       node.toggleParent();
     } else if (node instanceof AnyAll) {
       node.c.forEach((childNode) => {
@@ -147,12 +148,9 @@ function reducer(root: Vine, action: MyAction): Vine {
       newRoot.hideAll(); return newRoot
     case 'toggleParent':
       if (action.nodeID == undefined) {
-        console.error("toggleParent called without nodeID");
         return newRoot;
       }
-      console.log(`handling toggleParent, nodeID=${action.nodeID}`);
       toggleParentNode(action.nodeID, newRoot);
-      console.log(`after toggling, reducer will return newRoot`, newRoot)
       return newRoot;
     default:
       return newRoot

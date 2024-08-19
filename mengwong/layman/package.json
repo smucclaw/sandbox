@@ -11,6 +11,7 @@
   "dependencies": {
     "@types/lodash": "^4.17.7",
     "deno": "^0.1.1",
+    "elkjs": "^0.9.3",
     "lodash": "^4.17.21",
     "lodash.product": "^18.10.0",
     "next": "14.2.5",

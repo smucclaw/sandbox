@@ -3,6 +3,48 @@ import { Vine, AnyAll, Any, All, Leaf, Fill, HideShow } from '@/woon';
 import { Flow } from '@/pages/flow';
 import _ from 'lodash';
 
+export const DocView: React.FC<Props> = ({ doc }) => {
+  const init = (initialContent:Vine) => initialContent.clone(); // Initialize with a deep copy to avoid mutations
+  const [root, dispatch] = useReducer(reducer, doc.content, init);
+  const toggleExpandAll = () => {
+    dispatch({type: root.viz !== HideShow.Collapsed ? 'COLLAPSE' : 'EXPAND'});
+  };
+  console.log(`DocView: root`, root)
+  return (
+    <div style={{ marginTop: '20px' }}>
+      <h1>{doc.title}</h1>
+
+      <div className="original">
+      <RenderOriginal key={`${doc.title}-showOriginal`} root={root} dispatch={dispatch} />
+      </div>
+      
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <h2>Combinations</h2>
+        <button id="expansion" onClick={toggleExpandAll} style={{ marginLeft: 'auto' }}>
+          {root.viz == HideShow.Collapsed ? 'Expand All' : 'Collapse All'}
+        </button>
+      </div>
+      <RenderSentences key={`${doc.title}-topLevel`} root={root} dispatch={dispatch} />
+      {root.viz === HideShow.Expanded && (
+      <div>
+          <p className="pRight">
+            When fully expanded, these are said to be in{" "}
+            <a href="https://en.wikipedia.org/wiki/Disjunctive_normal_form" target="_new">disjunctive normal form.</a>
+          </p>
+        </div>
+      )}
+
+      <div><h2>Circuit Diagram</h2></div>
+      <Flow root={root} dispatch={dispatch} />
+      <textarea className="vineEditor" value={JSON.stringify(root, null, 2)} readOnly />
+      <RenderVine root={root} dispatch={dispatch} />
+    </div>
+  );
+};
+
+export default DocView;
+
+
 interface Props {
   doc: Document;
 }
@@ -14,7 +56,7 @@ interface JustRoot {
 
 type MyDispatch = React.Dispatch<MyAction>;
 
-type MyAction = {
+export type MyAction = {
   type: string,
   nodeID ?: number,
 }
@@ -83,45 +125,6 @@ export const RenderSentences: React.FC<JustRoot> = ({ root, dispatch }) => {
 }
 
 
-export const DocView: React.FC<Props> = ({ doc }) => {
-  const init = (initialContent:Vine) => initialContent.clone(); // Initialize with a deep copy to avoid mutations
-  const [root, dispatch] = useReducer(reducer, doc.content, init);
-  const toggleExpandAll = () => {
-    dispatch({type: root.viz !== HideShow.Collapsed ? 'COLLAPSE' : 'EXPAND'});
-  };
-  console.log(`DocView: root`, root)
-  return (
-    <div style={{ marginTop: '20px' }}>
-      <h1>{doc.title}</h1>
-
-      <div className="original"><h2>Original</h2>
-      <RenderOriginal key={`${doc.title}-showOriginal`} root={root} dispatch={dispatch} />
-      </div>
-      
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h2>Expansions</h2>
-        <button id="expansion" onClick={toggleExpandAll} style={{ marginLeft: 'auto' }}>
-          {root.viz == HideShow.Collapsed ? 'Expand All' : 'Collapse All'}
-        </button>
-      </div>
-      <RenderSentences key={`${doc.title}-topLevel`} root={root} dispatch={dispatch} />
-      {root.viz === HideShow.Expanded && (
-      <div>
-          <p className="pRight">
-            When fully expanded, the above are said to be in{" "}
-            <a href="https://en.wikipedia.org/wiki/Disjunctive_normal_form" target="_new">disjunctive normal form.</a>
-          </p>
-        </div>
-      )}
-
-      <div><h2>Circuit Diagram</h2></div>
-      <textarea className="vineEditor" value={JSON.stringify(root, null, 2)} readOnly />
-      <RenderVine root={root} dispatch={dispatch} />
-    </div>
-  );
-};
-
-export default DocView;
 
 function reducer(root: Vine, action: MyAction): Vine {
   const toggleParentNode = (nodeID:number, node: Vine) => {

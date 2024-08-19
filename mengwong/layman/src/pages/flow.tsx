@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { ReactFlowProvider, useReactFlow } from 'reactflow';
 import ReactFlow, {
   MiniMap,
@@ -9,44 +9,36 @@ import ReactFlow, {
   Node,
   Edge,
 } from 'reactflow';
-import { Document } from '@/pages/docview'
-
 import 'reactflow/dist/style.css';
+import { MyAction } from '@/pages/docview';
+import { Vine } from '@/woon';
 
 type Props = {
-  doc : Document,
+  root : Vine,
   nodes ?: Node[],
-  edges ?: Edge[]
+  edges ?: Edge[],
+  dispatch: React.Dispatch<MyAction>;
 }
 
-export const FlowInner : React.FC<Props> = ({doc}) => {
-  const [nodes, setNodes, onNodesChange] = useNodesState<Node[]>(doc.content.getFlowNodes({x:0, y:0}));
-  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge[]>(doc.content.getFlowEdges());
-  useEffect(() => {
-    // all this react stuff is madness
-    console.log("doc has changed:", doc);
-    console.log(`1: nodes has ${nodes.length} elements`);
-    const freshNodes = doc.content.getFlowNodes({x:0, y:0})
-    console.log(`freshNodes has ${freshNodes.length} elements`);
-    setNodes(freshNodes)
-    console.log(`2: nodes has ${nodes.length} elements`);
-  }, [doc]);
+// when we talk about `root` here we are being inductive so it could really
+// be any Vine, not just a Document.content
+export const FlowInner : React.FC<Props> = ({root, dispatch}) => {
+  const nodes = root.getFlowNodes({x:0, y:0})
+  const edges = root.getFlowEdges()
   return <ReactFlow
-  nodes={nodes}
-  edges={edges}
-  onNodesChange={onNodesChange}
-  onEdgesChange={onEdgesChange}
+  defaultNodes={nodes}
+  defaultEdges={edges}
 >
   <Controls />
   <Background />
 </ReactFlow>
 }
 
-export const Flow : React.FC<Props> = ({doc}) => {
+export const Flow : React.FC<Props> = ({root, dispatch}) => {
   return (
     <ReactFlowProvider>
     <div style={{ width: '100%', height: '500px' }}>
-    <FlowInner doc={doc} />
+    <FlowInner root={root} dispatch={dispatch} />
     </div>
     </ReactFlowProvider>
   );

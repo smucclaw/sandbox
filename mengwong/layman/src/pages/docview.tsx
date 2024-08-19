@@ -99,12 +99,20 @@ export const DocView: React.FC<Props> = ({ doc }) => {
       </div>
       
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h2>Cases</h2>
+        <h2>Expansions</h2>
         <button id="expansion" onClick={toggleExpandAll} style={{ marginLeft: 'auto' }}>
-          {root.viz !== HideShow.Collapsed ? 'Expanded' : 'Collapsed'}
+          {root.viz == HideShow.Collapsed ? 'Expand All' : 'Collapse All'}
         </button>
       </div>
       <RenderSentences key={`${doc.title}-topLevel`} root={root} dispatch={dispatch} />
+      {root.viz === HideShow.Expanded && (
+      <div>
+          <p className="pRight">
+            When fully expanded, the above are said to be in{" "}
+            <a href="https://en.wikipedia.org/wiki/Disjunctive_normal_form" target="_new">disjunctive normal form.</a>
+          </p>
+        </div>
+      )}
 
       <div><h2>Circuit Diagram</h2></div>
       <textarea className="vineEditor" value={JSON.stringify(root, null, 2)} readOnly />
@@ -141,7 +149,7 @@ function reducer(root: Vine, action: MyAction): Vine {
       }
       console.log(`handling toggleParent, nodeID=${action.nodeID}`);
       toggleParentNode(action.nodeID, newRoot);
-      console.log(`after toggling, reducer will return newRoot ${newRoot.c[3].viz}`, newRoot)
+      console.log(`after toggling, reducer will return newRoot`, newRoot)
       return newRoot;
     default:
       return newRoot

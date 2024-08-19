@@ -79,6 +79,7 @@ const App: React.FC = () => {
           <><p>rendering docview with {selectedDocument.id} {selectedDocument.title}</p>
             <DocView
               doc={selectedDocument}
+              key={selectedDocument.id}
             />
 
           </>

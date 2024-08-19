@@ -62,6 +62,7 @@ export class Vine { // your basic tree, with AnyAll leaves, and Leaf/Fill termin
       return this
      }
   clone() { return new Vine(this.viz, this.id) }
+  isFullyExpanded() : boolean { return this.viz === HideShow.Expanded }
 }
 
 
@@ -97,6 +98,9 @@ export class AnyAll extends Vine {
   merge<T>(...l:Vine[][][]) : Vine[][] { return [] }
   hideAll() { super.hideAll(); this.c.forEach(x => x.hideAll()) }
   showAll() { super.showAll(); this.c.forEach(x => x.showAll()) }
+  isFullyExpanded() : boolean { return this.viz === HideShow.Expanded
+     && this.c.filter( x=> isAny(x) || isAll(x))
+              .every(x => x.isFullyExpanded()) }
  }
 
 export class All extends AnyAll {

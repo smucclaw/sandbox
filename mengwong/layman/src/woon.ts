@@ -61,18 +61,19 @@ export class Vine { // your basic tree, with AnyAll leaves, and Leaf/Fill termin
       p.toggleViz(newViz) };
       return this
      }
+  clone() { return new Vine(this.viz, this.id) }
 }
 
 
 export class AnyAll extends Vine {
-constructor(
-  public c : Vine[],
-  viz ?: HideShow,
-  id  ?: number) {
-  super(viz, id);
-  for (const child of c) { child.recordParent(this) }
-}
-   expand(exOpts : ExpansionOpts) : Vine[][] {
+  constructor(
+    public c : Vine[],
+    viz ?: HideShow,
+    id  ?: number) {
+    super(viz, id);
+    for (const child of c) { child.recordParent(this) }
+  }
+  expand(exOpts : ExpansionOpts) : Vine[][] {
     // console.log(`* ${this.id} expand() starting`, this);
     if (exOpts.hideShowOverride !== undefined) {
       if (exOpts.hideShowOverride === HideShow.Collapsed) {
@@ -86,13 +87,13 @@ constructor(
     if (this?.viz === HideShow.Collapsed) {
       // console.log(`${this.id} this.viz is collapsed, doing All-style merge`);
          return xprod(... this.c.map(x => x.expand(exOpts)))        // All-style merge
-       }
+        }
     // console.log(`${this.id} this.viz is not collapsed, so doing native merge`);
     const merged = this.merge(...(this.c
                                     .filter(ch => ! (exOpts.fParent(this) && exOpts.fChild(ch)))
                                     .map( c => c.expand(exOpts))))
     return merged
-   }
+  }
   merge<T>(...l:Vine[][][]) : Vine[][] { return [] }
   hideAll() { super.hideAll(); this.c.forEach(x => x.hideAll()) }
   showAll() { super.showAll(); this.c.forEach(x => x.showAll()) }
@@ -125,6 +126,7 @@ export class All extends AnyAll {
     ]
     return edges
    }
+   clone() { return new All(this.c.map(x => x.clone()), this.viz, this.id) }
   }
 // const initialEdges = [{ id: 'e1-2', source: '1', target: '2' }];
 
@@ -153,6 +155,7 @@ export class Any extends AnyAll {
 
     return edges
   }
+  clone() { return new Any(this.c.map(x => x.clone()), this.viz, this.id) }
 }
   
 // ground terms which can take boolean values
@@ -174,6 +177,7 @@ export class Leaf extends Vine {
      }
     ]
   }
+  clone() { return new Leaf(this.text, this.value, this.dflt, this.viz, this.id) }
 }
 
 // non-ground-terms, just inert bits of text needed for grammatical comprehensibility. This replaces the Pre / PrePost from AnyAll
@@ -193,6 +197,7 @@ export class Fill extends Vine {
     }
     ]
   }
+  clone() { return new Fill(this.fill, this.viz, this.id) }
 }
 
 const isAll    = (v: Vine) => v instanceof All

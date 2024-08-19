@@ -84,7 +84,7 @@ export const RenderSentences: React.FC<JustRoot> = ({ root, dispatch }) => {
 
 
 export const DocView: React.FC<Props> = ({ doc }) => {
-  const init = (initialContent:Vine) => _.cloneDeep(initialContent); // Initialize with a deep copy to avoid mutations
+  const init = (initialContent:Vine) => initialContent.clone(); // Initialize with a deep copy to avoid mutations
   const [root, dispatch] = useReducer(reducer, doc.content, init);
   const toggleExpandAll = () => {
     dispatch({type: root.viz !== HideShow.Collapsed ? 'COLLAPSE' : 'EXPAND'});
@@ -116,28 +116,34 @@ export const DocView: React.FC<Props> = ({ doc }) => {
 export default DocView;
 
 function reducer(root: Vine, action: MyAction): Vine {
+  const toggleParentNode = (nodeID:number, node: Vine) => {
+    if (node.id === nodeID) {
+      console.log(`toggling parent of ${node.id}`);
+      node.toggleParent();
+    } else if (node instanceof AnyAll) {
+      node.c.forEach((childNode) => {
+        toggleParentNode(nodeID, childNode);
+      });
+    }
+  };
+
   console.log("reducer called with", action);
-  const newRoot = _.cloneDeep(root)
+  const newRoot = root.clone()
   switch (action.type) {
     case 'EXPAND':
       newRoot.showAll(); return newRoot
     case 'COLLAPSE':
       newRoot.hideAll(); return newRoot
     case 'toggleParent':
+      if (action.nodeID == undefined) {
+        console.error("toggleParent called without nodeID");
+        return newRoot;
+      }
       console.log(`handling toggleParent, nodeID=${action.nodeID}`);
-      const toggleParentNode = (node: Vine) => {
-        if (node.id === action.nodeID) {
-          console.log(`toggling parent of ${node.id}`);
-          node.toggleParent();
-        } else if (node instanceof AnyAll) {
-          node.c.forEach((childNode) => {
-            toggleParentNode(childNode);
-          });
-        }
-      };
-      toggleParentNode(newRoot);
+      toggleParentNode(action.nodeID, newRoot);
+      console.log(`after toggling, reducer will return newRoot ${newRoot.c[3].viz}`, newRoot)
       return newRoot;
     default:
-      return _.clone(root)
+      return newRoot
   }
 }

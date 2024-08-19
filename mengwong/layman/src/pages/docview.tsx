@@ -11,6 +11,7 @@ export const DocView: React.FC<Props> = ({ doc }) => {
   };
   const flowNodes = root.getFlowNodes({x:0, y:0})
   const flowEdges = root.getFlowEdges()
+  console.log(`DocView: root`, root)
   console.log(`DocView: flowNodes`, flowNodes)
   console.log(`DocView: flowEdges`, flowEdges)
   // console.log(`DocView: root`, root)
@@ -39,11 +40,11 @@ export const DocView: React.FC<Props> = ({ doc }) => {
       )}
 
       <h2>Circuit Diagram</h2>
-      <div className="flowParent">
+      <div style={{ width: '1000px', height: '500px' }}>
       <Flow root={root} nodes={flowNodes} edges={flowEdges} dispatch={dispatch} />
+      </div>
         <textarea className="vineEditor" value={JSON.stringify(root, null, 2)} readOnly />
         <RenderVine root={root} dispatch={dispatch} />
-      </div>
     </div>
   );
 };

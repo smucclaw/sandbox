@@ -128,7 +128,7 @@ export class All extends AnyAll {
           width: 20,
           height: 20,
           borderRadius: "50%",
-          backgroundColor: "grey"
+          backgroundColor: "green"
         },
       },
 
@@ -140,12 +140,14 @@ export class All extends AnyAll {
    getFlowEdges() : Edge[] {
     // we connect ourselves to our first child, and the children to each other in sequence.
     // this will probably change when we figure out subflows.
-    const edges = [
-      { id: `e${this.id}-${this.c[0].id}`, source: `${this.id}`, target: `${this.c[0].id}` },
-        ...(this.c.slice(-1).flatMap((n,i) => [{ id: `e${n.id}-${this.c[i+1].id}`, source: `${n.id}`, target:`${this.c[i+1].id}`},
-                                               ...n.getFlowEdges()]))
-    ]
+    const edges = _.flatten([
+      { id: `e${this.id}-${this.c[0].id}-firstchildOfAll`, source: `${this.id}`, target: `${this.c[0].id}` },
+      ...(this.c.slice(0, -1).flatMap((n,i) => [{ id: `e${n.id}-${this.c[i+1].id}`, source: `${n.id}`, target:`${this.c[i+1].id}`},
+                           ...n.getFlowEdges()])),
+       this.c[this.c.length - 1].getFlowEdges()
+    ])
     console.log(`** All ${this.id} getFlowEdges`, edges);
+    console.log(`All originally`, this)
     return edges
    }
    clone() { return new All(this.c.map(x => x.clone()), this.viz, this.id) }
@@ -178,7 +180,7 @@ export class Any extends AnyAll {
         width: 20,
         height: 20,
         borderRadius: "50%",
-        backgroundColor: "grey"
+        backgroundColor: "blue"
       },
     },
       ...(this.c.flatMap((x,i) => x.getFlowNodes({ x: relPos.x, y: relPos.y + 50*(i+0) })))
@@ -189,9 +191,10 @@ export class Any extends AnyAll {
   getFlowEdges() : Edge[] {
     // we connect ourselves to all the children in parallel
     const edges = this.c.flatMap((n,i) => [{ id: `e${this.id}-${n.id}`, source: `${this.id}`, target: `${n.id}` },
-                                           ...n.getFlowEdges()])
+                                           ...(n.getFlowEdges())])
 
     console.log(`** Any ${this.id} getFlowEdges`, edges);
+    console.log(`Any originally`, this)
     return edges
   }
   clone() { return new Any(this.c.map(x => x.clone()), this.viz, this.id) }

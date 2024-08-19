@@ -39,9 +39,11 @@ export const DocView: React.FC<Props> = ({ doc }) => {
       )}
 
       <h2>Circuit Diagram</h2>
-        <Flow root={root} nodes={flowNodes} edges={flowEdges} dispatch={dispatch} />
+      <div className="flowParent">
+      <Flow root={root} nodes={flowNodes} edges={flowEdges} dispatch={dispatch} />
         <textarea className="vineEditor" value={JSON.stringify(root, null, 2)} readOnly />
         <RenderVine root={root} dispatch={dispatch} />
+      </div>
     </div>
   );
 };

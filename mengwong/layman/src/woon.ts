@@ -421,39 +421,55 @@ export const narnia = com(
   ),
 )
 
+export const cheating_tautology =
+  com(say('whether'),say('such deception'),
+      com(any(ele('was'),say('or'),ele('was not')),
+	  say('the'),
+	  any(ele('sole'), say('or'), ele('main')),
+	  say('inducement')
+	 )
+     )
+
 export const cheating = com(
   com(say('by'), ele('deceiving'), say('any person')),
-  com(say('whether'),say('such deception'),any(
-    com(say('was the'),
-	any(ele('sole'),
-	    ele('main')),
-	say('inducement')),
-    ele('not'))),
+  // cheating_tautology,
   any(com(any(ele('fraudulently'),
+	      say('or'),
 	      ele('dishonestly')),
-	  say('induces the person so deceived to'),
-	  any(ele('deliver any property to any person'),
-	      ele('consent that any person shall retain any property')),
+	  say('induces the person so deceived'),
+	  any(com(say('to'),
+		  any(ele('deliver'),
+		      say('or'),
+		      ele('cause the delivery of')),
+		  say('any property to any person')),
+	      say('or'),
+	      ele('to consent that any person shall retain any property,')),
 	 ),
-      com(ele('intentionally induces'),
-	  say('the person so deceived to'),
-	  all(any(ele('do anything which he would not do'),
-		  ele('not do anything which he would do')),
-	      say('if he were not so deceived'),
+      say('or'),
+      com(ele('intentionally'),
+	  say('induces the person so deceived to'),
+	  all(com(any(ele('do anything which he would not do'),
+		      say('or'),
+		      ele('not do anything which he would do')),
+		  say('if he were not so deceived')
+		 ),
 	      say('and'),
-	      say('which act or omission'),
-	      any(ele('causes'),
-		  say('or'),
-		  ele('is likely to cause')),
-	      any(ele('damage'),
-		  say('or'),
-		  ele('harm')),
-	      say('to any person in'),
-	      any(ele('body'),
-		  ele('mind'),
-		  ele('reputation'),
-		  say('or'),
-		  ele('property'))
+	      com(say('which act or omission'),
+		  any(ele('causes'),
+		      say('or'),
+		      ele('is likely to cause')),
+		  any(// ele('damage'),
+		      // say('or'),
+		      ele('harm')
+		     ),
+		  say('to any person in'),
+		  any(ele('body'),
+		      ele('mind'),
+		      ele('reputation'),
+		      say('or'),
+		      ele('property')
+		     )
+		 )
 	     )
 	 )
      )

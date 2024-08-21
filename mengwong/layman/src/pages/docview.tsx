@@ -82,7 +82,7 @@ export const RenderVine: React.FC<JustRoot> = ({ root }) => {
 
 const excludeFill0 = {
   fParent: (s: Vine) => s instanceof Any && s.viz !== HideShow.Collapsed,
-  fChild: (p: Vine) => p instanceof Fill
+  fChild: (p: Vine) => p instanceof Fill && p.fill == 'or'
 };
 
 const RenderNode: React.FC<{ node: Vine, dispatch: MyDispatch }> = ({ node, dispatch }) => {

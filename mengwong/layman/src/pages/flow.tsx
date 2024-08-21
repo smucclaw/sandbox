@@ -50,8 +50,8 @@ const getLayoutedElements = (nodes:Node[], edges:Edge[], options:LayoutOptions =
       sourcePosition: isHorizontal ? 'right' : 'bottom',
 
       // Hardcode a width and height for elk to use when layouting.
-      width: 150,
-      height: 50,
+      width: 850,
+      height: 500,
     })),
     edges: edges.map(e => { return {...e, sources:[e.source], targets:[e.target]} as ElkExtendedEdge }),
   };
@@ -90,10 +90,10 @@ const LayoutFlow : React.FC<{root:Vine, initialNodes:Node[], initialEdges:Edge[]
       const es = useInitialNodes ? initialEdges : edges;
 
       getLayoutedElements(ns, es, opts).then(
-        ({ nodes: layoutedNodes, edges: layoutedEdges }) => {
+        ({ nodes: layoutedNodes = [], edges: layoutedEdges = [] }) => {
           setNodes(layoutedNodes);
           setEdges(layoutedEdges);
-
+      
           window.requestAnimationFrame(() => fitView());
         },
       );
@@ -103,35 +103,39 @@ const LayoutFlow : React.FC<{root:Vine, initialNodes:Node[], initialEdges:Edge[]
 
   // Calculate the initial layout on mount.
   useLayoutEffect(() => {
-    onLayout({ direction: 'DOWN', useInitialNodes: true });
+    onLayout({ direction: 'RIGHT', useInitialNodes: true });
   }, []);
 
   return (
-    <ReactFlow
-      nodes={nodes}
-      edges={edges}
-      onConnect={onConnect}
-      onNodesChange={onNodesChange}
-      onEdgesChange={onEdgesChange}
-      fitView
-    >
-      <Panel position="top-right">
-        <button onClick={() => onLayout({ direction: 'DOWN' })}>
-          vertical layout
-        </button>
-
-        <button onClick={() => onLayout({ direction: 'RIGHT' })}>
-          horizontal layout
-        </button>
-      </Panel>
-    </ReactFlow>
+    <div style={{ width: '100%', height: '600px' }}>
+      <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        onConnect={onConnect}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        fitView
+      >
+        <Panel position="top-right">
+          <button onClick={() => onLayout({ direction: 'DOWN' })}>
+            vertical layout
+          </button>
+  
+          <button onClick={() => onLayout({ direction: 'RIGHT' })}>
+            horizontal layout
+          </button>
+        </Panel>
+      </ReactFlow>
+    </div>
   );
 }
 
 export const Flow: React.FC<Props> = ({ root, nodes, edges, dispatch }) => {
   return (
   <ReactFlowProvider>
-    <LayoutFlow root={root} initialNodes={nodes} initialEdges={edges} dispatch={dispatch} />
+  <ReactFlow key={`rf-${root.id}`} nodes={nodes} edges={edges} />
   </ReactFlowProvider>
 );
+//   <LayoutFlow key={`layout-${root.id}`} root={root} initialNodes={nodes} initialEdges={edges} dispatch={dispatch} />
+
 }

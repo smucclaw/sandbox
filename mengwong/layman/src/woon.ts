@@ -1,6 +1,7 @@
 import _ from "lodash"
 import 'lodash.product';
-import { Node, Edge, XYPosition, Position } from 'reactflow'
+import { Node, Edge, XYPosition, Position, Handle } from 'reactflow'
+import { useCallback } from 'react';
 
 // Expansion from a BoolStruct to a DNF (Disjunctive Normal Form):
 // We traverse the BoolStruct, depth-first, flattening the BoolStruct to a list of lists -- a sum of products.
@@ -101,6 +102,16 @@ export class AnyAll extends Vine {
   isFullyExpanded() : boolean { return this.viz === HideShow.Expanded
      && this.c.filter( x=> isAny(x) || isAll(x))
               .every(x => x.isFullyExpanded()) }
+  assignParentGroup(nodes:Node[]) {
+    console.log(`** ${this.id} assignParentGroup`);
+    nodes.forEach(node => {
+      if (this.c.some(child => `${child.id}` === node.id || `${child.id}-group` === node.id)) {
+        node.parentId = `${this.id}-group`;
+        node.extent = 'parent'
+        console.log(`** ${this.id} assignParentGroup assigned ${node.id} to parent ${this.id}-group`);
+      }
+    });
+  }
  }
 
 export class All extends AnyAll {
@@ -110,6 +121,7 @@ export class All extends AnyAll {
    }
    getFlowNodes(relPos:XYPosition) : Node[] {
     // console.log(`** All ${this.id} getFlowNodes`);
+    const childFlowNodes = this.c.flatMap((x,i) => x.getFlowNodes({ x: 170*(i+0)+40, y: 0 }))
     const nodes = [
       { // the hypernode group
        id: `${this.id}-group`,
@@ -117,6 +129,10 @@ export class All extends AnyAll {
        data: { label: `all` },
        position: relPos,
        sourcePosition: Position.Right, targetPosition: Position.Left,
+       style: {
+        width: Math.max(...childFlowNodes.map(node => node.position.x)) - relPos.x + 100,
+        height: Math.max(...childFlowNodes.map(node => node.position.y)) - relPos.y + 100,
+       }
       },
       { // a pseudo-node which is basically a tiny little circle which acts as a common source for the children in the group
         id: `${this.id}`,
@@ -131,9 +147,10 @@ export class All extends AnyAll {
           backgroundColor: "green"
         },
       },
-
-      ...(this.c.flatMap((x,i) => x.getFlowNodes({ x: relPos.x + 170*(i+1), y: relPos.y })))
+      ...childFlowNodes
      ]
+     this.assignParentGroup(nodes);
+
     console.log(`** All ${this.id} getFlowNodes`, nodes);
     return nodes
    }
@@ -154,6 +171,33 @@ export class All extends AnyAll {
   }
 // const initialEdges = [{ id: 'e1-2', source: '1', target: '2' }];
 
+// the parent/group/hypernode for an Any object, a custom node with multiple handles.
+// the "outer" handles are intended for use by peers and parents.
+// the "inner" handles connect the children.
+export function AnyGroup (v:Vine[], relPos:XYPosition) : Node[] {
+  // iterate thorugh v.c, calling getFlowNodes on each child, and then computing the position of the next child based on the extent of the bounding box so far.
+  // This deals with the situation where a child 
+  const childFlowNodes = v.flatMap((x,i) => x.getFlowNodes({ x: 40, y: 50*(i+0) }))
+
+  const nodes = [
+    { // this becomes the hypernode
+    id: `${v[0].id}-group`,
+    type: 'default',
+    data: { label: `` },
+    position: relPos,
+    sourcePosition: Position.Left, targetPosition: Position.Left,
+    style: {
+      width: Math.max(...childFlowNodes.map(node => (node.position.x + (node.style?.width as number) || 0))) + 40,
+      height: Math.max(...childFlowNodes.map(node => node.position.y)) - relPos.y + 50,
+     }
+    },
+        ...childFlowNodes,
+      ]
+  ssignParentGroup(nodes);
+  console.log(`** AnyGroup getFlowNodes`, nodes);
+  return nodes
+}
+
 export class Any extends AnyAll {
   merge (...l:Vine[][][]) : Vine[][] {    // console.log("* doing Any merge");
     // we use this mechanism to exclude any top-level elements which are only Fill nodes from the sentence rendering,
@@ -162,36 +206,33 @@ export class Any extends AnyAll {
     return xprod(l.flat(1))
   }
   getFlowNodes(relPos:XYPosition) : Node[] {
+    const childFlowNodes = this.c.flatMap((x,i) => x.getFlowNodes({ x: 40, y: 50*(i+0) }))
+    const midpoint_y = Math.max(...childFlowNodes.map(node => node.position.y)) / 2;
+    const rightmargin_x = Math.max(...childFlowNodes.map(node => node.position.x)) + 170;
     const nodes = [
       { // this becomes the hypernode
       id: `${this.id}-group`,
-      type: 'group',
-      data: { label: `any` },
+      type: 'default',
+      data: { label: `` },
       position: relPos,
-      sourcePosition: Position.Right, targetPosition: Position.Left,
-    },
-    { // a pseudo-node which is basically a tiny little circle which acts as a common source for the children in the group
-      id: `${this.id}`,
-      type: 'default', // this becomes the hypernode
-      data: { label: `any` },
-      position: relPos,
-      sourcePosition: Position.Right, targetPosition: Position.Left,
+      sourcePosition: Position.Left, targetPosition: Position.Left,
       style: {
-        width: 20,
-        height: 20,
-        borderRadius: "50%",
-        backgroundColor: "blue"
+        width: Math.max(...childFlowNodes.map(node => (node.position.x + (node.style?.width as number) || 0))) + 40,
+        height: Math.max(...childFlowNodes.map(node => node.position.y)) - relPos.y + 50,
+       }
       },
-    },
-      ...(this.c.flatMap((x,i) => x.getFlowNodes({ x: relPos.x, y: relPos.y + 50*(i+0) })))
-    ]
-    console.log(`** Any ${this.id} getFlowNodes`, nodes);
+          ...childFlowNodes,
+        ]
+    this.assignParentGroup(nodes);
+  console.log(`** Any ${this.id} getFlowNodes`, nodes);
     return nodes
   }
   getFlowEdges() : Edge[] {
     // we connect ourselves to all the children in parallel
-    const edges = this.c.flatMap((n,i) => [{ id: `e${this.id}-${n.id}`, source: `${this.id}`, target: `${n.id}` },
-                                           ...(n.getFlowEdges())])
+    const edges = this.c.flatMap((n,i) => [
+      { id: `e${this.id}-${n.id}-in`,  source: `${this.id}-group`, target: `${n.id}` },
+      { id: `e${this.id}-${n.id}-out`, source: `${n.id}`, target: `${this.id}-out` },
+      ...(n.getFlowEdges())])
 
     console.log(`** Any ${this.id} getFlowEdges`, edges);
     console.log(`Any originally`, this)
@@ -216,6 +257,11 @@ export class Leaf extends Vine {
       data: { label: this.text },
       position: relPos,
       sourcePosition: Position.Right, targetPosition: Position.Left,
+      style: {
+        width: 100,
+        height: 50,
+        backgroundColor: this.value == undefined ? "white" : this.value ? "green" : "red"
+      }
      }
     ]
   }
@@ -236,6 +282,11 @@ export class Fill extends Vine {
       data: { label: this.fill },
       position: relPos,
       sourcePosition: Position.Right, targetPosition: Position.Left,
+      style: {
+        width: 100,
+        height: 50,
+        backgroundColor: this.value == undefined ? "white" : this.value ? "green" : "red"
+      }
     }
     ]
   }
@@ -244,6 +295,7 @@ export class Fill extends Vine {
 
 const isAll    = (v: Vine) => v instanceof All
 const isAny    = (v: Vine) => v instanceof Any
+const isNot    = (v: Vine) => v instanceof Not
 const isLeaf   = (v: Vine) => v instanceof Leaf
 const isFill   = (v: Vine) => v instanceof Fill
 
@@ -251,6 +303,73 @@ enum A {
   ny, // disjunctive list
   ll, // conjunctive list
 }
+
+export class Not extends Vine {
+  constructor(
+    public c : Vine,
+    viz ?: HideShow,
+    id  ?: number) {
+    super(viz, id);
+    c.recordParent(this)
+  }
+  expand(exOpts : ExpansionOpts) : Vine[][] {
+    const merged = this.c.expand(exOpts)
+    return merged
+  }
+  getFlowNodes(relPos:XYPosition) : Node[] {
+    const childFlowNodes = this.c.getFlowNodes({ x: relPos.x + 170, y: relPos.y })
+
+    const nodes = [
+      { // the hypernode group
+       id: `${this.id}-group`,
+       type: 'group',
+       data: { label: `not` },
+       position: relPos,
+       sourcePosition: Position.Right, targetPosition: Position.Left,
+      },
+      { // a pseudo-node which is basically a tiny little circle which acts as a common source for the children in the group
+        id: `${this.id}`,
+        type: 'default',
+        data: { label: `not` },
+        position: relPos,
+        sourcePosition: Position.Right, targetPosition: Position.Left,
+        style: {
+          width: 20,
+          height: 20,
+          borderRadius: "50%",
+          backgroundColor: "red"
+        },
+      },
+      ...childFlowNodes
+     ]
+     this.assignParentGroup(nodes);
+
+    console.log(`** Not ${this.id} getFlowNodes`, nodes);
+    return nodes
+   }
+   assignParentGroup(nodes:Node[]) {
+    console.log(`** ${this.id} assignParentGroup`);
+    nodes.forEach(node => {
+      if (`${this.c.id}` === node.id || `${this.c.id}-group` === node.id) {
+        node.parentId = `${this.id}-group`;
+        node.extent = 'parent'
+        console.log(`** ${this.id} assignParentGroup assigned ${node.id} to parent ${this.id}-group`);
+      }
+    });
+  }
+
+   getFlowEdges() : Edge[] {
+    // we connect ourselves to our (only) child
+    const edges = _.flatten([
+      { id: `e${this.id}-${this.c.id}-childOfNot`, source: `${this.id}`, target: `${this.c.id}` },
+      ...this.c.getFlowEdges()
+    ])
+    console.log(`** Not ${this.id} getFlowEdges`, edges);
+    return edges
+   }
+   clone() { return new Not(this.c.clone(), this.viz, this.id) }
+}
+
 
 // this isn't really HideShow it's more of a fold / unfold, collapse / expand.
 // when an Any node is expanded, the DNF shows each of its children in parallel.
@@ -274,8 +393,9 @@ export const mustSing =
 export function all (...l:Vine[]) : All { return new All(l) } // conjunction
 export function any (...l:Vine[]) : All { return new Any(l) } // disjunction
 export function com (...l:Vine[]) : All { return new All(l) } // compound
-export function ele (l:string) : Leaf { return new Leaf(l) }  // element
-export function say (l:string) : Fill { return new Fill(l) }  // filler
+export function not (l:Vine)      : Not { return new Not(l) }  // negation
+export function ele (l:string)    : Leaf { return new Leaf(l) }  // element
+export function say (l:string)    : Fill { return new Fill(l) }  // filler
 
 export const narnia = com(
   say('there is'),

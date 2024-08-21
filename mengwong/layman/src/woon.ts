@@ -193,7 +193,7 @@ export function AnyGroup (v:Vine[], relPos:XYPosition) : Node[] {
     },
         ...childFlowNodes,
       ]
-  ssignParentGroup(nodes);
+  // this.assignParentGroup(nodes);
   console.log(`** AnyGroup getFlowNodes`, nodes);
   return nodes
 }
@@ -285,7 +285,6 @@ export class Fill extends Vine {
       style: {
         width: 100,
         height: 50,
-        backgroundColor: this.value == undefined ? "white" : this.value ? "green" : "red"
       }
     }
     ]
@@ -379,16 +378,21 @@ export enum HideShow {
 }
 
 export const mustSing =
-  com(
-  say("... who"),
-  ele("walks"),
-  say("and"),
-  any(
-    ele("drinks"),
-    say("or"),
-    ele("eats")
-  )
-);
+  com( // all
+    say("... who"),
+    ele("walks"),
+    say("and"),
+    any( 
+      say("maybe"),
+      ele("drinks"),
+      say("or"),
+      com( // all
+        ele("eats"),
+        say("if they are hungry?"),
+        say("maybe just greedy?")
+      )
+    )
+  );
 
 export function all (...l:Vine[]) : All { return new All(l) } // conjunction
 export function any (...l:Vine[]) : All { return new Any(l) } // disjunction
@@ -415,6 +419,44 @@ export const narnia = com(
       )
     ),
   ),
+)
+
+export const cheating = com(
+  com(say('by'), ele('deceiving'), say('any person')),
+  com(say('whether'),say('such deception'),any(
+    com(say('was the'),
+	any(ele('sole'),
+	    ele('main')),
+	say('inducement')),
+    ele('not'))),
+  any(com(any(ele('fraudulently'),
+	      ele('dishonestly')),
+	  say('induces the person so deceived to'),
+	  any(ele('deliver any property to any person'),
+	      ele('consent that any person shall retain any property')),
+	 ),
+      com(ele('intentionally induces'),
+	  say('the person so deceived to'),
+	  all(any(ele('do anything which he would not do'),
+		  ele('not do anything which he would do')),
+	      say('if he were not so deceived'),
+	      say('and'),
+	      say('which act or omission'),
+	      any(ele('causes'),
+		  say('or'),
+		  ele('is likely to cause')),
+	      any(ele('damage'),
+		  say('or'),
+		  ele('harm')),
+	      say('to any person in'),
+	      any(ele('body'),
+		  ele('mind'),
+		  ele('reputation'),
+		  say('or'),
+		  ele('property'))
+	     )
+	 )
+     )
 )
 
 if (require.main === module) {

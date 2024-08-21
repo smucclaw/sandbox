@@ -422,12 +422,15 @@ export const narnia = com(
 )
 
 export const cheating_tautology =
-  com(say('whether'),say('such deception'),
-      com(any(ele('was'),say('or'),ele('was not')),
-	  say('the'),
-	  any(ele('sole'), say('or'), ele('main')),
-	  say('inducement')
-	 )
+  com(say('whether'),
+      say('such deception'),
+      any(ele('was'),
+	  say('or'),
+	  ele('was not')
+	 ),
+      say('the'),
+      any(ele('sole'), say('or'), ele('main')),
+      say('inducement')
      )
 
 export const cheating = com(
@@ -437,13 +440,16 @@ export const cheating = com(
 	      say('or'),
 	      ele('dishonestly')),
 	  say('induces the person so deceived'),
-	  any(com(say('to'),
+	  com(say('to'),
+	      any(
+		com(
 		  any(ele('deliver'),
 		      say('or'),
 		      ele('cause the delivery of')),
 		  say('any property to any person')),
-	      say('or'),
-	      ele('to consent that any person shall retain any property,')),
+		say('or'),
+		ele('consent that any person shall retain any property,'))
+	     ),
 	 ),
       say('or'),
       com(ele('intentionally'),

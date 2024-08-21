@@ -80,9 +80,11 @@ export const RenderVine: React.FC<JustRoot> = ({ root }) => {
   return <div><p>tree render goes here</p></div>
 };
 
+// during expansion of any/all, if these conditions match the parent and the child, don't show the child, because it is filler that only makes sense in a collapsed version.
 const excludeFill0 = {
-  fParent: (s: Vine) => s instanceof Any && s.viz !== HideShow.Collapsed,
-  fChild: (p: Vine) => p instanceof Fill && p.fill == 'or'
+  fParent: (s: Vine) => (s instanceof All || (s instanceof Any && s.viz !== HideShow.Collapsed)),
+  fChild: (p: Vine) => (p instanceof Fill && ['or', 'either', 'whether'].includes(p.fill)
+  || p instanceof Leaf && ['or', 'either', 'whether'].includes(p.text))
 };
 
 const RenderNode: React.FC<{ node: Vine, dispatch: MyDispatch }> = ({ node, dispatch }) => {

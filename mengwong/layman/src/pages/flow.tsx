@@ -107,7 +107,6 @@ const LayoutFlow : React.FC<{root:Vine, initialNodes:Node[], initialEdges:Edge[]
   }, []);
 
   return (
-    <div style={{ width: '100%', height: '600px' }}>
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -125,15 +124,17 @@ const LayoutFlow : React.FC<{root:Vine, initialNodes:Node[], initialEdges:Edge[]
             horizontal layout
           </button>
         </Panel>
+        <Controls />
       </ReactFlow>
-    </div>
   );
 }
 
 export const Flow: React.FC<Props> = ({ root, nodes, edges, dispatch }) => {
   return (
   <ReactFlowProvider>
-  <ReactFlow key={`rf-${root.id}`} nodes={nodes} edges={edges} />
+  <ReactFlow key={`rf-${root.id}`} nodes={nodes} edges={edges}>
+    <Controls />
+  </ReactFlow>
   </ReactFlowProvider>
 );
 //   <LayoutFlow key={`layout-${root.id}`} root={root} initialNodes={nodes} initialEdges={edges} dispatch={dispatch} />

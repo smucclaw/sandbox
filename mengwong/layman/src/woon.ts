@@ -464,9 +464,7 @@ export const cheating = com(
 		  any(ele('causes'),
 		      say('or'),
 		      ele('is likely to cause')),
-		  any(// ele('damage'),
-		      // say('or'),
-		      ele('harm')
+		  any(ele('damage or harm')
 		     ),
 		  say('to any person in'),
 		  any(ele('body'),

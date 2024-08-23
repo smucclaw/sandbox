@@ -22,7 +22,14 @@ export const DocView: React.FC<Props> = ({ doc }) => {
       <div className="original">
       <RenderOriginal key={`${doc.title}-showOriginal`} root={root} dispatch={dispatch} />
       </div>
-      
+
+      <h2>Circuit Diagram</h2>
+        <div style={{ width: '100%', height: '500px' }}>
+          <Flow root={root} nodes={flowNodes} edges={flowEdges} dispatch={dispatch} />
+        </div>
+        <textarea className="vineEditor" value={JSON.stringify(root, null, 2)} readOnly />
+        <RenderVine root={root} dispatch={dispatch} />
+
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h2>Combinations</h2>
         <button id="expansion" onClick={toggleExpandAll} style={{ marginLeft: 'auto' }}>
@@ -39,12 +46,6 @@ export const DocView: React.FC<Props> = ({ doc }) => {
       </div>
       )}
 
-      <h2>Circuit Diagram</h2>
-      <div style={{ width: '1000px', height: '500px' }}>
-      <Flow root={root} nodes={flowNodes} edges={flowEdges} dispatch={dispatch} />
-      </div>
-        <textarea className="vineEditor" value={JSON.stringify(root, null, 2)} readOnly />
-        <RenderVine root={root} dispatch={dispatch} />
     </div>
   );
 };

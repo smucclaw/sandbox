@@ -15,6 +15,7 @@ export const DocView: React.FC<Props> = ({ doc }) => {
   console.log(`DocView: flowNodes`, flowNodes)
   console.log(`DocView: flowEdges`, flowEdges)
   // console.log(`DocView: root`, root)
+  // <textarea className="vineEditor" value={JSON.stringify(root, null, 2)} readOnly />
   return (
     <div style={{ marginTop: '20px' }}>
       <h1>{doc.title}</h1>
@@ -23,11 +24,10 @@ export const DocView: React.FC<Props> = ({ doc }) => {
       <RenderOriginal key={`${doc.title}-showOriginal`} root={root} dispatch={dispatch} />
       </div>
 
-      <h2>Circuit Diagram</h2>
-        <div style={{ width: '100%', height: '500px' }}>
+        <div style={{ width: '100%', height: '1000px' }}>
           <Flow root={root} nodes={flowNodes} edges={flowEdges} dispatch={dispatch} />
         </div>
-        <textarea className="vineEditor" value={JSON.stringify(root, null, 2)} readOnly />
+        
         <RenderVine root={root} dispatch={dispatch} />
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -78,7 +78,8 @@ export const RenderVine: React.FC<JustRoot> = ({ root }) => {
   // Render the tree visualization using a library of your choice
   // You can use the 'show' property to determine whether to render the node as expanded or collapsed
   // You can use the 'value' property to determine the state of the leaf nodes (true or false)
-  return <div><p>tree render goes here</p></div>
+  return <></>
+  // </><div><p>tree render goes here</p></div>
 };
 
 // during expansion of any/all, if these conditions match the parent and the child, don't show the child, because it is filler that only makes sense in a collapsed version.

@@ -197,8 +197,10 @@ export class All extends AnyAll {
     // we connect ourselves to our first child, and the children to each other in sequence.
     // this will probably change when we figure out subflows.
     const edges = _.flatten([
-      { id: `e${this.id}-${this.c[0].id}-firstchildOfAll`, source: `${this.id}`, target: `${this.c[0].id}`,  style: { stroke: 'black', strokeWidth: 4 }, },
-      ...(this.c.slice(0, -1).flatMap((n,i) => [{ id: `e${n.id}-${this.c[i+1].id}`, source: `${n.id}`, target:`${this.c[i+1].id}`,  style: { stroke: 'black', strokeWidth: 4 },},
+      { id: `e${this.id}-${this.c[0].id}-firstchildOfAll`, source: `${this.id}-in`, target: (isAny(this.c[0]) || isAll(this.c[0]) ? `${this.c[0].id}-in` : `${this.c[0].id}-in`),  style: { stroke: 'black', strokeWidth: 4 }, },
+      ...(this.c.slice(0, -1).flatMap((n,i) => [{ id: `e${n.id}-${this.c[i+1].id}`, source: (isAny(n) || isAll(n) ? `${n.id}-out` : `${n.id}`),
+                target: (isAny(this.c[i+1]) || isAll(this.c[i+1]) ? `${this.c[i+1].id}-in` : `${this.c[i+1].id}`),
+                  style: { stroke: 'black', strokeWidth: 4 },},
                            ...n.getFlowEdges()])),
        this.c[this.c.length - 1].getFlowEdges()
     ])
@@ -300,8 +302,8 @@ export class Any extends AnyAll {
   getFlowEdges() : Edge[] {
     // we connect ourselves to all the children in parallel
     const edges = this.c.flatMap((n,i) => [
-      { id: `e${this.id}-${n.id}-in`,  source: `${this.id}-in`, target: (isAll(n) || isAny(n)) ? `${n.id}-in` : n.id,     style: { stroke: isFill(n) ?'none':"black", strokeWidth: 4 },   },
-      { id: `e${this.id}-${n.id}-out`, source: (isAll(n) || isAny(n)) ? `${n.id}-out` : n.id, target: `${this.id}-out`,    style: { stroke: isFill(n) ?'none':"black", strokeWidth: 4 }, },
+      { id: `e${this.id}-${n.id}-in`,  source: `${this.id}-in`, target: (isAll(n) || isAny(n)) ? `${n.id}-in` : String(n.id),     style: { stroke: isFill(n) ?'none':"black", strokeWidth: 4 },   },
+      { id: `e${this.id}-${n.id}-out`, source: (isAll(n) || isAny(n)) ? `${n.id}-out` : String(n.id), target: `${this.id}-out`,    style: { stroke: isFill(n) ?'none':"black", strokeWidth: 4 }, },
       ...(n.getFlowEdges())])
 
     console.log(`** Any ${this.id} getFlowEdges`, edges);
@@ -360,8 +362,8 @@ export class Fill extends Vine {
         height: 40,
         border: "none",
         background: "transparent",
-      }
-    }
+      },
+  }
     if (parentId !== undefined) { node.parentId = parentId }
     return [ node ]
 
@@ -530,16 +532,54 @@ export const cheating_tautology =
       say('inducement')
      )
 
-export const cheating = com(
+// Whoever cheats and thereby dishonestly induces the person deceived
+// to deliver or cause the delivery of any property to any person, or
+// to make, alter or destroy the whole or any part of a valuable
+// security, or anything which is signed or sealed, and which is
+// capable of being converted into a valuable security, shall be
+// punished with imprisonment for a term which may extend to 10 years,
+// and shall also be liable to fine.
+
+export const marijuana =
+  all(say("whoever"),
+      ele("cheats"),
+      say("and"),
+      ele("thereby dishonestly induces"),
+      say("the person deceived to"),
+      any(all(any(ele("deliver"),
+		  say("or"),
+		  ele("cause the delivery of")),
+	      say("any property")),
+	  say("to any person"),
+	  say("or to"),
+          all(
+	    any(ele("make"),
+		ele("alter"),say("or"),
+		    ele("destroy")
+	       ),
+	    any(ele("the whole of"),
+		say("or"),
+		ele("any part of")
+		any(ele("a valuable security"),
+		    say("or"),
+		all(
+		  any(ele("anything signed"),
+		      ele("anything sealed")),
+		  say("and which is"),
+		  ele("capable of being converted into a valuable security")
+		)))))
+    
+export const cheating = 
+all(
   com(say('by'), ele('deceiving'), say('any person')),
   // cheating_tautology,
-  any(com(any(ele('fraudulently'),
+  any(all(any(ele('fraudulently'),
 	      say('or'),
 	      ele('dishonestly')),
 	  say('induces the person so deceived'),
 	  com(say('to'),
 	      any(
-		com(
+		all(
 		  any(ele('deliver'),
 		      say('or'),
 		      ele('cause the delivery of')),

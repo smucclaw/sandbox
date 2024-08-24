@@ -559,7 +559,7 @@ export const marijuana =
 	       ),
 	    any(ele("the whole of"),
 		say("or"),
-		ele("any part of")
+		ele("any part of"),
 		any(ele("a valuable security"),
 		    say("or"),
 		all(
@@ -567,7 +567,7 @@ export const marijuana =
 		      ele("anything sealed")),
 		  say("and which is"),
 		  ele("capable of being converted into a valuable security")
-		)))))
+		))))))
     
 export const cheating = 
 all(

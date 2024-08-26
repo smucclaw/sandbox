@@ -1,14 +1,17 @@
 import React, { useState } from 'react';
 import { Vine, Any, All, Leaf, Fill, HideShow,
-        narnia, mustSing, cheating } from '@/woon';
+        narnia, mustSing, cheating, laymanS, abcde, marijuana } from '@/woon';
 import { DocView, Document } from '@/pages/docview';
 import { EssayContent1 } from '@/pages/essay';
 
 const App: React.FC = () => {
   const [documents, setDocuments] = useState<Document[]>([
-    { id: "narnia",   title: 'In Narnia, a crime is committed if', content: narnia },
-    { id: "mustSing", title: 'Every person must sing...',          content: mustSing },
-    { id: "cheating", title: '415 Cheating',                       content: cheating },
+    { id: "mustSing",  title: 'Every person must sing...',          content: mustSing },
+    { id: "narnia",    title: 'In Narnia, a crime is committed if', content: narnia },
+    { id: "cheating",  title: '415 Cheating',                       content: cheating },
+    { id: "laymanSS",  title: 'Layman Allen\'s SSS examples',       content: laymanS },
+    { id: "abcde",     title: 'ABCDE example',                      content: abcde },
+    { id: "marijuana",  title: 'section 420',                       content: marijuana },
     ]);
   const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
 

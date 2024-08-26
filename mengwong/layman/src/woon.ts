@@ -35,6 +35,8 @@ const defaultExpansionOpts : ExpansionOpts = {
   fChild:  _.constant(false)
 }
 
+const [xMargin, yMargin] = [40,20]
+
 export class Vine { // your basic tree, with AnyAll leaves, and Leaf/Fill terminals.
   toggleParent () {}
   constructor(
@@ -47,7 +49,7 @@ export class Vine { // your basic tree, with AnyAll leaves, and Leaf/Fill termin
    // takes two filter functions; first applied to the parent, the second to be applied to the children.
    // will exclude children where both functions return true.
    // the sentence rendering code uses this to hide "or" fillers since those don't belong in the sentence.
-  getFlowNodes(_newPos:XYPosition) : Node[] { return [] }
+  getFlowNodes(_newPos:XYPosition,_parentId:string) : Node[] { return [] }
   getFlowEdges() : Edge[] { return [] }
   hideAll() { this.viz = HideShow.Collapsed; }
   showAll() { this.viz = HideShow.Expanded;  }
@@ -101,55 +103,92 @@ export class AnyAll extends Vine {
   showAll() { super.showAll(); this.c.forEach(x => x.showAll()) }
   isFullyExpanded() : boolean { return this.viz === HideShow.Expanded
      && this.c.filter( x=> isAny(x) || isAll(x))
-              .every(x => x.isFullyExpanded()) }
-  assignParentGroup(nodes:Node[]) {
-    console.log(`** ${this.id} assignParentGroup`);
-    nodes.forEach(node => {
-      if (this.c.some(child => `${child.id}` === node.id || `${child.id}-group` === node.id)) {
-        node.parentId = `${this.id}-group`;
-        node.extent = 'parent'
-        console.log(`** ${this.id} assignParentGroup assigned ${node.id} to parent ${this.id}-group`);
-      }
-    });
-  }
+       .every(x => x.isFullyExpanded()) }
+
+
  }
 
 export class All extends AnyAll {
-   merge (...l:Vine[][][]) : Vine[][] { // console.log("* doing All merge");
-    // console.log(`** All ${this.id} merge, collapsed`);
-    return xprod(...l)
-   }
-   getFlowNodes(relPos:XYPosition) : Node[] {
-    // console.log(`** All ${this.id} getFlowNodes`);
-    const childFlowNodes = this.c.flatMap((x,i) => x.getFlowNodes({ x: 170*(i+0)+40, y: 0 }))
+  merge (...l:Vine[][][]) : Vine[][] { // console.log("* doing All merge");
+   // console.log(`** All ${this.id} merge, collapsed`);
+   return xprod(...l)
+  }
+  getFlowNodes(relPos:XYPosition, parentId: string) : Node[] {
+    console.log(`** All ${this.id} getFlowNodes given ${JSON.stringify(relPos)}`, this);
+    const childFlowNodes :Node[] = []
+    // iteratively build the childFlowNodes. Each child will have its own size, which is not known until we call getFlowNodes on it.
+    // The position argument which we pass to each child's getFlowNodes is dependent on the sum of the children before it.
+         
+    this.c.forEach((x,i) => {
+      // we calculate the latest x position as the maximum of the children's x positions and their width.
+      // the y position for a new child is always 0 because we are stacking the children horizontally.
+      // we pass these as the position argument to the next child.
+       const maxX = Math.max(...childFlowNodes.map(node => node.position.x + (node.style?.width as number) ?? 0), 0) // thanks, JS, max [] gives -Infinity wtf
+       const childNode = x.getFlowNodes({ x: maxX + xMargin, y: yMargin}, `${this.id}-group`); // bounding box left margin
+       childFlowNodes.push(...childNode);
+    })
+
+    console.log(`** All ${this.id} getFlowNodes done constructing childFlowNodes`, childFlowNodes);
+
+    const [bboxWidth, bboxHeight] = [Math.max(...childFlowNodes.map(node => node.position.x + (node.style?.width  as number) || 0), 0) + xMargin, // bounding box right margin
+                                     Math.max(...childFlowNodes.map(node => node.position.y + (node.style?.height as number) || 0), 0) + xMargin] // bounding box bottom margin?
+
+    // the infrastructure for the child nodes consists of the parent group node, an in-node living in the left margin, and an out-node living in the right margin.
     const nodes = [
-      { // the hypernode group
+      { // GROUP: the hypernode group
        id: `${this.id}-group`,
        type: 'group',
        data: { label: `all` },
        position: relPos,
        sourcePosition: Position.Right, targetPosition: Position.Left,
        style: {
-        width: Math.max(...childFlowNodes.map(node => node.position.x)) - relPos.x + 100,
-        height: Math.max(...childFlowNodes.map(node => node.position.y)) - relPos.y + 100,
-       }
+        width:  bboxWidth,//+ xMargin,
+        height: bboxHeight,
+        border: 'none',
       },
-      { // a pseudo-node which is basically a tiny little circle which acts as a common source for the children in the group
-        id: `${this.id}`,
+       parentId: parentId
+      },
+      { // IN: a pseudo-node which is basically a tiny little circle which acts as a lead-in to the children in the group
+        id: `${this.id}-in`,
         type: 'default',
-        data: { label: `all` },
-        position: relPos,
+        data: { label: `` },
+        position: {x: 0, y: bboxHeight / 2 - 10 },
+        parentId: `${this.id}-group`,
         sourcePosition: Position.Right, targetPosition: Position.Left,
         style: {
-          width: 20,
-          height: 20,
+          width: 0,
+          height: 0,
           borderRadius: "50%",
-          backgroundColor: "green"
+          background: "transparent",
+          border: "none",
+
+        },
+      },
+      { // OUT: a pseudo-node which is basically a tiny little circle which acts as a lead-out to the children in the group
+        id: `${this.id}-out`,
+        type: 'default',
+        data: { label: `` },
+        position: {x: bboxWidth - 22, y: bboxHeight / 2 - 10 },
+        sourcePosition: Position.Right, targetPosition: Position.Left,
+        parentId: `${this.id}-group`,
+        style: {
+          width: 0,
+          height: 0,
+          borderRadius: "50%",
+          background: "transparent",
+          border: "none",
+
         },
       },
       ...childFlowNodes
      ]
-     this.assignParentGroup(nodes);
+    // now that we know the bounding box of the group, we can re-layout the children
+    nodes.slice(3).forEach(node => {
+      if (node.parentId != `${this.id}-group`) { return }
+      console.log(`** All ${this.id} repositioning ${node.id}, previously ${JSON.stringify(node.position)}`);
+      node.position.y = (bboxHeight - Number(node.style?.height)) / 2 + yMargin - 20
+      console.log(`** All ${this.id} repositioned ${node.id} to ${JSON.stringify(node.position)}`);
+    })
 
     console.log(`** All ${this.id} getFlowNodes`, nodes);
     return nodes
@@ -157,9 +196,13 @@ export class All extends AnyAll {
    getFlowEdges() : Edge[] {
     // we connect ourselves to our first child, and the children to each other in sequence.
     // this will probably change when we figure out subflows.
+    const lastChild : Vine = this.c[this.c.length - 1]
     const edges = _.flatten([
-      { id: `e${this.id}-${this.c[0].id}-firstchildOfAll`, source: `${this.id}`, target: `${this.c[0].id}` },
-      ...(this.c.slice(0, -1).flatMap((n,i) => [{ id: `e${n.id}-${this.c[i+1].id}`, source: `${n.id}`, target:`${this.c[i+1].id}`},
+      { id: `e${this.id}-${this.c[0].id}-firstchildOfAll`, source: `${this.id}-in`, target: (isAny(this.c[0]) || isAll(this.c[0]) ? `${this.c[0].id}-in` : `${this.c[0].id}`),  style: { stroke: 'black', strokeWidth: 4 }, },
+      { id: `e${this.id}-${lastChild.id}-lastchildOfAll`, target: `${this.id}-out`, source: (isAny(lastChild) || isAll(lastChild)) ? `${lastChild.id}-out` : `${lastChild.id}`,  style: { stroke: 'black', strokeWidth: 4 }, },
+      ...(this.c.slice(0, -1).flatMap((n,i) => [{ id: `e${n.id}-${this.c[i+1].id}`, source: (isAny(n) || isAll(n) ? `${n.id}-out` : `${n.id}`),
+                target: (isAny(this.c[i+1]) || isAll(this.c[i+1]) ? `${this.c[i+1].id}-in` : `${this.c[i+1].id}`),
+                  style: { stroke: 'black', strokeWidth: 4 },},
                            ...n.getFlowEdges()])),
        this.c[this.c.length - 1].getFlowEdges()
     ])
@@ -171,32 +214,6 @@ export class All extends AnyAll {
   }
 // const initialEdges = [{ id: 'e1-2', source: '1', target: '2' }];
 
-// the parent/group/hypernode for an Any object, a custom node with multiple handles.
-// the "outer" handles are intended for use by peers and parents.
-// the "inner" handles connect the children.
-export function AnyGroup (v:Vine[], relPos:XYPosition) : Node[] {
-  // iterate thorugh v.c, calling getFlowNodes on each child, and then computing the position of the next child based on the extent of the bounding box so far.
-  // This deals with the situation where a child 
-  const childFlowNodes = v.flatMap((x,i) => x.getFlowNodes({ x: 40, y: 50*(i+0) }))
-
-  const nodes = [
-    { // this becomes the hypernode
-    id: `${v[0].id}-group`,
-    type: 'default',
-    data: { label: `` },
-    position: relPos,
-    sourcePosition: Position.Left, targetPosition: Position.Left,
-    style: {
-      width: Math.max(...childFlowNodes.map(node => (node.position.x + (node.style?.width as number) || 0))) + 40,
-      height: Math.max(...childFlowNodes.map(node => node.position.y)) - relPos.y + 50,
-     }
-    },
-        ...childFlowNodes,
-      ]
-  // this.assignParentGroup(nodes);
-  console.log(`** AnyGroup getFlowNodes`, nodes);
-  return nodes
-}
 
 export class Any extends AnyAll {
   merge (...l:Vine[][][]) : Vine[][] {    // console.log("* doing Any merge");
@@ -205,33 +222,90 @@ export class Any extends AnyAll {
     // console.log(`* Any ${this.id} merge, should be expanding`);
     return xprod(l.flat(1))
   }
-  getFlowNodes(relPos:XYPosition) : Node[] {
-    const childFlowNodes = this.c.flatMap((x,i) => x.getFlowNodes({ x: 40, y: 50*(i+0) }))
-    const midpoint_y = Math.max(...childFlowNodes.map(node => node.position.y)) / 2;
-    const rightmargin_x = Math.max(...childFlowNodes.map(node => node.position.x)) + 170;
+  getFlowNodes(relPos:XYPosition, parentId: string) : Node[] {
+    console.log(`** Any ${this.id} getFlowNodes given ${JSON.stringify(relPos)}`, this);
+    const childFlowNodes :Node[] = []
+    // iteratively build the childFlowNodes. Each child will have its own size, which is not known until we call getFlowNodes on it.
+    // The position argument which we pass to each child's getFlowNodes is dependent on the sum of the children before it.
+         
+    this.c.forEach((x,i) => {
+      // we calculate the latest y position as the maximum of the children's y positions and their height
+      // the x position for a new child is always 0 (well, 20, for a left margin) because we are stacking the children vertically.
+      // we pass these as the position argument to the next child.
+       const maxY = Math.max(...childFlowNodes.map(node => node.position.y + (node.style?.height as number) ?? 0), 0)
+       const childNode = x.getFlowNodes({ x: 0, y: maxY + 20}, `${this.id}-group`); // x=20, bounding box left margin
+       childFlowNodes.push(...childNode);
+       console.log(`*** Any child: `, childNode)
+    })
+    console.log(`** Any ${this.id} getFlowNodes done constructing childFlowNodes`, childFlowNodes);
+
+    const [bboxWidth, bboxHeight] = [Math.max(...childFlowNodes.map(node => node.position.x + (node.style?.width  as number) || 0), 0)  + xMargin, // bounding box right margin
+                                     Math.max(...childFlowNodes.map(node => node.position.y + (node.style?.height as number) || 0), 0)  + yMargin] // bounding box bottom margin?)
+    console.log(`bboxWidth = ${bboxWidth}, bboxHeight = ${bboxHeight}`)
+    // the infrastructure for the child nodes consists of the parent group node, an in-node living in the left margin, and an out-node living in the right margin.
     const nodes = [
-      { // this becomes the hypernode
-      id: `${this.id}-group`,
-      type: 'default',
-      data: { label: `` },
-      position: relPos,
-      sourcePosition: Position.Left, targetPosition: Position.Left,
-      style: {
-        width: Math.max(...childFlowNodes.map(node => (node.position.x + (node.style?.width as number) || 0))) + 40,
-        height: Math.max(...childFlowNodes.map(node => node.position.y)) - relPos.y + 50,
-       }
+      { // GROUP: the hypernode group
+       id: `${this.id}-group`,
+       type: 'group',
+       data: { label: `any` },
+       position: relPos,
+       sourcePosition: Position.Right, targetPosition: Position.Left,
+       style: {
+        width:  bboxWidth,
+        height: bboxHeight,
+        border: 'none',
       },
-          ...childFlowNodes,
-        ]
-    this.assignParentGroup(nodes);
-  console.log(`** Any ${this.id} getFlowNodes`, nodes);
+       parentId: parentId
+      },
+      { // IN: a pseudo-node which is basically a tiny little circle which acts as a lead-in to the children in the group
+        id: `${this.id}-in`,
+        type: 'default',
+        data: { label: `` },
+        position: {x: -12, y: bboxHeight / 2 - 10}, // if/when we allow switchin between vertical and horizontal layouts this will have to change
+        parentId: `${this.id}-group`,
+        sourcePosition: Position.Right, targetPosition: Position.Left,
+        style: {
+          width: 0,
+          height: 0,
+          borderRadius: "50%",
+          background: "transparent",
+          border: "none",
+        },
+      },
+      { // OUT: a pseudo-node which is basically a tiny little circle which acts as a lead-out to the children in the group
+        id: `${this.id}-out`,
+        type: 'default',
+        data: { label: `` },
+        position: {x: bboxWidth - (xMargin-28), y: bboxHeight / 2 - 10},
+        sourcePosition: Position.Right, targetPosition: Position.Left,
+        parentId: `${this.id}-group`,
+        style: {
+          width: 0,
+          height: 0,
+          borderRadius: "50%",
+          background: "transparent",
+          border: "none",
+
+        },
+      },
+      ...childFlowNodes
+    ]
+    // now that we know the bounding box of the group, we can re-layout the children
+    nodes.slice(3).forEach(node => {
+      if (node.parentId != `${this.id}-group`) { return }
+      console.log(`** Any ${this.id} repositioning ${node.id}, previously ${JSON.stringify(node.position)}`);
+      node.position.x = (bboxWidth - Number(node.style?.width)) / 2
+      console.log(`** Any ${this.id} repositioned ${node.id} to ${JSON.stringify(node.position)}`);
+    })
+    
+    console.log(`** Any ${this.id} getFlowNodes`, nodes);
     return nodes
   }
   getFlowEdges() : Edge[] {
     // we connect ourselves to all the children in parallel
     const edges = this.c.flatMap((n,i) => [
-      { id: `e${this.id}-${n.id}-in`,  source: `${this.id}-group`, target: `${n.id}` },
-      { id: `e${this.id}-${n.id}-out`, source: `${n.id}`, target: `${this.id}-out` },
+      { id: `e${this.id}-${n.id}-in`,  source: `${this.id}-in`, target: (isAll(n) || isAny(n)) ? `${n.id}-in` : String(n.id),     style: { stroke: isFill(n) ?'none':"black", strokeWidth: 4 },   },
+      { id: `e${this.id}-${n.id}-out`, source: (isAll(n) || isAny(n)) ? `${n.id}-out` : String(n.id), target: `${this.id}-out`,    style: { stroke: isFill(n) ?'none':"black", strokeWidth: 4 }, },
       ...(n.getFlowEdges())])
 
     console.log(`** Any ${this.id} getFlowEdges`, edges);
@@ -250,8 +324,9 @@ export class Leaf extends Vine {
     viz  ?: HideShow,
     id   ?: number,
   ) { super(viz,id) }
-  getFlowNodes(relPos:XYPosition) : Node[] {
-    return [ {
+  getFlowNodes(relPos:XYPosition, parentId ?: string) : Node[] {
+    console.log(`** Leaf ${this.id} getFlowNodes ${JSON.stringify(relPos)}`, this);
+    const node : Node = {
       id: `${this.id}`,
       type: 'default',
       data: { label: this.text },
@@ -259,11 +334,12 @@ export class Leaf extends Vine {
       sourcePosition: Position.Right, targetPosition: Position.Left,
       style: {
         width: 100,
-        height: 50,
+        height: 40,
         backgroundColor: this.value == undefined ? "white" : this.value ? "green" : "red"
       }
-     }
-    ]
+    }
+    if (parentId !== undefined) { node.parentId = parentId }
+    return [ node ]
   }
   clone() { return new Leaf(this.text, this.value, this.dflt, this.viz, this.id) }
 }
@@ -275,8 +351,9 @@ export class Fill extends Vine {
     viz  ?: HideShow,
     id      ?: number
   ) { super(viz,id) }
-  getFlowNodes(relPos:XYPosition) : Node[] {
-    return [ {
+  getFlowNodes(relPos:XYPosition, parentId ?: string) : Node[] {
+    console.log(`** Fill ${this.id} getFlowNodes ${JSON.stringify(relPos)}`, this);
+    const node : Node = {
       id: `${this.id}`,
       type: 'default',
       data: { label: this.fill },
@@ -284,10 +361,14 @@ export class Fill extends Vine {
       sourcePosition: Position.Right, targetPosition: Position.Left,
       style: {
         width: 100,
-        height: 50,
-      }
-    }
-    ]
+        height: 40,
+        border: "none",
+        background: "transparent",
+      },
+  }
+    if (parentId !== undefined) { node.parentId = parentId }
+    return [ node ]
+
   }
   clone() { return new Fill(this.fill, this.viz, this.id) }
 }
@@ -315,26 +396,46 @@ export class Not extends Vine {
     const merged = this.c.expand(exOpts)
     return merged
   }
-  getFlowNodes(relPos:XYPosition) : Node[] {
-    const childFlowNodes = this.c.getFlowNodes({ x: relPos.x + 170, y: relPos.y })
+  getFlowNodes(relPos:XYPosition, parentId: string) : Node[] {
+    const childFlowNodes : Node[] = this.c.getFlowNodes({ x: xMargin, y: 0 }, `${this.id}-group`);
+
+    // [TODO] same treatment as Any/All, except there is always only one child logically though there may be mulitple physically.
+    // the first element of childFlowNodes should be the group, or the singleton leaf, so we use that.
 
     const nodes = [
-      { // the hypernode group
+      { // GROUP: the hypernode group
        id: `${this.id}-group`,
        type: 'group',
        data: { label: `not` },
        position: relPos,
+       style: {
+        width: childFlowNodes[0].style?.width || 99 + xMargin,
+        height: childFlowNodes[0].style?.height || 99 + yMargin,
+       },
        sourcePosition: Position.Right, targetPosition: Position.Left,
       },
-      { // a pseudo-node which is basically a tiny little circle which acts as a common source for the children in the group
-        id: `${this.id}`,
+      { // IN
+        id: `${this.id}-in`,
         type: 'default',
         data: { label: `not` },
-        position: relPos,
+        position: { x: 5, y: Number(childFlowNodes[0]?.style?.height || 99) / 2 - 10},
         sourcePosition: Position.Right, targetPosition: Position.Left,
         style: {
-          width: 20,
-          height: 20,
+          width: 5,
+          height: 5,
+          borderRadius: "50%",
+          backgroundColor: "red"
+        },
+      },
+      { // OUT
+        id: `${this.id}-out`,
+        type: 'default',
+        data: { label: `not` },
+        position: { x: Number(childFlowNodes[0].style?.width) || 99, y: (Number(childFlowNodes[0].style?.height) ?? 99) / 2 - 10 },
+        sourcePosition: Position.Right, targetPosition: Position.Left,
+        style: {
+          width: 5,
+          height: 5,
           borderRadius: "50%",
           backgroundColor: "red"
         },
@@ -433,16 +534,57 @@ export const cheating_tautology =
       say('inducement')
      )
 
-export const cheating = com(
+// Whoever cheats and thereby dishonestly induces the person deceived
+// to deliver or cause the delivery of any property to any person, or
+// to make, alter or destroy the whole or any part of a valuable
+// security, or anything which is signed or sealed, and which is
+// capable of being converted into a valuable security, shall be
+// punished with imprisonment for a term which may extend to 10 years,
+// and shall also be liable to fine.
+
+export const marijuana =
+  all(say("whoever"),
+    ele("cheats"),
+    say("and"),
+    ele("thereby dishonestly induces"),
+    say("the person deceived to"),
+    any(
+      com(
+        any(
+          ele("deliver"),
+          say("or"),
+          ele("cause the delivery of")),
+        say("any property"),
+        say("to any person"),
+        say("or to")),
+      all(
+        any(ele("make"),
+          ele("alter"), say("or"),
+          ele("destroy")
+        ),
+        any(ele("the whole of"),
+          say("or"),
+          ele("any part of"),
+          any(ele("a valuable security"),
+            say("or"),
+            all(
+              any(ele("anything signed"),
+                ele("anything sealed")),
+              say("and which is"),
+              ele("capable of being converted into a valuable security")
+            ))))))
+    
+export const cheating = 
+all(
   com(say('by'), ele('deceiving'), say('any person')),
   // cheating_tautology,
-  any(com(any(ele('fraudulently'),
+  any(all(any(ele('fraudulently'),
 	      say('or'),
 	      ele('dishonestly')),
 	  say('induces the person so deceived'),
 	  com(say('to'),
 	      any(
-		com(
+		all(
 		  any(ele('deliver'),
 		      say('or'),
 		      ele('cause the delivery of')),
@@ -464,9 +606,7 @@ export const cheating = com(
 		  any(ele('causes'),
 		      say('or'),
 		      ele('is likely to cause')),
-		  any(// ele('damage'),
-		      // say('or'),
-		      ele('harm')
+		  any(ele('damage or harm')
 		     ),
 		  say('to any person in'),
 		  any(ele('body'),
@@ -480,6 +620,25 @@ export const cheating = com(
 	 )
      )
 )
+
+export const laymanS =
+  com(
+    all(ele('S2'),
+	any(
+          all(ele('S3'),ele('S4'),
+              any(ele('S5'),
+		  all(ele('S6'),ele('S7'))
+		 )
+             ),
+          all(ele('S8'),ele('S9'))
+        )
+       )
+  )
+
+export const abcde =
+  any(all(ele('a'),ele('b')),
+      all(ele('c'),ele('d'),ele('e'))
+  )
 
 if (require.main === module) {
   const expanded = narnia.expand(defaultExpansionOpts);

@@ -196,8 +196,10 @@ export class All extends AnyAll {
    getFlowEdges() : Edge[] {
     // we connect ourselves to our first child, and the children to each other in sequence.
     // this will probably change when we figure out subflows.
+    const lastChild : Vine = this.c[this.c.length - 1]
     const edges = _.flatten([
-      { id: `e${this.id}-${this.c[0].id}-firstchildOfAll`, source: `${this.id}-in`, target: (isAny(this.c[0]) || isAll(this.c[0]) ? `${this.c[0].id}-in` : `${this.c[0].id}-in`),  style: { stroke: 'black', strokeWidth: 4 }, },
+      { id: `e${this.id}-${this.c[0].id}-firstchildOfAll`, source: `${this.id}-in`, target: (isAny(this.c[0]) || isAll(this.c[0]) ? `${this.c[0].id}-in` : `${this.c[0].id}`),  style: { stroke: 'black', strokeWidth: 4 }, },
+      { id: `e${this.id}-${lastChild.id}-lastchildOfAll`, target: `${this.id}-out`, source: (isAny(lastChild) || isAll(lastChild)) ? `${lastChild.id}-out` : `${lastChild.id}`,  style: { stroke: 'black', strokeWidth: 4 }, },
       ...(this.c.slice(0, -1).flatMap((n,i) => [{ id: `e${n.id}-${this.c[i+1].id}`, source: (isAny(n) || isAll(n) ? `${n.id}-out` : `${n.id}`),
                 target: (isAny(this.c[i+1]) || isAll(this.c[i+1]) ? `${this.c[i+1].id}-in` : `${this.c[i+1].id}`),
                   style: { stroke: 'black', strokeWidth: 4 },},
@@ -542,32 +544,35 @@ export const cheating_tautology =
 
 export const marijuana =
   all(say("whoever"),
-      ele("cheats"),
-      say("and"),
-      ele("thereby dishonestly induces"),
-      say("the person deceived to"),
-      any(all(any(ele("deliver"),
-		  say("or"),
-		  ele("cause the delivery of")),
-	      say("any property")),
-	  say("to any person"),
-	  say("or to"),
-          all(
-	    any(ele("make"),
-		ele("alter"),say("or"),
-		    ele("destroy")
-	       ),
-	    any(ele("the whole of"),
-		say("or"),
-		ele("any part of"),
-		any(ele("a valuable security"),
-		    say("or"),
-		all(
-		  any(ele("anything signed"),
-		      ele("anything sealed")),
-		  say("and which is"),
-		  ele("capable of being converted into a valuable security")
-		))))))
+    ele("cheats"),
+    say("and"),
+    ele("thereby dishonestly induces"),
+    say("the person deceived to"),
+    any(
+      com(
+        any(
+          ele("deliver"),
+          say("or"),
+          ele("cause the delivery of")),
+        say("any property"),
+        say("to any person"),
+        say("or to")),
+      all(
+        any(ele("make"),
+          ele("alter"), say("or"),
+          ele("destroy")
+        ),
+        any(ele("the whole of"),
+          say("or"),
+          ele("any part of"),
+          any(ele("a valuable security"),
+            say("or"),
+            all(
+              any(ele("anything signed"),
+                ele("anything sealed")),
+              say("and which is"),
+              ele("capable of being converted into a valuable security")
+            ))))))
     
 export const cheating = 
 all(
@@ -626,8 +631,7 @@ export const laymanS =
 		 )
              ),
           all(ele('S8'),ele('S9'))
-        ),
-        ele('S1')
+        )
        )
   )
 

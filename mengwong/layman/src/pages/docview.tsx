@@ -24,7 +24,7 @@ export const DocView: React.FC<Props> = ({ doc }) => {
       <RenderOriginal key={`${doc.title}-showOriginal`} root={root} dispatch={dispatch} />
       </div>
 
-        <div style={{ width: '100%', height: '1000px' }}>
+        <div style={{ width: '100%', height: '400px' }}>
           <Flow root={root} nodes={flowNodes} edges={flowEdges} dispatch={dispatch} />
         </div>
         

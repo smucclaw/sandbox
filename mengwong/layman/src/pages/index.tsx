@@ -9,7 +9,7 @@ const App: React.FC = () => {
     { id: "mustSing",  title: 'Every person must sing...',          content: mustSing },
     { id: "narnia",    title: 'In Narnia, a crime is committed if', content: narnia },
     { id: "cheating",  title: '415 Cheating',                       content: cheating },
-    { id: "laymanSS",  title: 'Layman Allen\'s SSS examples',       content: laymanS },
+    { id: "laymanSS",  title: 'Layman Allen\'s example says S1 if', content: laymanS },
     { id: "abcde",     title: 'ABCDE example',                      content: abcde },
     { id: "marijuana",  title: 'section 420',                       content: marijuana },
     ]);

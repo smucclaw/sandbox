@@ -51,6 +51,21 @@ p {
   text-align: right;
 }
 
+textarea .vineEditor {
+  height: 6em;
+  resize: vertical;
+}
+
+.invisihandles-node {
+  padding: 10px;
+  border-radius: 3px;
+  width: 100px;
+  font-size: 12px;
+  background-color: transparent;
+  text-align: center;
+}
+
+
 a {
   color: blue;
   text-decoration: underline;

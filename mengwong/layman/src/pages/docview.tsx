@@ -1,7 +1,8 @@
 import React, { useState, useReducer } from 'react';
-import { Vine, AnyAll, Any, All, Leaf, Fill, HideShow } from '@/woon';
+import { Vine, AnyAll, Any, All, Leaf, Fill, HideShow, any, all, ele, say, com } from '@/woon';
 import { Flow } from '@/pages/flow';
 import _ from 'lodash';
+import { abcde_as_text } from '@/woon';
 
 export const DocView: React.FC<Props> = ({ doc }) => {
   const init = (initialContent:Vine) => initialContent.clone(); // Initialize with a deep copy to avoid mutations
@@ -16,19 +17,29 @@ export const DocView: React.FC<Props> = ({ doc }) => {
   console.log(`DocView: flowEdges`, flowEdges)
   // console.log(`DocView: root`, root)
   // <textarea className="vineEditor" value={JSON.stringify(root, null, 2)} readOnly />
+  const [textareaValue, setTextareaValue] = useState(abcde_as_text);
+
+  const handleTextareaChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setTextareaValue(event.target.value);
+  };
+
+  const handleTextareaBlur = () => {
+    dispatch({ type: 'NewVine', content: textareaValue });
+  };
+
   return (
     <div style={{ marginTop: '20px' }}>
       <h1>{doc.title}</h1>
 
       <div className="original">
-      <RenderOriginal key={`${doc.title}-showOriginal`} root={root} dispatch={dispatch} />
+        <RenderOriginal key={`${doc.title}-showOriginal`} root={root} dispatch={dispatch} />
       </div>
 
-        <div style={{ width: '100%', height: '400px' }}>
-          <Flow root={root} nodes={flowNodes} edges={flowEdges} dispatch={dispatch} />
-        </div>
-        
-        <RenderVine root={root} dispatch={dispatch} />
+      <div style={{ width: '100%', height: '400px' }}>
+        <Flow root={root} nodes={flowNodes} edges={flowEdges} dispatch={dispatch} />
+      </div>
+
+      <RenderVine root={root} dispatch={dispatch} />
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h2>Combinations</h2>
@@ -36,16 +47,23 @@ export const DocView: React.FC<Props> = ({ doc }) => {
           {root.viz == HideShow.Collapsed ? 'Expand All' : 'Collapse All'}
         </button>
       </div>
+
       <RenderSentences key={`${doc.title}-topLevel`} root={root} dispatch={dispatch} />
+
       {root.viz === HideShow.Expanded && (
-      <div>
-        <p className="pRight">
-          When fully expanded, these are said to be in{" "}
-          <a href="https://en.wikipedia.org/wiki/Disjunctive_normal_form" target="_new">disjunctive normal form.</a>
-        </p>
-      </div>
+        <div>
+          <p className="pRight">
+            When fully expanded, these are said to be in{' '}
+            <a href="https://en.wikipedia.org/wiki/Disjunctive_normal_form" target="_new">
+              disjunctive normal form.
+            </a>
+          </p>
+        </div>
       )}
 
+      <div>
+        <textarea className="vineEditor" value={textareaValue} onChange={handleTextareaChange} onBlur={handleTextareaBlur} />
+      </div>
     </div>
   );
 };
@@ -67,6 +85,7 @@ type MyDispatch = React.Dispatch<MyAction>;
 export type MyAction = {
   type: string,
   nodeID ?: number,
+  content ?: string,
 }
 export interface Document {
   id: string;
@@ -159,6 +178,12 @@ function reducer(root: Vine, action: MyAction): Vine {
       }
       toggleParentNode(action.nodeID, newRoot);
       return newRoot;
+    case 'NewVine':
+      if (action.content != undefined) {
+        return eval(action.content) as Vine
+      } else {
+        return newRoot
+      }
     default:
       return newRoot
   }

@@ -1,7 +1,9 @@
 import _ from "lodash"
 import 'lodash.product';
-import { Node, Edge, XYPosition, Position, Handle } from 'reactflow'
-import { useCallback } from 'react';
+import { Node, Edge, XYPosition, Position, Handle, NodeProps } from 'reactflow'
+import React, { Fragment, useCallback } from 'react';
+
+
 
 // Expansion from a BoolStruct to a DNF (Disjunctive Normal Form):
 // We traverse the BoolStruct, depth-first, flattening the BoolStruct to a list of lists -- a sum of products.
@@ -138,7 +140,6 @@ export class All extends AnyAll {
       { // GROUP: the hypernode group
        id: `${this.id}-group`,
        type: 'group',
-       data: { label: `all` },
        position: relPos,
        sourcePosition: Position.Right, targetPosition: Position.Left,
        style: {
@@ -150,35 +151,20 @@ export class All extends AnyAll {
       },
       { // IN: a pseudo-node which is basically a tiny little circle which acts as a lead-in to the children in the group
         id: `${this.id}-in`,
-        type: 'default',
-        data: { label: `` },
+        type: 'connector',
         position: {x: 0, y: bboxHeight / 2 - 10 },
         parentId: `${this.id}-group`,
         sourcePosition: Position.Right, targetPosition: Position.Left,
-        style: {
-          width: 0,
-          height: 0,
-          borderRadius: "50%",
-          background: "transparent",
-          border: "none",
-
-        },
+        style: { width: 1, height: 1 },
       },
       { // OUT: a pseudo-node which is basically a tiny little circle which acts as a lead-out to the children in the group
         id: `${this.id}-out`,
-        type: 'default',
+        type: 'connector',
         data: { label: `` },
         position: {x: bboxWidth - 22, y: bboxHeight / 2 - 10 },
         sourcePosition: Position.Right, targetPosition: Position.Left,
         parentId: `${this.id}-group`,
-        style: {
-          width: 0,
-          height: 0,
-          borderRadius: "50%",
-          background: "transparent",
-          border: "none",
-
-        },
+        style: { width: 1, height: 1 },
       },
       ...childFlowNodes
      ]
@@ -204,7 +190,7 @@ export class All extends AnyAll {
                 target: (isAny(this.c[i+1]) || isAll(this.c[i+1]) ? `${this.c[i+1].id}-in` : `${this.c[i+1].id}`),
                   style: { stroke: 'black', strokeWidth: 4 },},
                            ...n.getFlowEdges()])),
-       this.c[this.c.length - 1].getFlowEdges()
+       lastChild.getFlowEdges()
     ])
     console.log(`** All ${this.id} getFlowEdges`, edges);
     console.log(`All originally`, this)
@@ -259,34 +245,19 @@ export class Any extends AnyAll {
       },
       { // IN: a pseudo-node which is basically a tiny little circle which acts as a lead-in to the children in the group
         id: `${this.id}-in`,
-        type: 'default',
-        data: { label: `` },
+        type: 'connector',
         position: {x: -12, y: bboxHeight / 2 - 10}, // if/when we allow switchin between vertical and horizontal layouts this will have to change
         parentId: `${this.id}-group`,
         sourcePosition: Position.Right, targetPosition: Position.Left,
-        style: {
-          width: 0,
-          height: 0,
-          borderRadius: "50%",
-          background: "transparent",
-          border: "none",
-        },
+        style: { width: 1, height: 1 },
       },
       { // OUT: a pseudo-node which is basically a tiny little circle which acts as a lead-out to the children in the group
         id: `${this.id}-out`,
-        type: 'default',
-        data: { label: `` },
+        type: 'connector',
         position: {x: bboxWidth - (xMargin-28), y: bboxHeight / 2 - 10},
         sourcePosition: Position.Right, targetPosition: Position.Left,
         parentId: `${this.id}-group`,
-        style: {
-          width: 0,
-          height: 0,
-          borderRadius: "50%",
-          background: "transparent",
-          border: "none",
-
-        },
+        style: { width: 1, height: 1 },
       },
       ...childFlowNodes
     ]
@@ -355,7 +326,7 @@ export class Fill extends Vine {
     console.log(`** Fill ${this.id} getFlowNodes ${JSON.stringify(relPos)}`, this);
     const node : Node = {
       id: `${this.id}`,
-      type: 'default',
+      type: 'invisiHandles',
       data: { label: this.fill },
       position: relPos,
       sourcePosition: Position.Right, targetPosition: Position.Left,
@@ -635,10 +606,19 @@ export const laymanS =
        )
   )
 
-export const abcde =
-  any(all(ele('a'),ele('b')),
+export const abcde_as_text =
+`
+ any(all(ele('a'),ele('b')),
       all(ele('c'),ele('d'),ele('e'))
   )
+`
+
+export const abcde = eval(abcde_as_text)
+
+// to do: add functionality to allow ele('e') to expand, by substitution, to not(ele('c'))
+// and do some interesting logic based on that using Espresso
+
+
 
 if (require.main === module) {
   const expanded = narnia.expand(defaultExpansionOpts);
@@ -659,3 +639,4 @@ if (require.main === module) {
 //       new Leaf("o3b")])])])
           
 // console.log(c2s.expand())
+

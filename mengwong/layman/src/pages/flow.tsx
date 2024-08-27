@@ -1,4 +1,4 @@
-import React, { useCallback, useLayoutEffect } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect } from 'react';
 import ELK from 'elkjs/lib/elk.bundled.js';
 import { ReactFlowProvider, useReactFlow } from 'reactflow';
 import ReactFlow, {
@@ -130,12 +130,21 @@ const LayoutFlow : React.FC<{root:Vine, initialNodes:Node[], initialEdges:Edge[]
   );
 }
 
-export const Flow: React.FC<Props> = ({ root, nodes, edges, dispatch }) => {
+export const Flow: React.FC<Props & { highlightedClass: string | null }> = ({ root, nodes, edges, dispatch, highlightedClass }) => {
+  const [reactFlowNodes, setReactFlowNodes] = useNodesState(nodes)
+
+  useEffect(() => {
+    setReactFlowNodes(nodes.map(node => ({
+      ...node,
+      className: node.className === highlightedClass ? 'highlight' : ''
+    })))
+  }, [highlightedClass, nodes])
+
   return (
-  <ReactFlowProvider>
-  <ReactFlow key={`rf-${root.id}`} nodes={nodes} edges={edges} />
-  </ReactFlowProvider>
-);
+    <ReactFlowProvider>
+      <ReactFlow key={`rf-${root.id}`} nodes={reactFlowNodes} edges={edges} />
+    </ReactFlowProvider>
+  )
 //   <LayoutFlow key={`layout-${root.id}`} root={root} initialNodes={nodes} initialEdges={edges} dispatch={dispatch} />
 
 }

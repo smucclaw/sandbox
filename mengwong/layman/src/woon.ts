@@ -40,6 +40,7 @@ export class Vine { // your basic tree, with AnyAll leaves, and Leaf/Fill termin
   constructor(
     public viz  ?: HideShow,
     public   id ?: number,
+    public className?: string
   ) {
     this.id = id ?? idMax++;
   }
@@ -71,9 +72,12 @@ export class AnyAll extends Vine {
   constructor(
     public c : Vine[],
     viz ?: HideShow,
-    id  ?: number) {
+    id  ?: number,
+  ) {
     super(viz, id);
-    for (const child of c) { child.recordParent(this) }
+    for (const child of c) {
+      child.recordParent(this)
+    }
   }
   expand(exOpts : ExpansionOpts) : Vine[][] {
     // console.log(`* ${this.id} expand() starting`, this);
@@ -132,7 +136,7 @@ export class All extends AnyAll {
        style: {
         width: Math.max(...childFlowNodes.map(node => node.position.x)) - relPos.x + 100,
         height: Math.max(...childFlowNodes.map(node => node.position.y)) - relPos.y + 100,
-       }
+       },
       },
       { // a pseudo-node which is basically a tiny little circle which acts as a common source for the children in the group
         id: `${this.id}`,
@@ -145,7 +149,7 @@ export class All extends AnyAll {
           height: 20,
           borderRadius: "50%",
           backgroundColor: "green"
-        },
+        }
       },
       ...childFlowNodes
      ]
@@ -206,14 +210,16 @@ export class Any extends AnyAll {
     return xprod(l.flat(1))
   }
   getFlowNodes(relPos:XYPosition) : Node[] {
+
     const childFlowNodes = this.c.flatMap((x,i) => x.getFlowNodes({ x: 40, y: 50*(i+0) }))
+
     const midpoint_y = Math.max(...childFlowNodes.map(node => node.position.y)) / 2;
     const rightmargin_x = Math.max(...childFlowNodes.map(node => node.position.x)) + 170;
     const nodes = [
       { // this becomes the hypernode
       id: `${this.id}-group`,
       type: 'default',
-      data: { label: `` },
+      data: { label: ``},
       position: relPos,
       sourcePosition: Position.Left, targetPosition: Position.Left,
       style: {
@@ -224,7 +230,7 @@ export class Any extends AnyAll {
           ...childFlowNodes,
         ]
     this.assignParentGroup(nodes);
-  console.log(`** Any ${this.id} getFlowNodes`, nodes);
+    console.log(`** Any ${this.id} getFlowNodes`, nodes);
     return nodes
   }
   getFlowEdges() : Edge[] {
@@ -273,7 +279,7 @@ export class Fill extends Vine {
   constructor(
     public fill     : string,
     viz  ?: HideShow,
-    id      ?: number
+    id      ?: number,
   ) { super(viz,id) }
   getFlowNodes(relPos:XYPosition) : Node[] {
     return [ {

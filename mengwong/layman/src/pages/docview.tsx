@@ -1,7 +1,7 @@
 import React, { useState, useReducer } from 'react';
 import { Vine, AnyAll, Any, All, Leaf, Fill, HideShow } from '@/woon';
 import { Flow } from '@/pages/flow';
-import _ from 'lodash';
+import _, { set } from 'lodash';
 
 export const DocView: React.FC<Props> = ({ doc }) => {
   const init = (initialContent:Vine) => initialContent.clone(); // Initialize with a deep copy to avoid mutations
@@ -9,8 +9,13 @@ export const DocView: React.FC<Props> = ({ doc }) => {
   const toggleExpandAll = () => {
     dispatch({type: root.viz !== HideShow.Collapsed ? 'COLLAPSE' : 'EXPAND'});
   };
-  const flowNodes = root.getFlowNodes({x:0, y:0})
+  
+  const flowNodes = root.getFlowNodes({x:0, y:0}).map((node) => ({
+    ...node,
+  }))
   const flowEdges = root.getFlowEdges()
+  const [highlightedClass, setHighlightedClass] = useState<string | null>(null);
+
   console.log(`DocView: root`, root)
   console.log(`DocView: flowNodes`, flowNodes)
   console.log(`DocView: flowEdges`, flowEdges)
@@ -20,7 +25,7 @@ export const DocView: React.FC<Props> = ({ doc }) => {
       <h1>{doc.title}</h1>
 
       <div className="original">
-      <RenderOriginal key={`${doc.title}-showOriginal`} root={root} dispatch={dispatch} />
+      <RenderOriginal key={`${doc.title}-showOriginal`} root={root} dispatch={dispatch} setHighlightedClass={setHighlightedClass} />
       </div>
       
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -29,7 +34,7 @@ export const DocView: React.FC<Props> = ({ doc }) => {
           {root.viz == HideShow.Collapsed ? 'Expand All' : 'Collapse All'}
         </button>
       </div>
-      <RenderSentences key={`${doc.title}-topLevel`} root={root} dispatch={dispatch} />
+      <RenderSentences key={`${doc.title}-topLevel`} root={root} dispatch={dispatch} setHighlightedClass={setHighlightedClass} />
       {root.viz === HideShow.Expanded && (
       <div>
         <p className="pRight">
@@ -41,7 +46,7 @@ export const DocView: React.FC<Props> = ({ doc }) => {
 
       <h2>Circuit Diagram</h2>
       <div style={{ width: '1000px', height: '500px' }}>
-      <Flow root={root} nodes={flowNodes} edges={flowEdges} dispatch={dispatch} />
+        <Flow root={root} nodes={flowNodes} edges={flowEdges} dispatch={dispatch} highlightedClass={highlightedClass} />
       </div>
         <textarea className="vineEditor" value={JSON.stringify(root, null, 2)} readOnly />
         <RenderVine root={root} dispatch={dispatch} />
@@ -102,36 +107,60 @@ const RenderNode: React.FC<{ node: Vine, dispatch: MyDispatch }> = ({ node, disp
     }
   };
 
-const RenderExpanded: React.FC<{expanded: Vine[][], dispatch: MyDispatch}> = ({ expanded, dispatch }) => {
+  const RenderExpanded: React.FC<{expanded: Vine[][], dispatch: MyDispatch, setHighlightedClass: (className: string | null) => void}> = ({ expanded, dispatch, setHighlightedClass }) => {
+    const handleMouseEnter = (disjunctionClass: string) => {
+      console.log("highlight nodes")
+      const nodes = document.querySelectorAll(`.${disjunctionClass}`)
+      nodes.forEach(node => {
+        node.classList.add('highlight')
+      })
+      setHighlightedClass(disjunctionClass);
+    }
+  
+    const handleMouseLeave = (disjunctionClass: string) => {
+      const nodes = document.querySelectorAll(`.${disjunctionClass}`);
+      nodes.forEach(node => {
+        node.classList.remove('highlight');
+      });
+      setHighlightedClass(null);
+    }
+
   return (
     <div>
-      <ol>
-        {expanded.map((item: Vine[], itemIndex: number) => (
-          <li key={itemIndex}>
+      <ol>        
+        {expanded.map((item: Vine[], itemIndex: number) => {
+          const disjunctionClass = `disjunction-${itemIndex}`;
+          item.forEach(node => {
+            node.className = disjunctionClass;
+          });
+          return (
+          <li key={itemIndex}
+            className={`disjunction-${itemIndex}`}
+            onMouseEnter={() => handleMouseEnter(disjunctionClass)}
+            onMouseLeave={() => handleMouseLeave(disjunctionClass)}
+          >
             <ul className="inline-list">
               {item.map((node: Vine, index: number) => (
                 <RenderNode node={node} dispatch={dispatch} key={node.id || index} />
               ))}
             </ul>
           </li>
-        ))}
+        )})}
       </ol>
     </div>
   );
 }  
 
-export const RenderOriginal: React.FC<JustRoot> = ({ root, dispatch }) => {
+export const RenderOriginal: React.FC<JustRoot & { setHighlightedClass: (className: string | null) => void }> = ({ root, dispatch, setHighlightedClass }) => {
   const excludeFill = {...excludeFill0, ...{hideShowOverride: HideShow.Collapsed}}
-  const expanded = root.expand(excludeFill);
-  return <RenderExpanded key="fromOriginal" expanded={expanded} dispatch={dispatch} />;
+  const expanded = root.expand(excludeFill)
+  return <RenderExpanded key="fromOriginal" expanded={expanded} dispatch={dispatch} setHighlightedClass={setHighlightedClass}  />
 }
 
-export const RenderSentences: React.FC<JustRoot> = ({ root, dispatch }) => {
-  const expanded = root.expand(excludeFill0);
-  return <RenderExpanded key="fromSentences" expanded={expanded} dispatch={dispatch} />;
+export const RenderSentences: React.FC<JustRoot & { setHighlightedClass: (className: string | null) => void }> = ({ root, dispatch, setHighlightedClass }) => {
+  const expanded = root.expand(excludeFill0)
+  return <RenderExpanded key="fromSentences" expanded={expanded} dispatch={dispatch} setHighlightedClass={setHighlightedClass} />
 }
-
-
 
 function reducer(root: Vine, action: MyAction): Vine {
   const toggleParentNode = (nodeID:number, node: Vine) => {

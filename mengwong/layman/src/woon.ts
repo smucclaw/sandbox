@@ -51,7 +51,7 @@ export class Vine { // your basic tree, with AnyAll leaves, and Leaf/Fill termin
    // takes two filter functions; first applied to the parent, the second to be applied to the children.
    // will exclude children where both functions return true.
    // the sentence rendering code uses this to hide "or" fillers since those don't belong in the sentence.
-  getFlowNodes(_newPos:XYPosition,_parentId:string) : Node[] { return [] }
+  getFlowNodes(_newPos:XYPosition,_parentId?:string) : Node[] { return [] }
   getFlowEdges() : Edge[] { return [] }
   hideAll() { this.viz = HideShow.Collapsed; }
   showAll() { this.viz = HideShow.Expanded;  }
@@ -136,12 +136,13 @@ export class All extends AnyAll {
                                      Math.max(...childFlowNodes.map(node => node.position.y + (node.style?.height as number) || 0), 0) + xMargin] // bounding box bottom margin?
 
     // the infrastructure for the child nodes consists of the parent group node, an in-node living in the left margin, and an out-node living in the right margin.
-    const nodes = [
+    const nodes : Node[] = [
       { // GROUP: the hypernode group
        id: `${this.id}-group`,
        type: 'group',
        position: relPos,
-       sourcePosition: Position.Right, targetPosition: Position.Left,
+	sourcePosition: Position.Right, targetPosition: Position.Left,
+	data: {},
        style: {
         width:  bboxWidth,//+ xMargin,
         height: bboxHeight,
@@ -151,17 +152,18 @@ export class All extends AnyAll {
       },
       { // IN: a pseudo-node which is basically a tiny little circle which acts as a lead-in to the children in the group
         id: `${this.id}-in`,
-        type: 'connector',
-        position: {x: 0, y: bboxHeight / 2 - 10 },
+        type: 'connectorR',
+	data: {},
+        position: {x: 0, y: bboxHeight / 2 + 15 },
         parentId: `${this.id}-group`,
         sourcePosition: Position.Right, targetPosition: Position.Left,
         style: { width: 1, height: 1 },
       },
       { // OUT: a pseudo-node which is basically a tiny little circle which acts as a lead-out to the children in the group
         id: `${this.id}-out`,
-        type: 'connector',
-        data: { label: `` },
-        position: {x: bboxWidth - 22, y: bboxHeight / 2 - 10 },
+        type: 'connectorR',
+	data: {},
+        position: {x: bboxWidth - 22, y: bboxHeight / 2 + 15 },
         sourcePosition: Position.Right, targetPosition: Position.Left,
         parentId: `${this.id}-group`,
         style: { width: 1, height: 1 },
@@ -172,7 +174,7 @@ export class All extends AnyAll {
     nodes.slice(3).forEach(node => {
       if (node.parentId != `${this.id}-group`) { return }
       console.log(`** All ${this.id} repositioning ${node.id}, previously ${JSON.stringify(node.position)}`);
-      node.position.y = (bboxHeight - Number(node.style?.height)) / 2 + yMargin - 20
+      node.position.y = (bboxHeight - Number(node.style?.height)) / 2 + yMargin
       console.log(`** All ${this.id} repositioned ${node.id} to ${JSON.stringify(node.position)}`);
     })
 
@@ -208,7 +210,7 @@ export class Any extends AnyAll {
     // console.log(`* Any ${this.id} merge, should be expanding`);
     return xprod(l.flat(1))
   }
-  getFlowNodes(relPos:XYPosition, parentId: string) : Node[] {
+  getFlowNodes(relPos:XYPosition, parentId?: string) : Node[] {
     console.log(`** Any ${this.id} getFlowNodes given ${JSON.stringify(relPos)}`, this);
     const childFlowNodes :Node[] = []
     // iteratively build the childFlowNodes. Each child will have its own size, which is not known until we call getFlowNodes on it.
@@ -245,7 +247,8 @@ export class Any extends AnyAll {
       },
       { // IN: a pseudo-node which is basically a tiny little circle which acts as a lead-in to the children in the group
         id: `${this.id}-in`,
-        type: 'connector',
+        type: 'connectorR',
+        data: { },
         position: {x: -12, y: bboxHeight / 2 - 10}, // if/when we allow switchin between vertical and horizontal layouts this will have to change
         parentId: `${this.id}-group`,
         sourcePosition: Position.Right, targetPosition: Position.Left,
@@ -253,8 +256,9 @@ export class Any extends AnyAll {
       },
       { // OUT: a pseudo-node which is basically a tiny little circle which acts as a lead-out to the children in the group
         id: `${this.id}-out`,
-        type: 'connector',
-        position: {x: bboxWidth - (xMargin-28), y: bboxHeight / 2 - 10},
+        type: 'connectorR',
+        data: { },
+        position: {x: bboxWidth + 15, y: bboxHeight / 2 - 10},
         sourcePosition: Position.Right, targetPosition: Position.Left,
         parentId: `${this.id}-group`,
         style: { width: 1, height: 1 },

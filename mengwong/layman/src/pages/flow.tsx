@@ -25,7 +25,26 @@ type Props = {
 
 
 // some infrastructure for a connector node with no visible body or handles
-const ConnectorNode: React.FC = () => {
+const ConnectorLeft: React.FC = () => {
+  return (
+    <div style={{ width: 1, height: 1 }}>
+      <Handle
+        type="target"
+        position={Position.Right}
+        style={{ opacity: 0, width: 1, height: 1 }}
+        isConnectable={true}
+      />
+      <Handle
+        type="source"
+        position={Position.Left}
+        style={{ opacity: 0, width: 1, height: 1 }}
+        isConnectable={true}
+      />
+    </div>
+  );
+};
+// some infrastructure for a connector node with no visible body or handles
+const ConnectorRight: React.FC = () => {
   return (
     <div style={{ width: 1, height: 1 }}>
       <Handle
@@ -65,7 +84,8 @@ const InvisiHandles: React.FC<{data:{label:string}}> = ({data}) => {
 };
 
 const nodeTypes = {
-  connector: ConnectorNode,
+  connectorL: ConnectorLeft,
+  connectorR: ConnectorRight,
   invisiHandles: InvisiHandles,
 };
 
@@ -81,3 +101,5 @@ export const Flow: React.FC<Props> = ({ root, nodes, edges, dispatch }) => {
 //   <LayoutFlow key={`layout-${root.id}`} root={root} initialNodes={nodes} initialEdges={edges} dispatch={dispatch} />
 
 }
+
+export default Flow

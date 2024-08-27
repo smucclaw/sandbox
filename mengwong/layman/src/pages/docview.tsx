@@ -1,6 +1,6 @@
 import React, { useState, useReducer } from 'react';
 import { Vine, AnyAll, Any, All, Leaf, Fill, HideShow, any, all, ele, say, com } from '@/woon';
-import { Flow } from '@/pages/flow';
+import Flow from '@/pages/flow';
 import _ from 'lodash';
 import { abcde_as_text } from '@/woon';
 
@@ -10,7 +10,7 @@ export const DocView: React.FC<Props> = ({ doc }) => {
   const toggleExpandAll = () => {
     dispatch({type: root.viz !== HideShow.Collapsed ? 'COLLAPSE' : 'EXPAND'});
   };
-  const flowNodes = root.getFlowNodes({x:0, y:0})
+  const flowNodes = root.getFlowNodes({x:0, y:0}, undefined)
   const flowEdges = root.getFlowEdges()
   console.log(`DocView: root`, root)
   console.log(`DocView: flowNodes`, flowNodes)
@@ -35,7 +35,7 @@ export const DocView: React.FC<Props> = ({ doc }) => {
         <RenderOriginal key={`${doc.title}-showOriginal`} root={root} dispatch={dispatch} />
       </div>
 
-      <div style={{ width: '100%', height: '400px' }}>
+      <div style={{ width: '100%', height: '800px' }}>
         <Flow root={root} nodes={flowNodes} edges={flowEdges} dispatch={dispatch} />
       </div>
 

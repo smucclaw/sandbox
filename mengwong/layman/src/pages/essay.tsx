@@ -168,3 +168,6 @@ export const EssayContent1: React.FC = () => {
   </div>
   )
 }
+
+export default EssayContent1
+

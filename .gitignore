@@ -1,3 +1,10 @@
 *~
 .idea
 .DS_Store
+.stack-work
+burrito
+halogen-parent-child
+.next
+cache
+node_modules
+pdfdiff-halogen

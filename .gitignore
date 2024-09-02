@@ -8,3 +8,11 @@
 node_modules/
 lib/
 .stack-work/
+.stack-work
+burrito
+halogen-parent-child
+.next
+cache
+node_modules
+pdfdiff-halogen
+dist-newstyle

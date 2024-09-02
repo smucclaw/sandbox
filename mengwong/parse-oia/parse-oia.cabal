@@ -138,4 +138,8 @@ test-suite parse-oia-test
     -- Test dependencies.
     build-depends:
         base ^>=4.18.2.1,
-        parse-oia
+        parse-oia,
+        hspec,
+        text,
+        tagsoup,
+        raw-strings-qq

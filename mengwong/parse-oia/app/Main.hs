@@ -13,5 +13,5 @@ main = do
   case result of
     Left err -> putStrLn $ "Error: " ++ show err
     Right clauses -> do
-      putStrLn $ "Parsed clauses:\n"
+      putStrLn "Parsed clauses:\n"
       pPrint clauses

@@ -75,7 +75,6 @@ library
         split,
         prettyprinter,
         pretty-simple,
-        megaparsec,
         tagsoup,
         megaparsec,
         extra
@@ -105,7 +104,8 @@ executable parse-oia
         parse-oia,
         tagsoup,
         raw-strings-qq,
-        text
+        text,
+        pretty-simple
 
     -- Directories containing source files.
     hs-source-dirs:   app

@@ -6,7 +6,7 @@
 module MyLib (parseOPM) where
 
 import Text.HTML.TagSoup
-import Text.Megaparsec
+    ( Tag(TagClose, TagOpen), parseTags, (~/=), innerText, renderTags )
 
 import Data.Text (Text)
 import qualified Data.Text.Lazy as TL
@@ -14,7 +14,7 @@ import qualified Data.Text as T
 import Data.List.Split (split, whenElt, keepDelimsL, dropInitBlank, dropInnerBlanks)
 import Data.List.Extra (concatUnzip)
 import Data.Char (isSpace)
-import Data.Maybe (mapMaybe, catMaybes, fromMaybe)
+import Data.Maybe (mapMaybe, catMaybes, mapMaybe, fromMaybe)
 import Data.Void (Void)
 
 import Debug.Trace (trace, traceShow, traceM)
@@ -22,7 +22,6 @@ import Text.Pretty.Simple (pShow)
 import Debug.Pretty.Simple (pTraceShow)
 
 import Control.Monad (when, unless)
-
 
 -- | basically Prolog.
 -- 
@@ -93,9 +92,6 @@ fakeClause1 = var "fake1"   :- All [ l "foo" ["Fake_1"]
 fakeClause2 = p " fake2" [] :- Any [ l "foo" ["Fake_1"]
                                    , l "bar" ["fake_2"]]
 
--- need to define Tag Text as a custom input stream type, maybe consider this later or see if https://hackage.haskell.org/package/tagsoup-megaparsec is usable.
-type Parser = Parsec Void (Tag Text)
-
 -- | top-level OPM parser returns a Program
 parseOPM :: Text -> Either String Program
 parseOPM input = 
@@ -156,7 +152,7 @@ Case 4:
 - OPM-conclusion: clause head
 - - OPM-level1: clause head
 - - - OPM-level2: predicate 1
-- - OPM-level1: and
+- OPM-level1: and
 - - - OPM-level2: predicate 2
 - - - OPM-level2: predicate 3
 - - - OPM-level2: predicate 4 and
@@ -254,46 +250,76 @@ If the current level contains a clause, we return it in the clause part. This is
 level1 element is a clause head, and its level2 children are goals. We postprocess the children to assign All/Any as appropriate based on the last word
 of the level2 children.
 
+[TODO] adjust the number of leading asterisks to match the parseLevel n depth
 
 -}
 
 parseLevel :: Int -> [Tag Text] -> ([Clause], [Goal])
 parseLevel n tags = do
-    traceM ("\n****** parseLevel " ++ show n ++ ": " ++ show tags)
+    traceM ("\n****** parseLevel input: " ++ show n ++ ": tags: " ++ show tags)
     let startNoise = takeWhile (not . isLevel n) tags
         signal     = dropWhile (not . isLevel n) tags
-    unless (null startNoise) $
-        traceM ("\n****** parseLevel " ++ show n ++ ": [ERROR] unexpected startNoise: " ++ show startNoise)
+    -- unless (null startNoise) $
+    --    traceM ("\n****** parseLevel " ++ show n ++ ": [ERROR] ignoring startNoise: " ++ show startNoise)
     
     let currentLevelChunks :: [[Tag Text]]
-        currentLevelChunks = split (keepDelimsL . dropInitBlank . dropInnerBlanks $ whenElt (isLevel n)) signal
+        currentLevelChunks = split (keepDelimsL . dropInitBlank . dropInnerBlanks $ whenElt (isLevel n)) $
+                             trace ("\n****** parseLevel " ++ show n ++ ": signal: " ++ show signal) signal
+
+    traceM ("\n****** parseLevel chunks: " ++ show n ++ ":\n" ++ T.unpack( T.unlines [ "- " <> -- (myInnerText $ takeWhile (~/= TagClose p_) levelChunk)
+                                                                                      renderTags levelChunk
+                                                                                      | levelChunk <- currentLevelChunks]))
+
     concatUnzip $ map eachChunk currentLevelChunks
 
     where
       eachChunk :: [Tag Text] -> ([Clause], [Goal])
       eachChunk tts =
-        let _ = trace ("\n****** parseLevel " ++ show n ++ ": this should be our clause head:" ++ show (innerText $ takeWhile (~/= TagClose p_) tts)) ()
-            clauseHead = p (T.unpack $ (\t -> fromMaybe t (T.stripSuffix " if" t)) $ myInnerText $ takeWhile (~/= TagClose p_) tts) []
-            children = parseLevel (n+1) $ dropWhile (~/= TagClose p_) tts
-            endsInAnd = any (T.isSuffixOf " and" . leaf2text) . snd
-            endsInOr  = any (T.isSuffixOf " or"  . leaf2text) . snd
+        let clauseHead = p (T.unpack $ (\t -> fromMaybe t (T.stripSuffix " if" t)) $ myInnerText $ takeWhile (~/= TagClose p_) tts) []
+            children = parseLevel (n+1) $ dropWhile (not . isLevel (n+1)) tts
+            endsInAnd = any (T.isSuffixOf " and") . mapMaybe goal2text . snd
+            endsInOr  = any (T.isSuffixOf " or")  . mapMaybe goal2text . snd
             childrenJoined = 
-              if | endsInAnd children -> All $ map (stripSuffix " and") (snd children)
-                 | endsInOr children  -> Any $ map (stripSuffix " or" ) (snd children)
-                 | otherwise          -> trace ("\n****** parseLevel " ++ show n ++ ": [ERROR] unexpected children without guidance for and/or, defaulting to All: " ++ show children) $
-                                         All $ snd children
-        in if | P "all" [] <- clauseHead -> (fst children, [All (snd children)])
-              | P "any" [] <- clauseHead -> (fst children, [Any (snd children)])
-              | P "all" _  <- clauseHead -> error $ "parseLevel " ++ show n ++ ": unexpected all arguments: " ++ show clauseHead
-              | P "any" _  <- clauseHead -> error $ "parseLevel " ++ show n ++ ": unexpected any arguments: " ++ show clauseHead
-              | null children            -> ([], [Leaf clauseHead])
-              | otherwise                -> ([clauseHead :- childrenJoined], [Leaf clauseHead])
+              if | endsInAnd children -> Right . All $ map (stripSuffix " and") (snd children)
+                 | endsInOr children  -> Right . Any $ map (stripSuffix " or" ) (snd children)
+                 | otherwise          -> trace ("\n****** parseLevel " ++ show n ++
+                                                ": [WARNING] children lacks and/or guidance, will defer to an upper combinator:\n" ++
+                                                TL.unpack (pShow (snd children))) $
+                                         Left $ snd children
+        in trace ("\n****** parseLevel " ++ show n ++ ": children: " ++ show children) $
+           if | P "both"   [] <- clauseHead -> (fst children, [allify childrenJoined])
+              | P "all"    [] <- clauseHead -> (fst children, [allify childrenJoined])
+              | P "either" [] <- clauseHead -> (fst children, [anyify childrenJoined])
+              | P "any"    [] <- clauseHead -> (fst children, [anyify childrenJoined])
+              | P "both"   _  <- clauseHead -> error $ "parseLevel " ++ show n ++ ": unexpected both arguments: "   ++ show clauseHead
+              | P "all"    _  <- clauseHead -> error $ "parseLevel " ++ show n ++ ": unexpected all arguments: "    ++ show clauseHead
+              | P "either" _  <- clauseHead -> error $ "parseLevel " ++ show n ++ ": unexpected either arguments: " ++ show clauseHead
+              | P "any"    _  <- clauseHead -> error $ "parseLevel " ++ show n ++ ": unexpected any arguments: "    ++ show clauseHead
+              | null (fst children) &&
+                null (snd children)    -> ([], [Leaf clauseHead])
+              | otherwise                -> ( [clauseHead :- either (error $ "parseLevel: [ERROR] children without any obvious and/or any/all combination: " <> T.unpack (TL.toStrict (pShow childrenJoined))) id
+                                                                 childrenJoined]
+                                        , [Leaf clauseHead])
 
-      leaf2text :: Goal -> Text
-      leaf2text (Leaf (P atom _terms)) = T.pack atom
-      leaf2text (Leaf (Var (VariableName _n str))) = T.pack str
-      leaf2text (Leaf Wildcard) = T.empty
-      leaf2text x = error $ "leaf2text: not a leaf: " ++ show x
+      allify :: Either [Goal] Goal -> Goal
+      allify = \case
+        Right (Any xs) -> error $ "parseLevel " ++ show n ++ ": expected an Any child, got All: " ++ show xs
+        Right  x       -> x
+        Left goals     -> trace ("parseLevel " ++ show n ++ ": resolved to All") $ All goals
+
+      anyify :: Either [Goal] Goal -> Goal
+      anyify = \case
+        Right (All xs) -> error $ "parseLevel " ++ show n ++ ": expected an Any group, got All: " ++ show xs
+        Right  x       -> x
+        Left goals     -> trace ("parseLevel " ++ show n ++ ": resolved to Any") $ Any goals
+
+
+      goal2text :: Goal -> Maybe Text
+      goal2text (Leaf (P atom _terms))             = return $ T.strip $ T.pack atom
+      goal2text (Leaf (Var (VariableName _n str))) = return $ T.strip $ T.pack str
+      goal2text (Leaf Wildcard)                    = return T.empty
+      goal2text x = -- trace ("goal2text: not a leaf: " ++ show x)
+                    Nothing
 
       stripSuffix :: Text -> Goal -> Goal
       stripSuffix suffix = \case
@@ -316,10 +342,9 @@ parseLevel n tags = do
       atomOf _ = error "atomOf: not a predicate"
 
 myInnerText :: [Tag Text] -> Text
-myInnerText = T.replace "\r" " "
-            . T.replace "\n" " "
-            . T.replace "\r\n" " "
-            . T.strip . innerText
+myInnerText = replaceMultipleWhitespace . T.strip . innerText
+  where
+    replaceMultipleWhitespace = T.unwords . T.words
 
 isLevel :: Int -> Tag Text -> Bool
 isLevel n tt = case n of
@@ -328,16 +353,11 @@ isLevel n tt = case n of
    where
      go level
        | tt == TagOpen "p" [("class",level)] =
-         trace ("\nisLevel " ++ show n ++ ": true on " ++ show tt) True
+         -- trace ("\nisLevel " ++ show n ++ ": true on " ++ show tt)
+          True
        | otherwise =
-         trace ("\nisLevel " ++ show n ++ ": false on " ++ show tt) False
-
-isNonEmptyText :: Tag Text -> Bool
-isNonEmptyText (TagText t)
-  | not $ T.all (\c -> isSpace c || c == '\r' || c == '\n') t = True
-  | otherwise = trace ("\nisNonEmptyText: failing on TagText " ++ show t) False
-isNonEmptyText _ = False
-
+         -- trace ("\nisLevel " ++ show n ++ ": false on " ++ show tt)
+          False
 
 div_ :: Text
 div_ = "div"

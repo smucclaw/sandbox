@@ -130,6 +130,13 @@ main = hspec $ do
             expected = Right [P "" [Var (VariableName 0 "the input screen for business has to be displayed")] :- Leaf (P "isCurrentlyUnknown" [ Var (VariableName 0 "TheBusiness") ] ) ]
         parseOPM input `shouldBe` expected
 
+-- % Assuming LE is your list and p/1 is the predicate you want to test
+
+-- test_at_least_one(LE) :-
+--     member(E, LE),
+--     p(E),
+--     !.
+
     it "same level or" $ do
         let input = [r|
         <html><body><div class=WordSection1>

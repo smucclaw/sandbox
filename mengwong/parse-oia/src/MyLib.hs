@@ -111,12 +111,10 @@ parseOPM input =
         [] -> Left "tagsoup failed to parse tags"
         tags -> do
           (cs, gs) <-parseLevel 0 $ getRelevantTags tags
-          if  | null gs  -> Right cs
-              | length gs == 1 &&
-                or [ g == Leaf thead -- the returned goal is the head of a top-level clause
-                   | g <- gs
-                   , (thead :- _) <- cs ]   -> Right cs
-              | otherwise -> Left $ "parseOPM: [ERROR] parseLevel 0 returned unexpected top-level goals:\n" ++ show gs ++ "\n\npredicates: " ++ show cs
+          if null gs
+             || all (`elem` [ Leaf thead | (thead :- _) <- cs ]) gs -- every goal is a top-level clause head. this is quadratic.
+             then Right cs
+             else Left $ "parseOPM: [ERROR] parseLevel 0 returned unexpected top-level goals:\n" ++ show gs ++ "\n\npredicates: " ++ show cs
 
 -- | we know the input HTML format has a bunch of tags to ignore until we get to the first div class=WordSection1.
 getRelevantTags :: [Tag Text] -> [Tag Text]
@@ -322,14 +320,14 @@ parseLevel n tags = do
             childrenJoined = 
               if | endsInAnd children -> debugTraceChunk "endsInAnd" $ pure . All $ filter ((/= Just "and") . goal2text) $ map (stripSuffix " and") (snd children)
                  | endsInOr children  -> debugTraceChunk "endsInOr"  $ pure . Any $ filter ((/= Just "or")  . goal2text) $ map (stripSuffix " or" ) (snd children)
-                 | (_, [All gs])      <- children -> debugTraceChunk "children destructured to All" $ pure (All gs)
-                 | (_, [Any gs])      <- children -> debugTraceChunk "children destructured to Any" $ pure (Any gs)
+                 | (_, [g])           <- children -> debugTraceChunk "children groups destructured to a single group element" $ pure g
                  | otherwise          -> debugTraceChunk ("[WARNING] children lack and/or guidance, will defer to an upper combinator:\n" ++
                                                           TL.unpack (pShow (snd children)))
-                                         >> throwError $ snd children
+                                         >> throwError $ snd children -- this "error" will be caught by a parent, and we'll continue; this is nonfatal.
         toreturn <- do
           debugTraceChunkM ("children: " ++ show children)
           debugTraceChunkM ("clauseHead: " ++ show clauseHead)
+          let falooaio = "for at least one of all instances of"
           if  | P "both"   [] <- clauseHead -> debugTraceChunkM "P \"both\" []"   >>  ((\g -> pure (fst children, [g])) =<< allify clauseHeadPos childrenJoined)
               | P "all"    [] <- clauseHead -> debugTraceChunkM "P \"all\" []"    >>  ((\g -> pure (fst children, [g])) =<< allify clauseHeadPos childrenJoined)
               | P "either" [] <- clauseHead -> debugTraceChunkM "P \"either\" []" >>  ((\g -> pure (fst children, [g])) =<< anyify clauseHeadPos childrenJoined)
@@ -338,6 +336,11 @@ parseLevel n tags = do
               | P "all"    _  <- clauseHead -> throwError $ debugChunk $ "unexpected all arguments: "    ++ show clauseHead
               | P "either" _  <- clauseHead -> throwError $ debugChunk $ "unexpected either arguments: " ++ show clauseHead
               | P "any"    _  <- clauseHead -> throwError $ debugChunk $ "unexpected any arguments: "    ++ show clauseHead
+              | falooaio `T.isPrefixOf` atomOfT clauseHead -> do
+                  debugTraceChunkM ("P \"" <> T.unpack falooaio <> "\" []")
+                  let instancesOf = T.drop (T.length falooaio) (atomOfT clauseHead)
+                  cJ <- getGoal clauseHeadPos childrenJoined
+                  pure (fst children, [All [Leaf (P "member" [var "E", var (T.unpack instancesOf)]), cJ]] )
               | null (fst children) &&
                 null (snd children)    -> debugTraceChunkM ("[WARNING] empty children, returning clause head as goal: " ++ show clauseHead)
                                           >> pure ([], [Leaf clauseHead])
@@ -362,6 +365,10 @@ parseLevel n tags = do
         Left goals     -> -- debugTrace ("parseLevel " ++ show pos ++ ": resolved to Any") $
                           pure $ Any goals
 
+      getGoal :: (Int,Int) -> Either [Goal] Goal -> Either String Goal
+      getGoal pos = \case
+        Left goals -> throwError $ "parseLevel " ++ show pos ++ ": [ERROR] expected a single goal, got multiple goals: " ++ show goals
+        Right goal -> pure goal
 
       goal2text :: Goal -> Maybe Text
       goal2text (Leaf (P atom _terms))             = return $ T.strip $ T.pack atom
@@ -389,6 +396,9 @@ parseLevel n tags = do
       atomOf :: Term -> String
       atomOf (P atom _) = atom
       atomOf _ = error "atomOf: not a predicate"
+
+      atomOfT :: Term -> Text
+      atomOfT = T.pack . atomOf
 
 myInnerText :: [Tag Text] -> Text
 myInnerText = replaceMultipleWhitespace . T.strip . innerText

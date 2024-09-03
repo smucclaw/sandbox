@@ -1,0 +1,11 @@
+Parsed clauses:
+
+[ P "IsMemberOf(the business, the competitor, the potential business with a higher score)" [] :- Any
+    [ Leaf
+        ( P "the business user feedback score < the competitor user feedback score" [] )
+    , All
+        [ Leaf
+            ( P "the business user feedback score = the competitor user feedback score" [] )
+        ]
+    ]
+]

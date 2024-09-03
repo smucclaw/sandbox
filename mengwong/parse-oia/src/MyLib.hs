@@ -26,7 +26,7 @@ import Control.Monad (when, unless)
 import Control.Monad.Except
 
 do_debug :: Bool
-do_debug = False
+do_debug = True
 
 debugTrace :: String -> a -> a
 debugTrace msg x = if do_debug then trace msg x else x
@@ -311,9 +311,8 @@ parseLevel n tags = do
         children <- parseLevel (n+1) $ dropWhile (not . isLevel (n+1)) tts
         clauseHeadPos <- getTagPosition tts
         let clauseHead = p (T.unpack $ (\t -> fromMaybe t (T.stripSuffix " if" t)) $ myInnerText $ takeWhile (~/= TagClose p_) tts) []
-
-            endsInAnd = any (T.isSuffixOf " and") . mapMaybe goal2text . snd
-            endsInOr  = any (T.isSuffixOf " or")  . mapMaybe goal2text . snd
+            endsInAnd = any (mAny [ T.isSuffixOf " and", (== "and") ] ) . mapMaybe goal2text . snd
+            endsInOr  = any (mAny [ T.isSuffixOf " or",  (== "or")  ] ) . mapMaybe goal2text . snd
             debugChunk :: String -> String
             debugChunk msg = "\n" <> replicate (n+1) '*' <> " parseLevel " ++ show n ++ "/" ++ show chunkN ++ " " ++ show clauseHeadPos ++ ": " ++ msg
             debugTraceChunk = debugTrace . debugChunk
@@ -321,8 +320,8 @@ parseLevel n tags = do
             debugTraceChunkM = debugTraceM . debugChunk
             childrenJoined :: Either [Goal] Goal
             childrenJoined = 
-              if | endsInAnd children -> debugTraceChunk "endsInAnd" $ pure . All $ map (stripSuffix " and") (snd children)
-                 | endsInOr children  -> debugTraceChunk "endsInOr"  $ pure . Any $ map (stripSuffix " or" ) (snd children)
+              if | endsInAnd children -> debugTraceChunk "endsInAnd" $ pure . All $ filter ((/= Just "and") . goal2text) $ map (stripSuffix " and") (snd children)
+                 | endsInOr children  -> debugTraceChunk "endsInOr"  $ pure . Any $ filter ((/= Just "or")  . goal2text) $ map (stripSuffix " or" ) (snd children)
                  | (_, [All gs])      <- children -> debugTraceChunk "children destructured to All" $ pure (All gs)
                  | (_, [Any gs])      <- children -> debugTraceChunk "children destructured to Any" $ pure (Any gs)
                  | otherwise          -> debugTraceChunk ("[WARNING] children lack and/or guidance, will defer to an upper combinator:\n" ++
@@ -414,3 +413,9 @@ div_ = "div"
 p_  :: Text
 p_   = "p"
 
+
+mAny :: [a -> Bool] -> (a -> Bool)
+mAny fs x = any ($ x) fs
+
+mAll :: [a -> Bool] -> (a -> Bool)
+mAll fs x = all ($ x) fs

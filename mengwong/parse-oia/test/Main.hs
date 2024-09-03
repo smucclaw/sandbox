@@ -77,7 +77,7 @@ main = hspec $ do
       <p class=OPM-level1>the time is night</p>
       <p class=OPM-level1>it is not cloudy</p></div></body></html>
       |]
-      parseOPM input `shouldBe` Left "parseLevel 0/1: [ERROR] children without any obvious and/or any/all combination.\n[Leaf (P \"the time is night\" []),Leaf (P \"it is not cloudy\" [])]"
+      parseOPM input `shouldBe` Left "\n* parseLevel 0/1 (3,31): [ERROR] children without any obvious and/or any/all combination.\n[Leaf (P \"the time is night\" []),Leaf (P \"it is not cloudy\" [])]"
 
     xit "parses nested OPM clauses" $ do
       let input = [r|
@@ -118,3 +118,29 @@ main = hspec $ do
           expected = Left "skipped level"
       parseOPM input `shouldBe` expected
 
+    xit "flip any" $ do
+        let input = [r|
+        <html><body><div class=WordSection1>
+        <p class=OPM-conclusion>the input screen for business has to be displayed if</p>
+        <p class=OPM-level1>for at least one of all instances of the business</p>
+        <p class=OPM-level2>the business is currently unknown</p>
+        </div></body></html>
+        |]
+        -- expected = Right [P "" [the input screen for business has to be displayed] :- Leaf (P "anyOf" [Var (VariableName 0 "the business")]), Leaf (P "isCurrentlyUnknown" [ Var (VariableName 0 "the business") ] ) ]
+            expected = Right [P "" [Var (VariableName 0 "the input screen for business has to be displayed")] :- Leaf (P "isCurrentlyUnknown" [ Var (VariableName 0 "TheBusiness") ] ) ]
+        parseOPM input `shouldBe` expected
+
+    it "same level or" $ do
+        let input = [r|
+        <html><body><div class=WordSection1>
+        <p class=OPM-conclusion>A is true if</p>
+            <p class=OPM-level1>B is true</p>
+            <p class=OPM-level1>or</p>
+            <p class=OPM-level1>all</p>
+                <p class=OPM-level2>C is true</p>
+                <p class=OPM-level2>and</p>
+                <p class=OPM-level2>D is true</p>
+        </div></body></html>
+        |]
+            expected = Right [P "A is true" [] :- Any [Leaf (P "B is true" []),All [Leaf (P "C is true" []),Leaf (P "D is true" [])]]]
+        parseOPM input `shouldBe` expected

@@ -17,11 +17,13 @@ import Data.Char (isSpace)
 import Data.Maybe (mapMaybe, catMaybes, fromMaybe)
 import Data.Void (Void)
 
+
 import Debug.Trace (trace, traceShow, traceM)
 import Text.Pretty.Simple (pShow)
 import Debug.Pretty.Simple (pTraceShow)
 
 import Control.Monad (when, unless)
+import Control.Monad.Except
 
 do_debug :: Bool
 do_debug = True
@@ -106,7 +108,11 @@ parseOPM :: Text -> Either String Program
 parseOPM input = 
     case parseTags input of
         [] -> Left "tagsoup failed to parse tags"
-        tags -> Right $ fst $ parseLevel 0 $ getRelevantTags tags
+        tags -> do
+          (cs, gs) <-parseLevel 0 $ getRelevantTags tags
+          if not (null gs)
+            then Left "parseOPM: [ERROR] parseLevel 0 returned top-level goals"
+            else Right cs
 
 -- | we know the input HTML format has a bunch of tags to ignore until we get to the first div class=WordSection1.
 getRelevantTags :: [Tag Text] -> [Tag Text]
@@ -263,7 +269,7 @@ of the level2 children.
 
 -}
 
-parseLevel :: Int -> [Tag Text] -> ([Clause], [Goal])
+parseLevel :: Int -> [Tag Text] -> Either String ([Clause], [Goal])
 parseLevel n tags = do
     debugTraceM ("\n****** parseLevel input: " ++ show n ++ ": tags: " ++ show tags)
     let startNoise = takeWhile (not . isLevel n) tags
@@ -280,13 +286,13 @@ parseLevel n tags = do
                                                                                             renderTags levelChunk
                                                                                             | levelChunk <- currentLevelChunks]))
 
-    concatUnzip $ map eachChunk (zip [1..] currentLevelChunks)
+    concatUnzip <$> mapM eachChunk (zip [1..] currentLevelChunks)
 
     where
-      eachChunk :: (Int, [Tag Text]) -> ([Clause], [Goal])
-      eachChunk (chunkN, tts) =
+      eachChunk :: (Int, [Tag Text]) -> Either String ([Clause], [Goal])
+      eachChunk (chunkN, tts) = do
+        children <- parseLevel (n+1) $ dropWhile (not . isLevel (n+1)) tts
         let clauseHead = p (T.unpack $ (\t -> fromMaybe t (T.stripSuffix " if" t)) $ myInnerText $ takeWhile (~/= TagClose p_) tts) []
-            children = parseLevel (n+1) $ dropWhile (not . isLevel (n+1)) tts
             endsInAnd = any (T.isSuffixOf " and") . mapMaybe goal2text . snd
             endsInOr  = any (T.isSuffixOf " or")  . mapMaybe goal2text . snd
             childrenJoined = 
@@ -298,26 +304,28 @@ parseLevel n tags = do
                                                ": [WARNING] children lack and/or guidance, will defer to an upper combinator:\n" ++
                                                TL.unpack (pShow (snd children))) $
                                          Left $ snd children
-            toreturn = debugTrace ("\n****** parseLevel " ++ show n ++ "/" ++ show chunkN ++ ": children: " ++ show children) $
-                       debugTrace ("\n****** parseLevel " ++ show n ++ "/" ++ show chunkN ++ ": clauseHead: " ++ show clauseHead) $
-              if  | P "both"   [] <- clauseHead -> debugTrace ("parseLevel " ++ show n ++ "/" ++ show chunkN ++ ": P \"both\" []") $ (fst children, [allify childrenJoined])
-                  | P "all"    [] <- clauseHead -> debugTrace ("parseLevel " ++ show n ++ "/" ++ show chunkN ++ ": P \"all\" []") $ (fst children, [allify childrenJoined])
-                  | P "either" [] <- clauseHead -> debugTrace ("parseLevel " ++ show n ++ "/" ++ show chunkN ++ ": P \"either\" []") $ (fst children, [anyify childrenJoined])
-                  | P "any"    [] <- clauseHead -> debugTrace ("parseLevel " ++ show n ++ "/" ++ show chunkN ++ ": P \"any\" []") $ (fst children, [anyify childrenJoined])
-                  | P "both"   _  <- clauseHead -> error $ "parseLevel " ++ show n ++ "/" ++ show chunkN ++ ": unexpected both arguments: "   ++ show clauseHead
-                  | P "all"    _  <- clauseHead -> error $ "parseLevel " ++ show n ++ "/" ++ show chunkN ++ ": unexpected all arguments: "    ++ show clauseHead
-                  | P "either" _  <- clauseHead -> error $ "parseLevel " ++ show n ++ "/" ++ show chunkN ++ ": unexpected either arguments: " ++ show clauseHead
-                  | P "any"    _  <- clauseHead -> error $ "parseLevel " ++ show n ++ "/" ++ show chunkN ++ ": unexpected any arguments: "    ++ show clauseHead
-                  | null (fst children) &&
-                    null (snd children)    -> debugTrace ("parseLevel " ++ show n ++ "/" ++ show chunkN ++ ": [WARNING] empty children, returning clause head as goal: " ++ show clauseHead) $
-                                              ([], [Leaf clauseHead])
-                  | otherwise              -> debugTrace ("parseLevel " ++ show n ++ "/" ++ show chunkN ++ ": otherwise.\n") $
-                                              ( [clauseHead :- either (error $ "parseLevel " ++ show n ++ "/" ++ show chunkN ++ ": [ERROR] children without any obvious and/or any/all combination.\n" <>
-                                                                     "clausehead = "     <> T.unpack (TL.toStrict (pShow clauseHead)) <> "\n" <>
-                                                                     "childrenJoined = " <> T.unpack (TL.toStrict (pShow childrenJoined))) id
-                                                                    childrenJoined]
-                                              , [Leaf clauseHead])
-         in debugTrace ("\n****** parseLevel " ++ show n ++ "/" ++ show chunkN ++ ": output:\n#+BEGIN_SRC haskell\n" ++ TL.unpack (pShow toreturn) ++ "\n#+END_SRC") $ toreturn
+        toreturn <- do
+          debugTraceM ("\n****** parseLevel " ++ show n ++ "/" ++ show chunkN ++ ": children: " ++ show children)
+          debugTraceM ("\n****** parseLevel " ++ show n ++ "/" ++ show chunkN ++ ": clauseHead: " ++ show clauseHead)
+          if  | P "both"   [] <- clauseHead -> debugTraceM ("parseLevel " ++ show n ++ "/" ++ show chunkN ++ ": P \"both\" []")   >>  pure (fst children, [allify childrenJoined])
+              | P "all"    [] <- clauseHead -> debugTraceM ("parseLevel " ++ show n ++ "/" ++ show chunkN ++ ": P \"all\" []")    >>  pure (fst children, [allify childrenJoined])
+              | P "either" [] <- clauseHead -> debugTraceM ("parseLevel " ++ show n ++ "/" ++ show chunkN ++ ": P \"either\" []") >>  pure (fst children, [anyify childrenJoined])
+              | P "any"    [] <- clauseHead -> debugTraceM ("parseLevel " ++ show n ++ "/" ++ show chunkN ++ ": P \"any\" []")    >>  pure (fst children, [anyify childrenJoined])
+              | P "both"   _  <- clauseHead -> throwError $ "parseLevel " ++ show n ++ "/" ++ show chunkN ++ ": unexpected both arguments: "   ++ show clauseHead
+              | P "all"    _  <- clauseHead -> throwError $ "parseLevel " ++ show n ++ "/" ++ show chunkN ++ ": unexpected all arguments: "    ++ show clauseHead
+              | P "either" _  <- clauseHead -> throwError $ "parseLevel " ++ show n ++ "/" ++ show chunkN ++ ": unexpected either arguments: " ++ show clauseHead
+              | P "any"    _  <- clauseHead -> throwError $ "parseLevel " ++ show n ++ "/" ++ show chunkN ++ ": unexpected any arguments: "    ++ show clauseHead
+              | null (fst children) &&
+                null (snd children)    -> debugTraceM ("parseLevel " ++ show n ++ "/" ++ show chunkN ++ ": [WARNING] empty children, returning clause head as goal: " ++ show clauseHead)
+                                          >> pure ([], [Leaf clauseHead])
+              | otherwise              -> debugTraceM ("parseLevel " ++ show n ++ "/" ++ show chunkN ++ ": otherwise.\n") >> pure
+                                          ( [clauseHead :- either (throwError $ "parseLevel " ++ show n ++ "/" ++ show chunkN ++ ": [ERROR] children without any obvious and/or any/all combination.\n" <>
+                                                                  "clausehead = "     <> T.unpack (TL.toStrict (pShow clauseHead)) <> "\n" <>
+                                                                  "childrenJoined = " <> T.unpack (TL.toStrict (pShow childrenJoined))) id
+                                                                childrenJoined]
+                                          , [Leaf clauseHead])
+        debugTraceM ("\n****** parseLevel " ++ show n ++ "/" ++ show chunkN ++ ": output:\n#+BEGIN_SRC haskell\n" ++ TL.unpack (pShow toreturn) ++ "\n#+END_SRC")
+        return toreturn
 
       allify :: Either [Goal] Goal -> Goal
       allify = \case

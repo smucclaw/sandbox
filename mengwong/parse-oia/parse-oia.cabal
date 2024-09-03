@@ -77,7 +77,8 @@ library
         pretty-simple,
         tagsoup,
         megaparsec,
-        extra
+        extra,
+        mtl
 
     -- Directories containing source files.
     hs-source-dirs:   src

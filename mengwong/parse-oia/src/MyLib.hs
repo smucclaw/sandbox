@@ -3,7 +3,7 @@
 {-# LANGUAGE MultiWayIf #-}
 {-# LANGUAGE LambdaCase #-}
 
-module MyLib (parseOPM) where
+module MyLib where
 
 import Text.HTML.TagSoup
     ( Tag(TagClose, TagOpen), parseTags, (~/=), innerText, renderTags )
@@ -14,7 +14,7 @@ import qualified Data.Text as T
 import Data.List.Split (split, whenElt, keepDelimsL, dropInitBlank, dropInnerBlanks)
 import Data.List.Extra (concatUnzip)
 import Data.Char (isSpace)
-import Data.Maybe (mapMaybe, catMaybes, mapMaybe, fromMaybe)
+import Data.Maybe (mapMaybe, catMaybes, fromMaybe)
 import Data.Void (Void)
 
 
@@ -25,9 +25,19 @@ import Debug.Pretty.Simple (pTraceShow)
 import Control.Monad (when, unless)
 import Control.Monad.Except
 
+do_debug :: Bool
+do_debug = True
+
+debugTrace :: String -> a -> a
+debugTrace msg x = if do_debug then trace msg x else x
+
+debugTraceM :: Monad m => String -> m ()
+debugTraceM msg = when do_debug (traceM msg)
+
 -- | basically Prolog.
 -- 
 -- See also https://hackage.haskell.org/package/prolog-0.3.2/docs/Language-Prolog.html
+-- And https://documentation.custhelp.com/euf/assets/devdocs/cloud19b/PolicyAutomation/en/Default.htm#Guides/Policy_Modeling_User_Guide/Work_with_rules/Rule_types.htm
 -- 
 -- examples:
 -- 
@@ -262,19 +272,20 @@ of the level2 children.
 
 parseLevel :: Int -> [Tag Text] -> Either String ([Clause], [Goal])
 parseLevel n tags = do
-    traceM ("\n****** parseLevel input: " ++ show n ++ ": tags: " ++ show tags)
+    debugTraceM ("\n****** parseLevel input: " ++ show n ++ ": tags: " ++ show tags)
     let startNoise = takeWhile (not . isLevel n) tags
         signal     = dropWhile (not . isLevel n) tags
-    -- unless (null startNoise) $
-    --    traceM ("\n****** parseLevel " ++ show n ++ ": [ERROR] ignoring startNoise: " ++ show startNoise)
+    unless (null startNoise) $
+        debugTraceM ("\n****** parseLevel " ++ show n ++ ": [ERROR] ignoring startNoise: " ++ show startNoise)
     
     let currentLevelChunks :: [[Tag Text]]
         currentLevelChunks = split (keepDelimsL . dropInitBlank . dropInnerBlanks $ whenElt (isLevel n)) $
-                             trace ("\n****** parseLevel " ++ show n ++ ": signal: " ++ show signal) signal
+                             debugTrace ("\n****** parseLevel " ++ show n ++ ": signal: " ++ T.unpack (renderTags signal))
+                             signal
 
-    traceM ("\n****** parseLevel chunks: " ++ show n ++ ":\n" ++ T.unpack( T.unlines [ "- " <> -- (myInnerText $ takeWhile (~/= TagClose p_) levelChunk)
-                                                                                      renderTags levelChunk
-                                                                                      | levelChunk <- currentLevelChunks]))
+    debugTraceM ("\n****** parseLevel " ++ show n ++ " level chunks:\n" ++ T.unpack( T.unlines [ "- " <> -- (myInnerText $ takeWhile (~/= TagClose p_) levelChunk)
+                                                                                            renderTags levelChunk
+                                                                                            | levelChunk <- currentLevelChunks]))
 
     concatUnzip <$> mapM eachChunk (zip [1..] currentLevelChunks)
 
@@ -286,11 +297,13 @@ parseLevel n tags = do
             endsInAnd = any (T.isSuffixOf " and") . mapMaybe goal2text . snd
             endsInOr  = any (T.isSuffixOf " or")  . mapMaybe goal2text . snd
             childrenJoined = 
-              if | endsInAnd children -> Right . All $ map (stripSuffix " and") (snd children)
-                 | endsInOr children  -> Right . Any $ map (stripSuffix " or" ) (snd children)
-                 | otherwise          -> trace ("\n****** parseLevel " ++ show n ++
-                                                ": [WARNING] children lacks and/or guidance, will defer to an upper combinator:\n" ++
-                                                TL.unpack (pShow (snd children))) $
+              if | endsInAnd children -> debugTrace ("parseLevel " ++ show n ++ "/" ++ show chunkN ++ ": endsInAnd") $ pure . All $ map (stripSuffix " and") (snd children)
+                 | endsInOr children  -> debugTrace ("parseLevel " ++ show n ++ "/" ++ show chunkN ++ ": endsInOr")  $ pure . Any $ map (stripSuffix " or" ) (snd children)
+                 | (_, [All gs])      <- children -> debugTrace ("parseLevel " ++ show n ++ "/" ++ show chunkN ++ ": children destructured to All") $ pure (All gs)
+                 | (_, [Any gs])      <- children -> debugTrace ("parseLevel " ++ show n ++ "/" ++ show chunkN ++ ": children destructured to Any") $ pure (Any gs)
+                 | otherwise          -> debugTrace ("\n****** parseLevel " ++ show n ++ "/" ++ show chunkN ++
+                                                     ": [WARNING] children lack and/or guidance, will defer to an upper combinator:\n" ++
+                                                     TL.unpack (pShow (snd children))) >>
                                          Left $ snd children
         toreturn <- do
           debugTraceM ("\n****** parseLevel " ++ show n ++ "/" ++ show chunkN ++ ": children: " ++ show children)
@@ -317,22 +330,24 @@ parseLevel n tags = do
 
       allify :: Either [Goal] Goal -> Goal
       allify = \case
-        Right (Any xs) -> error $ "parseLevel " ++ show n ++ ": expected an Any child, got All: " ++ show xs
+        Right (Any xs) -> error $ "parseLevel " ++ show n ++ ": [ERROR] expected an Any child, got All: " ++ show xs
         Right  x       -> x
-        Left goals     -> trace ("parseLevel " ++ show n ++ ": resolved to All") $ All goals
+        Left goals     -> -- debugTrace ("parseLevel " ++ show n ++ ": resolved to All") $
+                          All goals
 
       anyify :: Either [Goal] Goal -> Goal
       anyify = \case
-        Right (All xs) -> error $ "parseLevel " ++ show n ++ ": expected an Any group, got All: " ++ show xs
+        Right (All xs) -> error $ "parseLevel " ++ show n ++ ": [ERROR] expected an Any group, got All: " ++ show xs
         Right  x       -> x
-        Left goals     -> trace ("parseLevel " ++ show n ++ ": resolved to Any") $ Any goals
+        Left goals     -> -- debugTrace ("parseLevel " ++ show n ++ ": resolved to Any") $
+                          Any goals
 
 
       goal2text :: Goal -> Maybe Text
       goal2text (Leaf (P atom _terms))             = return $ T.strip $ T.pack atom
       goal2text (Leaf (Var (VariableName _n str))) = return $ T.strip $ T.pack str
       goal2text (Leaf Wildcard)                    = return T.empty
-      goal2text x = -- trace ("goal2text: not a leaf: " ++ show x)
+      goal2text x = -- debugTrace ("goal2text: not a leaf: " ++ show x)
                     Nothing
 
       stripSuffix :: Text -> Goal -> Goal
@@ -367,10 +382,10 @@ isLevel n tt = case n of
    where
      go level
        | tt == TagOpen "p" [("class",level)] =
-         -- trace ("\nisLevel " ++ show n ++ ": true on " ++ show tt)
+         -- debugTrace ("\nisLevel " ++ show n ++ ": true on " ++ show tt)
           True
        | otherwise =
-         -- trace ("\nisLevel " ++ show n ++ ": false on " ++ show tt)
+         -- debugTrace ("\nisLevel " ++ show n ++ ": false on " ++ show tt)
           False
 
 div_ :: Text

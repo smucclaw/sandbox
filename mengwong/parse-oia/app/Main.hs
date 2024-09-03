@@ -11,7 +11,7 @@ main = do
   input <- TIO.getContents
   let result = MyLib.parseOPM input
   case result of
-    Left err -> putStrLn $ "Error: " ++ show err
+    Left err -> putStrLn $ "parseOPM error: " ++ err
     Right clauses -> do
       putStrLn $ "Parsed clauses:\n"
       pPrint clauses

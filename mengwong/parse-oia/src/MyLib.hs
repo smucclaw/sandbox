@@ -16,6 +16,7 @@ import Data.List.Extra (concatUnzip)
 import Data.Char (isSpace)
 import Data.Maybe (mapMaybe, catMaybes, fromMaybe)
 import Data.Void (Void)
+import Data.Either (fromRight)
 
 
 import Debug.Trace (trace, traceShow, traceM)
@@ -26,7 +27,7 @@ import Control.Monad (when, unless)
 import Control.Monad.Except
 
 do_debug :: Bool
-do_debug = True
+do_debug = False
 
 debugTrace :: String -> a -> a
 debugTrace msg x = if do_debug then trace msg x else x
@@ -111,9 +112,12 @@ parseOPM input =
         [] -> Left "tagsoup failed to parse tags"
         tags -> do
           (cs, gs) <-parseLevel 0 $ getRelevantTags tags
-          if not (null gs)
-            then Left "parseOPM: [ERROR] parseLevel 0 returned top-level goals"
-            else Right cs
+          if  | null gs  -> Right cs
+              | length gs == 1 &&
+                or [ g == Leaf thead -- the returned goal is the head of a top-level clause
+                   | g <- gs
+                   , (thead :- _) <- cs ]   -> Right cs
+              | otherwise -> Left $ "parseOPM: [ERROR] parseLevel 0 returned unexpected top-level goals:\n" ++ show gs ++ "\n\npredicates: " ++ show cs
 
 -- | we know the input HTML format has a bunch of tags to ignore until we get to the first div class=WordSection1.
 getRelevantTags :: [Tag Text] -> [Tag Text]
@@ -296,6 +300,7 @@ parseLevel n tags = do
         let clauseHead = p (T.unpack $ (\t -> fromMaybe t (T.stripSuffix " if" t)) $ myInnerText $ takeWhile (~/= TagClose p_) tts) []
             endsInAnd = any (T.isSuffixOf " and") . mapMaybe goal2text . snd
             endsInOr  = any (T.isSuffixOf " or")  . mapMaybe goal2text . snd
+            childrenJoined :: Either [Goal] Goal
             childrenJoined = 
               if | endsInAnd children -> debugTrace ("parseLevel " ++ show n ++ "/" ++ show chunkN ++ ": endsInAnd") $ pure . All $ map (stripSuffix " and") (snd children)
                  | endsInOr children  -> debugTrace ("parseLevel " ++ show n ++ "/" ++ show chunkN ++ ": endsInOr")  $ pure . Any $ map (stripSuffix " or" ) (snd children)
@@ -304,7 +309,7 @@ parseLevel n tags = do
                  | otherwise          -> debugTrace ("\n****** parseLevel " ++ show n ++ "/" ++ show chunkN ++
                                                      ": [WARNING] children lack and/or guidance, will defer to an upper combinator:\n" ++
                                                      TL.unpack (pShow (snd children))) >>
-                                         Left $ snd children
+                                         throwError $ snd children
         toreturn <- do
           debugTraceM ("\n****** parseLevel " ++ show n ++ "/" ++ show chunkN ++ ": children: " ++ show children)
           debugTraceM ("\n****** parseLevel " ++ show n ++ "/" ++ show chunkN ++ ": clauseHead: " ++ show clauseHead)
@@ -319,12 +324,10 @@ parseLevel n tags = do
               | null (fst children) &&
                 null (snd children)    -> debugTraceM ("parseLevel " ++ show n ++ "/" ++ show chunkN ++ ": [WARNING] empty children, returning clause head as goal: " ++ show clauseHead)
                                           >> pure ([], [Leaf clauseHead])
-              | otherwise              -> debugTraceM ("parseLevel " ++ show n ++ "/" ++ show chunkN ++ ": otherwise.\n") >> pure
-                                          ( [clauseHead :- either (throwError $ "parseLevel " ++ show n ++ "/" ++ show chunkN ++ ": [ERROR] children without any obvious and/or any/all combination.\n" <>
-                                                                  "clausehead = "     <> T.unpack (TL.toStrict (pShow clauseHead)) <> "\n" <>
-                                                                  "childrenJoined = " <> T.unpack (TL.toStrict (pShow childrenJoined))) id
-                                                                childrenJoined]
-                                          , [Leaf clauseHead])
+              | otherwise     -> case childrenJoined of
+                                   Left x  -> throwError $ "parseLevel " ++ show n ++ "/" ++ show chunkN ++ ": [ERROR] children without any obvious and/or any/all combination.\n" ++ show x
+                                   Right x -> pure ( [clauseHead :- x], [Leaf clauseHead])
+
         debugTraceM ("\n****** parseLevel " ++ show n ++ "/" ++ show chunkN ++ ": output:\n#+BEGIN_SRC haskell\n" ++ TL.unpack (pShow toreturn) ++ "\n#+END_SRC")
         return toreturn
 

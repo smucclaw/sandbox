@@ -67,7 +67,6 @@ export class Vine { // your basic tree, with AnyAll leaves, and Leaf/Fill termin
   isFullyExpanded() : boolean { return this.viz === HideShow.Expanded }
 }
 
-
 export class AnyAll extends Vine {
   constructor(
     public c : Vine[],
@@ -148,7 +147,6 @@ export class All extends AnyAll {
           width: 20,
           height: 20,
           borderRadius: "50%",
-          backgroundColor: "green"
         }
       },
       ...childFlowNodes
@@ -225,7 +223,7 @@ export class Any extends AnyAll {
       style: {
         width: Math.max(...childFlowNodes.map(node => (node.position.x + (node.style?.width as number) || 0))) + 40,
         height: Math.max(...childFlowNodes.map(node => node.position.y)) - relPos.y + 50,
-       }
+      }
       },
           ...childFlowNodes,
         ]

@@ -93,7 +93,7 @@ const LayoutFlow : React.FC<{root:Vine, initialNodes:Node[], initialEdges:Edge[]
         ({ nodes: layoutedNodes = [], edges: layoutedEdges = [] }) => {
           setNodes(layoutedNodes);
           setEdges(layoutedEdges);
-      
+
           window.requestAnimationFrame(() => fitView());
         },
       );
@@ -130,15 +130,13 @@ const LayoutFlow : React.FC<{root:Vine, initialNodes:Node[], initialEdges:Edge[]
   );
 }
 
-export const Flow: React.FC<Props & { highlightedClass: string | null }> = ({ root, nodes, edges, dispatch, highlightedClass }) => {
+export const Flow: React.FC<Props> = ({ root, nodes, edges, dispatch }) => {
   const [reactFlowNodes, setReactFlowNodes] = useNodesState(nodes)
+  console.log('nodes:', nodes, root);
 
   useEffect(() => {
-    setReactFlowNodes(nodes.map(node => ({
-      ...node,
-      className: node.className === highlightedClass ? 'highlight' : ''
-    })))
-  }, [highlightedClass, nodes])
+    setReactFlowNodes(nodes);
+  }, [nodes]);
 
   return (
     <ReactFlowProvider>

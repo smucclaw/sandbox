@@ -49,6 +49,7 @@ debugTraceM msg = when do_debug (traceM msg)
 --
 
 data Clause = Term :- Goal
+            | Fact Term
             deriving (Show, Eq)
 
 -- and/or tree BoolStruct, slight modification from Language.Prolog
@@ -58,9 +59,12 @@ data Goal = Leaf Term
           | Any [Goal]
           deriving (Show, Eq)
 
+lhs :: Clause -> Term
 lhs (t :- _) = t
+lhs (Fact t) = t
 rhs :: Clause -> Goal
 rhs (_:- g) = g
+rhs (Fact _) = l "ALWAYS" []
 
 type Program = [Clause]
 
@@ -111,10 +115,16 @@ parseOPM input =
         [] -> Left "tagsoup failed to parse tags"
         tags -> do
           (cs, gs) <-parseLevel 0 $ getRelevantTags tags
-          if null gs
-             || all (`elem` [ Leaf thead | (thead :- _) <- cs ]) gs -- every goal is a top-level clause head. this is quadratic.
-             then Right cs
-             else Left $ "parseOPM: [ERROR] parseLevel 0 returned unexpected top-level goals:\n" ++ show gs ++ "\n\npredicates: " ++ show cs
+          -- sometimes we get back goals that are not defined as clause heads with associated bodies.
+          -- we treat these as facts, and give them special handling.
+          let facts = filter (not . (`elem` [ Leaf thead | (thead :- _) <- cs ])) gs
+          return $ cs ++ (topLevelFact <$> facts)
+  where
+    topLevelFact :: Goal -> Clause
+    topLevelFact g = case g of
+      Leaf leaf -> Fact leaf
+      _ -> error "topLevelFact: not a leaf"
+
 
 -- | we know the input HTML format has a bunch of tags to ignore until we get to the first div class=WordSection1.
 getRelevantTags :: [Tag Text] -> [Tag Text]
@@ -307,15 +317,9 @@ parseLevel n tags = do
       eachChunk :: (Int, [Tag Text]) -> Either String ([Clause], [Goal])
       eachChunk (chunkN, tts) = do
         children <- parseLevel (n+1) $ dropWhile (not . isLevel (n+1)) tts
-        clauseHeadPos <- getTagPosition tts
         let clauseHead = p (T.unpack $ (\t -> fromMaybe t (T.stripSuffix " if" t)) $ myInnerText $ takeWhile (~/= TagClose p_) tts) []
             endsInAnd = any (mAny [ T.isSuffixOf " and", (== "and") ] ) . mapMaybe goal2text . snd
             endsInOr  = any (mAny [ T.isSuffixOf " or",  (== "or")  ] ) . mapMaybe goal2text . snd
-            debugChunk :: String -> String
-            debugChunk msg = "\n" <> replicate (n+1) '*' <> " parseLevel " ++ show n ++ "/" ++ show chunkN ++ " " ++ show clauseHeadPos ++ ": " ++ msg
-            debugTraceChunk = debugTrace . debugChunk
-            debugTraceChunkM :: String -> Either String ()
-            debugTraceChunkM = debugTraceM . debugChunk
             childrenJoined :: Either [Goal] Goal
             childrenJoined = 
               if | endsInAnd children -> debugTraceChunk "endsInAnd" $ pure . All $ filter ((/= Just "and") . goal2text) $ map (stripSuffix " and") (snd children)
@@ -328,19 +332,14 @@ parseLevel n tags = do
           debugTraceChunkM ("children: " ++ show children)
           debugTraceChunkM ("clauseHead: " ++ show clauseHead)
           let falooaio = "for at least one of all instances of"
-          if  | P "both"   [] <- clauseHead -> debugTraceChunkM "P \"both\" []"   >>  ((\g -> pure (fst children, [g])) =<< allify clauseHeadPos childrenJoined)
-              | P "all"    [] <- clauseHead -> debugTraceChunkM "P \"all\" []"    >>  ((\g -> pure (fst children, [g])) =<< allify clauseHeadPos childrenJoined)
-              | P "either" [] <- clauseHead -> debugTraceChunkM "P \"either\" []" >>  ((\g -> pure (fst children, [g])) =<< anyify clauseHeadPos childrenJoined)
-              | P "any"    [] <- clauseHead -> debugTraceChunkM "P \"any\" []"    >>  ((\g -> pure (fst children, [g])) =<< anyify clauseHeadPos childrenJoined)
-              | P "both"   _  <- clauseHead -> throwError $ debugChunk $ "unexpected both arguments: "   ++ show clauseHead
-              | P "all"    _  <- clauseHead -> throwError $ debugChunk $ "unexpected all arguments: "    ++ show clauseHead
-              | P "either" _  <- clauseHead -> throwError $ debugChunk $ "unexpected either arguments: " ++ show clauseHead
-              | P "any"    _  <- clauseHead -> throwError $ debugChunk $ "unexpected any arguments: "    ++ show clauseHead
+              myAtom = atomOfT clauseHead; myAtomStr = T.unpack myAtom
+          if  | myAtom `elem` ["both", "all"]   -> debugTraceChunkM ("P "<>myAtomStr<>" []") >>  ((\g -> pure (fst children, [g])) =<< allify clauseHeadPos childrenJoined)
+              | myAtom `elem` ["either", "any"] -> debugTraceChunkM ("P "<>myAtomStr<>" []") >>  ((\g -> pure (fst children, [g])) =<< anyify clauseHeadPos childrenJoined)
               | falooaio `T.isPrefixOf` atomOfT clauseHead -> do
                   debugTraceChunkM ("P \"" <> T.unpack falooaio <> "\" []")
-                  let instancesOf = T.drop (T.length falooaio) (atomOfT clauseHead)
+                  let instancesOf = T.drop (T.length falooaio + 1) (atomOfT clauseHead)
                   cJ <- getGoal clauseHeadPos childrenJoined
-                  pure (fst children, [All [Leaf (P "member" [var "E", var (T.unpack instancesOf)]), cJ]] )
+                  pure (fst children, [All [Leaf (P "member" [var (T.unpack instancesOf), var ("all instances of " <> T.unpack instancesOf)]), cJ]] )
               | null (fst children) &&
                 null (snd children)    -> debugTraceChunkM ("[WARNING] empty children, returning clause head as goal: " ++ show clauseHead)
                                           >> pure ([], [Leaf clauseHead])
@@ -350,6 +349,15 @@ parseLevel n tags = do
 
         debugTraceChunkM ("output:\n#+BEGIN_SRC haskell\n" ++ TL.unpack (pShow toreturn) ++ "\n#+END_SRC")
         return toreturn
+
+        where
+            debugChunk :: String -> String
+            debugChunk msg = "\n" <> replicate (n+1) '*' <> " parseLevel " ++ show n ++ "/" ++ show chunkN ++ " " ++ show clauseHeadPos ++ ": " ++ msg
+            debugTraceChunk = debugTrace . debugChunk
+            debugTraceChunkM :: String -> Either String ()
+            debugTraceChunkM = debugTraceM . debugChunk
+            clauseHeadPos = fromRight (0,0) $ getTagPosition tts
+
 
       allify :: (Int, Int) -> Either [Goal] Goal -> Either String Goal
       allify pos = \case

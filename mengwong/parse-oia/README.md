@@ -31,6 +31,11 @@ OIA / OPM: https://documentation.custhelp.com/euf/assets/devdocs/cloud19b/Policy
 
 Our AST is a modified version of that found in https://hackage.haskell.org/package/prolog
 
+# TODO
 
+break this out into its own repo
 
+upgrade from propositional (`"foo is bar" :- ...`) to predicate logic style (`isBar(foo) :- ...`)
+
+integrate fully with Language.Prolog to actually support consult/1
 

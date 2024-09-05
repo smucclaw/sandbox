@@ -2,6 +2,7 @@
 
 Parses the Oracle Intelligent Assistant / Oracle Policy Modelling rules into Horn clauses, with a little bit of semantic desugaring of Prolog-style functionality, e.g. `member/2`
 
+
 ## Usage
 
 ``` bash
@@ -10,7 +11,14 @@ cabal run < ~/src/smucclaw/royalflush/oia-rules/Business\ Status.html > business
 cabal run < ~/src/smucclaw/royalflush/oia-rules/System\ Rules.html > system-rules.hs
 ```
 
-## Context
+## Upstream
+
+The HTML we work with is an OIA business rule Word document saved as
+"Filtered HTML". Critically, we rely on the class names
+`OPM-conclusion`, `OPM-level[123...]` to intuit the structure of the
+Horn clauses.
+
+## Downstream
 
 This is meant to then transpile toward
 [Lam4](https://github.com/smucclaw/lam4) and then

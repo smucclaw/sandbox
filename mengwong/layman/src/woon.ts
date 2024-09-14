@@ -471,7 +471,7 @@ export const mustSing =
   );
 
 export function all (...l:Vine[]) : All { return new All(l) } // conjunction
-export function any (...l:Vine[]) : All { return new Any(l) } // disjunction
+export function any (...l:Vine[]) : Any { return new Any(l) } // disjunction
 export function com (...l:Vine[]) : All { return new All(l) } // compound
 export function not (l:Vine)      : Not { return new Not(l) }  // negation
 export function ele (l:string)    : Leaf { return new Leaf(l) }  // element

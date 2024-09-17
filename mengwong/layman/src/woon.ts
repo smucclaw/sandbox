@@ -683,4 +683,23 @@ export const bna1981_1_1_text =
 `
 
 export const bna1981_1_1 = eval(bna1981_1_1_text)
-    
+
+const with_a_bit_less_unnecessary_ink_on_the_screen =
+`
+
+
+  * a person is a British citizen if
+  & the person is
+    | born in the United Kingdom after commencement
+    | born in a qualifying territory on or after the appointed day
+  & the person’s
+    | father
+    | mother
+    - is
+    | a British citizen
+    | settled in the United Kingdom
+    | settled in the qualifying territory in which the person is born
+
+
+
+`

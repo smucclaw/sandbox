@@ -60,13 +60,15 @@ export const DocView: React.FC<Props> = ({ doc }) => {
         </div>
       )}
 
+    { (doc.source != undefined) && (
       <div>
         <h2>Source</h2>
+        <p>In a hopefully not too distant future this will be editable so you can change the L4 and the diagram will update.</p>
         <pre className="vineEditor">
           {textareaValue}
         </pre>
-        <p>In a hopefully not too distant future this will be editable so you can change the L4 and the diagram will update.</p>
       </div>
+    )}
     </div>
   );
 };

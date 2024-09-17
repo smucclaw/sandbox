@@ -691,14 +691,14 @@ const with_a_bit_less_unnecessary_ink_on_the_screen =
   * a person is a British citizen if
   & the person is
     | born in the United Kingdom after commencement
-    | born in a qualifying territory on or after the appointed day
+    | born in a qualifying territory on or after the appointed day (colonies)
   & the person’s
     | father
     | mother
     - is
     | a British citizen
     | settled in the United Kingdom
-    | settled in the qualifying territory in which the person is born
+    | (colonies) => settled in the qualifying territory in which the person is born
 
 
 

@@ -44,6 +44,7 @@ export class Vine { // your basic tree, with AnyAll leaves, and Leaf/Fill termin
   constructor(
     public viz  ?: HideShow,
     public   id ?: number,
+    public className?: string
   ) {
     this.id = id ?? idMax++;
   }
@@ -70,14 +71,16 @@ export class Vine { // your basic tree, with AnyAll leaves, and Leaf/Fill termin
   isFullyExpanded() : boolean { return this.viz === HideShow.Expanded }
 }
 
-
 export class AnyAll extends Vine {
   constructor(
     public c : Vine[],
     viz ?: HideShow,
-    id  ?: number) {
+    id  ?: number,
+  ) {
     super(viz, id);
-    for (const child of c) { child.recordParent(this) }
+    for (const child of c) {
+      child.recordParent(this)
+    }
   }
   expand(exOpts : ExpansionOpts) : Vine[][] {
     // console.log(`* ${this.id} expand() starting`, this);
@@ -324,7 +327,7 @@ export class Fill extends Vine {
   constructor(
     public fill     : string,
     viz  ?: HideShow,
-    id      ?: number
+    id      ?: number,
   ) { super(viz,id) }
   getFlowNodes(relPos:XYPosition, parentId ?: string) : Node[] {
     console.log(`** Fill ${this.id} getFlowNodes ${JSON.stringify(relPos)}`, this);

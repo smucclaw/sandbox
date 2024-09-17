@@ -1,4 +1,4 @@
-import React, { useCallback, useLayoutEffect } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect } from 'react';
 import { ReactFlowProvider, useReactFlow } from 'reactflow';
 import ReactFlow, {
   MiniMap,
@@ -91,6 +91,13 @@ const nodeTypes = {
 
 
 export const Flow: React.FC<Props> = ({ root, nodes, edges, dispatch }) => {
+  const [reactFlowNodes, setReactFlowNodes] = useNodesState(nodes)
+  console.log('nodes:', nodes, root);
+
+  useEffect(() => {
+    setReactFlowNodes(nodes);
+  }, [nodes]);
+
   return (
   <ReactFlowProvider>
   <ReactFlow key={`rf-${root.id}`} nodes={nodes} edges={edges} nodeTypes={nodeTypes}>

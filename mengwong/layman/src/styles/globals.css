@@ -151,3 +151,7 @@ em {
   height: auto;
   resize: both;
 }
+
+.highlight {
+  background-color: greenyellow;
+}

@@ -658,25 +658,25 @@ export const bna1981_1_1_text =
 `  com(
     all(
       com(
-	say('the person is'),
-	any(ele('born in the United Kingdom after commencement'),
-	    say('or'),
-	    ele('born in a qualifying territory on or after the appointed day'))
+        say('the person is'),
+        any(ele('born in the United Kingdom after commencement'),
+            say('or'),
+            ele('born in a qualifying territory on or after the appointed day'))
       ),
       say('and'),
       com(
-	say('the person’s'),
-	any(
-	  ele('father'),
-	  say('or'),
-	  ele('mother')
-	),
-	say('is'),
-	any(ele('a British citizen'),
-	    say('or'),
-	    ele('settled in the United Kingdom'),
-	    say('or'),
-	    ele('settled in the qualifying territory in which the person is born'))
+        say('the person’s'),
+        any(
+          ele('father'),
+          say('or'),
+          ele('mother')
+        ),
+        say('is'),
+        any(ele('a British citizen'),
+            say('or'),
+            ele('settled in the United Kingdom'),
+            say('or'),
+            ele('settled in the qualifying territory in which the person is born'))
       )
     )
   )

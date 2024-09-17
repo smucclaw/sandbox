@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Vine, Any, All, Leaf, Fill, HideShow,
-        narnia, mustSing, cheating, laymanS, abcde, marijuana } from '@/woon';
+         narnia, mustSing, cheating, laymanS, abcde, marijuana,
+	 bna1981_1_1,
+       } from '@/woon';
 import { DocView, Document } from '@/pages/docview';
 import { EssayContent1 } from '@/pages/essay';
 
@@ -11,7 +13,8 @@ const App: React.FC = () => {
     { id: "cheating",  title: '415 Cheating',                       content: cheating },
     { id: "laymanSS",  title: 'Layman Allen\'s example says S1 if', content: laymanS },
     { id: "abcde",     title: 'ABCDE example',                      content: abcde },
-    { id: "marijuana",  title: 'section 420',                       content: marijuana },
+    { id: "marijuana",   title: 'section 420',                      content: marijuana },
+    { id: "bna1981_1_1", title: 'British Nationality Act S1',       content: bna1981_1_1 },
     ]);
   const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
 

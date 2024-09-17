@@ -623,7 +623,6 @@ export const abcde = eval(abcde_as_text)
 // and do some interesting logic based on that using Espresso
 
 
-
 if (require.main === module) {
   const expanded = narnia.expand(defaultExpansionOpts);
   // console.log("* narnia")
@@ -644,3 +643,49 @@ if (require.main === module) {
           
 // console.log(c2s.expand())
 
+// A person is a British citizen if –
+//   (a) the person is born –
+//       (i)  in the United Kingdom after commencement, or
+//       (ii) in a qualifying territory on or after the appointed day; and
+//   (b) when the person is born, the person’s father or mother is–
+//       (i)   a British citizen;
+//       (ii)  settled in the United Kingdom; or
+//       (iii) settled in the qualifying territoryin which the person is born.
+
+// this motivates an expansion rule along the lines of
+//   com(say(A), any(B, C))
+//   -->
+//   any(ele(A ++ B),
+//       ele(A ++ C))
+
+
+export const bna1981_1_1 =
+  com(
+    all(
+      com(
+	say('the person is'),
+	any(ele('born in the United Kingdom after commencement'),
+	    say('or'),
+	    ele('born in a qualifying territory on or after the appointed day'))
+      ),
+      say('and'),
+      com(
+	say('when the person is born,'),
+	com(com(say('the person’s'),
+		any(
+		  ele('father'),
+		  say('or'),
+		  ele('mother')
+		),
+		say('is')),
+	    any(ele('a British citizen'),
+		say('or'),
+		ele('settled in the United Kingdom'),
+		say('or'),
+		ele('settled in the qualifying territory in which the person is born'))
+	   )
+      )
+    )
+  )
+      
+    

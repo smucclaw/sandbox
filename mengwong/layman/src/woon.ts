@@ -308,9 +308,9 @@ export class Leaf extends Vine {
       position: relPos,
       sourcePosition: Position.Right, targetPosition: Position.Left,
       style: {
-        width: 100,
-        height: 40,
-        backgroundColor: this.value == undefined ? "white" : this.value ? "green" : "red"
+      width: 150,
+      height: Math.max(40, this.text.length * 1.6), // Ensure a minimum height of 40
+      backgroundColor: this.value == undefined ? "white" : this.value ? "green" : "red"
       }
     }
     if (parentId !== undefined) { node.parentId = parentId }
@@ -459,14 +459,9 @@ export const mustSing =
     ele("walks"),
     say("and"),
     any( 
-      say("maybe"),
       ele("drinks"),
       say("or"),
-      com( // all
-        ele("eats"),
-        say("if they are hungry?"),
-        say("maybe just greedy?")
-      )
+      ele("eats"),
     )
   );
 

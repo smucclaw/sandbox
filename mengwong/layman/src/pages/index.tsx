@@ -14,7 +14,7 @@ const App: React.FC = () => {
     { id: "laymanSS",  title: 'Layman Allen\'s example says S1 if', content: laymanS },
     { id: "abcde",     title: 'ABCDE example',                      content: abcde, source: abcde_text },
     { id: "marijuana",   title: 'section 420',                      content: marijuana },
-    { id: "bna1981_1_1", title: 'British Nationality Act S1',       content: bna1981_1_1, source:bna1981_1_1_text },
+    { id: "bna1981_1_1", title: 'BNA S1: a person is a British citizen if ...',       content: bna1981_1_1, source:bna1981_1_1_text },
     ]);
   const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
 

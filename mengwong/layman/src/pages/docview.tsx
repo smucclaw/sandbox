@@ -35,7 +35,7 @@ export const DocView: React.FC<Props> = ({ doc }) => {
         <RenderOriginal key={`${doc.title}-showOriginal`} root={root} dispatch={dispatch} />
       </div>
 
-      <div style={{ width: '100%', height: '800px' }}>
+      <div style={{ width: '100%', height: '600px' }}>
         <Flow root={root} nodes={flowNodes} edges={flowEdges} dispatch={dispatch} />
       </div>
 
@@ -62,7 +62,11 @@ export const DocView: React.FC<Props> = ({ doc }) => {
       )}
 
       <div>
-        <textarea className="vineEditor" value={textareaValue} onChange={handleTextareaChange} onBlur={handleTextareaBlur} />
+        <h2>Source</h2>
+        <textarea className="vineEditor"
+                  value={textareaValue}
+                  onChange={handleTextareaChange}
+                  onBlur={handleTextareaBlur} />
       </div>
     </div>
   );

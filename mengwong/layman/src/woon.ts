@@ -659,8 +659,8 @@ if (require.main === module) {
 //       ele(A ++ C))
 
 
-export const bna1981_1_1 =
-  com(
+export const bna1981_1_1_as_text =
+`  com(
     all(
       com(
 	say('the person is'),
@@ -670,22 +670,22 @@ export const bna1981_1_1 =
       ),
       say('and'),
       com(
-	say('when the person is born,'),
-	com(com(say('the person’s'),
-		any(
-		  ele('father'),
-		  say('or'),
-		  ele('mother')
-		),
-		say('is')),
-	    any(ele('a British citizen'),
-		say('or'),
-		ele('settled in the United Kingdom'),
-		say('or'),
-		ele('settled in the qualifying territory in which the person is born'))
-	   )
+	say('the person’s'),
+	any(
+	  ele('father'),
+	  say('or'),
+	  ele('mother')
+	),
+	say('is'),
+	any(ele('a British citizen'),
+	    say('or'),
+	    ele('settled in the United Kingdom'),
+	    say('or'),
+	    ele('settled in the qualifying territory in which the person is born'))
       )
     )
   )
-      
+`
+
+export const bna1981_1_1 = eval(bna1981_1_1_as_text)
     

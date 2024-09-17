@@ -66,10 +66,12 @@ const App: React.FC = () => {
                 {document.title}
               </button>
               <br />
+    {/* 
               <button onClick={() => deleteDocument(document)}>(del)</button>
               <button onClick={() => renameDocument(document, 'New Title')}>
                 (Rename)
               </button>
+     */}
             </li>
           ))}
         </ul>

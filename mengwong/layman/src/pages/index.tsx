@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Vine, Any, All, Leaf, Fill, HideShow,
-         narnia, mustSing, cheating, laymanS, abcde, marijuana,
-	 bna1981_1_1,
+         narnia, mustSing, cheating, laymanS, abcde, abcde_text, marijuana,
+	 bna1981_1_1, bna1981_1_1_text,
        } from '@/woon';
 import { DocView, Document } from '@/pages/docview';
 import { EssayContent1 } from '@/pages/essay';
@@ -12,9 +12,9 @@ const App: React.FC = () => {
     { id: "narnia",    title: 'In Narnia, a crime is committed if', content: narnia },
     { id: "cheating",  title: '415 Cheating',                       content: cheating },
     { id: "laymanSS",  title: 'Layman Allen\'s example says S1 if', content: laymanS },
-    { id: "abcde",     title: 'ABCDE example',                      content: abcde },
+    { id: "abcde",     title: 'ABCDE example',                      content: abcde, source: abcde_text },
     { id: "marijuana",   title: 'section 420',                      content: marijuana },
-    { id: "bna1981_1_1", title: 'British Nationality Act S1',       content: bna1981_1_1 },
+    { id: "bna1981_1_1", title: 'British Nationality Act S1',       content: bna1981_1_1, source:bna1981_1_1_text },
     ]);
   const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
 
@@ -22,7 +22,8 @@ const App: React.FC = () => {
     const newDocument: Document = {
       id: Math.random().toString(),
       title: 'In Narnia, a crime is committed if',
-      content: narnia
+      content: narnia,
+      // TODO tweak this so users can type into the textarea for a new document
     };
     setDocuments([...documents, newDocument]);
     setSelectedDocument(newDocument);

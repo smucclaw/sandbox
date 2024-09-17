@@ -2,7 +2,6 @@ import React, { useState, useReducer } from 'react';
 import { Vine, AnyAll, Any, All, Leaf, Fill, HideShow, any, all, ele, say, com } from '@/woon';
 import Flow from '@/pages/flow';
 import _ from 'lodash';
-import { abcde_as_text } from '@/woon';
 
 export const DocView: React.FC<Props> = ({ doc }) => {
   const init = (initialContent:Vine) => initialContent.clone(); // Initialize with a deep copy to avoid mutations
@@ -17,7 +16,7 @@ export const DocView: React.FC<Props> = ({ doc }) => {
   console.log(`DocView: flowEdges`, flowEdges)
   // console.log(`DocView: root`, root)
   // <textarea className="vineEditor" value={JSON.stringify(root, null, 2)} readOnly />
-  const [textareaValue, setTextareaValue] = useState(abcde_as_text);
+  const [textareaValue, setTextareaValue] = useState(doc.source == undefined ? "TBD" : doc.source);
 
   const handleTextareaChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setTextareaValue(event.target.value);
@@ -63,10 +62,10 @@ export const DocView: React.FC<Props> = ({ doc }) => {
 
       <div>
         <h2>Source</h2>
-        <textarea className="vineEditor"
-                  value={textareaValue}
-                  onChange={handleTextareaChange}
-                  onBlur={handleTextareaBlur} />
+        <pre className="vineEditor">
+          {textareaValue}
+        </pre>
+        <p>In a hopefully not too distant future this will be editable so you can change the L4 and the diagram will update.</p>
       </div>
     </div>
   );
@@ -95,6 +94,7 @@ export interface Document {
   id: string;
   title: string;
   content: Vine;
+  source ?: string;
 }
 
 export const RenderVine: React.FC<JustRoot> = ({ root }) => {
@@ -184,7 +184,9 @@ function reducer(root: Vine, action: MyAction): Vine {
       return newRoot;
     case 'NewVine':
       if (action.content != undefined) {
-        return eval(action.content) as Vine
+	// return eval(action.content) as Vine
+	// TODO eval doesn't work argh, returns "ReferenceError: com is not defined"
+	return newRoot
       } else {
         return newRoot
       }

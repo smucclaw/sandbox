@@ -610,14 +610,14 @@ export const laymanS =
        )
   )
 
-export const abcde_as_text =
+export const abcde_text =
 `
  any(all(ele('a'),ele('b')),
       all(ele('c'),ele('d'),ele('e'))
   )
 `
 
-export const abcde = eval(abcde_as_text)
+export const abcde = eval(abcde_text)
 
 // to do: add functionality to allow ele('e') to expand, by substitution, to not(ele('c'))
 // and do some interesting logic based on that using Espresso
@@ -659,7 +659,7 @@ if (require.main === module) {
 //       ele(A ++ C))
 
 
-export const bna1981_1_1_as_text =
+export const bna1981_1_1_text =
 `  com(
     all(
       com(
@@ -687,5 +687,5 @@ export const bna1981_1_1_as_text =
   )
 `
 
-export const bna1981_1_1 = eval(bna1981_1_1_as_text)
+export const bna1981_1_1 = eval(bna1981_1_1_text)
     

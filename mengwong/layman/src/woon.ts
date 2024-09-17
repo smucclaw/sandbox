@@ -44,7 +44,7 @@ export class Vine { // your basic tree, with AnyAll leaves, and Leaf/Fill termin
   constructor(
     public viz  ?: HideShow,
     public   id ?: number,
-    public className?: string
+    public className?: string,
   ) {
     this.id = id ?? idMax++;
   }
@@ -303,11 +303,13 @@ export class Leaf extends Vine {
     id   ?: number,
   ) { super(viz,id) }
   getFlowNodes(relPos:XYPosition, parentId ?: string) : Node[] {
-    console.log(`** Leaf ${this.id} getFlowNodes ${JSON.stringify(relPos)}`, this);
+    console.log(`** Leaf ${this.id} getFlowNodes ${JSON.stringify(relPos)}`, this)
     const node : Node = {
       id: `${this.id}`,
       type: 'default',
-      data: { label: this.text },
+      data: {
+        label: this.text,
+      },
       position: relPos,
       sourcePosition: Position.Right, targetPosition: Position.Left,
       style: {
@@ -316,9 +318,11 @@ export class Leaf extends Vine {
         backgroundColor: this.value == undefined ? "white" : this.value ? "green" : "red"
       }
     }
+    
     if (parentId !== undefined) { node.parentId = parentId }
     return [ node ]
   }
+
   clone() { return new Leaf(this.text, this.value, this.dflt, this.viz, this.id) }
 }
 

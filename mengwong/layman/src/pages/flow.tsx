@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useLayoutEffect } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react';
 import { ReactFlowProvider, useReactFlow } from 'reactflow';
 import ReactFlow, {
   MiniMap,
@@ -20,9 +20,9 @@ type Props = {
   root : Vine,
   nodes : Node[],
   edges : Edge[],
-  dispatch: React.Dispatch<MyAction>;
+  dispatch: React.Dispatch<MyAction>,
+  onNodeClick: (nodeId: string) => void,
 }
-
 
 // some infrastructure for a connector node with no visible body or handles
 const ConnectorLeft: React.FC = () => {
@@ -90,17 +90,39 @@ const nodeTypes = {
 };
 
 
-export const Flow: React.FC<Props> = ({ root, nodes, edges, dispatch }) => {
+export const Flow: React.FC<Props> = ({ root, nodes, edges, dispatch, onNodeClick }) => {
   const [reactFlowNodes, setReactFlowNodes] = useNodesState(nodes)
-  console.log('nodes:', nodes, root);
+  const [highlightedNodeId, setHighlightedNodeId] = useState<string | null>(null)
+
+  console.log('nodes:', nodes, root)
 
   useEffect(() => {
-    setReactFlowNodes(nodes);
-  }, [nodes]);
+    setReactFlowNodes(nodes)
+  }, [nodes])
+
+  console.log("ReactFlow nodes state:", reactFlowNodes);
+
+  const handleNodeClick = useCallback((event: React.MouseEvent, node: Node) => {
+    setReactFlowNodes(prevNodes => {
+      const newHighlightedNodeId = highlightedNodeId === node.id ? null : node.id
+      
+      const updatedNodes = prevNodes.map(n => ({
+        ...n,
+        className: n.id === newHighlightedNodeId ? 'highlight' : ''
+      }))
+      
+      return updatedNodes
+    })
+
+    setHighlightedNodeId(prevId => (prevId === node.id ? null : node.id))
+    
+    onNodeClick(node.id);
+  }, [highlightedNodeId, onNodeClick, setReactFlowNodes])
+  
 
   return (
   <ReactFlowProvider>
-  <ReactFlow key={`rf-${root.id}`} nodes={nodes} edges={edges} nodeTypes={nodeTypes}>
+  <ReactFlow key={`rf-${root.id}`} nodes={reactFlowNodes} edges={edges} nodeTypes={nodeTypes}onNodeClick={handleNodeClick}>
     <Controls />
   </ReactFlow>
   </ReactFlowProvider>

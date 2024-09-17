@@ -153,5 +153,5 @@ em {
 }
 
 .highlight {
-  background-color: greenyellow;
+  background-color: greenyellow !important;
 }

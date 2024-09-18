@@ -105,26 +105,41 @@ export const Flow: React.FC<Props> = ({ root, nodes, edges, dispatch, onNodeClic
     onNodesChange(reactFlowNodes)
   }, [reactFlowNodes, onNodesChange])
 
-  console.log("ReactFlow nodes state:", reactFlowNodes);
 
+  const [highlightedNodeIds, setHighlightedNodeIds] = useState<string[]>([])
   const handleNodeClick = useCallback((event: React.MouseEvent, node: Node) => {
     setReactFlowNodes(prevNodes => {
-      const newHighlightedNodeId = highlightedNodeId === node.id ? null : node.id
-      
+      const highlightedNodesSet = new Set<string>(highlightedNodeIds)
+  
+      if (highlightedNodesSet.has(node.id)) {
+        highlightedNodesSet.delete(node.id)
+      } else {
+        highlightedNodesSet.add(node.id)
+      }
+  
+      const newHighlightedNodeIds = Array.from(highlightedNodesSet)
+  
       const updatedNodes = prevNodes.map(n => ({
         ...n,
-        className: n.id === newHighlightedNodeId ? 'highlight' : ''
+        className: newHighlightedNodeIds.includes(n.id) ? 'highlight' : ''
       }))
-      setReactFlowNodes(updatedNodes);
+  
       return updatedNodes
     })
-
-    setHighlightedNodeId(prevId => (prevId === node.id ? null : node.id))
-    
-    onNodeClick(node.id);
-  }, [highlightedNodeId, onNodeClick, setReactFlowNodes, reactFlowNodes])
   
-
+    setHighlightedNodeIds(prev => {
+      const updatedSet = new Set(prev)
+      if (updatedSet.has(node.id)) {
+        updatedSet.delete(node.id)
+      } else {
+        updatedSet.add(node.id)
+      }
+      return Array.from(updatedSet)
+    })
+  
+    onNodeClick(node.id)
+  }, [highlightedNodeIds, onNodeClick, setReactFlowNodes])
+  
   return (
   <ReactFlowProvider>
   <ReactFlow key={`rf-${root.id}`} nodes={reactFlowNodes} edges={edges} nodeTypes={nodeTypes}onNodeClick={handleNodeClick}>

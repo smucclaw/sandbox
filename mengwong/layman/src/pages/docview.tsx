@@ -19,16 +19,10 @@ export const DocView: React.FC<Props> = ({ doc }) => {
     setHighlightedNodeId(prevId => prevId === nodeId ? null : nodeId)
   }, [])
   
-  const handleNodesChange = useCallback((updatedNodes: Node[]) => {
-    console.log('Updated nodes:', updatedNodes);
-    setFlowNodes(updatedNodes);
-  }, []);  
-
+  const handleNodesChange = useCallback((updatedNodes: Node[]) => {setFlowNodes(updatedNodes)}, [])
   const highlightFlowNodes = useCallback((nodeIds: number[]) => {
-    console.log("flowNodes", flowNodes)
+    console.log("flowNodes before highlighting", flowNodes)
     const updatedNodes = flowNodes.map(node => {
-      console.log("all the nodes", node)
-  
       if (node.type === `invisiHandles`) {
         const isHighlighted = nodeIds.includes(parseInt(node.id))
         return {
@@ -36,17 +30,15 @@ export const DocView: React.FC<Props> = ({ doc }) => {
           className: isHighlighted ? 'highlight' : node.className
         }
       }
-  
       return node
     })
   
     setFlowNodes(updatedNodes)
-
+  
     const updatedEdges = flowEdges.map(edge => {
       const isHighlighted = nodeIds.some(id => 
         edge.source.includes(`${id}`) || edge.target.includes(`${id}`)
       )
-      console.log(`Edge ${edge.id} (source: ${edge.source}, target: ${edge.target}) ${isHighlighted ? 'will be highlighted' : 'will not be highlighted'}`)
       return {
         ...edge,
         style: {
@@ -56,7 +48,7 @@ export const DocView: React.FC<Props> = ({ doc }) => {
       }
     })
     setFlowEdges(updatedEdges)
-  }, [flowNodes])
+  }, [flowNodes, flowEdges])
 
   const resetHighlight = useCallback(() => {
     setFlowNodes(prevNodes =>
@@ -64,16 +56,16 @@ export const DocView: React.FC<Props> = ({ doc }) => {
         if (node.type === `default`) {
           return {
             ...node,
-            className: node.className?.includes('highlight') ? 'highlight' : node.className
+            className: node.className?.includes('highlight') ? 'highlight' : ''
           }
         }
-  
         return {
           ...node,
           className: ''
         }
       })
     )
+  
     setFlowEdges(prevEdges => 
       prevEdges.map(edge => ({
         ...edge,
@@ -84,6 +76,7 @@ export const DocView: React.FC<Props> = ({ doc }) => {
       }))
     )
   }, [])
+  
  
   console.log(`DocView: root`, root)
   console.log(`DocView: flowNodes`, flowNodes)
@@ -211,7 +204,6 @@ const RenderNode: React.FC<{ node: Vine, dispatch: MyDispatch, highlightedNodeId
   const RenderExpanded: React.FC<{expanded: Vine[][], dispatch: MyDispatch,  highlightFlowNodes: (nodeIds: number[]) => void,  resetHighlight: () => void,
     highlightedNodeId: string | number | null}> = ({ expanded, dispatch, highlightFlowNodes, resetHighlight, highlightedNodeId }) => {
 
-
     return (
       <div>
         <ol>
@@ -224,7 +216,7 @@ const RenderNode: React.FC<{ node: Vine, dispatch: MyDispatch, highlightedNodeId
             const containsHighlightedNode = item.some(node => {
               return node.id == highlightedNodeId
             })
-           
+
             return (
               <li key={itemIndex}
               onMouseEnter={() => highlightFlowNodes(nodeIds)}

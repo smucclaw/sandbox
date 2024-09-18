@@ -313,9 +313,9 @@ export class Leaf extends Vine {
       position: relPos,
       sourcePosition: Position.Right, targetPosition: Position.Left,
       style: {
-        width: 100,
-        height: 40,
-        backgroundColor: this.value == undefined ? "white" : this.value ? "green" : "red"
+      width: 150,
+      height: Math.max(40, this.text.length * 1.6), // Ensure a minimum height of 40
+      backgroundColor: this.value == undefined ? "white" : this.value ? "green" : "red"
       }
     }
     
@@ -466,19 +466,14 @@ export const mustSing =
     ele("walks"),
     say("and"),
     any( 
-      say("maybe"),
       ele("drinks"),
       say("or"),
-      com( // all
-        ele("eats"),
-        say("if they are hungry?"),
-        say("maybe just greedy?")
-      )
+      ele("eats"),
     )
   );
 
 export function all (...l:Vine[]) : All { return new All(l) } // conjunction
-export function any (...l:Vine[]) : All { return new Any(l) } // disjunction
+export function any (...l:Vine[]) : Any { return new Any(l) } // disjunction
 export function com (...l:Vine[]) : All { return new All(l) } // compound
 export function not (l:Vine)      : Not { return new Not(l) }  // negation
 export function ele (l:string)    : Leaf { return new Leaf(l) }  // element
@@ -617,18 +612,17 @@ export const laymanS =
        )
   )
 
-export const abcde_as_text =
+export const abcde_text =
 `
  any(all(ele('a'),ele('b')),
       all(ele('c'),ele('d'),ele('e'))
   )
 `
 
-export const abcde = eval(abcde_as_text)
+export const abcde = eval(abcde_text)
 
 // to do: add functionality to allow ele('e') to expand, by substitution, to not(ele('c'))
 // and do some interesting logic based on that using Espresso
-
 
 
 if (require.main === module) {
@@ -651,3 +645,66 @@ if (require.main === module) {
           
 // console.log(c2s.expand())
 
+// A person is a British citizen if –
+//   (a) the person is born –
+//       (i)  in the United Kingdom after commencement, or
+//       (ii) in a qualifying territory on or after the appointed day; and
+//   (b) when the person is born, the person’s father or mother is–
+//       (i)   a British citizen;
+//       (ii)  settled in the United Kingdom; or
+//       (iii) settled in the qualifying territoryin which the person is born.
+
+// this motivates an expansion rule along the lines of
+//   com(say(A), any(B, C))
+//   -->
+//   any(ele(A ++ B),
+//       ele(A ++ C))
+
+
+export const bna1981_1_1_text =
+`  com(
+    all(
+      com(
+        say('the person is'),
+        any(ele('born in the United Kingdom after commencement'),
+            say('or'),
+            ele('born in a qualifying territory on or after the appointed day'))
+      ),
+      say('and'),
+      com(
+        say('the person’s'),
+        any(
+          ele('father'),
+          say('or'),
+          ele('mother')
+        ),
+        say('is'),
+        any(ele('a British citizen'),
+            say('or'),
+            ele('settled in the United Kingdom'),
+            say('or'),
+            ele('settled in the qualifying territory in which the person is born'))
+      )
+    )
+  )
+`
+
+export const bna1981_1_1 = eval(bna1981_1_1_text)
+
+const with_a_bit_less_unnecessary_ink_on_the_screen =
+`
+
+
+  * a person is a British citizen if
+    & the person is
+      XOR born in the United Kingdom after commencement
+      XOR born in a qualifying territory on or after the appointed day (colonies)
+    & the person’s
+      OR  father
+      OR  mother
+      - is
+      OR  a British citizen
+      OR  settled in the United Kingdom
+      OR  (colonies) => settled in the qualifying territory in which the person is born
+
+`

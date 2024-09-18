@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Vine, Any, All, Leaf, Fill, HideShow,
-        narnia, mustSing, cheating, laymanS, abcde, marijuana } from '@/woon';
+         narnia, mustSing, cheating, laymanS, abcde, abcde_text, marijuana,
+	 bna1981_1_1, bna1981_1_1_text,
+       } from '@/woon';
 import { DocView, Document } from '@/pages/docview';
 import { EssayContent1 } from '@/pages/essay';
 
@@ -10,8 +12,9 @@ const App: React.FC = () => {
     { id: "narnia",    title: 'In Narnia, a crime is committed if', content: narnia },
     { id: "cheating",  title: '415 Cheating',                       content: cheating },
     { id: "laymanSS",  title: 'Layman Allen\'s example says S1 if', content: laymanS },
-    { id: "abcde",     title: 'ABCDE example',                      content: abcde },
-    { id: "marijuana",  title: 'section 420',                       content: marijuana },
+    { id: "abcde",     title: 'ABCDE example',                      content: abcde, source: abcde_text },
+    { id: "marijuana",   title: 'section 420',                      content: marijuana },
+    { id: "bna1981_1_1", title: 'BNA S1: a person is a British citizen if ...',       content: bna1981_1_1, source:bna1981_1_1_text },
     ]);
   const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
 
@@ -19,7 +22,8 @@ const App: React.FC = () => {
     const newDocument: Document = {
       id: Math.random().toString(),
       title: 'In Narnia, a crime is committed if',
-      content: narnia
+      content: narnia,
+      // TODO tweak this so users can type into the textarea for a new document
     };
     setDocuments([...documents, newDocument]);
     setSelectedDocument(newDocument);
@@ -63,10 +67,12 @@ const App: React.FC = () => {
                 {document.title}
               </button>
               <br />
+    {/* 
               <button onClick={() => deleteDocument(document)}>(del)</button>
               <button onClick={() => renameDocument(document, 'New Title')}>
                 (Rename)
               </button>
+     */}
             </li>
           ))}
         </ul>

@@ -2,6 +2,7 @@ import React, { useState, useReducer, useCallback } from 'react';
 import { Vine, AnyAll, Any, All, Leaf, Fill, HideShow, any, all, ele, say, com } from '@/woon';
 import Flow from '@/pages/flow';
 import _ from 'lodash';
+import {Node} from 'reactflow';
 
 export const DocView: React.FC<Props> = ({ doc }) => {
   const init = (initialContent:Vine) => initialContent.clone(); // Initialize with a deep copy to avoid mutations
@@ -11,29 +12,79 @@ export const DocView: React.FC<Props> = ({ doc }) => {
   };
   
   const [flowNodes, setFlowNodes] = useState(root.getFlowNodes({x:0, y:0}))
-  const flowEdges = root.getFlowEdges()
+  const [flowEdges, setFlowEdges] = useState(root.getFlowEdges())
 
   const [highlightedNodeId, setHighlightedNodeId] = useState<string | null>(null)
   const handleNodeClick = useCallback((nodeId: string) => {
     setHighlightedNodeId(prevId => prevId === nodeId ? null : nodeId)
   }, [])
+  
+  const handleNodesChange = useCallback((updatedNodes: Node[]) => {
+    console.log('Updated nodes:', updatedNodes);
+    setFlowNodes(updatedNodes);
+  }, []);  
 
-  // update colour of mouseovered nodes
-  const highlightFlowNodes = (item: any) => {
-    const ids = item.map((obj: { id: any; })  => obj.id)
+  const highlightFlowNodes = useCallback((nodeIds: number[]) => {
+    console.log("flowNodes", flowNodes)
+    const updatedNodes = flowNodes.map(node => {
+      console.log("all the nodes", node)
+  
+      if (node.type === `invisiHandles`) {
+        const isHighlighted = nodeIds.includes(parseInt(node.id))
+        return {
+          ...node,
+          className: isHighlighted ? 'highlight' : node.className
+        }
+      }
+  
+      return node
+    })
+  
+    setFlowNodes(updatedNodes)
 
-    const allNodes = document.querySelectorAll('.react-flow__node')
-
-    allNodes.forEach(node => {
-      const nodeId = node.getAttribute('data-id')
-
-      if (nodeId !== null && ids.includes(parseInt(nodeId))) {
-        console.log("allNodes", nodeId, node)
-        if (node instanceof HTMLElement){node.style.backgroundColor=`greenyellow`}
+    const updatedEdges = flowEdges.map(edge => {
+      const isHighlighted = nodeIds.some(id => 
+        edge.source.includes(`${id}`) || edge.target.includes(`${id}`)
+      )
+      console.log(`Edge ${edge.id} (source: ${edge.source}, target: ${edge.target}) ${isHighlighted ? 'will be highlighted' : 'will not be highlighted'}`)
+      return {
+        ...edge,
+        style: {
+          ...edge.style,
+          stroke: isHighlighted ? 'lime' : 'black',
+        }
       }
     })
-  }
+    setFlowEdges(updatedEdges)
+  }, [flowNodes])
 
+  const resetHighlight = useCallback(() => {
+    setFlowNodes(prevNodes =>
+      prevNodes.map(node => {
+        if (node.type === `default`) {
+          return {
+            ...node,
+            className: node.className?.includes('highlight') ? 'highlight' : node.className
+          }
+        }
+  
+        return {
+          ...node,
+          className: ''
+        }
+      })
+    )
+    setFlowEdges(prevEdges => 
+      prevEdges.map(edge => ({
+        ...edge,
+        style: {
+          ...edge.style,
+          stroke: 'black'
+        }
+      }))
+    )
+  }, [])
+ 
   console.log(`DocView: root`, root)
   console.log(`DocView: flowNodes`, flowNodes)
   console.log(`DocView: flowEdges`, flowEdges)
@@ -54,15 +105,15 @@ export const DocView: React.FC<Props> = ({ doc }) => {
       <h1>{doc.title}</h1>
 
       <div className="original">
-        <RenderOriginal key={`${doc.title}-showOriginal`} root={root} dispatch={dispatch} highlightFlowNodes={highlightFlowNodes} highlightedNodeId={highlightedNodeId}
+        <RenderOriginal key={`${doc.title}-showOriginal`} root={root} dispatch={dispatch} highlightFlowNodes={highlightFlowNodes} resetHighlight={resetHighlight} highlightedNodeId={highlightedNodeId}
  />
       </div>
 
       <div style={{ width: '100%', height: '800px' }}>
-        <Flow root={root} nodes={flowNodes} edges={flowEdges} dispatch={dispatch} onNodeClick={handleNodeClick} />
+        <Flow root={root} nodes={flowNodes} edges={flowEdges} dispatch={dispatch} onNodeClick={handleNodeClick} onNodesChange={handleNodesChange} />
       </div>
 
-      <RenderVine root={root} dispatch={dispatch} highlightFlowNodes={highlightFlowNodes} highlightedNodeId={highlightedNodeId} />
+      <RenderVine root={root} dispatch={dispatch} highlightFlowNodes={highlightFlowNodes} resetHighlight={resetHighlight} highlightedNodeId={highlightedNodeId} />
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h2>Combinations</h2>
@@ -71,7 +122,7 @@ export const DocView: React.FC<Props> = ({ doc }) => {
         </button>
       </div>
       <RenderSentences key={`${doc.title}-topLevel`} root={root} dispatch={dispatch}
-      highlightFlowNodes={highlightFlowNodes} highlightedNodeId={highlightedNodeId} />
+      highlightFlowNodes={highlightFlowNodes} resetHighlight={resetHighlight}  highlightedNodeId={highlightedNodeId} />
       {root.viz === HideShow.Expanded && (
         <div>
           <p className="pRight">
@@ -106,7 +157,8 @@ interface Props {
 interface JustRoot {
   root: Vine;
   dispatch: MyDispatch;
-  highlightFlowNodes: (item: {}) => void;
+  highlightFlowNodes: (nodeIds: number[]) => void;
+  resetHighlight: () => void,
   highlightedNodeId: string | number | null;
 }
 
@@ -156,34 +208,27 @@ const RenderNode: React.FC<{ node: Vine, dispatch: MyDispatch, highlightedNodeId
   }
 };
 
-  const RenderExpanded: React.FC<{expanded: Vine[][], dispatch: MyDispatch, highlightFlowNodes: (item: {}) => void, highlightedNodeId: string | number | null}> = ({ expanded, dispatch, highlightFlowNodes, highlightedNodeId }) => {
+  const RenderExpanded: React.FC<{expanded: Vine[][], dispatch: MyDispatch,  highlightFlowNodes: (nodeIds: number[]) => void,  resetHighlight: () => void,
+    highlightedNodeId: string | number | null}> = ({ expanded, dispatch, highlightFlowNodes, resetHighlight, highlightedNodeId }) => {
 
-    const handleMouseEnter = (item: any) => {
-      highlightFlowNodes(item)
-    }
-
-    const handleMouseLeave = () => {
-      document.querySelectorAll('.react-flow__node').forEach(node => {
-        if (node instanceof HTMLElement) {
-          node.style.backgroundColor = 'transparent'
-        }
-      })
-    }
 
     return (
       <div>
         <ol>
           {expanded.map((item: Vine[], itemIndex: number) => {
+            const nodeIds = item
+            .map(node => node.id)
+            .filter((id): id is number => id !== undefined)
+            console.log("this Vine", item, nodeIds)
+
             const containsHighlightedNode = item.some(node => {
               return node.id == highlightedNodeId
             })
-            console.log("clickedNode", highlightedNodeId, containsHighlightedNode)
-
+           
             return (
-            <li key={itemIndex}
-              onMouseEnter={() => handleMouseEnter(item)}
-              onMouseLeave={() => handleMouseLeave()}
-            >
+              <li key={itemIndex}
+              onMouseEnter={() => highlightFlowNodes(nodeIds)}
+              onMouseLeave={resetHighlight}>
               {}
               <ul className={`inline-list ${containsHighlightedNode ? 'highlight' : ''}`}>
                 {item.map((node: Vine, index: number) => (
@@ -197,16 +242,16 @@ const RenderNode: React.FC<{ node: Vine, dispatch: MyDispatch, highlightedNodeId
     )
   }
 
-export const RenderOriginal: React.FC<JustRoot> = ({ root, dispatch , highlightFlowNodes, highlightedNodeId}) => {
+export const RenderOriginal: React.FC<JustRoot> = ({ root, dispatch , highlightFlowNodes, resetHighlight, highlightedNodeId}) => {
   const excludeFill = {...excludeFill0, ...{hideShowOverride: HideShow.Collapsed}}
   const expanded = root.expand(excludeFill)
-  return <RenderExpanded expanded={expanded} dispatch={dispatch} highlightFlowNodes={highlightFlowNodes} highlightedNodeId={highlightedNodeId} />
+  return <RenderExpanded expanded={expanded} dispatch={dispatch} highlightFlowNodes={highlightFlowNodes}  resetHighlight={resetHighlight} highlightedNodeId={highlightedNodeId} />
 
 }
 
-export const RenderSentences: React.FC<JustRoot> = ({ root, dispatch, highlightFlowNodes, highlightedNodeId }) => {
+export const RenderSentences: React.FC<JustRoot> = ({ root, dispatch, highlightFlowNodes, resetHighlight, highlightedNodeId }) => {
   const expanded = root.expand(excludeFill0)
-  return <RenderExpanded expanded={expanded} dispatch={dispatch} highlightFlowNodes={highlightFlowNodes} highlightedNodeId={highlightedNodeId} />
+  return <RenderExpanded expanded={expanded} dispatch={dispatch} highlightFlowNodes={highlightFlowNodes} resetHighlight={resetHighlight} highlightedNodeId={highlightedNodeId} />
 }
 
 function reducer(root: Vine, action: MyAction): Vine {

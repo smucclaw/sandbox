@@ -22,6 +22,7 @@ type Props = {
   edges : Edge[],
   dispatch: React.Dispatch<MyAction>,
   onNodeClick: (nodeId: string) => void,
+  onNodesChange: (nodes: Node[]) => void
 }
 
 // some infrastructure for a connector node with no visible body or handles
@@ -90,7 +91,7 @@ const nodeTypes = {
 };
 
 
-export const Flow: React.FC<Props> = ({ root, nodes, edges, dispatch, onNodeClick }) => {
+export const Flow: React.FC<Props> = ({ root, nodes, edges, dispatch, onNodeClick, onNodesChange }) => {
   const [reactFlowNodes, setReactFlowNodes] = useNodesState(nodes)
   const [highlightedNodeId, setHighlightedNodeId] = useState<string | null>(null)
 
@@ -98,7 +99,11 @@ export const Flow: React.FC<Props> = ({ root, nodes, edges, dispatch, onNodeClic
 
   useEffect(() => {
     setReactFlowNodes(nodes)
-  }, [nodes])
+  }, [nodes, setReactFlowNodes])
+
+  useEffect(() => {
+    onNodesChange(reactFlowNodes)
+  }, [reactFlowNodes, onNodesChange])
 
   console.log("ReactFlow nodes state:", reactFlowNodes);
 
@@ -110,14 +115,14 @@ export const Flow: React.FC<Props> = ({ root, nodes, edges, dispatch, onNodeClic
         ...n,
         className: n.id === newHighlightedNodeId ? 'highlight' : ''
       }))
-      
+      setReactFlowNodes(updatedNodes);
       return updatedNodes
     })
 
     setHighlightedNodeId(prevId => (prevId === node.id ? null : node.id))
     
     onNodeClick(node.id);
-  }, [highlightedNodeId, onNodeClick, setReactFlowNodes])
+  }, [highlightedNodeId, onNodeClick, setReactFlowNodes, reactFlowNodes])
   
 
   return (

@@ -153,5 +153,6 @@ em {
 }
 
 .highlight {
-  background-color: greenyellow !important;
+  background-color: lime !important;
+  stroke: green !important;
 }

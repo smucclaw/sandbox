@@ -167,9 +167,7 @@ Parsed clauses:
 , Fact
     ( P "the investor’s allocated portion in Utilities = the investor’s total allocation in Utilities / the investor’s total assets under management" [] )
 , Fact
-    ( P "the business’s suitability score = Round(DefaultWithUnknown(the value for money of the business, 1) * the business’s founder bonus factor * the business’s client bonus factor, 8)" [] )
-, Fact
-    ( P "the business’s valuation percentage = the business’s suitability score * 100" [] )
+    ( P "the business’s suitability score = Round(the value for money of the business * the business’s founder bonus factor * the business’s client bonus factor, 8)" [] )
 , Fact
     ( P "the value for money of the business = the estimated valuation of the business / the implied valuation of the business" [] )
 , Fact

@@ -14,7 +14,7 @@ import ReactFlow, {
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { MyAction } from '@/pages/docview';
-import { Vine, AnyAll, All, Any, Leaf, Fill } from '@/woon';
+import { Vine, AnyAll, All, Any, Leaf, Fill, any } from '@/woon';
 
 type Props = {
   root : Vine,
@@ -105,9 +105,8 @@ const families = (root: Vine): (string | undefined)[][] => {
 
 export const Flow: React.FC<Props> = ({root, nodes, edges, dispatch, onNodeClick, onNodesChange }) => {
   const [reactFlowNodes, setReactFlowNodes] = useNodesState(nodes)
-  const [highlightedNodeId, setHighlightedNodeId] = useState<string | null>(null)
+  const [flowEdges, setFlowEdges] = useEdgesState(edges)
   const disj = families(root)
-  console.log("families", families(root))
 
   useEffect(() => {
     setReactFlowNodes(nodes)
@@ -116,6 +115,10 @@ export const Flow: React.FC<Props> = ({root, nodes, edges, dispatch, onNodeClick
   useEffect(() => {
     onNodesChange(reactFlowNodes)
   }, [reactFlowNodes, onNodesChange])
+
+  useEffect(() => {
+    setFlowEdges(edges)
+  }, [edges, setFlowEdges])
 
   const [highlightedNodeIds, setHighlightedNodeIds] = useState<Set<string>>(new Set())
 
@@ -160,11 +163,52 @@ export const Flow: React.FC<Props> = ({root, nodes, edges, dispatch, onNodeClick
         className: highlightedNodeIds.has(n.id) ? 'highlight' : ''
       }))
     )
-  }, [highlightedNodeIds, setReactFlowNodes])
+    setFlowEdges(prevEdges => {
+      let connectedEdges: Edge[] = []
+
+        if (highlightedNodeIds.size > 0){
+
+        const matchArrs = disj.filter(arr => (Array.from(highlightedNodeIds)).every(id => arr.includes(id)))
+        const matching = Array.from(new Set(matchArrs.flat()))
+        console.log("family match", matchArrs, highlightedNodeIds, matching)
+
+
+        let edg: Edge[] = []
+        matching.forEach((id) => {
+          edg = [
+            ...edg,
+            ...prevEdges.filter(edge => 
+              edge.source.includes(`${id}`) || 
+              edge.target.includes(`${id}`) || 
+              edge.id.includes(`${id}`)
+            )
+          ]
+        })
+        connectedEdges = [...connectedEdges, ...edg]
+      }
+
+      return prevEdges.map(edge => {
+        const isHighlighted = connectedEdges.some(connectedEdge => 
+          connectedEdge.id === edge.id
+        )
+
+        console.log("family edges", connectedEdges)
+
+        return {
+          ...edge,
+          style: {
+            ...edge.style,
+            stroke: isHighlighted ? 'lime' : 'black',
+          }
+        }
+      })
+    })
+
+  }, [highlightedNodeIds, setReactFlowNodes, setFlowEdges])
 
   return (
   <ReactFlowProvider>
-  <ReactFlow key={`rf-${root.id}`} nodes={reactFlowNodes} edges={edges} nodeTypes={nodeTypes} onNodeClick={handleNodeClick}>
+  <ReactFlow key={`rf-${root.id}`} nodes={reactFlowNodes} edges={flowEdges} nodeTypes={nodeTypes} onNodeClick={handleNodeClick}>
     <Controls />
   </ReactFlow>
   </ReactFlowProvider>

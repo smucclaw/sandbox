@@ -34,7 +34,7 @@ export const DocView: React.FC<Props> = ({ doc }) => {
     })
   
     setFlowNodes(updatedNodes)
-  
+
     const updatedEdges = flowEdges.map(edge => {
       const isHighlighted = nodeIds.some(id => 
         edge.source.includes(`${id}`) || edge.target.includes(`${id}`)
@@ -65,7 +65,7 @@ export const DocView: React.FC<Props> = ({ doc }) => {
         }
       })
     )
-  
+
     setFlowEdges(prevEdges => 
       prevEdges.map(edge => ({
         ...edge,
@@ -76,8 +76,8 @@ export const DocView: React.FC<Props> = ({ doc }) => {
       }))
     )
   }, [])
-  
- 
+
+
   console.log(`DocView: root`, root)
   console.log(`DocView: flowNodes`, flowNodes)
   console.log(`DocView: flowEdges`, flowEdges)
@@ -98,8 +98,7 @@ export const DocView: React.FC<Props> = ({ doc }) => {
       <h1>{doc.title}</h1>
 
       <div className="original">
-        <RenderOriginal key={`${doc.title}-showOriginal`} root={root} dispatch={dispatch} highlightFlowNodes={highlightFlowNodes} resetHighlight={resetHighlight} highlightedNodeId={highlightedNodeId}
- />
+        <RenderOriginal key={`${doc.title}-showOriginal`} root={root} dispatch={dispatch} highlightFlowNodes={highlightFlowNodes} resetHighlight={resetHighlight} highlightedNodeId={highlightedNodeId} />
       </div>
 
       <div style={{ width: '100%', height: '800px' }}>
@@ -211,7 +210,6 @@ const RenderNode: React.FC<{ node: Vine, dispatch: MyDispatch, highlightedNodeId
             const nodeIds = item
             .map(node => node.id)
             .filter((id): id is number => id !== undefined)
-            console.log("this Vine", item, nodeIds)
 
             const containsHighlightedNode = item.some(node => {
               return node.id == highlightedNodeId

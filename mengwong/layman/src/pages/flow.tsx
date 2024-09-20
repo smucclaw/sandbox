@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { ReactFlowProvider, useReactFlow } from 'reactflow';
 import ReactFlow, {
   MiniMap,
@@ -14,7 +14,7 @@ import ReactFlow, {
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { MyAction } from '@/pages/docview';
-import { Vine } from '@/woon';
+import { Vine, AnyAll, All, Any, Leaf, Fill } from '@/woon';
 
 type Props = {
   root : Vine,
@@ -90,12 +90,24 @@ const nodeTypes = {
   invisiHandles: InvisiHandles,
 };
 
+const families = (root: Vine): (string | undefined)[][] => {
+  const say = new Set(['or', 'either', 'whether']);
+  
+  const excludeFill0 = {
+    fParent: (s: Vine) => s instanceof All || s instanceof Any,
+    fChild: (p: Vine) =>
+      (p instanceof Fill && say.has(p.fill)) ||
+      (p instanceof Leaf && say.has(p.text))
+  }
 
-export const Flow: React.FC<Props> = ({ root, nodes, edges, dispatch, onNodeClick, onNodesChange }) => {
+  return (root.expand(excludeFill0).map(innerArray => innerArray.map(item => item.id?.toString())))
+}
+
+export const Flow: React.FC<Props> = ({root, nodes, edges, dispatch, onNodeClick, onNodesChange }) => {
   const [reactFlowNodes, setReactFlowNodes] = useNodesState(nodes)
   const [highlightedNodeId, setHighlightedNodeId] = useState<string | null>(null)
-
-  console.log('nodes:', nodes, root)
+  const disj = families(root)
+  console.log("families", families(root))
 
   useEffect(() => {
     setReactFlowNodes(nodes)
@@ -105,44 +117,54 @@ export const Flow: React.FC<Props> = ({ root, nodes, edges, dispatch, onNodeClic
     onNodesChange(reactFlowNodes)
   }, [reactFlowNodes, onNodesChange])
 
+  const [highlightedNodeIds, setHighlightedNodeIds] = useState<Set<string>>(new Set())
 
-  const [highlightedNodeIds, setHighlightedNodeIds] = useState<string[]>([])
-  const handleNodeClick = useCallback((event: React.MouseEvent, node: Node) => {
-    setReactFlowNodes(prevNodes => {
-      const highlightedNodesSet = new Set<string>(highlightedNodeIds)
-  
-      if (highlightedNodesSet.has(node.id)) {
-        highlightedNodesSet.delete(node.id)
-      } else {
-        highlightedNodesSet.add(node.id)
+  const handleNodeClick = useCallback(
+    (event: React.MouseEvent, node: Node) => {
+      const checkArrayExists = (disj: (string | undefined)[][], clicked: string[]): boolean => {
+        return disj.some((arr: (string | undefined)[]) => {
+          return clicked.every((id: string) => arr.includes(id))
+        })
       }
-  
-      const newHighlightedNodeIds = Array.from(highlightedNodesSet)
-  
-      const updatedNodes = prevNodes.map(n => ({
+      setHighlightedNodeIds(prevHighlighted => {
+        const newHighlighted = new Set(prevHighlighted)
+        const clickedArray = ([node.id, Array.from(newHighlighted)]).flat().map((id: string) => (id))
+        const matchingArrays = Array.from(new Set(disj.filter(arr => arr.includes(node.id)).flat()))
+        
+        if (!checkArrayExists(disj, clickedArray)) {
+          const idsToRemove = clickedArray.filter(id => !matchingArrays.includes(id))
+          console.log("remove", idsToRemove)
+          idsToRemove.forEach((id) =>{newHighlighted.delete(id)})
+          newHighlighted.add(node.id)
+        } else { 
+          if (newHighlighted.has(node.id)) {
+            newHighlighted.delete(node.id)
+          } else {
+            newHighlighted.add(node.id)
+          }}
+
+        return newHighlighted
+      })
+
+      if (onNodeClick) {
+        onNodeClick(node.id)
+      }
+    },
+    [onNodeClick]
+  )
+
+  useEffect(() => {
+    setReactFlowNodes(prevNodes => 
+      prevNodes.map(n => ({
         ...n,
-        className: newHighlightedNodeIds.includes(n.id) ? 'highlight' : ''
+        className: highlightedNodeIds.has(n.id) ? 'highlight' : ''
       }))
-  
-      return updatedNodes
-    })
-  
-    setHighlightedNodeIds(prev => {
-      const updatedSet = new Set(prev)
-      if (updatedSet.has(node.id)) {
-        updatedSet.delete(node.id)
-      } else {
-        updatedSet.add(node.id)
-      }
-      return Array.from(updatedSet)
-    })
-  
-    onNodeClick(node.id)
-  }, [highlightedNodeIds, onNodeClick, setReactFlowNodes])
-  
+    )
+  }, [highlightedNodeIds, setReactFlowNodes])
+
   return (
   <ReactFlowProvider>
-  <ReactFlow key={`rf-${root.id}`} nodes={reactFlowNodes} edges={edges} nodeTypes={nodeTypes}onNodeClick={handleNodeClick}>
+  <ReactFlow key={`rf-${root.id}`} nodes={reactFlowNodes} edges={edges} nodeTypes={nodeTypes} onNodeClick={handleNodeClick}>
     <Controls />
   </ReactFlow>
   </ReactFlowProvider>

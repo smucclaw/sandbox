@@ -1,3 +1,23 @@
 {
-  "extends": "next/core-web-vitals"
+  "parser": "@typescript-eslint/parser",
+  "extends": [
+    "eslint:recommended",
+    "plugin:react/recommended",
+    "plugin:@typescript-eslint/recommended",
+     "next/core-web-vitals"
+  ],
+  "plugins": ["@typescript-eslint", "react", "react-hooks"],
+  "rules": {
+    "no-constant-condition": "error", // infinite loops
+    "react-hooks/exhaustive-deps": "warn", // infinite loops
+    "no-unreachable": "error",
+    "no-loop-func": "error", // infinite loops
+    "@typescript-eslint/no-unused-vars": "warn",
+    "@typescript-eslint/no-explicit-any": "off"
+  },
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
+  }
 }

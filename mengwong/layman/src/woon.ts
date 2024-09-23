@@ -128,9 +128,13 @@ export class All extends AnyAll {
       // we calculate the latest x position as the maximum of the children's x positions and their width.
       // the y position for a new child is always 0 because we are stacking the children horizontally.
       // we pass these as the position argument to the next child.
-       const maxX = Math.max(...childFlowNodes.map(node => node.position.x + (node.style?.width as number) ?? 0), 0) // thanks, JS, max [] gives -Infinity wtf
+      //  const maxX = Math.max(...childFlowNodes.map(node => node.position.x + (node.style?.width as number) ?? 0), 0) // thanks, JS, max [] gives -Infinity wtf
+      // wrap 'as number' in ()
+      // so when node.style?.width is undefined, we use 0. otherwise it becomes undefined and never becomes 0
+       const maxX = Math.max(...childFlowNodes.map(node => (node.position.x + ((node.style?.width as number) ?? 0))), 0)
+
        const childNode = x.getFlowNodes({ x: maxX + xMargin, y: yMargin}, `${this.id}-group`); // bounding box left margin
-       childFlowNodes.push(...childNode);
+       childFlowNodes.push(...childNode)
     })
 
     console.log(`** All ${this.id} getFlowNodes done constructing childFlowNodes`, childFlowNodes);
@@ -223,8 +227,8 @@ export class Any extends AnyAll {
       // we calculate the latest y position as the maximum of the children's y positions and their height
       // the x position for a new child is always 0 (well, 20, for a left margin) because we are stacking the children vertically.
       // we pass these as the position argument to the next child.
-       const maxY = Math.max(...childFlowNodes.map(node => node.position.y + (node.style?.height as number) ?? 0), 0)
-       const childNode = x.getFlowNodes({ x: 0, y: maxY + 20}, `${this.id}-group`); // x=20, bounding box left margin
+      const maxY = Math.max(...childFlowNodes.map(node => node.position.y + ((node.style?.height as number) ?? 0)), 0)
+      const childNode = x.getFlowNodes({ x: 0, y: maxY + 20}, `${this.id}-group`); // x=20, bounding box left margin
        childFlowNodes.push(...childNode);
        console.log(`*** Any child: `, childNode)
     })
@@ -413,8 +417,11 @@ export class Not extends Vine {
         id: `${this.id}-out`,
         type: 'default',
         data: { label: `not` },
-        position: { x: Number(childFlowNodes[0].style?.width) || 99, y: (Number(childFlowNodes[0].style?.height) ?? 99) / 2 - 10 },
-        sourcePosition: Position.Right, targetPosition: Position.Left,
+        // use ?? instead of || so fallback is used when null/undefined
+        position: {
+          x: Number(childFlowNodes[0].style?.width ?? 99),
+          y: (Number(childFlowNodes[0].style?.height ?? 99) / 2) - 10
+        },        sourcePosition: Position.Right, targetPosition: Position.Left,
         style: {
           width: 5,
           height: 5,

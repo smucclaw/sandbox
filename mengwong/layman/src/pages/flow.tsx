@@ -22,7 +22,7 @@ type Props = {
   edges : Edge[],
   dispatch: React.Dispatch<MyAction>,
   onNodeClick: (nodeId: string) => void,
-  onNodesChange: (nodes: Node[]) => void
+  // onNodesChange: (nodes: Node[]) => void
 }
 
 // some infrastructure for a connector node with no visible body or handles
@@ -103,7 +103,7 @@ const families = (root: Vine): (string | undefined)[][] => {
   return (root.expand(excludeFill0).map(innerArray => innerArray.map(item => item.id?.toString())))
 }
 
-export const Flow: React.FC<Props> = ({root, nodes, edges, dispatch, onNodeClick, onNodesChange }) => {
+export const Flow: React.FC<Props> = ({root, nodes, edges, dispatch, onNodeClick }) => {
   const [reactFlowNodes, setReactFlowNodes] = useNodesState(nodes)
   const [flowEdges, setFlowEdges] = useEdgesState(edges)
   const disj = families(root)
@@ -112,9 +112,9 @@ export const Flow: React.FC<Props> = ({root, nodes, edges, dispatch, onNodeClick
     setReactFlowNodes(nodes)
   }, [nodes, setReactFlowNodes])
 
-  useEffect(() => {
-    onNodesChange(reactFlowNodes)
-  }, [reactFlowNodes, onNodesChange])
+  // useEffect(() => {
+  //   onNodesChange(reactFlowNodes)
+  // }, [reactFlowNodes, onNodesChange])
 
   useEffect(() => {
     setFlowEdges(edges)

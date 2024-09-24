@@ -22,7 +22,7 @@ type Props = {
   edges : Edge[],
   dispatch: React.Dispatch<MyAction>,
   onNodeClick: (nodeId: string) => void,
-  // onNodesChange: (nodes: Node[]) => void
+  onNodesChange: (nodes: Node[]) => void
 }
 
 // some infrastructure for a connector node with no visible body or handles
@@ -91,19 +91,20 @@ const nodeTypes = {
 };
 
 const families = (root: Vine): (string | undefined)[][] => {
-  const say = new Set(['or', 'either', 'whether']);
-  
-  const excludeFill0 = {
-    fParent: (s: Vine) => s instanceof All || s instanceof Any,
-    fChild: (p: Vine) =>
-      (p instanceof Fill && say.has(p.fill)) ||
-      (p instanceof Leaf && say.has(p.text))
+  const say = new Set(['or', 'either', 'whether'])
+
+  const excludeFill: { fParent: (s: Vine) => boolean; fChild: (p: Vine) => boolean } = {
+    fParent: (s: Vine) => s instanceof All || (s instanceof Any),
+    fChild: (p: Vine) => (p instanceof Fill && say.has(p.fill)) || (p instanceof Leaf && say.has(p.text))
   }
 
-  return (root.expand(excludeFill0).map(innerArray => innerArray.map(item => item.id?.toString())))
+  const expandedRoot = root.expand(excludeFill)
+  return expandedRoot.map(innerArray =>
+    innerArray.map(item => item.id?.toString())
+  )
 }
 
-export const Flow: React.FC<Props> = ({root, nodes, edges, dispatch, onNodeClick }) => {
+export const Flow: React.FC<Props> = ({root, nodes, edges, dispatch, onNodeClick, onNodesChange }) => {
   const [reactFlowNodes, setReactFlowNodes] = useNodesState(nodes)
   const [flowEdges, setFlowEdges] = useEdgesState(edges)
   const disj = families(root)
@@ -112,9 +113,9 @@ export const Flow: React.FC<Props> = ({root, nodes, edges, dispatch, onNodeClick
     setReactFlowNodes(nodes)
   }, [nodes, setReactFlowNodes])
 
-  // useEffect(() => {
-  //   onNodesChange(reactFlowNodes)
-  // }, [reactFlowNodes, onNodesChange])
+  useEffect(() => {
+    onNodesChange(reactFlowNodes)
+  }, [reactFlowNodes, onNodesChange])
 
   useEffect(() => {
     setFlowEdges(edges)
@@ -153,7 +154,7 @@ export const Flow: React.FC<Props> = ({root, nodes, edges, dispatch, onNodeClick
         onNodeClick(node.id)
       }
     },
-    [onNodeClick]
+    [onNodeClick, disj]
   )
 
   useEffect(() => {
@@ -208,7 +209,7 @@ export const Flow: React.FC<Props> = ({root, nodes, edges, dispatch, onNodeClick
 
   return (
   <ReactFlowProvider>
-  <ReactFlow key={`rf-${root.id}`} nodes={reactFlowNodes} edges={flowEdges} nodeTypes={nodeTypes} onNodeClick={handleNodeClick}>
+  <ReactFlow nodes={reactFlowNodes} edges={flowEdges} nodeTypes={nodeTypes} onNodeClick={handleNodeClick}>
     <Controls />
   </ReactFlow>
   </ReactFlowProvider>

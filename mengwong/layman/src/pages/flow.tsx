@@ -22,7 +22,8 @@ type Props = {
   edges : Edge[],
   dispatch: React.Dispatch<MyAction>,
   onNodeClick: (nodeId: string) => void,
-  onNodesChange: (nodes: Node[]) => void
+  onNodesChange: (nodes: Node[]) => void,
+  clickedNodes: (highlightedNodeIds: Set<string>) => void
 }
 
 // some infrastructure for a connector node with no visible body or handles
@@ -104,10 +105,10 @@ const families = (root: Vine): (string | undefined)[][] => {
   )
 }
 
-export const Flow: React.FC<Props> = ({root, nodes, edges, dispatch, onNodeClick, onNodesChange }) => {
+export const Flow: React.FC<Props> = ({root, nodes, edges, dispatch, onNodeClick, onNodesChange, clickedNodes }) => {
   const [reactFlowNodes, setReactFlowNodes] = useNodesState(nodes)
   const [flowEdges, setFlowEdges] = useEdgesState(edges)
-  const disj = families(root)
+  const disj = useMemo(() => families(root), [root])
 
   useEffect(() => {
     setReactFlowNodes(nodes)
@@ -130,82 +131,67 @@ export const Flow: React.FC<Props> = ({root, nodes, edges, dispatch, onNodeClick
           return clicked.every((id: string) => arr.includes(id))
         })
       }
+  
       setHighlightedNodeIds(prevHighlighted => {
         const newHighlighted = new Set(prevHighlighted)
-        const clickedArray = ([node.id, Array.from(newHighlighted)]).flat().map((id: string) => (id))
+        const clickedArray = [node.id, ...Array.from(newHighlighted)].flat()
         const matchingArrays = Array.from(new Set(disj.filter(arr => arr.includes(node.id)).flat()))
         
         if (!checkArrayExists(disj, clickedArray)) {
           const idsToRemove = clickedArray.filter(id => !matchingArrays.includes(id))
           console.log("remove", idsToRemove)
-          idsToRemove.forEach((id) =>{newHighlighted.delete(id)})
+          idsToRemove.forEach(id => newHighlighted.delete(id))
           newHighlighted.add(node.id)
-        } else { 
+        } else {
           if (newHighlighted.has(node.id)) {
             newHighlighted.delete(node.id)
           } else {
             newHighlighted.add(node.id)
-          }}
+          }
+        }
 
+        clickedNodes(newHighlighted)
+  
         return newHighlighted
       })
-
+  
       if (onNodeClick) {
         onNodeClick(node.id)
       }
     },
-    [onNodeClick, disj]
-  )
+    [onNodeClick, disj, clickedNodes]
+  )  
 
   useEffect(() => {
-    setReactFlowNodes(prevNodes => 
-      prevNodes.map(n => ({
+    setReactFlowNodes(prevNodes => {
+      const updatedNodes = prevNodes.map(n => ({
         ...n,
         className: highlightedNodeIds.has(n.id) ? 'highlight' : ''
       }))
-    )
+    
+      return JSON.stringify(prevNodes) !== JSON.stringify(updatedNodes) ? updatedNodes : prevNodes
+    })
+    
     setFlowEdges(prevEdges => {
-      let connectedEdges: Edge[] = []
-
-        if (highlightedNodeIds.size > 0){
-
-        const matchArrs = disj.filter(arr => (Array.from(highlightedNodeIds)).every(id => arr.includes(id)))
-        const matching = Array.from(new Set(matchArrs.flat()))
-        console.log("family match", matchArrs, highlightedNodeIds, matching)
-
-
-        let edg: Edge[] = []
-        matching.forEach((id) => {
-          edg = [
-            ...edg,
-            ...prevEdges.filter(edge => 
-              edge.source.includes(`${id}`) || 
-              edge.target.includes(`${id}`) || 
-              edge.id.includes(`${id}`)
-            )
-          ]
-        })
-        connectedEdges = [...connectedEdges, ...edg]
-      }
-
-      return prevEdges.map(edge => {
-        const isHighlighted = connectedEdges.some(connectedEdge => 
-          connectedEdge.id === edge.id
-        )
-
-        console.log("family edges", connectedEdges)
-
-        return {
-          ...edge,
-          style: {
-            ...edge.style,
-            stroke: isHighlighted ? 'lime' : 'black',
-          }
-        }
+      const connectedEdges = prevEdges.filter(edge => {
+        const isHighlighted = highlightedNodeIds.has(edge.source) || highlightedNodeIds.has(edge.target)
+        return isHighlighted
       })
+    
+      const updatedEdges = prevEdges.map(edge => ({
+        ...edge,
+        style: {
+          ...edge.style,
+          stroke: connectedEdges.some(connectedEdge => connectedEdge.id === edge.id) ? 'lime' : 'black',
+        }
+      }))
+    
+      return JSON.stringify(prevEdges) !== JSON.stringify(updatedEdges) ? updatedEdges : prevEdges
     })
 
-  }, [highlightedNodeIds, setReactFlowNodes, setFlowEdges])
+    clickedNodes(highlightedNodeIds)
+
+  }, [highlightedNodeIds,setReactFlowNodes, setFlowEdges, clickedNodes])
 
   return (
   <ReactFlowProvider>

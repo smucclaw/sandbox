@@ -1,8 +1,8 @@
-import React, { useState, useReducer, useCallback } from 'react';
+import React, { useState, useReducer, useCallback, useRef, useMemo } from 'react';
 import { Vine, AnyAll, Any, All, Leaf, Fill, HideShow, any, all, ele, say, com } from '@/woon';
 import Flow from '@/pages/flow';
 import _ from 'lodash';
-import {Node} from 'reactflow';
+import {Node, Edge} from 'reactflow';
 
 export const DocView: React.FC<Props> = ({ doc }) => {
   const init = (initialContent:Vine) => initialContent.clone(); // Initialize with a deep copy to avoid mutations
@@ -15,73 +15,91 @@ export const DocView: React.FC<Props> = ({ doc }) => {
   const [flowEdges, setFlowEdges] = useState(root.getFlowEdges())
 
   const [highlightedNodeId, setHighlightedNodeId] = useState<string | null>(null)
+  const [highlightedNodeIds, setHighlightedNodeIds] = useState<Set<string>>(new Set())
+  
   const handleNodeClick = useCallback((nodeId: string) => {
     setHighlightedNodeId(prevId => prevId === nodeId ? null : nodeId)
   }, [])
   
-  const handleNodesChange = useCallback((updatedNodes: Node[]) => {setFlowNodes(updatedNodes)}, [])
-  const highlightFlowNodes = useCallback((nodeIds: number[]) => {
-    console.log("flowNodes before highlighting", flowNodes)
-    const updatedNodes = flowNodes.map(node => {
-      if (node.type === `invisiHandles`) {
-        const isHighlighted = nodeIds.includes(parseInt(node.id))
-        const newClassName = isHighlighted ? 'highlight' : node.className
-        if (node.className !== newClassName) {
-          return { ...node, className: newClassName }
-        }
-      }
-      return node
-    })
-      
-    setFlowNodes(updatedNodes)
-
-    const updatedEdges = flowEdges.map(edge => {
-      const isHighlighted = nodeIds.some(id => 
-        edge.source.includes(`${id}`) || edge.target.includes(`${id}`)
+  const handleNodesChange = useCallback((updatedNodes: Node[]) => {
+    setFlowNodes(prevNodes => {
+      const hasChanges = updatedNodes.some((node, index) => 
+        JSON.stringify(node) !== JSON.stringify(prevNodes[index])
       )
-      return {
-        ...edge,
-        style: {
-          ...edge.style,
-          stroke: isHighlighted ? 'lime' : 'black',
-        }
-      }
+      return hasChanges ? updatedNodes : prevNodes
     })
-    setFlowEdges(updatedEdges)
-  }, [flowNodes, flowEdges])
+  }, [])
 
-  const resetHighlight = useCallback(() => {
-    setFlowNodes(prevNodes =>
-      prevNodes.map(node => {
-        if (node.type === `default`) {
-          return {
-            ...node,
-            className: node.className?.includes('highlight') ? 'highlight' : ''
+  const clickedNodesRef = useRef<Set<string>>(new Set())
+  const handleClickedNodes = useCallback((newHighlightedNodeIds: Set<string>) => {
+    setHighlightedNodeIds(newHighlightedNodeIds)
+    clickedNodesRef.current = newHighlightedNodeIds
+  }, [])
+
+  React.useEffect(() => {
+    setFlowEdges(root.getFlowEdges())
+  }, [root])
+
+
+  const highlightTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const highlightFlowNodes = useCallback((nodeIds: number[]) => {
+    if (highlightTimeoutRef.current) {
+      clearTimeout(highlightTimeoutRef.current)
+    }
+
+    highlightTimeoutRef.current = setTimeout(() => {
+      console.log("clicked", clickedNodesRef)
+      setFlowNodes(prevNodes => prevNodes.map(node => {
+        if (node.type === 'invisiHandles') {
+          const isHighlighted = nodeIds.includes(parseInt(node.id))
+          return { ...node, className: isHighlighted ? 'highlight' : node.className }
+        } else if (node.type === 'default') {
+          const isClicked = clickedNodesRef.current.has(node.id)
+         }
+        return node
+      }))
+
+      setFlowEdges(prevEdges => prevEdges.map(edge => {
+        const isHighlighted = nodeIds.some(id => 
+          edge.source.includes(`${id}`) || edge.target.includes(`${id}`)
+        )
+        return {
+          ...edge,
+          style: {
+            ...edge.style,
+            stroke: isHighlighted ? 'lime' : 'black',
           }
         }
-        return {
-          ...node,
-          className: ''
-        }
-      })
-    )
+      }))
+    }, 50) // debounce
+  }, [])
 
-    setFlowEdges(prevEdges => 
-      prevEdges.map(edge => ({
+  const resetHighlight = useCallback(() => {
+    if (highlightTimeoutRef.current) {
+      clearTimeout(highlightTimeoutRef.current)
+    }
+
+    highlightTimeoutRef.current = setTimeout(() => {
+      setFlowNodes(prevNodes => prevNodes.map(node => ({
+        ...node,
+        className: node.type === 'default' && node.className?.includes('highlight') ? 'highlight' : ''
+      })));
+
+      setFlowEdges(prevEdges => prevEdges.map(edge => ({
         ...edge,
         style: {
           ...edge.style,
           stroke: 'black'
         }
-      }))
-    )
+      })))
+    }, 50) // add debounce
   }, [])
 
 
   console.log(`DocView: root`, root)
   console.log(`DocView: flowNodes`, flowNodes)
   console.log(`DocView: flowEdges`, flowEdges)
-  // console.log(`DocView: root`, root)
   // <textarea className="vineEditor" value={JSON.stringify(root, null, 2)} readOnly />
   const [textareaValue, setTextareaValue] = useState(doc.source == undefined ? "TBD" : doc.source);
 
@@ -102,7 +120,7 @@ export const DocView: React.FC<Props> = ({ doc }) => {
       </div>
 
       <div style={{ width: '100%', height: '800px' }}>
-        <Flow root={root} nodes={flowNodes} edges={flowEdges} dispatch={dispatch} onNodeClick={handleNodeClick} onNodesChange={handleNodesChange} />
+        <Flow root={root} nodes={flowNodes} edges={flowEdges} dispatch={dispatch} onNodeClick={handleNodeClick} onNodesChange={handleNodesChange} clickedNodes={handleClickedNodes} />
       </div>
 
       <RenderVine root={root} dispatch={dispatch} highlightFlowNodes={highlightFlowNodes} resetHighlight={resetHighlight} highlightedNodeId={highlightedNodeId} />

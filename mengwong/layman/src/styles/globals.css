@@ -154,5 +154,8 @@ em {
 
 .highlight {
   background-color: lime !important;
-  stroke: green !important;
+}
+
+.light-highlight {
+  background-color: rgb(137, 189, 137) !important;
 }

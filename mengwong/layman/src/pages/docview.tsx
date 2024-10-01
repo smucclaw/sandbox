@@ -51,11 +51,14 @@ export const DocView: React.FC<Props> = ({ doc }) => {
     highlightTimeoutRef.current = setTimeout(() => {
       console.log("clicked", clickedNodesRef)
       setFlowNodes(prevNodes => prevNodes.map(node => {
+        const isHighlighted = nodeIds.includes(parseInt(node.id))
         if (node.type === 'invisiHandles') {
-          const isHighlighted = nodeIds.includes(parseInt(node.id))
-          return { ...node, className: isHighlighted ? 'highlight' : node.className }
+          return { ...node, className: isHighlighted ? 'highlight' : '' }
         } else if (node.type === 'default') {
-          const isClicked = clickedNodesRef.current.has(node.id)
+          const notClicked = !clickedNodesRef.current.has(node.id)
+          if (notClicked) {
+            return { ...node, className: isHighlighted? 'light-highlight' : ''}
+          }
          }
         return node
       }))
@@ -83,7 +86,7 @@ export const DocView: React.FC<Props> = ({ doc }) => {
     highlightTimeoutRef.current = setTimeout(() => {
       setFlowNodes(prevNodes => prevNodes.map(node => ({
         ...node,
-        className: node.type === 'default' && node.className?.includes('highlight') ? 'highlight' : ''
+        className: node.type === 'default' && clickedNodesRef.current.has(node.id) ? 'highlight' : ''
       })));
 
       setFlowEdges(prevEdges => prevEdges.map(edge => ({

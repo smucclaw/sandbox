@@ -33,7 +33,7 @@ export const DocView: React.FC<Props> = ({ doc }) => {
   const clickedNodesRef = useRef<Set<string>>(new Set())
   const handleClickedNodes = useCallback((newHighlightedNodeIds: Set<string>) => {
     setHighlightedNodeIds(newHighlightedNodeIds)
-    clickedNodesRef.current = newHighlightedNodeIds
+    clickedNodesRef = newHighlightedNodeIds
   }, [])
 
   React.useEffect(() => {
@@ -49,17 +49,22 @@ export const DocView: React.FC<Props> = ({ doc }) => {
     }
 
     highlightTimeoutRef.current = setTimeout(() => {
-      console.log("clicked", clickedNodesRef)
+      console.log("clicked", clickedNodesRef.current)
       setFlowNodes(prevNodes => prevNodes.map(node => {
         const isHighlighted = nodeIds.includes(parseInt(node.id))
+        const isClicked = clickedNodesRef.current.has(node.id)
+
         if (node.type === 'invisiHandles') {
           return { ...node, className: isHighlighted ? 'highlight' : '' }
-        } else if (node.type === 'default') {
-          const notClicked = !clickedNodesRef.current.has(node.id)
-          if (notClicked) {
-            return { ...node, className: isHighlighted? 'light-highlight' : ''}
+        }
+
+        if (node.type === 'default') {
+          if (isClicked) {
+            return { ...node, className: isHighlighted ? 'highlight' : 'nopath-highlight' }
           }
-         }
+          return { ...node, className: isHighlighted ? 'light-highlight' : '' }
+        }
+
         return node
       }))
 

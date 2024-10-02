@@ -157,5 +157,9 @@ em {
 }
 
 .light-highlight {
-  background-color: rgb(137, 189, 137) !important;
+  background-color: rgb(189, 255, 189) !important;
+}
+
+.nopath-highlight {
+  background-color: red !important;
 }

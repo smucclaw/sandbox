@@ -715,3 +715,138 @@ const with_a_bit_less_unnecessary_ink_on_the_screen =
       OR  (colonies) => settled in the qualifying territory in which the person is born
 
 `
+
+
+export const title_covered_1_2 =
+  any(
+    all(
+        ele('the Title being vested other than as stated in Schedule A'),
+    ),
+    say('or'),
+    any(
+      all(
+	  ele('any defect in'),
+	  any(
+	      ele('lien'),
+	      say('or'),
+	      ele('encumbrance on the title')
+	  )
+      ),
+      say('or'),
+      all(
+	  ele('a defect in the Title caused by'),
+	  any(
+	      ele('forgery'),
+	      say('or'),
+	      ele('fraud'),
+	      say('or'),
+	      ele('undue influence'),
+	      say('or'),
+	      ele('duress'),
+	      say('or'),
+	      ele('incompetency'),
+	      say('or'),
+	      ele('incapacity'),
+	      say('or'),
+	      ele('impersonation')
+	  )
+      ),
+      say('or'),
+      all(say('the failure of a',
+	      any(
+		ele('person'),
+		say('or'),
+		ele('entity')),
+	      say('to have authorized a'),
+	      any(ele('transfer'),
+		  say('or'),
+		  ele('conveyance')
+		 ))),
+      any(
+	say('a document affecting the Title not properly'),
+	ele('authorized'),
+	say('or'),
+	ele('created'),
+	say('or'),
+	ele('executed'),
+	say('or'),
+	ele('witnessed'),
+	say('or'),
+	ele('sealed'),
+	say('or'),
+	ele('acknowledged'),
+	say('or'),
+	ele('notarized'),
+	say('or'),
+	ele('notarized by remote online notarization'),
+	say('or'),
+	ele('delivered')
+      ),
+    
+      ele('a failure to perform those acts necessary to create a document by electronic means authorized by law'),
+
+      all(
+	say('a document executed under a'),
+	any(ele('falsified'),
+	    ele('expired'),
+	    say('or'),
+	    ele('otherwise invalid')),
+	say(' power of attorney')
+      ),
+      say('or'),
+
+      any(
+	all(
+	  say('a document not properly'),
+	  any(
+	    ele('filed'),
+	    ele('recorded'),
+	    say('or'),
+	    ele('indexed')
+	  )
+	),
+	say('or'),
+	
+	ele('the failure to have performed those acts by electronic means authorized by law')
+      ),
+
+      any(
+	ele('a defective judicial proceeding'),
+	say('or'),
+	ele('administrative proceeding')
+      ),
+
+      say('or'),
+
+      ele('the repudiation of an electronic signature by a person who executed a document because the electronic signature on the document was not valid under applicable electronic transactions law')
+    ),
+    say('or'),
+    any(
+        ele('the lien of real estate taxes'),
+        say('or'),
+        ele('assessments imposed on the Title by a governmental authority due or payable but unpaid')
+    ),
+    say('or'),
+    all(
+      any(
+	ele('an encumbrance'),
+	ele('violation'),
+	say('or'),
+	ele('variation'),
+	say('or'),
+	ele('adverse circumstance'),
+	say('or'),
+	ele('boundary line overlap'),
+	say('or'),
+	ele('encroachment'),
+	say('or'),
+	ele('encroachment of an improvement across the boundary lines of the Land')
+      ),
+      say('if'),
+      ele('the Aforesaid would have been disclosed by an accurate and complete land title survey of the Land')
+    )
+  )
+
+
+
+    

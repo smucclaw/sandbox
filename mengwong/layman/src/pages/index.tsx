@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Vine, Any, All, Leaf, Fill, HideShow,
          narnia, mustSing, cheating, laymanS, abcde, abcde_text, marijuana,
-	 bna1981_1_1, bna1981_1_1_text,
+	 bna1981_1_1, bna1981_1_1_text, title_covered_1_2
        } from '@/woon';
 import { DocView, Document } from '@/pages/docview';
 import { EssayContent1 } from '@/pages/essay';
@@ -15,6 +15,7 @@ const App: React.FC = () => {
     { id: "abcde",     title: 'ABCDE example',                      content: abcde, source: abcde_text },
     { id: "marijuana",   title: 'section 420',                      content: marijuana },
     { id: "bna1981_1_1", title: 'BNA S1: a person is a British citizen if ...',       content: bna1981_1_1, source:bna1981_1_1_text },
+    { id: "title_covered_1_2", title: 'title insurance covered parts 1 and 2',       content: title_covered_1_2 },
     ]);
   const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
 

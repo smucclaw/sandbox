@@ -28,13 +28,7 @@ DECLARE Gathering HAS
         MEANS NOT `takes place indoors`
     `venue kind`                                                               IS A VenueKind
         MEANS IF `takes place indoors` THEN Indoor ELSE Outdoor
-    `takes place at a private dwelling`                                        IS A BOOLEAN
-    `takes place in the open air`                                              IS A BOOLEAN
-    `takes place at a workplace`                                               IS A BOOLEAN
-    `takes place on a construction or other working site`                      IS A BOOLEAN
-    `the workplace or site is excepted under this Order`                       IS A BOOLEAN
     `is a school group of pupils and staff at school premises`                 IS A BOOLEAN
-    `is for education provided by a school college university or other institution` IS A BOOLEAN
     `is a wedding, civil partnership ceremony or funeral`                      IS A BOOLEAN
     `ceremony officers role`                                                   IS A CeremonyOfficersRole
     `number of ceremony officers`                                              IS A NUMBER
@@ -42,12 +36,22 @@ DECLARE Gathering HAS
     `total of officers and guests`                                             IS A NUMBER
         MEANS `number of ceremony officers` PLUS `number of guests`
     `is for the purposes of work`                                              IS A BOOLEAN
-    `is a controlled gathering`                                                IS A BOOLEAN
-    `takes place wholly or partly during the Christmas period`                 IS A BOOLEAN
+-- NB: as FIRST ENACTED, Art.3 was a flat 10-person cap at "any premises", with no
+-- indoor/outdoor distinction and no private-dwelling, open-air, workplace,
+-- construction-site, education, controlled-gathering or Christmas-period concepts.
+-- Those arrive with the later amendments; they are fields of the Gathering record in
+-- GCO-as-at-20210115.l4 and GCO-as-repealed.l4, and are deliberately absent here.
+
+-- Art.7 has its OWN subject: the publicly accessible premises, not the gathering
+-- of Art.3. Keeping it a separate record (as in GCO-as-repealed.l4 and
+-- GCO-as-at-20210115.l4) keeps the parallel skeleton aligned, and keeps the Art.7
+-- headcount ("persons gathering in the indoor areas") distinct from the Art.3
+-- headcount ("persons taking part"), which is a different number of a different thing.
+DECLARE PubliclyAccessiblePremisesGathering HAS
+    `number of persons gathering in the indoor areas`                          IS A NUMBER
     `premises are publicly accessible`                                         IS A BOOLEAN
     `the person is responsible for the premises`                               IS A BOOLEAN
     `the person allowed the gathering`                                         IS A BOOLEAN
-    `number of persons gathering in indoor publicly accessible areas`             IS A NUMBER
 
 DECLARE Participant HAS
     `name`                                                                     IS A STRING
@@ -61,9 +65,12 @@ DECLARE ResponsiblePerson HAS
     `fails to prevent the gathering by reason of force majeure as a holiday industrial tour guide` IS A BOOLEAN
         MEANS `is an official from Visit Jersey escorting a pre-arranged automotive tour of the island for news and travel journalists who are guests of the Jersey Government`
 
-DECLARE GatheringSituation HAS
+DECLARE Article3Situation HAS
     gathering                                                                  IS A Gathering
     participant                                                                IS A Participant
+
+DECLARE Article7Situation HAS
+    gathering                                                                  IS A PubliclyAccessiblePremisesGathering
     responsible                                                                IS A ResponsiblePerson
 
 §§ `3 Restriction on gatherings - as first enacted`

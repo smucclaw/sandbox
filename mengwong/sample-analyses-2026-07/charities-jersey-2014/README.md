@@ -93,13 +93,13 @@ and, one level down, limb (a):
         "(a) a contravention, by a registered charity or by any of its governors, of a provision -"
     ... m's `the actor is the registered charity or one of its governors`
     AND     "(i) of this Law, or of any enactment under this Law,"
-        ..  m's `(a)(i) contravention of a provision of this Law, or of any enactment under this Law`
-        ..  "(ii) of the constitution of the registered charity, or of the constitutional Law of the charity,"
-        ..  m's `(a)(ii) contravention of a provision of the constitution of the registered charity, ...`
+        ..  m's `(a)(i) contravention of a provision of this Law ...`
+        ..  "(ii) of the constitution of the registered charity, ..."
+        ..  m's `(a)(ii) contravention of ... the constitution of the charity ...`
         ..  "(iii) of a required steps notice, or"
         ..  m's `(a)(iii) contravention of a provision of a required steps notice`
-        ..  "(iv) of an order of the court under this Law or under the constitutional Law of the charity, ..."
-        ..  m's `(a)(iv) contravention of a provision of an order of the court under this Law ...`
+        ..  "(iv) of an order of the court under this Law ..."
+        ..  m's `(a)(iv) contravention of ... an order of the court ...`
 ```
 
 Read down the left margin and you are reading Article 2(10)(a). The quoted lines are the Act. The lines
@@ -356,9 +356,9 @@ a purpose that *would* fall within head (b) (education), *is* pleaded as merely 
 excluded:
 
 ```l4
-#ASSERT `falls within a head of Article 6(1)` `campaigning ... (pleaded as merely incidental)`   -- it would...
-#ASSERT NOT `is a charitable purpose` `campaigning ... (pleaded as merely incidental)`           -- gate 1 shut
-#ASSERT NOT `is a purpose purely ancillary or incidental to a charitable purpose` `campaigning ...`  -- gate 2 shut
+#ASSERT `falls within a head of Article 6(1)` `campaigning ...`      -- it WOULD fall within (b)...
+#ASSERT NOT `is a charitable purpose` `campaigning ...`              -- ...but gate 1 is shut
+#ASSERT NOT `is a purpose purely ancillary ...` `campaigning ...`    -- ...and gate 2 is shut
 ```
 
 Whoever drafted 6(5) had thought about the evasion. It is nice to be able to *show* that.
@@ -531,9 +531,9 @@ explicitly, as a conjunct, and flag it:
 
 ```l4
 `Article 18(4)(a) — ... mentioned in Article 2(10)` g MEANS
-        "(a) the governor contravenes a provision, or commits an offence, mentioned in Article 2(10);"
+        "(a) the governor contravenes a provision, or commits an offence, mentioned in Art 2(10);"
     ... `is misconduct` (g's `the Article 2(10) allegation`)
-    AND ... g's `the governor is the person who contravened the provision or committed the offence`
+    AND ... g's `the governor is the person who contravened or committed the offence`
 ```
 
 Both cases are tested — the outsider's fraud (not attributed) and the governor's own fraud (attributed).
